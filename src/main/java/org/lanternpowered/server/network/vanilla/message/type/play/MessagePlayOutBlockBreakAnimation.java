@@ -1,0 +1,54 @@
+package org.lanternpowered.server.network.vanilla.message.type.play;
+
+import org.lanternpowered.server.network.message.Message;
+
+import com.flowpowered.math.vector.Vector3i;
+
+public final class MessagePlayOutBlockBreakAnimation implements Message {
+
+    private final Vector3i position;
+    private final int state;
+    private final int id;
+
+    /**
+     * Creates a new block break animation message. The id must be unique for
+     * every break animation and the state must be between 0-9 in order to
+     * create/update the animation, and any other value will remove it.
+     * 
+     * @param position the position
+     * @param id the id
+     * @param state the state
+     */
+    public MessagePlayOutBlockBreakAnimation(Vector3i position, int id, int state) {
+        this.position = position;
+        this.state = state;
+        this.id = id;
+    }
+
+    /**
+     * Gets the position of the block animation.
+     * 
+     * @return the position
+     */
+    public Vector3i getPosition() {
+        return this.position;
+    }
+
+    /**
+     * Gets the id of the block animation.
+     * 
+     * @return the id
+     */
+    public int getId() {
+        return this.id;
+    }
+
+    /**
+     * Gets the state of the block animation.
+     * 
+     * @return the state
+     */
+    public int getState() {
+        return this.state;
+    }
+}

@@ -69,7 +69,7 @@ public class AtomicByteArray implements Serializable {
             int value = 0;
             for (int j = 0; j < PACKED_VALUES; j++) {
                 int k = i + j;
-                if (k >= initialContent.length || k > length) {
+                if (k >= initialContent.length || k >= length) {
                     flag = true;
                     break;
                 }

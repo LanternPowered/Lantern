@@ -18,7 +18,7 @@ import org.lanternpowered.server.network.message.codec.object.serializer.SimpleO
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
-public class SimpleChannelBuf implements ChannelBuf {
+public class LanternChannelBuf implements ChannelBuf {
 
     /**
      * A object serializer context specific for the sponge channel buffer.
@@ -39,9 +39,9 @@ public class SimpleChannelBuf implements ChannelBuf {
     private final ByteBuf buf;
 
     @Nullable
-    private SimpleChannelBuf opposite;
+    private LanternChannelBuf opposite;
 
-    public SimpleChannelBuf(ByteBuf buf) {
+    public LanternChannelBuf(ByteBuf buf) {
         this.buf = buf;
     }
 
@@ -56,12 +56,12 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf order(ByteOrder order) {
+    public LanternChannelBuf order(ByteOrder order) {
         if (this.buf.order().equals(order)) {
             return this;
         } else {
             if (this.opposite == null) {
-                this.opposite = new SimpleChannelBuf(this.buf.order(order));
+                this.opposite = new LanternChannelBuf(this.buf.order(order));
                 this.opposite.opposite = this;
             }
             return this.opposite;
@@ -79,7 +79,7 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf setReadIndex(int index) {
+    public LanternChannelBuf setReadIndex(int index) {
         this.buf.readerIndex(index);
         return this;
     }
@@ -90,55 +90,55 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf setWriteIndex(int index) {
+    public LanternChannelBuf setWriteIndex(int index) {
         this.buf.writerIndex(index);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setIndex(int readIndex, int writeIndex) {
+    public LanternChannelBuf setIndex(int readIndex, int writeIndex) {
         this.buf.setIndex(readIndex, writeIndex);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf clear() {
+    public LanternChannelBuf clear() {
         this.buf.clear();
         return this;
     }
 
     @Override
-    public SimpleChannelBuf markRead() {
+    public LanternChannelBuf markRead() {
         this.buf.markReaderIndex();
         return this;
     }
 
     @Override
-    public SimpleChannelBuf markWrite() {
+    public LanternChannelBuf markWrite() {
         this.buf.markWriterIndex();
         return this;
     }
 
     @Override
-    public SimpleChannelBuf resetRead() {
+    public LanternChannelBuf resetRead() {
         this.buf.resetReaderIndex();
         return this;
     }
 
     @Override
-    public SimpleChannelBuf resetWrite() {
+    public LanternChannelBuf resetWrite() {
         this.buf.resetWriterIndex();
         return this;
     }
 
     @Override
-    public SimpleChannelBuf slice() {
-        return new SimpleChannelBuf(this.buf.slice());
+    public LanternChannelBuf slice() {
+        return new LanternChannelBuf(this.buf.slice());
     }
 
     @Override
-    public SimpleChannelBuf slice(int index, int length) {
-        return new SimpleChannelBuf(this.buf.slice(index, length));
+    public LanternChannelBuf slice(int index, int length) {
+        return new LanternChannelBuf(this.buf.slice(index, length));
     }
 
     @Override
@@ -147,13 +147,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeBoolean(boolean data) {
+    public LanternChannelBuf writeBoolean(boolean data) {
         this.buf.writeBoolean(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setBoolean(int index, boolean data) {
+    public LanternChannelBuf setBoolean(int index, boolean data) {
         this.buf.setBoolean(index, data);
         return this;
     }
@@ -169,13 +169,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeByte(byte data) {
+    public LanternChannelBuf writeByte(byte data) {
         this.buf.writeByte(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setByte(int index, byte data) {
+    public LanternChannelBuf setByte(int index, byte data) {
         this.buf.setByte(index, data);
         return this;
     }
@@ -191,13 +191,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeShort(short data) {
+    public LanternChannelBuf writeShort(short data) {
         this.buf.writeShort(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setShort(int index, short data) {
+    public LanternChannelBuf setShort(int index, short data) {
         this.buf.setShort(index, data);
         return this;
     }
@@ -213,13 +213,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeChar(char data) {
+    public LanternChannelBuf writeChar(char data) {
         this.buf.writeChar(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setChar(int index, char data) {
+    public LanternChannelBuf setChar(int index, char data) {
         this.buf.setChar(index, data);
         return this;
     }
@@ -235,13 +235,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeInteger(int data) {
+    public LanternChannelBuf writeInteger(int data) {
         this.buf.writeInt(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setInteger(int index, int data) {
+    public LanternChannelBuf setInteger(int index, int data) {
         this.buf.setInt(index, data);
         return this;
     }
@@ -257,13 +257,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeLong(long data) {
+    public LanternChannelBuf writeLong(long data) {
         this.buf.writeLong(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setLong(int index, long data) {
+    public LanternChannelBuf setLong(int index, long data) {
         this.buf.setLong(index, data);
         return this;
     }
@@ -279,13 +279,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeFloat(float data) {
+    public LanternChannelBuf writeFloat(float data) {
         this.buf.writeFloat(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setFloat(int index, float data) {
+    public LanternChannelBuf setFloat(int index, float data) {
         this.buf.setFloat(index, data);
         return this;
     }
@@ -301,13 +301,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeDouble(double data) {
+    public LanternChannelBuf writeDouble(double data) {
         this.buf.writeDouble(data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setDouble(int index, double data) {
+    public LanternChannelBuf setDouble(int index, double data) {
         this.buf.setDouble(index, data);
         return this;
     }
@@ -323,13 +323,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeString(String data) {
+    public LanternChannelBuf writeString(String data) {
         CONTEXT.write(this.buf, String.class, data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setString(int index, String data) {
+    public LanternChannelBuf setString(int index, String data) {
         CONTEXT.writeAt(this.buf, index, String.class, data);
         return this;
     }
@@ -345,13 +345,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeUuid(UUID data) {
+    public LanternChannelBuf writeUuid(UUID data) {
         CONTEXT.write(this.buf, UUID.class, data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setUuid(int index, UUID data) {
+    public LanternChannelBuf setUuid(int index, UUID data) {
         CONTEXT.writeAt(this.buf, index, UUID.class, data);
         return this;
     }
@@ -367,13 +367,13 @@ public class SimpleChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public SimpleChannelBuf writeDataView(DataView data) {
+    public LanternChannelBuf writeDataView(DataView data) {
         CONTEXT.write(this.buf, DataView.class, data);
         return this;
     }
 
     @Override
-    public SimpleChannelBuf setDataView(int index, DataView data) {
+    public LanternChannelBuf setDataView(int index, DataView data) {
         CONTEXT.writeAt(this.buf, index, DataView.class, data);
         return this;
     }

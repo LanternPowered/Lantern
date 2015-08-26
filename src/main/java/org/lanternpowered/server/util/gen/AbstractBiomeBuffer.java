@@ -1,0 +1,79 @@
+package org.lanternpowered.server.util.gen;
+
+import com.flowpowered.math.vector.Vector2i;
+import com.google.common.base.MoreObjects;
+
+import org.lanternpowered.server.util.VecHelper;
+import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.extent.BiomeArea;
+import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.StorageType;
+
+/**
+ * Base class for biome areas. This class provides methods for retrieving the
+ * size and for range checking.
+ */
+@NonnullByDefault
+public abstract class AbstractBiomeBuffer implements BiomeArea {
+
+    protected Vector2i start;
+    protected Vector2i size;
+    protected Vector2i end;
+    private final int xLine;
+
+    protected AbstractBiomeBuffer(Vector2i start, Vector2i size) {
+        this.start = start;
+        this.size = size;
+        this.end = this.start.add(this.size).sub(Vector2i.ONE);
+        this.xLine = size.getX();
+    }
+
+    protected final void checkRange(int x, int z) {
+        if (!VecHelper.inBounds(x, z, this.start, this.end)) {
+            throw new PositionOutOfBoundsException(new Vector2i(x, z), this.start, this.end);
+        }
+    }
+
+    protected int getIndex(int x, int y) {
+        return (y - this.start.getY()) * this.xLine + (x - this.start.getX());
+    }
+
+    @Override
+    public Vector2i getBiomeMin() {
+        return this.start;
+    }
+
+    @Override
+    public Vector2i getBiomeMax() {
+        return this.end;
+    }
+
+    @Override
+    public Vector2i getBiomeSize() {
+        return this.size;
+    }
+
+    @Override
+    public boolean containsBiome(Vector2i position) {
+        return this.containsBiome(position.getX(), position.getY());
+    }
+
+    @Override
+    public boolean containsBiome(int x, int z) {
+        return VecHelper.inBounds(x, z, this.start, this.end);
+    }
+
+    @Override
+    public MutableBiomeArea getBiomeCopy() {
+        return this.getBiomeCopy(StorageType.STANDARD);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+            .add("min", this.getBiomeMin())
+            .add("max", this.getBiomeMax())
+            .toString();
+    }
+}

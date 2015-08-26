@@ -10,7 +10,7 @@ import javax.annotation.Nullable;
 
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.network.ChannelListener;
 import org.spongepowered.api.network.ChannelRegistrar;
@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class SimpleChannelRegistrar implements ChannelRegistrar {
+public class LanternChannelRegistrar implements ChannelRegistrar {
 
     private final Map<String, RegisteredChannel> channels = Maps.newConcurrentMap();
-    private final Game game;
+    private final Server server;
 
     public static class RegisteredChannel {
 
@@ -51,8 +51,8 @@ public class SimpleChannelRegistrar implements ChannelRegistrar {
         }
     }
 
-    public SimpleChannelRegistrar(Game game) {
-        this.game = game;
+    public LanternChannelRegistrar(Server server) {
+        this.server = server;
     }
 
     @Override
@@ -65,7 +65,7 @@ public class SimpleChannelRegistrar implements ChannelRegistrar {
         }
         this.channels.put(channel, new RegisteredChannel(channel, container, listener));
         MessagePlayInOutRegisterChannels message = new MessagePlayInOutRegisterChannels(Sets.newHashSet(channel));
-        for (Player player : this.game.getServer().getOnlinePlayers()) {
+        for (Player player : this.server.getOnlinePlayers()) {
             ((Session) player.getConnection()).send(message);
         }
     }

@@ -40,6 +40,27 @@ public class AtomicShortArray implements Serializable {
         this.backingArray = new AtomicIntegerArray(this.backingArraySize);
     }
 
+    /**
+     * Creates a new {@link AtomicShortArray} of the given length, with all
+     * elements initially zero.
+     *
+     * @param length the length of the array
+     */
+    public AtomicShortArray(short[] array) {
+        this.length = array.length;
+        this.backingArraySize = (this.length & 1) + (this.length >> 1);
+        int[] array0 = new int[this.backingArraySize];
+        for (int i = 0; i < this.backingArraySize; i++) {
+            int j = i << 1;
+            int value = array[j];
+            if (j + 1 < array.length) {
+                value |= array[j + 1] << 4;
+            }
+            array0[i] = value;
+        }
+        this.backingArray = new AtomicIntegerArray(array0);
+    }
+
     private int getPacked(int index) {
         return this.backingArray.get(index >> 1);
     }

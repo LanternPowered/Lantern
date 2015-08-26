@@ -12,10 +12,12 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
+import org.lanternpowered.server.block.LanternBlockRegistry;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
+import org.lanternpowered.server.world.biome.LanternBiomeRegistry;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameProfile;
@@ -79,6 +81,8 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternGameDictionary gameDictionary = new LanternGameDictionary();
     private final LanternResourcePackFactory resourcePackFactory = new LanternResourcePackFactory();
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
+    private final LanternBiomeRegistry biomeRegistry = new LanternBiomeRegistry();
+    private final LanternBlockRegistry blockRegistry = new LanternBlockRegistry();
 
     {
         ImmutableSet.Builder<String> builder = ImmutableSet.builder();
@@ -92,6 +96,24 @@ public class LanternGameRegistry implements GameRegistry {
             }
         }
         this.defaultGameRules = builder.build();
+    }
+
+    /**
+     * Gets the {@link LanternBlockRegistry}.
+     * 
+     * @return the block registry
+     */
+    public LanternBlockRegistry getBlockRegistry() {
+        return this.blockRegistry;
+    }
+
+    /**
+     * Gets the {@link LanternBiomeRegistry}.
+     * 
+     * @return the biome registry
+     */
+    public LanternBiomeRegistry getBiomeRegistry() {
+        return this.biomeRegistry;
     }
 
     /**

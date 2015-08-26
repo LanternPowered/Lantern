@@ -26,8 +26,7 @@ public class SimpleCatalogTypeRegistry<T extends CatalogType> implements Catalog
     public void register(T catalogType) {
         String id = checkNotNull(catalogType, "catalogType").getId().toLowerCase();
         checkNotNullOrEmpty(id, "identifier");
-        checkState(!this.types.containsKey(id), "identifier already present (" + id + ")");
-        this.types.put(id, catalogType);
+        checkState(this.types.putIfAbsent(id, catalogType) == null, "identifier already present (" + id + ")");
     }
 
     @Override

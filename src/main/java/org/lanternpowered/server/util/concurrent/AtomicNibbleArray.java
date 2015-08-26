@@ -73,13 +73,19 @@ public class AtomicNibbleArray implements Serializable {
             int value = 0;
             for (int j = 0; j < PACKED_VALUES; j++) {
                 int k = i + j;
-                if (k >= initialContent.length || k > length) {
+                if (k >= length) {
+                    flag = true;
+                    break;
+                }
+                if (packed) {
+                    k >>= 1;
+                }
+                if (k >= initialContent.length) {
                     flag = true;
                     break;
                 }
                 byte value0;
                 if (packed) {
-                    k >>= 1;
                     if ((j & 0x1) != 0) {
                         value0 = (byte) ((initialContent[k] >> VALUE_BITS) & VALUE_MASK);
                     } else {
@@ -326,24 +332,40 @@ public class AtomicNibbleArray implements Serializable {
      * @return an array containing the values in the array
      */
     public byte[] getPackedArray(byte[] array) {
-        if (array == null || array.length != this.length) {
-            array = new byte[this.length];
+        int length0 = this.length >> 1; 
+        if (array == null || array.length != length0) {
+            array = new byte[length0];
         }
         for (int i = 0; i < this.length; i += PACKED_VALUES) {
             int packed = this.getPacked(i);
             for (int j = 0; j < 4; j += 2) {
-                if (i + j >= this.length) {
+                int k = i + j;
+                if (k >= this.length) {
                     break;
                 }
-                array[i + j] = (byte) (packed & 0xff);
-                if (i + j + 1 >= this.length) {
+                array[k] = (byte) (packed & 0xff);
+                if (++k >= this.length) {
                     break;
                 }
-                array[i + j + 1] = (byte) ((packed >> 4) & 0xff);
+                array[k] = (byte) ((packed >> 4) & 0xff);
             }
         }
         return array;
     }
+
+    /**
+    * Gets an array containing all the values in the array but packed with in each
+    * byte two nibbles. If the array length isn't even, the length will be rounded
+    * up and the last value will only contain one value. This means that it is
+    * possible that the length and the array length may be different.
+    * 
+    * The returned values are not guaranteed to be from the same time instant.
+    *
+    * @return an array containing the values in the array
+    */
+   public byte[] getPackedArray() {
+       return this.getPackedArray(null);
+   }
 
     /**
      * Returns a string representation of the array.

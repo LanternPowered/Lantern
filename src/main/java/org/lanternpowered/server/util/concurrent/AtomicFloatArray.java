@@ -112,7 +112,7 @@ public class AtomicFloatArray implements Serializable {
      * @param update the new value
      * @return true if successful.
      */
-    public final boolean weakCompareAndSet(int index, int expect, int update) {
+    public final boolean weakCompareAndSet(int index, float expect, float update) {
         return this.compareAndSet(index, expect, update);
     }
 

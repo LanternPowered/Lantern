@@ -2,6 +2,7 @@ package org.lanternpowered.server.catalog;
 
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import org.spongepowered.api.CatalogType;
 
@@ -15,7 +16,7 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 public class SimpleCatalogTypeRegistry<T extends CatalogType> implements CatalogTypeRegistry<T> {
 
-    private final Map<String, T> types = Maps.newConcurrentMap();
+    private final ConcurrentMap<String, T> types = Maps.newConcurrentMap();
 
     @Override
     public Set<T> getAll() {

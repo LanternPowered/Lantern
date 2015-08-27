@@ -1,27 +1,3 @@
-/*
- * This file is part of Sponge, licensed under the MIT License (MIT).
- *
- * Copyright (c) SpongePowered <https://www.spongepowered.org>
- * Copyright (c) contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- */
 package org.lanternpowered.server.util.gen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -29,8 +5,8 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector2i;
 
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBiomeBuffer;
+import org.lanternpowered.server.world.biome.LanternBiomes;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
@@ -52,7 +28,7 @@ import java.util.Arrays;
  * The short array can then be reused by calling {@link #reuse(Vector2i)}.</p>
  */
 @NonnullByDefault
-public final class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeArea {
+public class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeArea {
 
     private boolean detached;
     private final short[] biomes;
@@ -79,8 +55,7 @@ public final class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer impl
     public void setBiome(int x, int z, BiomeType biome) {
         this.checkOpen();
         this.checkRange(x, z);
-
-        this.biomes[this.getIndex(x, z)] = LanternGame.get().getRegistry().getBiomeRegistry().getInternalId(biome);
+        this.biomes[this.getIndex(x, z)] = LanternBiomes.getId(biome);
     }
 
     @Override
@@ -94,10 +69,9 @@ public final class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer impl
         this.checkRange(x, z);
 
         short biomeId = this.biomes[this.getIndex(x, z)];
-        BiomeType biomeType = LanternGame.get().getRegistry().getBiomeRegistry().getByInternalId(biomeId);
+        BiomeType biomeType = LanternBiomes.getById(biomeId);
         return biomeType == null ? BiomeTypes.OCEAN : biomeType;
     }
-
 
     /**
      * Gets the internal short array, and prevents further of it through this

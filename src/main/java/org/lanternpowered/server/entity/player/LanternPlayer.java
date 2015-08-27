@@ -302,12 +302,6 @@ public class LanternPlayer extends LanternEntityLiving implements Player {
     }
 
     @Override
-    public void sendMessage(ChatType type, String... message) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public void sendMessage(ChatType type, Text... messages) {
         // TODO Auto-generated method stub
         

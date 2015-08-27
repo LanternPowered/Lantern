@@ -61,6 +61,14 @@ public class LanternWorld extends AbstractExtent implements World {
 
     private final LanternChunkManager chunkManager = null;
 
+    private final String name;
+    private final UUID uniqueId;
+
+    public LanternWorld(String name, UUID uniqueId) {
+        this.uniqueId = uniqueId;
+        this.name = name;
+    }
+
     public LanternChunkManager getChunkManager() {
         return this.chunkManager;
     }
@@ -515,8 +523,7 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public UUID getUniqueId() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.uniqueId;
     }
 
     @Override
@@ -580,12 +587,6 @@ public class LanternWorld extends AbstractExtent implements World {
     }
 
     @Override
-    public void sendMessage(ChatType type, String... message) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public void sendMessage(ChatType type, Text... messages) {
         // TODO Auto-generated method stub
         
@@ -623,14 +624,12 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Location<World> getLocation(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return new Location<World>(this, x, y, z);
     }
 
     @Override
     public Location<World> getLocation(double x, double y, double z) {
-        // TODO Auto-generated method stub
-        return null;
+        return new Location<World>(this, x, y, z);
     }
 
     @Override
@@ -641,20 +640,17 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.name;
     }
 
     @Override
     public Optional<Chunk> getChunk(Vector3i position) {
-        // TODO Auto-generated method stub
-        return null;
+        return Optional.<Chunk>fromNullable(this.chunkManager.getChunk(position));
     }
 
     @Override
     public Optional<Chunk> getChunk(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getChunk(new Vector3i(x, y, z));
     }
 
     @Override
@@ -677,8 +673,7 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Iterable<Chunk> getLoadedChunks() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getLoadedChunks();
     }
 
     @Override

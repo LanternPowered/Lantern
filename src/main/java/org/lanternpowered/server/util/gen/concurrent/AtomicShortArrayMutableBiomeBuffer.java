@@ -2,11 +2,11 @@ package org.lanternpowered.server.util.gen.concurrent;
 
 import com.flowpowered.math.vector.Vector2i;
 
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
 import org.lanternpowered.server.util.gen.AbstractBiomeBuffer;
 import org.lanternpowered.server.util.gen.ShortArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.ShortArrayMutableBiomeBuffer;
+import org.lanternpowered.server.world.biome.LanternBiomes;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
@@ -45,7 +45,7 @@ public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffe
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
         this.checkRange(x, z);
-        this.biomes.set(this.getIndex(x, z), LanternGame.get().getRegistry().getBiomeRegistry().getInternalId(biome));
+        this.biomes.set(this.getIndex(x, z), LanternBiomes.getId(biome));
     }
 
     @Override
@@ -57,7 +57,7 @@ public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffe
     public BiomeType getBiome(int x, int z) {
         this.checkRange(x, z);
         short biomeId = this.biomes.get(this.getIndex(x, z));
-        BiomeType biomeType = LanternGame.get().getRegistry().getBiomeRegistry().getByInternalId(biomeId);
+        BiomeType biomeType = LanternBiomes.getById(biomeId);
         return biomeType == null ? BiomeTypes.OCEAN : biomeType;
     }
 

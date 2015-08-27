@@ -1,10 +1,10 @@
 package org.lanternpowered.server.world.chunk.tickets;
 
 import java.util.Collections;
-import java.util.Map;
 import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.service.world.ChunkLoadService.EntityLoadingTicket;
@@ -18,12 +18,13 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public final class LanternLoadingTickets {
 
-    private final Map<Vector2i, Set<LanternLoadingTicket>> ticketsByPos = Maps.newConcurrentMap();
+    private final ConcurrentMap<Vector2i, Set<LanternLoadingTicket>> ticketsByPos = Maps.newConcurrentMap();
     private final Set<LanternLoadingTicket> tickets = Collections.newSetFromMap(new MapMaker()
             .initialCapacity(1000).weakKeys().<LanternLoadingTicket, Boolean>makeMap());
 
@@ -168,7 +169,7 @@ public final class LanternLoadingTickets {
     protected void force(LanternLoadingTicket ticket, Vector2i chunk) {
         Set<LanternLoadingTicket> set = this.ticketsByPos.get(ticket);
         if (set == null) {
-            set = Collections.newSetFromMap(Maps.<LanternLoadingTicket, Boolean>newConcurrentMap());
+            set = Sets.newConcurrentHashSet();
             Set<LanternLoadingTicket> set0 = this.ticketsByPos.putIfAbsent(chunk, set);
             if (set0 != null) {
                 set = set0;

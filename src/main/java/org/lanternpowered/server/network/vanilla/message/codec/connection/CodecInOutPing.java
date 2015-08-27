@@ -19,5 +19,4 @@ public final class CodecInOutPing implements Codec<MessageInOutPing> {
     public MessageInOutPing decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessageInOutPing(context.read(buf, VarInt.class).value());
     }
-
 }

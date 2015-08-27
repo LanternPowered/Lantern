@@ -40,8 +40,12 @@ public abstract class AbstractBlockBuffer implements BlockVolume {
         }
     }
 
-    protected int getIndex(int x, int y, int z) {
-        return (x - this.start.getX()) * this.yzSlice + (z - this.start.getZ()) * this.yLine + (y - this.start.getY());
+    public int getIndex(int x, int y, int z) {
+        // return (x - this.start.getX()) * this.yzSlice + (z - this.start.getZ()) * this.yLine + (y - this.start.getY());
+
+        // Using a different formula to make it easier to copy the contents of the array,
+        // this should increase the performance wile generating chunks
+        return (y - this.start.getY()) * this.yzSlice + (z - this.start.getZ()) * this.yLine + (x - this.start.getX());
     }
 
     @Override

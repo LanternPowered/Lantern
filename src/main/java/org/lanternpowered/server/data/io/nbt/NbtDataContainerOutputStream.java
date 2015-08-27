@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.lanternpowered.server.data.io.DataViewOutput;
+import org.lanternpowered.server.data.io.DataContainerOutput;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
@@ -19,7 +19,7 @@ import org.spongepowered.api.data.DataView;
 /**
  * A data output stream that serializes data views into the nbt format.
  */
-public class NbtDataViewOutputStream implements Closeable, Flushable, DataViewOutput {
+public class NbtDataContainerOutputStream implements Closeable, Flushable, DataContainerOutput {
 
     private final DataOutputStream dos;
 
@@ -28,7 +28,7 @@ public class NbtDataViewOutputStream implements Closeable, Flushable, DataViewOu
      * 
      * @param dataOutputStream the data output stream
      */
-    public NbtDataViewOutputStream(DataOutputStream dataOutputStream) {
+    public NbtDataContainerOutputStream(DataOutputStream dataOutputStream) {
         this.dos = checkNotNull(dataOutputStream, "dataOutputStream");
     }
 
@@ -52,13 +52,18 @@ public class NbtDataViewOutputStream implements Closeable, Flushable, DataViewOu
         if (type == BYTE) {
             this.dos.writeByte((Byte) object);
         } else if (type == BYTE_ARRAY) {
-            Byte[] array0 = (Byte[]) object;
-            byte[] array1 = new byte[array0.length];
-            for (int i = 0; i < array0.length; i++) {
-                array1[i] = array0[i];
+            byte[] array0;
+            if (object instanceof byte[]) {
+                array0 = (byte[]) object;
+            } else {
+                Byte[] array1 = (Byte[]) object;
+                array0 = new byte[array1.length];
+                for (int i = 0; i < array0.length; i++) {
+                    array1[i] = array0[i];
+                }
             }
-            this.dos.writeShort(array1.length);
-            this.dos.write(array1);
+            this.dos.writeShort(array0.length);
+            this.dos.write(array0);
         } else if (type == COMPOUND) {
             // Convert the object in something we can serialize
             if (object instanceof DataView) {
@@ -77,10 +82,18 @@ public class NbtDataViewOutputStream implements Closeable, Flushable, DataViewOu
         } else if (type == INT) {
             this.dos.writeInt((Integer) object);
         } else if (type == INT_ARRAY) {
-            Integer[] array0 = (Integer[]) object;
-            this.dos.writeShort(array0.length);
-            for (int i = 0; i < array0.length; i++) {
-                this.dos.writeInt(array0[i]);
+            if (object instanceof int[]) {
+                int[] array0 = (int[]) object;
+                this.dos.writeShort(array0.length);
+                for (int i = 0; i < array0.length; i++) {
+                    this.dos.writeInt(array0[i]);
+                }
+            } else {
+                Integer[] array0 = (Integer[]) object;
+                this.dos.writeShort(array0.length);
+                for (int i = 0; i < array0.length; i++) {
+                    this.dos.writeInt(array0[i]);
+                }
             }
         } else if (type == LIST) {
             List<Object> list = (List<Object>) object;
@@ -112,7 +125,7 @@ public class NbtDataViewOutputStream implements Closeable, Flushable, DataViewOu
     private byte typeFor(Object object) {
         if (object instanceof Byte) {
             return BYTE;
-        } else if (object instanceof Byte[]) {
+        } else if (object instanceof Byte[] || object instanceof byte[]) {
             return BYTE_ARRAY;
         } else if (object instanceof Map || object instanceof DataView || object instanceof DataSerializable) {
             return COMPOUND;
@@ -122,7 +135,7 @@ public class NbtDataViewOutputStream implements Closeable, Flushable, DataViewOu
             return FLOAT;
         } else if (object instanceof Integer) {
             return INT;
-        } else if (object instanceof Integer[]) {
+        } else if (object instanceof Integer[] || object instanceof int[]) {
             return INT_ARRAY;
         } else if (object instanceof List) {
             return LIST;

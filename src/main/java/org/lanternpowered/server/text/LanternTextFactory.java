@@ -30,7 +30,7 @@ public class LanternTextFactory implements TextFactory {
     private final LegacyTextRepresentation defLegacyTextRepresentation;
     private final XmlTextRepresentation xmlTextRepresentation;
 
-    private final char legacyChar = '§';
+    private final char legacyChar = '\u00A7';
 
     public LanternTextFactory(TranslationManager translationManager) {
         this.defLegacyTextRepresentation = new LegacyTextRepresentation(this.legacyChar);

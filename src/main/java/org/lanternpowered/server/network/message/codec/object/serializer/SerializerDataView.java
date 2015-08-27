@@ -13,8 +13,8 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.CodecException;
 
-import org.lanternpowered.server.data.io.nbt.NbtDataViewInputStream;
-import org.lanternpowered.server.data.io.nbt.NbtDataViewOutputStream;
+import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
+import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
 
 import org.spongepowered.api.data.DataView;
 
@@ -28,7 +28,7 @@ public class SerializerDataView implements ObjectSerializer<DataView> {
         }
         try {
             DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(new ByteBufOutputStream(buf)));
-            NbtDataViewOutputStream ndvos = new NbtDataViewOutputStream(dos);
+            NbtDataContainerOutputStream ndvos = new NbtDataContainerOutputStream(dos);
             ndvos.write(object);
             ndvos.flush();
             ndvos.close();
@@ -47,7 +47,7 @@ public class SerializerDataView implements ObjectSerializer<DataView> {
         buf.readerIndex(index);
         try {
             DataInputStream dis = new DataInputStream(new GZIPInputStream(new ByteBufInputStream(buf)));
-            NbtDataViewInputStream ndvis = new NbtDataViewInputStream(dis);
+            NbtDataContainerInputStream ndvis = new NbtDataContainerInputStream(dis);
             try {
                 return ndvis.read();
             } finally {

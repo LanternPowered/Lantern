@@ -2,18 +2,18 @@ package org.lanternpowered.server.data.io;
 
 import java.io.IOException;
 
-import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.DataContainer;
 
 /**
  * A input that can be used to read data views.
  */
-public interface DataViewInput {
+public interface DataContainerInput {
 
     /**
-     * Reads a data view from the input.
+     * Reads a {@link DataContainer} from the input.
      * 
      * @return the data view
      * @throws IOException when a i/o error occurred
      */
-    DataView read() throws IOException;
+    DataContainer read() throws IOException;
 }

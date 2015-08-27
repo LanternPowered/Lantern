@@ -7,6 +7,7 @@ import org.lanternpowered.server.util.gen.ShortArrayImmutableBlockBuffer;
 import org.lanternpowered.server.util.gen.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.ShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBlockBuffer;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -271,6 +272,8 @@ public abstract class AbstractExtent implements Extent {
                 return new ShortArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, this.getBlockMin(),
                         this.getBlockMax(), this.getBlockSize()), this.getBlockMin(), this.getBlockSize());
             case THREAD_SAFE:
+                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, this.getBlockMin(),
+                        this.getBlockMax(), this.getBlockSize()), this.getBlockMin(), this.getBlockSize());
             default:
                 throw new UnsupportedOperationException(type.name());
         }

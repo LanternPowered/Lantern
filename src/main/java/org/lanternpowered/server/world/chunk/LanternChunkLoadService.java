@@ -35,6 +35,11 @@ public class LanternChunkLoadService implements ChunkLoadService {
             return 32;
         }
 
+        @Override
+        public int getMaxTicketsFor(UUID playerUUID) {
+            return 50;
+        }
+
     };
 
     public static class RegisteredCallback {

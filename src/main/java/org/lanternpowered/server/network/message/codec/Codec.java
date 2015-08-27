@@ -24,13 +24,4 @@ public interface Codec<T extends Message> {
      * @return the message
      */
     T decode(CodecContext context, ByteBuf buf) throws CodecException;
-
-    /**
-     * Generates a hash for the context and message that is used
-     * for the caching system of messages.
-     * 
-     * @param context the context
-     * @return the hash code
-     */
-    // int encodeCachingHash(CodecContext context, T message);
 }

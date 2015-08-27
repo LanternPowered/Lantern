@@ -6,6 +6,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.service.scheduler.TaskBuilder;
@@ -13,8 +14,6 @@ import org.spongepowered.api.service.scheduler.TaskBuilder;
 import java.util.concurrent.TimeUnit;
 
 public class LanternTaskBuilder implements TaskBuilder {
-
-    private static final long TICK_DURATION = 50;
 
     private final LanternScheduler scheduler;
 
@@ -35,11 +34,11 @@ public class LanternTaskBuilder implements TaskBuilder {
     public TaskBuilder async() {
         this.syncType = ScheduledTask.TaskSynchronicity.ASYNCHRONOUS;
         if (this.tickDelay != -1) {
-            this.delay = this.tickDelay * TICK_DURATION;
+            this.delay = this.tickDelay * LanternGame.TICK_DURATION;
             this.tickDelay = -1;
         }
         if (this.tickInterval != -1) {
-            this.interval = this.tickInterval * TICK_DURATION;
+            this.interval = this.tickInterval * LanternGame.TICK_DURATION;
             this.tickInterval = -1;
         }
         return this;

@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
+import org.lanternpowered.server.util.NibbleArray;
+
 public class AtomicNibbleArray implements Serializable {
 
     private static final long serialVersionUID = -8011969936196392062L;
@@ -48,6 +50,16 @@ public class AtomicNibbleArray implements Serializable {
         this.length = length;
         this.backingArraySize = (length & INDEX_MASK) + (length >> INDEX_BITS);
         this.backingArray = new AtomicIntegerArray(this.backingArraySize);
+    }
+
+    /**
+     * Creates a new {@link AtomicNibbleArray} of the contents from the
+     * {@link NibbleArray}.
+     *
+     * @param length the length of the array
+     */
+    public AtomicNibbleArray(NibbleArray nibbleArray) {
+        this(nibbleArray.length(), nibbleArray.getPackedArray(), true);
     }
 
     /**
@@ -110,7 +122,7 @@ public class AtomicNibbleArray implements Serializable {
     }
 
     /**
-     * Gets the length of the array
+     * Gets the length of the array.
      *
      * @return the length
      */
@@ -119,7 +131,7 @@ public class AtomicNibbleArray implements Serializable {
     }
 
     /**
-     * Gets an element from the array at a given index
+     * Gets an element from the array at a given index.
      *
      * @param index the index
      * @return the element

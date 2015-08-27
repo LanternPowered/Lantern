@@ -10,7 +10,8 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.data.io.DataViewInput;
+import org.lanternpowered.server.data.io.DataContainerInput;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
@@ -20,7 +21,7 @@ import com.google.common.collect.Lists;
 /**
  * A data input stream that deserializes data views from the nbt format.
  */
-public class NbtDataViewInputStream implements Closeable, DataViewInput {
+public class NbtDataContainerInputStream implements Closeable, DataContainerInput {
 
     private final DataInputStream dis;
 
@@ -29,7 +30,7 @@ public class NbtDataViewInputStream implements Closeable, DataViewInput {
      * 
      * @param dataInputStream the data input stream
      */
-    public NbtDataViewInputStream(DataInputStream dataInputStream) {
+    public NbtDataContainerInputStream(DataInputStream dataInputStream) {
         this.dis = checkNotNull(dataInputStream, "dataInputStream");
     }
 
@@ -39,8 +40,8 @@ public class NbtDataViewInputStream implements Closeable, DataViewInput {
     }
 
     @Override
-    public DataView read() throws IOException {
-        return (DataView) this.readObject(null, this.readEntry());
+    public DataContainer read() throws IOException {
+        return (DataContainer) this.readObject(null, this.readEntry());
     }
 
     private Object readObject(@Nullable DataView container, Entry entry) throws IOException {

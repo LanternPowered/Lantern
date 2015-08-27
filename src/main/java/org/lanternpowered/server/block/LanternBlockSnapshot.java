@@ -12,8 +12,8 @@ import static org.spongepowered.api.data.DataQuery.of;
 
 public class LanternBlockSnapshot implements BlockSnapshot {
 
-    private Vector3i location;
-    private BlockState state;
+    private final Vector3i location;
+    private final BlockState state;
 
     public LanternBlockSnapshot(Vector3i location, BlockState blockState) {
         this.location = checkNotNull(location, "location");
@@ -37,7 +37,7 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public void setBlockState(BlockState blockState) {
-        this.state = checkNotNull(blockState, "blockState");
+        throw new UnsupportedOperationException(); // Method will be removed in the future
     }
 
     @Override
@@ -47,12 +47,11 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public void setLocation(Vector3i location) {
-        this.location = checkNotNull(location, "location");
+        throw new UnsupportedOperationException(); // Method will be removed in the future
     }
 
     @Override
     public LanternBlockSnapshot copy() {
         return new LanternBlockSnapshot(this.location, this.state);
     }
-
 }

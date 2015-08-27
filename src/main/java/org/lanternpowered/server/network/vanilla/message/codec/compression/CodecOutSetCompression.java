@@ -19,5 +19,4 @@ public final class CodecOutSetCompression implements Codec<MessageOutSetCompress
     public MessageOutSetCompression decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new UnsupportedOperationException();
     }
-
 }

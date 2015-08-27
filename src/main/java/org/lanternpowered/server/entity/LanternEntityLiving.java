@@ -5,18 +5,15 @@ import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
 import org.spongepowered.api.entity.living.Living;
 
 public class LanternEntityLiving extends LanternEntity implements Living {
-    protected float headYaw;
 
     @Override
     public HealthData getHealthData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(HealthData.class).get();
     }
 
     @Override
     public DamageableData getMortalData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(DamageableData.class).get();
     }
 
 }

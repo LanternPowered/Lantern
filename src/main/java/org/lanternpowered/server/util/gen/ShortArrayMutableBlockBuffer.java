@@ -32,6 +32,15 @@ public class ShortArrayMutableBlockBuffer extends AbstractBlockBuffer implements
         this.blocks = blocks;
     }
 
+    /**
+     * Gets the underlying array with all the block types.
+     * 
+     * @return the array
+     */
+    public short[] getArray() {
+        return this.blocks;
+    }
+
     @Override
     public void setBlock(Vector3i position, BlockState block) {
         this.setBlock(position.getX(), position.getY(), position.getZ(), block);
@@ -50,14 +59,14 @@ public class ShortArrayMutableBlockBuffer extends AbstractBlockBuffer implements
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
         this.checkRange(x, y, z);
-        this.blocks[this.getIndex(x, y, z)] = LanternBlocks.getInternalId(block);
+        this.blocks[this.getIndex(x, y, z)] = LanternBlocks.getStateId(block);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
         this.checkRange(x, y, z);
         short blockState = this.blocks[this.getIndex(x, y, z)];
-        BlockState block = LanternBlocks.getStateByInternalId(blockState);
+        BlockState block = LanternBlocks.getStateById(blockState);
         return block == null ? this.air : block;
     }
 

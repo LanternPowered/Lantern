@@ -6,6 +6,7 @@ import io.netty.handler.codec.CodecException;
 
 import java.util.List;
 
+import org.lanternpowered.server.network.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
@@ -46,4 +47,11 @@ public class ProcessorPlayOutChannelPayload implements Processor<MessagePlayInOu
         }
     }
 
+    public static final class CachingHash implements CachingHashGenerator<MessagePlayInOutChannelPayload> {
+
+        @Override
+        public int generate(CodecContext context, MessagePlayInOutChannelPayload message) {
+            return context.channel().attr(ProcessorPlayInChannelPayload.FML_MULTI_PART_MESSAGE_ENABLED).get() ? 1 : 0;
+        }
+    }
 }

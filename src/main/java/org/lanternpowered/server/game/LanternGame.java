@@ -4,7 +4,6 @@ import java.io.File;
 
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.plugin.PluginManager;
@@ -18,8 +17,26 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class LanternGame implements Game {
+
     // The singleton instance of the game
     private static LanternGame game;
+
+    // The server will aim for 20 ticks per second
+    public static final int TICKS_PER_SECOND = 20;
+
+    // The amount of milli seconds in one tick
+    public static final int TICK_DURATION = 1000 / TICKS_PER_SECOND;
+
+    /**
+     * Gets the current time in ticks. This method is similar to
+     * {@link System#currentTimeMillis()} but the unit is converted
+     * to ticks.
+     * 
+     * @return the current time in ticks
+     */
+    public static long currentTimeTicks() {
+        return System.currentTimeMillis() / TICK_DURATION;
+    }
 
     /**
      * Gets the instance of the game.

@@ -30,7 +30,7 @@ public class LanternBiomeRegistry {
     // TODO: Make a string to id lookup to save/load the internal ids
 
     @Nullable
-    public BiomeType getByInternalId(int internalId) {
+    public BiomeType getById(int internalId) {
         if (internalId < 0 || internalId >= Short.MAX_VALUE) {
             return null;
         }
@@ -38,7 +38,7 @@ public class LanternBiomeRegistry {
     }
 
     @Nullable
-    public Short getInternalId(BiomeType biomeType) {
+    public Short getId(BiomeType biomeType) {
         if (!this.idsByBiome.containsKey(biomeType)) {
             return null;
         }

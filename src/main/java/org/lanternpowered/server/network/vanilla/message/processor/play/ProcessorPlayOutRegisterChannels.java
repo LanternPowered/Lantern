@@ -18,5 +18,4 @@ public final class ProcessorPlayOutRegisterChannels implements Processor<Message
     public void process(CodecContext context, MessagePlayInOutRegisterChannels message, List<Message> output) throws CodecException {
         output.add(new MessagePlayInOutChannelPayload("REGISTER", encodeChannels(message.getChannels())));
     }
-
 }

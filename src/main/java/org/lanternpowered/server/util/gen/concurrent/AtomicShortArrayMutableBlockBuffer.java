@@ -54,14 +54,14 @@ public class AtomicShortArrayMutableBlockBuffer extends AbstractBlockBuffer impl
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
         this.checkRange(x, y, z);
-        this.blocks.set(this.getIndex(x, y, z), LanternBlocks.getInternalId(block));
+        this.blocks.set(this.getIndex(x, y, z), LanternBlocks.getStateId(block));
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
         this.checkRange(x, y, z);
         short blockState = this.blocks.get(this.getIndex(x, y, z));
-        BlockState block = LanternBlocks.getStateByInternalId(blockState);
+        BlockState block = LanternBlocks.getStateById(blockState);
         return block == null ? this.air : block;
     }
 

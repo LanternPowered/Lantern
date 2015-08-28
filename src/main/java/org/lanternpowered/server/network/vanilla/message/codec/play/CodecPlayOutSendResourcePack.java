@@ -21,5 +21,4 @@ public final class CodecPlayOutSendResourcePack implements Codec<MessagePlayOutS
     public MessagePlayOutSendResourcePack decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
-
 }

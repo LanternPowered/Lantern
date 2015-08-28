@@ -6,10 +6,9 @@ import java.util.Locale;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
-import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializer;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
-import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInClientSettings;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -34,7 +33,7 @@ public class SerializerItemStack implements ObjectSerializer<ItemStack> {
             return;
         }
 
-        Locale locale = getLocale(context);
+        Locale locale = CodecUtils.getLocale(context);
 
         DataContainer tag = new MemoryDataContainer();
         int id = 1; // TODO: Lookup the internal id
@@ -89,20 +88,8 @@ public class SerializerItemStack implements ObjectSerializer<ItemStack> {
         int amount = buf.readByte();
         int data = buf.readShort();
         DataView tag = context.read(buf, DataView.class);
-
-        Locale locale = getLocale(context);
+        Locale locale = CodecUtils.getLocale(context);
 
         return null;
     }
-
-    private static Locale getLocale(ObjectSerializerContext context) {
-        if (context instanceof CodecContext) {
-            Locale locale0 = ((CodecContext) context).channel().attr(ProcessorPlayInClientSettings.LOCALE).get();
-            if (locale0 != null) {
-                return locale0;
-            }
-        }
-        return Locale.ENGLISH;
-    }
-
 }

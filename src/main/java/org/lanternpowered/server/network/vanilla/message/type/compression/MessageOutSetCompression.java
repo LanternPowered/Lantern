@@ -28,5 +28,4 @@ public final class MessageOutSetCompression implements Message {
     public int getThreshold() {
         return this.threshold;
     }
-
 }

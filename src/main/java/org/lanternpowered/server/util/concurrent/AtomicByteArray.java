@@ -51,6 +51,15 @@ public class AtomicByteArray implements Serializable {
     }
 
     /**
+     * Creates a new {@link AtomicByteArray} of the given content.
+     *
+     * @param content the content
+     */
+    public AtomicByteArray(byte[] content) {
+        this(content.length, content);
+    }
+
+    /**
      * Creates a new {@link AtomicByteArray} of the given length, with all
      * elements copied from the initial content array. The lengths don't have
      * to match, if it's shorter then the remaining content be set to zero,

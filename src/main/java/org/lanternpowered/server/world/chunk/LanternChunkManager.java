@@ -50,6 +50,11 @@ public class LanternChunkManager {
         this.world = world;
     }
 
+    /**
+     * Gets a immutable set with all the loaded chunks.
+     * 
+     * @return the loaded chunks
+     */
     public ImmutableSet<Chunk> getLoadedChunks() {
         ImmutableSet.Builder<Chunk> builder = ImmutableSet.builder();
         for (LanternChunk chunk : this.chunks.values()) {
@@ -113,7 +118,7 @@ public class LanternChunkManager {
      * @param z the z coordinate
      * @return the chunk
      */
-    public LanternChunk getChunkSafely(int x, int z) {
+    public LanternChunk getOrCreateChunk(int x, int z) {
         Vector2i key = new Vector2i(x, z);
 
         if (this.chunks.containsKey(key)) {
@@ -138,6 +143,14 @@ public class LanternChunkManager {
     }
 
     public boolean load(int x, int z, boolean generate) {
+        return this.load(this.getOrCreateChunk(x, z), generate);
+    }
+
+    public boolean unload(int x, int z) {
+        LanternChunk chunk = this.getChunk(x, z);
+        if (chunk != null) {
+            return this.unload(chunk);
+        }
         return false;
     }
 
@@ -224,5 +237,6 @@ public class LanternChunkManager {
         }
 
         chunk.initializeSections(sections);
+        chunk.automaticHeightMap();
     }
 }

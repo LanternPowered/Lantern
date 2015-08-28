@@ -3,11 +3,13 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
+import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+@Caching(CodecUtils.LocaleCachingHash.class)
 public final class CodecPlayOutWindowSetSlot implements Codec<MessagePlayOutSetWindowSlot> {
 
     @Override
@@ -23,5 +25,4 @@ public final class CodecPlayOutWindowSetSlot implements Codec<MessagePlayOutSetW
     public MessagePlayOutSetWindowSlot decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
-
 }

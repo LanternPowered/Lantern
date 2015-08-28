@@ -2,6 +2,7 @@ package org.lanternpowered.server.world.chunk;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.storage.ChunkLayout;
 
@@ -64,9 +65,7 @@ public class LanternChunkLayout implements ChunkLayout {
 
     @Override
     public boolean isValidChunk(int x, int y, int z) {
-        return x >= SPACE_MIN.getX() && x <= SPACE_MAX.getX()
-                && y >= SPACE_MIN.getY() && y <= SPACE_MAX.getY()
-                && z >= SPACE_MIN.getZ() && z <= SPACE_MAX.getZ();
+        return VecHelper.inBounds(x, y, z, SPACE_MIN, SPACE_MAX);
     }
 
     @Override

@@ -35,5 +35,4 @@ public final class CodecLoginOutEncryptionRequest implements Codec<MessageLoginO
     public MessageLoginOutEncryptionRequest decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new UnsupportedOperationException();
     }
-
 }

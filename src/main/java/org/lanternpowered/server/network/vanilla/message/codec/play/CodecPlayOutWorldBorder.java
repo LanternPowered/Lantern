@@ -3,11 +3,13 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
+import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder.Action;
 
+@Caching
 public final class CodecPlayOutWorldBorder implements Codec<MessagePlayOutWorldBorder> {
 
     @Override
@@ -57,5 +59,4 @@ public final class CodecPlayOutWorldBorder implements Codec<MessagePlayOutWorldB
     public MessagePlayOutWorldBorder decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
-
 }

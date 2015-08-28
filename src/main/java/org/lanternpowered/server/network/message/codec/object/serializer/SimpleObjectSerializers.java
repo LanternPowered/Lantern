@@ -3,10 +3,17 @@ package org.lanternpowered.server.network.message.codec.object.serializer;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.network.message.codec.object.VarInt;
+import org.lanternpowered.server.network.message.codec.object.VarLong;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.text.Text;
+
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -15,6 +22,20 @@ import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 public class SimpleObjectSerializers implements ObjectSerializers {
+
+    public static final SimpleObjectSerializers DEFAULT = new SimpleObjectSerializers() {
+
+        {
+            this.register(DataView.class, new SerializerDataView());
+            this.register(String.class, new SerializerString());
+            this.register(Text.class, new SerializerText());
+            this.register(UUID.class, new SerializerUUID());
+            this.register(VarInt.class, new SerializerVarInt());
+            this.register(VarLong.class, new SerializerVarLong());
+            this.register(Vector3i.class, new SerializerVector3i());
+        }
+
+    };
 
     private final Map<Class<?>, ObjectSerializer<?>> serializers = Maps.newConcurrentMap();
     private final LoadingCache<Class<?>, Optional<ObjectSerializer<?>>> cache =

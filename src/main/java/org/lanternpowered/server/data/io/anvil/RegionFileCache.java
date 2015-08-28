@@ -6,6 +6,7 @@ import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.lanternpowered.server.game.LanternGame;
 
@@ -15,19 +16,20 @@ import org.lanternpowered.server.game.LanternGame;
  */
 public class RegionFileCache {
 
+    public static final String REGION_FILE_EXTENSION = "mca";
+    public static final Pattern REGION_FILE_PATTERN = Pattern.compile("r\\.([-+]?[0-9])+.([-+]?[0-9])+\\." + REGION_FILE_EXTENSION);
+
     private static final int MAX_CACHE_SIZE = 256;
 
     private final Map<File, Reference<RegionFile>> cache = new HashMap<>();
-    private final String extension;
     private final File regionDir;
 
     public RegionFileCache(File basePath, String extension) {
         this.regionDir = new File(basePath, "region");
-        this.extension = extension;
     }
 
     public RegionFile getRegionFile(int chunkX, int chunkZ) throws IOException {
-        File file = new File(this.regionDir, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + this.extension);
+        File file = new File(this.regionDir, "r." + (chunkX >> 5) + "." + (chunkZ >> 5) + REGION_FILE_EXTENSION);
         Reference<RegionFile> ref = this.cache.get(file);
 
         if (ref != null && ref.get() != null) {

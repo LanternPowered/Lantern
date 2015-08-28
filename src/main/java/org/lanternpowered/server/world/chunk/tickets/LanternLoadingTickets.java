@@ -42,7 +42,7 @@ public final class LanternLoadingTickets {
      */
     public Optional<LoadingTicket> createTicket(String plugin) {
         checkNotNull(plugin, "plugin");
-        if (this.getTicketsFor(plugin) >= this.provider.getMaxTicketsFor(plugin)) {
+        if (this.getTicketsForPlugin(plugin) >= this.provider.getMaxTicketsFor(plugin)) {
             return Optional.absent();
         }
         int chunks = this.provider.getMaxChunksForTicket(plugin);
@@ -59,7 +59,7 @@ public final class LanternLoadingTickets {
      */
     public Optional<EntityLoadingTicket> createEntityTicket(String plugin) {
         checkNotNull(plugin, "plugin");
-        if (this.getTicketsFor(plugin) >= this.provider.getMaxTicketsFor(plugin)) {
+        if (this.getTicketsForPlugin(plugin) >= this.provider.getMaxTicketsFor(plugin)) {
             return Optional.absent();
         }
         int chunks = this.provider.getMaxChunksForTicket(plugin);
@@ -78,7 +78,8 @@ public final class LanternLoadingTickets {
     public Optional<PlayerLoadingTicket> createPlayerTicket(String plugin, UUID player) {
         checkNotNull(plugin, "plugin");
         checkNotNull(player, "player");
-        if (this.getTicketsFor(plugin) >= this.provider.getMaxTicketsFor(plugin)) {
+        if (this.getTicketsForPlugin(plugin) >= this.provider.getMaxTicketsFor(plugin) ||
+                this.provider.getAvailableTicketsFor(player) == 0) {
             return Optional.absent();
         }
         int chunks = this.provider.getMaxChunksForTicket(plugin);
@@ -96,7 +97,8 @@ public final class LanternLoadingTickets {
     public Optional<PlayerEntityLoadingTicket> createPlayerEntityTicket(String plugin, UUID player) {
         checkNotNull(plugin, "plugin");
         checkNotNull(player, "player");
-        if (this.getTicketsFor(plugin) >= this.provider.getMaxTicketsFor(plugin)) {
+        if (this.getTicketsForPlugin(plugin) >= this.provider.getMaxTicketsFor(plugin) ||
+                this.provider.getAvailableTicketsFor(player) == 0) {
             return Optional.absent();
         }
         int chunks = this.provider.getMaxChunksForTicket(plugin);
@@ -111,11 +113,28 @@ public final class LanternLoadingTickets {
      * @param plugin the plugin
      * @return the tickets
      */
-    public int getTicketsFor(String plugin) {
+    public int getTicketsForPlugin(String plugin) {
         checkNotNull(plugin, "plugin");
         int count = 0;
         for (LanternLoadingTicket ticket : this.tickets) {
             if (ticket.getPlugin().equals(plugin)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Gets the amount of tickets that are attached to the player.
+     * 
+     * @param player the player uuid
+     * @return the tickets
+     */
+    public int getTicketsForPlayer(UUID player) {
+        checkNotNull(player, "player");
+        int count = 0;
+        for (LanternLoadingTicket ticket : this.tickets) {
+            if (ticket instanceof PlayerLoadingTicket && player.equals(((PlayerLoadingTicket) ticket).getPlayerUniqueId())) {
                 count++;
             }
         }

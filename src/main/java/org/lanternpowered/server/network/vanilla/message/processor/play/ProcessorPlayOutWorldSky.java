@@ -3,11 +3,13 @@ package org.lanternpowered.server.network.vanilla.message.processor.play;
 import java.util.List;
 
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
 
+@Caching
 public final class ProcessorPlayOutWorldSky implements Processor<MessagePlayOutWorldSky> {
 
     @Override
@@ -39,5 +41,4 @@ public final class ProcessorPlayOutWorldSky implements Processor<MessagePlayOutW
         output.add(new MessagePlayOutChangeGameState(7, rain));
         output.add(new MessagePlayOutChangeGameState(8, darkness));
     }
-
 }

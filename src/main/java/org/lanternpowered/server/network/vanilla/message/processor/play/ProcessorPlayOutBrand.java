@@ -5,11 +5,13 @@ import io.netty.handler.codec.CodecException;
 import java.util.List;
 
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
+@Caching
 public final class ProcessorPlayOutBrand implements Processor<MessagePlayInOutBrand> {
 
     @Override
@@ -17,5 +19,4 @@ public final class ProcessorPlayOutBrand implements Processor<MessagePlayInOutBr
         output.add(new MessagePlayInOutChannelPayload("MC|Brand",
                 context.write(context.byteBufAlloc().buffer(), String.class, message.getBrand())));
     }
-
 }

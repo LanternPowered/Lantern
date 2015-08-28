@@ -60,6 +60,7 @@ import com.google.common.collect.ImmutableSet;
 public class LanternWorld extends AbstractExtent implements World {
 
     private final LanternChunkManager chunkManager = null;
+    private final LanternWorldProperties properties = null;
 
     private final String name;
     private final UUID uniqueId;
@@ -634,8 +635,7 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Difficulty getDifficulty() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.properties.getDifficulty();
     }
 
     @Override
@@ -667,8 +667,7 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public boolean unloadChunk(Chunk chunk) {
-        // TODO Auto-generated method stub
-        return false;
+        return chunk.unloadChunk();
     }
 
     @Override
@@ -720,14 +719,12 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public boolean doesKeepSpawnLoaded() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.properties.doesKeepSpawnLoaded();
     }
 
     @Override
     public void setKeepSpawnLoaded(boolean keepLoaded) {
-        // TODO Auto-generated method stub
-        
+        this.properties.setKeepSpawnLoaded(keepLoaded);
     }
 
     @Override
@@ -756,14 +753,12 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public WorldProperties getProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.properties;
     }
 
     @Override
     public Location<World> getSpawnLocation() {
-        // TODO Auto-generated method stub
-        return null;
+        return new Location<World>(this, this.properties.getSpawnPosition());
     }
 
     @Override

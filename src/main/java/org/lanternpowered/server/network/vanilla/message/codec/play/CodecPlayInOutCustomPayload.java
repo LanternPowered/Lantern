@@ -3,10 +3,12 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
+import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
+@Caching
 public final class CodecPlayInOutCustomPayload implements Codec<MessagePlayInOutChannelPayload> {
 
     @Override
@@ -24,5 +26,4 @@ public final class CodecPlayInOutCustomPayload implements Codec<MessagePlayInOut
         buf.readBytes(content);
         return new MessagePlayInOutChannelPayload(channel, content);
     }
-
 }

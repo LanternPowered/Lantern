@@ -20,5 +20,4 @@ public final class CodecPlayOutPlayerSpawnPosition implements Codec<MessagePlayO
     public MessagePlayOutPlayerSpawnPosition decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
-
 }

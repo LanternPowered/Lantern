@@ -1,4 +1,4 @@
-package org.lanternpowered.server.network.caching;
+package org.lanternpowered.server.network.message.caching;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -20,10 +20,10 @@ public interface CachingHashGenerator<T extends Message> {
      *
      * @param <T> the message type
      */
-    public static final class Equal<T extends Message> implements CachingHashGenerator<T> {
+    public static final class Equal implements CachingHashGenerator<Message> {
 
         @Override
-        public int generate(CodecContext context, T message) {
+        public int generate(CodecContext context, Message message) {
             return 0;
         }
     }

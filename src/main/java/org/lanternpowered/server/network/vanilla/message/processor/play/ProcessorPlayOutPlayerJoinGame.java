@@ -10,7 +10,7 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 
-public class ProcessorPlayOutPlayerJoinGame implements Processor<MessagePlayOutPlayerJoinGame> {
+public final class ProcessorPlayOutPlayerJoinGame implements Processor<MessagePlayOutPlayerJoinGame> {
 
     public final static AttributeKey<Integer> PLAYER_ENTITY_ID = AttributeKey.valueOf("player-entity-id");
 
@@ -19,5 +19,4 @@ public class ProcessorPlayOutPlayerJoinGame implements Processor<MessagePlayOutP
         context.channel().attr(PLAYER_ENTITY_ID).set(message.getEntityId());
         output.add(message);
     }
-
 }

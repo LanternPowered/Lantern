@@ -23,5 +23,4 @@ public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
         int state = context.read(buf, VarInt.class).value();
         return new MessageHandshakeIn(state, address, port, protocol);
     }
-
 }

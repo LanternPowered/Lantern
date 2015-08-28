@@ -1,0 +1,140 @@
+package org.lanternpowered.server.network.rcon;
+
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
+
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.rcon.RconLoginEvent;
+import org.spongepowered.api.event.rcon.RconQuitEvent;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.AttributeKey;
+
+public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
+
+    private static final AttributeKey<RconSource> SOURCE = AttributeKey.valueOf("rcon-source");
+
+    private static final byte FAILURE = -1;
+    private static final byte TYPE_RESPONSE = 0;
+    private static final byte TYPE_COMMAND = 2;
+    private static final byte TYPE_LOGIN = 3;
+
+    private final RconServer server;
+    private final String password;
+
+    public RconHandler(RconServer server, String password) {
+        this.password = password;
+        this.server = server;
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
+        buf = buf.order(ByteOrder.LITTLE_ENDIAN);
+        if (buf.readableBytes() < 8) {
+            return;
+        }
+
+        int requestId = buf.readInt();
+        int type = buf.readInt();
+
+        byte[] payloadData = new byte[buf.readableBytes() - 2];
+        buf.readBytes(payloadData);
+        String payload = new String(payloadData, StandardCharsets.UTF_8);
+
+        // Two byte padding
+        buf.readBytes(2);
+
+        if (type == TYPE_LOGIN) {
+            handleLogin(ctx, payload, this.password, requestId);
+        } else if (type == TYPE_COMMAND) {
+            handleCommand(ctx, payload, requestId);
+        } else {
+            sendLargeResponse(ctx, requestId, "Unknown request " + Integer.toHexString(type));
+        }
+    }
+
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) {
+        Channel channel = ctx.channel();
+        RconSource source = this.server.newSource(channel);
+
+        if (!channel.attr(SOURCE).compareAndSet(null, source)) {
+            throw new IllegalStateException("Rcon source may not be set more than once!");
+        }
+
+        this.server.onChannelActive(channel, source);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) {
+        Channel channel = ctx.channel();
+        RconSource source = channel.attr(SOURCE).getAndRemove();
+
+        RconQuitEvent event = SpongeEventFactory.createRconQuit(LanternGame.get(), source);
+        LanternGame.get().getEventManager().post(event);
+
+        this.server.onChannelInactive(channel, source);
+    }
+
+    private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {
+        RconSource source = ctx.channel().attr(SOURCE).get();
+
+        if (password.equals(payload)) {
+            RconLoginEvent event = SpongeEventFactory.createRconLogin(LanternGame.get(), source);
+
+            if (!LanternGame.get().getEventManager().post(event)) {
+                source.setLoggedIn(true);
+                sendResponse(ctx, requestId, TYPE_COMMAND, "");
+
+                LanternGame.log().info("Rcon connection from [" + ctx.channel().remoteAddress() + "]");
+                return;
+            }
+        }
+
+        source.setLoggedIn(false);
+        sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
+    }
+
+    private static void handleCommand(ChannelHandlerContext ctx, String payload, int requestId) {
+        RconSource source = ctx.channel().attr(SOURCE).get();
+
+        if (!source.getLoggedIn()) {
+            sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
+            return;
+        }
+
+        LanternGame.get().getCommandDispatcher().process(source, payload);
+        sendLargeResponse(ctx, requestId, source.flush());
+    }
+
+    private static void sendResponse(ChannelHandlerContext ctx, int requestId, int type, String payload) {
+        ByteBuf buf = ctx.alloc().buffer().order(ByteOrder.LITTLE_ENDIAN);
+        buf.writeInt(requestId);
+        buf.writeInt(type);
+        buf.writeBytes(payload.getBytes(StandardCharsets.UTF_8));
+        buf.writeByte(0);
+        buf.writeByte(0);
+        ctx.write(buf);
+    }
+
+    private static void sendLargeResponse(ChannelHandlerContext ctx, int requestId, String payload) {
+        if (payload.length() == 0) {
+            sendResponse(ctx, requestId, TYPE_RESPONSE, "");
+            return;
+        }
+
+        int start = 0;
+        while (start < payload.length()) {
+            int length = payload.length() - start;
+            int truncated = length > 2048 ? 2048 : length;
+
+            sendResponse(ctx, requestId, TYPE_RESPONSE, payload.substring(start, truncated));
+            start += truncated;
+        }
+    }
+
+}

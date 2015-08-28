@@ -18,5 +18,4 @@ public final class ProcessorPlayOutSetReducedDebug implements Processor<MessageP
         int action = message.isReduced() ? 22 : 23;
         output.add(new MessagePlayOutEntityStatus(entityId, action));
     }
-
 }

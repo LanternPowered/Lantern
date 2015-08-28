@@ -12,6 +12,7 @@ import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.util.VecHelper;
+import org.lanternpowered.server.util.concurrent.AtomicByteArray;
 import org.lanternpowered.server.util.concurrent.AtomicNibbleArray;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
 import org.lanternpowered.server.world.LanternWorld;
@@ -168,6 +169,7 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     private volatile boolean loaded;
     private volatile boolean populated;
 
+    private AtomicByteArray heightMap;
     private AtomicReferenceArray<ChunkSection> sections = new AtomicReferenceArray<ChunkSection>(CHUNK_SECTIONS);
     private AtomicShortArray biomes;
 
@@ -187,9 +189,18 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         if (this.sections != null || this.biomes != null) {
             throw new IllegalStateException("Chunk is already initialized!");
         }
+        this.heightMap = new AtomicByteArray(CHUNK_AREA_SIZE.lengthSquared());
         this.sections = new AtomicReferenceArray<ChunkSection>(CHUNK_SECTIONS);
         this.biomes = new AtomicShortArray(CHUNK_AREA_SIZE.lengthSquared());
         this.loaded = true;
+    }
+
+    public ChunkSection[] getSections() {
+        ChunkSection[] array = new ChunkSection[CHUNK_SECTIONS];
+        for (int i = 0; i < array.length; i++) {
+            array[i] = this.sections.get(i);
+        }
+        return array;
     }
 
     public void initializeSections(ChunkSection[] sections) {
@@ -213,6 +224,75 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         this.biomes = new AtomicShortArray(biomes);
     }
 
+    /**
+     * Scan downwards to determine the new height map value.
+     */
+    private int lowerHeightMap(int x, int y, int z) {
+        for (--y; y >= 0; --y) {
+            if (getType(x, z, y) != 0) {
+                break;
+            }
+        }
+        return y + 1;
+    }
+
+    public int[] getHeightMap() {
+        int[] heightMap = new int[this.heightMap.length()];
+        for (int i = 0; i < heightMap.length; i++) {
+            heightMap[i] = this.heightMap.get(i);
+        }
+        return heightMap;
+    }
+
+    public void setHeightMap(int[] heightMap) {
+        if (this.heightMap == null) {
+            byte[] array = new byte[heightMap.length];
+            for (int i = 0; i < array.length; i++) {
+                array[i] = (byte) heightMap[i];
+            }
+            this.heightMap = new AtomicByteArray(array);
+        } else {
+            for (int i = 0; i < heightMap.length; i++) {
+                this.heightMap.set(i, (byte) heightMap[i]);
+            }
+        }
+    }
+
+    /**
+     * Automatically fill the height map after chunks have been initialized.
+     */
+    public void automaticHeightMap() {
+        byte[] heightMap = this.heightMap == null ? new byte[CHUNK_AREA_SIZE.lengthSquared()] : null;
+
+        // Determine max Y chunk section at a time
+        int sy = this.sections.length() - 1;
+        for (; sy >= 0; --sy) {
+            if (this.sections.get(sy) != null) {
+                break;
+            }
+        }
+
+        int wx = CHUNK_AREA_SIZE.getX();
+        int wz = CHUNK_AREA_SIZE.getY();
+        int y = (sy + 1) * 16;
+
+        for (int x = 0; x < wx; ++x) {
+            for (int z = 0; z < wz; ++z) {
+                byte value = (byte) this.lowerHeightMap(x, y, z);
+                int index = z * wx + x;
+                if (heightMap != null) {
+                    heightMap[index] = value;
+                } else {
+                    this.heightMap.set(index, value);
+                }
+            }
+        }
+
+        if (heightMap != null) {
+            this.heightMap = new AtomicByteArray(heightMap);
+        }
+    }
+
     public void setPopulated(boolean populated) {
         this.populated = populated;
     }
@@ -233,6 +313,15 @@ public class LanternChunk extends AbstractExtent implements Chunk {
      */
     public int getZ() {
         return this.z;
+    }
+
+    /**
+     * Gets a array with all the biomes.
+     * 
+     * @return the biomes
+     */
+    public short[] getBiomes() {
+        return this.biomes.getArray();
     }
 
     /**

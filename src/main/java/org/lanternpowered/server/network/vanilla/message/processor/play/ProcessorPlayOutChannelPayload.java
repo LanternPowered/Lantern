@@ -6,13 +6,15 @@ import io.netty.handler.codec.CodecException;
 
 import java.util.List;
 
-import org.lanternpowered.server.network.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.caching.Caching;
+import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
-public class ProcessorPlayOutChannelPayload implements Processor<MessagePlayInOutChannelPayload> {
+@Caching(ProcessorPlayOutChannelPayload.CachingHash.class)
+public final class ProcessorPlayOutChannelPayload implements Processor<MessagePlayInOutChannelPayload> {
 
     @Override
     public void process(CodecContext context, MessagePlayInOutChannelPayload message, List<Message> output) throws CodecException {

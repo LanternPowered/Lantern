@@ -9,4 +9,6 @@ public interface TicketsProvider {
     int getMaxChunksForTicket(String plugin);
 
     int getMaxTicketsFor(UUID playerUUID);
+
+    int getAvailableTicketsFor(UUID playerUUID);
 }

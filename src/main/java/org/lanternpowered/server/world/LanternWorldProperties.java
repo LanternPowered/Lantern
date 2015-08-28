@@ -28,7 +28,6 @@ public class LanternWorldProperties implements WorldProperties {
     private UUID uniqueId;
     private Vector3i spawnPosition;
     private Difficulty difficulty;
-
     private GameRules rules;
 
     private boolean enabled;

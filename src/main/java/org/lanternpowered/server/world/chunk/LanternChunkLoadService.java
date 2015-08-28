@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.UUID;
 
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.tickets.TicketsProvider;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -38,6 +39,11 @@ public class LanternChunkLoadService implements ChunkLoadService {
         @Override
         public int getMaxTicketsFor(UUID playerUUID) {
             return 50;
+        }
+
+        @Override
+        public int getAvailableTicketsFor(UUID playerUUID) {
+            return getAvailableTickets(playerUUID);
         }
 
     };
@@ -109,13 +115,17 @@ public class LanternChunkLoadService implements ChunkLoadService {
     public int getAvailableTickets(Object plugin, World world) {
         String id = checkPlugin(plugin, "plugin").getId();
         LanternWorld world0 = (LanternWorld) checkNotNull(world, "world");
-        return this.provider.getMaxTicketsFor(id) - world0.getChunkManager().getLoadingTickets().getTicketsFor(id);
+        return this.provider.getMaxTicketsFor(id) - world0.getChunkManager().getLoadingTickets().getTicketsForPlugin(id);
     }
 
     @Override
     public int getAvailableTickets(UUID player) {
-        // TODO Auto-generated method stub
-        return 0;
+        checkPlugin(player, "player");
+        int count = 0;
+        for (World world : LanternGame.get().getServer().getWorlds()) {
+            count += ((LanternWorld) world).getChunkManager().getLoadingTickets().getTicketsForPlayer(player);
+        }
+        return this.provider.getMaxTicketsFor(player) - count;
     }
 
     @Override

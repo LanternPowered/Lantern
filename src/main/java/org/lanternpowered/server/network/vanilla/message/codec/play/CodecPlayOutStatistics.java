@@ -28,5 +28,4 @@ public final class CodecPlayOutStatistics implements Codec<MessagePlayOutStatist
     public MessagePlayOutStatistics decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
-
 }

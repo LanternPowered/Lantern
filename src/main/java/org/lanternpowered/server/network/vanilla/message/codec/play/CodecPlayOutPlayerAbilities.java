@@ -3,10 +3,12 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
+import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
 
+@Caching
 public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAbilities> {
 
     @Override
@@ -39,5 +41,4 @@ public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAb
         float w = ((y + 1f) * z) / (2 * x);
         return w;
     }
-
 }

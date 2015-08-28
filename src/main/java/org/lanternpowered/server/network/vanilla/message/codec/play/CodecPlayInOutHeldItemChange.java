@@ -22,5 +22,4 @@ public final class CodecPlayInOutHeldItemChange implements Codec<MessagePlayInOu
     public MessagePlayInOutHeldItemChange decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessagePlayInOutHeldItemChange((byte) buf.readShort());
     }
-
 }

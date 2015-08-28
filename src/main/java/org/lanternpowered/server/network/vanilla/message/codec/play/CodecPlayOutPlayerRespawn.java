@@ -23,5 +23,4 @@ public final class CodecPlayOutPlayerRespawn implements Codec<MessagePlayOutPlay
     public MessagePlayOutPlayerRespawn decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
-
 }

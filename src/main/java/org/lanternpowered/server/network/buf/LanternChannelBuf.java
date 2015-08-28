@@ -35,7 +35,6 @@ public class LanternChannelBuf implements ChannelBuf {
 
             });
 
-
     private final ByteBuf buf;
 
     @Nullable
@@ -43,6 +42,10 @@ public class LanternChannelBuf implements ChannelBuf {
 
     public LanternChannelBuf(ByteBuf buf) {
         this.buf = buf;
+    }
+
+    public ByteBuf getDelegate() {
+        return this.buf;
     }
 
     @Override

@@ -7,6 +7,11 @@ import io.netty.buffer.UnpooledByteBufAllocator;
 public class SimpleObjectSerializerContext extends AbstractObjectSerializerContext {
 
     /**
+     * A object serializer context specific for the sponge channel buffer.
+     */
+    public static final ObjectSerializerContext CONTEXT = new SimpleObjectSerializerContext(SimpleObjectSerializers.DEFAULT);
+
+    /**
      * A byte buf allocator that will always return a heap buffer to
      * allow the {@link ByteBuf#array()} to work.
      */
@@ -20,5 +25,4 @@ public class SimpleObjectSerializerContext extends AbstractObjectSerializerConte
     public ByteBufAllocator byteBufAlloc() {
         return ALLOCATOR;
     }
-
 }

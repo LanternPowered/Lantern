@@ -18,5 +18,4 @@ public class CodecPlayInOutCloseWindow implements Codec<MessagePlayInOutCloseWin
     public MessagePlayInOutCloseWindow decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessagePlayInOutCloseWindow(buf.readByte());
     }
-
 }

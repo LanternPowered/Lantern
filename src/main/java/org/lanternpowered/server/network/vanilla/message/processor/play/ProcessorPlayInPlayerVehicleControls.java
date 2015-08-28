@@ -13,7 +13,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayInPlayerVehicleControls;
 
-public class ProcessorPlayInPlayerVehicleControls implements Processor<MessagePlayInPlayerVehicleControls> {
+public final class ProcessorPlayInPlayerVehicleControls implements Processor<MessagePlayInPlayerVehicleControls> {
 
     private final static AttributeKey<Boolean> SNEAKING = AttributeKey.valueOf("last-sneaking-state");
     private final static AttributeKey<Boolean> JUMPING = AttributeKey.valueOf("last-jumping-state");

@@ -9,22 +9,19 @@ import org.lanternpowered.server.network.session.Session;
 
 public class SimpleCodecContext extends AbstractObjectSerializerContext implements CodecContext {
 
-    private final ByteBufAllocator byteBufAllocator;
     private final Channel channel;
     private final Session session;
 
-    public SimpleCodecContext(ObjectSerializers objectSerializers, ByteBufAllocator byteBufAllocator,
-            Channel channel, Session session) {
+    public SimpleCodecContext(ObjectSerializers objectSerializers, Channel channel, Session session) {
         super(objectSerializers);
 
-        this.byteBufAllocator = byteBufAllocator;
         this.channel = channel;
         this.session = session;
     }
 
     @Override
     public ByteBufAllocator byteBufAlloc() {
-        return this.byteBufAllocator;
+        return this.channel.alloc();
     }
 
     @Override
@@ -36,5 +33,4 @@ public class SimpleCodecContext extends AbstractObjectSerializerContext implemen
     public Session session() {
         return this.session;
     }
-
 }

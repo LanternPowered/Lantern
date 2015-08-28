@@ -50,6 +50,9 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
     @SuppressWarnings("unchecked")
     private void writePayload(byte type, Object object) throws IOException {
         if (type == BYTE) {
+            if (object instanceof Boolean) {
+                object = (byte) (((Boolean) object) ? 1 : 0);
+            }
             this.dos.writeByte((Byte) object);
         } else if (type == BYTE_ARRAY) {
             byte[] array0;
@@ -123,7 +126,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
     }
 
     private byte typeFor(Object object) {
-        if (object instanceof Byte) {
+        if (object instanceof Byte || object instanceof Boolean) {
             return BYTE;
         } else if (object instanceof Byte[] || object instanceof byte[]) {
             return BYTE_ARRAY;

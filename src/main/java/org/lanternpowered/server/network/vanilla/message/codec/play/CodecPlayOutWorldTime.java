@@ -3,10 +3,12 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
+import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 
+@Caching
 public final class CodecPlayOutWorldTime implements Codec<MessagePlayOutWorldTime> {
 
     @Override
@@ -36,5 +38,4 @@ public final class CodecPlayOutWorldTime implements Codec<MessagePlayOutWorldTim
     public MessagePlayOutWorldTime decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new UnsupportedOperationException();
     }
-
 }

@@ -82,8 +82,8 @@ public class AtomicFloatArray implements Serializable {
      * @param newValue the new value
      * @return the previous value
      */
-    public final int getAndSet(int index, float newValue) {
-        return this.backingArray.getAndSet(index, Float.floatToRawIntBits(newValue));
+    public final float getAndSet(int index, float newValue) {
+        return Float.intBitsToFloat(this.backingArray.getAndSet(index, Float.floatToRawIntBits(newValue)));
     }
 
     /**

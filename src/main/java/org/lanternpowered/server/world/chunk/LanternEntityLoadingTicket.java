@@ -1,4 +1,4 @@
-package org.lanternpowered.server.world.chunk.tickets;
+package org.lanternpowered.server.world.chunk;
 
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.service.world.ChunkLoadService.EntityLoadingTicket;
@@ -7,8 +7,8 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityL
 
     protected volatile Entity entity;
 
-    public LanternEntityLoadingTicket(String plugin, LanternLoadingTickets tickets, int maxChunks) {
-        super(plugin, tickets, maxChunks);
+    public LanternEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks) {
+        super(plugin, chunkManager, maxChunks);
     }
 
     @Override
@@ -20,5 +20,4 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityL
     public Entity getBoundEntity() {
         return this.entity;
     }
-
 }

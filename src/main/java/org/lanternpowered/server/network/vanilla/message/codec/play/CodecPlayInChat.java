@@ -18,5 +18,4 @@ public final class CodecPlayInChat implements Codec<MessagePlayInChatMessage> {
     public MessagePlayInChatMessage decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessagePlayInChatMessage(context.read(buf, String.class));
     }
-
 }

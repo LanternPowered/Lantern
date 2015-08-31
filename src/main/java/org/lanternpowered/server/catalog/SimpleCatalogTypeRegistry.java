@@ -60,4 +60,9 @@ public class SimpleCatalogTypeRegistry<T extends CatalogType> implements Catalog
         return this.types;
     }
 
+    @Override
+    public boolean has(T catalogType) {
+        return this.types.containsValue(checkNotNull(catalogType, "catalogType"));
+    }
+
 }

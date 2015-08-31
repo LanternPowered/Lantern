@@ -1,11 +1,10 @@
-package org.lanternpowered.server.world.chunk.tickets;
+package org.lanternpowered.server.world.chunk;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.service.world.ChunkLoadService.LoadingTicket;
 
 import com.flowpowered.math.vector.Vector2i;
@@ -17,7 +16,7 @@ import com.google.common.collect.ImmutableSet;
 class LanternLoadingTicket implements LoadingTicket {
 
     private final ConcurrentLinkedQueue<Vector2i> queue = new ConcurrentLinkedQueue<Vector2i>();
-    private final LanternLoadingTickets tickets;
+    private final LanternChunkManager chunkManager;
     private final String plugin;
 
     // The maximum amount of chunks that can be loaded by this ticket
@@ -26,9 +25,9 @@ class LanternLoadingTicket implements LoadingTicket {
     // The amount of chunks that may be loaded by this ticket
     private volatile int numChunks;
 
-    public LanternLoadingTicket(String plugin, LanternLoadingTickets tickets, int maxChunks) {
+    public LanternLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks) {
+        this.chunkManager = chunkManager;
         this.maxChunks = maxChunks;
-        this.tickets = tickets;
         this.plugin = plugin;
     }
 
@@ -44,22 +43,19 @@ class LanternLoadingTicket implements LoadingTicket {
     @Override
     public boolean setNumChunks(int numChunks) {
         checkArgument(numChunks >= 0, "numChunks may not be negative");
-
         if (numChunks > this.maxChunks) {
             return false;
         }
-
         // Remove the oldest chunks that cannot be loaded anymore
         if (numChunks < this.numChunks) {
             int size = this.queue.size();
 
             if (numChunks < size) {
                 for (int i = 0; i < size - numChunks; i++) {
-                    this.tickets.release(this, this.queue.poll());
+                    this.chunkManager.release(this, this.queue.poll());
                 }
             }
         }
-
         this.numChunks = numChunks;
         return true;
     }
@@ -82,12 +78,10 @@ class LanternLoadingTicket implements LoadingTicket {
     @Override
     public ImmutableSet<Vector3i> getChunkList() {
         return ImmutableSet.copyOf(Collections2.transform(this.queue, new Function<Vector2i, Vector3i>() {
-
             @Override
             public Vector3i apply(Vector2i input) {
                 return LanternChunk.fromVector2(input);
             }
-
         }));
     }
 
@@ -98,11 +92,10 @@ class LanternLoadingTicket implements LoadingTicket {
         if (!this.queue.contains(chunk0)) {
             // Remove the oldest chunk if necessary
             if (this.queue.size() >= this.numChunks) {
-                this.tickets.release(this, this.queue.poll());
+                this.chunkManager.release(this, this.queue.poll());
             }
-
             this.queue.add(chunk0);
-            this.tickets.force(this, chunk0);
+            this.chunkManager.force(this, chunk0);
         }
     }
 
@@ -110,7 +103,7 @@ class LanternLoadingTicket implements LoadingTicket {
     public void unforceChunk(Vector3i chunk) {
         Vector2i chunk0 = checkNotNull(chunk, "chunk").toVector2(true);
         if (this.queue.remove(chunk0)) {
-            this.tickets.release(this, chunk0);
+            this.chunkManager.release(this, chunk0);
         }
     }
 
@@ -126,8 +119,7 @@ class LanternLoadingTicket implements LoadingTicket {
     @Override
     public void release() {
         while (!this.queue.isEmpty()) {
-            this.tickets.release(this, this.queue.poll());
+            this.chunkManager.release(this, this.queue.poll());
         }
     }
-
 }

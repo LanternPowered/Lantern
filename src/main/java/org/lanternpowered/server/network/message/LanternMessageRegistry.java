@@ -3,15 +3,12 @@ package org.lanternpowered.server.network.message;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
-import java.util.List;
 import java.util.Map;
 
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -81,7 +78,7 @@ public class LanternMessageRegistry implements MessageRegistry {
     public <M extends Message, P extends Processor<? super M>> LanternMessageRegistration<M> register(
             Class<M> message, P processor) {
         LanternMessageRegistration<M> registration = (LanternMessageRegistration<M>) this.getOrCreate(message);
-        registration.processors.add(processor);
+        registration.processor = processor;
         return registration;
     }
 
@@ -97,9 +94,9 @@ public class LanternMessageRegistry implements MessageRegistry {
 
     private static final class LanternMessageRegistration<M extends Message> implements MessageRegistration<M> {
 
-        private final List<Processor> processors = Lists.newArrayList();
         private final Class<M> type;
 
+        private Processor processor;
         private Codec<?> codec;
         private Handler<?> handler;
         private Integer opcode;
@@ -129,22 +126,8 @@ public class LanternMessageRegistry implements MessageRegistry {
         }
 
         @Override
-        public <P extends Processor<? super M>> List<P> getProcessors() {
-            return ImmutableList.<P>copyOf((List) this.processors);
-        }
-
-        @Override
-        public <P extends Processor<? super M>> void insertProcessor(int index, P processor) {
-            if (index >= this.processors.size()) {
-                this.processors.add(processor);
-            } else {
-                this.processors.add(index, processor);
-            }
-        }
-
-        @Override
-        public <P extends Processor<? super M>> void addProcessor(P processor) {
-            this.processors.add(processor);
+        public <P extends Processor<? super M>> P getProcessor() {
+            return (P) this.processor;
         }
     }
 

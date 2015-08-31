@@ -23,5 +23,4 @@ public final class CodecPlayOutChangeGameState implements Codec<MessagePlayOutCh
     public MessagePlayOutChangeGameState decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
-
 }

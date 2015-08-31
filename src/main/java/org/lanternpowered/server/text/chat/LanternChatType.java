@@ -5,10 +5,8 @@ import org.spongepowered.api.text.chat.ChatType;
 public class LanternChatType implements ChatType {
 
     private final String name;
-    private final byte internalId;
 
-    public LanternChatType(String name, byte internalId) {
-        this.internalId = internalId;
+    public LanternChatType(String name) {
         this.name = name;
     }
 
@@ -20,9 +18,5 @@ public class LanternChatType implements ChatType {
     @Override
     public String getName() {
         return this.name;
-    }
-
-    public byte getInternalId() {
-        return this.internalId;
     }
 }

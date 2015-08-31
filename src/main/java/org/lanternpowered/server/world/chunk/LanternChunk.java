@@ -355,6 +355,9 @@ public class LanternChunk extends AbstractExtent implements Chunk {
      * @return the chunk section
      */
     public ChunkSection getSectionAtHeight(int y) {
+        if (this.sections == null) {
+            return null;
+        }
         y >>= 4;
         if (y < 0 || y > this.sections.length()) {
             return null;
@@ -503,7 +506,8 @@ public class LanternChunk extends AbstractExtent implements Chunk {
 
     @Override
     public BlockSnapshot getBlockSnapshot(int x, int y, int z) {
-        return new LanternBlockSnapshot(new Vector3i(x, y, z), this.getBlock(x, y, z));
+        // TODO: Verify the used location in constructor
+        return new LanternBlockSnapshot(new Vector3i(this.x << 4 | x, y, this.z << 4 | z), this.getBlock(x, y, z));
     }
 
     @Override
@@ -1010,5 +1014,4 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         }
         return false;
     }
-
 }

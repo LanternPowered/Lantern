@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
+import org.lanternpowered.server.util.VecHelper;
+import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -57,6 +59,9 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
+
 public class LanternWorld extends AbstractExtent implements World {
 
     private final LanternChunkManager chunkManager = null;
@@ -86,43 +91,54 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public BlockSnapshot getBlockSnapshot(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBlockSnapshot(x & 0xf, y, z & 0xf);
     }
 
     @Override
     public void setBlockSnapshot(int x, int y, int z, BlockSnapshot snapshot) {
-        // TODO Auto-generated method stub
-        
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlockSnapshot(x & 0xf, y, z & 0xf, snapshot);
     }
 
     @Override
     public void interactBlock(int x, int y, int z, Direction side) {
-        // TODO Auto-generated method stub
-        
+        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.interactBlock(x & 0xf, y, z & 0xf, side);
+        }
     }
 
     @Override
     public void interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side) {
-        // TODO Auto-generated method stub
-        
+        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.interactBlockWith(x & 0xf, y, z & 0xf, itemStack, side);
+        }
     }
 
     @Override
     public boolean digBlock(int x, int y, int z) {
-        // TODO Auto-generated method stub
+        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            return chunk.digBlock(x & 0xf, y, z & 0xf);
+        }
         return false;
     }
 
     @Override
     public boolean digBlockWith(int x, int y, int z, ItemStack itemStack) {
-        // TODO Auto-generated method stub
+        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            return chunk.digBlockWith(x & 0xf, y, z & 0xf, itemStack);
+        }
         return false;
     }
 
     @Override
     public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack) {
-        // TODO Auto-generated method stub
+        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            return chunk.getBlockDigTimeWith(x & 0xf, y, z & 0xf, itemStack);
+        }
         return 0;
     }
 
@@ -158,8 +174,11 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
+        if (chunk != null) {
+            return chunk.getScheduledUpdates(x & 0xf, y, z & 0xf);
+        }
+        return ImmutableSet.of();
     }
 
     @Override
@@ -332,8 +351,7 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public BiomeType getBiome(int x, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBiome(x & 0xf, z & 0xf);
     }
 
     @Override
@@ -654,15 +672,16 @@ public class LanternWorld extends AbstractExtent implements World {
     }
 
     @Override
-    public Optional<Chunk> loadChunk(Vector3i position, boolean shouldGenerate) {
-        // TODO Auto-generated method stub
-        return null;
+    public Optional<Chunk> loadChunk(Vector3i position, boolean generate) {
+        return this.loadChunk(position.getX(), position.getY(), position.getZ(), generate);
     }
 
     @Override
-    public Optional<Chunk> loadChunk(int x, int y, int z, boolean shouldGenerate) {
-        // TODO Auto-generated method stub
-        return null;
+    public Optional<Chunk> loadChunk(int x, int y, int z, boolean generate) {
+        if (!VecHelper.inBounds(x, y, z, SPACE_MIN, SPACE_MAX)) {
+            return Optional.absent();
+        }
+        return Optional.<Chunk>of(this.chunkManager.getOrLoadChunk(new Vector2i(x, z), generate));
     }
 
     @Override

@@ -21,5 +21,4 @@ public final class CodecPlayInPlayerAbilities implements Codec<MessagePlayInPlay
         buf.readFloat();
         return new MessagePlayInPlayerAbilities(flying);
     }
-
 }

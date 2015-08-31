@@ -39,5 +39,4 @@ public class LanternResourcePack implements ResourcePack {
     public Optional<String> getHash() {
         return this.hash;
     }
-
 }

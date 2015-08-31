@@ -11,88 +11,110 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 public class LanternWorldCreationSettings implements WorldCreationSettings {
 
+    private final String name;
+    private final GameMode gameMode;
+    private final DimensionType dimensionType;
+    private final GeneratorType generatorType;
+    private final Collection<WorldGeneratorModifier> generatorModifiers;
+    private final DataContainer generatorSettings;
+
+    private final boolean hardcore;
+    private final boolean enabled;
+    private final boolean loadsOnStartup;
+    private final boolean keepsSpawnLoaded;
+    private final boolean usesMapFeatures;
+    private final boolean bonusChestEnabled;
+    private final boolean commandsAllowed;
+
+    private final long seed;
+
+    LanternWorldCreationSettings(String name, GameMode gameMode, DimensionType dimensionType, GeneratorType generatorType,
+            Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, boolean hardcore,
+            boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
+            boolean bonusChestEnabled, boolean commandsAllowed, long seed) {
+        this.generatorModifiers = generatorModifiers;
+        this.generatorSettings = generatorSettings;
+        this.bonusChestEnabled = bonusChestEnabled;
+        this.keepsSpawnLoaded = keepsSpawnLoaded;
+        this.usesMapFeatures = usesMapFeatures;
+        this.commandsAllowed = commandsAllowed;
+        this.loadsOnStartup = loadsOnStartup;
+        this.dimensionType = dimensionType;
+        this.generatorType = generatorType;
+        this.hardcore = hardcore;
+        this.gameMode = gameMode;
+        this.enabled = enabled;
+        this.name = name;
+        this.seed = seed;
+    }
+
     @Override
     public String getWorldName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.name;
     }
 
     @Override
     public boolean isEnabled() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.enabled;
     }
 
     @Override
     public boolean loadOnStartup() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.loadsOnStartup;
     }
 
     @Override
     public boolean doesKeepSpawnLoaded() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.keepsSpawnLoaded;
     }
 
     @Override
     public long getSeed() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.seed;
     }
 
     @Override
     public GameMode getGameMode() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.gameMode;
     }
 
     @Override
     public GeneratorType getGeneratorType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.generatorType;
     }
 
     @Override
     public Collection<WorldGeneratorModifier> getGeneratorModifiers() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.generatorModifiers;
     }
 
     @Override
     public boolean usesMapFeatures() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.usesMapFeatures;
     }
 
     @Override
     public boolean isHardcore() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.hardcore;
     }
 
     @Override
     public boolean commandsAllowed() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.commandsAllowed;
     }
 
     @Override
     public boolean bonusChestEnabled() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.bonusChestEnabled;
     }
 
     @Override
     public DimensionType getDimensionType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.dimensionType;
     }
 
     @Override
     public DataContainer getGeneratorSettings() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.generatorSettings;
     }
-
 }

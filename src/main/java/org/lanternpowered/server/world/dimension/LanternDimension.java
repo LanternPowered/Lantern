@@ -1,5 +1,6 @@
 package org.lanternpowered.server.world.dimension;
 
+import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
@@ -7,28 +8,45 @@ import org.spongepowered.api.world.GeneratorType;
 
 public class LanternDimension implements Dimension {
 
+    private final String name;
+    private final DimensionType dimensionType;
+    private final LanternWorld world;
+    private final boolean hasSky;
+
+    private volatile Context dimContext;
+
+    private boolean allowPlayerRespawns = true;
+    private boolean waterEvaporates = false;
+
+    public LanternDimension(LanternWorld world, String name, DimensionType dimensionType,
+            boolean hasSky) {
+        this.dimensionType = dimensionType;
+        this.hasSky = hasSky;
+        this.world = world;
+        this.name = name;
+    }
+
     @Override
     public Context getContext() {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.dimContext == null) {
+            this.dimContext = new Context(Context.DIMENSION_KEY, this.getName());
+        }
+        return this.dimContext;
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.name;
     }
 
     @Override
     public boolean allowsPlayerRespawns() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.allowPlayerRespawns;
     }
 
     @Override
     public void setAllowsPlayerRespawns(boolean allow) {
-        // TODO Auto-generated method stub
-        
+        this.allowPlayerRespawns = allow;
     }
 
     @Override
@@ -39,26 +57,22 @@ public class LanternDimension implements Dimension {
 
     @Override
     public boolean doesWaterEvaporate() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.waterEvaporates;
     }
 
     @Override
     public void setWaterEvaporates(boolean evaporates) {
-        // TODO Auto-generated method stub
-        
+        this.waterEvaporates = evaporates;
     }
 
     @Override
     public boolean hasSky() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.hasSky;
     }
 
     @Override
     public DimensionType getType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.dimensionType;
     }
 
     @Override
@@ -75,8 +89,7 @@ public class LanternDimension implements Dimension {
 
     @Override
     public GeneratorType getGeneratorType() {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Is this supposed to return this?
+        return this.world.getProperties().getGeneratorType();
     }
-
 }

@@ -77,7 +77,7 @@ public class LanternAttributeBuilder implements AttributeBuilder {
         checkState(this.def != null, "defaultValue is not set");
         checkState(this.def >= this.min && this.def <= this.max, "defaultValue must scale between the minimum and maximum value");
         LanternAttribute attribute = new LanternAttribute(this.identifier, this.name, this.min, this.max, this.def, this.targets);
-        // TODO: Register the new attribute
+        this.registry.register(attribute);
         return attribute;
     }
 

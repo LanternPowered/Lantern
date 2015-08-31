@@ -5,28 +5,34 @@ import org.spongepowered.api.world.DimensionType;
 
 public class LanternDimensionType implements DimensionType {
 
+    private final String name;
+    private final Class<? extends Dimension> dimensionClass;
+    private final boolean keepSpawnLoaded;
+
+    public LanternDimensionType(String name, Class<? extends Dimension> dimensionClass,
+            boolean keepSpawnLoaded) {
+        this.keepSpawnLoaded = keepSpawnLoaded;
+        this.dimensionClass = dimensionClass;
+        this.name = name;
+    }
+
     @Override
     public String getId() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.name;
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.name;
     }
 
     @Override
     public boolean doesKeepSpawnLoaded() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.keepSpawnLoaded;
     }
 
     @Override
     public Class<? extends Dimension> getDimensionClass() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.dimensionClass;
     }
-
 }

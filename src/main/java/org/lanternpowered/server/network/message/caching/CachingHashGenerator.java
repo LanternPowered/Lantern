@@ -17,8 +17,6 @@ public interface CachingHashGenerator<T extends Message> {
     /**
      * This hash generator will always return {@code 0}, this means that all the
      * messages that are processed for each context, will give the same result.
-     *
-     * @param <T> the message type
      */
     public static final class Equal implements CachingHashGenerator<Message> {
 

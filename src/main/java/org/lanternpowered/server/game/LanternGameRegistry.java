@@ -8,20 +8,28 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
+import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder;
 import org.lanternpowered.server.block.LanternBlockRegistry;
+import org.lanternpowered.server.catalog.CatalogTypeRegistry;
+import org.lanternpowered.server.catalog.SimpleCatalogTypeRegistry;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
+import org.lanternpowered.server.world.LanternWorldBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeRegistry;
+import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.GameRegistry;
+import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.attribute.AttributeBuilder;
 import org.spongepowered.api.attribute.AttributeCalculator;
 import org.spongepowered.api.attribute.AttributeModifierBuilder;
@@ -64,6 +72,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.world.WorldBuilder;
+import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.explosion.ExplosionBuilder;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
@@ -72,10 +81,13 @@ import org.spongepowered.api.world.gen.PopulatorFactory;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 public class LanternGameRegistry implements GameRegistry {
 
+    private final LanternGame game;
     private final Set<String> defaultGameRules;
     private final LanternTranslationManager translationManager = new LanternTranslationManager();
     private final LanternGameDictionary gameDictionary = new LanternGameDictionary();
@@ -83,6 +95,15 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
     private final LanternBiomeRegistry biomeRegistry = new LanternBiomeRegistry();
     private final LanternBlockRegistry blockRegistry = new LanternBlockRegistry();
+    private final CatalogTypeRegistry<Attribute> attributeRegistry = new SimpleCatalogTypeRegistry<Attribute>();
+    private final CatalogTypeRegistry<WorldGeneratorModifier> worldGeneratorModifierRegistry =
+            new SimpleCatalogTypeRegistry<WorldGeneratorModifier>();
+    private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
+            .put(Attribute.class, this.attributeRegistry)
+            .put(BiomeType.class, this.biomeRegistry)
+            .put(BlockType.class, this.blockRegistry)
+            .put(WorldGeneratorModifier.class, this.worldGeneratorModifierRegistry)
+            .build();
 
     {
         ImmutableSet.Builder<String> builder = ImmutableSet.builder();
@@ -96,6 +117,28 @@ public class LanternGameRegistry implements GameRegistry {
             }
         }
         this.defaultGameRules = builder.build();
+    }
+
+    public LanternGameRegistry(LanternGame game) {
+        this.game = game;
+    }
+
+    /**
+     * Gets the {@link CatalogTypeRegistry<WorldGeneratorModifier>}.
+     * 
+     * @return the world generator modifier registry
+     */
+    public CatalogTypeRegistry<WorldGeneratorModifier> getWorldGeneratorModifierRegistry() {
+        return this.worldGeneratorModifierRegistry;
+    }
+
+    /**
+     * Gets the {@link CatalogTypeRegistry<Attribute>}.
+     * 
+     * @return the attribute registry
+     */
+    public CatalogTypeRegistry<Attribute> getAttributeRegistry() {
+        return this.attributeRegistry;
     }
 
     /**
@@ -134,16 +177,22 @@ public class LanternGameRegistry implements GameRegistry {
         return this.translationManager;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends CatalogType> Optional<T> getType(Class<T> typeClass, String id) {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.catalogTypeRegistries.containsKey(typeClass)) {
+            return (Optional<T>) this.catalogTypeRegistries.get(typeClass).get(id);
+        }
+        return Optional.absent();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends CatalogType> Collection<T> getAllOf(Class<T> typeClass) {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.catalogTypeRegistries.containsKey(typeClass)) {
+            return (Collection<T>) this.catalogTypeRegistries.get(typeClass).getAll();
+        }
+        return ImmutableList.of();
     }
 
     @Override
@@ -269,8 +318,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public void registerWorldGeneratorModifier(WorldGeneratorModifier modifier) {
-        // TODO Auto-generated method stub
-        
+        this.worldGeneratorModifierRegistry.register(modifier);
     }
 
     @Override
@@ -370,20 +418,17 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public AttributeModifierBuilder createAttributeModifierBuilder() {
-        // TODO Auto-generated method stub
-        return null;
+        return new LanternAttributeModifierBuilder();
     }
 
     @Override
     public AttributeBuilder createAttributeBuilder() {
-        // TODO Auto-generated method stub
-        return null;
+        return new LanternAttributeBuilder(this.attributeRegistry);
     }
 
     @Override
     public WorldBuilder createWorldBuilder() {
-        // TODO Auto-generated method stub
-        return null;
+        return new LanternWorldBuilder(this.game);
     }
 
     @Override
@@ -424,8 +469,6 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public ExtentBufferFactory getExtentBufferFactory() {
-        // TODO Auto-generated method stub
-        return null;
+        return LanternExtentBufferFactory.INSTANCE;
     }
-
 }

@@ -4,10 +4,13 @@ import java.util.List;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
+import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.session.Session;
+
+import com.google.common.base.Optional;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.EncoderException;
@@ -31,16 +34,23 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered!");
         }
 
-        List<Processor> processors = registration.getProcessors();
-        // Only process if there are processors found
-        if (!processors.isEmpty()) {
+        Processor processor = registration.getProcessor();
+        // Only process if there is a processor found
+        if (processor != null) {
             CodecContext context = ctx.channel().attr(CONTEXT).get();
-            for (Processor processor : processors) {
-                // The processor should handle the output messages
-                processor.process(context, message, output);
+            // Handle first the caching system
+            Optional<CachingHashGenerator<?>> hashGen = CachedMessages.getHashGenerator(processor.getClass());
+            if (hashGen.isPresent()) {
+                int hash = ((CachingHashGenerator) hashGen.get()).generate(context, message);
+                List<Message> messages = CachedMessages.getCachedMessage(message).getProcessedMessages(hash);
+                if (messages != null) {
+                    output.addAll(messages);
+                    return;
+                }
             }
+            processor.process(context, message, output);
         } else {
-            // Push the codec context
+            // Push to the codec context
             output.add(message);
         }
     }

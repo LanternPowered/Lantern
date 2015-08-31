@@ -1,7 +1,5 @@
 package org.lanternpowered.server.network.message;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -26,15 +24,11 @@ public interface MessageRegistration<M extends Message> {
     Integer getOpcode();
 
     /**
-     * Gets the processors of the registration.
+     * Gets the processor of the registration.
      * 
-     * @return the processors
+     * @return the processor
      */
-    <P extends Processor<? super M>> List<P> getProcessors();
-
-    <P extends Processor<? super M>> void insertProcessor(int index, P processor);
-
-    <P extends Processor<? super M>> void addProcessor(P processor);
+    <P extends Processor<? super M>> P getProcessor();
 
     @Nullable
     <C extends Codec<? super M>> C getCodec();

@@ -23,5 +23,4 @@ public final class CodecPlayInPlayerVehicleControls implements Codec<MessagePlay
         boolean sneak = (flags & 0x2) != 0;
         return new MessagePlayInPlayerVehicleControls(forwards, sideways, jump, sneak);
     }
-
 }

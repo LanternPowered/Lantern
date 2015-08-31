@@ -15,7 +15,7 @@ import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 
-public class LanternBiomeRegistry {
+public class LanternBiomeRegistry extends SimpleCatalogTypeRegistry<BiomeType> {
 
     // A lookup for the biomes by it's (internal) id
     private final TShortObjectMap<BiomeType> biomesById = TCollections.synchronizedMap(new TShortObjectHashMap<BiomeType>());
@@ -23,9 +23,6 @@ public class LanternBiomeRegistry {
 
     // The counter for custom biome ids. (Non vanilla ones.)
     private final AtomicInteger biomeIdCounter = new AtomicInteger(256);
-
-    // The registry that can be used to lookup/register biome types
-    private final BiomeCatalogTypeRegistry biomeTypeRegistry = new BiomeCatalogTypeRegistry();
 
     // TODO: Make a string to id lookup to save/load the internal ids
 
@@ -46,16 +43,6 @@ public class LanternBiomeRegistry {
     }
 
     /**
-     * Registers a {@link BiomeType}. This method should be used
-     * to register custom (modded) biome types.
-     * 
-     * @param biomeType the biome type
-     */
-    public void register(BiomeType biomeType) {
-        this.biomeTypeRegistry.register(biomeType);
-    }
-
-    /**
      * Registers a {@link BiomeType} with the specified biome id. This method
      * should only be used to register default (vanilla) biome types.
      * 
@@ -66,26 +53,25 @@ public class LanternBiomeRegistry {
         short biomeId0 = (short) (biomeId & 0xff);
         checkState(!this.biomesById.containsKey(biomeId), "Biome id already present! (" + biomeId + ")");
         checkState(!this.idsByBiome.containsKey(biomeType), "Biome type already present! (" + biomeType.getId() + ")");
-        this.biomeTypeRegistry.register0(biomeType);
         this.biomesById.put(biomeId0, biomeType);
         this.idsByBiome.put(biomeType, biomeId0);
+        super.register(biomeType);
     }
 
-    private class BiomeCatalogTypeRegistry extends SimpleCatalogTypeRegistry<BiomeType> {
-
-        @Override
-        public void register(BiomeType catalogType) {
-            int biomeId = biomeIdCounter.getAndIncrement();
-            if (biomeId > Short.MAX_VALUE) {
-                throw new IllegalStateException("Exceeded the biome limit. (" + Short.MAX_VALUE + ")");
-            }
-            biomesById.put((short) biomeId, catalogType);
-            idsByBiome.put(catalogType, (short) biomeId);
-            super.register(catalogType);
+    /**
+     * Registers a {@link BiomeType}. This method should be used
+     * to register custom (modded) biome types.
+     * 
+     * @param biomeType the biome type
+     */
+    @Override
+    public void register(BiomeType catalogType) {
+        int biomeId = biomeIdCounter.getAndIncrement();
+        if (biomeId > Short.MAX_VALUE) {
+            throw new IllegalStateException("Exceeded the biome limit. (" + Short.MAX_VALUE + ")");
         }
-
-        public void register0(BiomeType catalogType) {
-            super.register(catalogType);
-        }
+        biomesById.put((short) biomeId, catalogType);
+        idsByBiome.put(catalogType, (short) biomeId);
+        super.register(catalogType);
     }
 }

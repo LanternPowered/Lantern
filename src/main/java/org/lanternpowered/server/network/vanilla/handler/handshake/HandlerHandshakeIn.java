@@ -18,7 +18,6 @@ public class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
             session.disconnect("Unknown protocol state! (" + message.getNextState() + ")");
         }
 
-        // Set the next state even if it's invalid to support kick messages
         session.setProtocolState(next);
         if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS)) {
             session.disconnect("Received a unexpected handshake message! (" + next + ")");

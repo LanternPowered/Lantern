@@ -7,7 +7,7 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
 
-public class CodecPlayInOutCloseWindow implements Codec<MessagePlayInOutCloseWindow> {
+public final class CodecPlayInOutCloseWindow implements Codec<MessagePlayInOutCloseWindow> {
 
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayInOutCloseWindow message) throws CodecException {

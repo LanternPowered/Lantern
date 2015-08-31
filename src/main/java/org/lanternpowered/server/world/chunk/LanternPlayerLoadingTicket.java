@@ -1,4 +1,4 @@
-package org.lanternpowered.server.world.chunk.tickets;
+package org.lanternpowered.server.world.chunk;
 
 import java.util.UUID;
 
@@ -8,8 +8,8 @@ class LanternPlayerLoadingTicket extends LanternLoadingTicket implements PlayerL
 
     private final UUID uuid;
 
-    public LanternPlayerLoadingTicket(String plugin, LanternLoadingTickets tickets, UUID uuid, int maxChunks) {
-        super(plugin, tickets, maxChunks);
+    public LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uuid, int maxChunks) {
+        super(plugin, chunkManager, maxChunks);
         this.uuid = uuid;
     }
 
@@ -17,5 +17,4 @@ class LanternPlayerLoadingTicket extends LanternLoadingTicket implements PlayerL
     public UUID getPlayerUniqueId() {
         return this.uuid;
     }
-
 }

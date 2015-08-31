@@ -1,4 +1,4 @@
-package org.lanternpowered.server.world.chunk.tickets;
+package org.lanternpowered.server.world.chunk;
 
 import java.util.UUID;
 
@@ -9,8 +9,8 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
 
     private final UUID uniqueId;
 
-    public LanternPlayerEntityLoadingTicket(String plugin, LanternLoadingTickets tickets, UUID uniqueId, int maxChunks) {
-        super(plugin, tickets, maxChunks);
+    public LanternPlayerEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks) {
+        super(plugin, chunkManager, maxChunks);
         this.uniqueId = uniqueId;
     }
 
@@ -19,7 +19,6 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
         if (entity == null || !entity.getUniqueId().equals(this.uniqueId)) {
             throw new IllegalArgumentException("Only a player with the uuid (" + this.uniqueId + ") can be applied to this ticket!");
         }
-
         super.bindToEntity(entity);
     }
 
@@ -27,5 +26,4 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
     public UUID getPlayerUniqueId() {
         return this.uniqueId;
     }
-
 }

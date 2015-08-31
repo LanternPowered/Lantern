@@ -36,5 +36,4 @@ public final class CodecPlayInResourcePackStatus implements Codec<MessagePlayInR
         }
         return new MessagePlayInResourcePackStatus(hash, status);
     }
-
 }

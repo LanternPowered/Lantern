@@ -4,10 +4,14 @@ import java.util.List;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
+import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
+import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.session.Session;
+
+import com.google.common.base.Optional;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -37,8 +41,19 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         CodecContext context = ctx.channel().attr(CONTEXT).get();
         context.writeVarInt(opcode, registration.getOpcode());
 
-        // Write the content of the message
-        ByteBuf content = registration.getCodec().encode(context, message);
+        Codec codec = registration.getCodec();
+        ByteBuf content = null;
+
+        // Handle first the caching system
+        Optional<CachingHashGenerator<?>> hashGen = CachedMessages.getHashGenerator(codec.getClass());
+        if (hashGen.isPresent()) {
+            int hash = ((CachingHashGenerator) hashGen.get()).generate(context, message);
+            content = CachedMessages.getCachedMessage(message).getEncodedMessage(hash);
+        }
+        if (content == null) {
+            // Write the content of the message
+            content = registration.getCodec().encode(context, message);
+        }
 
         // Add the buffer to the output
         output.add(Unpooled.wrappedBuffer(opcode, content));
@@ -68,13 +83,11 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         // Read the content of the message
         Message message = registration.getCodec().decode(context, content);
 
-        List<Processor> processors = registration.getProcessors();
+        Processor processor = registration.getProcessor();
         // Only process if there are processors found
-        if (!processors.isEmpty()) {
-            for (Processor processor : processors) {
-                // The processor should handle the output messages
-                processor.process(context, message, output);
-            }
+        if (processor != null) {
+            // The processor should handle the output messages
+            processor.process(context, message, output);
         } else {
             // Add the message to the output
             output.add(message);

@@ -43,15 +43,4 @@ public final class MessagePlayOutChangeGameState implements Message {
     public float getValue() {
         return this.value;
     }
-
-    /*
-     * public enum Type { INVALID_BED(0), RAINING_END(1), RAINING_START(2),
-     * GAME_MODE(3), CREDITS(4), ARROW_HIT(6), RAIN_STRENGTH(7),
-     * THUNDER_STRENGTH(8), MOB_APPEARANCE(10); private final int id; Type(int
-     * id) { this.id = id; } /** Gets the id of the type.
-     * @return the id
-     *//*
-        * public int getId() { return this.id; } }
-        */
-
 }

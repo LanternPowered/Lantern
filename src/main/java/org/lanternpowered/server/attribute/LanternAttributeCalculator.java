@@ -2,7 +2,6 @@ package org.lanternpowered.server.attribute;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.spongepowered.api.attribute.AttributeCalculator;
@@ -18,14 +17,7 @@ public class LanternAttributeCalculator implements AttributeCalculator {
         List<AttributeModifier> modifiers0 = Lists.newArrayList(modifiers);
 
         // Sort the modifiers by operation priority
-        Collections.sort(modifiers0, new Comparator<AttributeModifier>() {
-
-            @Override
-            public int compare(AttributeModifier arg0, AttributeModifier arg1) {
-                return arg0.getOperation().compareTo(arg1.getOperation());
-            }
-
-        });
+        Collections.sort(modifiers0, (AttributeModifier m1, AttributeModifier m2) -> m1.getOperation().compareTo(m2.getOperation()));
 
         // The last operation
         Operation lastOperation = null;

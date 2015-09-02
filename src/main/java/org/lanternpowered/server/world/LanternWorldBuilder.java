@@ -10,11 +10,13 @@ import java.util.Set;
 
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.entity.player.gamemode.GameMode;
-import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.WorldCreationSettings;
@@ -32,11 +34,14 @@ public class LanternWorldBuilder implements WorldBuilder {
 
     private String name;
     private GameMode gameMode;
-    private DimensionType dimensionType;
+    private LanternDimensionType dimensionType;
     private GeneratorType generatorType;
     private Collection<WorldGeneratorModifier> generatorModifiers;
     private DataContainer generatorSettings;
+    private TeleporterAgent teleporterAgent;
+
     private Boolean keepsSpawnLoaded;
+    private Boolean waterEvaporates; // Non-sponge property
 
     private boolean hardcore;
     private boolean enabled;
@@ -53,25 +58,26 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public WorldBuilder fill(WorldCreationSettings settings) {
-        checkNotNull(settings, "settings");
-        this.hardcore = settings.isHardcore();
-        this.enabled = settings.isEnabled();
-        this.gameMode = settings.getGameMode();
-        this.keepsSpawnLoaded = settings.doesKeepSpawnLoaded();
-        this.usesMapFeatures = settings.usesMapFeatures();
-        this.seed = settings.getSeed();
-        this.generatorModifiers = settings.getGeneratorModifiers();
-        this.name = settings.getWorldName();
-        this.dimensionType = settings.getDimensionType();
-        this.generatorType = settings.getGeneratorType();
-        this.bonusChestEnabled = settings.bonusChestEnabled();
-        this.commandsAllowed = settings.commandsAllowed();
+    public LanternWorldBuilder fill(WorldCreationSettings settings) {
+        LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) checkNotNull(settings, "settings");
+        this.hardcore = settings0.isHardcore();
+        this.enabled = settings0.isEnabled();
+        this.gameMode = settings0.getGameMode();
+        this.keepsSpawnLoaded = settings0.doesKeepSpawnLoaded();
+        this.usesMapFeatures = settings0.usesMapFeatures();
+        this.seed = settings0.getSeed();
+        this.generatorModifiers = settings0.getGeneratorModifiers();
+        this.name = settings0.getWorldName();
+        this.dimensionType = settings0.getDimensionType();
+        this.generatorType = settings0.getGeneratorType();
+        this.bonusChestEnabled = settings0.bonusChestEnabled();
+        this.commandsAllowed = settings0.commandsAllowed();
+        this.teleporterAgent = settings0.getTeleporterAgent();
         return this;
     }
 
     @Override
-    public WorldBuilder fill(WorldProperties properties) {
+    public LanternWorldBuilder fill(WorldProperties properties) {
         checkNotNull(properties, "properties");
         this.hardcore = properties.isHardcore();
         this.enabled = properties.isEnabled();
@@ -81,55 +87,55 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.seed = properties.getSeed();
         this.generatorModifiers = properties.getGeneratorModifiers();
         this.name = properties.getWorldName();
-        this.dimensionType = properties.getDimensionType();
+        this.dimensionType = (LanternDimensionType) properties.getDimensionType();
         this.generatorType = properties.getGeneratorType();
         return this;
     }
 
     @Override
-    public WorldBuilder name(String name) {
+    public LanternWorldBuilder name(String name) {
         this.name = checkNotNull(name, "name");
         return this;
     }
 
     @Override
-    public WorldBuilder enabled(boolean state) {
+    public LanternWorldBuilder enabled(boolean state) {
         this.enabled = state;
         return null;
     }
 
     @Override
-    public WorldBuilder loadsOnStartup(boolean state) {
+    public LanternWorldBuilder loadsOnStartup(boolean state) {
         this.loadsOnStartup = state;
         return this;
     }
 
     @Override
-    public WorldBuilder keepsSpawnLoaded(boolean state) {
+    public LanternWorldBuilder keepsSpawnLoaded(boolean state) {
         this.keepsSpawnLoaded = state;
         return this;
     }
 
     @Override
-    public WorldBuilder seed(long seed) {
+    public LanternWorldBuilder seed(long seed) {
         this.seed = seed;
         return this;
     }
 
     @Override
-    public WorldBuilder gameMode(GameMode gameMode) {
+    public LanternWorldBuilder gameMode(GameMode gameMode) {
         this.gameMode = checkNotNull(gameMode, "gameMode");
         return this;
     }
 
     @Override
-    public WorldBuilder generator(GeneratorType type) {
+    public LanternWorldBuilder generator(GeneratorType type) {
         this.generatorType = checkNotNull(type, "type");
         return this;
     }
 
     @Override
-    public WorldBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
+    public LanternWorldBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
         Set<WorldGeneratorModifier> entries = Sets.newHashSet();
         CatalogTypeRegistry<WorldGeneratorModifier> registry = this.game.getRegistry()
@@ -145,35 +151,46 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public WorldBuilder dimensionType(DimensionType type) {
-        this.dimensionType = checkNotNull(type, "type");
+    public LanternWorldBuilder dimensionType(DimensionType type) {
+        this.dimensionType = (LanternDimensionType) checkNotNull(type, "type");
         return this;
     }
 
     @Override
-    public WorldBuilder usesMapFeatures(boolean enabled) {
+    public LanternWorldBuilder usesMapFeatures(boolean enabled) {
         this.usesMapFeatures = enabled;
         return this;
     }
 
     @Override
-    public WorldBuilder hardcore(boolean enabled) {
+    public LanternWorldBuilder hardcore(boolean enabled) {
         this.hardcore = enabled;
         return this;
     }
 
     @Override
-    public WorldBuilder generatorSettings(DataContainer settings) {
+    public LanternWorldBuilder generatorSettings(DataContainer settings) {
         this.generatorSettings = checkNotNull(settings, "settings");
         return this;
     }
 
     @Override
-    public WorldBuilder reset() {
+    public LanternWorldBuilder teleporterAgent(TeleporterAgent agent) {
+        this.teleporterAgent = checkNotNull(agent, "agent");
+        return this;
+    }
+
+    public LanternWorldBuilder waterEvaporates(boolean evaporates) {
+        this.waterEvaporates = evaporates;
+        return this;
+    }
+
+    @Override
+    public LanternWorldBuilder reset() {
         this.usesMapFeatures = true;
         this.gameMode = GameModes.SURVIVAL;
         this.hardcore = false;
-        this.keepsSpawnLoaded = false;
+        this.keepsSpawnLoaded = null;
         this.loadsOnStartup = false;
         this.enabled = true;
         this.bonusChestEnabled = false;
@@ -184,6 +201,9 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.dimensionType = null;
         this.generatorType = null;
         this.generatorSettings = null;
+        this.waterEvaporates = null;
+        // This teleporter agent won't return anything useful
+        this.teleporterAgent = new LanternTeleporterAgent();
         return null;
     }
 
@@ -197,7 +217,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public WorldCreationSettings buildSettings() throws IllegalStateException {
+    public LanternWorldCreationSettings buildSettings() throws IllegalStateException {
         checkState(this.name != null, "name is not set");
         checkState(this.dimensionType != null, "dimensionType is not set");
         checkState(this.generatorType != null, "generatorType is not set");
@@ -209,8 +229,13 @@ public class LanternWorldBuilder implements WorldBuilder {
         if (this.keepsSpawnLoaded == null) {
             keepsSpawnLoaded = this.dimensionType.doesKeepSpawnLoaded();
         }
+        boolean waterEvaporates = this.waterEvaporates;
+        if (this.waterEvaporates == null) {
+            waterEvaporates = this.dimensionType.doesWaterEvaporate();
+        }
         return new LanternWorldCreationSettings(this.name, this.gameMode, this.dimensionType, this.generatorType,
-                this.generatorModifiers, generatorSettings, this.hardcore, this.enabled, this.loadsOnStartup,
-                keepsSpawnLoaded, this.usesMapFeatures, this.bonusChestEnabled, this.commandsAllowed, this.seed);
+                this.generatorModifiers, generatorSettings, this.teleporterAgent, this.hardcore, this.enabled,
+                this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.bonusChestEnabled, this.commandsAllowed,
+                waterEvaporates, this.seed);
     }
 }

@@ -3,18 +3,9 @@ package org.lanternpowered.server.world.rules;
 import java.util.List;
 import java.util.Map;
 
-import org.spongepowered.api.world.World;
-
 import com.google.common.base.Optional;
 
 public interface GameRules {
-
-    /**
-     * Gets the world the game rules are attached to.
-     * 
-     * @return the world
-     */
-    World getWorld();
 
     /**
      * Adds a new game rule and returns the instance.
@@ -85,5 +76,4 @@ public interface GameRules {
      * @return the values
      */
     Map<String, String> getValues();
-
 }

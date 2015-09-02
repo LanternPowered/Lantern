@@ -7,7 +7,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 
-public class RconFramingHandler extends ByteToMessageCodec<ByteBuf> {
+public final class RconFramingHandler extends ByteToMessageCodec<ByteBuf> {
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
@@ -37,5 +37,4 @@ public class RconFramingHandler extends ByteToMessageCodec<ByteBuf> {
         in.readBytes(buf, length);
         out.add(buf);
     }
-
 }

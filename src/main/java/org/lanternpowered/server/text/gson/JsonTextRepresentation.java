@@ -22,6 +22,15 @@ public class JsonTextRepresentation implements TextRepresentation {
         this.gson = JsonTextSerializer.applyTo(new GsonBuilder(), translationManager).create();
     }
 
+    /**
+     * Gets the gson instance.
+     * 
+     * @return the gson
+     */
+    public Gson getGson() {
+        return this.gson;
+    }
+
     @Override
     public String to(Text text) {
         return this.gson.toJson(checkNotNull(text, "text"));

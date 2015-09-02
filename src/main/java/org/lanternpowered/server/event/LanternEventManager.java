@@ -14,12 +14,11 @@ import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
 import org.lanternpowered.server.game.LanternGame;
-
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.EventHandler;
+import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.event.EventManager;
 
@@ -113,7 +112,7 @@ public class LanternEventManager implements EventManager {
 
         Class<?> handle = listener.getClass();
         for (Method method : handle.getMethods()) {
-            Subscribe subscribe = method.getAnnotation(Subscribe.class);
+            Listener subscribe = method.getAnnotation(Listener.class);
             if (subscribe != null) {
                 if (isValidHandler(method)) {
                     Class<? extends Event> eventClass = (Class<? extends Event>) method.getParameterTypes()[0];
@@ -129,7 +128,7 @@ public class LanternEventManager implements EventManager {
                     handlers.add(createRegistration(plugin, eventClass, subscribe, handler));
                 } else {
                     LanternGame.log().warn("The method {} on {} has @{} but has the wrong signature", method, handle.getName(),
-                            Subscribe.class.getName());
+                            Listener.class.getName());
                 }
             }
         }
@@ -138,32 +137,39 @@ public class LanternEventManager implements EventManager {
     }
 
     private static <T extends Event> RegisteredHandler<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
-            Subscribe subscribe, EventHandler<? super T> handler) {
+            Listener subscribe, EventListener<? super T> handler) {
         return createRegistration(plugin, eventClass, subscribe.order(), subscribe.ignoreCancelled(), handler);
     }
 
     private static <T extends Event> RegisteredHandler<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
-            Order order, boolean ignoreCancelled, EventHandler<? super T> handler) {
+            Order order, boolean ignoreCancelled, EventListener<? super T> handler) {
         return new RegisteredHandler<T>(plugin, eventClass, order, handler, ignoreCancelled);
     }
 
     @Override
-    public void register(Object plugin, Object listener) {
+    public void registerListeners(Object plugin, Object listener) {
         this.register(checkPlugin(plugin, "plugin"), checkNotNull(listener, "listener"));
     }
 
     @Override
-    public <T extends Event> void register(Object plugin, Class<T> eventClass, EventHandler<? super T> handler) {
-        this.register(plugin, eventClass, Order.DEFAULT, handler);
+    public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, boolean beforeModifications,
+            EventListener<? super T> listener) {
+        // Ignore the "beforeModifications" property, this is only used in combination with mods
+        this.registerListener(plugin, eventClass, order, listener);
     }
 
     @Override
-    public <T extends Event> void register(Object plugin, Class<T> eventClass, Order order, EventHandler<? super T> handler) {
+    public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, EventListener<? super T> listener) {
+        this.registerListener(plugin, eventClass, Order.DEFAULT, listener);
+    }
+
+    @Override
+    public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, EventListener<? super T> listener) {
         checkPlugin(plugin, "plugin");
-        checkPlugin(eventClass, "eventClass");
-        checkPlugin(order, "order");
-        checkPlugin(handler, "handler");
-        this.register(createRegistration(checkPlugin(plugin, "plugin"), eventClass, order, false, handler));
+        checkNotNull(eventClass, "eventClass");
+        checkNotNull(order, "order");
+        checkNotNull(listener, "listener");
+        this.register(createRegistration(checkPlugin(plugin, "plugin"), eventClass, order, false, listener));
     }
 
     private void unregister(Predicate<RegisteredHandler<?>> unregister) {
@@ -186,7 +192,7 @@ public class LanternEventManager implements EventManager {
     }
 
     @Override
-    public void unregister(final Object listener) {
+    public void unregisterListeners(final Object listener) {
         checkNotNull(listener, "listener");
         this.unregister(new Predicate<RegisteredHandler<?>>() {
 
@@ -199,7 +205,7 @@ public class LanternEventManager implements EventManager {
     }
 
     @Override
-    public void unregisterPlugin(Object pluginObj) {
+    public void unregisterPluginListeners(Object pluginObj) {
         final PluginContainer plugin = checkPlugin(pluginObj, "plugin");
         this.unregister(new Predicate<RegisteredHandler<?>>() {
 

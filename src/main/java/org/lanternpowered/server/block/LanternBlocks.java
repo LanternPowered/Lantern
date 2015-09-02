@@ -4,6 +4,7 @@ import javax.annotation.Nullable;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 
 public class LanternBlocks {
 
@@ -31,4 +32,18 @@ public class LanternBlocks {
         return getRegistry().getStateId(blockState);
     }
 
+    @Nullable
+    public static Short getStateId(BlockType blockType) {
+        return getRegistry().getStateId(blockType);
+    }
+
+    @Nullable
+    public static BlockType getTypeById(int internalId) {
+        return getRegistry().getTypeById(internalId);
+    }
+
+    @Nullable
+    public static Short getTypeId(BlockType blockType) {
+        return getRegistry().getTypeId(blockType);
+    }
 }

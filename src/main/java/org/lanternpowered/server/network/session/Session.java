@@ -18,22 +18,27 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 
 import javax.annotation.Nullable;
+import javax.crypto.SecretKey;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.network.buf.LanternChannelBuf;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageAsync;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
+import org.lanternpowered.server.network.pipeline.MessageEncryptionHandler;
+import org.lanternpowered.server.network.pipeline.NoopHandler;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.compression.MessageOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
+import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
-import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.text.Text;
@@ -43,9 +48,16 @@ import com.google.common.collect.Sets;
 
 public class Session implements PlayerConnection {
 
+    public static final String ENCRYPTION = "encryption";
+    public static final String LEGACY_PING = "legacyping";
+    public static final String COMPRESSION = "compression";
+    public static final String FRAMING = "framing";
+    public static final String CODECS = "codecs";
+    public static final String PROCESSOR = "processor";
+    public static final String HANDLER = "handler";
+
     public static final AttributeKey<Session> SESSION = AttributeKey.valueOf("session");
     public static final AttributeKey<ProtocolState> STATE = AttributeKey.valueOf("state");
-    public static final AttributeKey<Integer> COMPRESSION_THRESHOLD = AttributeKey.valueOf("compression-threshold");
 
     // The random for this session
     private final Random random = new Random();
@@ -95,6 +107,9 @@ public class Session implements PlayerConnection {
     // The last ping time
     private long pingTimeStart;
 
+    @Nullable
+    private ProxyData proxyData;
+
     /**
      * Creates a new session.
      * 
@@ -105,6 +120,15 @@ public class Session implements PlayerConnection {
         this.address = (InetSocketAddress) channel.remoteAddress();
         this.channel = channel;
         this.server = server;
+    }
+
+    @Nullable
+    public ProxyData getProxyData() {
+        return this.proxyData;
+    }
+
+    public void setProxyData(@Nullable ProxyData proxyData) {
+        this.proxyData = proxyData;
     }
 
     /**
@@ -169,7 +193,7 @@ public class Session implements PlayerConnection {
     public void setCompression(int threshold) {
         ProtocolState state = this.getProtocolState();
         if (state.equals(ProtocolState.HANDSHAKE) || state.equals(ProtocolState.STATUS)) {
-            throw new IllegalStateException("compression cannot be set in the state (" + state + ")");
+            throw new IllegalStateException("Compression cannot be set in the state (" + state + ")");
         }
         this.send(new MessageOutSetCompression(threshold));
     }
@@ -190,6 +214,11 @@ public class Session implements PlayerConnection {
      * @return the future
      */
     public ChannelFuture sendWithFuture(Message message) {
+        if (!this.channel.isActive()) {
+            // discard messages sent if we're closed, since this happens a lot
+            return null;
+        }
+
         ChannelFuture future = this.channel.writeAndFlush(message).addListener(new GenericFutureListener<Future<? super Void>>() {
             @Override
             public void operationComplete(Future<? super Void> future) throws Exception {
@@ -202,7 +231,12 @@ public class Session implements PlayerConnection {
         // This is a special case, we need to make sure that the message is send
         // before we set the compression on the server side
         if (message instanceof MessageOutSetCompression) {
-            this.channel.attr(COMPRESSION_THRESHOLD).set(((MessageOutSetCompression) message).getThreshold());
+            int threshold = ((MessageOutSetCompression) message).getThreshold();
+            if (threshold == -1) {
+                this.channel.pipeline().replace(COMPRESSION, COMPRESSION, NoopHandler.INSTANCE);
+            } else {
+                this.channel.pipeline().replace(COMPRESSION, COMPRESSION, new MessageCompressionHandler(threshold));
+            }
         }
 
         return future;
@@ -262,6 +296,14 @@ public class Session implements PlayerConnection {
             } catch (Throwable throwable) {
                 this.onHandlerThrowable(message, handler, throwable);
             }
+        }
+    }
+
+    public void setExcryption(@Nullable SecretKey secretKey) {
+        if (secretKey == null) {
+            this.channel.pipeline().replace(ENCRYPTION, ENCRYPTION, NoopHandler.INSTANCE);
+        } else {
+            this.channel.pipeline().replace(ENCRYPTION, ENCRYPTION, new MessageEncryptionHandler(secretKey));
         }
     }
 
@@ -337,6 +379,10 @@ public class Session implements PlayerConnection {
      */
     public void onHandlerThrowable(Message message, Handler<?> handle, Throwable throwable) {
         LanternGame.log().error("Error while handling " + message + " (handler: " + handle.getClass().getSimpleName() + ")", throwable);
+    }
+
+    public void setPlayer(LanternGameProfile profile) {
+        
     }
 
     public void onDisconnect() {
@@ -490,7 +536,8 @@ public class Session implements PlayerConnection {
     }
 
     @Override
-    public Player getPlayer() {
+    @Nullable
+    public LanternPlayer getPlayer() {
         return this.player;
     }
 

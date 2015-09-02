@@ -2,19 +2,19 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.data.EnumGameMode;
 
 public final class MessagePlayOutSetGameMode implements Message {
 
-    private final EnumGameMode gameMode;
+    private final LanternGameMode gameMode;
 
     /**
      * Creates a new set game mode message.
      * 
      * @param gameMode the game mode
      */
-    public MessagePlayOutSetGameMode(EnumGameMode gameMode) {
+    public MessagePlayOutSetGameMode(LanternGameMode gameMode) {
         this.gameMode = checkNotNull(gameMode, "gameMode");
     }
 
@@ -23,7 +23,7 @@ public final class MessagePlayOutSetGameMode implements Message {
      * 
      * @return the game mode
      */
-    public EnumGameMode getGameMode() {
+    public LanternGameMode getGameMode() {
         return this.gameMode;
     }
 

@@ -4,20 +4,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.EventHandler;
+import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public class RegisteredHandler<T extends Event> implements LanternEventHandler<T>, Comparable<RegisteredHandler<?>> {
+public class RegisteredHandler<T extends Event> implements LanternEventListener<T>, Comparable<RegisteredHandler<?>> {
     private final PluginContainer plugin;
-    private final EventHandler<? super T> handler;
+    private final EventListener<? super T> handler;
 
     private final Class<T> eventClass;
     private final Order order;
 
     private final boolean ignoreCancelled;
 
-    RegisteredHandler(PluginContainer plugin, Class<T> eventClass, Order order, EventHandler<? super T> handler, boolean ignoreCancelled) {
+    RegisteredHandler(PluginContainer plugin, Class<T> eventClass, Order order, EventListener<? super T> handler, boolean ignoreCancelled) {
         this.plugin = checkNotNull(plugin, "plugin");
         this.eventClass = checkNotNull(eventClass, "eventClass");
         this.order = checkNotNull(order, "order");
@@ -39,8 +39,8 @@ public class RegisteredHandler<T extends Event> implements LanternEventHandler<T
 
     @Override
     public Object getHandle() {
-        if (this.handler instanceof LanternEventHandler) {
-            return ((LanternEventHandler<?>) this.handler).getHandle();
+        if (this.handler instanceof LanternEventListener) {
+            return ((LanternEventListener<?>) this.handler).getHandle();
         }
 
         return this.handler;

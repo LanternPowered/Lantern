@@ -2,26 +2,26 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.data.EnumDifficulty;
-import org.lanternpowered.server.network.vanilla.message.data.EnumEnvironment;
-import org.lanternpowered.server.network.vanilla.message.data.EnumGameMode;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
 
 public final class MessagePlayOutPlayerJoinGame implements Message {
 
     private final int entityId;
     private final int playerListSize;
 
-    private final EnumGameMode gameMode;
-    private final EnumDifficulty difficulty;
-    private final EnumEnvironment environment;
+    private final LanternGameMode gameMode;
+    private final LanternDifficulty difficulty;
+    private final LanternDimensionType dimensionType;
 
     // Reduce info on the debug screen
     private final boolean reducedDebug;
 
-    public MessagePlayOutPlayerJoinGame(EnumGameMode gameMode, EnumEnvironment environment, EnumDifficulty difficulty,
-            int entityId, int playerListSize, boolean reducedDebug) {
-        this.environment = checkNotNull(environment, "environment");
+    public MessagePlayOutPlayerJoinGame(LanternGameMode gameMode, LanternDimensionType dimensionType,
+            LanternDifficulty difficulty, int entityId, int playerListSize, boolean reducedDebug) {
+        this.dimensionType = checkNotNull(dimensionType, "dimensionType");
         this.difficulty = checkNotNull(difficulty, "difficulty");
         this.gameMode = checkNotNull(gameMode, "gameMode");
         this.playerListSize = playerListSize;
@@ -52,17 +52,17 @@ public final class MessagePlayOutPlayerJoinGame implements Message {
      * 
      * @return the game mode
      */
-    public EnumGameMode getGameMode() {
+    public LanternGameMode getGameMode() {
         return this.gameMode;
     }
 
     /**
-     * Gets the environment of the world this player is currently in.
+     * Gets the dimension type of the world this player is currently in.
      * 
-     * @return the environment
+     * @return the dimension type
      */
-    public EnumEnvironment getEnvironment() {
-        return this.environment;
+    public LanternDimensionType getDimensionType() {
+        return this.dimensionType;
     }
 
     /**
@@ -70,7 +70,7 @@ public final class MessagePlayOutPlayerJoinGame implements Message {
      * 
      * @return the difficulty
      */
-    public EnumDifficulty getDifficulty() {
+    public LanternDifficulty getDifficulty() {
         return this.difficulty;
     }
 

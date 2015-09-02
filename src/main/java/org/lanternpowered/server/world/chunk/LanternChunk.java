@@ -36,7 +36,9 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
@@ -505,14 +507,26 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     }
 
     @Override
-    public BlockSnapshot getBlockSnapshot(int x, int y, int z) {
-        // TODO: Verify the used location in constructor
-        return new LanternBlockSnapshot(new Vector3i(this.x << 4 | x, y, this.z << 4 | z), this.getBlock(x, y, z));
+    public BlockSnapshot createSnapshot(int x, int y, int z) {
+        return new LanternBlockSnapshot(new Location<World>(this.world, this.x << 4 | x, y, this.z << 4 | z),
+                this.getBlock(x, y, z));
     }
 
     @Override
-    public void setBlockSnapshot(int x, int y, int z, BlockSnapshot snapshot) {
-        this.setBlock(x, y, z, snapshot.getState());
+    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean spawnEntity(Entity entity, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     @Override
@@ -671,12 +685,6 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public boolean spawnEntity(Entity entity) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override

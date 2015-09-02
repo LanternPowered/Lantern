@@ -1,5 +1,6 @@
 package org.lanternpowered.server.game;
 
+import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -13,16 +14,23 @@ import org.spongepowered.api.service.persistence.DataBuilder;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 
 public class LanternGameProfile implements GameProfile {
 
     private static final DataQuery NAME = DataQuery.of("Name");
     private static final DataQuery UNIQUE_ID = DataQuery.of("UniqueId");
 
+    private final List<Property> properties;
     private final UUID uniqueId;
     private final String name;
 
     public LanternGameProfile(UUID uniqueId, String name) {
+        this(uniqueId, name, Lists.newArrayList());
+    }
+
+    public LanternGameProfile(UUID uniqueId, String name, List<Property> properties) {
+        this.properties = properties;
         this.uniqueId = uniqueId;
         this.name = name;
     }
@@ -42,6 +50,10 @@ public class LanternGameProfile implements GameProfile {
     @Override
     public String getName() {
         return this.name;
+    }
+
+    public List<Property> getProperties() {
+        return this.properties;
     }
 
     public static class LanternDataBuilder implements DataBuilder<GameProfile> {

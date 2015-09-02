@@ -1,5 +1,8 @@
 package org.lanternpowered.server.block;
 
+import java.util.List;
+
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
@@ -9,6 +12,8 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.util.Cycleable;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -162,7 +167,13 @@ public class LanternBlockState implements BlockState {
     }
 
     @Override
-    public ImmutableCollection<ImmutableDataManipulator<?, ?>> getManipulators() {
+    public BlockSnapshot snapshotFor(Location<World> location) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<ImmutableDataManipulator<?, ?>> getManipulators() {
         // TODO Auto-generated method stub
         return null;
     }

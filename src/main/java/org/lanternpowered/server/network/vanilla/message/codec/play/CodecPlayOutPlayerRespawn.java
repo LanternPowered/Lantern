@@ -12,9 +12,9 @@ public final class CodecPlayOutPlayerRespawn implements Codec<MessagePlayOutPlay
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutPlayerRespawn message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeInt(message.getEnvironment().getId());
-        buf.writeByte((byte) message.getDifficulty().getId());
-        buf.writeByte((byte) message.getGameMode().getId());
+        buf.writeInt(message.getDimensionType().getInternalId());
+        buf.writeByte(message.getDifficulty().getInternalId());
+        buf.writeByte(message.getGameMode().getInternalId());
         context.write(buf, String.class, "default"); // Not used
         return buf;
     }

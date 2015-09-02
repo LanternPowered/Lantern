@@ -112,11 +112,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
             short[] types = new short[rawTypes.length];
             for (int i = 0; i < rawTypes.length; i++) {
-                int type = ((rawTypes[i] & 0xff) << 4) | dataArray.get(i);
-                if (extTypesArray != null) {
-                    type |= extTypesArray.get(i) << 12;
-                }
-                types[i] = (short) type;
+                types[i] = (short) ((extTypesArray == null ? 0 : extTypesArray.get(i)) << 12 | ((rawTypes[i] & 0xff) << 4) | dataArray.get(i));
             }
 
             sections[y] = new ChunkSection(types, new NibbleArray(rawTypes.length, skyLight, true),

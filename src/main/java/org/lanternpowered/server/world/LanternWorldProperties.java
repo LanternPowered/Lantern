@@ -8,10 +8,11 @@ import java.util.UUID;
 
 import org.lanternpowered.server.world.rules.GameRule;
 import org.lanternpowered.server.world.rules.GameRules;
+import org.lanternpowered.server.world.rules.LanternGameRules;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.entity.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -24,18 +25,26 @@ import com.google.common.base.Optional;
 
 public class LanternWorldProperties implements WorldProperties {
 
-    private String name;
-    private UUID uniqueId;
-    private Vector3i spawnPosition;
-    private Difficulty difficulty;
-    private GameRules rules;
+    protected String name;
+    protected UUID uniqueId;
+    protected Vector3i spawnPosition;
+    protected Difficulty difficulty;
+    protected GameRules rules;
+    protected GeneratorType generatorType;
+    protected GameMode gameMode;
 
-    private boolean enabled;
-    private boolean loadOnStartup;
-    private boolean keepSpawnLoaded;
-    private boolean commandsAllowed;
-    private boolean mapFeatures;
-    private boolean hardcore;
+    protected boolean enabled;
+    protected boolean loadOnStartup;
+    protected boolean keepSpawnLoaded;
+    protected boolean commandsAllowed;
+    protected boolean mapFeatures;
+    protected boolean hardcore;
+
+    protected long seed;
+
+    protected GameRules createGameRules() {
+        return new LanternGameRules();
+    }
 
     @Override
     public DataContainer toContainer() {
@@ -102,13 +111,11 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setGeneratorType(GeneratorType type) {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public long getSeed() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.seed;
     }
 
     @Override
@@ -190,9 +197,8 @@ public class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
-    public void setGameMode(GameMode gamemode) {
-        // TODO Auto-generated method stub
-
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode = checkNotNull(gameMode, "gameMode");
     }
 
     @Override
@@ -391,5 +397,4 @@ public class LanternWorldProperties implements WorldProperties {
         // TODO Auto-generated method stub
         
     }
-
 }

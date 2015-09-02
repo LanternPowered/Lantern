@@ -28,7 +28,9 @@ import com.google.common.collect.Lists;
 
 public class LegacyTextRepresentation implements TextRepresentation {
 
-    private static final BiMap<Object, Character> FORMATS = ImmutableBiMap.<Object, Character>builder()
+    public static final char DEFAULT_CHAR = '\u00A7';
+    public static final LegacyTextRepresentation DEFAULT_REPRESENTATION = new LegacyTextRepresentation(DEFAULT_CHAR);
+    public static final BiMap<Object, Character> FORMATS = ImmutableBiMap.<Object, Character>builder()
             .put(TextColors.BLACK, '0')
             .put(TextColors.DARK_BLUE, '1')
             .put(TextColors.DARK_GREEN, '2')

@@ -1,4 +1,4 @@
-package org.lanternpowered.server.network.vanilla.handler.handshake;
+package org.lanternpowered.server.network.vanilla.message.handler.handshake;
 
 import java.net.InetSocketAddress;
 
@@ -22,7 +22,7 @@ public class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
         if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS)) {
             session.disconnect("Received a unexpected handshake message! (" + next + ")");
         }
-        session.setVirtualHost(InetSocketAddress.createUnresolved(message.getServerAddress(), message.getServerPort()));
+        // session.setVirtualHost(message.getAddress());
         session.setProtocolVersion(message.getProtocolVersion());
 
         if (next == ProtocolState.LOGIN) {

@@ -27,13 +27,9 @@ public class LanternTextFactory implements TextFactory {
 
     private final JsonTextRepresentation jsonTextRepresentation;
     private final PlainTextRepresentation plainTextRepresentation;
-    private final LegacyTextRepresentation defLegacyTextRepresentation;
     private final XmlTextRepresentation xmlTextRepresentation;
 
-    private final char legacyChar = '\u00A7';
-
     public LanternTextFactory(TranslationManager translationManager) {
-        this.defLegacyTextRepresentation = new LegacyTextRepresentation(this.legacyChar);
         this.jsonTextRepresentation = new JsonTextRepresentation(translationManager);
         this.plainTextRepresentation = new PlainTextRepresentation();
         this.xmlTextRepresentation = new XmlTextRepresentation();
@@ -61,13 +57,13 @@ public class LanternTextFactory implements TextFactory {
 
     @Override
     public char getLegacyChar() {
-        return this.legacyChar;
+        return LegacyTextRepresentation.DEFAULT_CHAR;
     }
 
     @Override
     public TextRepresentation legacy(char legacyChar) {
-        if (legacyChar == this.legacyChar) {
-            return this.defLegacyTextRepresentation;
+        if (legacyChar == LegacyTextRepresentation.DEFAULT_CHAR) {
+            return LegacyTextRepresentation.DEFAULT_REPRESENTATION;
         }
         try {
             return this.legacyCache.get(legacyChar);

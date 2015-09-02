@@ -30,7 +30,9 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
@@ -171,15 +173,28 @@ public class ExtentViewDownsize extends AbstractExtent {
     }
 
     @Override
-    public BlockSnapshot getBlockSnapshot(int x, int y, int z) {
+    public BlockSnapshot createSnapshot(int x, int y, int z) {
         this.checkRange(x, y, z);
-        return this.extent.getBlockSnapshot(x, y, z);
+        return this.extent.createSnapshot(x, y, z);
     }
 
     @Override
-    public void setBlockSnapshot(int x, int y, int z, BlockSnapshot snapshot) {
+    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         this.checkRange(x, y, z);
-        this.extent.setBlockSnapshot(x, y, z, snapshot);
+        this.extent.restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
+    }
+
+    @Override
+    public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
+        this.checkRange(position.getX(), position.getY(), position.getZ());
+        return this.extent.restoreSnapshot(snapshot, position);
+    }
+
+    @Override
+    public boolean spawnEntity(Entity entity, Cause cause) {
+        Vector3d position = entity.getLocation().getPosition();
+        this.checkRange(position.getX(), position.getY(), position.getZ());
+        return this.extent.spawnEntity(entity, cause);
     }
 
     @Override
@@ -480,13 +495,6 @@ public class ExtentViewDownsize extends AbstractExtent {
     }
 
     @Override
-    public boolean spawnEntity(Entity entity) {
-        final Location<World> location = entity.getLocation();
-        this.checkRange(location.getX(), location.getY(), location.getZ());
-        return this.extent.spawnEntity(entity);
-    }
-
-    @Override
     public Collection<Entity> getEntities() {
         final Collection<Entity> entities = this.extent.getEntities();
         for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext(); ) {
@@ -556,7 +564,6 @@ public class ExtentViewDownsize extends AbstractExtent {
             final Location<World> block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
         }
-
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {
@@ -574,7 +581,5 @@ public class ExtentViewDownsize extends AbstractExtent {
             final Location<World> block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
         }
-
     }
-
 }

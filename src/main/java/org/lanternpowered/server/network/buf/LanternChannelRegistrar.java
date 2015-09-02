@@ -11,7 +11,7 @@ import javax.annotation.Nullable;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelListener;
 import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.network.ChannelRegistrationException;

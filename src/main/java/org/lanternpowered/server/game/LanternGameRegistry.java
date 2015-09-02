@@ -18,12 +18,15 @@ import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder;
 import org.lanternpowered.server.block.LanternBlockRegistry;
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.catalog.SimpleCatalogTypeRegistry;
+import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.item.LanternItemRegistry;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.world.LanternWorldBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeRegistry;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameDictionary;
@@ -33,6 +36,8 @@ import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.attribute.AttributeBuilder;
 import org.spongepowered.api.attribute.AttributeCalculator;
 import org.spongepowered.api.attribute.AttributeModifierBuilder;
+import org.spongepowered.api.block.BlockSnapshotBuilder;
+import org.spongepowered.api.block.BlockStateBuilder;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.ImmutableDataRegistry;
 import org.spongepowered.api.data.manipulator.DataManipulatorRegistry;
@@ -41,8 +46,22 @@ import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.value.ValueBuilder;
 import org.spongepowered.api.effect.particle.ParticleEffectBuilder;
 import org.spongepowered.api.effect.particle.ParticleType;
+import org.spongepowered.api.entity.EntitySnapshotBuilder;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSourceBuilder;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSourceBuilder;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSourceBuilder;
+import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSourceBuilder;
+import org.spongepowered.api.event.cause.entity.damage.source.ProjectileDamageSourceBuilder;
+import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCauseBuilder;
+import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCauseBuilder;
+import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCauseBuilder;
+import org.spongepowered.api.event.cause.entity.spawn.MobSpawnerSpawnCauseBuilder;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCauseBuilder;
+import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCauseBuilder;
 import org.spongepowered.api.item.FireworkEffectBuilder;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;
@@ -73,6 +92,8 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.ExplosionBuilder;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
@@ -95,6 +116,9 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
     private final LanternBiomeRegistry biomeRegistry = new LanternBiomeRegistry();
     private final LanternBlockRegistry blockRegistry = new LanternBlockRegistry();
+    private final LanternItemRegistry itemRegistry = new LanternItemRegistry();
+    private final CatalogTypeRegistry<Difficulty> difficultyRegistry = new SimpleCatalogTypeRegistry<Difficulty>();
+    private final CatalogTypeRegistry<GameMode> gameModeRegistry = new SimpleCatalogTypeRegistry<GameMode>();
     private final CatalogTypeRegistry<Attribute> attributeRegistry = new SimpleCatalogTypeRegistry<Attribute>();
     private final CatalogTypeRegistry<WorldGeneratorModifier> worldGeneratorModifierRegistry =
             new SimpleCatalogTypeRegistry<WorldGeneratorModifier>();
@@ -102,6 +126,7 @@ public class LanternGameRegistry implements GameRegistry {
             .put(Attribute.class, this.attributeRegistry)
             .put(BiomeType.class, this.biomeRegistry)
             .put(BlockType.class, this.blockRegistry)
+            .put(ItemType.class, this.itemRegistry)
             .put(WorldGeneratorModifier.class, this.worldGeneratorModifierRegistry)
             .build();
 
@@ -121,6 +146,29 @@ public class LanternGameRegistry implements GameRegistry {
 
     public LanternGameRegistry(LanternGame game) {
         this.game = game;
+        this.registerGameObjects();
+    }
+
+    private void registerGameObjects() {
+        this.registerDifficulties();
+        this.registerGameModes();
+    }
+
+    private void registerDifficulties() {
+        this.difficultyRegistry.register(new LanternDifficulty("peaceful", 0));
+        this.difficultyRegistry.register(new LanternDifficulty("easy", 1));
+        this.difficultyRegistry.register(new LanternDifficulty("normal", 2));
+        this.difficultyRegistry.register(new LanternDifficulty("hard", 3));
+        RegistryHelper.mapFields(Difficulties.class, key -> this.difficultyRegistry.get(key.toLowerCase()).get());
+    }
+
+    private void registerGameModes() {
+        this.gameModeRegistry.register(new LanternGameMode("not_set", -1));
+        this.gameModeRegistry.register(new LanternGameMode("survival", 0));
+        this.gameModeRegistry.register(new LanternGameMode("creative", 1));
+        this.gameModeRegistry.register(new LanternGameMode("adventure", 2));
+        this.gameModeRegistry.register(new LanternGameMode("spectator", 3));
+        RegistryHelper.mapFields(GameModes.class, key -> this.gameModeRegistry.get(key.toLowerCase()).get());
     }
 
     /**
@@ -148,6 +196,15 @@ public class LanternGameRegistry implements GameRegistry {
      */
     public LanternBlockRegistry getBlockRegistry() {
         return this.blockRegistry;
+    }
+
+    /**
+     * Gets the {@link LanternItemRegistry}.
+     * 
+     * @return the item registry
+     */
+    public LanternItemRegistry getItemRegistry() {
+        return this.itemRegistry;
     }
 
     /**
@@ -470,5 +527,89 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public ExtentBufferFactory getExtentBufferFactory() {
         return LanternExtentBufferFactory.INSTANCE;
+    }
+
+    @Override
+    public BlockStateBuilder createBlockStateBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BlockSnapshotBuilder createBlockSnapshotBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public EntitySnapshotBuilder createEntitySnapshotBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BlockDamageSourceBuilder createBlockDamageSourceBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DamageSourceBuilder createDamageSourceBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public EntityDamageSourceBuilder createEntityDamageSourceBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public FallingBlockDamageSourceBuilder createFallingBlockDamageSourceBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ProjectileDamageSourceBuilder createProjectileDamageSourceBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SpawnCauseBuilder createSpawnCauseBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BlockSpawnCauseBuilder createBlockSpawnCauseBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public EntitySpawnCauseBuilder createEntitySpawnCauseBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BreedingSpawnCauseBuilder createBreedingSpawnCauseBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public MobSpawnerSpawnCauseBuilder createMobSpawnerSpawnCauseBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public WeatherSpawnCauseBuilder createWeatherSpawnCauseBuilder() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

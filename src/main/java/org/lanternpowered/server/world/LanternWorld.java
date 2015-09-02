@@ -1,9 +1,11 @@
 package org.lanternpowered.server.world;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.lanternpowered.server.entity.player.LanternPlayer;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
@@ -26,7 +28,9 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.context.Context;
@@ -39,6 +43,7 @@ import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.WorldCreationSettings;
@@ -58,6 +63,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
@@ -75,6 +81,15 @@ public class LanternWorld extends AbstractExtent implements World {
         this.name = name;
     }
 
+    /**
+     * Gets the players that are currently in this world.
+     * 
+     * @return the players
+     */
+    public List<LanternPlayer> getPlayers() {
+        return Lists.newArrayList();
+    }
+
     public LanternChunkManager getChunkManager() {
         return this.chunkManager;
     }
@@ -89,6 +104,7 @@ public class LanternWorld extends AbstractExtent implements World {
         return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
 
+    /*
     @Override
     public BlockSnapshot getBlockSnapshot(int x, int y, int z) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBlockSnapshot(x & 0xf, y, z & 0xf);
@@ -97,7 +113,7 @@ public class LanternWorld extends AbstractExtent implements World {
     @Override
     public void setBlockSnapshot(int x, int y, int z, BlockSnapshot snapshot) {
         this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlockSnapshot(x & 0xf, y, z & 0xf, snapshot);
-    }
+    }*/
 
     @Override
     public void interactBlock(int x, int y, int z, Direction side) {
@@ -251,12 +267,6 @@ public class LanternWorld extends AbstractExtent implements World {
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public boolean spawnEntity(Entity entity) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override
@@ -784,6 +794,36 @@ public class LanternWorld extends AbstractExtent implements World {
     public void triggerExplosion(Explosion explosion) {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public BlockSnapshot createSnapshot(int x, int y, int z) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean spawnEntity(Entity entity, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public TeleporterAgent getTeleporterAgent() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

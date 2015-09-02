@@ -21,7 +21,9 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
@@ -206,15 +208,27 @@ public class ExtentViewTransform extends AbstractExtent {
     }
 
     @Override
-    public BlockSnapshot getBlockSnapshot(int x, int y, int z) {
-        return this.extent.getBlockSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
+    public BlockSnapshot createSnapshot(int x, int y, int z) {
+        return this.extent.createSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
-    public void setBlockSnapshot(int x, int y, int z, BlockSnapshot snapshot) {
-        this.extent.setBlockSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), snapshot);
+    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+        this.extent.restoreSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), snapshot, force, notifyNeighbors);
+    }
+
+    @Override
+    public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
+        return this.extent.restoreSnapshot(snapshot, this.inverseTransform(position));
+    }
+
+    @Override
+    public boolean spawnEntity(Entity entity, Cause cause) {
+        final Location<World> location = entity.getLocation();
+        entity.setLocation(new Location<World>(location.getExtent(), this.inverseTransform(location.getPosition())));
+        return this.extent.spawnEntity(entity, cause);
     }
 
     @Override
@@ -510,13 +524,6 @@ public class ExtentViewTransform extends AbstractExtent {
     @Override
     public Optional<Entity> createEntity(EntityType type, Vector3i position) {
         return this.extent.createEntity(type, this.inverseTransform.transform(position));
-    }
-
-    @Override
-    public boolean spawnEntity(Entity entity) {
-        final Location<World> location = entity.getLocation();
-        entity.setLocation(new Location<World>(location.getExtent(), inverseTransform(location.getPosition())));
-        return this.extent.spawnEntity(entity);
     }
 
     private Vector3d inverseTransform(Vector3d vector) {

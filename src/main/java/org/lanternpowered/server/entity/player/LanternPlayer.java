@@ -1,174 +1,107 @@
 package org.lanternpowered.server.entity.player;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntityHuman;
 import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.permission.SubjectBase;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.data.manipulator.mutable.entity.AchievementData;
 import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
-import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
 import org.spongepowered.api.data.manipulator.mutable.entity.GameModeData;
 import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
 import org.spongepowered.api.data.manipulator.mutable.entity.StatisticData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.entity.player.tab.TabList;
-import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
-import org.spongepowered.api.network.PlayerConnection;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.sink.MessageSink;
+import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.command.CommandSource;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 
-public class LanternPlayer extends LanternEntityLiving implements Player {
+public class LanternPlayer extends LanternEntityHuman implements Player {
 
-    private final Session session = null;
+    // We cannot extend the subject base directly, so we have to forward the methods
+    private final SubjectBase permissionSubject = new SubjectBase() {
 
-    @Override
-    public boolean isViewingInventory() {
-        // TODO Auto-generated method stub
-        return false;
+        @Override
+        public String getIdentifier() {
+            return LanternPlayer.this.getIdentifier();
+        }
+
+        @Override
+        public Optional<CommandSource> getCommandSource() {
+            return Optional.of(LanternPlayer.this);
+        }
+
+        @Override
+        protected String getSubjectCollectionIdentifier() {
+            return PermissionService.SUBJECTS_USER;
+        }
+
+        @Override
+        protected Tristate getPermissionDefault(String permission) {
+            return Tristate.TRUE;
+        }
+
+    };
+
+    private Session session = null;
+    private MessageSink messageSink = MessageSinks.toAll();
+
+    private GameProfile gameProfile;
+
+    // The (client) locale of the player
+    private Locale locale = Locale.ENGLISH;
+
+    // The (client) render distance of the player
+    // When specified -1, the render distance will match the server one
+    private int renderDistance = -1;
+
+    private boolean sleepingIgnored;
+
+    /**
+     * Gets the render distance of the player.
+     * 
+     * @return the render distance
+     */
+    public int getRenderDistance() {
+        return this.renderDistance;
     }
 
-    @Override
-    public Optional<Inventory> getOpenInventory() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void openInventory(Inventory inventory) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void closeInventory() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getHelmet() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setHelmet(ItemStack helmet) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getChestplate() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setChestplate(ItemStack chestplate) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getLeggings() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setLeggings(ItemStack leggings) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getBoots() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setBoots(ItemStack boots) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getItemInHand() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setItemInHand(ItemStack itemInHand) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public boolean canEquip(EquipmentType type) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean canEquip(EquipmentType type, ItemStack equipment) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Optional<ItemStack> getEquipped(EquipmentType type) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean equip(EquipmentType type, ItemStack equipment) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public CarriedInventory<? extends Carrier> getInventory() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public GameProfile getProfile() {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * Sets the render distance of the player.
+     * 
+     * @param renderDistance the render distance
+     */
+    public void setRenderDistance(int renderDistance) {
+        this.renderDistance = renderDistance;
     }
 
     @Override
@@ -182,135 +115,138 @@ public class LanternPlayer extends LanternEntityLiving implements Player {
     }
 
     @Override
+    public Optional<CommandSource> getCommandSource() {
+        return Optional.of(this);
+    }
+
+    @Override
+    public SubjectCollection getContainingCollection() {
+        return this.permissionSubject.getContainingCollection();
+    }
+
+    @Override
+    public SubjectData getSubjectData() {
+        return this.permissionSubject.getSubjectData();
+    }
+
+    @Override
+    public SubjectData getTransientSubjectData() {
+        return this.permissionSubject.getTransientSubjectData();
+    }
+
+    @Override
+    public boolean hasPermission(Set<Context> contexts, String permission) {
+        return this.permissionSubject.hasPermission(contexts, permission);
+    }
+
+    @Override
+    public boolean hasPermission(String permission) {
+        return this.permissionSubject.hasPermission(permission);
+    }
+
+    @Override
+    public Tristate getPermissionValue(Set<Context> contexts, String permission) {
+        return this.permissionSubject.getPermissionValue(contexts, permission);
+    }
+
+    @Override
+    public boolean isChildOf(Subject parent) {
+        return this.permissionSubject.isChildOf(parent);
+    }
+
+    @Override
+    public boolean isChildOf(Set<Context> contexts, Subject parent) {
+        return this.permissionSubject.isChildOf(contexts, parent);
+    }
+
+    @Override
+    public List<Subject> getParents() {
+        return this.permissionSubject.getParents();
+    }
+
+    @Override
+    public List<Subject> getParents(Set<Context> contexts) {
+        return this.permissionSubject.getParents(contexts);
+    }
+
+    @Override
+    public Set<Context> getActiveContexts() {
+        return this.permissionSubject.getActiveContexts();
+    }
+
+    @Override
+    public GameProfile getProfile() {
+        return this.gameProfile;
+    }
+
+    @Override
     public String getIdentifier() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Optional<CommandSource> getCommandSource() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SubjectCollection getContainingCollection() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SubjectData getSubjectData() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SubjectData getTransientSubjectData() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean hasPermission(Set<Context> contexts, String permission) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(String permission) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Tristate getPermissionValue(Set<Context> contexts, String permission) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isChildOf(Subject parent) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isChildOf(Set<Context> contexts, Subject parent) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public List<Subject> getParents() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Subject> getParents(Set<Context> contexts) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Set<Context> getActiveContexts() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void sendMessage(Text... messages) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void sendMessage(Iterable<Text> messages) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void spawnParticles(ParticleEffect particleEffect, Vector3d position, int radius) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void playSound(SoundType sound, Vector3d position, double volume) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void playSound(SoundType sound, Vector3d position, double volume, double pitch) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public void sendMessage(ChatType type, Text... messages) {
-        // TODO Auto-generated method stub
-        
+        this.sendMessage(type, Lists.newArrayList(checkNotNull(messages, "messages")));
     }
 
     @Override
     public void sendMessage(ChatType type, Iterable<Text> messages) {
-        // TODO Auto-generated method stub
-        
+        checkNotNull(messages, "messages");
+        checkNotNull(type, "type");
+        for (Text message : messages) {
+            if (message != null) {
+                this.session.send(new MessagePlayOutChatMessage(message, type));
+            }
+        }
+    }
+
+    @Override
+    public void sendMessage(Text... messages) {
+        this.sendMessage(Lists.newArrayList(checkNotNull(messages, "messages")));
+    }
+
+    @Override
+    public void sendMessage(Iterable<Text> messages) {
+        this.sendMessage(ChatTypes.CHAT, checkNotNull(messages, "messages"));
+    }
+
+    @Override
+    public MessageSink getMessageSink() {
+        return this.messageSink;
+    }
+
+    @Override
+    public void setMessageSink(MessageSink sink) {
+        this.messageSink = checkNotNull(sink, "sink");
+    }
+
+    @Override
+    public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
+        this.session.send(new MessagePlayOutParticleEffect(position, particleEffect));
+    }
+
+    @Override
+    public void spawnParticles(ParticleEffect particleEffect, Vector3d position, int radius) {
+        if (this.getLocation().getPosition().distanceSquared(position) < radius * radius) {
+            this.spawnParticles(particleEffect, position);
+        }
+    }
+
+    @Override
+    public void playSound(SoundType sound, Vector3d position, double volume) {
+        this.playSound(sound, position, volume, 1.0);
+    }
+
+    @Override
+    public void playSound(SoundType sound, Vector3d position, double volume, double pitch) {
+        this.playSound(sound, position, volume, pitch, 0.0);
+    }
+
+    @Override
+    public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
+        this.session.send(new MessagePlayOutSoundEffect(sound.getName(), position,
+                (float) Math.max(minVolume, volume), (float) pitch));
     }
 
     @Override
@@ -333,20 +269,28 @@ public class LanternPlayer extends LanternEntityLiving implements Player {
 
     @Override
     public Locale getLocale() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.locale;
+    }
+
+    public void setLocale(Locale locale) {
+        this.locale = checkNotNull(locale, "locale");
     }
 
     @Override
-    public PlayerConnection getConnection() {
-        // TODO Auto-generated method stub
-        return null;
+    public Session getConnection() {
+        return this.session;
     }
 
     @Override
     public void sendResourcePack(ResourcePack pack) {
-        // TODO Auto-generated method stub
-        
+        String hash = pack.getHash().or(pack.getId());
+        String location;
+        try {
+            location = pack.getUrl().toURI().toString();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        this.session.send(new MessagePlayOutSendResourcePack(location, hash));
     }
 
     @Override
@@ -357,14 +301,12 @@ public class LanternPlayer extends LanternEntityLiving implements Player {
 
     @Override
     public void kick() {
-        // TODO Auto-generated method stub
-        
+        this.session.disconnect();
     }
 
     @Override
     public void kick(Text reason) {
-        // TODO Auto-generated method stub
-        
+        this.session.disconnect(reason);
     }
 
     @Override
@@ -380,81 +322,45 @@ public class LanternPlayer extends LanternEntityLiving implements Player {
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public MessageSink getMessageSink() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setMessageSink(MessageSink sink) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public boolean isSleepingIgnored() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.sleepingIgnored;
     }
 
     @Override
     public void setSleepingIgnored(boolean sleepingIgnored) {
-        // TODO Auto-generated method stub
-        
+        this.sleepingIgnored = sleepingIgnored;
     }
 
-    @Override
-    public FoodData getFoodData() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    // TODO: The following methods need to be removed after the jdk8 update of the api,
+    // they will be implemented using the default methods
 
     @Override
     public AchievementData getAchievementData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(AchievementData.class).get();
     }
 
     @Override
     public StatisticData getStatisticData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(StatisticData.class).get();
     }
 
     @Override
     public BanData getBanData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(BanData.class).get();
     }
 
     @Override
     public JoinData getJoinData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(JoinData.class).get();
     }
 
     @Override
     public DisplayNameData getDisplayNameData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(DisplayNameData.class).get();
     }
 
     @Override
     public GameModeData getGameModeData() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.get(GameModeData.class).get();
     }
-
 }

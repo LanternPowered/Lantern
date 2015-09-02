@@ -12,7 +12,6 @@ public class LanternAttributeModifier implements AttributeModifier {
 
     public LanternAttributeModifier(Operation operation, double value) {
         checkNotNull(operation, "operation");
-
         this.operation = operation;
         this.value = value;
     }

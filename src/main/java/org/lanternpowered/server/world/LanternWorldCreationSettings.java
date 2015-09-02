@@ -2,10 +2,11 @@ package org.lanternpowered.server.world;
 
 import java.util.Collection;
 
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.entity.player.gamemode.GameMode;
-import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
@@ -13,10 +14,11 @@ public class LanternWorldCreationSettings implements WorldCreationSettings {
 
     private final String name;
     private final GameMode gameMode;
-    private final DimensionType dimensionType;
+    private final LanternDimensionType dimensionType;
     private final GeneratorType generatorType;
     private final Collection<WorldGeneratorModifier> generatorModifiers;
     private final DataContainer generatorSettings;
+    private final TeleporterAgent teleporterAgent;
 
     private final boolean hardcore;
     private final boolean enabled;
@@ -25,19 +27,22 @@ public class LanternWorldCreationSettings implements WorldCreationSettings {
     private final boolean usesMapFeatures;
     private final boolean bonusChestEnabled;
     private final boolean commandsAllowed;
+    private final boolean waterEvaporates;
 
     private final long seed;
 
-    LanternWorldCreationSettings(String name, GameMode gameMode, DimensionType dimensionType, GeneratorType generatorType,
-            Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, boolean hardcore,
-            boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
-            boolean bonusChestEnabled, boolean commandsAllowed, long seed) {
+    LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType dimensionType, GeneratorType generatorType,
+            Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
+            boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
+            boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, long seed) {
         this.generatorModifiers = generatorModifiers;
         this.generatorSettings = generatorSettings;
         this.bonusChestEnabled = bonusChestEnabled;
         this.keepsSpawnLoaded = keepsSpawnLoaded;
         this.usesMapFeatures = usesMapFeatures;
         this.commandsAllowed = commandsAllowed;
+        this.teleporterAgent = teleporterAgent;
+        this.waterEvaporates = waterEvaporates;
         this.loadsOnStartup = loadsOnStartup;
         this.dimensionType = dimensionType;
         this.generatorType = generatorType;
@@ -103,18 +108,26 @@ public class LanternWorldCreationSettings implements WorldCreationSettings {
         return this.commandsAllowed;
     }
 
+    public boolean waterEvaporates() {
+        return this.waterEvaporates;
+    }
+
     @Override
     public boolean bonusChestEnabled() {
         return this.bonusChestEnabled;
     }
 
     @Override
-    public DimensionType getDimensionType() {
+    public LanternDimensionType getDimensionType() {
         return this.dimensionType;
     }
 
     @Override
     public DataContainer getGeneratorSettings() {
         return this.generatorSettings;
+    }
+
+    public TeleporterAgent getTeleporterAgent() {
+        return this.teleporterAgent;
     }
 }

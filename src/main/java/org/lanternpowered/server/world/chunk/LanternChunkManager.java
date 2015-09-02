@@ -425,7 +425,9 @@ public class LanternChunkManager {
         // Try to load chunk
         try {
             if (this.chunkIOService.read(chunk)) {
-                LanternGame.get().getEventManager().post(SpongeEventFactory.createChunkLoad(LanternGame.get(), chunk));
+                // TODO: Add cause
+                LanternGame.get().getEventManager().post(SpongeEventFactory.createLoadChunkEvent(
+                        null, LanternGame.get(), chunk));
                 return true;
             }
         } catch (Exception e) {
@@ -445,7 +447,9 @@ public class LanternChunkManager {
             LanternGame.log().error("Error while generating chunk (" + chunk.getX() + "," + chunk.getZ() + ")", e);
             return false;
         }
-        LanternGame.get().getEventManager().post(SpongeEventFactory.createChunkLoad(LanternGame.get(), chunk));
+        // TODO: Add cause
+        LanternGame.get().getEventManager().post(SpongeEventFactory.createLoadChunkEvent(
+                null, LanternGame.get(), chunk));
         return true;
     }
 

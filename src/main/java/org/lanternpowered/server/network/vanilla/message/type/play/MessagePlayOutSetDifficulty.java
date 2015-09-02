@@ -3,18 +3,18 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.vanilla.message.data.EnumDifficulty;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 
 public final class MessagePlayOutSetDifficulty implements Message {
 
-    private final EnumDifficulty difficulty;
+    private final LanternDifficulty difficulty;
 
     /**
      * Creates a new set difficulty message.
      * 
      * @param difficulty the difficulty
      */
-    public MessagePlayOutSetDifficulty(EnumDifficulty difficulty) {
+    public MessagePlayOutSetDifficulty(LanternDifficulty difficulty) {
         this.difficulty = checkNotNull(difficulty, "difficulty");
     }
 
@@ -23,7 +23,7 @@ public final class MessagePlayOutSetDifficulty implements Message {
      * 
      * @return the difficulty
      */
-    public EnumDifficulty getDifficulty() {
+    public LanternDifficulty getDifficulty() {
         return this.difficulty;
     }
 

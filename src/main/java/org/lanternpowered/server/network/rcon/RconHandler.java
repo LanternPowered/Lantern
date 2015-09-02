@@ -74,7 +74,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel channel = ctx.channel();
         RconSource source = channel.attr(SOURCE).getAndRemove();
 
-        RconQuitEvent event = SpongeEventFactory.createRconQuit(LanternGame.get(), source);
+        RconQuitEvent event = SpongeEventFactory.createRconQuitEvent(source);
         LanternGame.get().getEventManager().post(event);
 
         this.server.onChannelInactive(channel, source);
@@ -82,9 +82,8 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {
         RconSource source = ctx.channel().attr(SOURCE).get();
-
         if (password.equals(payload)) {
-            RconLoginEvent event = SpongeEventFactory.createRconLogin(LanternGame.get(), source);
+            RconLoginEvent event = SpongeEventFactory.createRconLoginEvent(source);
 
             if (!LanternGame.get().getEventManager().post(event)) {
                 source.setLoggedIn(true);
@@ -94,19 +93,16 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 return;
             }
         }
-
         source.setLoggedIn(false);
         sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
     }
 
     private static void handleCommand(ChannelHandlerContext ctx, String payload, int requestId) {
         RconSource source = ctx.channel().attr(SOURCE).get();
-
         if (!source.getLoggedIn()) {
             sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
             return;
         }
-
         LanternGame.get().getCommandDispatcher().process(source, payload);
         sendLargeResponse(ctx, requestId, source.flush());
     }
@@ -126,7 +122,6 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
             sendResponse(ctx, requestId, TYPE_RESPONSE, "");
             return;
         }
-
         int start = 0;
         while (start < payload.length()) {
             int length = payload.length() - start;

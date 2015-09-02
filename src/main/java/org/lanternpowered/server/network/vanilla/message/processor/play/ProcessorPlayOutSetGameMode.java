@@ -16,6 +16,6 @@ public final class ProcessorPlayOutSetGameMode implements Processor<MessagePlayO
 
     @Override
     public void process(CodecContext context, MessagePlayOutSetGameMode message, List<Message> output) throws CodecException {
-        output.add(new MessagePlayOutChangeGameState(3, message.getGameMode().getId()));
+        output.add(new MessagePlayOutChangeGameState(3, message.getGameMode().getInternalId()));
     }
 }

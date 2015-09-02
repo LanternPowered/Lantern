@@ -2,7 +2,8 @@ package org.lanternpowered.server.network.pipeline;
 
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.pipeline.MessageCodecHandler;
-import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
+import org.lanternpowered.server.network.pipeline.legacy.LegacyPingHandler;
+import org.lanternpowered.server.network.session.Session;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -32,13 +33,14 @@ public final class MessageChannelInitializer extends ChannelInitializer<SocketCh
     @Override
     protected void initChannel(SocketChannel channel) throws Exception {
         channel.pipeline()
-                // .addLast("legacyping", new LegacyPingHandler())
-                .addLast("framing", new MessageFramingHandler())
-                .addLast("compression", new MessageCompressionHandler())
-                .addLast("codecs", new MessageCodecHandler())
+                .addLast(Session.ENCRYPTION, NoopHandler.INSTANCE)
+                .addLast(Session.LEGACY_PING, new LegacyPingHandler())
+                .addLast(Session.FRAMING, new MessageFramingHandler())
+                .addLast(Session.COMPRESSION, NoopHandler.INSTANCE)
+                .addLast(Session.CODECS, new MessageCodecHandler())
                 .addLast("readtimeout", new ReadTimeoutHandler(READ_TIMEOUT))
                 .addLast("writeidletimeout", new IdleStateHandler(0, WRITE_IDLE_TIMEOUT, 0))
-                .addLast("processor", new MessageProcessorHandler())
-                .addLast("handler", new MessageChannelHandler(this.networkManager));
+                .addLast(Session.PROCESSOR, new MessageProcessorHandler())
+                .addLast(Session.HANDLER, new MessageChannelHandler(this.networkManager));
     }
 }

@@ -17,6 +17,7 @@ public class LanternDimension implements Dimension {
 
     private boolean allowPlayerRespawns = true;
     private boolean waterEvaporates = false;
+    private int buildHeight = 256;
 
     public LanternDimension(LanternWorld world, String name, DimensionType dimensionType,
             boolean hasSky) {
@@ -83,8 +84,7 @@ public class LanternDimension implements Dimension {
 
     @Override
     public int getBuildHeight() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.buildHeight;
     }
 
     @Override

@@ -22,4 +22,20 @@ public class LanternBlockRegistry extends SimpleCatalogTypeRegistry<BlockType> {
         // TODO
         return null;
     }
+
+    @Nullable
+    public Short getStateId(BlockType blockType) {
+        return this.getStateId(blockType.getDefaultState());
+    }
+
+    @Nullable
+    public BlockType getTypeById(int internalId) {
+        return this.getStateById(internalId & 0xfff).getType();
+    }
+
+    @Nullable
+    public Short getTypeId(BlockType blockType) {
+        Short id = this.getStateId(blockType);
+        return id == null ? null : (short) (id & 0xfff);
+    }
 }

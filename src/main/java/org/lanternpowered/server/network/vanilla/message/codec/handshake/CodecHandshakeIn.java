@@ -1,14 +1,29 @@
 package org.lanternpowered.server.network.vanilla.message.codec.handshake;
 
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.List;
+import java.util.UUID;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
+import org.lanternpowered.server.game.LanternGameProfile.Property;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.object.VarInt;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
+import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
+import org.lanternpowered.server.util.UUIDHelper;
+
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
+
+    private static final Gson gson = new Gson();
 
     @Override
     public ByteBuf encode(CodecContext context, MessageHandshakeIn message) throws CodecException {
@@ -18,9 +33,40 @@ public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
     @Override
     public MessageHandshakeIn decode(CodecContext context, ByteBuf buf) throws CodecException {
         int protocol = context.read(buf, VarInt.class).value();
-        String address = context.read(buf, String.class);
+        String hostname = context.read(buf, String.class);
         short port = buf.readShort();
         int state = context.read(buf, VarInt.class).value();
-        return new MessageHandshakeIn(state, address, port, protocol);
+        ProxyData proxyData = null;
+        SocketAddress socketAddress;
+        // Check for bungee-coord data
+        String[] split = hostname.split("\00\\|", 2)[0].split("\00"); // Ignore any extra data
+        if (split.length > 0) {
+            // TODO: Check whether bungee is enabled
+            if (split.length != 3 && split.length != 4) {
+                throw new CodecException("Parts length was " + split.length + ", should be 3 or 4!");
+            }
+            hostname = split[0];
+            socketAddress = new InetSocketAddress(split[1], port);
+            UUID uniqueId = UUIDHelper.fromFlatString(split[2]);
+            List<Property> properties = Lists.newArrayList();
+            if (split.length == 4) {
+                try {
+                    JsonArray json = gson.fromJson(split[3], JsonArray.class);
+                    for (int i = 0; i < json.size(); i++) {
+                        JsonObject json0 = json.get(i).getAsJsonObject();
+                        String name = json0.get("name").getAsString();
+                        String value = json0.get("value").getAsString();
+                        String signature = json0.has("signature") ? json0.get("signature").getAsString() : null;
+                        properties.add(new Property(name, value, signature));
+                    }
+                } catch (Exception e) {
+                    throw new CodecException(e);
+                }
+            }
+            proxyData = new ProxyData(uniqueId, properties);
+        } else {
+            socketAddress = new InetSocketAddress(hostname, port);
+        }
+        return new MessageHandshakeIn(state, hostname, socketAddress, protocol, proxyData);
     }
 }

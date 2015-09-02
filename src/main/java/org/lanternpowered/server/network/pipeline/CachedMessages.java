@@ -11,6 +11,7 @@ import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.reflect.TypeToken;
 
 public class CachedMessages {
 
@@ -19,14 +20,17 @@ public class CachedMessages {
             CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES)
                     .build(new CacheLoader<Class<?>, Optional<CachingHashGenerator<?>>>() {
 
-                @SuppressWarnings("unchecked")
+                @SuppressWarnings({"unchecked", "rawtypes"})
                 @Override
                 public Optional<CachingHashGenerator<?>> load(Class<?> key) throws Exception {
-                    Caching[] caching = key.getAnnotationsByType(Caching.class);
-                    if (caching.length == 0) {
-                        return Optional.absent();
+                    for (Class<?> key0 : TypeToken.of(key).getTypes().rawTypes()) {
+                        Caching caching = key0.getAnnotation(Caching.class);
+                        if (caching != null) {
+                            // This cast is strange, but necessary for some reason
+                            return (Optional) Optional.of(caching.value().newInstance());
+                        }
                     }
-                    return (Optional<CachingHashGenerator<?>>) Optional.of(caching[0].value().newInstance());
+                    return Optional.absent();
                 }
 
             });

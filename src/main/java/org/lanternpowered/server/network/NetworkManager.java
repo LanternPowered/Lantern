@@ -29,6 +29,15 @@ public final class NetworkManager {
     }
 
     /**
+     * Gets the server.
+     * 
+     * @return the server
+     */
+    public LanternServer getServer() {
+        return this.server;
+    }
+
+    /**
      * Gets the session registry.
      * 
      * @return the session registry

@@ -13,7 +13,7 @@ public final class CodecPlayOutSetDifficulty implements Codec<MessagePlayOutSetD
 
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutSetDifficulty message) throws CodecException {
-        return context.byteBufAlloc().buffer(1).writeByte(message.getDifficulty().getId());
+        return context.byteBufAlloc().buffer(1).writeByte(message.getDifficulty().getInternalId());
     }
 
     @Override

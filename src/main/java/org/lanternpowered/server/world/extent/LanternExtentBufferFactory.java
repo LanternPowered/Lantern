@@ -57,5 +57,4 @@ public final class LanternExtentBufferFactory implements ExtentBufferFactory {
     public MutableBlockVolume createThreadSafeBlockBuffer(int xSize, int ySize, int zSize) {
         return this.createThreadSafeBlockBuffer(new Vector3i(xSize, ySize, zSize));
     }
-
 }

@@ -1,12 +1,24 @@
 package org.lanternpowered.server.network.vanilla.message.type.handshake;
 
+import java.net.SocketAddress;
+import java.util.List;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
+
+import org.lanternpowered.server.game.LanternGameProfile.Property;
 import org.lanternpowered.server.network.message.MessageAsync;
+
+import com.google.common.collect.ImmutableList;
 
 public class MessageHandshakeIn implements MessageAsync {
 
-    private final String address;
+    private final SocketAddress address;
+    private final String hostname;
 
-    private final short port;
+    @Nullable
+    private final ProxyData proxyData;
+
     private final int protocol;
     private final int state;
 
@@ -18,11 +30,13 @@ public class MessageHandshakeIn implements MessageAsync {
      * @param port the port
      * @param protocol the client protocol
      */
-    public MessageHandshakeIn(int state, String address, short port, int protocol) {
+    public MessageHandshakeIn(int state, String hostname, SocketAddress address,
+            int protocol, @Nullable ProxyData proxyData) {
+        this.proxyData = proxyData;
+        this.hostname = hostname;
         this.protocol = protocol;
         this.address = address;
         this.state = state;
-        this.port = port;
     }
 
     /**
@@ -35,21 +49,21 @@ public class MessageHandshakeIn implements MessageAsync {
     }
 
     /**
-     * Gets the server address.
+     * Gets the host name that was used to join the server.
      * 
-     * @return the address
+     * @return the host name
      */
-    public String getServerAddress() {
-        return this.address;
+    public String getHostname() {
+        return this.hostname;
     }
 
     /**
-     * Gets the server port.
+     * Gets the socket address that was used to join the server.
      * 
-     * @return the port
+     * @return the socket address
      */
-    public short getServerPort() {
-        return this.port;
+    public SocketAddress getAddress() {
+        return this.address;
     }
 
     /**
@@ -61,4 +75,26 @@ public class MessageHandshakeIn implements MessageAsync {
         return this.protocol;
     }
 
+    public ProxyData getProxyData() {
+        return this.proxyData;
+    }
+
+    public static class ProxyData {
+
+        private final UUID uniqueId;
+        private final List<Property> properties;
+
+        public ProxyData(UUID uniqueId, List<Property> properties) {
+            this.properties = ImmutableList.copyOf(properties);
+            this.uniqueId = uniqueId;
+        }
+
+        public UUID getUniqueId() {
+            return this.uniqueId;
+        }
+
+        public List<Property> getProperties() {
+            return this.properties;
+        }
+    }
 }

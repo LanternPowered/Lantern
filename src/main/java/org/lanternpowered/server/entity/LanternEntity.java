@@ -13,8 +13,10 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.world.Location;
@@ -362,6 +364,18 @@ public class LanternEntity implements Entity {
 
     @Override
     public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public EntitySnapshot createSnapshot() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean damage(double damage, Cause cause) {
         // TODO Auto-generated method stub
         return false;
     }

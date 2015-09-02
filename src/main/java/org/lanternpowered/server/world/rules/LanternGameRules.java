@@ -5,11 +5,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.world.GameRuleChangeEvent;
 import org.spongepowered.api.util.Coerce;
-import org.spongepowered.api.world.World;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -17,37 +13,24 @@ import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class SimpleGameRules implements GameRules {
+public class LanternGameRules implements GameRules {
 
-    private final Map<String, GameRuleBase> rules = Maps.newHashMap();
-    private final World world;
-
-    public SimpleGameRules(World world) {
-        this.world = world;
-    }
+    private final Map<String, LanternGameRule> rules = Maps.newHashMap();
 
     @Override
-    public World getWorld() {
-        return this.world;
-    }
-
-    @Override
-    public GameRuleBase newRule(String name) {
+    public LanternGameRule newRule(String name) {
         checkNotNull(name, "name");
-
         if (this.rules.containsKey(name)) {
             return this.rules.get(name);
         }
-
-        GameRuleBase rule = new GameRuleBase(name);
+        LanternGameRule rule = this.createGameRule(name);
         this.rules.put(name, rule);
-
         return rule;
     }
 
     @Override
     public Optional<GameRule> getRule(String name) {
-        return Optional.<GameRule>fromNullable(this.rules.get(checkNotNull(name, "name")));
+        return Optional.fromNullable(this.rules.get(checkNotNull(name, "name")));
     }
 
     @Override
@@ -81,33 +64,35 @@ public class SimpleGameRules implements GameRules {
 
     @Override
     public Map<String, String> getValues() {
-        return Collections.unmodifiableMap(Maps.transformValues(this.rules, new Function<GameRuleBase, String>() {
-
+        return Collections.unmodifiableMap(Maps.transformValues(this.rules, new Function<LanternGameRule, String>() {
             @Override
-            public String apply(GameRuleBase input) {
+            public String apply(LanternGameRule input) {
                 return input.value;
             }
-
         }));
     }
 
     @Override
     public List<GameRule> getRules() {
-        return Collections.unmodifiableList(new ArrayList<GameRule>(this.rules.values()));
+        return Collections.unmodifiableList(new ArrayList<>(this.rules.values()));
     }
 
-    class GameRuleBase implements GameRule {
+    protected LanternGameRule createGameRule(String name) {
+        return new LanternGameRule(name);
+    }
+
+    class LanternGameRule implements GameRule {
 
         private final String name;
 
         // The value of the game rule
-        private String value = "";
+        protected String value = "";
 
         // Optional possible types
-        private Boolean valueBoolean = false;
-        private Number valueNumber = 0;
+        protected Boolean valueBoolean = false;
+        protected Number valueNumber = 0;
 
-        public GameRuleBase(String name) {
+        public LanternGameRule(String name) {
             this.name = name;
         }
 
@@ -119,19 +104,9 @@ public class SimpleGameRules implements GameRules {
         @Override
         public <T> void setValue(T object) {
             checkNotNull(object, "object");
-
-            String oldValue = this.value;
-
             this.value = Coerce.toString(object);
             this.valueBoolean = Coerce.toBoolean(this.value);
             this.valueNumber = Coerce.toDouble(this.value);
-
-            if (!this.value.equals(oldValue)) {
-                GameRuleChangeEvent event = SpongeEventFactory.createGameRuleChange(LanternGame.get(), world, this.name, oldValue, this.value);
-                if (LanternGame.get().getEventManager().post(event)) {
-                    return;
-                }
-            }
         }
 
         @Override

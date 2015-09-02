@@ -8,7 +8,7 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
-import org.spongepowered.api.event.entity.player.PlayerResourcePackStatusEvent.ResourcePackStatus;
+import org.spongepowered.api.event.entity.living.player.PlayerResourcePackStatusEvent.ResourcePackStatus;
 
 import com.google.common.collect.ImmutableMap;
 

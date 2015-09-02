@@ -1,18 +1,24 @@
 package org.lanternpowered.server;
 
 import java.net.InetSocketAddress;
+import java.security.KeyPair;
 import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.network.buf.LanternChannelRegistrar;
+import org.lanternpowered.server.util.SecurityHelper;
+import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelListener;
 import org.spongepowered.api.network.ChannelRegistrationException;
 import org.spongepowered.api.service.world.ChunkLoadService;
+import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.sink.MessageSink;
+import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.util.command.source.ConsoleSource;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
@@ -25,6 +31,27 @@ import com.google.common.util.concurrent.ListenableFuture;
 public class LanternServer implements Server {
 
     private final LanternChannelRegistrar channelRegistrar = new LanternChannelRegistrar(this);
+    private final KeyPair keyPair = SecurityHelper.generateKeyPair();
+
+    private Favicon favicon;
+
+    /**
+     * Gets the key pair.
+     * 
+     * @return the key pair
+     */
+    public KeyPair getKeyPair() {
+        return this.keyPair;
+    }
+
+    /**
+     * Gets the favicon of the server.
+     * 
+     * @return the favicon
+     */
+    public Optional<Favicon> getFavicon() {
+        return Optional.fromNullable(this.favicon);
+    }
 
     @Override
     public void registerChannel(Object plugin, ChannelListener listener, String channel) throws ChannelRegistrationException {
@@ -164,8 +191,7 @@ public class LanternServer implements Server {
 
     @Override
     public ChunkLayout getChunkLayout() {
-        // TODO Auto-generated method stub
-        return null;
+        return LanternChunkLayout.INSTANCE;
     }
 
     @Override
@@ -176,8 +202,7 @@ public class LanternServer implements Server {
 
     @Override
     public MessageSink getBroadcastSink() {
-        // TODO Auto-generated method stub
-        return null;
+        return MessageSinks.toAll();
     }
 
     @Override
@@ -224,8 +249,7 @@ public class LanternServer implements Server {
 
     @Override
     public ConsoleSource getConsole() {
-        // TODO Auto-generated method stub
-        return null;
+        return LanternConsoleSource.INSTANCE;
     }
 
     @Override
@@ -234,6 +258,9 @@ public class LanternServer implements Server {
         return null;
     }
 
+    /**
+     * The following will be hard to detect since we are multi-threaded.
+     */
     @Override
     public double getTicksPerSecond() {
         // TODO Auto-generated method stub

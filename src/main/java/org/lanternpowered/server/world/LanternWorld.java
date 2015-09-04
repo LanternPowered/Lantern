@@ -5,7 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.lanternpowered.server.entity.player.LanternPlayer;
+import org.lanternpowered.server.effect.LanternViewer;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
@@ -52,7 +55,6 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.gen.WorldGenerator;
-import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
 
@@ -68,13 +70,23 @@ import com.google.common.collect.Lists;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
-public class LanternWorld extends AbstractExtent implements World {
+public class LanternWorld extends AbstractExtent implements World, LanternViewer {
+
+    public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
+    public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
+    public static final Vector3i BLOCK_SIZE = BLOCK_MAX.sub(BLOCK_MIN).add(1, 1, 1);
+    public static final Vector2i BIOME_MIN = BLOCK_MIN.toVector2(true);
+    public static final Vector2i BIOME_MAX = BLOCK_MAX.toVector2(true);
+    public static final Vector2i BIOME_SIZE = BIOME_MAX.sub(BIOME_MIN).add(1, 1);
 
     private final LanternChunkManager chunkManager = null;
     private final LanternWorldProperties properties = null;
 
     private final String name;
     private final UUID uniqueId;
+
+    private final TeleporterAgent teleporterAgent = null;
+    private Context worldContext;
 
     public LanternWorld(String name, UUID uniqueId) {
         this.uniqueId = uniqueId;
@@ -283,80 +295,67 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getTileEntity(x, y, z);
     }
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Vector3i getBlockMin() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Vector3i getBlockMax() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Vector3i getBlockSize() {
-        // TODO Auto-generated method stub
-        return null;
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x & 0xf, y, z & 0xf, block);
     }
 
     @Override
     public boolean containsBlock(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return false;
+        return VecHelper.inBounds(x, y, z, BLOCK_MIN, BLOCK_MAX);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBlock(x & 0xf, y, z & 0xf);
     }
 
     @Override
     public BlockType getBlockType(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getBlock(x, y, z).getType();
     }
 
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
-        // TODO Auto-generated method stub
-        
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBiome(x & 0xf, z & 0xf, biome);
     }
 
     @Override
     public Vector2i getBiomeMin() {
-        // TODO Auto-generated method stub
-        return null;
+        return BIOME_MIN;
     }
 
     @Override
     public Vector2i getBiomeMax() {
-        // TODO Auto-generated method stub
-        return null;
+        return BIOME_MAX;
     }
 
     @Override
     public Vector2i getBiomeSize() {
-        // TODO Auto-generated method stub
-        return null;
+        return BIOME_SIZE;
+    }
+
+    @Override
+    public Vector3i getBlockMin() {
+        return BLOCK_MIN;
+    }
+
+    @Override
+    public Vector3i getBlockMax() {
+        return BLOCK_MAX;
+    }
+
+    @Override
+    public Vector3i getBlockSize() {
+        return BLOCK_SIZE;
     }
 
     @Override
     public boolean containsBiome(int x, int z) {
-        // TODO Auto-generated method stub
-        return false;
+        return VecHelper.inBounds(x, z, BIOME_MIN, BIOME_MAX);
     }
 
     @Override
@@ -366,152 +365,130 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(x & 0xf, y, z & 0xf, propertyClass);
     }
 
     @Override
     public Collection<Property<?, ?>> getProperties(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperties(x & 0xf, y, z & 0xf);
     }
 
     @Override
     public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).get(x & 0xf, y, z & 0xf, key);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> get(int x, int y, int z, Class<T> manipulatorClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).get(x & 0xf, y, z & 0xf, manipulatorClass);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(int x, int y, int z, Class<T> manipulatorClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrCreate(x & 0xf, y, z & 0xf, manipulatorClass);
     }
 
     @Override
     public <E> E getOrNull(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrNull(x & 0xf, y, z & 0xf, key);
     }
 
     @Override
     public <E> E getOrElse(int x, int y, int z, Key<? extends BaseValue<E>> key, E defaultValue) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrElse(x & 0xf, y, z & 0xf, key, defaultValue);
     }
 
     @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValue(x & 0xf, y, z & 0xf, key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Key<?> key) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, BaseValue<?> value) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, value);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, manipulatorClass);
     }
 
     @Override
     public boolean supports(int x, int y, int z, DataManipulator<?, ?> manipulator) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, manipulator);
     }
 
     @Override
     public ImmutableSet<Key<?>> getKeys(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getKeys(x & 0xf, y, z & 0xf);
     }
 
     @Override
     public ImmutableSet<ImmutableValue<?>> getValues(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValues(x & 0xf, y, z & 0xf);
     }
 
     @Override
     public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).transform(x & 0xf, y, z & 0xf, key, function);
     }
 
     @Override
     public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, key, value);
     }
 
     @Override
     public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, value);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, manipulator);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, manipulator, function);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, Iterable<DataManipulator<?, ?>> manipulators) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, manipulators);
     }
 
     @Override
-    public DataTransactionResult offer(Vector3i blockPosition, Iterable<DataManipulator<?, ?>> values, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
+    public DataTransactionResult offer(Vector3i coords, Iterable<DataManipulator<?, ?>> values, MergeFunction function) {
+        int x = coords.getX();
+        int y = coords.getY();
+        int z = coords.getZ();
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(new Vector3i(x & 0xf, y, z & 0xf), values, function);
     }
 
     @Override
     public DataTransactionResult remove(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).remove(x & 0xf, y, z & 0xf, manipulatorClass);
     }
 
     @Override
     public DataTransactionResult remove(int x, int y, int z, Key<?> key) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).remove(x & 0xf, y, z & 0xf, key);
     }
 
     @Override
     public DataTransactionResult undo(int x, int y, int z, DataTransactionResult result) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).undo(x & 0xf, y, z & 0xf, result);
     }
 
     @Override
-    public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, DataHolder from) {
-        // TODO Auto-generated method stub
-        return null;
+    public DataTransactionResult copyFrom(int x, int y, int z, DataHolder from) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).copyFrom(x & 0xf, y, z & 0xf, from);
     }
 
     @Override
@@ -521,9 +498,8 @@ public class LanternWorld extends AbstractExtent implements World {
     }
 
     @Override
-    public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, DataHolder from, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
+    public DataTransactionResult copyFrom(int x, int y, int z, DataHolder from, MergeFunction function) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).copyFrom(x & 0xf, y, z & 0xf, from, function);
     }
 
     @Override
@@ -534,20 +510,17 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Collection<DataManipulator<?, ?>> getManipulators(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getManipulators(x & 0xf, y, z & 0xf);
     }
 
     @Override
     public boolean validateRawData(int x, int y, int z, DataView container) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).validateRawData(x & 0xf, y, z & 0xf, container);
     }
 
     @Override
     public void setRawData(int x, int y, int z, DataView container) throws InvalidDataException {
-        // TODO Auto-generated method stub
-        
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setRawData(x & 0xf, y, z & 0xf, container);
     }
 
     @Override
@@ -598,33 +571,28 @@ public class LanternWorld extends AbstractExtent implements World {
     }
 
     @Override
-    public void playSound(SoundType sound, Vector3d position, double volume) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void playSound(SoundType sound, Vector3d position, double volume, double pitch) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void sendMessage(ChatType type, Text... messages) {
-        // TODO Auto-generated method stub
-        
+        List<LanternPlayer> players = this.getPlayers();
+        if (!players.isEmpty()) {
+            MessagePlayOutSoundEffect message = new MessagePlayOutSoundEffect(sound.getName(), position,
+                    (float) Math.max(minVolume, volume), (float) pitch);
+            for (LanternPlayer player : players) {
+                player.getConnection().send(message);
+            }
+        }
     }
 
     @Override
     public void sendMessage(ChatType type, Iterable<Text> messages) {
-        // TODO Auto-generated method stub
-        
+        List<LanternPlayer> players = this.getPlayers();
+        if (!players.isEmpty()) {
+            for (Text message : messages) {
+                MessagePlayOutChatMessage networkMessage = new MessagePlayOutChatMessage(message, type);
+                for (LanternPlayer player : players) {
+                    player.getConnection().send(networkMessage);
+                }
+            }
+        }
     }
 
     @Override
@@ -647,8 +615,10 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Context getContext() {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.worldContext == null) {
+            this.worldContext = new Context(Context.WORLD_KEY, this.getName());
+        }
+        return this.worldContext;
     }
 
     @Override
@@ -691,7 +661,13 @@ public class LanternWorld extends AbstractExtent implements World {
         if (!VecHelper.inBounds(x, y, z, SPACE_MIN, SPACE_MAX)) {
             return Optional.absent();
         }
-        return Optional.<Chunk>of(this.chunkManager.getOrLoadChunk(new Vector2i(x, z), generate));
+        Chunk chunk;
+        if (generate) {
+            chunk = this.chunkManager.getOrLoadChunk(new Vector2i(x, z), generate);
+        } else {
+            chunk = this.chunkManager.getOrLoadChunkIfPresent(new Vector2i(x, z));
+        }
+        return Optional.of(chunk);
     }
 
     @Override
@@ -718,14 +694,12 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public Optional<String> getGameRule(String gameRule) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.properties.getGameRule(gameRule);
     }
 
     @Override
     public Map<String, String> getGameRules() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.properties.getGameRules();
     }
 
     @Override
@@ -736,14 +710,12 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public WorldGenerator getWorldGenerator() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getWorldGenerator();
     }
 
     @Override
     public void setWorldGenerator(WorldGenerator generator) {
-        // TODO Auto-generated method stub
-        
+        this.chunkManager.setWorldGenerator(generator);
     }
 
     @Override
@@ -781,7 +753,7 @@ public class LanternWorld extends AbstractExtent implements World {
     }
 
     @Override
-    public WorldProperties getProperties() {
+    public LanternWorldProperties getProperties() {
         return this.properties;
     }
 
@@ -822,8 +794,6 @@ public class LanternWorld extends AbstractExtent implements World {
 
     @Override
     public TeleporterAgent getTeleporterAgent() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.teleporterAgent;
     }
-
 }

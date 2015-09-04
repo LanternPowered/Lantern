@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.text.LanternTextHelper;
 import org.lanternpowered.server.text.LanternTextHelper.RawAction;
 import org.spongepowered.api.text.Text;
@@ -17,8 +18,6 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -28,32 +27,16 @@ import com.google.gson.JsonSerializationContext;
 
 public class JsonTextBaseSerializer {
 
-    private final static BiMap<String, TextColor> COLORS = ImmutableBiMap.<String, TextColor>builder()
-            .put("black", TextColors.BLACK)
-            .put("dark_blue", TextColors.DARK_BLUE)
-            .put("dark_green", TextColors.DARK_GREEN)
-            .put("dark_aqua", TextColors.DARK_AQUA)
-            .put("dark_red", TextColors.DARK_RED)
-            .put("dark_purple", TextColors.DARK_PURPLE)
-            .put("gold", TextColors.GOLD)
-            .put("gray", TextColors.GRAY)
-            .put("dark_gray", TextColors.DARK_GRAY)
-            .put("blue", TextColors.BLUE)
-            .put("green", TextColors.GREEN)
-            .put("aqua", TextColors.AQUA)
-            .put("red", TextColors.RED)
-            .put("light_purple", TextColors.LIGHT_PURPLE)
-            .put("yellow", TextColors.YELLOW)
-            .put("white", TextColors.WHITE)
-            .build();
-
     public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context) throws JsonParseException {
         this.deserialize(json, builder, context, json.has("extra") ? json.getAsJsonArray("extra") : null);
     }
 
     public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context, @Nullable JsonArray children) throws JsonParseException {
         if (json.has("color")) {
-            builder.color(COLORS.get(json.get("color").getAsString()));
+            TextColor color = LanternGame.get().getRegistry().getType(TextColor.class, json.get("color").getAsString()).orNull();
+            if (color != null) {
+                builder.color(color);
+            }
         }
         TextStyle style = builder.getStyle();
         if (json.has("bold")) {
@@ -119,7 +102,7 @@ public class JsonTextBaseSerializer {
     public void serialize(JsonObject json, Text text, JsonSerializationContext context, List<Text> children) {
         TextColor color = text.getColor();
         if (color != TextColors.NONE) {
-            json.addProperty("color", COLORS.inverse().get(color));
+            json.addProperty("color", color.getId());
         }
         TextStyle style = text.getStyle();
         Optional<Boolean> bold = style.isBold();

@@ -2,15 +2,18 @@ package org.lanternpowered.server.attribute;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.animal.Horse;
+import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
 import com.google.common.base.Predicate;
 
-public class LanternAttribute extends SimpleCatalogType implements Attribute {
+public class LanternAttribute extends LanternCatalogType implements Attribute {
 
     private final Text name;
     private final Predicate<DataHolder> targets;
@@ -62,4 +65,30 @@ public class LanternAttribute extends SimpleCatalogType implements Attribute {
         return this.name;
     }
 
+    public static class Target {
+
+        public static final Predicate<DataHolder> LIVING = new Predicate<DataHolder>() {
+
+            @Override
+            public boolean apply(DataHolder input) {
+                return input instanceof Living;
+            }
+        };
+
+        public static final Predicate<DataHolder> ZOMBIE = new Predicate<DataHolder>() {
+
+            @Override
+            public boolean apply(DataHolder input) {
+                return input instanceof Zombie;
+            }
+        };
+
+        public static final Predicate<DataHolder> HORSE = new Predicate<DataHolder>() {
+
+            @Override
+            public boolean apply(DataHolder input) {
+                return input instanceof Horse;
+            }
+        };
+    }
 }

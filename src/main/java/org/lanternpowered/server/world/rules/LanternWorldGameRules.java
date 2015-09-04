@@ -23,7 +23,7 @@ public class LanternWorldGameRules extends LanternGameRules {
                 super.setValue(object);
                 if (!this.value.equals(oldValue)) {
                     ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(
-                            LanternGame.get(), this.getName(), oldValue, this.value, world);
+                            LanternGame.get(), this.getName(), oldValue, world, this.value);
                     LanternGame.get().getEventManager().post(event);
                 }
             }

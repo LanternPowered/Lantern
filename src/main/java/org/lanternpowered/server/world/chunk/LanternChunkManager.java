@@ -83,10 +83,19 @@ public class LanternChunkManager {
     private WorldGenerator worldGenerator;
 
     public LanternChunkManager(LanternWorld world, LanternChunkLoadService chunkLoadService,
-            ChunkIOService chunkIOService) {
-        this.chunkLoadService = chunkLoadService;
-        this.chunkIOService = chunkIOService;
-        this.world = world;
+            ChunkIOService chunkIOService, WorldGenerator worldGenerator) {
+        this.chunkLoadService = checkNotNull(chunkLoadService, "chunkLoadService");
+        this.chunkIOService = checkNotNull(chunkIOService, "chunkIOService");
+        this.worldGenerator = checkNotNull(worldGenerator, "worldGenerator");
+        this.world = checkNotNull(world, "world");
+    }
+
+    public void setWorldGenerator(WorldGenerator worldGenerator) {
+        this.worldGenerator = checkNotNull(worldGenerator, "worldGenerator");
+    }
+
+    public WorldGenerator getWorldGenerator() {
+        return this.worldGenerator;
     }
 
     void force(LanternLoadingTicket ticket, Vector2i coords) {
@@ -346,6 +355,35 @@ public class LanternChunkManager {
      */
     public LanternChunk getOrCreateChunk(int x, int z) {
         return this.getOrCreateChunk(new Vector2i(x, z));
+    }
+
+    /**
+     * Gets a chunk for the coordinates.
+     * 
+     * @param x the x coordinate
+     * @param z the z coordinate
+     * @return the chunk
+     */
+    @Nullable
+    public LanternChunk getOrLoadChunkIfPresent(int x, int z) {
+        return this.getOrLoadChunkIfPresent(new Vector2i(x, z));
+    }
+
+    /**
+     * Gets a chunk for the coordinates.
+     * 
+     * @param x the x coordinate
+     * @param z the z coordinate
+     * @return the chunk
+     */
+    @Nullable
+    public LanternChunk getOrLoadChunkIfPresent(Vector2i coords) {
+        LanternChunk chunk = this.getChunk(coords);
+        if (chunk == null) {
+            return null;
+        }
+        this.load(chunk, false);
+        return chunk;
     }
 
     /**

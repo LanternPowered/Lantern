@@ -2,11 +2,11 @@ package org.lanternpowered.server.block;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.catalog.SimpleCatalogTypeRegistry;
+import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 
-public class LanternBlockRegistry extends SimpleCatalogTypeRegistry<BlockType> {
+public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> {
 
     @Nullable
     public BlockState getStateById(int internalId) {
@@ -37,5 +37,21 @@ public class LanternBlockRegistry extends SimpleCatalogTypeRegistry<BlockType> {
     public Short getTypeId(BlockType blockType) {
         Short id = this.getStateId(blockType);
         return id == null ? null : (short) (id & 0xfff);
+    }
+
+    @Nullable
+    public BlockState getStateByIdAndData(int internalId, byte data) {
+        return this.getStateById(internalId & 0xfff | (data & 0xf) << 12);
+    }
+
+    @Nullable
+    public BlockState getStateByTypeAndData(BlockType blockType, byte data) {
+        return this.getStateById(this.getTypeId(blockType) & 0xfff | (data & 0xf) << 12);
+    }
+
+    @Nullable
+    public Byte getStateData(BlockState blockState) {
+        Short id = this.getStateId(blockState);
+        return id == null ? null : (byte) ((id >> 12) & 0xf);
     }
 }

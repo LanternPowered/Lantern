@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.network.buf.LanternChannelRegistrar;
 import org.lanternpowered.server.util.SecurityHelper;
+import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
@@ -19,6 +20,7 @@ import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
+import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.source.ConsoleSource;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
@@ -26,14 +28,18 @@ import org.spongepowered.api.world.storage.ChunkLayout;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class LanternServer implements Server {
 
     private final LanternChannelRegistrar channelRegistrar = new LanternChannelRegistrar(this);
+    private final LanternWorldManager worldManager = new LanternWorldManager();
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
 
     private Favicon favicon;
+    private boolean onlineMode;
+    private boolean whitelist;
 
     /**
      * Gets the key pair.
@@ -51,6 +57,18 @@ public class LanternServer implements Server {
      */
     public Optional<Favicon> getFavicon() {
         return Optional.fromNullable(this.favicon);
+    }
+
+    /**
+     * Gets all the active command sources.
+     * 
+     * @return the active command sources
+     */
+    public Collection<CommandSource> getActiveCommandSources() {
+        ImmutableList.Builder<CommandSource> commandSources = ImmutableList.builder();
+        commandSources.add(this.getConsole());
+        commandSources.addAll(this.getOnlinePlayers());
+        return commandSources.build();
     }
 
     @Override
@@ -89,104 +107,87 @@ public class LanternServer implements Server {
 
     @Override
     public Collection<World> getWorlds() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getWorlds();
     }
 
     @Override
     public Collection<WorldProperties> getUnloadedWorlds() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getUnloadedWorlds();
     }
 
     @Override
     public Collection<WorldProperties> getAllWorldProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getAllWorldProperties();
     }
 
     @Override
     public Optional<World> getWorld(UUID uniqueId) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getWorld(uniqueId);
     }
 
     @Override
     public Optional<World> getWorld(String worldName) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getWorld(worldName);
     }
 
     @Override
     public Optional<WorldProperties> getDefaultWorld() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getDefaultWorld();
     }
 
     @Override
     public Optional<World> loadWorld(String worldName) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.loadWorld(worldName);
     }
 
     @Override
     public Optional<World> loadWorld(UUID uniqueId) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.loadWorld(uniqueId);
     }
 
     @Override
     public Optional<World> loadWorld(WorldProperties properties) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.loadWorld(properties);
     }
 
     @Override
     public Optional<WorldProperties> getWorldProperties(String worldName) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getWorldProperties(worldName);
     }
 
     @Override
     public Optional<WorldProperties> getWorldProperties(UUID uniqueId) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.getWorldProperties(uniqueId);
     }
 
     @Override
     public boolean unloadWorld(World world) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.worldManager.unloadWorld(world);
     }
 
     @Override
     public Optional<WorldProperties> createWorld(WorldCreationSettings settings) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.createWorld(settings);
     }
 
     @Override
     public ListenableFuture<Optional<WorldProperties>> copyWorld(WorldProperties worldProperties, String copyName) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.copyWorld(worldProperties, copyName);
     }
 
     @Override
     public Optional<WorldProperties> renameWorld(WorldProperties worldProperties, String newName) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.renameWorld(worldProperties, newName);
     }
 
     @Override
     public ListenableFuture<Boolean> deleteWorld(WorldProperties worldProperties) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.worldManager.deleteWorld(worldProperties);
     }
 
     @Override
     public boolean saveWorldProperties(WorldProperties properties) {
-        // TODO Auto-generated method stub
-        return false;
+        return this.worldManager.saveWorldProperties(properties);
     }
 
     @Override
@@ -213,20 +214,17 @@ public class LanternServer implements Server {
 
     @Override
     public boolean hasWhitelist() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.whitelist;
     }
 
     @Override
     public void setHasWhitelist(boolean enabled) {
-        // TODO Auto-generated method stub
-        
+        this.whitelist = enabled;
     }
 
     @Override
     public boolean getOnlineMode() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.onlineMode;
     }
 
     @Override
@@ -266,5 +264,4 @@ public class LanternServer implements Server {
         // TODO Auto-generated method stub
         return 0;
     }
-
 }

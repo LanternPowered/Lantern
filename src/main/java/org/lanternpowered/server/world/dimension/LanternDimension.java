@@ -1,28 +1,28 @@
 package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.GeneratorType;
 
 public class LanternDimension implements Dimension {
 
     private final String name;
-    private final DimensionType dimensionType;
+    private final LanternDimensionType dimensionType;
     private final LanternWorld world;
-    private final boolean hasSky;
+    private final int buildHeight;
 
     private volatile Context dimContext;
 
     private boolean allowPlayerRespawns = true;
     private boolean waterEvaporates = false;
-    private int buildHeight = 256;
 
-    public LanternDimension(LanternWorld world, String name, DimensionType dimensionType,
-            boolean hasSky) {
+
+    public LanternDimension(LanternWorld world, String name, LanternDimensionType dimensionType,
+            int buildHeight) {
         this.dimensionType = dimensionType;
-        this.hasSky = hasSky;
+        this.buildHeight = buildHeight;
         this.world = world;
         this.name = name;
     }
@@ -68,7 +68,7 @@ public class LanternDimension implements Dimension {
 
     @Override
     public boolean hasSky() {
-        return this.hasSky;
+        return this.dimensionType.hasSky();
     }
 
     @Override
@@ -78,8 +78,7 @@ public class LanternDimension implements Dimension {
 
     @Override
     public int getHeight() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.getGeneratorType().getGeneratorHeight();
     }
 
     @Override
@@ -88,7 +87,7 @@ public class LanternDimension implements Dimension {
     }
 
     @Override
-    public GeneratorType getGeneratorType() {
+    public LanternGeneratorType getGeneratorType() {
         // TODO: Is this supposed to return this?
         return this.world.getProperties().getGeneratorType();
     }

@@ -29,12 +29,13 @@ public class LanternWorldCreationSettings implements WorldCreationSettings {
     private final boolean commandsAllowed;
     private final boolean waterEvaporates;
 
+    private final int buildHeight;
     private final long seed;
 
     LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType dimensionType, GeneratorType generatorType,
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
             boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
-            boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, long seed) {
+            boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, long seed, int buildHeight) {
         this.generatorModifiers = generatorModifiers;
         this.generatorSettings = generatorSettings;
         this.bonusChestEnabled = bonusChestEnabled;
@@ -46,6 +47,7 @@ public class LanternWorldCreationSettings implements WorldCreationSettings {
         this.loadsOnStartup = loadsOnStartup;
         this.dimensionType = dimensionType;
         this.generatorType = generatorType;
+        this.buildHeight = buildHeight;
         this.hardcore = hardcore;
         this.gameMode = gameMode;
         this.enabled = enabled;
@@ -129,5 +131,9 @@ public class LanternWorldCreationSettings implements WorldCreationSettings {
 
     public TeleporterAgent getTeleporterAgent() {
         return this.teleporterAgent;
+    }
+
+    public int getBuildHeight() {
+        return this.buildHeight;
     }
 }

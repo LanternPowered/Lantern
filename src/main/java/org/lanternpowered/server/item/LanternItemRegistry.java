@@ -2,10 +2,10 @@ package org.lanternpowered.server.item;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.catalog.SimpleCatalogTypeRegistry;
+import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.spongepowered.api.item.ItemType;
 
-public class LanternItemRegistry extends SimpleCatalogTypeRegistry<ItemType> {
+public class LanternItemRegistry extends LanternCatalogTypeRegistry<ItemType> {
 
     @Nullable
     public ItemType getById(int internalId) {

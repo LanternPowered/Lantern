@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.catalog.SimpleCatalogTypeRegistry;
+import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.spongepowered.api.world.biome.BiomeType;
 
 import gnu.trove.TCollections;
@@ -15,7 +15,7 @@ import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 
-public class LanternBiomeRegistry extends SimpleCatalogTypeRegistry<BiomeType> {
+public class LanternBiomeRegistry extends LanternCatalogTypeRegistry<BiomeType> {
 
     // A lookup for the biomes by it's (internal) id
     private final TShortObjectMap<BiomeType> biomesById = TCollections.synchronizedMap(new TShortObjectHashMap<BiomeType>());

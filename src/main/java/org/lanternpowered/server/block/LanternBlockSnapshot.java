@@ -136,12 +136,6 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     }
 
     @Override
-    public ImmutableCollection<ImmutableDataManipulator<?, ?>> getContainers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
         // TODO Auto-generated method stub
         return null;
@@ -191,6 +185,12 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public BlockSnapshot withState(BlockState blockState) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<ImmutableDataManipulator<?, ?>> getContainers() {
         // TODO Auto-generated method stub
         return null;
     }

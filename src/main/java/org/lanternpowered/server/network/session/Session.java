@@ -21,7 +21,7 @@ import javax.annotation.Nullable;
 import javax.crypto.SecretKey;
 
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.entity.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.network.buf.LanternChannelBuf;

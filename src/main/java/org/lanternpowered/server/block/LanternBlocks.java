@@ -46,4 +46,19 @@ public class LanternBlocks {
     public static Short getTypeId(BlockType blockType) {
         return getRegistry().getTypeId(blockType);
     }
+
+    @Nullable
+    public static BlockState getStateByIdAndData(int internalId, byte data) {
+        return getRegistry().getStateByIdAndData(internalId, data);
+    }
+
+    @Nullable
+    public static Byte getStateData(BlockState blockState) {
+        return getRegistry().getStateData(blockState);
+    }
+
+    @Nullable
+    public static BlockState getStateByTypeAndData(BlockType blockType, byte data) {
+        return getRegistry().getStateByTypeAndData(blockType, data);
+    }
 }

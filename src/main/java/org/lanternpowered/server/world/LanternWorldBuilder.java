@@ -43,6 +43,8 @@ public class LanternWorldBuilder implements WorldBuilder {
     private Boolean keepsSpawnLoaded;
     private Boolean waterEvaporates; // Non-sponge property
 
+    private int buildHeight; // Non-sponge property
+
     private boolean hardcore;
     private boolean enabled;
     private boolean loadsOnStartup;
@@ -73,6 +75,8 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.bonusChestEnabled = settings0.bonusChestEnabled();
         this.commandsAllowed = settings0.commandsAllowed();
         this.teleporterAgent = settings0.getTeleporterAgent();
+        this.waterEvaporates = settings0.waterEvaporates();
+        this.buildHeight = settings0.getBuildHeight();
         return this;
     }
 
@@ -185,6 +189,12 @@ public class LanternWorldBuilder implements WorldBuilder {
         return this;
     }
 
+    public LanternWorldBuilder buildHeight(int buildHeight) {
+        checkState(buildHeight <= 256, "the build height cannot be greater then 256");
+        this.buildHeight = buildHeight;
+        return this;
+    }
+
     @Override
     public LanternWorldBuilder reset() {
         this.usesMapFeatures = true;
@@ -202,6 +212,7 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.generatorType = null;
         this.generatorSettings = null;
         this.waterEvaporates = null;
+        this.buildHeight = 256;
         // This teleporter agent won't return anything useful
         this.teleporterAgent = new LanternTeleporterAgent();
         return null;
@@ -236,6 +247,6 @@ public class LanternWorldBuilder implements WorldBuilder {
         return new LanternWorldCreationSettings(this.name, this.gameMode, this.dimensionType, this.generatorType,
                 this.generatorModifiers, generatorSettings, this.teleporterAgent, this.hardcore, this.enabled,
                 this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.bonusChestEnabled, this.commandsAllowed,
-                waterEvaporates, this.seed);
+                waterEvaporates, this.seed, this.buildHeight);
     }
 }

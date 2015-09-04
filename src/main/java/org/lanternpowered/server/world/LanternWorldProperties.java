@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
 
+import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.rules.GameRule;
 import org.lanternpowered.server.world.rules.GameRules;
 import org.lanternpowered.server.world.rules.LanternGameRules;
@@ -103,7 +104,7 @@ public class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
-    public GeneratorType getGeneratorType() {
+    public LanternGeneratorType getGeneratorType() {
         // TODO Auto-generated method stub
         return null;
     }

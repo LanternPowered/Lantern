@@ -1,4 +1,4 @@
-package org.lanternpowered.server.entity.player;
+package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import org.lanternpowered.server.effect.LanternViewer;
 import org.lanternpowered.server.entity.LanternEntityHuman;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
@@ -45,7 +46,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
-public class LanternPlayer extends LanternEntityHuman implements Player {
+public class LanternPlayer extends LanternEntityHuman implements Player, LanternViewer {
 
     // We cannot extend the subject base directly, so we have to forward the methods
     private final SubjectBase permissionSubject = new SubjectBase() {
@@ -186,11 +187,6 @@ public class LanternPlayer extends LanternEntityHuman implements Player {
     }
 
     @Override
-    public void sendMessage(ChatType type, Text... messages) {
-        this.sendMessage(type, Lists.newArrayList(checkNotNull(messages, "messages")));
-    }
-
-    @Override
     public void sendMessage(ChatType type, Iterable<Text> messages) {
         checkNotNull(messages, "messages");
         checkNotNull(type, "type");
@@ -231,16 +227,6 @@ public class LanternPlayer extends LanternEntityHuman implements Player {
         if (this.getLocation().getPosition().distanceSquared(position) < radius * radius) {
             this.spawnParticles(particleEffect, position);
         }
-    }
-
-    @Override
-    public void playSound(SoundType sound, Vector3d position, double volume) {
-        this.playSound(sound, position, volume, 1.0);
-    }
-
-    @Override
-    public void playSound(SoundType sound, Vector3d position, double volume, double pitch) {
-        this.playSound(sound, position, volume, pitch, 0.0);
     }
 
     @Override

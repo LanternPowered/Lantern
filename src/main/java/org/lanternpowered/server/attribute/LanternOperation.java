@@ -1,11 +1,11 @@
 package org.lanternpowered.server.attribute;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.attribute.Operation;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public abstract class LanternOperation extends SimpleCatalogType implements Operation {
+public abstract class LanternOperation extends LanternCatalogType implements Operation {
 
     // The priority of the operation
     private final int priority;

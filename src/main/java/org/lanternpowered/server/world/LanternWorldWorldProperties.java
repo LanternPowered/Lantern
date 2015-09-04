@@ -2,7 +2,7 @@ package org.lanternpowered.server.world;
 
 import java.util.List;
 
-import org.lanternpowered.server.entity.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.rules.GameRules;

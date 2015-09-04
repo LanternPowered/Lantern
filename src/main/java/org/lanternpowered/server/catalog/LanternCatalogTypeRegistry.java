@@ -14,7 +14,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-public class SimpleCatalogTypeRegistry<T extends CatalogType> implements CatalogTypeRegistry<T> {
+public class LanternCatalogTypeRegistry<T extends CatalogType> implements CatalogTypeRegistry<T> {
 
     private final ConcurrentMap<String, T> types = Maps.newConcurrentMap();
 

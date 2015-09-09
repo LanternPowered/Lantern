@@ -51,13 +51,23 @@ public class LanternServerConfig {
         }
         if (!this.file.exists()) {
             this.dataContainer = new MemoryDataContainer();
-            for (Setting<?> setting : getDefaultSettings()) {
+            for (Setting<?> setting : Settings.getDefaults()) {
                 this.dataContainer.set(setting.path, setting.def);
             }
             loader.save(ConfigurateTranslator.instance().translateData(this.dataContainer));
             LanternGame.log().info("Unable to find the configuration file {}, generating a new one...", this.file);
         } else {
             this.dataContainer = (DataContainer) ConfigurateTranslator.instance().translateFrom(loader.load());
+            boolean update = false;
+            for (Setting<?> setting : Settings.getDefaults()) {
+                if (!this.dataContainer.contains(setting.path)) {
+                    this.dataContainer.set(setting.path, setting.def);
+                    update = true;
+                }
+            }
+            if (update) {
+                loader.save(ConfigurateTranslator.instance().translateData(this.dataContainer));
+            }
             LanternGame.log().info("Successfully loaded the configuration file {}", this.file);
         }
     }
@@ -79,15 +89,6 @@ public class LanternServerConfig {
             return (T) this.parameters.get(setting);
         }
         return (T) this.dataContainer.get(setting.path).or(setting.def);
-    }
-
-    /**
-     * Gets the default setting instances.
-     * 
-     * @return the default settings
-     */
-    public static Set<Setting<?>> getDefaultSettings() {
-        return Settings.defaults;
     }
 
     /**
@@ -135,6 +136,16 @@ public class LanternServerConfig {
                 }
             }
             defaults = builder.build();
+        }
+
+
+        /**
+         * Gets the default setting instances.
+         * 
+         * @return the default settings
+         */
+        public static Set<Setting<?>> getDefaults() {
+            return defaults;
         }
 
     }

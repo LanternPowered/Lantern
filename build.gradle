@@ -86,9 +86,11 @@ shadowJar {
     dependencies {
         // SpongeAPI
         include dependency('org.spongepowered:spongeapi')
+        include dependency('org.spongepowered:event-gen-core')
 
-		include dependency('net.sf.trove4j:trove4j')
+        include dependency('net.sf.trove4j:trove4j')
         include dependency('com.google.guava:guava')
+        include dependency('com.google.code.findbugs:jsr305')
         include dependency('org.apache.commons:commons-lang3')
         include dependency('io.netty:netty-all')
 
@@ -119,7 +121,7 @@ shadowJar {
         include dependency('ninja.leaping.configurate:configurate-yaml')
         include dependency('org.yaml:snakeyaml')
         include dependency('com.google.code.gson:gson')
-        include dependency('com.typesafe:config:1.2.1')
+        include dependency('com.typesafe:config')
 
         // Database
         include dependency('com.zaxxer:HikariCP-java6')

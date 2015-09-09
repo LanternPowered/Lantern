@@ -4,7 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.event.entity.living.player.PlayerResourcePackStatusEvent.ResourcePackStatus;
+import org.spongepowered.api.event.entity.living.player.ResourcePackStatusEvent.ResourcePackStatus;
 
 public final class MessagePlayInResourcePackStatus implements Message {
 

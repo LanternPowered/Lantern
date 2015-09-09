@@ -31,7 +31,7 @@ public class AsyncScheduler extends SchedulerBase {
                 mainLoop();
             }
         });
-        thread.setName("Sponge Async Scheduler Thread");
+        thread.setName("Lantern Async Scheduler Thread");
         thread.setDaemon(true);
         thread.start();
     }
@@ -121,5 +121,4 @@ public class AsyncScheduler extends SchedulerBase {
             this.lock.unlock();
         }
     }
-
 }

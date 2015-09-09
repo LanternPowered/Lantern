@@ -5,8 +5,7 @@ import java.nio.charset.StandardCharsets;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.rcon.RconLoginEvent;
-import org.spongepowered.api.event.rcon.RconQuitEvent;
+import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -67,6 +66,9 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         }
 
         this.server.onChannelActive(channel, source);
+
+        RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(source);
+        LanternGame.get().getEventManager().post(event);
     }
 
     @Override
@@ -74,7 +76,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel channel = ctx.channel();
         RconSource source = channel.attr(SOURCE).getAndRemove();
 
-        RconQuitEvent event = SpongeEventFactory.createRconQuitEvent(source);
+        RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(source);
         LanternGame.get().getEventManager().post(event);
 
         this.server.onChannelInactive(channel, source);
@@ -83,7 +85,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {
         RconSource source = ctx.channel().attr(SOURCE).get();
         if (password.equals(payload)) {
-            RconLoginEvent event = SpongeEventFactory.createRconLoginEvent(source);
+            RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(source);
 
             if (!LanternGame.get().getEventManager().post(event)) {
                 source.setLoggedIn(true);

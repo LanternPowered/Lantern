@@ -38,8 +38,7 @@ public class LanternPlatform implements Platform {
 
     @Override
     public MinecraftVersion getMinecraftVersion() {
-        // TODO Auto-generated method stub
-        return null;
+        return LanternMinecraftVersion.CURRENT;
     }
 
     @Override
@@ -57,5 +56,4 @@ public class LanternPlatform implements Platform {
     public Type getExecutionType() {
         return Type.SERVER;
     }
-
 }

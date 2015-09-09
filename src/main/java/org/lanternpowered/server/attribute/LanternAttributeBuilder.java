@@ -32,8 +32,7 @@ public class LanternAttributeBuilder implements AttributeBuilder {
 
     @Override
     public AttributeBuilder id(String id) {
-        checkNotNullOrEmpty(id, "identifier");
-        this.identifier = id;
+        this.identifier = checkNotNullOrEmpty(id, "identifier");
         return this;
     }
 
@@ -58,13 +57,13 @@ public class LanternAttributeBuilder implements AttributeBuilder {
     @Override
     public AttributeBuilder targets(Predicate<DataHolder> targets) {
         this.targets = checkNotNull(targets, "targets");
-        return null;
+        return this;
     }
 
     @Override
     public AttributeBuilder name(Text name) {
         this.name = checkNotNull(name, "name");
-        return null;
+        return this;
     }
 
     @Override
@@ -91,5 +90,4 @@ public class LanternAttributeBuilder implements AttributeBuilder {
         this.def = null;
         return this;
     }
-
 }

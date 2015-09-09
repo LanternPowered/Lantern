@@ -67,28 +67,8 @@ public class LanternAttribute extends LanternCatalogType implements Attribute {
 
     public static class Target {
 
-        public static final Predicate<DataHolder> LIVING = new Predicate<DataHolder>() {
-
-            @Override
-            public boolean apply(DataHolder input) {
-                return input instanceof Living;
-            }
-        };
-
-        public static final Predicate<DataHolder> ZOMBIE = new Predicate<DataHolder>() {
-
-            @Override
-            public boolean apply(DataHolder input) {
-                return input instanceof Zombie;
-            }
-        };
-
-        public static final Predicate<DataHolder> HORSE = new Predicate<DataHolder>() {
-
-            @Override
-            public boolean apply(DataHolder input) {
-                return input instanceof Horse;
-            }
-        };
+        public static final Predicate<DataHolder> LIVING = input -> input instanceof Living;
+        public static final Predicate<DataHolder> ZOMBIE = input -> input instanceof Zombie;
+        public static final Predicate<DataHolder> HORSE = input -> input instanceof Horse;
     }
 }

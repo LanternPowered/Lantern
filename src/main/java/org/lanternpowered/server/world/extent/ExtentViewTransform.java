@@ -201,6 +201,15 @@ public class ExtentViewTransform extends AbstractExtent {
             .transformZ(x, y, z));
     }
 
+    /**
+     * TODO: Use true/false as default notifyNeighbors setting?
+     */
+    @Override
+    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
+        this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
+                .transformZ(x, y, z), block, notifyNeighbors);
+    }
+
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
         this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
@@ -214,8 +223,8 @@ public class ExtentViewTransform extends AbstractExtent {
     }
 
     @Override
-    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        this.extent.restoreSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+        return this.extent.restoreSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
                 this.inverseTransform.transformZ(x, y, z), snapshot, force, notifyNeighbors);
     }
 

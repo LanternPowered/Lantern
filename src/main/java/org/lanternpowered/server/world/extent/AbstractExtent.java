@@ -53,6 +53,21 @@ import com.google.common.collect.ImmutableSet;
 public abstract class AbstractExtent implements Extent {
 
     @Override
+    public void setBlock(Vector3i position, BlockState block, boolean notifyNeighbors) {
+        this.setBlock(position.getX(), position.getY(), position.getZ(), block, notifyNeighbors);
+    }
+
+    @Override
+    public void setBlockType(Vector3i position, BlockType type, boolean notifyNeighbors) {
+        this.setBlockType(position.getX(), position.getY(), position.getZ(), type, notifyNeighbors);
+    }
+
+    @Override
+    public void setBlockType(int x, int y, int z, BlockType type, boolean notifyNeighbors) {
+        this.setBlock(x, y, z, type.getDefaultState(), notifyNeighbors);
+    }
+
+    @Override
     public Location<? extends Extent> getLocation(Vector3i position) {
         return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
@@ -103,30 +118,15 @@ public abstract class AbstractExtent implements Extent {
     }
 
     @Override
-    public void restoreSnapshot(BlockSnapshot snapshot) {
-        this.restoreSnapshot(snapshot, false, true);
-    }
-
-    @Override
-    public void restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orNull();
         checkArgument(location != null, "location is not present in snapshot");
-        this.restoreSnapshot(location.getBlockPosition(), snapshot, force, notifyNeighbors);
+        return this.restoreSnapshot(location.getBlockPosition(), snapshot, force, notifyNeighbors);
     }
 
     @Override
-    public void restoreSnapshot(Vector3i position, BlockSnapshot snapshot) {
-        this.restoreSnapshot(position.getX(), position.getY(), position.getZ(), snapshot);
-    }
-
-    @Override
-    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot) {
-        this.restoreSnapshot(x, y, z, snapshot, false, true);
-    }
-
-    @Override
-    public void restoreSnapshot(Vector3i position, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        this.restoreSnapshot(position.getX(), position.getY(), position.getZ(), snapshot, force, notifyNeighbors);
+    public boolean restoreSnapshot(Vector3i position, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+        return this.restoreSnapshot(position.getX(), position.getY(), position.getZ(), snapshot, force, notifyNeighbors);
     }
 
     @Override

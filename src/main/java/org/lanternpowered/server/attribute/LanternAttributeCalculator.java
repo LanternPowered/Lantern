@@ -17,7 +17,7 @@ public class LanternAttributeCalculator implements AttributeCalculator {
         List<AttributeModifier> modifiers0 = Lists.newArrayList(modifiers);
 
         // Sort the modifiers by operation priority
-        Collections.sort(modifiers0, (AttributeModifier m1, AttributeModifier m2) -> m1.getOperation().compareTo(m2.getOperation()));
+        Collections.sort(modifiers0, (m1, m2) -> m1.getOperation().compareTo(m2.getOperation()));
 
         // The last operation
         Operation lastOperation = null;

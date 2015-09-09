@@ -6,11 +6,11 @@ import com.google.common.base.MoreObjects;
 
 public class LanternMinecraftVersion implements MinecraftVersion {
 
-    public static final MinecraftVersion CURRENT = new LanternMinecraftVersion("1.8", 47, false);
+    public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion("1.8", 47, false);
 
-    public static final MinecraftVersion V1_3 = new LanternMinecraftVersion("<=1.3", 39, true);
-    public static final MinecraftVersion V1_5 = new LanternMinecraftVersion("1.4-1.5", 61, true);
-    public static final MinecraftVersion V1_6 = new LanternMinecraftVersion("1.6", 78, true);
+    public static final LanternMinecraftVersion V1_3 = new LanternMinecraftVersion("<=1.3", 39, true);
+    public static final LanternMinecraftVersion V1_5 = new LanternMinecraftVersion("1.4-1.5", 61, true);
+    public static final LanternMinecraftVersion V1_6 = new LanternMinecraftVersion("1.6", 78, true);
 
     private final String name;
     private final int protocol;

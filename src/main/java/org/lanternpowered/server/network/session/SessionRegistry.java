@@ -2,9 +2,8 @@ package org.lanternpowered.server.network.session;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collections;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.collect.Sets;
 
 /**
  * A list of all the sessions which provides a convenient {@link #pulse()}
@@ -12,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SessionRegistry {
 
-    private final Set<Session> sessions = Collections.newSetFromMap(new ConcurrentHashMap<Session, Boolean>());
+    private final Set<Session> sessions = Sets.newConcurrentHashSet();
 
     /**
      * Pulses all the sessions.

@@ -193,8 +193,7 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public GameMode getGameMode() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.gameMode;
     }
 
     @Override

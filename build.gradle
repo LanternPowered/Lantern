@@ -26,43 +26,58 @@ version = '1.0.0-SNAPSHOT'
 
 // Repositories
 repositories {
-	mavenCentral()
+    mavenCentral()
     maven {
-		url 'http://repo.spongepowered.org/maven'
-	}
-	maven {
-		url 'https://oss.sonatype.org/content/groups/public'
-	}
+        url 'http://repo.spongepowered.org/maven'
+    }
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public'
+    }
 }
 
 // Project dependencies
 dependencies {
-	compile 'org.spongepowered:spongeapi:2.1-SNAPSHOT'
-	compile 'org.ow2.asm:asm-all:5.0.3'
-	compile 'org.apache.commons:commons-lang3:3.4'
-	compile 'org.mariadb.jdbc:mariadb-java-client:1.1.8'
-	compile 'org.fusesource.jansi:jansi:1.11'
-	compile 'org.xerial:sqlite-jdbc:3.8.+'
-	compile 'com.zaxxer:HikariCP-java6:2.1.0'
-	compile 'com.google.guava:guava:18.0'
-	compile 'com.google.inject:guice:4.0-beta5'
-	compile 'com.google.code.gson:gson:2.3.1'
+    compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.3'
+    compile 'org.apache.logging.log4j:log4j-core:2.3'
+    compile 'org.apache.logging.log4j:log4j-api:2.3'
+    compile 'org.spongepowered:spongeapi:2.1-SNAPSHOT'
+    compile 'org.ow2.asm:asm-all:5.0.3'
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'org.mariadb.jdbc:mariadb-java-client:1.1.8'
+    compile 'org.fusesource.jansi:jansi:1.11'
+    compile 'org.xerial:sqlite-jdbc:3.8.+'
+    compile 'com.zaxxer:HikariCP-java6:2.1.0'
+    compile 'com.google.guava:guava:18.0'
+    compile 'com.google.inject:guice:4.0-beta5'
+    compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.flowpowered:flow-math:1.0.0'
     compile 'com.flowpowered:flow-noise:1.0.1-SNAPSHOT'
     compile 'io.netty:netty-all:4.0.21.Final'
     compile 'net.sf.trove4j:trove4j:3.0.3'
-	compile 'ninja.leaping.configurate:configurate-core:2.0'
-	compile 'ninja.leaping.configurate:configurate-gson:2.0'
-	compile 'ninja.leaping.configurate:configurate-hocon:2.0'
-	compile 'ninja.leaping.configurate:configurate-yaml:2.0'
-	compile 'jline:jline:2.12.1'
+    compile 'ninja.leaping.configurate:configurate-core:2.0'
+    compile 'ninja.leaping.configurate:configurate-gson:2.0'
+    compile 'ninja.leaping.configurate:configurate-hocon:2.0'
+    compile 'ninja.leaping.configurate:configurate-yaml:2.0'
+    compile 'jline:jline:2.12.1'
 
-	testCompile 'junit:junit:4.11'
+    testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:1.9.0'
 }
 
 jar {
 	classifier = 'release'
+    manifest {
+        attributes(
+                'Main-Class': 'org.lanternpowered.server.LanternServer',
+                'Implementation-Title': 'LanternServer',
+                'Implementation-Version': version,
+       	        'Implementation-Vendor': 'LanternPowered',
+                'Specification-Title': 'SpongeAPI',
+                'Specification-Version': '2.1-SNAPSHOT',
+                'Specification-Vendor': 'SpongePowered',
+                'Sealed': true
+        )
+    }
 }
 
 shadowJar {
@@ -72,35 +87,41 @@ shadowJar {
         // SpongeAPI
         include dependency('org.spongepowered:spongeapi')
 
-		include dependency('com.google.guava:guava')
-		include dependency('com.google.code.gson:gson')
-		include dependency('org.apache.commons:commons-lang3')
-		include dependency('io.netty:netty-all')
+		include dependency('net.sf.trove4j:trove4j')
+        include dependency('com.google.guava:guava')
+        include dependency('org.apache.commons:commons-lang3')
+        include dependency('io.netty:netty-all')
 
-		// Bytecode
-		include dependency('org.ow2.asm:asm-all')
+        // Bytecode
+        include dependency('org.ow2.asm:asm-all')
 
-		// Logging
+        // Logging and Console
         include dependency('org.slf4j:slf4j-api')
         include dependency('org.apache.logging.log4j:log4j-slf4j-impl')
+        include dependency('org.apache.logging.log4j:log4j-core')
+        include dependency('org.apache.logging.log4j:log4j-api')
+        include dependency('org.fusesource.jansi:jansi')
+        include dependency('jline:jline')
 
-		// Guice
+        // Guice
         include dependency('com.google.inject:guice')
         include dependency('javax.inject:javax.inject')
         include dependency('aopalliance:aopalliance')
 
-		// Math and Noise
+        // Math and Noise
         include dependency('com.flowpowered:flow-math')
         include dependency('com.flowpowered:flow-noise')
 
-		// Configuration
+        // Configuration
         include dependency('ninja.leaping.configurate:configurate-core')
         include dependency('ninja.leaping.configurate:configurate-hocon')
         include dependency('ninja.leaping.configurate:configurate-gson')
         include dependency('ninja.leaping.configurate:configurate-yaml')
         include dependency('org.yaml:snakeyaml')
+        include dependency('com.google.code.gson:gson')
+        include dependency('com.typesafe:config:1.2.1')
 
-		// Database
+        // Database
         include dependency('com.zaxxer:HikariCP-java6')
         include dependency('org.mariadb.jdbc:mariadb-java-client')
         include dependency('com.h2database:h2')

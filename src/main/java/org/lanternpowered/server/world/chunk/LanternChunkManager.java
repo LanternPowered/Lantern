@@ -465,7 +465,7 @@ public class LanternChunkManager {
             if (this.chunkIOService.read(chunk)) {
                 // TODO: Add cause
                 LanternGame.get().getEventManager().post(SpongeEventFactory.createLoadChunkEvent(
-                        null, LanternGame.get(), chunk));
+                        LanternGame.get(), null, chunk));
                 return true;
             }
         } catch (Exception e) {
@@ -487,7 +487,7 @@ public class LanternChunkManager {
         }
         // TODO: Add cause
         LanternGame.get().getEventManager().post(SpongeEventFactory.createLoadChunkEvent(
-                null, LanternGame.get(), chunk));
+                LanternGame.get(), null, chunk));
         return true;
     }
 

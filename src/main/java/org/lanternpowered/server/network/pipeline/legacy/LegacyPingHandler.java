@@ -12,7 +12,7 @@ import org.lanternpowered.server.status.LanternStatusResponsePlayers;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.server.PingServerEvent;
+import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
@@ -108,7 +108,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
             LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(Lists.<GameProfile>newArrayList(), online, max);
             LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orNull(), motd, players);
 
-            PingServerEvent event = SpongeEventFactory.createPingServerEvent(client, LanternGame.get(), response, server);
+            ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(client, response);
             LanternGame.get().getEventManager().post(event);
 
             // Cancelled, we are done here

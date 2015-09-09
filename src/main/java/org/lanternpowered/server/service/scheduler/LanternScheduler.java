@@ -6,9 +6,12 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.scheduler.SchedulerService;
 import org.spongepowered.api.service.scheduler.Task;
@@ -16,6 +19,7 @@ import org.spongepowered.api.service.scheduler.TaskBuilder;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.ListenableFutureTask;
 
 public class LanternScheduler implements SchedulerService {
 
@@ -93,6 +97,18 @@ public class LanternScheduler implements SchedulerService {
         return allTasks;
     }
 
+    /**
+     * Calls the callable from the main thread.
+     * 
+     * @param callable the callable
+     * @return the future result
+     */
+    public <V> Future<V> callSync(Callable<V> callable) {
+        ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
+        this.createTaskBuilder().execute(future).submit(LanternGame.plugin());
+        return future;
+    }
+
     private SchedulerBase getDelegate(Task task) {
         if (task.isAsynchronous()) {
             return this.asyncScheduler;
@@ -118,10 +134,9 @@ public class LanternScheduler implements SchedulerService {
     }
 
     /**
-     * Ticks the synchronous scheduler.
+     * Pulses the synchronous scheduler.
      */
-    public void tickSyncScheduler() {
+    public void pulseSyncScheduler() {
         this.syncScheduler.tick();
     }
-
 }

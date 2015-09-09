@@ -1,6 +1,7 @@
 package org.lanternpowered.server.game;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -10,15 +11,15 @@ public class RegistryHelper {
 
     public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping, Collection<String> ignoredFields) {
         boolean mappingSuccess = true;
-        for (Field f : apiClass.getDeclaredFields()) {
-            if (ignoredFields.contains(f.getName())) {
+        for (Field field : apiClass.getDeclaredFields()) {
+            if (ignoredFields.contains(field.getName())) {
                 continue;
             }
             try {
-                if (!mapping.containsKey(f.getName().toLowerCase())) {
+                if (!mapping.containsKey(field.getName().toLowerCase())) {
                     continue;
                 }
-                f.set(null, mapping.get(f.getName().toLowerCase()));
+                setField(field, null, mapping.get(field.getName().toLowerCase()));
             } catch (Exception e) {
                 e.printStackTrace();
                 mappingSuccess = false;
@@ -29,9 +30,9 @@ public class RegistryHelper {
 
     public static boolean mapFields(Class<?> apiClass, Function<String, ?> mapFunction) {
         boolean mappingSuccess = true;
-        for (Field f : apiClass.getDeclaredFields()) {
+        for (Field field : apiClass.getDeclaredFields()) {
             try {
-                f.set(null, mapFunction.apply(f.getName()));
+                setField(field, null, mapFunction.apply(field.getName()));
             } catch (Exception e) {
                 e.printStackTrace();
                 mappingSuccess = false;
@@ -40,13 +41,26 @@ public class RegistryHelper {
         return mappingSuccess;
     }
 
+    private static void setField(Field field, Object target, Object object) throws Exception {
+        int modifiers = field.getModifiers();
+
+        if (Modifier.isFinal(modifiers)) {
+            Field mfield = Field.class.getDeclaredField("modifiers");
+            mfield.setAccessible(true);
+            mfield.set(field, modifiers & ~Modifier.FINAL);
+        }
+
+        field.setAccessible(true);
+        field.set(target, object);
+    }
+
     public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping) {
         return mapFields(apiClass, mapping, Collections.<String>emptyList());
     }
 
     public static boolean setFactory(Class<?> apiClass, Object factory) {
         try {
-            apiClass.getDeclaredField("factory").set(null, factory);
+            setField(apiClass.getDeclaredField("factory"), null, factory);
             return true;
         } catch (Exception e) {
             e.printStackTrace();

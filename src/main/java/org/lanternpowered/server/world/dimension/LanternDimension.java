@@ -18,7 +18,6 @@ public class LanternDimension implements Dimension {
     private boolean allowPlayerRespawns = true;
     private boolean waterEvaporates = false;
 
-
     public LanternDimension(LanternWorld world, String name, LanternDimensionType dimensionType,
             int buildHeight) {
         this.dimensionType = dimensionType;

@@ -513,8 +513,9 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     }
 
     @Override
-    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         // TODO Auto-generated method stub
+        return false;
     }
 
     @Override
@@ -735,6 +736,12 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     @Override
     public Vector3i getBlockSize() {
         return CHUNK_SIZE;
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
+        // TODO Auto-generated method stub
+        
     }
 
     @Override
@@ -1022,4 +1029,5 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         }
         return false;
     }
+
 }

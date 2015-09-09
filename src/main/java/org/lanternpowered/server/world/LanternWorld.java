@@ -775,9 +775,9 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     }
 
     @Override
-    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         // TODO Auto-generated method stub
-        
+        return false;
     }
 
     @Override
@@ -795,5 +795,16 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     @Override
     public TeleporterAgent getTeleporterAgent() {
         return this.teleporterAgent;
+    }
+
+    public void pulse() {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
+        // TODO Auto-generated method stub
+        
     }
 }

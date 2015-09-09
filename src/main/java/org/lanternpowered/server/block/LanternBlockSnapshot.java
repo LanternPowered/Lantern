@@ -2,6 +2,7 @@ package org.lanternpowered.server.block;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -17,6 +18,7 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableCollection;
@@ -193,5 +195,35 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     public List<ImmutableDataManipulator<?, ?>> getContainers() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public UUID getWorldUniqueId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Vector3i getPosition() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BlockSnapshot withLocation(Location<World> location) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public BlockSnapshot withContainer(DataContainer container) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean restore(boolean force, boolean notifyNeighbors) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

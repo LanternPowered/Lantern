@@ -1,5 +1,6 @@
 package org.lanternpowered.server.block;
 
+import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.item.ItemBlock;
@@ -7,12 +8,14 @@ import org.spongepowered.api.text.translation.Translation;
 
 import com.google.common.base.Optional;
 
-public class LanternBlockType implements BlockType {
+public class LanternBlockType extends LanternSimpleCatalogType implements BlockType {
 
-    @Override
-    public String getId() {
-        // TODO Auto-generated method stub
-        return null;
+    private float emittedLight;
+
+    private boolean tickRandomly;
+
+    public LanternBlockType(String identifier) {
+        super(identifier);
     }
 
     @Override
@@ -21,10 +24,12 @@ public class LanternBlockType implements BlockType {
         return null;
     }
 
+    /**
+     * Uhm, this is strange...
+     */
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return super.getName();
     }
 
     @Override
@@ -35,14 +40,12 @@ public class LanternBlockType implements BlockType {
 
     @Override
     public boolean getTickRandomly() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.tickRandomly;
     }
 
     @Override
     public void setTickRandomly(boolean tickRandomly) {
-        // TODO Auto-generated method stub
-        
+        this.tickRandomly = tickRandomly;
     }
 
     @Override
@@ -92,5 +95,4 @@ public class LanternBlockType implements BlockType {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

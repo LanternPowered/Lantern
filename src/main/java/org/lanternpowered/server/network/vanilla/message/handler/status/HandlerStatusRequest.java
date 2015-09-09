@@ -19,7 +19,7 @@ import org.lanternpowered.server.text.gson.JsonTextRepresentation;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.server.PingServerEvent;
+import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -54,7 +54,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(Lists.<GameProfile>newArrayList(), online, max);
         LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orNull(), motd, players);
 
-        PingServerEvent event = SpongeEventFactory.createPingServerEvent(client, LanternGame.get(), response, server);
+        ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(client, response);
 
         // Cancelled, we are done here
         if (event.isCancelled()) {

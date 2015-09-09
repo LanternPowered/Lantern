@@ -166,6 +166,15 @@ public class ExtentViewDownsize extends AbstractExtent {
         return this.extent.getBlock(x, y, z);
     }
 
+    /**
+     * TODO: Use true/false as default notifyNeighbors setting?
+     */
+    @Override
+    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
+        this.checkRange(x, y, z);
+        this.extent.setBlock(x, y, z, block, notifyNeighbors);
+    }
+
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
         this.checkRange(x, y, z);
@@ -179,9 +188,9 @@ public class ExtentViewDownsize extends AbstractExtent {
     }
 
     @Override
-    public void restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         this.checkRange(x, y, z);
-        this.extent.restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
+        return this.extent.restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
     }
 
     @Override

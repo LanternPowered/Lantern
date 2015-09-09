@@ -190,11 +190,6 @@ public class LanternTransform <E extends Extent> implements Transform<E> {
     }
 
     @Override
-    public void invalidate() {
-        this.extent = null;
-    }
-
-    @Override
     public String toString() {
         return "Transform{location=" + this.getLocation() + ", rotation=" + this.getRotation() +
                 ", scale=" + this.getScale() + '}';

@@ -297,11 +297,11 @@ public class LegacyTextRepresentation implements TextRepresentation {
         return new String(result);
     }
 
-    static String strip(String text, char code) {
+    public static String strip(String text, char code) {
         return strip(text, code, false);
     }
 
-    static String strip(String text, char code, boolean all) {
+    public static String strip(String text, char code, boolean all) {
         int next = text.indexOf(code);
         int last = text.length() - 1;
         if (next == -1 || next == last) {

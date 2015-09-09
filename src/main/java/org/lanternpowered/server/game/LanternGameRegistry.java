@@ -81,7 +81,7 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.EntitySnapshotBuilder;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.Transform.Builder;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSourceBuilder;
@@ -214,12 +214,17 @@ public class LanternGameRegistry implements GameRegistry {
         this.defaultGameRules = builder.build();
     }
 
+    private boolean registered;
+
     public LanternGameRegistry(LanternGame game) {
         this.game = game;
-        this.registerGameObjects();
     }
 
-    private void registerGameObjects() {
+    public void registerGameObjects() {
+        if (this.registered) {
+            throw new IllegalStateException("You can only register the game objects once!");
+        }
+        this.registered = true;
         this.registerTextFactory();
         this.registerTextStyles();
         this.registerTextColors();
@@ -248,7 +253,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.plantTypeRegistry.register(new LanternPlantType("white_tulip"));
         this.plantTypeRegistry.register(new LanternPlantType("pink_tulip"));
         this.plantTypeRegistry.register(new LanternPlantType("oxeye_daisy"));
-        RegistryHelper.mapFields(PlantTypes.class, key -> this.plantTypeRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(PlantTypes.class, this.plantTypeRegistry.getDelegateMap());
     }
 
     private void registerDoublePlantTypes() {
@@ -258,20 +263,20 @@ public class LanternGameRegistry implements GameRegistry {
         this.doublePlantTypeRegistry.register(new LanternDoublePlantType("fern"));
         this.doublePlantTypeRegistry.register(new LanternDoublePlantType("rose"));
         this.doublePlantTypeRegistry.register(new LanternDoublePlantType("paeonia"));
-        RegistryHelper.mapFields(DoublePlantTypes.class, key -> this.doublePlantTypeRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(DoublePlantTypes.class, this.doublePlantTypeRegistry.getDelegateMap());
     }
 
     private void registerShrubTypes() {
         this.shrubTypeRegistry.register(new LanternShrubType("dead_bush"));
         this.shrubTypeRegistry.register(new LanternShrubType("tall_grass"));
         this.shrubTypeRegistry.register(new LanternShrubType("fern"));
-        RegistryHelper.mapFields(ShrubTypes.class, key -> this.shrubTypeRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(ShrubTypes.class, this.shrubTypeRegistry.getDelegateMap());
     }
 
     private void registerGeneratorTypes() {
         this.generatorTypeRegistry.register(new LanternGeneratorTypeNether("nether"));
         this.generatorTypeRegistry.register(new FlatGeneratorType("flat"));
-        RegistryHelper.mapFields(GeneratorTypes.class, key -> this.generatorTypeRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(GeneratorTypes.class, this.generatorTypeRegistry.getDelegateMap());
     }
 
     private void registerDimensionTypes() {
@@ -281,11 +286,13 @@ public class LanternGameRegistry implements GameRegistry {
                 LanternDimensionOverworld.class, true, false, true));
         this.dimensionTypeRegistry.register(new LanternDimensionType("nether", 1,
                 LanternDimensionNether.class, false, true, false));
-        RegistryHelper.mapFields(DimensionTypes.class, key -> this.dimensionTypeRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(DimensionTypes.class, this.dimensionTypeRegistry.getDelegateMap());
     }
 
     private void registerAttributes() {
         Map<String, Attribute> mappings = Maps.newHashMap();
+        mappings.put("GENERIC_ARMOR", this.registerDefaultAttribute(
+                "generic.armor", 0.0, 0.0, Double.MAX_VALUE, LanternAttribute.Target.LIVING));
         mappings.put("GENERIC_MAX_HEALTH", this.registerDefaultAttribute(
                 "generic.maxHealth", 20.0, 0.0, Double.MAX_VALUE, LanternAttribute.Target.LIVING));
         mappings.put("GENERIC_FOLLOW_RANGE", this.registerDefaultAttribute(
@@ -305,7 +312,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     private Attribute registerDefaultAttribute(String id, double def, double min, double max, Predicate<DataHolder> targets) {
         return this.createAttributeBuilder().id(id)
-                .defaultValue(20)
+                .defaultValue(def)
                 .maximum(max)
                 .minimum(min)
                 .name(Texts.of(this.translationManager.get("attribute.name." + id)))
@@ -322,7 +329,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.rotationRegistry.register(new LanternRotation("bottom_left", 225));
         this.rotationRegistry.register(new LanternRotation("left", 270));
         this.rotationRegistry.register(new LanternRotation("top_left", 315));
-        RegistryHelper.mapFields(Rotations.class, key -> this.rotationRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(Rotations.class, this.rotationRegistry.getDelegateMap());
     }
 
     private void registerTextFactory() {
@@ -340,7 +347,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.textStyleRegistry.register(new LanternTextStyle("strikethrough", null, null, null, true, null));
         this.textStyleRegistry.register(new LanternTextStyle("obfuscated", null, null, null, null, true));
         this.textStyleRegistry.register(new LanternTextStyle("reset", false, false, false, false, false));
-        RegistryHelper.mapFields(TextStyles.class, key -> this.textStyleRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(TextStyles.class, this.textStyleRegistry.getDelegateMap());
     }
 
     private void registerTextColors() {
@@ -361,7 +368,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.textColorRegistry.register(new LanternTextColor("yellow", new Color(0xFFFF55)));
         this.textColorRegistry.register(new LanternTextColor("white", Color.WHITE));
         this.textColorRegistry.register(new LanternTextColor("reset", Color.WHITE));
-        RegistryHelper.mapFields(TextColors.class, key -> this.textColorRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(TextColors.class, this.textColorRegistry.getDelegateMap());
     }
 
     private void registerDifficulties() {
@@ -369,7 +376,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.difficultyRegistry.register(new LanternDifficulty("easy", 1));
         this.difficultyRegistry.register(new LanternDifficulty("normal", 2));
         this.difficultyRegistry.register(new LanternDifficulty("hard", 3));
-        RegistryHelper.mapFields(Difficulties.class, key -> this.difficultyRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(Difficulties.class, this.difficultyRegistry.getDelegateMap());
     }
 
     private void registerGameModes() {
@@ -378,7 +385,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.gameModeRegistry.register(new LanternGameMode("creative", 1));
         this.gameModeRegistry.register(new LanternGameMode("adventure", 2));
         this.gameModeRegistry.register(new LanternGameMode("spectator", 3));
-        RegistryHelper.mapFields(GameModes.class, key -> this.gameModeRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(GameModes.class, this.gameModeRegistry.getDelegateMap());
     }
 
     private void registerSoundTypes() {
@@ -635,7 +642,7 @@ public class LanternGameRegistry implements GameRegistry {
             mappings.put(en.getKey(), soundType);
             this.soundTypeRegistry.register(soundType);
         }
-        RegistryHelper.mapFields(SoundTypes.class, key -> this.soundTypeRegistry.get(key.toLowerCase()).get());
+        RegistryHelper.mapFields(SoundTypes.class, mappings);
     }
 
     private void registerNotePitches() {
@@ -996,18 +1003,6 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public <E extends Extent> Transform<E> createTransform() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E extends Extent> Transform<E> createTransform(E extent) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public ExtentBufferFactory getExtentBufferFactory() {
         return LanternExtentBufferFactory.INSTANCE;
     }
@@ -1092,6 +1087,12 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public WeatherSpawnCauseBuilder createWeatherSpawnCauseBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <E extends Extent> Builder<E> createTransformBuilder() {
         // TODO Auto-generated method stub
         return null;
     }

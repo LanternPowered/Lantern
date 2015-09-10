@@ -1,8 +1,10 @@
 package org.lanternpowered.server.game;
 
 import java.io.File;
+import java.util.Locale;
 
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
@@ -155,6 +157,7 @@ public class LanternGame implements Game {
                 SimpleDispatcher.FIRST_DISAMBIGUATOR); // TODO: Use custom disambiguator like in sponge
         if (this.registerService(CommandService.class, commandService)) {
             // TODO: Register commands
+            commandService.register(this.minecraft, new CommandStop(this).build(), "stop");
         }
 
         // Create the teleport helper
@@ -162,6 +165,9 @@ public class LanternGame implements Game {
 
         // Create the event manager instance
         this.eventManager = new LanternEventManager();
+
+        // Load the default translations
+        this.gameRegistry.getTranslationManager().addResourceBundle("translations/en_US", Locale.ENGLISH);
 
         // Load the plugin instances
         this.pluginManager.loadPlugins();

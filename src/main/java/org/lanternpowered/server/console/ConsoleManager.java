@@ -75,7 +75,7 @@ public class ConsoleManager {
         System.setOut(new LoggingPrintStream(LogManager.getLogger("System.OUT"), Level.INFO));
         System.setErr(new LoggingPrintStream(LogManager.getLogger("System.ERR"), Level.ERROR));
 
-        if (!flag) {
+        if (flag) {
             // We delay this message to avoid initializing the loggers before we are ready
             LanternGame.log().warn("Failed to initialize jline terminal. Using default.");
         }

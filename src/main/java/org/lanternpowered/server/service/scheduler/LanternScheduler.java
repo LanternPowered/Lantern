@@ -139,4 +139,8 @@ public class LanternScheduler implements SchedulerService {
     public void pulseSyncScheduler() {
         this.syncScheduler.tick();
     }
+
+    public void shutdownAsyncScheduler() {
+        this.asyncScheduler.shutdown();
+    }
 }

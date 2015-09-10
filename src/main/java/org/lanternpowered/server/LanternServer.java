@@ -16,17 +16,20 @@ import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lanternpowered.server.LanternServerConfig.Setting;
 import org.lanternpowered.server.LanternServerConfig.Settings;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.buf.LanternChannelRegistrar;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
+import org.lanternpowered.server.util.ShutdownMonitorThread;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.spongepowered.api.Server;
@@ -49,6 +52,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 
@@ -242,12 +246,15 @@ public class LanternServer implements Server {
     // The maximum amount of players that can join
     private int maxPlayers;
 
+    // The amount of ticks the server is running
+    private final AtomicInteger runningTimeTicks = new AtomicInteger(0);
+
     private Text motd;
     private Favicon favicon;
     private boolean onlineMode;
     private boolean whitelist;
 
-    private int runningTimeTicks = 0;
+    private volatile boolean shuttingDown;
 
     public LanternServer(LanternGame game, LanternServerConfig config, ConsoleManager consoleManager) {
         this.consoleManager = consoleManager;
@@ -308,7 +315,7 @@ public class LanternServer implements Server {
      * Pulses (ticks) the game.
      */
     private void pulse() {
-        this.runningTimeTicks++;
+        this.runningTimeTicks.incrementAndGet();
         // Pulse the network sessions
         this.networkManager.getSessionRegistry().pulse();
         // Pulse the sync scheduler tasks
@@ -359,8 +366,7 @@ public class LanternServer implements Server {
 
     @Override
     public Collection<Player> getOnlinePlayers() {
-        // TODO Auto-generated method stub
-        return null;
+        return Lists.newArrayList();
     }
 
     @Override
@@ -472,7 +478,7 @@ public class LanternServer implements Server {
 
     @Override
     public int getRunningTimeTicks() {
-        return this.runningTimeTicks;
+        return this.runningTimeTicks.get();
     }
 
     @Override
@@ -508,13 +514,37 @@ public class LanternServer implements Server {
     @Override
     public void shutdown() {
         // TODO Auto-generated method stub
-        
+        this.shutdown(null);
     }
 
     @Override
     public void shutdown(Text kickMessage) {
-        // TODO Auto-generated method stub
-        
+        if (this.shuttingDown) {
+            return;
+        }
+        this.shuttingDown = true;
+
+        // Debug a message
+        LanternGame.log().info("Stopping the server...");
+
+        // Kick all the online players
+        this.getOnlinePlayers().forEach(player -> ((LanternPlayer) player).getConnection().disconnect(kickMessage));
+
+        // Stop the network servers - starts the shutdown process
+        // It may take a second or two for Netty to totally clean up
+        this.networkManager.shutdown();
+
+        // Stop the world manager
+        this.worldManager.shutdown();
+
+        // Shutdown the executor
+        this.executor.shutdown();
+
+        // Stop the async scheduler
+        this.game.getScheduler().shutdownAsyncScheduler();
+
+        // Wait for a while and terminate any rogue threads
+        new ShutdownMonitorThread().start();
     }
 
     @Override

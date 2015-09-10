@@ -1,5 +1,6 @@
 package org.lanternpowered.server.text.translation;
 
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 import org.spongepowered.api.text.translation.Translation;
@@ -13,7 +14,7 @@ public interface TranslationManager {
      * 
      * @param resourceBundle the resource bundle
      */
-    void addResourceBundle(ResourceBundle resourceBundle);
+    void addResourceBundle(String resourceBundle, Locale locale);
 
     /**
      * Gets a {@link Translation} for the specified key.

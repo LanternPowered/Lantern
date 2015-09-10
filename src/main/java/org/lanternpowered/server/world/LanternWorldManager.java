@@ -66,7 +66,7 @@ public class LanternWorldManager {
         }
     }
 
-    public void interrupt() {
+    public void shutdown() {
         this.tickBegin.forceTermination();
         this.tickEnd.forceTermination();
         for (WorldEntry ent : this.worlds) {
@@ -74,6 +74,7 @@ public class LanternWorldManager {
                 ent.thread.interrupt();
             }
         }
+        this.executor.shutdown();
     }
 
     private Runnable tickEndTask = new Runnable() {
@@ -97,7 +98,7 @@ public class LanternWorldManager {
             try {
                 this.executor.submit(this.tickEndTask);
             } catch (RejectedExecutionException ex) {
-                this.interrupt();
+                this.shutdown();
                 return;
             }
         } catch (InterruptedException e) {

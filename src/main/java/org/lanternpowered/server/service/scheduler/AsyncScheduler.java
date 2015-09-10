@@ -36,6 +36,10 @@ public class AsyncScheduler extends SchedulerBase {
         thread.start();
     }
 
+    void shutdown() {
+        this.executor.shutdown();
+    }
+
     private void mainLoop() {
         this.executor = Executors.newCachedThreadPool();
         this.lastProcessingTimestamp = System.currentTimeMillis();

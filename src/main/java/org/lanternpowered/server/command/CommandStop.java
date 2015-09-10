@@ -1,7 +1,6 @@
 package org.lanternpowered.server.command;
 
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -22,16 +21,12 @@ public class CommandStop implements Command {
     public CommandSpec build() {
         return CommandSpec.builder()
                 .permission("minecraft.command.stop")
-                .description(Texts.of(this.game.getRegistry().getTranslationManager().get("commands.stop.usage")))
+                .description(Texts.of(this.game.getRegistry().getTranslationManager().get("commands.stop.description")))
                 .executor(new CommandExecutor() {
 
                     @Override
                     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                        if (args.hasAny("message")) {
-                            game.getServer().shutdown(args.<Text>getOne("message").get());
-                        } else {
-                            game.getServer().shutdown();
-                        }
+                        game.getServer().shutdown();
                         return CommandResult.success();
                     }
 

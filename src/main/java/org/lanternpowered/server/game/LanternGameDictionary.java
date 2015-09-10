@@ -16,7 +16,7 @@ import com.google.common.collect.Sets;
 
 public class LanternGameDictionary implements GameDictionary {
 
-    private final Map<String, Set<ItemType>> map = Maps.newHashMap();
+    private final Map<String, Set<ItemType>> map = Maps.newConcurrentMap();
 
     @Override
     public void register(String key, ItemType type) {
@@ -25,7 +25,7 @@ public class LanternGameDictionary implements GameDictionary {
 
         Set<ItemType> set = this.map.get(key);
         if (set == null) {
-            set = Sets.newHashSet();
+            set = Sets.newConcurrentHashSet();
             this.map.put(key, set);
         }
         set.add(type);

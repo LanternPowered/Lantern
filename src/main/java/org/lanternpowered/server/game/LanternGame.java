@@ -4,10 +4,12 @@ import java.io.File;
 import java.util.Locale;
 
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
+import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.scheduler.LanternScheduler;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
@@ -24,6 +26,7 @@ import org.spongepowered.api.service.SimpleServiceManager;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.command.SimpleCommandService;
 import org.spongepowered.api.service.event.EventManager;
+import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.scheduler.SchedulerService;
 import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.util.command.dispatcher.SimpleDispatcher;
@@ -153,11 +156,15 @@ public class LanternGame implements Game {
             throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ChunkLoadService!");
         }
 
+        // Register the pagination service
+        this.registerService(PaginationService.class, new LanternPaginationService(this));
+
+        // Register the command service
         SimpleCommandService commandService = new SimpleCommandService(this, log(),
                 SimpleDispatcher.FIRST_DISAMBIGUATOR); // TODO: Use custom disambiguator like in sponge
         if (this.registerService(CommandService.class, commandService)) {
-            // TODO: Register commands
-            commandService.register(this.minecraft, new CommandStop(this).build(), "stop");
+            commandService.register(this.minecraft, new CommandStop(this).build(), "stop", "shutdown");
+            commandService.register(this.minecraft, new CommandHelp(this).build(), "help", "?");
         }
 
         // Create the teleport helper

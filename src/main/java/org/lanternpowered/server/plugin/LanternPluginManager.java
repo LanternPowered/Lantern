@@ -6,7 +6,10 @@ import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,10 +53,8 @@ public class LanternPluginManager implements PluginManager {
 
     private final Game game;
     private final File pluginsFolder;
-    private final PluginClassLoader pluginClassLoader;
 
     public LanternPluginManager(Game game, File pluginsFolder, PluginContainer minecraft) {
-        this.pluginClassLoader = new PluginClassLoader(ClassLoader.getSystemClassLoader());
         this.pluginsFolder = checkNotNull(pluginsFolder, "pluginsFolder");
         this.game = checkNotNull(game, "game");
 
@@ -64,6 +65,17 @@ public class LanternPluginManager implements PluginManager {
     private void registerPlugin(PluginContainer plugin) {
         this.plugins.put(plugin.getId(), plugin);
         this.pluginInstances.put(plugin.getInstance(), plugin);
+    }
+
+    private void addLibrary(URL url) {
+        URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
+        try {
+            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            method.setAccessible(true);
+            method.invoke(sysLoader, url);
+        } catch (ReflectiveOperationException e) {
+            LanternGame.log().error("Failed to add to classpath: " + url, e);
+        }
     }
 
     public void loadPlugins() {
@@ -80,7 +92,7 @@ public class LanternPluginManager implements PluginManager {
             // jar doesn't contain a plugin, it may be used as
             // a library
             try {
-                this.pluginClassLoader.addURL(jar.toURI().toURL());
+                this.addLibrary(jar.toURI().toURL());
             } catch (MalformedURLException e) {
                 LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
                 continue;
@@ -116,11 +128,14 @@ public class LanternPluginManager implements PluginManager {
         for (PluginEntry entry : plugins) {
             boolean flag = false;
 
-            for (String require : entry.required) {
-                if (!identifiers.containsKey(require) && !this.plugins.containsKey(entry.id)) {
-                    LanternGame.log().error("The plugin {} ({}) is missing the dependency {}", entry.id, entry.classPath, require);
-                    flag = true;
-                    break;
+            if (entry.required != null) {
+                for (String require : entry.required) {
+                    if (!this.plugins.containsKey(entry.id)) {
+                        LanternGame.log().error("The plugin {} (from {}) is missing the dependency {}",
+                                entry.id, entry.classPath, require);
+                        flag = true;
+                        break;
+                    }
                 }
             }
 
@@ -128,19 +143,26 @@ public class LanternPluginManager implements PluginManager {
                 continue;
             }
 
-            LanternPluginContainer container = new LanternPluginContainer(entry.id, entry.name, entry.version);
-            Injector injector = Guice.createInjector(new PluginModule(container, this.game));
-            Object instance;
             try {
-                instance = injector.getInstance(Class.forName(entry.classPath));
-            } catch (ClassNotFoundException e) {
-                LanternGame.log().error("Unable to load the plugin {} ({})", entry.id, entry.classPath, e);
-                continue;
-            }
-            container.setInstance(instance);
+                LanternPluginContainer container = new LanternPluginContainer(entry.id, entry.name, entry.version);
+                Class<?> pluginClass;
+                try {
+                    pluginClass = Class.forName(entry.classPath);
+                } catch (ClassNotFoundException e) {
+                    LanternGame.log().error("Unable to load the plugin {} (from {})", entry.id, entry.classPath, e);
+                    continue;
+                }
+                Injector injector = Guice.createInjector(new PluginModule(container, pluginClass, this.game));
+                Object instance = injector.getInstance(pluginClass);
+                container.setInstance(instance);
 
-            this.registerPlugin(container);
-            this.game.getEventManager().registerListeners(container, instance);
+                this.registerPlugin(container);
+                this.game.getEventManager().registerListeners(container, instance);
+
+                LanternGame.log().info("Loaded plugin: {} {} (from {})", container.getName(), container.getVersion(), entry.classPath);
+            } catch (Throwable e) {
+                LanternGame.log().error("Failed to load plugin: {} (from {})", entry.id, entry.classPath, e);
+            }
         }
     }
 
@@ -267,11 +289,11 @@ public class LanternPluginManager implements PluginManager {
                     PluginEntry entry = new PluginEntry();
                     entry.id = (String) settings.get("id");
                     entry.name = (String) settings.get("name");
-                    entry.version = (String) settings.get("version");
+                    entry.version = settings.containsKey("version") ? (String) settings.get("version") : "unknown";
                     entry.classPath = classNode.name.replace('/', '.');
 
                     String dependencies = (String) settings.get("dependencies");
-                    if (!dependencies.isEmpty()) {
+                    if (dependencies != null && !dependencies.isEmpty()) {
                         List<String> parts0 = Splitter.on(';').splitToList(dependencies);
                         for (String part0 : parts0) {
                             List<String> parts1 = Splitter.on(':').limit(2).splitToList(part0);

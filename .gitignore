@@ -11,7 +11,6 @@ build
 dist
 lib
 out
-run
 target
 *.com
 *.class

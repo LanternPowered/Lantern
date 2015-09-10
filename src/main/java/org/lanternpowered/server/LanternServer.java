@@ -40,7 +40,6 @@ import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.util.command.CommandSource;
@@ -93,8 +92,6 @@ public class LanternServer implements Server {
 
             // Initialize the game
             game.initialize(server, pluginsFolder, worldsFolder);
-
-            LanternConsoleSource.INSTANCE.sendMessage(Texts.of(TextColors.RED, "COLORED DEBUG!"));
 
             // Bind the network channel
             server.bind();
@@ -295,7 +292,7 @@ public class LanternServer implements Server {
             try {
                 this.favicon = LanternFavicon.load(file);
             } catch (IOException e) {
-                LanternGame.log().error("Failed to decode the favicon", e);
+                LanternGame.log().error("Failed to load the favicon", e);
             }
         }
 
@@ -513,8 +510,7 @@ public class LanternServer implements Server {
 
     @Override
     public void shutdown() {
-        // TODO Auto-generated method stub
-        this.shutdown(null);
+        this.shutdown(Texts.of(this.game.getRegistry().getTranslationManager().get("disconnect.closed")));
     }
 
     @Override
@@ -526,6 +522,9 @@ public class LanternServer implements Server {
 
         // Debug a message
         LanternGame.log().info("Stopping the server...");
+
+        // Stop the console
+        this.consoleManager.shutdown();
 
         // Kick all the online players
         this.getOnlinePlayers().forEach(player -> ((LanternPlayer) player).getConnection().disconnect(kickMessage));

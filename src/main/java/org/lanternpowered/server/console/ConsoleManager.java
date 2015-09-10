@@ -120,9 +120,9 @@ public class ConsoleManager {
             String message = this.toString();
             this.reset();
 
-            boolean flag = stashed == null;
+            boolean flag = jline && stashed == null;
 
-            if (jline && flag) {
+            if (flag) {
                 stashed = reader.getCursorBuffer().copy();
                 reader.getOutput().write("\r");
                 reader.flush();
@@ -131,7 +131,7 @@ public class ConsoleManager {
             byte[] bytes = formatter.format(message).getBytes();
             this.output.write(bytes, 0, bytes.length);
 
-            if (jline && flag) {
+            if (flag) {
                 reader.resetPromptLine(reader.getPrompt(), stashed.toString(), stashed.cursor);
                 stashed = null;
             }
@@ -152,7 +152,6 @@ public class ConsoleManager {
     }
 
     public void shutdown() {
-        this.reader.shutdown();
         this.active = false;
     }
 

@@ -74,3 +74,4 @@ nb-configuration.xml
 # Other Files #
 ###############
 /openCmd.bat
+/run

@@ -34,6 +34,7 @@ import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.network.ChannelListener;
 import org.spongepowered.api.network.ChannelRegistrationException;
 import org.spongepowered.api.service.world.ChunkLoadService;
@@ -284,6 +285,9 @@ public class LanternServer implements Server {
     }
 
     public void start() {
+        this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game));
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game));
+
         this.maxPlayers = this.config.get(Settings.MAX_PLAYERS);
         this.motd = Texts.json().fromUnchecked(this.config.get(Settings.MOTD));
 
@@ -306,6 +310,8 @@ public class LanternServer implements Server {
                 }
             }
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
+
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(this.game));
     }
 
     /**
@@ -520,6 +526,9 @@ public class LanternServer implements Server {
         }
         this.shuttingDown = true;
 
+        // Call the event
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(this.game));
+
         // Debug a message
         LanternGame.log().info("Stopping the server...");
 
@@ -541,6 +550,9 @@ public class LanternServer implements Server {
 
         // Stop the async scheduler
         this.game.getScheduler().shutdownAsyncScheduler();
+
+        // Call the event
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game));
 
         // Wait for a while and terminate any rogue threads
         new ShutdownMonitorThread().start();

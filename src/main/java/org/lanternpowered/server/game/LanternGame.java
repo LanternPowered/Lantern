@@ -10,6 +10,7 @@ import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
+import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.service.scheduler.LanternScheduler;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.service.ProviderExistsException;
@@ -27,6 +29,7 @@ import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.command.SimpleCommandService;
 import org.spongepowered.api.service.event.EventManager;
 import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.service.profile.GameProfileResolver;
 import org.spongepowered.api.service.scheduler.SchedulerService;
 import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.util.command.dispatcher.SimpleDispatcher;
@@ -156,6 +159,9 @@ public class LanternGame implements Game {
             throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ChunkLoadService!");
         }
 
+        // Register the game profile resolver
+        this.registerService(GameProfileResolver.class, new LanternGameProfileResolver());
+
         // Register the pagination service
         this.registerService(PaginationService.class, new LanternPaginationService(this));
 
@@ -178,6 +184,12 @@ public class LanternGame implements Game {
 
         // Load the plugin instances
         this.pluginManager.loadPlugins();
+
+        // Call the init events
+        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(this));
+        // TODO: Initialize the permission service
+        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(this));
+        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(this));
     }
 
     private <T> boolean registerService(Class<T> serviceClass, T serviceImpl) {

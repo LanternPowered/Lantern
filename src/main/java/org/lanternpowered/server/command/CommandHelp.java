@@ -6,7 +6,6 @@ import static org.spongepowered.api.util.command.args.GenericArguments.string;
 import java.util.Collection;
 import java.util.Comparator;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.service.pagination.PaginationBuilder;
@@ -43,7 +42,7 @@ public class CommandHelp implements Command {
         return CommandSpec
                 .builder()
                 .arguments(optional(string(Texts.of("command"))))
-                .description(Texts.of("View a list of all commands."))
+                .description(Texts.of("View a list of all commands"))
                 .extendedDescription(Texts.of("View a list of all commands. Hover over\n" + " a command to view its description."
                         + " Click\n a command to insert it into your chat bar."))
                 .executor(new CommandExecutor() {
@@ -68,13 +67,7 @@ public class CommandHelp implements Command {
 
                         TreeSet<CommandMapping> commands = new TreeSet<CommandMapping>(comparator);
                         commands.addAll(Collections2.filter(game.getCommandDispatcher().getAll().values(),
-                                new Predicate<CommandMapping>() {
-
-                                    @Override
-                                    public boolean apply(CommandMapping input) {
-                                        return input.getCallable().testPermission(src);
-                                    }
-                                }));
+                                input -> input.getCallable().testPermission(src)));
 
                         // Console sources cannot see/use the pagination
                         boolean paginate = !(src instanceof ConsoleSource);

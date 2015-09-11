@@ -167,38 +167,50 @@ public class LanternGameProfileResolver implements GameProfileResolver {
         public GameProfile call() throws Exception {
             URL url = new URL("https://sessionserver.mojang.com/session/minecraft/profile/"
                     + UUIDHelper.toFlatString(this.uniqueId));
-            URLConnection uc = url.openConnection();
 
-            /**
-             * Can return null if the uuid invalid is.
-             */
-            InputStream is = uc.getInputStream();
-            if (is.available() == 0) {
-                return null;
-            }
+            while (true) {
+                URLConnection uc = url.openConnection();
+                InputStream is = uc.getInputStream();
 
-            JsonObject json = gson.fromJson(new InputStreamReader(is), JsonObject.class);
-
-            String name = json.get("name").getAsString();
-            List<Property> properties = Lists.newArrayList();
-
-            /**
-             * Search for the textures entry.
-             */
-            if (json.has("properties")) {
-                JsonArray array = json.get("properties").getAsJsonArray();
-                for (JsonElement element : array) {
-                    JsonObject property = (JsonObject) element;
-
-                    String propName = property.get("name").getAsString();
-                    String value = property.get("value").getAsString();
-                    String signature = property.has("signature") ? property.get("signature").getAsString() : null;
-
-                    properties.add(new Property(propName, value, signature));
+                // Can be empty if the unique id invalid is
+                if (is.available() == 0) {
+                    return null;
                 }
-            }
 
-            return new LanternGameProfile(this.uniqueId, name, properties);
+                int attempts = 0;
+
+                JsonObject json = gson.fromJson(new InputStreamReader(is), JsonObject.class);
+                if (json.has("error")) {
+                    // If it fails too many times, just leave it
+                    if (++attempts > 3) {
+                        return null;
+                    }
+                    // Too many requests, lets wait for 35 seconds
+                    Thread.sleep(35000);
+                    continue;
+                }
+
+                String name = json.get("name").getAsString();
+                List<Property> properties = Lists.newArrayList();
+
+                /**
+                 * Search for the textures entry.
+                 */
+                if (json.has("properties")) {
+                    JsonArray array = json.get("properties").getAsJsonArray();
+                    for (JsonElement element : array) {
+                        JsonObject property = (JsonObject) element;
+
+                        String propName = property.get("name").getAsString();
+                        String value = property.get("value").getAsString();
+                        String signature = property.has("signature") ? property.get("signature").getAsString() : null;
+
+                        properties.add(new Property(propName, value, signature));
+                    }
+                }
+
+                return new LanternGameProfile(this.uniqueId, name, properties);
+            }
         }
     }
 
@@ -228,7 +240,7 @@ public class LanternGameProfileResolver implements GameProfileResolver {
             return results;
         }
 
-        public void post(Map<String, UUID> results, List<String> names) throws IOException {
+        private void post(Map<String, UUID> results, List<String> names) throws IOException {
             String body = gson.toJson(names);
             URL url = new URL("https://api.mojang.com/profiles/minecraft");
 

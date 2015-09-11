@@ -65,4 +65,8 @@ public class LanternCatalogTypeRegistry<T extends CatalogType> implements Catalo
         return this.types.containsValue(checkNotNull(catalogType, "catalogType"));
     }
 
+    @Override
+    public boolean has(String identifier) {
+        return this.types.containsKey(checkNotNull(identifier, "identifier"));
+    }
 }

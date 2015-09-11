@@ -25,6 +25,15 @@ public interface CatalogTypeRegistry<T extends CatalogType> {
     boolean has(T catalogType);
 
     /**
+     * Gets whether the registry a catalog type contains
+     * with the specified id.
+     * 
+     * @param identifier the identifier
+     * @return is present
+     */
+    boolean has(String identifier);
+
+    /**
      * Gets a catalog type by using the specified identifier.
      * 
      * @param identifier the identifier

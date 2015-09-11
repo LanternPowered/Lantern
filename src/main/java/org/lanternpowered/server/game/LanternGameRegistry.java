@@ -35,6 +35,9 @@ import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.LanternTextFactory;
 import org.lanternpowered.server.text.format.LanternTextColor;
 import org.lanternpowered.server.text.format.LanternTextStyle;
+import org.lanternpowered.server.text.selector.LanternArgumentHolder;
+import org.lanternpowered.server.text.selector.LanternSelectorFactory;
+import org.lanternpowered.server.text.selector.LanternSelectorType;
 import org.lanternpowered.server.text.sink.LanternMessageSinkFactory;
 import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
@@ -125,6 +128,12 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.text.selector.ArgumentHolder;
+import org.spongepowered.api.text.selector.ArgumentType;
+import org.spongepowered.api.text.selector.ArgumentTypes;
+import org.spongepowered.api.text.selector.SelectorType;
+import org.spongepowered.api.text.selector.SelectorTypes;
+import org.spongepowered.api.text.selector.Selectors;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.rotation.Rotation;
@@ -144,6 +153,8 @@ import org.spongepowered.api.world.gamerule.DefaultGameRules;
 import org.spongepowered.api.world.gen.PopulatorFactory;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
@@ -178,6 +189,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final CatalogTypeRegistry<ShrubType> shrubTypeRegistry = new LanternCatalogTypeRegistry<ShrubType>();
     private final CatalogTypeRegistry<DoublePlantType> doublePlantTypeRegistry = new LanternCatalogTypeRegistry<DoublePlantType>();
     private final CatalogTypeRegistry<PlantType> plantTypeRegistry = new LanternCatalogTypeRegistry<PlantType>();
+    private final CatalogTypeRegistry<SelectorType> selectorTypeRegistry = new LanternCatalogTypeRegistry<SelectorType>();
     private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
             .put(Attribute.class, this.attributeRegistry)
             .put(BiomeType.class, this.biomeRegistry)
@@ -198,6 +210,7 @@ public class LanternGameRegistry implements GameRegistry {
             .put(DoublePlantType.class, this.doublePlantTypeRegistry)
             .put(PlantType.class, this.plantTypeRegistry)
             .put(WorldGeneratorModifier.class, this.worldGeneratorModifierRegistry)
+            .put(SelectorType.class, this.selectorTypeRegistry)
             .build();
 
     {
@@ -240,6 +253,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerGameModes();
         this.registerRotations();
         this.registerAttributes();
+        this.registerSelectors();
     }
 
     private void registerPlantTypes() {
@@ -369,6 +383,81 @@ public class LanternGameRegistry implements GameRegistry {
         this.textColorRegistry.register(new LanternTextColor("white", Color.WHITE));
         this.textColorRegistry.register(new LanternTextColor("reset", Color.WHITE));
         RegistryHelper.mapFields(TextColors.class, this.textColorRegistry.getDelegateMap());
+    }
+
+    private void registerSelectors() {
+        Map<String, SelectorType> selectorMappings = Maps.newHashMap();
+        selectorMappings.put("all_players", new LanternSelectorType("a"));
+        selectorMappings.put("all_entities", new LanternSelectorType("e"));
+        selectorMappings.put("nearest_player", new LanternSelectorType("p"));
+        selectorMappings.put("random", new LanternSelectorType("r"));
+        for (SelectorType type : selectorMappings.values()) {
+            this.selectorTypeRegistry.register(type);
+        }
+        RegistryHelper.mapFields(SelectorTypes.class, selectorMappings);
+
+        LanternSelectorFactory factory = new LanternSelectorFactory(this.selectorTypeRegistry);
+        Map<String, ArgumentHolder<?>> argMappings = Maps.newHashMap();
+        // POSITION
+        ArgumentType<Integer> x = factory.createArgumentType("x", Integer.class);
+        ArgumentType<Integer> y = factory.createArgumentType("y", Integer.class);
+        ArgumentType<Integer> z = factory.createArgumentType("z", Integer.class);
+        ArgumentHolder.Vector3<Vector3i, Integer> position = new LanternArgumentHolder.LanternVector3<Vector3i, Integer>(x, y, z, Vector3i.class);
+        argMappings.put("position", position);
+
+        // RADIUS
+        ArgumentType<Integer> rmin = factory.createArgumentType("rm", Integer.class);
+        ArgumentType<Integer> rmax = factory.createArgumentType("r", Integer.class);
+        ArgumentHolder.Limit<ArgumentType<Integer>> radius = new LanternArgumentHolder.LanternLimit<ArgumentType<Integer>>(rmin, rmax);
+        argMappings.put("radius", radius);
+
+        // GAME_MODE
+        argMappings.put("game_mode", factory.createArgumentType("m", GameMode.class));
+
+        // COUNT
+        argMappings.put("count", factory.createArgumentType("c", Integer.class));
+
+        // LEVEL
+        ArgumentType<Integer> lmin = factory.createArgumentType("lm", Integer.class);
+        ArgumentType<Integer> lmax = factory.createArgumentType("l", Integer.class);
+        ArgumentHolder.Limit<ArgumentType<Integer>> level = new LanternArgumentHolder.LanternLimit<ArgumentType<Integer>>(lmin, lmax);
+        argMappings.put("level", level);
+
+        // TEAM
+        argMappings.put("team", factory.createInvertibleArgumentType("team", Integer.class,
+                org.spongepowered.api.scoreboard.Team.class.getName()));
+
+        // NAME
+        argMappings.put("name", factory.createInvertibleArgumentType("name", String.class));
+
+        // DIMENSION
+        ArgumentType<Integer> dx = factory.createArgumentType("dx", Integer.class);
+        ArgumentType<Integer> dy = factory.createArgumentType("dy", Integer.class);
+        ArgumentType<Integer> dz = factory.createArgumentType("dz", Integer.class);
+        ArgumentHolder.Vector3<Vector3i, Integer> dimension =
+                new LanternArgumentHolder.LanternVector3<Vector3i, Integer>(dx, dy, dz, Vector3i.class);
+        argMappings.put("dimension", dimension);
+
+        // ROTATION
+        ArgumentType<Double> rotxmin = factory.createArgumentType("rxm", Double.class);
+        ArgumentType<Double> rotymin = factory.createArgumentType("rym", Double.class);
+        ArgumentType<Double> rotzmin = factory.createArgumentType("rzm", Double.class);
+        ArgumentHolder.Vector3<Vector3d, Double> rotmin =
+                new LanternArgumentHolder.LanternVector3<Vector3d, Double>(rotxmin, rotymin, rotzmin, Vector3d.class);
+        ArgumentType<Double> rotxmax = factory.createArgumentType("rx", Double.class);
+        ArgumentType<Double> rotymax = factory.createArgumentType("ry", Double.class);
+        ArgumentType<Double> rotzmax = factory.createArgumentType("rz", Double.class);
+        ArgumentHolder.Vector3<Vector3d, Double> rotmax =
+                new LanternArgumentHolder.LanternVector3<Vector3d, Double>(rotxmax, rotymax, rotzmax, Vector3d.class);
+        ArgumentHolder.Limit<ArgumentHolder.Vector3<Vector3d, Double>> rot =
+                new LanternArgumentHolder.LanternLimit<ArgumentHolder.Vector3<Vector3d, Double>>(rotmin, rotmax);
+        argMappings.put("rotation", rot);
+
+        // ENTITY_TYPE
+        argMappings.put("entity_type", factory.createInvertibleArgumentType("type", EntityType.class));
+
+        RegistryHelper.mapFields(ArgumentTypes.class, argMappings);
+        RegistryHelper.setFactory(Selectors.class, factory);
     }
 
     private void registerDifficulties() {

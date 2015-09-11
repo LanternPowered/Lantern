@@ -115,5 +115,4 @@ public class RconServer implements RconService {
     public String getRconPassword() {
         return this.password;
     }
-
 }

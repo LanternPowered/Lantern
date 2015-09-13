@@ -62,6 +62,10 @@ public class LanternTranslationManager implements TranslationManager {
 
     @Override
     public void addResourceBundle(String resourceBundle, Locale locale) {
+        // We cannot allow the resource bundle instance to be directly
+        // added to the translation manager, because for some strange
+        // reasons the "getLocale" always a empty object returns (no name)
+        // and doesn't match the one in the constructor
         ResourceBundle bundle = ResourceBundle.getBundle(checkNotNull(resourceBundle, "resourceBundle"));
         Set<ResourceBundle> bundles;
 

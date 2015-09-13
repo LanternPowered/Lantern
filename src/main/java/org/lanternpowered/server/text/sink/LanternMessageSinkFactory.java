@@ -4,13 +4,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
-import java.util.WeakHashMap;
 
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.util.Sets2;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -29,6 +28,7 @@ import com.google.common.collect.Maps;
 public class LanternMessageSinkFactory implements MessageSinkFactory {
 
     private static class PermissionSink extends MessageSink {
+
         private final String permission;
 
         private PermissionSink(String permission) {
@@ -57,16 +57,16 @@ public class LanternMessageSinkFactory implements MessageSinkFactory {
 
     @Override
     public MessageSink toPermission(String permission) {
-        checkNotNull(permission, "permission");
-        return new PermissionSink(permission);
+        return new PermissionSink(checkNotNull(permission, "permission"));
     }
 
     public static final MessageSink TO_ALL = new MessageSink() {
         @Override
         public Iterable<CommandSource> getRecipients() {
-            Set<CommandSource> ret = new HashSet<>(LanternGame.get().getServer().getOnlinePlayers());
-            ret.add(LanternGame.get().getServer().getConsole());
-            return ret;
+            return ImmutableSet.<CommandSource>builder()
+                    .add(LanternGame.get().getServer().getConsole())
+                    .addAll(LanternGame.get().getServer().getOnlinePlayers())
+                    .build();
         }
     };
 
@@ -81,7 +81,7 @@ public class LanternMessageSinkFactory implements MessageSinkFactory {
     public static final MessageSink TO_NONE = new MessageSink() {
         @Override
         public Iterable<CommandSource> getRecipients() {
-            return Collections.emptyList();
+            return ImmutableSet.of();
         }
     };
 
@@ -121,13 +121,8 @@ public class LanternMessageSinkFactory implements MessageSinkFactory {
 
         @Override
         public Iterable<CommandSource> getRecipients() {
-            return ImmutableSet.copyOf(Iterables.concat(Iterables.transform(this.contents, new Function<MessageSink, Iterable<CommandSource>>() {
-                @Nullable
-                @Override
-                public Iterable<CommandSource> apply(@Nullable MessageSink input) {
-                    return input.getRecipients();
-                }
-            })));
+            return ImmutableSet.copyOf(Iterables.concat(Iterables.transform(this.contents,
+                    (MessageSink sink) -> sink == null ? Collections.<CommandSource>emptyList() : sink.getRecipients())));
         }
     }
 
@@ -137,12 +132,11 @@ public class LanternMessageSinkFactory implements MessageSinkFactory {
     }
 
     private static class FixedSink extends MessageSink {
+
         private final Set<CommandSource> contents;
 
         private FixedSink(Set<CommandSource> provided) {
-            Set<CommandSource> contents = Collections.newSetFromMap(new WeakHashMap<CommandSource, Boolean>());
-            contents.addAll(provided);
-            this.contents = Collections.unmodifiableSet(contents);
+            this.contents = Collections.unmodifiableSet(Sets2.newWeakHashSet(provided));
         }
 
         @Override

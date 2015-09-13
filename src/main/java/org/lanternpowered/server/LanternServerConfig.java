@@ -3,20 +3,20 @@ package org.lanternpowered.server;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 
+import org.lanternpowered.server.data.translator.ConfigurateTranslator;
 import org.lanternpowered.server.game.LanternGame;
+
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.translator.ConfigurateTranslator;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spongepowered.api.data.DataQuery.of;
 
@@ -45,7 +45,10 @@ public class LanternServerConfig {
      * @throws IOException
      */
     public void load() throws IOException {
-        GsonConfigurationLoader loader = GsonConfigurationLoader.builder().setFile(this.file).setIndent(4).build();
+        GsonConfigurationLoader loader = GsonConfigurationLoader.builder().setFile(this.file).build();
+        // Why is the hocon one throwing errors :(
+        // -> com.typesafe.config.ConfigException$BugOrBroken: bug in method caller: not valid to create ConfigObject from map with non-String key: ip
+        // HoconConfigurationLoader loader = HoconConfigurationLoader.builder().setFile(this.file).build();
         if (!this.folder.exists()) {
             this.folder.mkdirs();
         }
@@ -72,7 +75,7 @@ public class LanternServerConfig {
         }
     }
 
-    public File getConfigFolder() {
+    public File getFolder() {
         return this.folder;
     }
 
@@ -122,10 +125,10 @@ public class LanternServerConfig {
         public static final Setting<String> PLUGIN_FOLDER = new Setting<>(of('.', "folders.plugins"), "plugins");
         public static final Setting<String> WORLD_FOLDER = new Setting<>(of('.', "folders.worlds"), "worlds");
 
-        private static Set<Setting<?>> defaults;
+        private static List<Setting<?>> defaults;
 
         static {
-            ImmutableSet.Builder<Setting<?>> builder = ImmutableSet.builder();
+            ImmutableList.Builder<Setting<?>> builder = ImmutableList.builder();
             for (Field field : Settings.class.getFields()) {
                 if (field.getType().isAssignableFrom(Setting.class)) {
                     try {
@@ -144,7 +147,7 @@ public class LanternServerConfig {
          * 
          * @return the default settings
          */
-        public static Set<Setting<?>> getDefaults() {
+        public static List<Setting<?>> getDefaults() {
             return defaults;
         }
 

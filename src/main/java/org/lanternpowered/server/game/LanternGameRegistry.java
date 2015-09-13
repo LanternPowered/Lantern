@@ -24,9 +24,12 @@ import org.lanternpowered.server.block.LanternBlockRegistry;
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
+import org.lanternpowered.server.data.type.LanternDoublePlantTypes;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.data.type.LanternPlantType;
+import org.lanternpowered.server.data.type.LanternPlantTypes;
 import org.lanternpowered.server.data.type.LanternShrubType;
+import org.lanternpowered.server.data.type.LanternShrubTypes;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.item.LanternItemRegistry;
@@ -257,33 +260,23 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private void registerPlantTypes() {
-        this.plantTypeRegistry.register(new LanternPlantType("dandelion"));
-        this.plantTypeRegistry.register(new LanternPlantType("poppy"));
-        this.plantTypeRegistry.register(new LanternPlantType("blue_orchid"));
-        this.plantTypeRegistry.register(new LanternPlantType("allium"));
-        this.plantTypeRegistry.register(new LanternPlantType("houstonia"));
-        this.plantTypeRegistry.register(new LanternPlantType("red_tulip"));
-        this.plantTypeRegistry.register(new LanternPlantType("orange_tulip"));
-        this.plantTypeRegistry.register(new LanternPlantType("white_tulip"));
-        this.plantTypeRegistry.register(new LanternPlantType("pink_tulip"));
-        this.plantTypeRegistry.register(new LanternPlantType("oxeye_daisy"));
+        for (LanternPlantType type : LanternPlantTypes.values()) {
+            this.plantTypeRegistry.register(type);
+        }
         RegistryHelper.mapFields(PlantTypes.class, this.plantTypeRegistry.getDelegateMap());
     }
 
     private void registerDoublePlantTypes() {
-        this.doublePlantTypeRegistry.register(new LanternDoublePlantType("sunflower"));
-        this.doublePlantTypeRegistry.register(new LanternDoublePlantType("syringa"));
-        this.doublePlantTypeRegistry.register(new LanternDoublePlantType("grass"));
-        this.doublePlantTypeRegistry.register(new LanternDoublePlantType("fern"));
-        this.doublePlantTypeRegistry.register(new LanternDoublePlantType("rose"));
-        this.doublePlantTypeRegistry.register(new LanternDoublePlantType("paeonia"));
+        for (LanternDoublePlantType type : LanternDoublePlantTypes.values()) {
+            this.doublePlantTypeRegistry.register(type);
+        }
         RegistryHelper.mapFields(DoublePlantTypes.class, this.doublePlantTypeRegistry.getDelegateMap());
     }
 
     private void registerShrubTypes() {
-        this.shrubTypeRegistry.register(new LanternShrubType("dead_bush"));
-        this.shrubTypeRegistry.register(new LanternShrubType("tall_grass"));
-        this.shrubTypeRegistry.register(new LanternShrubType("fern"));
+        for (LanternShrubType type : LanternShrubTypes.values()) {
+            this.shrubTypeRegistry.register(type);
+        }
         RegistryHelper.mapFields(ShrubTypes.class, this.shrubTypeRegistry.getDelegateMap());
     }
 

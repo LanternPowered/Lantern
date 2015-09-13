@@ -6,12 +6,15 @@ import java.util.Locale;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
+import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
+import org.lanternpowered.server.service.config.LanternConfigService;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.service.scheduler.LanternScheduler;
+import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
 import org.slf4j.Logger;
@@ -27,10 +30,12 @@ import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.SimpleServiceManager;
 import org.spongepowered.api.service.command.CommandService;
 import org.spongepowered.api.service.command.SimpleCommandService;
+import org.spongepowered.api.service.config.ConfigService;
 import org.spongepowered.api.service.event.EventManager;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.profile.GameProfileResolver;
 import org.spongepowered.api.service.scheduler.SchedulerService;
+import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.util.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.world.TeleportHelper;
@@ -114,6 +119,9 @@ public class LanternGame implements Game {
     // The chunk load service
     private ChunkLoadService chunkLoadService;
 
+    // The config service
+    private ConfigService configService;
+
     // The teleport helper
     private TeleportHelper teleportHelper;
 
@@ -130,7 +138,7 @@ public class LanternGame implements Game {
         game = this;
     }
 
-    public void initialize(LanternServer server, File pluginsFolder, File worldsFolder) {
+    public void initialize(LanternServer server, File configFolder, File pluginsFolder, File worldsFolder) {
         this.worldsFolder = worldsFolder;
         this.server = server;
 
@@ -146,6 +154,12 @@ public class LanternGame implements Game {
 
         // Create the service manager instance
         this.serviceManager = new SimpleServiceManager(this.pluginManager);
+
+        // Register the config service
+        this.configService = new LanternConfigService(configFolder);
+        if (!this.registerService(ConfigService.class, this.configService)) {
+            throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ConfigService!");
+        }
 
         // Create the scheduler
         this.scheduler = new LanternScheduler();
@@ -171,6 +185,8 @@ public class LanternGame implements Game {
         if (this.registerService(CommandService.class, commandService)) {
             commandService.register(this.minecraft, new CommandStop(this).build(), "stop", "shutdown");
             commandService.register(this.minecraft, new CommandHelp(this).build(), "help", "?");
+            // TODO: Use a different plugin for this command?
+            commandService.register(this.minecraft, new CommandVersion(this).build(), "version");
         }
 
         // Create the teleport helper
@@ -188,6 +204,10 @@ public class LanternGame implements Game {
         // Call the init events
         this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(this));
         // TODO: Initialize the permission service
+
+        // Create the default sql service
+        this.registerService(SqlService.class, new LanternSqlService());
+
         this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(this));
         this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(this));
     }
@@ -268,5 +288,14 @@ public class LanternGame implements Game {
      */
     public ChunkLoadService getChunkLoadService() {
         return this.chunkLoadService;
+    }
+
+    /**
+     * Gets the {@link ConfigService}.
+     * 
+     * @return the config service
+     */
+    public ConfigService getConfigService() {
+        return this.configService;
     }
 }

@@ -1,21 +1,41 @@
 package org.lanternpowered.server.block;
 
+import java.util.Collection;
+
+import org.lanternpowered.server.block.state.BlockStateBase;
 import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.item.ItemBlock;
 import org.spongepowered.api.text.translation.Translation;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Lists;
 
 public class LanternBlockType extends LanternSimpleCatalogType implements BlockType {
+
+    // The block state base which contains all the possible block states
+    private final BlockStateBase blockStateBase;
+    private final MaterialType materialType;
 
     private float emittedLight;
 
     private boolean tickRandomly;
+    private boolean areStatisticsEnabled;
 
-    public LanternBlockType(String identifier) {
+    public LanternBlockType(String identifier, MaterialType materialType) {
+        this(identifier, materialType, Lists.newArrayList());
+    }
+
+    public LanternBlockType(String identifier, MaterialType materialType, Iterable<BlockTrait<?>> blockTraits) {
         super(identifier);
+
+        // Create the block state base
+        this.blockStateBase = new BlockStateBase(this, blockTraits);
+
+        // Sets the material type
+        this.materialType = materialType;
     }
 
     @Override
@@ -34,8 +54,7 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
     @Override
     public BlockState getDefaultState() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.blockStateBase.getDefaultBlockState();
     }
 
     @Override
@@ -50,8 +69,7 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
     @Override
     public boolean isLiquid() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.materialType == MaterialType.LIQUID;
     }
 
     @Override
@@ -62,8 +80,7 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
     @Override
     public boolean isGaseous() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.materialType == MaterialType.GAS;
     }
 
     @Override
@@ -74,14 +91,12 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
     @Override
     public boolean areStatisticsEnabled() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.areStatisticsEnabled;
     }
 
     @Override
     public float getEmittedLight() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.emittedLight;
     }
 
     @Override
@@ -94,5 +109,21 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
     public boolean isReplaceable() {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public Collection<BlockTrait<?>> getTraits() {
+        return this.blockStateBase.getTraits();
+    }
+
+    @Override
+    public Optional<BlockTrait<?>> getTrait(String blockTrait) {
+        return this.blockStateBase.getTrait(blockTrait);
+    }
+
+    public static enum MaterialType {
+        GAS,
+        LIQUID,
+        SOLID,
     }
 }

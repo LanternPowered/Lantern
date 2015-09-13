@@ -1,10 +1,16 @@
-package org.lanternpowered.server.block;
+package org.lanternpowered.server.block.state;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.lanternpowered.server.block.trait.BlockTraitKey;
+import org.lanternpowered.server.block.trait.MutableBlockTraitValue;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -17,10 +23,26 @@ import org.spongepowered.api.world.World;
 
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableCollection;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableTable;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class LanternBlockState implements BlockState {
+
+    // A lookup table to get a specific state when you would change a value
+    protected ImmutableTable<BlockTrait<?>, Comparable<?>, BlockState> propertyValueTable;
+
+    // The values for every attached trait
+    protected final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
+
+    // The base block state
+    private final BlockStateBase baseState;
+
+    public LanternBlockState(BlockStateBase baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
+        this.traitValues = traitValues;
+        this.baseState = baseState;
+    }
 
     @Override
     public DataContainer toContainer() {
@@ -30,8 +52,7 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public BlockType getType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.baseState.getBlockType();
     }
 
     @Override
@@ -60,14 +81,19 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public <E> Optional<BlockState> with(Key<? extends BaseValue<E>> key, E value) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.supports(key) || !((BlockTraitKey) key).getBlockTrait().getPredicate().apply(value)) {
+            return Optional.absent();
+        }
+        return Optional.of(this.propertyValueTable.row(((BlockTraitKey) key).getBlockTrait()).get(value));
     }
 
     @Override
     public Optional<BlockState> with(BaseValue<?> value) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.supports(value)) {
+            return Optional.absent();
+        }
+        return Optional.of(this.propertyValueTable.row(((BlockTraitKey) value.getKey()).getBlockTrait())
+                .get(value.get()));
     }
 
     @Override
@@ -102,50 +128,56 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.supports(key)) {
+            return Optional.absent();
+        }
+        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
+        return Optional.fromNullable((E) this.traitValues.get(blockTrait));
     }
 
     @Override
     public <E> E getOrNull(Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getOrElse(key, null);
     }
 
     @Override
     public <E> E getOrElse(Key<? extends BaseValue<E>> key, E defaultValue) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.supports(key)) {
+            return defaultValue;
+        }
+        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
+        return (E) this.traitValues.get(blockTrait);
     }
 
     @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.supports(key)) {
+            return Optional.absent();
+        }
+        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
+        return Optional.of((V) new MutableBlockTraitValue(((BlockTraitKey) key), this.traitValues.get(blockTrait)));
     }
 
     @Override
     public boolean supports(Key<?> key) {
-        // TODO Auto-generated method stub
-        return false;
+        return key instanceof BlockTraitKey && this.traitValues.containsKey(((BlockTraitKey) key).getBlockTrait());
     }
 
     @Override
     public boolean supports(BaseValue<?> baseValue) {
-        // TODO Auto-generated method stub
-        return false;
+        Key<?> key = baseValue.getKey();
+        return this.supports(key) && ((BlockTraitKey) key).getBlockTrait().getPredicate().apply(baseValue.get());
     }
 
     @Override
     public BlockState copy() {
-        // TODO Auto-generated method stub
-        return null;
+        // Should be safe to do this, this class is immutable
+        return this;
     }
 
     @Override
     public ImmutableSet<Key<?>> getKeys() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.baseState.getKeys();
     }
 
     @Override
@@ -156,8 +188,25 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public BlockState cycleValue(Key<? extends BaseValue<? extends Cycleable<?>>> key) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.supports(key)) {
+            return this;
+        }
+
+        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
+        Object value = this.traitValues.get(blockTrait);
+        Iterator<?> it = blockTrait.getPossibleValues().iterator();
+
+        while (it.hasNext()) {
+            if (it.next() == value) {
+                if (it.hasNext()) {
+                    value = it.next();
+                } else {
+                    value = blockTrait.getPossibleValues().iterator().next();
+                }
+            }
+        }
+
+        return this.propertyValueTable.row(blockTrait).get(value);
     }
 
     @Override
@@ -178,4 +227,28 @@ public class LanternBlockState implements BlockState {
         return null;
     }
 
+    @Override
+    public <T extends Comparable<T>> Optional<T> getTraitValue(BlockTrait<T> blockTrait) {
+        return Optional.fromNullable((T) this.traitValues.get(blockTrait));
+    }
+
+    @Override
+    public Optional<BlockTrait<?>> getTrait(String blockTrait) {
+        return this.baseState.getTrait(blockTrait);
+    }
+
+    @Override
+    public Collection<BlockTrait<?>> getTraits() {
+        return this.traitValues.keySet();
+    }
+
+    @Override
+    public Collection<?> getTraitValues() {
+        return this.traitValues.values();
+    }
+
+    @Override
+    public Map<BlockTrait<?>, ?> getTraitMap() {
+        return this.traitValues;
+    }
 }

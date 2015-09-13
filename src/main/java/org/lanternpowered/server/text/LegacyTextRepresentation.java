@@ -26,6 +26,11 @@ import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+/**
+ * TODO: PermissionsEx (PEX) is translating the translations
+ * with the toString (or other) method, which gives unreadable results.
+ * Strangely this is working in sponge.
+ */
 public class LegacyTextRepresentation implements TextRepresentation {
 
     public static final char DEFAULT_CHAR = '\u00A7';
@@ -203,7 +208,20 @@ public class LegacyTextRepresentation implements TextRepresentation {
             Translation translation = text0.getTranslation();
             ImmutableList<Object> args = text0.getArguments();
 
-            builder.append(translation.get(locale, args.toArray(new Object[] {})));
+            Object[] args0 = new Object[args.size()];
+            for (int i = 0; i < args0.length; i++) {
+                Object object = args.get(i);
+                if (object instanceof Text || object instanceof TextBuilder) {
+                    if (object instanceof TextBuilder) {
+                        object = ((TextBuilder) object).build();
+                    }
+                    args0[i] = to((Text) object, locale, new StringBuilder(), colorCode).toString();
+                } else {
+                    args0[i] = object;
+                }
+            }
+
+            builder.append(translation.get(locale, args0));
         } else if (text instanceof Text.Placeholder) {
             Text.Placeholder text0 = (Text.Placeholder) text;
 

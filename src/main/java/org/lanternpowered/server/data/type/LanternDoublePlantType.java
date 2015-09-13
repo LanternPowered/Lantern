@@ -1,11 +1,9 @@
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.data.type.DoublePlantType;
 
-public class LanternDoublePlantType extends LanternSimpleCatalogType implements DoublePlantType {
+public interface LanternDoublePlantType extends DoublePlantType, SimpleCatalogType {
 
-    public LanternDoublePlantType(String identifier) {
-        super(identifier);
-    }
+    byte getInternalId();
 }

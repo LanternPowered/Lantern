@@ -113,7 +113,11 @@ public class LanternGameProfileResolver implements GameProfileResolver {
                 } else {
                     rest = Lists.newArrayList(names);
                 }
-                uniqueIds.addAll(new GetUUID(names).call().values());
+                Map<String, UUID> results = new GetUUID(rest).call();
+                if (useCache) {
+                    uuidByNameCache.putAll(results);
+                }
+                uniqueIds.addAll(results.values());
                 for (UUID uniqueId : uniqueIds) {
                     profiles.add(useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call());
                 }
@@ -193,9 +197,6 @@ public class LanternGameProfileResolver implements GameProfileResolver {
                 String name = json.get("name").getAsString();
                 List<Property> properties = Lists.newArrayList();
 
-                /**
-                 * Search for the textures entry.
-                 */
                 if (json.has("properties")) {
                     JsonArray array = json.get("properties").getAsJsonArray();
                     for (JsonElement element : array) {

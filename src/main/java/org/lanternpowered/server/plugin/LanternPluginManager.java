@@ -28,7 +28,6 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
@@ -51,10 +50,10 @@ public class LanternPluginManager implements PluginManager {
     private final Map<String, PluginContainer> plugins = Maps.newHashMap();
     private final Map<Object, PluginContainer> pluginInstances = Maps.newIdentityHashMap();
 
-    private final Game game;
+    private final LanternGame game;
     private final File pluginsFolder;
 
-    public LanternPluginManager(Game game, File pluginsFolder, PluginContainer minecraft) {
+    public LanternPluginManager(LanternGame game, File pluginsFolder, PluginContainer minecraft) {
         this.pluginsFolder = checkNotNull(pluginsFolder, "pluginsFolder");
         this.game = checkNotNull(game, "game");
 

@@ -3,6 +3,7 @@ package org.lanternpowered.server;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
@@ -37,6 +38,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.network.ChannelListener;
 import org.spongepowered.api.network.ChannelRegistrationException;
+import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
@@ -92,7 +94,7 @@ public class LanternServer implements Server {
             File worldsFolder = new File(config.get(Settings.WORLD_FOLDER));
 
             // Initialize the game
-            game.initialize(server, pluginsFolder, worldsFolder);
+            game.initialize(server, config.getFolder(), pluginsFolder, worldsFolder);
 
             // Bind the network channel
             server.bind();
@@ -136,7 +138,7 @@ public class LanternServer implements Server {
             final String opt = args[i];
 
             if (!opt.startsWith("-")) {
-                System.err.println("Ignored invalid option: " + opt);
+                LanternGame.log().warn("Ignored invalid option: " + opt);
                 continue;
             }
 
@@ -168,7 +170,7 @@ public class LanternServer implements Server {
 
             // Below this point, options require parameters
             if (i == args.length - 1) {
-                System.err.println("Ignored option specified without value: " + opt);
+                LanternGame.log().warn("Ignored option specified without value: " + opt);
                 continue;
             }
 
@@ -208,7 +210,7 @@ public class LanternServer implements Server {
                     parameters.put(Settings.MAIN_WORLD, args[++i]);
                     break;
                 default:
-                    System.err.println("Ignored invalid option: " + opt);
+                    LanternGame.log().warn("Ignored invalid option: " + opt);
             }
         }
 
@@ -221,7 +223,8 @@ public class LanternServer implements Server {
     /**
      * The scheduled executor service which backs this worlds.
      */
-    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
+            runnable -> new Thread(runnable, "server"));
 
     private final LanternChannelRegistrar channelRegistrar = new LanternChannelRegistrar(this);
     private final LanternWorldManager worldManager = new LanternWorldManager();
@@ -550,6 +553,15 @@ public class LanternServer implements Server {
 
         // Stop the async scheduler
         this.game.getScheduler().shutdownAsyncScheduler();
+
+        SqlService service = this.game.getServiceManager().provide(SqlService.class).orNull();
+        if (service instanceof Closeable) {
+            try {
+                ((Closeable) service).close();
+            } catch (IOException e) {
+                LanternGame.log().error("A error occurred while closing the sql service.", e);
+            }
+        }
 
         // Call the event
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game));

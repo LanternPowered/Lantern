@@ -1,11 +1,16 @@
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
 import org.spongepowered.api.data.type.PlantType;
 
-public class LanternPlantType extends LanternSimpleCatalogType implements PlantType {
+public interface LanternPlantType extends PlantType {
 
-    public LanternPlantType(String identifier) {
-        super(identifier);
+    FlowerColor getFlowerColor();
+
+    byte getInternalId();
+
+    public static enum FlowerColor {
+        YELLOW,
+        RED,
+        ;
     }
 }

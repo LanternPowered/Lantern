@@ -33,7 +33,7 @@ public class FlatGeneratorSettingsParser {
             }
             BlockState block = layer.getBlockState();
             builder.append(block.getType().getId());
-            int data = LanternBlocks.getStateData(block);
+            int data = LanternBlocks.reg().getStateData(block);
             if (data > 0) {
                 builder.append(':').append(data);
             }
@@ -69,13 +69,13 @@ public class FlatGeneratorSettingsParser {
                     if (parts1.length > 1) {
                         blockData = Coerce.toInteger(parts[1]);
                     }
-                    blockType = LanternBlocks.getTypeById(Coerce.toInteger(parts[1]));
+                    blockType = LanternBlocks.reg().getTypeByInternalId(Coerce.toInteger(parts[1]));
                 } else {
                     parts1 = parts1[index1].split(":", 3);
                     String name = parts1.length > 1 ? parts1[0] + ':' + parts1[1] : parts1[0];
-                    blockType = LanternBlocks.getRegistry().get(name).orNull();
+                    blockType = LanternBlocks.reg().get(name).orNull();
                     if (blockType == null) {
-                        blockType = LanternBlocks.getRegistry().get(parts1[0]).orNull();
+                        blockType = LanternBlocks.reg().get(parts1[0]).orNull();
                         if (parts1.length > 1) {
                             blockData = Coerce.toInteger(parts1[1]);
                         }
@@ -86,7 +86,7 @@ public class FlatGeneratorSettingsParser {
                 if (blockType == null) {
                     return null;
                 }
-                layers.add(new FlatLayer(LanternBlocks.getStateByTypeAndData(blockType,
+                layers.add(new FlatLayer(LanternBlocks.reg().getStateByTypeAndData(blockType,
                         (byte) GenericMath.clamp(blockData, 0x0, 0xf)), depth));
             }
         }

@@ -49,7 +49,7 @@ public class LanternBiomeRegistry extends LanternCatalogTypeRegistry<BiomeType> 
      * @param biomeType the biome type
      * @param biomeId the biome id
      */
-    public void register(BiomeType biomeType, byte biomeId) {
+    public void register(byte biomeId, BiomeType biomeType) {
         short biomeId0 = (short) (biomeId & 0xff);
         checkState(!this.biomesById.containsKey(biomeId), "Biome id already present! (" + biomeId + ")");
         checkState(!this.idsByBiome.containsKey(biomeType), "Biome type already present! (" + biomeType.getId() + ")");

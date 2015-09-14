@@ -522,6 +522,7 @@ public class LanternServer implements Server {
         this.shutdown(Texts.of(this.game.getRegistry().getTranslationManager().get("disconnect.closed")));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void shutdown(Text kickMessage) {
         if (this.shuttingDown) {
@@ -533,7 +534,7 @@ public class LanternServer implements Server {
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(this.game));
 
         // Debug a message
-        LanternGame.log().info("Stopping the server...");
+        LanternGame.log().info("Stopping the server... (" + Texts.legacy().to(kickMessage) + ")");
 
         // Stop the console
         this.consoleManager.shutdown();

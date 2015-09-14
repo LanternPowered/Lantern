@@ -39,7 +39,7 @@ public class ExtentBufferUtil {
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
                 for (int y = min.getY(); y <= max.getY(); y++) {
-                    copy[i++] = LanternBlocks.getStateId(volume.getBlock(x, y, z));
+                    copy[i++] = LanternBlocks.reg().getInternalStateId(volume.getBlock(x, y, z));
                 }
             }
         }

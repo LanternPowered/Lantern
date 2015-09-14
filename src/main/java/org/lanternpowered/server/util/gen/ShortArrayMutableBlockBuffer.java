@@ -59,14 +59,14 @@ public class ShortArrayMutableBlockBuffer extends AbstractBlockBuffer implements
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
         this.checkRange(x, y, z);
-        this.blocks[this.getIndex(x, y, z)] = LanternBlocks.getStateId(block);
+        this.blocks[this.getIndex(x, y, z)] = LanternBlocks.reg().getInternalStateId(block);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
         this.checkRange(x, y, z);
         short blockState = this.blocks[this.getIndex(x, y, z)];
-        BlockState block = LanternBlocks.getStateById(blockState);
+        BlockState block = LanternBlocks.reg().getStateByInternalId(blockState);
         return block == null ? this.air : block;
     }
 

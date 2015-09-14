@@ -34,7 +34,6 @@ public class CommandVersion implements Command {
         return CommandSpec.builder()
                 .permission("minecraft.command.version")
                 .description(Texts.of(this.description))
-                .extendedDescription(Texts.of(this.description))
                 .executor(new CommandExecutor() {
 
                     @Override

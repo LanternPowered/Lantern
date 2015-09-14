@@ -1,57 +1,131 @@
 package org.lanternpowered.server.block;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
+
+import gnu.trove.TCollections;
+import gnu.trove.map.TObjectShortMap;
+import gnu.trove.map.TShortObjectMap;
+import gnu.trove.map.hash.TObjectShortHashMap;
+import gnu.trove.map.hash.TShortObjectHashMap;
+
+import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 
-public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> {
+public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> implements BlockRegistry {
 
-    @Nullable
-    public BlockState getStateById(int internalId) {
+    private final TShortObjectMap<BlockState> blockStatesById = TCollections.synchronizedMap(new TShortObjectHashMap<BlockState>());
+    private final TObjectShortMap<BlockState> idsByBlockState = TCollections.synchronizedMap(new TObjectShortHashMap<BlockState>());
+ 
+    private final TShortObjectMap<BlockType> blocksById = TCollections.synchronizedMap(new TShortObjectHashMap<BlockType>());
+    private final TObjectShortMap<BlockType> idsByBlock = TCollections.synchronizedMap(new TObjectShortHashMap<BlockType>());
+
+    // The counter for custom block ids. (Non vanilla ones.)
+    private final AtomicInteger blockIdCounter = new AtomicInteger(1024);
+
+    private void register0(int internalId, LanternBlockType blockType, Function<BlockState, Byte> dataValueGenerator) {
+        checkNotNull(blockType, "blockType");
+        checkState(internalId >= 0, "Block id cannot be negative.");
+        checkState(internalId <= 0xfff, "Exceeded the block id limit. (" + 0xfff + ")");
+        short internalId0 = (short) internalId;
+        checkState(!this.blocksById.containsKey(internalId0), "Block id already present! (" + internalId + ")");
+        super.register(blockType);
+        this.blocksById.put(internalId0, blockType);
+        this.idsByBlock.put(blockType, internalId0);
+        if (dataValueGenerator != null && blockType.blockStateBase.getBlockStates().size() > 1) {
+            for (BlockState state : blockType.blockStateBase.getBlockStates()) {
+                byte dataValue = dataValueGenerator.apply((LanternBlockState) state);
+                short stateValue = (short) ((internalId & 0xfff) << 4 | dataValue & 0xf);
+                this.blockStatesById.put(stateValue, state);
+                this.idsByBlockState.put(state, stateValue);
+            }
+        } else {
+            BlockState state = blockType.getDefaultState();
+            this.blockStatesById.put(internalId0, state);
+            this.idsByBlockState.put(state, internalId0);
+        }
+    }
+
+    @Override
+    public void register(int internalId, BlockType blockType, Function<BlockState, Byte> dataValueGenerator) {
+        this.register0(internalId, (LanternBlockType) blockType, checkNotNull(dataValueGenerator, "dataValueGenerator"));
+    }
+
+    @Override
+    public void register(int internalId, BlockType blockType0) {
+        LanternBlockType blockType = (LanternBlockType) checkNotNull(blockType0, "blockType");
+        checkState(blockType.blockStateBase.getBlockStates().size() <= 1,
+                "You cannot register a blockType with more then one state with this method.");
+        this.register(internalId, blockType, null);
+    }
+
+    @Override
+    public void register(BlockType blockType, Function<BlockState, Byte> dataValueGenerator) {
+        this.register(this.getNextInternalId(), blockType, dataValueGenerator);
+    }
+
+    @Override
+    public void register(BlockType catalogType) {
+        this.register(this.getNextInternalId(), catalogType);
+    }
+
+    private int getNextInternalId() {
+        int internalId;
+        do {
+            internalId = this.blockIdCounter.getAndIncrement();
+        } while (this.blocksById.containsKey((short) internalId));
+        return internalId;
+    }
+
+    @Override
+    public BlockState getStateByInternalId(int internalId) {
         if (internalId < 0 || internalId >= Short.MAX_VALUE) {
             return null;
         }
-        // TODO
-        return null;
+        return this.blockStatesById.get((short) internalId);
     }
 
-    @Nullable
-    public Short getStateId(BlockState blockState) {
-        // TODO
-        return null;
+    @Override
+    public Short getInternalStateId(BlockState blockState) {
+        return this.idsByBlockState.containsKey(blockState) ? this.idsByBlockState.get(blockState) : null;
     }
 
-    @Nullable
-    public Short getStateId(BlockType blockType) {
-        return this.getStateId(blockType.getDefaultState());
+    @Override
+    public Short getInternalStateId(BlockType blockType) {
+        return this.getInternalStateId(blockType.getDefaultState());
     }
 
-    @Nullable
-    public BlockType getTypeById(int internalId) {
-        return this.getStateById((internalId & 0xfff) << 4).getType();
+    @Override
+    public BlockType getTypeByInternalId(int internalId) {
+        return this.blocksById.get((short) (internalId & 0xfff));
     }
 
-    @Nullable
-    public Short getTypeId(BlockType blockType) {
-        Short id = this.getStateId(blockType);
-        return id == null ? null : (short) ((id >> 4) & 0xfff);
+    @Override
+    public Short getInternalTypeId(BlockType blockType) {
+        return this.idsByBlock.containsKey(blockType) ? this.idsByBlock.get(blockType) : null;
     }
 
-    @Nullable
-    public BlockState getStateByIdAndData(int internalId, byte data) {
-        return this.getStateById((internalId & 0xfff) << 4 | (data & 0xf));
+    @Override
+    public BlockState getStateByInternalIdAndData(int internalId, byte data) {
+        return this.getStateByInternalId((internalId & 0xfff) << 4 | (data & 0xf));
     }
 
-    @Nullable
+    @Override
     public BlockState getStateByTypeAndData(BlockType blockType, byte data) {
-        return this.getStateById((this.getTypeId(blockType) & 0xfff) << 4 | (data & 0xf));
+        Short blockId = this.getInternalTypeId(blockType);
+        if (blockId == null) {
+            return null;
+        }
+        return this.getStateByInternalId((blockId & 0xfff) << 4 | (data & 0xf));
     }
 
-    @Nullable
+    @Override
     public Byte getStateData(BlockState blockState) {
-        Short id = this.getStateId(blockState);
-        return id == null ? null : (byte) (id & 0xf);
+        return this.idsByBlockState.containsKey(blockState) ? (byte) (this.idsByBlockState.get(blockState) & 0xf) : null;
     }
 }

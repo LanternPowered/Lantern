@@ -708,7 +708,7 @@ public class LanternChunk extends AbstractExtent implements Chunk {
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
-        this.setType(x, y, z, LanternBlocks.getStateId(block));
+        this.setType(x, y, z, LanternBlocks.reg().getInternalStateId(block));
     }
 
     private void checkAreaBounds(int x, int z) {
@@ -751,7 +751,7 @@ public class LanternChunk extends AbstractExtent implements Chunk {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return LanternBlocks.getStateById(this.getType(x, y, z));
+        return LanternBlocks.reg().getStateByInternalId(this.getType(x, y, z));
     }
 
     @Override

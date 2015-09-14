@@ -31,10 +31,10 @@ import com.google.common.collect.ImmutableTable;
 public class LanternBlockState implements BlockState {
 
     // A lookup table to get a specific state when you would change a value
-    protected ImmutableTable<BlockTrait<?>, Comparable<?>, BlockState> propertyValueTable;
+    ImmutableTable<BlockTrait<?>, Comparable<?>, BlockState> propertyValueTable;
 
     // The values for every attached trait
-    protected final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
+    final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
 
     // The base block state
     private final BlockStateBase baseState;
@@ -160,7 +160,7 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public boolean supports(Key<?> key) {
-        return key instanceof BlockTraitKey && this.traitValues.containsKey(((BlockTraitKey) key).getBlockTrait());
+        return key instanceof BlockTraitKey && this.supportsTrait(((BlockTraitKey) key).getBlockTrait());
     }
 
     @Override
@@ -191,22 +191,7 @@ public class LanternBlockState implements BlockState {
         if (!this.supports(key)) {
             return this;
         }
-
-        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
-        Object value = this.traitValues.get(blockTrait);
-        Iterator<?> it = blockTrait.getPossibleValues().iterator();
-
-        while (it.hasNext()) {
-            if (it.next() == value) {
-                if (it.hasNext()) {
-                    value = it.next();
-                } else {
-                    value = blockTrait.getPossibleValues().iterator().next();
-                }
-            }
-        }
-
-        return this.propertyValueTable.row(blockTrait).get(value);
+        return (BlockState) this.cycleTraitValue(((BlockTraitKey) key).getBlockTrait()).get();
     }
 
     @Override
@@ -225,6 +210,71 @@ public class LanternBlockState implements BlockState {
     public List<ImmutableDataManipulator<?, ?>> getContainers() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    /**
+     * Cycles to the next possible value of the block trait and returns
+     * the new block state. Will return absent if the block trait or
+     * the value isn't supported.
+     * 
+     * @param blockTrait the block trait
+     * @return the block state if successful
+     */
+    public <T extends Comparable<T>> Optional<BlockState> cycleTraitValue(BlockTrait<T> blockTrait) {
+        if (!this.supportsTrait(blockTrait)) {
+            return Optional.absent();
+        }
+
+        T value = (T) this.traitValues.get(blockTrait);
+        Iterator<T> it = blockTrait.getPossibleValues().iterator();
+
+        while (it.hasNext()) {
+            if (it.next() == value) {
+                if (it.hasNext()) {
+                    value = it.next();
+                } else {
+                    value = blockTrait.getPossibleValues().iterator().next();
+                }
+            }
+        }
+
+        return this.setTraitValue(blockTrait, value);
+    }
+
+    /**
+     * Attempts to set the trait value and gets the new block state. Will return absent
+     * if the block trait or the value isn't supported.
+     * 
+     * @param blockTrait the block trait
+     * @param value the value
+     * @return the new block state if successful
+     */
+    public <T extends Comparable<T>> Optional<BlockState> setTraitValue(BlockTrait<T> blockTrait, T value) {
+        if (!this.supportsTraitValue(blockTrait, value)) {
+            return Optional.absent();
+        }
+        return Optional.of(this.propertyValueTable.row(blockTrait).get(value));
+    }
+
+    /**
+     * Gets whether this block state the specified trait supports.
+     * 
+     * @param blockTrait the block trait
+     * @return whether the block trait is supported
+     */
+    public <T extends Comparable<T>> boolean supportsTrait(BlockTrait<T> blockTrait) {
+        return this.traitValues.containsKey(blockTrait);
+    }
+
+    /**
+     * Gets whether this block state the specified trait supports.
+     * 
+     * @param blockTrait the block trait
+     * @param value the value
+     * @return whether the block trait and value are supported
+     */
+    public <T extends Comparable<T>> boolean supportsTraitValue(BlockTrait<T> blockTrait, T value) {
+        return this.supportsTrait(blockTrait) && blockTrait.getPredicate().apply(value);
     }
 
     @Override

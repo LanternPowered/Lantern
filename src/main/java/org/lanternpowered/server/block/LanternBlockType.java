@@ -1,7 +1,6 @@
 package org.lanternpowered.server.block;
 
 import java.util.Collection;
-
 import org.lanternpowered.server.block.state.BlockStateBase;
 import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
 import org.spongepowered.api.block.BlockState;
@@ -16,7 +15,7 @@ import com.google.common.collect.Lists;
 public class LanternBlockType extends LanternSimpleCatalogType implements BlockType {
 
     // The block state base which contains all the possible block states
-    private final BlockStateBase blockStateBase;
+    final BlockStateBase blockStateBase;
     private final MaterialType materialType;
 
     private float emittedLight;

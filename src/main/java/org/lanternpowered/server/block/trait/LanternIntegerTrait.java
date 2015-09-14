@@ -8,7 +8,7 @@ import org.spongepowered.api.block.trait.IntegerTrait;
 
 import com.google.common.collect.ImmutableSet;
 
-public class LanternIntegerTrait extends LanternBlockTrait<Integer> implements IntegerTrait {
+public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implements IntegerTrait {
 
     private LanternIntegerTrait(String name, ImmutableSet<Integer> possibleValues) {
         super(name, Integer.class, possibleValues);

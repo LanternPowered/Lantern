@@ -60,7 +60,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             } else if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
                 // Only block types are allowed
                 if (itemType instanceof ItemBlock) {
-                    int id = LanternBlocks.getTypeId(((ItemBlock) itemType).getBlock());
+                    int id = LanternBlocks.reg().getInternalTypeId(((ItemBlock) itemType).getBlock());
                     int data = 0; // TODO: Retrieve data value from item stack
                     extraData = data << 12 | id;
                 }

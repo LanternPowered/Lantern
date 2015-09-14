@@ -35,7 +35,7 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
     public BlockState getBlock(int x, int y, int z) {
         this.checkRange(x, y, z);
         short blockState = this.blocks[this.getIndex(x, y, z)];
-        BlockState block = LanternBlocks.getStateById(blockState);
+        BlockState block = LanternBlocks.reg().getStateByInternalId(blockState);
         return block == null ? this.air : block;
     }
 

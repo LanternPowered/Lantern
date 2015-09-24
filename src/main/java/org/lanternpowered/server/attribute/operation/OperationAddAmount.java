@@ -4,8 +4,8 @@ import org.lanternpowered.server.attribute.LanternOperation;
 
 public class OperationAddAmount extends LanternOperation {
 
-    public OperationAddAmount(String identifier, String name, int priority) {
-        super(identifier, name, priority);
+    public OperationAddAmount(String name, int priority) {
+        super(name, priority);
     }
 
     @Override

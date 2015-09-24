@@ -57,11 +57,11 @@ public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> 
     }
 
     @Override
-    public void register(int internalId, BlockType blockType0) {
-        LanternBlockType blockType = (LanternBlockType) checkNotNull(blockType0, "blockType");
-        checkState(blockType.blockStateBase.getBlockStates().size() <= 1,
+    public void register(int internalId, BlockType blockType) {
+        LanternBlockType blockType0 = (LanternBlockType) checkNotNull(blockType, "blockType");
+        checkState(blockType0.blockStateBase.getBlockStates().size() <= 1,
                 "You cannot register a blockType with more then one state with this method.");
-        this.register(internalId, blockType, null);
+        this.register0(internalId, blockType0, null);
     }
 
     @Override

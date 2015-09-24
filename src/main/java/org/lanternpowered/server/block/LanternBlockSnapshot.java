@@ -6,6 +6,8 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.world.WeakWorldReference;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
@@ -21,33 +23,44 @@ import org.spongepowered.api.world.World;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableCollection;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.spongepowered.api.data.DataQuery.of;
 
 public class LanternBlockSnapshot implements BlockSnapshot {
 
-    private final Location<World> location;
+    @Nullable
+    private final WeakWorldReference world;
+    @Nullable
+    private final Vector3i position;
     private final BlockState state;
 
-    public LanternBlockSnapshot(@Nullable Location<World> location, BlockState blockState) {
+    public LanternBlockSnapshot(Location<World> location, BlockState blockState) {
+        this(new WeakWorldReference(checkNotNull(location, "location").getExtent()),
+                location.getBlockPosition(), blockState);
+    }
+
+    public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState) {
+        this(new WeakWorldReference(checkNotNull(worldUUID, "worldUUID")), position, blockState);
+    }
+
+    private LanternBlockSnapshot(WeakWorldReference world, Vector3i position,
+            BlockState blockState) {
         this.state = checkNotNull(blockState, "blockState");
-        this.location = location;
+        this.position = checkNotNull(position, "position");
+        this.world = world;
     }
 
     @Override
     public DataContainer toContainer() {
-        DataContainer container = new MemoryDataContainer();
-        if (this.location != null) {
-            container
-                .set(of("world"), this.location.getExtent().getName())
-                .set(of("x"), this.location.getX())
-                .set(of("y"), this.location.getY())
-                .set(of("z"), this.location.getZ());
-        }
-        container.set(of("state"), this.state);
-        return container;
+        return new MemoryDataContainer()
+            .set(Location.WORLD_ID, this.world.getUniqueId().toString())
+            .createView(DataQueries.SNAPSHOT_WORLD_POSITION)
+                .set(Location.POSITION_X, this.position.getX())
+                .set(Location.POSITION_Y, this.position.getY())
+                .set(Location.POSITION_Z, this.position.getZ())
+            .getContainer()
+            .set(DataQueries.BLOCK_STATE, this.state);
     }
 
     @Override
@@ -57,12 +70,19 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public LanternBlockSnapshot copy() {
-        return new LanternBlockSnapshot(this.location, this.state);
+        return new LanternBlockSnapshot(this.world == null ? null : this.world.copy(), this.position, this.state);
     }
 
     @Override
     public Optional<Location<World>> getLocation() {
-        return Optional.fromNullable(this.location);
+        if (this.world == null) {
+            return Optional.absent();
+        }
+        Optional<World> world = this.world.getWorld();
+        if (!world.isPresent()) {
+            return Optional.absent();
+        }
+        return Optional.of(new Location<>(world.get(), this.position));
     }
 
     @Override
@@ -199,20 +219,19 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public UUID getWorldUniqueId() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.world.getUniqueId();
     }
 
     @Override
     public Vector3i getPosition() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.position;
     }
 
     @Override
     public BlockSnapshot withLocation(Location<World> location) {
-        // TODO Auto-generated method stub
-        return null;
+        checkNotNull(location, "location");
+        return new LanternBlockSnapshot(new WeakWorldReference(location.getExtent()),
+                location.getBlockPosition(), this.state);
     }
 
     @Override

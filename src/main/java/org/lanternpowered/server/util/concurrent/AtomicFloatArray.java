@@ -200,7 +200,7 @@ public class AtomicFloatArray implements Serializable {
      * @param array the provided array
      * @return an array containing the values in the array
      */
-    public float[] getArray(float[] array) {
+    public final float[] getArray(float[] array) {
         int length = this.length();
         if (array == null || array.length != length) {
             array = new float[length];
@@ -219,7 +219,7 @@ public class AtomicFloatArray implements Serializable {
      *
      * @return the array
      */
-    public float[] getArray() {
+    public final float[] getArray() {
         return this.getArray(null);
     }
 

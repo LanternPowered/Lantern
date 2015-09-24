@@ -70,7 +70,7 @@ public class AtomicShortArray implements Serializable {
      *
      * @return the length
      */
-    public int length() {
+    public final int length() {
         return this.length;
     }
 
@@ -80,7 +80,7 @@ public class AtomicShortArray implements Serializable {
      * @param index the index
      * @return the element
      */
-    public short get(int index) {
+    public final short get(int index) {
         int packed = this.getPacked(index);
         return even(index) ? key1(packed) : key2(packed);
     }
@@ -92,7 +92,7 @@ public class AtomicShortArray implements Serializable {
      * @param value the new value
      * @return the old value
      */
-    public int getAndSet(int index, short value) {
+    public final int getAndSet(int index, short value) {
         boolean success = false;
         short odd = 0;
         short even = 0;
@@ -123,7 +123,7 @@ public class AtomicShortArray implements Serializable {
      * @param even the new value for the element at (index)
      * @param odd the new value for the element at (index + 1)
      */
-    public void set(int index, short even, short odd) {
+    public final void set(int index, short even, short odd) {
         if ((index & 0x1) != 0) {
             throw new IllegalArgumentException("When setting 2 elements at once, the index must be even!");
         }
@@ -138,7 +138,7 @@ public class AtomicShortArray implements Serializable {
      * @param newValue the new value
      * @return true on success
      */
-    public boolean compareAndSet(int index, short expected, short newValue) {
+    public final boolean compareAndSet(int index, short expected, short newValue) {
         boolean success = false;
         short odd = 0;
         short even = 0;
@@ -187,7 +187,7 @@ public class AtomicShortArray implements Serializable {
      * @param array the provided array
      * @return an array containing the values in the array
      */
-    public short[] getArray(short[] array) {
+    public final short[] getArray(short[] array) {
         if (array == null || array.length != this.length) {
             array = new short[this.length];
         }
@@ -207,7 +207,7 @@ public class AtomicShortArray implements Serializable {
      * @param index the index
      * @param value the new value
      */
-    public void set(int index, short value) {
+    public final void set(int index, short value) {
         this.getAndSet(index, value);
     }
 
@@ -217,7 +217,7 @@ public class AtomicShortArray implements Serializable {
      * @param index the index
      * @param value the new value
      */
-    public void lazySet(int index, short value) {
+    public final void lazySet(int index, short value) {
         this.set(index, value);
     }
 
@@ -229,7 +229,7 @@ public class AtomicShortArray implements Serializable {
      * @param newValue the new value
      * @return true on success
      */
-    public boolean weakCompareAndSet(int index, short expected, short newValue) {
+    public final boolean weakCompareAndSet(int index, short expected, short newValue) {
         return this.compareAndSet(index, expected, newValue);
     }
 
@@ -240,7 +240,7 @@ public class AtomicShortArray implements Serializable {
      * @param delta the delta to add to the element
      * @return the new value
      */
-    public short addAndGet(int index, short delta) {
+    public final short addAndGet(int index, short delta) {
         return this.addAndGet(index, delta, false);
     }
 
@@ -251,7 +251,7 @@ public class AtomicShortArray implements Serializable {
      * @param delta the delta to add to the element
      * @return the old value
      */
-    public short getAndAdd(int index, short delta) {
+    public final short getAndAdd(int index, short delta) {
         return this.addAndGet(index, delta, true);
     }
 
@@ -261,7 +261,7 @@ public class AtomicShortArray implements Serializable {
      * @param index the index
      * @return the old value
      */
-    public short getAndIncrement(int index) {
+    public final short getAndIncrement(int index) {
         return this.getAndAdd(index, (short) 1);
     }
 
@@ -271,7 +271,7 @@ public class AtomicShortArray implements Serializable {
      * @param index the index
      * @return the old value
      */
-    public short getAndDecrement(int index) {
+    public final short getAndDecrement(int index) {
         return this.getAndAdd(index, (short) -1);
     }
 
@@ -281,7 +281,7 @@ public class AtomicShortArray implements Serializable {
      * @param index the index
      * @return the new value
      */
-    public short incrementAndGet(int index) {
+    public final short incrementAndGet(int index) {
         return this.addAndGet(index, (short) 1);
     }
 
@@ -291,7 +291,7 @@ public class AtomicShortArray implements Serializable {
      * @param index the index
      * @return the new value
      */
-    public short decrementAndGet(int index) {
+    public final short decrementAndGet(int index) {
         return this.addAndGet(index, (short) -1);
     }
 
@@ -302,7 +302,7 @@ public class AtomicShortArray implements Serializable {
      *
      * @return the array
      */
-    public short[] getArray() {
+    public final short[] getArray() {
         return this.getArray(null);
     }
 

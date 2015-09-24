@@ -18,13 +18,20 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
     final BlockStateBase blockStateBase;
     private final MaterialType materialType;
 
-    private float emittedLight;
+    private float emittedLight = 0f;
 
+    private boolean fullBlock;
+    private boolean replaceable;
     private boolean tickRandomly;
     private boolean areStatisticsEnabled;
+    private boolean affectedByGravity;
 
     public LanternBlockType(String identifier, MaterialType materialType) {
         this(identifier, materialType, Lists.newArrayList());
+    }
+
+    public LanternBlockType(String identifier, MaterialType materialType, BlockTrait<?>... blockTraits) {
+        this(identifier, materialType, Lists.newArrayList(blockTraits));
     }
 
     public LanternBlockType(String identifier, MaterialType materialType, Iterable<BlockTrait<?>> blockTraits) {
@@ -35,6 +42,21 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
         // Sets the material type
         this.materialType = materialType;
+
+        // Non solid block should always be replaceable
+        this.replaceable = materialType != MaterialType.SOLID;
+    }
+
+    public void setFullBlock(boolean full) {
+        this.fullBlock = full;
+    }
+
+    public void setReplaceable(boolean replaceable) {
+        this.replaceable = replaceable;
+    }
+
+    public void setAffectedByGravity(boolean affected) {
+        this.affectedByGravity = affected;
     }
 
     @Override
@@ -73,8 +95,7 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
     @Override
     public boolean isSolidCube() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.materialType == MaterialType.SOLID && this.fullBlock;
     }
 
     @Override
@@ -84,8 +105,7 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
     @Override
     public boolean isAffectedByGravity() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.affectedByGravity;
     }
 
     @Override
@@ -106,8 +126,7 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
 
     @Override
     public boolean isReplaceable() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.replaceable;
     }
 
     @Override

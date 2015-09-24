@@ -1,5 +1,9 @@
 package org.lanternpowered.server.world.rules;
 
+import org.spongepowered.api.event.cause.Cause;
+
+import com.google.common.base.Optional;
+
 public interface GameRule {
 
     /**
@@ -14,41 +18,48 @@ public interface GameRule {
      * 
      * @param object the object
      */
-    <T> void setValue(T object);
+    <T> void set(T object);
+
+    /**
+     * Sets the value of the game rule with a specific cause.
+     * 
+     * @param object the object
+     * @param cause the cause
+     */
+    <T> void set(T object, Cause cause);
 
     /**
      * Gets the value of the game rule as a string.
      * 
      * @return the value
      */
-    String stringValue();
+    Optional<String> asString();
 
     /**
      * Gets the value of the game rule as a boolean.
      * 
      * @return the value
      */
-    boolean booleanValue();
+    Optional<Boolean> asBoolean();
 
     /**
      * Gets the value of the game rule as a double.
      * 
      * @return the value
      */
-    double doubleValue();
+    Optional<Double> asDouble();
 
     /**
      * Gets the value of the game rule as a float.
      * 
      * @return the value
      */
-    float floatValue();
+    Optional<Float> asFloat();
 
     /**
      * Gets the value of the game rule as a integer.
      * 
      * @return the value
      */
-    int intValue();
-
+    Optional<Integer> asInt();
 }

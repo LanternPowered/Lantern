@@ -253,7 +253,7 @@ public class LanternWorldProperties implements WorldProperties {
         if (!rule.isPresent()) {
             return Optional.absent();
         }
-        return Optional.of(rule.get().stringValue());
+        return rule.get().asString();
     }
 
     @Override
@@ -263,7 +263,7 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public void setGameRule(String gameRule, String value) {
-        this.rules.newRule(checkNotNull(gameRule, "gameRule")).setValue(value);
+        this.rules.newRule(checkNotNull(gameRule, "gameRule")).set(value);
     }
 
     @Override

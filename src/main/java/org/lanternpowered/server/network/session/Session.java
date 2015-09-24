@@ -26,7 +26,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.network.buf.LanternChannelBuf;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.MessageAsync;
+import org.lanternpowered.server.network.message.AsyncMessage;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
@@ -313,7 +313,7 @@ public class Session implements PlayerConnection {
      * @param message the message
      */
     public void messageReceived(Message message) {
-        if (message instanceof MessageAsync) {
+        if (message instanceof AsyncMessage) {
             this.handleMessage(this.getProtocol(), message);
         } else {
             this.messageQueue.add(message);

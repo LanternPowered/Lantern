@@ -2,7 +2,6 @@ package org.lanternpowered.server.game;
 
 import java.util.Map;
 
-import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Platform;
 
 import com.google.common.base.MoreObjects;
@@ -37,7 +36,7 @@ public class LanternPlatform implements Platform {
     }
 
     @Override
-    public MinecraftVersion getMinecraftVersion() {
+    public LanternMinecraftVersion getMinecraftVersion() {
         return LanternMinecraftVersion.CURRENT;
     }
 
@@ -55,5 +54,16 @@ public class LanternPlatform implements Platform {
     @Override
     public Type getExecutionType() {
         return Type.SERVER;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("type", this.getType())
+                .add("executionType", this.getExecutionType())
+                .add("version", this.getVersion())
+                .add("apiVersion", this.getApiVersion())
+                .add("minecraftVersion", this.getMinecraftVersion())
+                .toString();
     }
 }

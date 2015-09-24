@@ -61,6 +61,16 @@ public class LanternGameProfileResolver implements GameProfileResolver {
 
             });
 
+    /**
+     * Puts the game profile into the cache.
+     * 
+     * @param gameProfile the game profile
+     */
+    public void cacheProfile(GameProfile gameProfile) {
+        this.uuidByNameCache.put(gameProfile.getName(), gameProfile.getUniqueId());
+        this.profileCache.put(gameProfile.getUniqueId(), gameProfile);
+    }
+
     @Override
     public ListenableFuture<GameProfile> get(UUID uniqueId) {
         return this.get(uniqueId, true);

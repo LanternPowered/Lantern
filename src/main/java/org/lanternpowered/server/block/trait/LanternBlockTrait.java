@@ -18,10 +18,10 @@ public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T>
     private final String name;
 
     LanternBlockTrait(String name, Class<T> valueClass, ImmutableSet<T> possibleValues) {
-        this.key = new BlockTraitKey(this, valueClass, Value.class);
         this.possibleValues = possibleValues;
         this.valueClass = valueClass;
         this.name = name;
+        this.key = new BlockTraitKey(this, valueClass, Value.class);
     }
 
     /**

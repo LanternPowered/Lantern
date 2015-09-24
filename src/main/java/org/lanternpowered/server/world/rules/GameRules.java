@@ -24,46 +24,6 @@ public interface GameRules {
     Optional<GameRule> getRule(String name);
 
     /**
-     * Gets the value of the game rule as a string.
-     * 
-     * @param name the name
-     * @return the value
-     */
-    Optional<String> asString(String name);
-
-    /**
-     * Gets the value of the game rule as a boolean.
-     * 
-     * @param name the name
-     * @return the value
-     */
-    boolean asBoolean(String name);
-
-    /**
-     * Gets the value of the game rule as a double.
-     * 
-     * @param name the name
-     * @return the value
-     */
-    double asDouble(String name);
-
-    /**
-     * Gets the value of the game rule as a float.
-     * 
-     * @param name the name
-     * @return the value
-     */
-    float asFloat(String name);
-
-    /**
-     * Gets the value of the game rule as a integer.
-     * 
-     * @param name the name
-     * @return the value
-     */
-    int asInteger(String name);
-
-    /**
      * Gets the game rules.
      * 
      * @return the rules

@@ -15,6 +15,8 @@ import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class LanternWorldManager {
@@ -106,9 +108,25 @@ public class LanternWorldManager {
         }
     }
 
+    public LanternWorld addWorld(LanternWorld world) {
+        final WorldEntry entry = new WorldEntry(world);
+        this.worlds.add(entry);
+        try {
+            entry.thread = new WorldThread(world);
+            this.tickBegin.register();
+            this.tickEnd.register();
+            entry.thread.start();
+            return world;
+        } catch (Throwable t) {
+            this.tickBegin.arriveAndDeregister();
+            this.tickEnd.arriveAndDeregister();
+            this.worlds.remove(entry);
+            return null;
+        }
+    }
+
     public Collection<World> getWorlds() {
-        // TODO Auto-generated method stub
-        return null;
+        return ImmutableList.copyOf(Collections2.transform(this.worlds, entry -> entry.world));
     }
 
     public Collection<WorldProperties> getUnloadedWorlds() {

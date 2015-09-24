@@ -1,14 +1,14 @@
 package org.lanternpowered.server.world.rules;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.Coerce;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,47 +34,14 @@ public class LanternGameRules implements GameRules {
     }
 
     @Override
-    public Optional<String> asString(String name) {
-        if (this.rules.containsKey(checkNotNull(name, "name"))) {
-            return Optional.of(this.rules.get(name).value);
-        } else {
-            return Optional.absent();
-        }
-    }
-
-    @Override
-    public boolean asBoolean(String name) {
-        return this.rules.containsKey(checkNotNull(name, "name")) ? this.rules.get(name).booleanValue() : false;
-    }
-
-    @Override
-    public double asDouble(String name) {
-        return this.rules.containsKey(checkNotNull(name, "name")) ? this.rules.get(name).doubleValue() : 0;
-    }
-
-    @Override
-    public float asFloat(String name) {
-        return this.rules.containsKey(checkNotNull(name, "name")) ? this.rules.get(name).floatValue() : 0;
-    }
-
-    @Override
-    public int asInteger(String name) {
-        return this.rules.containsKey(checkNotNull(name, "name")) ? this.rules.get(name).intValue() : 0;
-    }
-
-    @Override
     public Map<String, String> getValues() {
-        return Collections.unmodifiableMap(Maps.transformValues(this.rules, new Function<LanternGameRule, String>() {
-            @Override
-            public String apply(LanternGameRule input) {
-                return input.value;
-            }
-        }));
+        return Collections.unmodifiableMap(Maps.transformValues(this.rules,
+                rule -> rule.value == null ? "" : rule.value));
     }
 
     @Override
     public List<GameRule> getRules() {
-        return Collections.unmodifiableList(new ArrayList<>(this.rules.values()));
+        return ImmutableList.<GameRule>copyOf(this.rules.values());
     }
 
     protected LanternGameRule createGameRule(String name) {
@@ -86,7 +53,7 @@ public class LanternGameRules implements GameRules {
         private final String name;
 
         // The value of the game rule
-        protected String value = "";
+        protected String value;
 
         // Optional possible types
         protected Boolean valueBoolean = false;
@@ -102,36 +69,46 @@ public class LanternGameRules implements GameRules {
         }
 
         @Override
-        public <T> void setValue(T object) {
-            checkNotNull(object, "object");
-            this.value = Coerce.toString(object);
-            this.valueBoolean = Coerce.toBoolean(this.value);
-            this.valueNumber = Coerce.toDouble(this.value);
+        public <T> void set(T object) {
+            this.set(object, Cause.empty());
         }
 
         @Override
-        public String stringValue() {
-            return this.value;
+        public <T> void set(T object, Cause cause) {
+            if (object == null) {
+                this.value = null;
+                this.valueBoolean = null;
+                this.valueNumber = null;
+            } else {
+                this.value = Coerce.asString(object).get();
+                this.valueBoolean = Coerce.asBoolean(object).orNull();
+                this.valueNumber = Coerce.asDouble(object).orNull();
+            }
         }
 
         @Override
-        public boolean booleanValue() {
-            return this.valueBoolean;
+        public Optional<String> asString() {
+            return Optional.fromNullable(this.value);
         }
 
         @Override
-        public double doubleValue() {
-            return this.valueNumber.doubleValue();
+        public Optional<Boolean> asBoolean() {
+            return Optional.fromNullable(this.valueBoolean);
         }
 
         @Override
-        public float floatValue() {
-            return this.valueNumber.floatValue();
+        public Optional<Double> asDouble() {
+            return this.valueNumber == null ? Optional.absent() : Optional.of(this.valueNumber.doubleValue());
         }
 
         @Override
-        public int intValue() {
-            return this.valueNumber.intValue();
+        public Optional<Float> asFloat() {
+            return this.valueNumber == null ? Optional.absent() : Optional.of(this.valueNumber.floatValue());
+        }
+
+        @Override
+        public Optional<Integer> asInt() {
+            return this.valueNumber == null ? Optional.absent() : Optional.of(this.valueNumber.intValue());
         }
     }
 

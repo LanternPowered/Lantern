@@ -1,8 +1,11 @@
 package org.lanternpowered.server.world.rules;
 
+import java.util.Objects;
+
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.ChangeWorldGameRuleEvent;
 
 public class LanternWorldGameRules extends LanternGameRules {
@@ -18,16 +21,14 @@ public class LanternWorldGameRules extends LanternGameRules {
         return new LanternGameRule(name) {
 
             @Override
-            public <T> void setValue(T object) {
+            public <T> void set(T object, Cause cause) {
                 String oldValue = this.value;
-                super.setValue(object);
-                /*
-                if (!this.value.equals(oldValue)) {
-                    ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(game, cause, originalValue, oldValue, name, targetWorld)
-                            LanternGame.get(), this.getName(), oldValue, world, this.value);
+                super.set(object);
+                if (!Objects.equals(this.value, oldValue)) {
+                    ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(LanternGame.get(),
+                            cause, oldValue == null ? "" : oldValue, this.value == null ? "" : this.value, name, world);
                     LanternGame.get().getEventManager().post(event);
                 }
-                */
             }
         };
     }

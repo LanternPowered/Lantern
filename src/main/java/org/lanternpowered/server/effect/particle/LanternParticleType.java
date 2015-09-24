@@ -11,7 +11,7 @@ public class LanternParticleType extends LanternSimpleCatalogType implements Par
     private final boolean hasMotion;
     private final int internalId;
 
-    public LanternParticleType(String identifier, int internalId, boolean hasMotion) {
+    public LanternParticleType(int internalId, String identifier, boolean hasMotion) {
         super(identifier);
         this.internalId = internalId;
         this.hasMotion = hasMotion;
@@ -30,8 +30,8 @@ public class LanternParticleType extends LanternSimpleCatalogType implements Par
 
         private final ItemStack defaultItem;
 
-        public Material(String name, int internalId, boolean hasMotion, ItemStack defaultItem) {
-            super(name, internalId, hasMotion);
+        public Material(int internalId, String name, boolean hasMotion, ItemStack defaultItem) {
+            super(internalId, name, hasMotion);
             this.defaultItem = defaultItem;
         }
 
@@ -45,8 +45,8 @@ public class LanternParticleType extends LanternSimpleCatalogType implements Par
 
         private final Color defaultColor;
 
-        public Colorable(String name, int internalId, boolean hasMotion, Color defaultColor) {
-            super(name, internalId, hasMotion);
+        public Colorable(int internalId, String name, boolean hasMotion, Color defaultColor) {
+            super(internalId, name, hasMotion);
             this.defaultColor = defaultColor;
         }
 
@@ -60,8 +60,8 @@ public class LanternParticleType extends LanternSimpleCatalogType implements Par
 
         private final float defaultSize;
 
-        public Resizable(String name, int internalId, boolean hasMotion, float defaultSize) {
-            super(name, internalId, hasMotion);
+        public Resizable(int internalId, String name, boolean hasMotion, float defaultSize) {
+            super(internalId, name, hasMotion);
             this.defaultSize = defaultSize;
         }
 
@@ -75,8 +75,8 @@ public class LanternParticleType extends LanternSimpleCatalogType implements Par
 
         private final float defaultNote;
 
-        public Note(String name, int internalId, boolean hasMotion, float defaultNote) {
-            super(name, internalId, hasMotion);
+        public Note(int internalId, String name, boolean hasMotion, float defaultNote) {
+            super(internalId, name, hasMotion);
             this.defaultNote = defaultNote;
         }
 

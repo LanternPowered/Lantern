@@ -22,8 +22,9 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
 
         if (content.length < 16777136) {
             output.add(message);
+        // Support the multi part messages of forge, but only if the client supports it
         } else {
-            boolean enabled = context.channel().attr(ProcessorPlayInChannelPayload.FML_MULTI_PART_MESSAGE_ENABLED).get();
+            boolean enabled = context.channel().attr(ProcessorPlayInChannelPayload.FML_ENABLED).get();
             if (!enabled) {
                 throw new CodecException("Payload may not be larger than 16777135 bytes.");
             }
@@ -53,7 +54,7 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
 
         @Override
         public int generate(CodecContext context, MessagePlayInOutChannelPayload message) {
-            return context.channel().attr(ProcessorPlayInChannelPayload.FML_MULTI_PART_MESSAGE_ENABLED).get() ? 1 : 0;
+            return context.channel().attr(ProcessorPlayInChannelPayload.FML_ENABLED).get() ? 1 : 0;
         }
     }
 }

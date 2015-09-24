@@ -21,8 +21,16 @@ import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder;
 import org.lanternpowered.server.block.LanternBlockRegistry;
+import org.lanternpowered.server.block.LanternBlockStateBuilder;
+import org.lanternpowered.server.block.type.BlockAir;
+import org.lanternpowered.server.block.type.BlockBedrock;
+import org.lanternpowered.server.block.type.BlockDirt;
+import org.lanternpowered.server.block.type.BlockGrass;
+import org.lanternpowered.server.block.type.BlockStone;
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
+import org.lanternpowered.server.data.type.LanternDirtType;
+import org.lanternpowered.server.data.type.LanternDirtTypes;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
 import org.lanternpowered.server.data.type.LanternDoublePlantTypes;
 import org.lanternpowered.server.data.type.LanternNotePitch;
@@ -30,8 +38,13 @@ import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPlantTypes;
 import org.lanternpowered.server.data.type.LanternShrubType;
 import org.lanternpowered.server.data.type.LanternShrubTypes;
+import org.lanternpowered.server.data.type.LanternStoneType;
+import org.lanternpowered.server.data.type.LanternStoneTypes;
+import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
+import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.LanternItemRegistry;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.status.LanternFavicon;
@@ -67,10 +80,13 @@ import org.spongepowered.api.attribute.Attributes;
 import org.spongepowered.api.block.BlockSnapshotBuilder;
 import org.spongepowered.api.block.BlockStateBuilder;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.ImmutableDataRegistry;
 import org.spongepowered.api.data.manipulator.DataManipulatorRegistry;
 import org.spongepowered.api.data.type.Career;
+import org.spongepowered.api.data.type.DirtType;
+import org.spongepowered.api.data.type.DirtTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.NotePitch;
@@ -80,9 +96,11 @@ import org.spongepowered.api.data.type.PlantTypes;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
+import org.spongepowered.api.data.type.StoneType;
+import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.value.ValueBuilder;
-import org.spongepowered.api.effect.particle.ParticleEffectBuilder;
 import org.spongepowered.api.effect.particle.ParticleType;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.EntitySnapshotBuilder;
@@ -193,6 +211,9 @@ public class LanternGameRegistry implements GameRegistry {
     private final CatalogTypeRegistry<DoublePlantType> doublePlantTypeRegistry = new LanternCatalogTypeRegistry<DoublePlantType>();
     private final CatalogTypeRegistry<PlantType> plantTypeRegistry = new LanternCatalogTypeRegistry<PlantType>();
     private final CatalogTypeRegistry<SelectorType> selectorTypeRegistry = new LanternCatalogTypeRegistry<SelectorType>();
+    private final CatalogTypeRegistry<DirtType> dirtTypeRegistry = new LanternCatalogTypeRegistry<DirtType>();
+    private final CatalogTypeRegistry<StoneType> stoneTypeRegistry = new LanternCatalogTypeRegistry<StoneType>();
+    private final CatalogTypeRegistry<ParticleType> particleTypeRegistry = new LanternCatalogTypeRegistry<ParticleType>();
     private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
             .put(Attribute.class, this.attributeRegistry)
             .put(BiomeType.class, this.biomeRegistry)
@@ -214,6 +235,9 @@ public class LanternGameRegistry implements GameRegistry {
             .put(PlantType.class, this.plantTypeRegistry)
             .put(WorldGeneratorModifier.class, this.worldGeneratorModifierRegistry)
             .put(SelectorType.class, this.selectorTypeRegistry)
+            .put(DirtType.class, this.dirtTypeRegistry)
+            .put(StoneType.class, this.stoneTypeRegistry)
+            .put(ParticleType.class, this.particleTypeRegistry)
             .build();
 
     {
@@ -241,6 +265,7 @@ public class LanternGameRegistry implements GameRegistry {
             throw new IllegalStateException("You can only register the game objects once!");
         }
         this.registered = true;
+        this.registerParticleTypes();
         this.registerTextFactory();
         this.registerTextStyles();
         this.registerTextColors();
@@ -249,6 +274,8 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerShrubTypes();
         this.registerPlantTypes();
         this.registerDoublePlantTypes();
+        this.registerDirtTypes();
+        this.registerStoneTypes();
         this.registerNotePitches();
         this.registerGeneratorTypes();
         this.registerDimensionTypes();
@@ -257,6 +284,57 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerRotations();
         this.registerAttributes();
         this.registerSelectors();
+        this.registerBlockTypes();
+    }
+
+    private void registerParticleTypes() {
+        Map<String, ParticleType> mappings = Maps.newHashMap();
+        mappings.put("explosion_normal", new LanternParticleType(0, "explode", true));
+        mappings.put("explosion_large", new LanternParticleType.Resizable(1, "largeexplode", false, 1f));
+        mappings.put("explosion_huge", new LanternParticleType(2, "hugeexplosion", false));
+        mappings.put("fireworks_spark", new LanternParticleType(3, "fireworksSpark", true));
+        mappings.put("water_bubble", new LanternParticleType(4, "bubble", true));
+        mappings.put("water_splash", new LanternParticleType(5, "splash", true));
+        mappings.put("water_wake", new LanternParticleType(6, "wake", true));
+        mappings.put("suspended", new LanternParticleType(7, "suspended", false));
+        mappings.put("suspended_depth", new LanternParticleType(8, "depthsuspend", false));
+        mappings.put("crit", new LanternParticleType(9, "crit", true));
+        mappings.put("crit_magic", new LanternParticleType(10, "magicCrit", true));
+        mappings.put("smoke_normal", new LanternParticleType(11, "smoke", true));
+        mappings.put("smoke_large", new LanternParticleType(12, "largesmoke", true));
+        mappings.put("spell", new LanternParticleType(13, "spell", false));
+        mappings.put("spell_instant", new LanternParticleType(14, "instantSpell", false));
+        mappings.put("spell_mob", new LanternParticleType.Colorable(15, "mobSpell", false, Color.BLACK));
+        mappings.put("spell_mob_ambient", new LanternParticleType.Colorable(16, "mobSpellAmbient", false, Color.BLACK));
+        mappings.put("spell_witch", new LanternParticleType(17, "witchMagic", false));
+        mappings.put("drip_water", new LanternParticleType(18, "dripWater", false));
+        mappings.put("drip_lava", new LanternParticleType(19, "dripLava", false));
+        mappings.put("villager_angry", new LanternParticleType(20, "angryVillager", false));
+        mappings.put("villager_happy", new LanternParticleType(21, "happyVillager", true));
+        mappings.put("town_aura", new LanternParticleType(22, "townaura", true));
+        mappings.put("note", new LanternParticleType.Note(23, "note", false, 0f));
+        mappings.put("portal", new LanternParticleType(24, "portal", true));
+        mappings.put("enchantment_table", new LanternParticleType(25, "enchantmenttable", true));
+        mappings.put("flame", new LanternParticleType(26, "flame", true));
+        mappings.put("lava", new LanternParticleType(27, "lava", false));
+        mappings.put("footstep", new LanternParticleType(28, "footstep", false));
+        mappings.put("cloud", new LanternParticleType(29, "cloud", true));
+        mappings.put("redstone", new LanternParticleType.Colorable(30, "reddust", false, Color.RED));
+        mappings.put("snowball", new LanternParticleType(31, "snowballpoof", false));
+        mappings.put("snow_shovel", new LanternParticleType(32, "snowshovel", true));
+        mappings.put("slime", new LanternParticleType(33, "slime", false));
+        mappings.put("heart", new LanternParticleType(34, "heart", false));
+        mappings.put("barrier", new LanternParticleType(35, "barrier", false));
+        mappings.put("item_crack", new LanternParticleType.Material(36, "iconcrack", true, new LanternItemStack(BlockTypes.STONE)));
+        mappings.put("block_crack", new LanternParticleType.Material(37, "blockcrack", true, new LanternItemStack(BlockTypes.STONE)));
+        mappings.put("block_dust", new LanternParticleType.Material(38, "blockdust", true, new LanternItemStack(BlockTypes.STONE)));
+        mappings.put("water_drop", new LanternParticleType(39, "droplet", false));
+        mappings.put("item_take", new LanternParticleType(40, "take", false));
+        mappings.put("mob_appearance", new LanternParticleType(41, "mobappearance", false));
+        for (ParticleType particleType : mappings.values()) {
+            this.particleTypeRegistry.register(particleType);
+        }
+        RegistryHelper.mapFields(ParticleTypes.class, this.particleTypeRegistry.getDelegateMap());
     }
 
     private void registerPlantTypes() {
@@ -271,6 +349,20 @@ public class LanternGameRegistry implements GameRegistry {
             this.doublePlantTypeRegistry.register(type);
         }
         RegistryHelper.mapFields(DoublePlantTypes.class, this.doublePlantTypeRegistry.getDelegateMap());
+    }
+
+    private void registerStoneTypes() {
+        for (LanternStoneType type : LanternStoneTypes.values()) {
+            this.stoneTypeRegistry.register(type);
+        }
+        RegistryHelper.mapFields(StoneTypes.class, this.stoneTypeRegistry.getDelegateMap());
+    }
+
+    private void registerDirtTypes() {
+        for (LanternDirtType type : LanternDirtTypes.values()) {
+            this.dirtTypeRegistry.register(type);
+        }
+        RegistryHelper.mapFields(DirtTypes.class, this.dirtTypeRegistry.getDelegateMap());
     }
 
     private void registerShrubTypes() {
@@ -306,6 +398,8 @@ public class LanternGameRegistry implements GameRegistry {
                 "generic.followRange", 32.0D, 0.0D, 2048.0D, LanternAttribute.Target.LIVING));
         mappings.put("GENERIC_ATTACK_DAMAGE", this.registerDefaultAttribute(
                 "generic.attackDamage", 2.0D, 0.0D, Double.MAX_VALUE, LanternAttribute.Target.LIVING));
+        mappings.put("GENERIC_ATTACK_SPEED", this.registerDefaultAttribute(
+                "generic.attackSpeed", 4.0, 0.0, 1024.0D, LanternAttribute.Target.LIVING));
         mappings.put("GENERIC_KNOCKBACK_RESISTANCE", this.registerDefaultAttribute(
                 "generic.knockbackResistance", 0.0D, 0.0D, 1.0D, LanternAttribute.Target.LIVING));
         mappings.put("GENERIC_MOVEMENT_SPEED", this.registerDefaultAttribute(
@@ -375,6 +469,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.textColorRegistry.register(new LanternTextColor("yellow", new Color(0xFFFF55)));
         this.textColorRegistry.register(new LanternTextColor("white", Color.WHITE));
         this.textColorRegistry.register(new LanternTextColor("reset", Color.WHITE));
+        this.textColorRegistry.register(TextColors.NONE);
         RegistryHelper.mapFields(TextColors.class, this.textColorRegistry.getDelegateMap());
     }
 
@@ -744,6 +839,23 @@ public class LanternGameRegistry implements GameRegistry {
         }
     }
 
+    private void registerBlockTypes() {
+        this.blockRegistry.register(0, new BlockAir("minecraft:air"));
+        this.blockRegistry.register(1, new BlockStone("minecraft:stone"),
+                state -> state.getTraitValue(BlockStone.TYPE).get().getInternalId());
+        this.blockRegistry.register(2, new BlockGrass("minecraft:grass"));
+        this.blockRegistry.register(3, new BlockDirt("minecraft:dirt"),
+                state -> state.getTraitValue(BlockDirt.TYPE).get().getInternalId());
+        this.blockRegistry.register(7, new BlockBedrock("minecraft:bedrock"));
+
+        Map<String, BlockType> mappings = Maps.newHashMap();
+        for (BlockType blockType : this.blockRegistry.getAll()) {
+            String id = blockType.getId();
+            mappings.put(id.replaceFirst("minecraft:", ""), blockType);
+        }
+        RegistryHelper.mapFields(BlockTypes.class, mappings);
+    }
+
     /**
      * Gets the {@link CatalogTypeRegistry<WorldGeneratorModifier>}.
      * 
@@ -1073,9 +1185,18 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public ParticleEffectBuilder createParticleEffectBuilder(ParticleType particle) {
-        // TODO Auto-generated method stub
-        return null;
+    public LanternParticleEffectBuilder createParticleEffectBuilder(ParticleType particle) {
+        if (particle instanceof ParticleType.Colorable) {
+            return new LanternParticleEffectBuilder.Colorable(particle);
+        } else if (particle instanceof ParticleType.Material) {
+            return new LanternParticleEffectBuilder.Material(particle);
+        } else if (particle instanceof ParticleType.Note) {
+            return new LanternParticleEffectBuilder.Note(particle);
+        } else if (particle instanceof ParticleType.Resizable) {
+            return new LanternParticleEffectBuilder.Resizable(particle);
+        } else {
+            return new LanternParticleEffectBuilder(particle);
+        }
     }
 
     @Override
@@ -1091,8 +1212,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public BlockStateBuilder createBlockStateBuilder() {
-        // TODO Auto-generated method stub
-        return null;
+        return new LanternBlockStateBuilder();
     }
 
     @Override

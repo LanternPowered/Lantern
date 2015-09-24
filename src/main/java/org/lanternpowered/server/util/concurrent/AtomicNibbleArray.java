@@ -126,7 +126,7 @@ public class AtomicNibbleArray implements Serializable {
      *
      * @return the length
      */
-    public int length() {
+    public final int length() {
         return this.length;
     }
 
@@ -136,7 +136,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param index the index
      * @return the element
      */
-    public byte get(int index) {
+    public final byte get(int index) {
         return key(this.getPacked(index), index & INDEX_BITS);
     }
 
@@ -147,7 +147,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param value the new value
      * @return the old value
      */
-    public byte getAndSet(int index, byte value) {
+    public final byte getAndSet(int index, byte value) {
         boolean success = false;
         byte oldValue = 0;
         int backingIndex = index >> INDEX_BITS;
@@ -169,7 +169,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param newValue the new value
      * @return true on success
      */
-    public boolean compareAndSet(int index, byte expected, byte newValue) {
+    public final boolean compareAndSet(int index, byte expected, byte newValue) {
         boolean success = false;
         byte oldValue = 0;
         int backingIndex = index >> INDEX_BITS;
@@ -208,7 +208,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param array the provided array
      * @return an array containing the values in the array
      */
-    public byte[] getArray(byte[] array) {
+    public final byte[] getArray(byte[] array) {
         if (array == null || array.length != this.length) {
             array = new byte[this.length];
         }
@@ -230,7 +230,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param index the index
      * @param value the new value
      */
-    public void set(int index, byte value) {
+    public final void set(int index, byte value) {
         this.getAndSet(index, value);
     }
 
@@ -240,7 +240,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param index the index
      * @param value the new value
      */
-    public void lazySet(int index, byte value) {
+    public final void lazySet(int index, byte value) {
         this.set(index, value);
     }
 
@@ -252,7 +252,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param newValue the new value
      * @return true on success
      */
-    public boolean weakCompareAndSet(int index, byte expected, byte newValue) {
+    public final boolean weakCompareAndSet(int index, byte expected, byte newValue) {
         return this.compareAndSet(index, expected, newValue);
     }
 
@@ -263,7 +263,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param delta the delta to add to the element
      * @return the new value
      */
-    public byte addAndGet(int index, byte delta) {
+    public final byte addAndGet(int index, byte delta) {
         return this.addAndGet(index, delta, false);
     }
 
@@ -274,7 +274,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param delta the delta to add to the element
      * @return the old value
      */
-    public byte getAndAdd(int index, byte delta) {
+    public final byte getAndAdd(int index, byte delta) {
         return this.addAndGet(index, delta, true);
     }
 
@@ -284,7 +284,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param index the index
      * @return the old value
      */
-    public byte getAndIncrement(int index) {
+    public final byte getAndIncrement(int index) {
         return this.getAndAdd(index, (byte) 1);
     }
 
@@ -294,7 +294,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param index the index
      * @return the old value
      */
-    public byte getAndDecrement(int index) {
+    public final byte getAndDecrement(int index) {
         return this.getAndAdd(index, (byte) -1);
     }
 
@@ -304,7 +304,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param index the index
      * @return the new value
      */
-    public byte incrementAndGet(int index) {
+    public final byte incrementAndGet(int index) {
         return this.addAndGet(index, (byte) 1);
     }
 
@@ -314,7 +314,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param index the index
      * @return the new value
      */
-    public byte decrementAndGet(int index) {
+    public final byte decrementAndGet(int index) {
         return this.addAndGet(index, (byte) -1);
     }
 
@@ -325,7 +325,7 @@ public class AtomicNibbleArray implements Serializable {
      *
      * @return the array
      */
-    public byte[] getArray() {
+    public final byte[] getArray() {
         return this.getArray(null);
     }
 
@@ -343,7 +343,7 @@ public class AtomicNibbleArray implements Serializable {
      * @param array the provided array
      * @return an array containing the values in the array
      */
-    public byte[] getPackedArray(byte[] array) {
+    public final byte[] getPackedArray(byte[] array) {
         int length0 = this.length >> 1; 
         if (array == null || array.length != length0) {
             array = new byte[length0];
@@ -375,7 +375,7 @@ public class AtomicNibbleArray implements Serializable {
     *
     * @return an array containing the values in the array
     */
-   public byte[] getPackedArray() {
+   public final byte[] getPackedArray() {
        return this.getPackedArray(null);
    }
 

@@ -4,8 +4,8 @@ import org.lanternpowered.server.attribute.LanternOperation;
 
 public class OperationMultiply extends LanternOperation {
 
-    public OperationMultiply(String identifier, String name, int priority) {
-        super(identifier, name, priority);
+    public OperationMultiply(String name, int priority) {
+        super(name, priority);
     }
 
     @Override
@@ -17,5 +17,4 @@ public class OperationMultiply extends LanternOperation {
     public boolean changeValueImmediately() {
         return false;
     }
-
 }

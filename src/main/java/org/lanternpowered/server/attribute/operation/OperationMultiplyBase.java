@@ -4,8 +4,8 @@ import org.lanternpowered.server.attribute.LanternOperation;
 
 public class OperationMultiplyBase extends LanternOperation {
 
-    public OperationMultiplyBase(String identifier, String name, int priority) {
-        super(identifier, name, priority);
+    public OperationMultiplyBase(String name, int priority) {
+        super(name, priority);
     }
 
     @Override

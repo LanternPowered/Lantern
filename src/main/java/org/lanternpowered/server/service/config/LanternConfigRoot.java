@@ -33,7 +33,7 @@ public class LanternConfigRoot implements ConfigRoot {
     @Override
     public ConfigurationLoader<CommentedConfigurationNode> getConfig() {
         return HoconConfigurationLoader.builder()
-                .setFile(getConfigFile())
+                .setFile(this.getConfigFile())
                 .build();
     }
 

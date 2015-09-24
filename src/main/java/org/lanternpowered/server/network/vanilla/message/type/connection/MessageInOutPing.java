@@ -1,8 +1,8 @@
 package org.lanternpowered.server.network.vanilla.message.type.connection;
 
-import org.lanternpowered.server.network.message.MessageAsync;
+import org.lanternpowered.server.network.message.AsyncMessage;
 
-public final class MessageInOutPing implements MessageAsync {
+public final class MessageInOutPing implements AsyncMessage {
 
     private final int id;
 

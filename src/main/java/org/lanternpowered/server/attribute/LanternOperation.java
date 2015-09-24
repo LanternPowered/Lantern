@@ -1,17 +1,17 @@
 package org.lanternpowered.server.attribute;
 
-import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
 import org.spongepowered.api.attribute.Operation;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public abstract class LanternOperation extends LanternCatalogType implements Operation {
+public abstract class LanternOperation extends LanternSimpleCatalogType implements Operation {
 
     // The priority of the operation
     private final int priority;
 
-    public LanternOperation(String identifier, String name, int priority) {
-        super(identifier, name);
+    public LanternOperation(String name, int priority) {
+        super(name);
 
         checkArgument(priority >= 0, "priority may not be negative");
         this.priority = priority;
@@ -19,6 +19,10 @@ public abstract class LanternOperation extends LanternCatalogType implements Ope
 
     @Override
     public int compareTo(Operation operation) {
-        return this.priority - ((LanternOperation) operation).priority;
+        if (operation instanceof LanternOperation) {
+            return this.priority - ((LanternOperation) operation).priority;
+        }
+        // TODO: How will we handle custom (plugin) operations?
+        return operation.compareTo(this);
     }
 }

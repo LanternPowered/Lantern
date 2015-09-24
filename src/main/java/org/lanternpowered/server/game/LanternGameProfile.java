@@ -1,5 +1,8 @@
 package org.lanternpowered.server.game;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -14,12 +17,16 @@ import org.spongepowered.api.service.persistence.DataBuilder;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
-public class LanternGameProfile implements GameProfile {
+public final class LanternGameProfile implements GameProfile {
 
     private static final DataQuery NAME = DataQuery.of("Name");
     private static final DataQuery UNIQUE_ID = DataQuery.of("UniqueId");
+    private static final DataQuery PROPERTIES = DataQuery.of("Properties");
+    private static final DataQuery VALUE = DataQuery.of("Value");
+    private static final DataQuery SIGNATURE = DataQuery.of("Signature");
 
     private final List<Property> properties;
     private final UUID uniqueId;
@@ -30,9 +37,9 @@ public class LanternGameProfile implements GameProfile {
     }
 
     public LanternGameProfile(UUID uniqueId, String name, List<Property> properties) {
-        this.properties = properties;
-        this.uniqueId = uniqueId;
-        this.name = name;
+        this.properties = Lists.newArrayList(checkNotNull(properties, "properties"));
+        this.uniqueId = checkNotNull(uniqueId, "uniqueId");
+        this.name = checkNotNullOrEmpty(name, "name");
     }
 
     @Override
@@ -42,9 +49,23 @@ public class LanternGameProfile implements GameProfile {
 
     @Override
     public DataContainer toContainer() {
-        return new MemoryDataContainer()
+        DataContainer container = new MemoryDataContainer()
                 .set(NAME, this.name)
                 .set(UNIQUE_ID, this.uniqueId.toString());
+        if (!this.properties.isEmpty()) {
+            List<DataContainer> list = Lists.newArrayListWithCapacity(this.properties.size());
+            for (Property property : this.properties) {
+                DataContainer entry = new MemoryDataContainer()
+                       .set(NAME, property.name)
+                       .set(VALUE, property.value);
+                if (property.signature != null) {
+                    entry.set(SIGNATURE, property.signature);
+                }
+                list.add(entry);
+            }
+            container.set(PROPERTIES, list);
+        }
+        return container;
     }
 
     @Override
@@ -53,7 +74,7 @@ public class LanternGameProfile implements GameProfile {
     }
 
     public List<Property> getProperties() {
-        return this.properties;
+        return ImmutableList.copyOf(this.properties);
     }
 
     public static class LanternDataBuilder implements DataBuilder<GameProfile> {
@@ -75,11 +96,24 @@ public class LanternGameProfile implements GameProfile {
             if (name == null) {
                 throw new InvalidDataException("Name is missing!");
             }
-            return Optional.<GameProfile>of(new LanternGameProfile(uniqueId0, name));
+            List<DataView> views = container.getViewList(PROPERTIES).orNull();
+            List<Property> properties;
+            if (views != null && !views.isEmpty()) {
+                properties = Lists.newArrayListWithCapacity(views.size());
+                for (DataView view : views) {
+                    if (view.contains(NAME) && view.contains(VALUE)) {
+                        properties.add(new Property(view.getString(NAME).get(), view.getString(VALUE).get(),
+                                view.getString(SIGNATURE).orNull()));
+                    }
+                }
+            } else {
+                properties = Lists.newArrayList();
+            }
+            return Optional.<GameProfile>of(new LanternGameProfile(uniqueId0, name, properties));
         }
     }
 
-    public static class Property {
+    public static final class Property {
 
         private final String name;
         private final String value;

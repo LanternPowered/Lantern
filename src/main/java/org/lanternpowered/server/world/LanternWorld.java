@@ -116,17 +116,6 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
         return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
 
-    /*
-    @Override
-    public BlockSnapshot getBlockSnapshot(int x, int y, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBlockSnapshot(x & 0xf, y, z & 0xf);
-    }
-
-    @Override
-    public void setBlockSnapshot(int x, int y, int z, BlockSnapshot snapshot) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlockSnapshot(x & 0xf, y, z & 0xf, snapshot);
-    }*/
-
     @Override
     public void interactBlock(int x, int y, int z, Direction side) {
         LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);

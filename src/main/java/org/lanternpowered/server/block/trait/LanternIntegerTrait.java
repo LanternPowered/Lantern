@@ -23,6 +23,26 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
      * @param possibleValues the possible values
      * @return the integer trait
      */
+    public static IntegerTrait of(String name, int... possibleValues) {
+        checkNotNullOrEmpty(name, "name");
+        checkNotNull(possibleValues, "possibleValues");
+        checkState(possibleValues.length != 0, "possibleValues may not be empty");
+        ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
+        for (int i = 0; i < possibleValues.length; i++) {
+            builder.add(possibleValues[i]);
+        }
+        return new LanternIntegerTrait(name, builder.build());
+    }
+
+    /**
+     * Creates a new integer trait with the specified name and the possible values.
+     * 
+     * <p>The possible values array may not be empty.</p>
+     * 
+     * @param name the name
+     * @param possibleValues the possible values
+     * @return the integer trait
+     */
     public static IntegerTrait of(String name, Iterable<Integer> possibleValues) {
         checkNotNullOrEmpty(name, "name");
         checkNotNull(possibleValues, "possibleValues");

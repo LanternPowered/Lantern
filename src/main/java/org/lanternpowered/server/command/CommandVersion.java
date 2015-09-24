@@ -1,9 +1,9 @@
 package org.lanternpowered.server.command;
 
-import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.text.translation.TranslationManager;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.command.CommandException;
@@ -15,6 +15,8 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 
 public class CommandVersion implements Command {
 
+    private final Game game;
+
     private final Translation description;
     private final Translation minecraftVersion;
     private final Translation implementationVersion;
@@ -23,6 +25,7 @@ public class CommandVersion implements Command {
     public CommandVersion(LanternGame game) {
         TranslationManager manager = game.getRegistry().getTranslationManager();
 
+        this.game = game;
         this.description = manager.get("commands.version.description");
         this.minecraftVersion = manager.get("commands.version.minecraft");
         this.implementationVersion = manager.get("commands.version.implementation");
@@ -40,10 +43,8 @@ public class CommandVersion implements Command {
                     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
                         src.sendMessage(Texts.of(minecraftVersion, LanternMinecraftVersion.CURRENT.getName(),
                                 LanternMinecraftVersion.CURRENT.getProtocol()));
-                        String version = LanternServer.class.getPackage().getSpecificationVersion();
-                        src.sendMessage(Texts.of(apiVersion, version == null ? "unknown" : version));
-                        version = LanternServer.class.getPackage().getImplementationVersion();
-                        src.sendMessage(Texts.of(implementationVersion, version == null ? "unknown" : version));
+                        src.sendMessage(Texts.of(apiVersion, game.getPlatform().getApiVersion()));
+                        src.sendMessage(Texts.of(implementationVersion, game.getPlatform().getVersion()));
                         return CommandResult.success();
                     }
 

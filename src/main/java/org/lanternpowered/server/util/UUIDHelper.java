@@ -1,5 +1,8 @@
 package org.lanternpowered.server.util;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.UUID;
 
 public final class UUIDHelper {
@@ -11,6 +14,8 @@ public final class UUIDHelper {
      * @return the uuid
      */
     public static UUID fromFlatString(String string) {
+        checkNotNull(string, "string");
+        checkArgument(string.length() == 32, "length must be 32");
         return UUID.fromString(string.substring(0, 8) + "-" + string.substring(8, 12) + "-" + string.substring(12, 16) +
                 "-" + string.substring(16, 20) + "-" + string.substring(20, 32));
     }
@@ -22,6 +27,6 @@ public final class UUIDHelper {
      * @return the flat string
      */
     public static String toFlatString(UUID uuid) {
-        return uuid.toString().replace("-", "");
+        return checkNotNull(uuid, "uuid").toString().replace("-", "");
     }
 }

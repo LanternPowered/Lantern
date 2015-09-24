@@ -9,8 +9,13 @@ import io.netty.util.AttributeKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.lanternpowered.server.network.forge.message.handshake.HandshakePhase;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutAck;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutHello;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutModList;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
@@ -25,12 +30,20 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
 public final class ProcessorPlayInChannelPayload implements Processor<MessagePlayInOutChannelPayload> {
 
-    public static final AttributeKey<Boolean> FML_MULTI_PART_MESSAGE_ENABLED = AttributeKey.valueOf("fml-multi-part-message-enabled");
+    public static final AttributeKey<Boolean> FML_ENABLED = AttributeKey.valueOf("fml-enabled");
     public static final AttributeKey<MultiPartMessage> FML_MULTI_PART_MESSAGE = AttributeKey.valueOf("fml-multi-part-message");
+
+    public static final int FML_HANDSHAKE_SERVER_HELLO = 0;
+    public static final int FML_HANDSHAKE_CLIENT_HELLO = 1;
+    public static final int FML_HANDSHAKE_MOD_LIST = 2;
+    public static final int FML_HANDSHAKE_REGISTRY_DATA = 3;
+    public static final int FML_HANDSHAKE_ACK = -1;
+    public static final int FML_HANDSHAKE_RESET = -2;
 
     @Override
     public void process(CodecContext context, MessagePlayInOutChannelPayload message, List<Message> output) throws CodecException {
@@ -83,10 +96,10 @@ public final class ProcessorPlayInChannelPayload implements Processor<MessagePla
             Iterator<String> it = channels.iterator();
             while (it.hasNext()) {
                 String channel0 = it.next();
-                if (channel0.equals("FML|MP")) {
-                    context.channel().attr(FML_MULTI_PART_MESSAGE_ENABLED).set(true);
-                }
                 if (channel0.startsWith("FML")) {
+                    context.session().send(new MessagePlayInOutRegisterChannels(Sets.newHashSet(
+                            "FML|HS", "FML|MP")));
+                    context.channel().attr(FML_ENABLED);
                     it.remove();
                 }
             }
@@ -98,10 +111,10 @@ public final class ProcessorPlayInChannelPayload implements Processor<MessagePla
             Iterator<String> it = channels.iterator();
             while (it.hasNext()) {
                 String channel0 = it.next();
-                if (channel0.equals("FML|MP")) {
-                    context.channel().attr(FML_MULTI_PART_MESSAGE_ENABLED).set(false);
-                }
                 if (channel0.startsWith("FML")) {
+                    if (channel0.equals("FML") || channel0.equals("FML|HS") || channel0.equals("FML|MP")) {
+                        context.channel().attr(FML_ENABLED).set(false);
+                    }
                     it.remove();
                 }
             }
@@ -133,6 +146,39 @@ public final class ProcessorPlayInChannelPayload implements Processor<MessagePla
                     attribute.set(null);
                 }
             }
+        } else if (channel.equals("FML|HS")) {
+            int type = content.readByte();
+            switch (type) {
+                case FML_HANDSHAKE_RESET:
+                    // server -> client message: ignore
+                    break;
+                case FML_HANDSHAKE_ACK:
+                    HandshakePhase phase = HandshakePhase.values()[content.readByte()];
+                    output.add(new MessageHandshakeInOutAck(phase));
+                    break;
+                case FML_HANDSHAKE_SERVER_HELLO:
+                    // server -> client message: ignore
+                    break;
+                case FML_HANDSHAKE_CLIENT_HELLO:
+                    content.readByte(); // The forge protocol version on the client
+                    output.add(new MessageHandshakeInOutHello());
+                    break;
+                case FML_HANDSHAKE_MOD_LIST:
+                    int size = context.readVarInt(content);
+                    Map<String, String> entries = Maps.newHashMapWithExpectedSize(size);
+                    for (int i = 0; i < size; i++) {
+                        entries.put(context.read(content, String.class), context.read(content, String.class));
+                    }
+                    output.add(new MessageHandshakeInOutModList(entries));
+                    break;
+                case FML_HANDSHAKE_REGISTRY_DATA:
+                    // server -> client message: ignore
+                    break;
+                default:
+                    throw new CodecException("Unknown forge handshake message with opcode: " + type);
+            }
+        } else if (channel.equals("FML")) {
+            
         } else if (channel.startsWith("FML")) {
             // A unknown/ignored fml channel
         } else {

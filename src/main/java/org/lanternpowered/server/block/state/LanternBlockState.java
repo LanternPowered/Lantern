@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.trait.BlockTraitKey;
 import org.lanternpowered.server.block.trait.MutableBlockTraitValue;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -110,20 +111,20 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public Optional<BlockState> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
+        // You cannot remove any data manipulators from a block state
+        return Optional.absent();
     }
 
     @Override
     public BlockState merge(BlockState that) {
-        // TODO Auto-generated method stub
-        return null;
+        // Huh? Not sure what to do here...
+        return this;
     }
 
     @Override
     public BlockState merge(BlockState that, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
+        // Huh? Not sure what to do here...
+        return this;
     }
 
     @Override
@@ -171,7 +172,6 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public BlockState copy() {
-        // Should be safe to do this, this class is immutable
         return this;
     }
 
@@ -196,8 +196,7 @@ public class LanternBlockState implements BlockState {
 
     @Override
     public BlockSnapshot snapshotFor(Location<World> location) {
-        // TODO Auto-generated method stub
-        return null;
+        return new LanternBlockSnapshot(location, this);
     }
 
     @Override

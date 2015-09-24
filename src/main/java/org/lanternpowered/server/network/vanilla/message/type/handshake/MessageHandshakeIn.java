@@ -7,11 +7,11 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.game.LanternGameProfile.Property;
-import org.lanternpowered.server.network.message.MessageAsync;
+import org.lanternpowered.server.network.message.AsyncMessage;
 
 import com.google.common.collect.ImmutableList;
 
-public class MessageHandshakeIn implements MessageAsync {
+public class MessageHandshakeIn implements AsyncMessage {
 
     private final SocketAddress address;
     private final String hostname;

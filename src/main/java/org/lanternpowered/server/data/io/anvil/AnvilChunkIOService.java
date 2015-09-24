@@ -32,9 +32,6 @@ import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_FIL
 
 public class AnvilChunkIOService implements ChunkIOService {
 
-    /**
-     * The size of a region - a 32x32 group of chunks.
-     */
     private static final int REGION_SIZE = 32;
 
     private static final DataQuery LEVEL = DataQuery.of("Level");

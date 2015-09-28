@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public class LanternPluginContainer implements PluginContainer {
+public final class LanternPluginContainer implements PluginContainer {
 
     private final String id;
     private final String name;
@@ -13,7 +13,7 @@ public class LanternPluginContainer implements PluginContainer {
     // The instance of the plugin
     private Object instance;
 
-    public LanternPluginContainer(String id, String name, String version) {
+    LanternPluginContainer(String id, String name, String version) {
         this.version = version;
         this.name = name;
         this.id = id;

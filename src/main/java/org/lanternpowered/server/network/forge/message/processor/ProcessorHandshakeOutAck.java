@@ -4,6 +4,7 @@ import io.netty.handler.codec.CodecException;
 
 import java.util.List;
 
+import org.lanternpowered.server.network.forge.message.handshake.ServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutAck;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -18,6 +19,7 @@ public final class ProcessorHandshakeOutAck implements Processor<MessageHandshak
         output.add(new MessagePlayInOutChannelPayload("FML|HS", context.byteBufAlloc()
                 .buffer(2)
                 .writeByte(ProcessorPlayInChannelPayload.FML_HANDSHAKE_ACK)
-                .writeByte(message.getPhase().ordinal())));
+                // Only the server state should be send to the client
+                .writeByte(((ServerHandshakePhase) message.getPhase()).ordinal())));
     }
 }

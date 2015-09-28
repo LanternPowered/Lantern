@@ -1,7 +1,5 @@
 package org.lanternpowered.server.network.vanilla.message.handler.handshake;
 
-import java.net.InetSocketAddress;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -24,6 +22,7 @@ public class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
         }
         // session.setVirtualHost(message.getAddress());
         session.setProtocolVersion(message.getProtocolVersion());
+        session.getChannel().attr(Session.FML_MARKER).set(message.hasFMLMarker());
 
         if (next == ProtocolState.LOGIN) {
             int protocol = ((LanternMinecraftVersion) LanternGame.get().getPlatform().getMinecraftVersion()).getProtocol();

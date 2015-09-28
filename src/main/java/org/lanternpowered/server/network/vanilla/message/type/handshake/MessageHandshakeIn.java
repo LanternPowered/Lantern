@@ -22,6 +22,8 @@ public class MessageHandshakeIn implements AsyncMessage {
     private final int protocol;
     private final int state;
 
+    private final boolean fmlMarker;
+
     /**
      * Creates a new handshake message.
      * 
@@ -31,12 +33,22 @@ public class MessageHandshakeIn implements AsyncMessage {
      * @param protocol the client protocol
      */
     public MessageHandshakeIn(int state, String hostname, SocketAddress address,
-            int protocol, @Nullable ProxyData proxyData) {
+            int protocol, @Nullable ProxyData proxyData, boolean fmlMarker) {
+        this.fmlMarker = fmlMarker;
         this.proxyData = proxyData;
         this.hostname = hostname;
         this.protocol = protocol;
         this.address = address;
         this.state = state;
+    }
+
+    /**
+     * Whether the handshake contains the fml marker.
+     * 
+     * @return has fml marker
+     */
+    public boolean hasFMLMarker() {
+        return this.fmlMarker;
     }
 
     /**

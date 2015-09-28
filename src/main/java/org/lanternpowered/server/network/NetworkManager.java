@@ -1,6 +1,7 @@
 package org.lanternpowered.server.network;
 
 import java.net.SocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
@@ -20,9 +21,12 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 public final class NetworkManager {
 
     private final ServerBootstrap bootstrap = new ServerBootstrap();
+    private final AtomicInteger counter = new AtomicInteger(0);
 
-    private final EventLoopGroup bossGroup = new NioEventLoopGroup();
-    private final EventLoopGroup workerGroup = new NioEventLoopGroup();
+    private final EventLoopGroup bossGroup = new NioEventLoopGroup(0,
+            runnable -> new Thread(runnable, "netty-" + this.counter.getAndIncrement()));
+    private final EventLoopGroup workerGroup = new NioEventLoopGroup(0,
+            runnable -> new Thread(runnable, "netty-" + this.counter.getAndIncrement()));
 
     private final SessionRegistry sessionRegistry = new SessionRegistry();
     private final LanternServer server;

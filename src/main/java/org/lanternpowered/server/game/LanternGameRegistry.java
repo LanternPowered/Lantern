@@ -1,5 +1,7 @@
 package org.lanternpowered.server.game;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -105,7 +107,6 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.EntitySnapshotBuilder;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.Transform.Builder;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSourceBuilder;
@@ -168,7 +169,6 @@ import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.ExplosionBuilder;
-import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
 import org.spongepowered.api.world.gen.PopulatorFactory;
@@ -1186,14 +1186,15 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public LanternParticleEffectBuilder createParticleEffectBuilder(ParticleType particle) {
+        checkNotNull(particle, "particleType");
         if (particle instanceof ParticleType.Colorable) {
-            return new LanternParticleEffectBuilder.Colorable(particle);
+            return new LanternParticleEffectBuilder.Colorable((ParticleType.Colorable) particle);
         } else if (particle instanceof ParticleType.Material) {
-            return new LanternParticleEffectBuilder.Material(particle);
+            return new LanternParticleEffectBuilder.Material((ParticleType.Material) particle);
         } else if (particle instanceof ParticleType.Note) {
-            return new LanternParticleEffectBuilder.Note(particle);
+            return new LanternParticleEffectBuilder.Note((ParticleType.Note) particle);
         } else if (particle instanceof ParticleType.Resizable) {
-            return new LanternParticleEffectBuilder.Resizable(particle);
+            return new LanternParticleEffectBuilder.Resizable((ParticleType.Resizable) particle);
         } else {
             return new LanternParticleEffectBuilder(particle);
         }
@@ -1289,12 +1290,6 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public WeatherSpawnCauseBuilder createWeatherSpawnCauseBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E extends Extent> Builder<E> createTransformBuilder() {
         // TODO Auto-generated method stub
         return null;
     }

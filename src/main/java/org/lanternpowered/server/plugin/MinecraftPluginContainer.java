@@ -3,7 +3,7 @@ package org.lanternpowered.server.plugin;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public class MinecraftPluginContainer implements PluginContainer {
+public final class MinecraftPluginContainer implements PluginContainer {
 
     private final Game game;
 

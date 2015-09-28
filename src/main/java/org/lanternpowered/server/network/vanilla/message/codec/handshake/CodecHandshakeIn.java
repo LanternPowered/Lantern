@@ -23,7 +23,8 @@ import com.google.gson.JsonObject;
 
 public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
 
-    private static final Gson gson = new Gson();
+    private static final String FML_HANDSHAKE_TOKEN = "\0FML\0";
+    private static final Gson GSON = new Gson();
 
     @Override
     public ByteBuf encode(CodecContext context, MessageHandshakeIn message) throws CodecException {
@@ -38,9 +39,15 @@ public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
         int state = context.read(buf, VarInt.class).value();
         ProxyData proxyData = null;
         SocketAddress socketAddress;
+        // Check for the fml marker
+        boolean fmlMarker = hostname.contains(FML_HANDSHAKE_TOKEN);
+        if (fmlMarker) {
+            hostname = hostname.split(FML_HANDSHAKE_TOKEN)[0];
+        }
         // Check for bungee-coord data
-        String[] split = hostname.split("\00\\|", 2)[0].split("\00"); // Ignore any extra data
-        if (split.length > 0) {
+        String[] split = hostname.split("\00\\|", 2)[0].split("\00");
+        // The position of the fml marker in the parts array, may be absent
+        if (split.length > 1) {
             // TODO: Check whether bungee is enabled
             if (split.length != 3 && split.length != 4) {
                 throw new CodecException("Parts length was " + split.length + ", should be 3 or 4!");
@@ -51,7 +58,7 @@ public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
             List<Property> properties = Lists.newArrayList();
             if (split.length == 4) {
                 try {
-                    JsonArray json = gson.fromJson(split[3], JsonArray.class);
+                    JsonArray json = GSON.fromJson(split[3], JsonArray.class);
                     for (int i = 0; i < json.size(); i++) {
                         JsonObject json0 = json.get(i).getAsJsonObject();
                         String name = json0.get("name").getAsString();
@@ -67,6 +74,6 @@ public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
         } else {
             socketAddress = new InetSocketAddress(hostname, port);
         }
-        return new MessageHandshakeIn(state, hostname, socketAddress, protocol, proxyData);
+        return new MessageHandshakeIn(state, hostname, socketAddress, protocol, proxyData, fmlMarker);
     }
 }

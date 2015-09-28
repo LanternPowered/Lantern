@@ -56,6 +56,7 @@ public class Session implements PlayerConnection {
     public static final String PROCESSOR = "processor";
     public static final String HANDLER = "handler";
 
+    public static final AttributeKey<Boolean> FML_MARKER = AttributeKey.valueOf("fml-marker");
     public static final AttributeKey<Session> SESSION = AttributeKey.valueOf("session");
     public static final AttributeKey<ProtocolState> STATE = AttributeKey.valueOf("state");
 

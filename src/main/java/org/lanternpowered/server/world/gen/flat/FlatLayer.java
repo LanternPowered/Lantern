@@ -3,7 +3,7 @@ package org.lanternpowered.server.world.gen.flat;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 
-public class FlatLayer {
+public final class FlatLayer {
 
     private final BlockState blockState;
     private final int depth;

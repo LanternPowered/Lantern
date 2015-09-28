@@ -28,7 +28,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
 
     @Override
-    public void channelRead(ChannelHandlerContext ctx, Object object) {
+    public void channelRead(ChannelHandlerContext ctx, Object object) throws Exception {
         LanternServer server = ctx.channel().attr(Session.SESSION).get().getServer();
 
         ByteBuf buf0 = (ByteBuf) object;

@@ -145,5 +145,4 @@ public class PluginModule extends AbstractModule {
             return this.game.getConfigService().getPluginConfig(this.container).getConfig();
         }
     }
-
 }

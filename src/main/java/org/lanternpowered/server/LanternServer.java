@@ -28,6 +28,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.buf.LanternChannelRegistrar;
+import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
@@ -38,6 +39,8 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.network.ChannelListener;
 import org.spongepowered.api.network.ChannelRegistrationException;
+import org.spongepowered.api.resourcepack.ResourcePack;
+import org.spongepowered.api.service.profile.GameProfileResolver;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.status.Favicon;
@@ -220,9 +223,7 @@ public class LanternServer implements Server {
         return new LanternServerConfig(configDir, configFile, parameters);
     }
 
-    /**
-     * The scheduled executor service which backs this worlds.
-     */
+    // The executor service for the server ticks
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
             runnable -> new Thread(runnable, "server"));
 
@@ -564,6 +565,11 @@ public class LanternServer implements Server {
             }
         }
 
+        GameProfileResolver gameProfileResolver = this.game.getServiceManager().provide(GameProfileResolver.class).orNull();
+        if (gameProfileResolver instanceof LanternGameProfileResolver) {
+            ((LanternGameProfileResolver) gameProfileResolver).shutdown();
+        }
+
         // Call the event
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game));
 
@@ -585,5 +591,11 @@ public class LanternServer implements Server {
     public double getTicksPerSecond() {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    @Override
+    public Optional<ResourcePack> getDefaultResourcePack() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

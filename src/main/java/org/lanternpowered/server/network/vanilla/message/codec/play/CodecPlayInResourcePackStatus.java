@@ -17,7 +17,7 @@ public final class CodecPlayInResourcePackStatus implements Codec<MessagePlayInR
     private final Map<Integer, ResourcePackStatus> status = ImmutableMap.<Integer, ResourcePackStatus>builder()
             .put(0, ResourcePackStatus.SUCCESSFULLY_LOADED)
             .put(1, ResourcePackStatus.DECLINED)
-            .put(2, ResourcePackStatus.PACK_FILE_FORMAT_NOT_RECOGNIZED)
+            .put(2, ResourcePackStatus.FAILED)
             .put(3, ResourcePackStatus.ACCEPTED)
             .build();
 

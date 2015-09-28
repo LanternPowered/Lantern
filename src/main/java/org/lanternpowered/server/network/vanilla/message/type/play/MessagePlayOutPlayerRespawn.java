@@ -17,7 +17,7 @@ public final class MessagePlayOutPlayerRespawn implements Message {
             LanternDifficulty difficulty) {
         this.dimensionType = checkNotNull(dimensionType, "dimensionType");
         this.difficulty = checkNotNull(difficulty, "difficulty");
-        this.gameMode = checkNotNull(gameMode, "game mode");
+        this.gameMode = checkNotNull(gameMode, "gameMode");
     }
 
     /**

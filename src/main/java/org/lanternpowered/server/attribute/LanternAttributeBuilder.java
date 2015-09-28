@@ -13,7 +13,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-public class LanternAttributeBuilder implements AttributeBuilder {
+public final class LanternAttributeBuilder implements AttributeBuilder {
 
     private final CatalogTypeRegistry<Attribute> registry;
 
@@ -27,7 +27,7 @@ public class LanternAttributeBuilder implements AttributeBuilder {
     private Predicate<DataHolder> targets = Predicates.alwaysTrue();
 
     public LanternAttributeBuilder(CatalogTypeRegistry<Attribute> registry) {
-        this.registry = registry;
+        this.registry = checkNotNull(registry, "registry");
     }
 
     @Override

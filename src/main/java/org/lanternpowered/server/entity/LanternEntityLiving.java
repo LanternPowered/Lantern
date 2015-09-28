@@ -22,5 +22,4 @@ public class LanternEntityLiving extends LanternEntity implements Living {
         // TODO Auto-generated method stub
         return null;
     }
-
 }

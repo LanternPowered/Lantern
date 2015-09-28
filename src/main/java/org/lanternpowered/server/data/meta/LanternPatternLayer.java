@@ -15,7 +15,7 @@ import org.spongepowered.api.service.persistence.InvalidDataException;
 
 import com.google.common.base.Optional;
 
-public class LanternPatternLayer implements PatternLayer {
+public final class LanternPatternLayer implements PatternLayer {
 
     private static final DataQuery BANNER_SHAPE = of("BannerShapeId");
     private static final DataQuery DYE_COLOR = of("DyeColor");

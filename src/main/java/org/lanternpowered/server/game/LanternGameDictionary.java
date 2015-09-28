@@ -47,5 +47,4 @@ public class LanternGameDictionary implements GameDictionary {
     public Map<String, Set<ItemType>> getAllItems() {
         return ImmutableMap.copyOf(this.map);
     }
-
 }

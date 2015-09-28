@@ -17,11 +17,14 @@ import org.spongepowered.api.util.command.source.ConsoleSource;
 
 import com.google.common.base.Optional;
 
-public class LanternConsoleSource extends SubjectBase implements ConsoleSource {
+public final class LanternConsoleSource extends SubjectBase implements ConsoleSource {
 
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
 
     private MessageSink messageSink;
+
+    private LanternConsoleSource() {
+    }
 
     @Override
     public String getName() {

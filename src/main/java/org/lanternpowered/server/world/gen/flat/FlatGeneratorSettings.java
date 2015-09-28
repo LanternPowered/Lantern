@@ -6,7 +6,7 @@ import org.spongepowered.api.world.biome.BiomeType;
 
 import com.google.common.collect.ImmutableList;
 
-public class FlatGeneratorSettings {
+public final class FlatGeneratorSettings {
 
     private final List<FlatLayer> layers;
     private final BiomeType biomeType;

@@ -31,7 +31,7 @@ public final class MessageFramingHandler extends ByteToMessageCodec<ByteBuf> {
         }
 
         ByteBuf buf1 = ctx.alloc().buffer(length);
-        buf1.readBytes(buf1, length);
+        buf.readBytes(buf1, length);
 
         output.add(buf1);
     }

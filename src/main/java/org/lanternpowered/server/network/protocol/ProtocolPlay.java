@@ -1,5 +1,15 @@
 package org.lanternpowered.server.network.protocol;
 
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutAck;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutHello;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutModList;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeOutRegistryData;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeOutReset;
+import org.lanternpowered.server.network.forge.message.processor.ProcessorHandshakeOutAck;
+import org.lanternpowered.server.network.forge.message.processor.ProcessorHandshakeOutHello;
+import org.lanternpowered.server.network.forge.message.processor.ProcessorHandshakeOutModList;
+import org.lanternpowered.server.network.forge.message.processor.ProcessorHandshakeOutRegistryData;
+import org.lanternpowered.server.network.forge.message.processor.ProcessorHandshakeOutReset;
 import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutPing;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutHeldItemChange;
@@ -62,6 +72,11 @@ public final class ProtocolPlay extends ProtocolBase {
         inbound.register(MessagePlayInClientSettings.class, new ProcessorPlayInClientSettings());
         inbound.register(MessagePlayInPlayerAction.class, new ProcessorPlayInPlayerAction());
         inbound.register(MessagePlayInPlayerVehicleControls.class, new ProcessorPlayInPlayerVehicleControls());
+        inbound.register(MessageHandshakeInOutAck.class, new ProcessorHandshakeOutAck());
+        inbound.register(MessageHandshakeInOutHello.class, new ProcessorHandshakeOutHello());
+        inbound.register(MessageHandshakeInOutModList.class, new ProcessorHandshakeOutModList());
+        inbound.register(MessageHandshakeOutRegistryData.class, new ProcessorHandshakeOutRegistryData());
+        inbound.register(MessageHandshakeOutReset.class, new ProcessorHandshakeOutReset());
 
         outbound.register(MessagePlayInOutBrand.class, new ProcessorPlayOutBrand());
         outbound.register(MessagePlayInOutChannelPayload.class, new ProcessorPlayOutChannelPayload());

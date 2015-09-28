@@ -2,7 +2,6 @@ package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -270,12 +269,7 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
     @Override
     public void sendResourcePack(ResourcePack pack) {
         String hash = pack.getHash().or(pack.getId());
-        String location;
-        try {
-            location = pack.getUrl().toURI().toString();
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
+        String location = pack.getUri().toString();
         this.session.send(new MessagePlayOutSendResourcePack(location, hash));
     }
 

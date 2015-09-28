@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.lanternpowered.server.network.forge.message.handshake.HandshakePhase;
+import org.lanternpowered.server.network.forge.message.handshake.ClientHandshakePhase;
 import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutAck;
 import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutHello;
 import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutModList;
@@ -153,7 +153,7 @@ public final class ProcessorPlayInChannelPayload implements Processor<MessagePla
                     // server -> client message: ignore
                     break;
                 case FML_HANDSHAKE_ACK:
-                    HandshakePhase phase = HandshakePhase.values()[content.readByte()];
+                    ClientHandshakePhase phase = ClientHandshakePhase.values()[content.readByte()];
                     output.add(new MessageHandshakeInOutAck(phase));
                     break;
                 case FML_HANDSHAKE_SERVER_HELLO:

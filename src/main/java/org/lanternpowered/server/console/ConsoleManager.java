@@ -23,7 +23,7 @@ public class ConsoleManager {
     // The console reader
     private ConsoleReader reader;
 
-    // A temp cursor, internal use only
+    // A temp cursor buffer, internal use only
     private volatile CursorBuffer stashed;
 
     // Whether the command threads are running

@@ -1,28 +1,28 @@
 package org.lanternpowered.server.resourcepack;
 
-import java.net.URL;
+import java.net.URI;
 
 import org.spongepowered.api.resourcepack.ResourcePack;
 
 import com.google.common.base.Optional;
 
-public class LanternResourcePack implements ResourcePack {
+public final class LanternResourcePack implements ResourcePack {
 
-    private final URL url;
+    private final URI uri;
     private final String name;
     private final String id;
     private final Optional<String> hash;
 
-    public LanternResourcePack(URL url, String name, String id, Optional<String> hash) {
+    LanternResourcePack(URI uri, String name, String id, Optional<String> hash) {
         this.hash = hash;
         this.name = name;
-        this.url = url;
+        this.uri = uri;
         this.id = id;
     }
 
     @Override
-    public URL getUrl() {
-        return this.url;
+    public URI getUri() {
+        return this.uri;
     }
 
     @Override

@@ -22,7 +22,7 @@ public class LanternParticleEffectBuilder implements ParticleEffectBuilder {
     protected int count;
 
     public LanternParticleEffectBuilder(ParticleType type) {
-        this.type = type;
+        this.type = checkNotNull(type, "type");
     }
 
     public LanternParticleEffectBuilder reset() {
@@ -60,7 +60,7 @@ public class LanternParticleEffectBuilder implements ParticleEffectBuilder {
 
         private Color color;
 
-        public Colorable(ParticleType type) {
+        public Colorable(ParticleType.Colorable type) {
             super(type);
         }
 
@@ -101,7 +101,7 @@ public class LanternParticleEffectBuilder implements ParticleEffectBuilder {
 
         private float size;
 
-        public Resizable(ParticleType type) {
+        public Resizable(ParticleType.Resizable type) {
             super(type);
         }
 
@@ -142,7 +142,7 @@ public class LanternParticleEffectBuilder implements ParticleEffectBuilder {
 
         private float note;
 
-        public Note(ParticleType type) {
+        public Note(ParticleType.Note type) {
             super(type);
         }
 
@@ -184,7 +184,7 @@ public class LanternParticleEffectBuilder implements ParticleEffectBuilder {
 
         private ItemStack item;
 
-        public Material(ParticleType type) {
+        public Material(ParticleType.Material type) {
             super(type);
         }
 

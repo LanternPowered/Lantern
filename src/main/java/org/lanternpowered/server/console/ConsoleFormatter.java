@@ -49,7 +49,6 @@ public class ConsoleFormatter implements Formatter {
         for (Entry<Pattern, String> entry : REPLACEMENTS.entrySet()) {
             text = entry.getKey().matcher(text).replaceAll(entry.getValue());
         }
-
         return text + RESET;
     }
 }

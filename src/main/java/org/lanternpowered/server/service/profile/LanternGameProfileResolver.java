@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -37,7 +36,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public class LanternGameProfileResolver implements GameProfileResolver {
+public final class LanternGameProfileResolver implements GameProfileResolver {
 
     private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     private final Gson gson = new Gson();
@@ -60,6 +59,13 @@ public class LanternGameProfileResolver implements GameProfileResolver {
                 }
 
             });
+
+    /**
+     * Stops the profile resolver service.
+     */
+    public void shutdown() {
+        this.service.shutdown();
+    }
 
     /**
      * Puts the game profile into the cache.
@@ -114,20 +120,23 @@ public class LanternGameProfileResolver implements GameProfileResolver {
                 if (useCache) {
                     rest = Lists.newArrayList();
                     for (String name : names) {
-                        if (uuidByNameCache.getIfPresent(name) == null) {
+                        UUID uniqueId = uuidByNameCache.getIfPresent(name);
+                        if (uniqueId == null) {
                             rest.add(name);
                         } else {
-                            uniqueIds.add(uuidByNameCache.get(name));
+                            uniqueIds.add(uniqueId);
                         }
                     }
                 } else {
                     rest = Lists.newArrayList(names);
                 }
-                Map<String, UUID> results = new GetUUID(rest).call();
-                if (useCache) {
-                    uuidByNameCache.putAll(results);
+                if (!rest.isEmpty()) {
+                    Map<String, UUID> results = new GetUUID(rest).call();
+                    if (useCache) {
+                        uuidByNameCache.putAll(results);
+                    }
+                    uniqueIds.addAll(results.values());
                 }
-                uniqueIds.addAll(results.values());
                 for (UUID uniqueId : uniqueIds) {
                     profiles.add(useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call());
                 }
@@ -159,11 +168,11 @@ public class LanternGameProfileResolver implements GameProfileResolver {
     @Override
     public Collection<GameProfile> match(String lastKnownName) {
         List<GameProfile> profiles = Lists.newArrayList();
-        if (this.uuidByNameCache.getIfPresent(lastKnownName) != null) {
-            try {
-                profiles.add(this.profileCache.get(this.uuidByNameCache.get(lastKnownName)));
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
+        UUID uniqueId = this.uuidByNameCache.getIfPresent(lastKnownName);
+        if (uniqueId != null) {
+            GameProfile profile = this.profileCache.getIfPresent(uniqueId);
+            if (profile != null) {
+                profiles.add(profile);
             }
         }
         return ImmutableList.copyOf(profiles);
@@ -196,11 +205,11 @@ public class LanternGameProfileResolver implements GameProfileResolver {
                 JsonObject json = gson.fromJson(new InputStreamReader(is), JsonObject.class);
                 if (json.has("error")) {
                     // If it fails too many times, just leave it
-                    if (++attempts > 3) {
+                    if (++attempts > 6) {
                         return null;
                     }
-                    // Too many requests, lets wait for 35 seconds
-                    Thread.sleep(35000);
+                    // Too many requests, lets wait for 10 seconds
+                    Thread.sleep(10000);
                     continue;
                 }
 
@@ -244,9 +253,13 @@ public class LanternGameProfileResolver implements GameProfileResolver {
             int size = names.size();
             int count = 0;
             do {
-                this.post(results, names.subList(count, Math.min(size, count + 100)));
+                int index = count;
                 count += 100;
-            } while (names.size() - count > 100);
+                if (count > size) {
+                    count = size;
+                }
+                this.post(results, names.subList(index, count));
+            } while (names.size() - count > 0);
 
             return results;
         }

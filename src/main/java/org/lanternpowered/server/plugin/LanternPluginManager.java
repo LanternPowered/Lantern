@@ -40,7 +40,7 @@ import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 
-public class LanternPluginManager implements PluginManager {
+public final class LanternPluginManager implements PluginManager {
 
     private static final String PLUGIN_DESCRIPTOR = Type.getDescriptor(Plugin.class);
     private static final String CLASS_EXTENSION = ".class";
@@ -230,7 +230,6 @@ public class LanternPluginManager implements PluginManager {
             }
             return 0;
         }
-
     }
 
     private static void scanZip(File file, List<PluginEntry> plugins) {

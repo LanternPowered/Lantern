@@ -21,7 +21,12 @@ import javax.crypto.spec.SecretKeySpec;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.game.LanternGameProfile.Property;
+import org.lanternpowered.server.network.forge.message.handshake.HandshakePhase;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInOutHello;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInStart;
+import org.lanternpowered.server.network.forge.message.handshake.ServerHandshakePhase;
 import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
 import org.lanternpowered.server.util.UUIDHelper;
@@ -170,13 +175,9 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                     return;
                 }*/
 
-                // Spawn player
-                LanternGame.get().getScheduler().createTaskBuilder().execute(new Runnable() {
-                    @Override
-                    public void run() {
-                        session.setPlayer(new LanternGameProfile(uuid, name, properties));
-                    }
-                });
+                session.setPlayer(new LanternGameProfile(uuid, name, properties));
+                session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
+                session.messageReceived(new MessageHandshakeInStart());
             } catch (Exception e) {
                 LanternGame.log().error("Error in authentication thread", e);
                 this.session.disconnect("Internal error during authentication.", true);

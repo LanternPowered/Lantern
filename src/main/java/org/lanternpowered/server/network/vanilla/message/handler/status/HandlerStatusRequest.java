@@ -71,15 +71,15 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
             online = -1;
         }
 
-        JsonObject object0 = new JsonObject();
-        JsonObject object1 = new JsonObject();
-        JsonObject object2 = new JsonObject();
+        JsonObject rootObject = new JsonObject();
+        JsonObject versionObject = new JsonObject();
+        JsonObject playersObject = new JsonObject();
 
-        object1.addProperty("name", LanternGame.get().getPlatform().getName());
-        object1.addProperty("protocol", ((LanternMinecraftVersion) version0).getProtocol());
+        versionObject.addProperty("name", LanternGame.get().getPlatform().getName());
+        versionObject.addProperty("protocol", ((LanternMinecraftVersion) version0).getProtocol());
 
-        object2.addProperty("max", max);
-        object2.addProperty("online", online);
+        playersObject.addProperty("max", max);
+        playersObject.addProperty("online", online);
 
         if (online != -1) {
             List<GameProfile> profiles = players.getProfiles();
@@ -92,20 +92,29 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
                     object3.addProperty("uuid", profile.getUniqueId().toString());
                     array.add(object3);
                 }
-                object2.add("sample", array);
+                playersObject.add("sample", array);
             }
         }
 
-        object0.add("version", object1);
-        object0.add("players", object2);
-        object0.add("description", ((JsonTextRepresentation) Texts.json()).getGson().toJsonTree(motd));
+        rootObject.add("version", versionObject);
+        rootObject.add("players", playersObject);
+        rootObject.add("description", ((JsonTextRepresentation) Texts.json()).getGson().toJsonTree(motd));
 
         Optional<Favicon> icon = response.getFavicon();
         if (icon.isPresent()) {
-            object0.addProperty("favicon", ((LanternFavicon) icon.get()).getEncoded());
+            rootObject.addProperty("favicon", ((LanternFavicon) icon.get()).getEncoded());
         }
 
-        session.send(new MessageStatusOutResponse(gson.toJson(object0)));
+        JsonObject fmlObject = new JsonObject();
+        // Trick the client that the server is fml, we support fml channels anyway
+        fmlObject.addProperty("type", "FML");
+        // The client shouldn't know the plugins (mods) list
+        fmlObject.add("modList", new JsonArray());
+
+        // Add the fml info
+        rootObject.add("modinfo", fmlObject);
+
+        session.send(new MessageStatusOutResponse(gson.toJson(rootObject)));
         // TODO: Is this good?
         session.send(new MessageStatusInOutPing(System.currentTimeMillis()));
     }

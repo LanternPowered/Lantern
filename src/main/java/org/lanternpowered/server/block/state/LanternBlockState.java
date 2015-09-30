@@ -13,12 +13,14 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.util.Cycleable;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -29,7 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public class LanternBlockState implements BlockState {
+public final class LanternBlockState implements BlockState {
 
     // A lookup table to get a specific state when you would change a value
     ImmutableTable<BlockTrait<?>, Comparable<?>, BlockState> propertyValueTable;
@@ -40,7 +42,7 @@ public class LanternBlockState implements BlockState {
     // The base block state
     private final BlockStateBase baseState;
 
-    public LanternBlockState(BlockStateBase baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
+    LanternBlockState(BlockStateBase baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
         this.traitValues = traitValues;
         this.baseState = baseState;
     }
@@ -299,5 +301,23 @@ public class LanternBlockState implements BlockState {
     @Override
     public Map<BlockTrait<?>, ?> getTraitMap() {
         return this.traitValues;
+    }
+
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<Property<?, ?>> getApplicableProperties() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Direction direction) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

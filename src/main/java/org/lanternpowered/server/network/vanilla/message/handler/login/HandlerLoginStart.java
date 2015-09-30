@@ -4,7 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 import org.lanternpowered.server.game.LanternGameProfile;
+import org.lanternpowered.server.network.forge.message.handshake.MessageHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
@@ -36,6 +38,8 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             } else {
                 session.setPlayer(new LanternGameProfile(proxy.getUniqueId(), username, proxy.getProperties()));
             }
+            session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
+            session.messageReceived(new MessageHandshakeInStart());
         }
     }
 }

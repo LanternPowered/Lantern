@@ -3,9 +3,13 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.rules.GameRule;
 import org.lanternpowered.server.world.rules.GameRules;
@@ -16,6 +20,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -26,11 +31,18 @@ import com.google.common.base.Optional;
 
 public class LanternWorldProperties implements WorldProperties {
 
+    protected final LanternGameRules rules = new LanternGameRules();
+
+    // The extra properties
+    protected DataContainer properties;
+
+    // The type of the dimension
+    protected DimensionType dimensionType;
+
     protected String name;
     protected UUID uniqueId;
     protected Vector3i spawnPosition;
     protected Difficulty difficulty;
-    protected GameRules rules;
     protected GeneratorType generatorType;
     protected GameMode gameMode;
 
@@ -43,9 +55,7 @@ public class LanternWorldProperties implements WorldProperties {
 
     protected long seed;
 
-    protected GameRules createGameRules() {
-        return new LanternGameRules();
-    }
+    protected LanternWorld world;
 
     @Override
     public DataContainer toContainer() {
@@ -244,7 +254,17 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public void setDifficulty(Difficulty difficulty) {
-        this.difficulty = checkNotNull(difficulty, "difficulty");
+        checkNotNull(difficulty, "difficulty");
+        if (this.difficulty != difficulty) {
+            List<LanternPlayer> players = this.world.getPlayers();
+            if (!players.isEmpty()) {
+                MessagePlayOutSetDifficulty message = new MessagePlayOutSetDifficulty((LanternDifficulty) difficulty);
+                for (LanternPlayer player : players) {
+                    player.getConnection().send(message);
+                }
+            }
+        }
+        this.difficulty = difficulty;
     }
 
     @Override
@@ -268,20 +288,17 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public DataContainer getAdditionalProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.properties;
     }
 
     @Override
     public Optional<DataView> getPropertySection(DataQuery path) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.properties.getView(path);
     }
 
     @Override
     public void setPropertySection(DataQuery path, DataView data) {
-        // TODO Auto-generated method stub
-
+        this.properties.set(path, data);
     }
 
     @Override

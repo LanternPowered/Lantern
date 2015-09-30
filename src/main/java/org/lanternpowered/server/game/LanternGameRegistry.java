@@ -906,7 +906,7 @@ public class LanternGameRegistry implements GameRegistry {
      * 
      * @return the resource pack factory
      */
-    public ResourcePackFactory getResourcePackFactory() {
+    public LanternResourcePackFactory getResourcePackFactory() {
         return this.resourcePackFactory;
     }
 
@@ -1048,7 +1048,7 @@ public class LanternGameRegistry implements GameRegistry {
      */
     @Override
     public Optional<ResourcePack> getById(String id) {
-        return this.resourcePackFactory.getIfPresent(id);
+        return this.resourcePackFactory.getById(id);
     }
 
     @Override

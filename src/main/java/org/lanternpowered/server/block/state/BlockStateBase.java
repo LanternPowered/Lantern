@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class BlockStateBase {
+public final class BlockStateBase {
 
     private final ImmutableMap<String, BlockTrait<?>> blockTraits;
     private final ImmutableList<BlockState> blockStates;

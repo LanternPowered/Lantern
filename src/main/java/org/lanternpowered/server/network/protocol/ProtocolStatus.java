@@ -12,7 +12,7 @@ import org.lanternpowered.server.network.vanilla.message.type.status.MessageStat
 
 public final class ProtocolStatus extends ProtocolBase {
 
-    public ProtocolStatus() {
+    ProtocolStatus() {
         MessageRegistry inbound = this.inbound();
         MessageRegistry outbound = this.outbound();
 

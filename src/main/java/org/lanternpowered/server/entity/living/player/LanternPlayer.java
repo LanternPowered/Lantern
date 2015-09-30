@@ -267,9 +267,10 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
     }
 
     @Override
-    public void sendResourcePack(ResourcePack pack) {
-        String hash = pack.getHash().or(pack.getId());
-        String location = pack.getUri().toString();
+    public void sendResourcePack(ResourcePack resourcePack) {
+        checkNotNull(resourcePack, "resourcePack");
+        String hash = resourcePack.getHash().or(resourcePack.getId());
+        String location = resourcePack.getUri().toString();
         this.session.send(new MessagePlayOutSendResourcePack(location, hash));
     }
 

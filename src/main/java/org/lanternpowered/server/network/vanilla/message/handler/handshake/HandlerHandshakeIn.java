@@ -7,7 +7,7 @@ import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 
-public class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
+public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
 
     @Override
     public void handle(Session session, MessageHandshakeIn message) {
@@ -17,7 +17,8 @@ public class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
         }
 
         session.setProtocolState(next);
-        if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS)) {
+        if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS) &&
+                !next.equals(ProtocolState.FORGE_HANDSHAKE)) {
             session.disconnect("Received a unexpected handshake message! (" + next + ")");
         }
         // session.setVirtualHost(message.getAddress());

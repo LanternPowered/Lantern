@@ -60,6 +60,9 @@ public class Session implements PlayerConnection {
     public static final AttributeKey<Session> SESSION = AttributeKey.valueOf("session");
     public static final AttributeKey<ProtocolState> STATE = AttributeKey.valueOf("state");
 
+    // The game profile of the player
+    private volatile LanternGameProfile gameProfile;
+
     // The random for this session
     private final Random random = new Random();
 
@@ -383,7 +386,11 @@ public class Session implements PlayerConnection {
     }
 
     public void setPlayer(LanternGameProfile profile) {
-        
+        this.gameProfile = profile;
+    }
+
+    public void spawnPlayer() {
+
     }
 
     public void onDisconnect() {

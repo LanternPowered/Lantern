@@ -12,7 +12,6 @@ import org.lanternpowered.server.network.forge.message.handshake.MessageHandshak
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
-import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
 public final class ProcessorHandshakeOutRegistryData implements Processor<MessageHandshakeOutRegistryData> {
@@ -26,7 +25,7 @@ public final class ProcessorHandshakeOutRegistryData implements Processor<Messag
         while (it.hasNext()) {
             Entry entry = it.next();
             ByteBuf buf = context.byteBufAlloc().buffer();
-            buf.writeByte(ProcessorPlayInChannelPayload.FML_HANDSHAKE_REGISTRY_DATA);
+            buf.writeByte(Constants.FML_HANDSHAKE_REGISTRY_DATA);
             buf.writeBoolean(it.hasNext());
             Map<String, Integer> ids = entry.getIds();
             context.writeVarInt(buf, ids.size());

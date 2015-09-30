@@ -188,12 +188,6 @@ public class LanternDataHolder implements DataHolder {
     }
 
     @Override
-    public Collection<Property<?, ?>> getProperties() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean validateRawData(DataContainer container) {
         // TODO Auto-generated method stub
         return false;
@@ -203,6 +197,12 @@ public class LanternDataHolder implements DataHolder {
     public void setRawData(DataContainer container) throws InvalidDataException {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public Collection<Property<?, ?>> getApplicableProperties() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

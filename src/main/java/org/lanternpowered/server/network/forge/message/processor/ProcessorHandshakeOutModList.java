@@ -11,7 +11,6 @@ import org.lanternpowered.server.network.forge.message.handshake.MessageHandshak
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
-import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
 public final class ProcessorHandshakeOutModList implements Processor<MessageHandshakeInOutModList> {
@@ -20,7 +19,7 @@ public final class ProcessorHandshakeOutModList implements Processor<MessageHand
     public void process(CodecContext context, MessageHandshakeInOutModList message, List<Message> output) throws CodecException {
         Map<String, String> entries = message.getEntries();
         ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeByte(ProcessorPlayInChannelPayload.FML_HANDSHAKE_MOD_LIST);
+        buf.writeByte(Constants.FML_HANDSHAKE_MOD_LIST);
         context.writeVarInt(buf, entries.size());
         for (Entry<String, String> en : entries.entrySet()) {
             context.write(buf, String.class, en.getKey());

@@ -11,6 +11,7 @@ import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
+import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
 @Caching(ProcessorPlayOutChannelPayload.CachingHash.class)
@@ -24,7 +25,7 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
             output.add(message);
         // Support the multi part messages of forge, but only if the client supports it
         } else {
-            boolean enabled = context.channel().attr(ProcessorPlayInChannelPayload.FML_ENABLED).get();
+            boolean enabled = context.channel().attr(Session.FML_MARKER).get();
             if (!enabled) {
                 throw new CodecException("Payload may not be larger than 16777135 bytes.");
             }
@@ -54,7 +55,7 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
 
         @Override
         public int generate(CodecContext context, MessagePlayInOutChannelPayload message) {
-            return context.channel().attr(ProcessorPlayInChannelPayload.FML_ENABLED).get() ? 1 : 0;
+            return context.channel().attr(Session.FML_MARKER).get() ? 1 : 0;
         }
     }
 }

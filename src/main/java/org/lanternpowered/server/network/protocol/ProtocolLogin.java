@@ -18,7 +18,7 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 
 public final class ProtocolLogin extends ProtocolBase {
 
-    public ProtocolLogin() {
+    ProtocolLogin() {
         MessageRegistry inbound = this.inbound();
         MessageRegistry outbound = this.outbound();
 

@@ -31,12 +31,6 @@ public class LanternTileEntity implements TileEntity {
     }
 
     @Override
-    public Collection<Property<?, ?>> getProperties() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean validateRawData(DataContainer container) {
         // TODO Auto-generated method stub
         return false;
@@ -236,6 +230,12 @@ public class LanternTileEntity implements TileEntity {
 
     @Override
     public BlockState getBlock() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<Property<?, ?>> getApplicableProperties() {
         // TODO Auto-generated method stub
         return null;
     }

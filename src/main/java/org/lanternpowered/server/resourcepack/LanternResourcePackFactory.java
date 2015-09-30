@@ -35,6 +35,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
 
     private final Map<String, ResourcePack> resourcePacks = Maps.newConcurrentMap();
     private final Map<CacheKey, ResourcePack> resourcePacksByKey = Maps.newConcurrentMap();
+    private final Map<String, ResourcePack> resourcePacksByHash = Maps.newConcurrentMap();
 
     // The folder the level resource packs should be stored if
     // they should be hashed, not sure how sponge will handle it
@@ -47,7 +48,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
         }
         String path = uri.toString();
         String plainPath = path.replaceAll("[^\\p{L}\\p{Nd}]+", "");
-        String hash = plainPath;
+        String hash = null;
         String id = "{URI:" + path;
         if (!unchecked) {
             InputStream is;
@@ -68,13 +69,20 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
         }
         id += "}";
         ResourcePack resourcePack = new LanternResourcePack(uri, plainPath, id, Optional.fromNullable(hash));
-        this.resourcePacks.put(resourcePack.getId(), resourcePack);
+        if (hash != null) {
+            this.resourcePacksByHash.put(hash, resourcePack);
+        }
+        this.resourcePacks.put(id, resourcePack);
         this.resourcePacksByKey.put(key, resourcePack);
         return resourcePack;
     }
 
-    public Optional<ResourcePack> getIfPresent(String id) {
+    public Optional<ResourcePack> getById(String id) {
         return Optional.fromNullable(this.resourcePacks.get(id));
+    }
+
+    public Optional<ResourcePack> getByHash(String hash) {
+        return Optional.fromNullable(this.resourcePacksByHash.get(hash));
     }
 
     @Override

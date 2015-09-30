@@ -3,9 +3,16 @@ package org.lanternpowered.server.world.rules;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
+import javax.annotation.Nullable;
+
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.world.ChangeWorldGameRuleEvent;
 import org.spongepowered.api.util.Coerce;
+import org.spongepowered.api.world.World;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
@@ -13,17 +20,27 @@ import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class LanternGameRules implements GameRules {
+public final class LanternGameRules implements GameRules {
 
     private final Map<String, LanternGameRule> rules = Maps.newHashMap();
+    @Nullable private World world;
+
+    /**
+     * Sets the world of the game rules.
+     * 
+     * @param world the world
+     */
+    public void setWorld(@Nullable World world) {
+        this.world = world;
+    }
 
     @Override
-    public LanternGameRule newRule(String name) {
+    public GameRule newRule(String name) {
         checkNotNull(name, "name");
         if (this.rules.containsKey(name)) {
             return this.rules.get(name);
         }
-        LanternGameRule rule = this.createGameRule(name);
+        LanternGameRule rule = new LanternGameRule(name);
         this.rules.put(name, rule);
         return rule;
     }
@@ -44,11 +61,7 @@ public class LanternGameRules implements GameRules {
         return ImmutableList.<GameRule>copyOf(this.rules.values());
     }
 
-    protected LanternGameRule createGameRule(String name) {
-        return new LanternGameRule(name);
-    }
-
-    class LanternGameRule implements GameRule {
+    private class LanternGameRule implements GameRule {
 
         private final String name;
 
@@ -75,6 +88,7 @@ public class LanternGameRules implements GameRules {
 
         @Override
         public <T> void set(T object, Cause cause) {
+            String oldValue = this.value;
             if (object == null) {
                 this.value = null;
                 this.valueBoolean = null;
@@ -83,6 +97,11 @@ public class LanternGameRules implements GameRules {
                 this.value = Coerce.asString(object).get();
                 this.valueBoolean = Coerce.asBoolean(object).orNull();
                 this.valueNumber = Coerce.asDouble(object).orNull();
+            }
+            if (!Objects.equals(this.value, oldValue)) {
+                ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(LanternGame.get(),
+                        cause, oldValue == null ? "" : oldValue, this.value == null ? "" : this.value, name, world);
+                LanternGame.get().getEventManager().post(event);
             }
         }
 
@@ -111,5 +130,4 @@ public class LanternGameRules implements GameRules {
             return this.valueNumber == null ? Optional.absent() : Optional.of(this.valueNumber.intValue());
         }
     }
-
 }

@@ -7,19 +7,24 @@ public enum ProtocolState {
     /**
      * The handshake state (initial).
      */
-    HANDSHAKE   (-1, new ProtocolHandshake()),
+    HANDSHAKE           (-1, new ProtocolHandshake()),
     /**
      * The normal play state.
      */
-    PLAY        (0, new ProtocolPlay()),
+    PLAY                (0, new ProtocolPlay()),
     /**
      * The status (or ping) state.
      */
-    STATUS      (1, new ProtocolStatus()),
+    STATUS              (1, new ProtocolStatus()),
     /**
      * The login state.
      */
-    LOGIN       (2, new ProtocolLogin());
+    LOGIN               (2, new ProtocolLogin()),
+    /**
+     * The handshake phase of forge. This may be skipped and
+     * is only activated by the server.
+     */
+    FORGE_HANDSHAKE     (999, new ProtocolForgeHandshake());
 
     private final static TIntObjectMap<ProtocolState> LOOKUP = new TIntObjectHashMap<ProtocolState>();
 

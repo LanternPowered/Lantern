@@ -55,12 +55,6 @@ public class LanternEntity implements Entity {
     }
 
     @Override
-    public Collection<Property<?, ?>> getProperties() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean validateRawData(DataContainer container) {
         // TODO Auto-generated method stub
         return false;
@@ -378,6 +372,12 @@ public class LanternEntity implements Entity {
     public boolean damage(double damage, Cause cause) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public Collection<Property<?, ?>> getApplicableProperties() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

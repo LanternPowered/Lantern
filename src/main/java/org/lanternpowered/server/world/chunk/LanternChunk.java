@@ -1030,4 +1030,10 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         return false;
     }
 
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

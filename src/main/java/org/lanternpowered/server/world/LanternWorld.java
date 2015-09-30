@@ -353,6 +353,15 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     }
 
     @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
+        int x = coords.getX();
+        int y = coords.getY();
+        int z = coords.getZ();
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(new Vector3i(x & 0xf, y, z & 0xf),
+                direction, propertyClass);
+    }
+
+    @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(x & 0xf, y, z & 0xf, propertyClass);
     }

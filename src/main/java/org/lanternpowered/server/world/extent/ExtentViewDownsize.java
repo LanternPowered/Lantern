@@ -166,6 +166,15 @@ public class ExtentViewDownsize extends AbstractExtent {
         return this.extent.getBlock(x, y, z);
     }
 
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
+        int x = coords.getX();
+        int y = coords.getY();
+        int z = coords.getZ();
+        this.checkRange(x, y, z);
+        return this.extent.getProperty(new Vector3i(x, y, z), direction, propertyClass);
+    }
+
     /**
      * TODO: Use true/false as default notifyNeighbors setting?
      */

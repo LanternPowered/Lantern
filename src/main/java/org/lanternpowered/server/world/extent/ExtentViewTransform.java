@@ -201,6 +201,15 @@ public class ExtentViewTransform extends AbstractExtent {
             .transformZ(x, y, z));
     }
 
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
+        int x = coords.getX();
+        int y = coords.getY();
+        int z = coords.getZ();
+        return this.extent.getProperty(new Vector3i(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z)), direction, propertyClass);
+    }
+
     /**
      * TODO: Use true/false as default notifyNeighbors setting?
      */

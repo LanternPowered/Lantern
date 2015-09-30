@@ -4,9 +4,9 @@ import org.lanternpowered.server.network.vanilla.message.codec.handshake.CodecHa
 import org.lanternpowered.server.network.vanilla.message.handler.handshake.HandlerHandshakeIn;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 
-public class ProtocolHandshake extends ProtocolBase {
+public final class ProtocolHandshake extends ProtocolBase {
 
-    public ProtocolHandshake() {
+    ProtocolHandshake() {
         this.inbound().register(0x00, MessageHandshakeIn.class, CodecHandshakeIn.class, new HandlerHandshakeIn());
     }
 }

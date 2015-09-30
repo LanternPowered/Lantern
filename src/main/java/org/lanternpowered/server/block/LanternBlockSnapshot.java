@@ -1,5 +1,6 @@
 package org.lanternpowered.server.block;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -12,6 +13,7 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -25,7 +27,6 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spongepowered.api.data.DataQuery.of;
 
 public class LanternBlockSnapshot implements BlockSnapshot {
 
@@ -244,5 +245,17 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     public boolean restore(boolean force, boolean notifyNeighbors) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Collection<Property<?, ?>> getApplicableProperties() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

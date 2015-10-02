@@ -11,7 +11,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import com.google.common.base.Optional;
 
-public class Conditions {
+public final class Conditions {
+
     private static final String NOT_AVAILABLE = "This function is not available yet.";
 
     /**

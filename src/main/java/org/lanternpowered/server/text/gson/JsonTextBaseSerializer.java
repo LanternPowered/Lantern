@@ -25,7 +25,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 
-public class JsonTextBaseSerializer {
+abstract class JsonTextBaseSerializer {
 
     public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context) throws JsonParseException {
         this.deserialize(json, builder, context, json.has("extra") ? json.getAsJsonArray("extra") : null);

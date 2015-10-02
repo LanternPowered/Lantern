@@ -1,8 +1,8 @@
 package org.lanternpowered.server.network.vanilla.message.type.connection;
 
-import org.lanternpowered.server.network.message.AsyncMessage;
+import org.lanternpowered.server.network.message.Message;
 
-public final class MessageInOutPing implements AsyncMessage {
+public final class MessageInOutPing implements Message {
 
     private final int id;
 
@@ -23,5 +23,4 @@ public final class MessageInOutPing implements AsyncMessage {
     public int getKeepAliveId() {
         return this.id;
     }
-
 }

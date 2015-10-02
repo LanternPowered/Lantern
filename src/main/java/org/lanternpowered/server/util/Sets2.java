@@ -7,7 +7,10 @@ import java.util.WeakHashMap;
 
 import com.google.common.collect.Maps;
 
-public class Sets2 {
+public final class Sets2 {
+
+    private Sets2() {
+    }
 
     public static <T> Set<T> newWeakHashSet() {
         return Collections.newSetFromMap(new WeakHashMap<T, Boolean>());

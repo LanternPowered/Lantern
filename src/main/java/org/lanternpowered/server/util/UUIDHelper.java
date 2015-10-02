@@ -7,6 +7,9 @@ import java.util.UUID;
 
 public final class UUIDHelper {
 
+    private UUIDHelper() {
+    }
+
     /**
      * Parses the uuid instance from a flat string (without dashes).
      * 

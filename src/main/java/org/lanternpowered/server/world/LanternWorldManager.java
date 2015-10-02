@@ -38,11 +38,13 @@ public class LanternWorldManager {
 
     private final Phaser tickBegin = new Phaser(1);
     private final Phaser tickEnd = new Phaser(1);
+    @Nullable private final String defaultWorld;
     private final File folder;
 
     private volatile int currentTick = -1;
 
-    public LanternWorldManager(File folder) {
+    public LanternWorldManager(File folder, @Nullable String defaultWorld) {
+        this.defaultWorld = defaultWorld;
         this.folder = folder;
     }
 
@@ -172,7 +174,7 @@ public class LanternWorldManager {
             if (this.propertiesByName.containsKey(folder)) {
                 return this.propertiesByName.get(name);
             }
-            WorldProperties properties = WorldPropertiesSerializer.read(folder);
+            WorldProperties properties = WorldPropertiesSerializer.read(folder, name);
             this.addProperties(properties);
             return properties;
         } catch (IOException e) {
@@ -209,8 +211,10 @@ public class LanternWorldManager {
     }
 
     public Optional<WorldProperties> getDefaultWorld() {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.defaultWorld == null) {
+            return Optional.absent();
+        }
+        return Optional.fromNullable(this.propertiesFromFolder(new File(this.folder, this.defaultWorld), true));
     }
 
     public Optional<World> loadWorld(String worldName) {
@@ -270,7 +274,7 @@ public class LanternWorldManager {
                 if (world != null) {
                     // TODO: Unlock saving
                 }
-                LanternWorldProperties properties = WorldPropertiesSerializer.read(worldFolder);
+                LanternWorldProperties properties = WorldPropertiesSerializer.read(worldFolder, copyName);
                 addProperties(properties);
                 return Optional.of(properties);
             }
@@ -330,7 +334,8 @@ public class LanternWorldManager {
 
     public boolean saveWorldProperties(WorldProperties properties) {
         try {
-            WorldPropertiesSerializer.write(folder, (LanternWorldProperties) properties);
+            WorldPropertiesSerializer.write(new File(folder, properties.getWorldName()),
+                    (LanternWorldProperties) properties);
         } catch (IOException e) {
             return false;
         }

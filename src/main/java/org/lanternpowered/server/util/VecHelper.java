@@ -5,6 +5,9 @@ import com.flowpowered.math.vector.Vector3i;
 
 public final class VecHelper {
 
+    private VecHelper() {
+    }
+
     public static boolean inBounds(int x, int y, Vector2i min, Vector2i max) {
         return x >= min.getX() && x <= max.getX() && y >= min.getY() && y <= max.getY();
     }

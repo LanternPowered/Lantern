@@ -54,6 +54,8 @@ public class LanternWorldProperties implements WorldProperties {
     protected boolean hardcore;
 
     protected long seed;
+    protected long time;
+    protected long age;
 
     protected LanternWorld world;
 
@@ -131,26 +133,22 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public long getTotalTime() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.age;
     }
 
     @Override
     public long getWorldTime() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.time;
     }
 
     @Override
     public void setWorldTime(long time) {
-        // TODO Auto-generated method stub
-
+        this.time = time;
     }
 
     @Override
     public DimensionType getDimensionType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.dimensionType;
     }
 
     @Override

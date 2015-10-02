@@ -78,7 +78,7 @@ public abstract class AbstractPlayInChannelPayloadProcessor implements Processor
                 message0.offset += len;
                 message0.index++;
                 if (message0.index >= message0.parts) {
-                    output.add(new MessagePlayInOutChannelPayload(message0.channel, message0.buffer));
+                    this.process(context, new MessagePlayInOutChannelPayload(message0.channel, message0.buffer), output);
                     attribute.set(null);
                 }
             }

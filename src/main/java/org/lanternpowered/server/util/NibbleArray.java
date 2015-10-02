@@ -113,7 +113,7 @@ public class NibbleArray {
         int index0 = index >> 1;
         byte previous = this.backingArray[index0];
 
-        if ((index0 & 0x1) == 0) {
+        if ((index & 0x1) == 0) {
             this.backingArray[index0] = (byte) ((previous & 0xf0) | value);
         } else {
             this.backingArray[index0] = (byte) ((previous & 0x0f) | (value << 4));
@@ -126,7 +126,7 @@ public class NibbleArray {
      * @param value the value to fill with
      */
     public void fill(byte value) {
-        value &= 0xf;
+        value &= 0x0f;
         Arrays.fill(this.backingArray, (byte) ((value << 4) | value));
     }
 

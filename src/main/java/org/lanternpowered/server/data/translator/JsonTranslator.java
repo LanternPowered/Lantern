@@ -60,7 +60,7 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
         return (DataView) this.fromJson(null, node);
     }
 
-    public Object fromJson(@Nullable DataView container, JsonElement json) {
+    private Object fromJson(@Nullable DataView container, JsonElement json) {
         if (json.isJsonObject()) {
             if (container == null) {
                 container = new MemoryDataContainer();
@@ -187,5 +187,4 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
         }
         return json;
     }
-
 }

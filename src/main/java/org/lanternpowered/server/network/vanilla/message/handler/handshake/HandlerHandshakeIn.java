@@ -2,11 +2,13 @@ package org.lanternpowered.server.network.vanilla.message.handler.handshake;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 
+@Async
 public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
 
     @Override
@@ -17,8 +19,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
         }
 
         session.setProtocolState(next);
-        if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS) &&
-                !next.equals(ProtocolState.FORGE_HANDSHAKE)) {
+        if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS)) {
             session.disconnect("Received a unexpected handshake message! (" + next + ")");
         }
         // session.setVirtualHost(message.getAddress());

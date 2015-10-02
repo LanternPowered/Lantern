@@ -12,7 +12,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-public class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text> {
+public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text> {
 
     /**
      * Registers the json text serializers for the specified gson builder.

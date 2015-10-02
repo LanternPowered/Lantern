@@ -16,7 +16,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Literal>, JsonDeserializer<Text.Literal> {
+public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Literal>, JsonDeserializer<Text.Literal> {
 
     @Override
     public Text.Literal deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

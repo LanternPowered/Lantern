@@ -25,8 +25,8 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.network.buf.LanternChannelBuf;
+import org.lanternpowered.server.network.message.AsyncHelper;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.AsyncMessage;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
@@ -46,6 +46,7 @@ import org.spongepowered.api.text.Texts;
 
 import com.google.common.collect.Sets;
 
+@SuppressWarnings({"rawtypes","unchecked"})
 public class Session implements PlayerConnection {
 
     public static final String ENCRYPTION = "encryption";
@@ -67,7 +68,18 @@ public class Session implements PlayerConnection {
     private final Random random = new Random();
 
     // A queue of incoming and unprocessed messages
-    private final Queue<Message> messageQueue = new ArrayDeque<Message>();
+    private final Queue<MessageEntry> messageQueue = new ArrayDeque<MessageEntry>();
+
+    private static class MessageEntry {
+
+        private final Handler handler;
+        private final Message message;
+
+        public MessageEntry(Message message, Handler handler) {
+            this.message = message;
+            this.handler = handler;
+        }
+    }
 
     // The server this session belongs to.
     private final LanternServer server;
@@ -284,22 +296,11 @@ public class Session implements PlayerConnection {
      * @param protocol the protocol to find the handler
      * @param message the message to be handled
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected void handleMessage(Protocol protocol, Message message) {
-        Class<? extends Message> messageClass = (Class<? extends Message>) message.getClass();
-        MessageRegistration registration = protocol.inbound().find(messageClass);
-
-        if (registration == null) {
-            throw new DecoderException("Failed to find a message registration for " + messageClass.getName() + "!");
-        }
-
-        Handler handler = registration.getHandler();
-        if (handler != null) {
-            try {
-                handler.handle(this, message);
-            } catch (Throwable throwable) {
-                this.onHandlerThrowable(message, handler, throwable);
-            }
+    protected void handleMessage(Handler handler, Message message) {
+        try {
+            handler.handle(this, message);
+        } catch (Throwable throwable) {
+            this.onHandlerThrowable(message, handler, throwable);
         }
     }
 
@@ -317,10 +318,20 @@ public class Session implements PlayerConnection {
      * @param message the message
      */
     public void messageReceived(Message message) {
-        if (message instanceof AsyncMessage) {
-            this.handleMessage(this.getProtocol(), message);
-        } else {
-            this.messageQueue.add(message);
+        Class<? extends Message> messageClass = (Class<? extends Message>) message.getClass();
+        MessageRegistration registration = this.getProtocol().inbound().find(messageClass);
+
+        if (registration == null) {
+            throw new DecoderException("Failed to find a message registration for " + messageClass.getName() + "!");
+        }
+
+        Handler handler = registration.getHandler();
+        if (handler != null) {
+            if (AsyncHelper.isAsyncMessage(message) || AsyncHelper.isAsyncHandler(handler)) {
+                this.handleMessage(handler, message);
+            } else {
+                this.messageQueue.add(new MessageEntry(message, handler));
+            }
         }
     }
 
@@ -469,13 +480,9 @@ public class Session implements PlayerConnection {
      * Pulses the session.
      */
     protected void pulse() {
-        // Handle the inbound messages synchronous
-        if (!this.messageQueue.isEmpty()) {
-            Protocol protocol = this.getProtocol();
-
-            while (!this.messageQueue.isEmpty()) {
-                this.handleMessage(protocol, this.messageQueue.poll());
-            }
+        MessageEntry entry;
+        while ((entry = this.messageQueue.poll()) != null) {
+            this.handleMessage(entry.handler, entry.message);
         }
     }
 

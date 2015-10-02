@@ -10,7 +10,7 @@ import java.security.spec.X509EncodedKeySpec;
 
 import org.lanternpowered.server.game.LanternGame;
 
-public class SecurityHelper {
+public final class SecurityHelper {
 
     private static SecureRandom random = new SecureRandom();
 

@@ -20,7 +20,7 @@ import com.google.gson.JsonSerializer;
 /**
  * Serializes/deserializes the {@link Text.Placeholder} object type introduced by sponge.
  */
-public class JsonTextPlaceholderSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text.Placeholder>, JsonSerializer<Text.Placeholder> {
+public final class JsonTextPlaceholderSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text.Placeholder>, JsonSerializer<Text.Placeholder> {
 
     @Override
     public JsonElement serialize(Text.Placeholder src, Type typeOfSrc, JsonSerializationContext context) {

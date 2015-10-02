@@ -228,7 +228,9 @@ public class LanternServer implements Server {
             runnable -> new Thread(runnable, "server"));
 
     private final LanternChannelRegistrar channelRegistrar = new LanternChannelRegistrar(this);
-    private final LanternWorldManager worldManager;
+
+    // The world manager
+    private LanternWorldManager worldManager;
 
     // The network manager
     private final NetworkManager networkManager = new NetworkManager(this);
@@ -259,7 +261,6 @@ public class LanternServer implements Server {
     private volatile boolean shuttingDown;
 
     public LanternServer(LanternGame game, LanternServerConfig config, ConsoleManager consoleManager) {
-        this.worldManager = new LanternWorldManager(game.getSavesDirectory());
         this.consoleManager = consoleManager;
         this.config = config;
         this.game = game;
@@ -290,6 +291,12 @@ public class LanternServer implements Server {
     }
 
     public void start() {
+        String defaultWorld = this.config.get(Settings.MAIN_WORLD);
+        if (defaultWorld.isEmpty()) {
+            defaultWorld = null;
+        }
+        this.worldManager = new LanternWorldManager(this.game.getSavesDirectory(), defaultWorld);
+
         this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game));
         this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game));
 

@@ -17,7 +17,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Translatable>, JsonDeserializer<Text.Translatable> {
+public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Translatable>, JsonDeserializer<Text.Translatable> {
 
     private final TranslationManager translationManager;
 

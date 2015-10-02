@@ -19,7 +19,7 @@ import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Score>, JsonDeserializer<Text.Score> {
+public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Score>, JsonDeserializer<Text.Score> {
 
     @Override
     public Text.Score deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

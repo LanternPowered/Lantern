@@ -16,7 +16,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Selector>, JsonDeserializer<Text.Selector> {
+public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Selector>, JsonDeserializer<Text.Selector> {
 
     @Override
     public Text.Selector deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

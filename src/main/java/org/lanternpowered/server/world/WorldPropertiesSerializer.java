@@ -11,6 +11,8 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
 import org.lanternpowered.server.game.LanternGame;
@@ -59,7 +61,7 @@ public class WorldPropertiesSerializer {
         return new File(folder, LEVEL_DATA).exists();
     }
 
-    public static LanternWorldProperties read(File folder) throws IOException {
+    public static LanternWorldProperties read(File folder, @Nullable String worldName) throws IOException {
         File levelFile = new File(folder, LEVEL_DATA);
         if (!levelFile.exists()) {
             throw new FileNotFoundException("Unable to find " + LEVEL_DATA + "!");
@@ -117,10 +119,16 @@ public class WorldPropertiesSerializer {
         }
 
         LanternWorldProperties properties = new LanternWorldProperties();
+        // Get the world name
+        properties.name = worldName == null ? folder.getName() : worldName;
         // Set the uuid
         properties.uniqueId = uuid;
         // Get the world seed
         properties.seed = container.getLong(SEED).or(new Random().nextLong());
+        // Get the world age
+        properties.age = container.getLong(AGE).or(0L);
+        // Get the world time
+        properties.time = container.getLong(TIME).or(0L);
 
         // Get the spawn position
         Optional<Integer> spawnX = container.getInt(SPAWN_X);

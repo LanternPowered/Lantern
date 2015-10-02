@@ -14,7 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-public class JsonTextRepresentation implements TextRepresentation {
+public final class JsonTextRepresentation implements TextRepresentation {
 
     private final Gson gson;
 

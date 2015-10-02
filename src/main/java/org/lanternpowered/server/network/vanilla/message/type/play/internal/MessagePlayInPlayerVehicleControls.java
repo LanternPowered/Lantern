@@ -2,7 +2,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play.internal;
 
 import org.lanternpowered.server.network.message.Message;
 
-public class MessagePlayInPlayerVehicleControls implements Message {
+public final class MessagePlayInPlayerVehicleControls implements Message {
 
     private final float sideways;
     private final float forwards;

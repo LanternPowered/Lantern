@@ -3,7 +3,7 @@ package org.lanternpowered.server.network.forge.handshake;
 public enum ForgeServerHandshakePhase implements ForgeHandshakePhase {
     START,
     HELLO,
-    WAITINGCACK,
+    WAITING_ACK,
     COMPLETE,
     DONE,
     ERROR,

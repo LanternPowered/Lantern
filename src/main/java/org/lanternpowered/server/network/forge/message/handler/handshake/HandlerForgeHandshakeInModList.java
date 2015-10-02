@@ -22,6 +22,6 @@ public final class HandlerForgeHandshakeInModList implements Handler<MessageForg
         // We don't need to validate the mods for now, maybe in the future, just poke back
         // Just use a empty map for now
         session.send(new MessageForgeHandshakeInOutModList(Maps.newHashMap()));
-        phase.set(ForgeServerHandshakePhase.WAITINGCACK);
+        phase.set(ForgeServerHandshakePhase.WAITING_ACK);
     }
 }

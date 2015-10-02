@@ -118,6 +118,7 @@ public class LanternServerConfig {
         public static final Setting<Boolean> ONLINE_MODE = new Setting<>(of('.', "server.online-mode"), true);
         public static final Setting<Integer> MAX_PLAYERS = new Setting<>(of('.', "server.max-players"), 20);
         public static final Setting<Boolean> WHITELIST = new Setting<>(of('.', "server.whitelist"), false);
+        public static final Setting<Boolean> REDUCED_DEBUG = new Setting<>(of('.', "server.reduced-debug"), false);
         public static final Setting<String> MAIN_WORLD = new Setting<>(of('.', "server.main-world"), "world");
         public static final Setting<String> FAVICON = new Setting<>(of('.', "server.favicon"), "favicon.png");
         public static final Setting<String> MOTD = new Setting<>(of('.', "server.motd"), "A Lantern Mincraft Server");

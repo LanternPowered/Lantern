@@ -118,7 +118,7 @@ public class Session implements PlayerConnection {
     private int pingMessageId;
 
     // The current ping of the channel
-    private int ping;
+    private volatile int ping;
 
     // The last ping time
     private long pingTimeStart;
@@ -401,7 +401,7 @@ public class Session implements PlayerConnection {
     }
 
     public void spawnPlayer() {
-
+        
     }
 
     public void onDisconnect() {

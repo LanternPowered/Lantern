@@ -5,6 +5,7 @@ import org.spongepowered.api.service.config.ConfigDir;
 
 import java.lang.annotation.Annotation;
 
+@SuppressWarnings("all")
 public class ConfigDirAnnotation implements ConfigDir {
 
     private final boolean shared;
@@ -31,7 +32,6 @@ public class ConfigDirAnnotation implements ConfigDir {
         if (!(o instanceof ConfigDir)) {
             return false;
         }
-
         ConfigDir that = (ConfigDir) o;
         return sharedRoot() == that.sharedRoot();
     }

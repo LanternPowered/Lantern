@@ -7,7 +7,7 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 
-public final class CodecPlayInChat implements Codec<MessagePlayInChatMessage> {
+public final class CodecPlayInChatMessage implements Codec<MessagePlayInChatMessage> {
 
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayInChatMessage message) throws CodecException {

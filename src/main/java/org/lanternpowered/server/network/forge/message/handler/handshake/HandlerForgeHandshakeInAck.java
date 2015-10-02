@@ -23,36 +23,36 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
     public void handle(Session session, MessageForgeHandshakeInOutAck message) {
         Attribute<ForgeServerHandshakePhase> phase = session.getChannel().attr(ForgeHandshakePhase.PHASE);
         switch (phase.get()) {
-            case WAITINGCACK:
-                if (!message.getPhase().equals(ForgeClientHandshakePhase.WAITINGSERVERDATA)) {
+            case WAITING_ACK:
+                if (!message.getPhase().equals(ForgeClientHandshakePhase.WAITING_SERVER_DATA)) {
                     session.disconnect("Retrieved unexpected forge handshake ack message. (Got " + message.getPhase() +
-                            ", expected " + ForgeClientHandshakePhase.WAITINGSERVERDATA + ")");
+                            ", expected " + ForgeClientHandshakePhase.WAITING_SERVER_DATA + ")");
                 } else {
                     List<MessageForgeHandshakeOutRegistryData.Entry> entries = Lists.newArrayList();
                     entries.add(new MessageForgeHandshakeOutRegistryData.Entry("fml:items", Maps.newHashMap(), Lists.newArrayList()));
                     entries.add(new MessageForgeHandshakeOutRegistryData.Entry("fml:blocks", Maps.newHashMap(), Lists.newArrayList()));
                     session.send(new MessageForgeHandshakeOutRegistryData(entries));
-                    session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.WAITINGCACK));
+                    session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.WAITING_ACK));
                     phase.set(ForgeServerHandshakePhase.COMPLETE);
                 }
                 break;
             case COMPLETE:
-                if (!message.getPhase().equals(ForgeClientHandshakePhase.WAITINGSERVERCOMPLETE)) {
+                if (!message.getPhase().equals(ForgeClientHandshakePhase.WAITING_SERVER_COMPLETE)) {
                     session.disconnect("Retrieved unexpected forge handshake ack message. (Got " + message.getPhase() +
-                            ", expected " + ForgeClientHandshakePhase.WAITINGSERVERCOMPLETE + ")");
+                            ", expected " + ForgeClientHandshakePhase.WAITING_SERVER_COMPLETE + ")");
                 } else {
                     session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.COMPLETE));
                     phase.set(ForgeServerHandshakePhase.DONE);
                 }
                 break;
             case DONE:
-                if (!message.getPhase().equals(ForgeClientHandshakePhase.PENDINGCOMPLETE) &&
+                if (!message.getPhase().equals(ForgeClientHandshakePhase.PENDING_COMPLETE) &&
                         !message.getPhase().equals(ForgeClientHandshakePhase.COMPLETE)) {
                     session.disconnect("Retrieved unexpected forge handshake ack message. (Got " + message.getPhase() +
-                            ", expected " + ForgeClientHandshakePhase.PENDINGCOMPLETE + " or " +
+                            ", expected " + ForgeClientHandshakePhase.PENDING_COMPLETE + " or " +
                             ForgeClientHandshakePhase.COMPLETE + ")");
                 } else {
-                    if (message.getPhase().equals(ForgeClientHandshakePhase.PENDINGCOMPLETE)) {
+                    if (message.getPhase().equals(ForgeClientHandshakePhase.PENDING_COMPLETE)) {
                         session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.DONE));
                     } else {
                         session.send(new MessageForgeHandshakeOutComplete());
@@ -60,6 +60,7 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                         session.spawnPlayer();
                     }
                 }
+                break;
             case ERROR:
                 break;
             default:

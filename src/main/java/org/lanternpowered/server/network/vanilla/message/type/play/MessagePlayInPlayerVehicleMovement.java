@@ -5,9 +5,6 @@ import org.lanternpowered.server.network.message.Message;
 /**
  * This is the only message that we will use to modify the controls
  * of the player. More info will come as I write the implementation.
- * 
- * Notes:
- * - Abilities Message -> allowFlying=true -> overrides sprint food limit
  */
 public final class MessagePlayInPlayerVehicleMovement implements Message {
 

@@ -5,7 +5,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 
-public class MessagePlayOutChatMessage implements Message {
+public final class MessagePlayOutChatMessage implements Message {
 
     private final Text message;
     private final ChatType chatType;

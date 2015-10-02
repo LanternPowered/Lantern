@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class LanternChannelRegistrar implements ChannelRegistrar {
+public final class LanternChannelRegistrar implements ChannelRegistrar {
 
     private final Map<String, RegisteredChannel> channels = Maps.newConcurrentMap();
     private final Server server;
@@ -84,7 +84,7 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
      */
     @Nullable
     public RegisteredChannel getRegisteredChannel(String channel) {
-        return this.channels.get(channel);
+        return this.channels.get(checkNotNull(channel, "channel"));
     }
 
 }

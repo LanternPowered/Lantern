@@ -14,6 +14,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.game.LanternGameProfile.Property;
@@ -38,7 +39,9 @@ import com.google.gson.JsonObject;
 
 public final class LanternGameProfileResolver implements GameProfileResolver {
 
-    private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+    private final AtomicInteger counter = new AtomicInteger();
+    private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(
+            runnable -> new Thread(runnable, "profile-resolver-" + this.counter.getAndIncrement())));
     private final Gson gson = new Gson();
 
     private final LoadingCache<UUID, GameProfile> profileCache = 

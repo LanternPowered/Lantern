@@ -3,9 +3,9 @@ package org.lanternpowered.server.network.forge.handshake;
 public enum ForgeClientHandshakePhase implements ForgeHandshakePhase {
     START,
     HELLO,
-    WAITINGSERVERDATA,
-    WAITINGSERVERCOMPLETE,
-    PENDINGCOMPLETE,
+    WAITING_SERVER_DATA,
+    WAITING_SERVER_COMPLETE,
+    PENDING_COMPLETE,
     COMPLETE,
     DONE,
     ERROR,

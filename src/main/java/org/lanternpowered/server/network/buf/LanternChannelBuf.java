@@ -25,14 +25,12 @@ public class LanternChannelBuf implements ChannelBuf {
      */
     private static final ObjectSerializerContext CONTEXT = new SimpleObjectSerializerContext(
             new SimpleObjectSerializers() {
-
                 {
                     this.register(UUID.class, new SerializerUUID());
                     this.register(DataView.class, new SerializerDataView());
                     this.register(VarInt.class, new SerializerVarInt());
                     this.register(String.class, new SerializerString());
                 }
-
             });
 
     private final ByteBuf buf;

@@ -2,8 +2,12 @@ package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutPing;
+import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInChangeSign;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCustomPayload;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutHeldItemChange;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerHealthUpdate;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerJoinGame;
@@ -12,6 +16,11 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnParticle;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
+import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInPlayerAction;
@@ -28,12 +37,16 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeSign;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenCredits;
@@ -79,6 +92,17 @@ public final class ProtocolPlay extends ProtocolBase {
         // Register handlers of the missing messages
 
         // Register the codecs and handlers of the default messages
+        inbound.register(0x00, MessageInOutPing.class, CodecInOutPing.class, new HandlerInPing());
+        inbound.register(0x01, MessagePlayInChatMessage.class, CodecPlayInChatMessage.class, new HandlerPlayInChatMessage());
+        // ...
+        inbound.register(0x12, MessagePlayInChangeSign.class, CodecPlayInChangeSign.class, new HandlerPlayInChangeSign());
+        // ...
+        inbound.register(0x17, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class,
+                new HandlerPlayInChannelPayload());
+        // 0x18
+        inbound.register(0x19, MessagePlayInResourcePackStatus.class, CodecPlayInResourcePackStatus.class,
+                new HandlerPlayInResourcePackStatus());
+
         outbound.register(0x00, MessageInOutPing.class, CodecInOutPing.class);
         outbound.register(0x01, MessagePlayOutPlayerJoinGame.class, CodecPlayOutPlayerJoinGame.class);
         outbound.register(0x02, MessagePlayOutChatMessage.class, CodecPlayOutChatMessage.class);
@@ -93,5 +117,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.register(0x2a, MessagePlayOutSpawnParticle.class, CodecPlayOutSpawnParticle.class);
         // ...
         outbound.register(0x3f, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class);
+        outbound.register(0x40, MessageOutDisconnect.class, CodecOutDisconnect.class);
+        // ...
     }
 }

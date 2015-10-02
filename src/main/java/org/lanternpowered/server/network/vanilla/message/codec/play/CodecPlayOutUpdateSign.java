@@ -7,6 +7,8 @@ import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateSign;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
 
 import com.flowpowered.math.vector.Vector3i;
 
@@ -17,13 +19,9 @@ public final class CodecPlayOutUpdateSign implements Codec<MessagePlayOutUpdateS
     public ByteBuf encode(CodecContext context, MessagePlayOutUpdateSign message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
         context.write(buf, Vector3i.class, message.getPosition());
-        String[] lines = message.getLines();
+        Text[] lines = message.getLines();
         for (int i = 0; i < 4; i++) {
-            String line = lines.length >= i ? null : lines[i];
-            if (line == null) {
-                line = "{\"text\":\"\"}";
-            }
-            context.write(buf, String.class, line);
+            context.write(buf, Text.class, lines[i] == null ? Texts.of() : lines[i]);
         }
         return buf;
     }

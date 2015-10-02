@@ -2,7 +2,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play.internal;
 
 import org.lanternpowered.server.network.message.Message;
 
-public class MessagePlayOutEntityStatus implements Message {
+public final class MessagePlayOutEntityStatus implements Message {
 
     private final int entityId;
     private final int status;

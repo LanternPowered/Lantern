@@ -23,7 +23,8 @@ public final class MessagePlayOutSetWindowSlot implements Message {
      * 
      * @return the item stack
      */
-    public @Nullable ItemStack getItem() {
+    @Nullable
+    public ItemStack getItem() {
         return this.itemStack;
     }
 

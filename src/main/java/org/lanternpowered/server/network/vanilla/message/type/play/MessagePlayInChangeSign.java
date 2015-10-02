@@ -1,25 +1,18 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.text.Text;
 
 import com.flowpowered.math.vector.Vector3i;
 
-public final class MessagePlayOutUpdateSign implements Message {
+public final class MessagePlayInChangeSign implements Message {
 
     private final Vector3i position;
-    private final Text[] lines;
+    private final String[] lines;
 
-    /**
-     * Creates the update sign message.
-     * 
-     * @param position the position
-     * @param lines the lines
-     */
-    public MessagePlayOutUpdateSign(Vector3i position, Text[] lines) {
+    public MessagePlayInChangeSign(Vector3i position, String[] lines) {
         this.position = checkNotNull(position, "position");
         checkNotNull(lines, "lines");
         checkArgument(lines.length == 4, "lines length must be 4");
@@ -36,11 +29,11 @@ public final class MessagePlayOutUpdateSign implements Message {
     }
 
     /**
-     * Gets the lines.
+     * Gets the lines of the sign.
      * 
      * @return the lines
      */
-    public Text[] getLines() {
+    public String[] getLines() {
         return this.lines;
     }
 }

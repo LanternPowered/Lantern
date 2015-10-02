@@ -6,6 +6,7 @@ import com.google.common.base.MoreObjects;
 
 import org.spongepowered.api.service.config.DefaultConfig;
 
+@SuppressWarnings("all")
 public class ConfigFileAnnotation implements DefaultConfig {
 
     private final boolean shared;
@@ -32,7 +33,6 @@ public class ConfigFileAnnotation implements DefaultConfig {
         if (!(o instanceof DefaultConfig)) {
             return false;
         }
-
         DefaultConfig that = (DefaultConfig) o;
         return sharedRoot() == that.sharedRoot();
     }

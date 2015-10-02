@@ -48,11 +48,10 @@ public final class LanternPluginContainer implements PluginContainer {
         return LoggerFactory.getLogger(this.id);
     }
 
-    public void setInstance(Object instance) {
+    void setInstance(Object instance) {
         if (this.instance != null) {
             throw new IllegalStateException("Instance for (" + this.getId() + ") can only be set once!");
         }
         this.instance = instance;
     }
-
 }

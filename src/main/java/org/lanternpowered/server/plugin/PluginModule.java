@@ -22,13 +22,13 @@ import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 
-public class PluginModule extends AbstractModule {
+public final class PluginModule extends AbstractModule {
 
     private final LanternPluginContainer container;
     private final Class<?> pluginClass;
     private final LanternGame game;
 
-    public PluginModule(LanternPluginContainer container, Class<?> pluginClass, LanternGame game) {
+    PluginModule(LanternPluginContainer container, Class<?> pluginClass, LanternGame game) {
         this.pluginClass = pluginClass;
         this.container = container;
         this.game = game;

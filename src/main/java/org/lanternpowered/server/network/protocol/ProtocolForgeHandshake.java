@@ -20,11 +20,14 @@ import org.lanternpowered.server.network.forge.message.type.handshake.MessageFor
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutReset;
 import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutPing;
+import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCustomPayload;
+import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
@@ -52,6 +55,7 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         outbound.register(MessagePlayInOutRegisterChannels.class, new ProcessorPlayOutRegisterChannels());
         outbound.register(MessagePlayInOutChannelPayload.class, new ProcessorPlayOutCustomPayload());
 
+        inbound.register(0x00, MessageInOutPing.class, CodecInOutPing.class, new HandlerInPing());
         inbound.register(0x17, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class);
         inbound.register(MessageForgeHandshakeInOutAck.class, new HandlerForgeHandshakeInAck());
         inbound.register(MessageForgeHandshakeInOutHello.class, new HandlerForgeHandshakeInHello());
@@ -60,5 +64,6 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
 
         outbound.register(0x00, MessageInOutPing.class, CodecInOutPing.class);
         outbound.register(0x3f, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class);
+        outbound.register(0x40, MessageOutDisconnect.class, CodecOutDisconnect.class);
     }
 }

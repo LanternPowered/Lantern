@@ -50,24 +50,16 @@ public final class AsyncHelper {
         return isAsync0(message);
     }
 
-    /**
-     * Gets whether the specified handler will be handled asynchronous.
-     * 
-     * @param handler the handler
-     * @return is asynchronous
-     */
-    private static boolean isAsync0(Class<?> handler) {
-        if (map.containsKey(handler)) {
-            return map.get(handler);
+    private static boolean isAsync0(Class<?> target) {
+        if (map.containsKey(target)) {
+            return map.get(target);
         }
         boolean async = false;
-        while (handler != null && handler != Object.class) {
-            if (async = (handler.getAnnotation(Async.class) != null)) {
-                break;
-            }
-            handler = handler.getSuperclass();
+        while (!async && target != null && target != Object.class) {
+            async = target.getAnnotation(Async.class) != null;
+            target = target.getSuperclass();
         }
-        map.put(handler, async);
+        map.put(target, async);
         return async;
     }
 

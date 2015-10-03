@@ -20,7 +20,9 @@ import org.lanternpowered.server.network.vanilla.message.handler.connection.Hand
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInPlayerAction;
@@ -71,7 +73,6 @@ public final class ProtocolPlay extends ProtocolBase {
         MessageRegistry outbound = this.outbound();
 
         // Register the processors
-
         inbound.register(MessagePlayInOutChannelPayload.class, new ProcessorPlayInChannelPayload());
         inbound.register(MessagePlayInClientSettings.class, new ProcessorPlayInClientSettings());
         inbound.register(MessagePlayInPlayerAction.class, new ProcessorPlayInPlayerAction());
@@ -79,17 +80,19 @@ public final class ProtocolPlay extends ProtocolBase {
 
         outbound.register(MessagePlayInOutBrand.class, new ProcessorPlayOutBrand());
         outbound.register(MessagePlayInOutChannelPayload.class, new ProcessorPlayOutChannelPayload());
+        outbound.register(MessagePlayInOutRegisterChannels.class, new ProcessorPlayOutRegisterChannels());
+        outbound.register(MessagePlayInOutUnregisterChannels.class, new ProcessorPlayOutUnregisterChannels());
         outbound.register(MessagePlayOutOpenBook.class, new ProcessorPlayOutOpenBook());
         outbound.register(MessagePlayOutOpenCredits.class, new ProcessorPlayOutOpenCredits());
         outbound.register(MessagePlayOutParticleEffect.class, new ProcessorPlayOutParticleEffect());
         outbound.register(MessagePlayOutPlayerJoinGame.class, new ProcessorPlayOutPlayerJoinGame());
-        outbound.register(MessagePlayInOutRegisterChannels.class, new ProcessorPlayOutRegisterChannels());
         outbound.register(MessagePlayOutSetGameMode.class, new ProcessorPlayOutSetGameMode());
         outbound.register(MessagePlayOutSetReducedDebug.class, new ProcessorPlayOutSetReducedDebug());
-        outbound.register(MessagePlayInOutUnregisterChannels.class, new ProcessorPlayOutUnregisterChannels());
         outbound.register(MessagePlayOutWorldSky.class, new ProcessorPlayOutWorldSky());
 
         // Register handlers of the missing messages
+        inbound.register(MessagePlayInOutRegisterChannels.class, new HandlerPlayInRegisterChannels());
+        inbound.register(MessagePlayInOutUnregisterChannels.class, new HandlerPlayInUnregisterChannels());
 
         // Register the codecs and handlers of the default messages
         inbound.register(0x00, MessageInOutPing.class, CodecInOutPing.class, new HandlerInPing());

@@ -7,6 +7,7 @@ import io.netty.util.Attribute;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
+import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
@@ -29,14 +30,19 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         Set<String> channels = Sets.newHashSet(LanternGame.get().getServer().getRegisteredChannels());
         if (fml) {
             channels.add("FML");
+            channels.add("FML|HS");
+            channels.add("FML|MP");
         }
         if (!channels.isEmpty()) {
             session.send(new MessagePlayInOutRegisterChannels(channels));
         }
         if (fml) {
-            phase.set(ForgeServerHandshakePhase.START);
+            phase.set(ForgeServerHandshakePhase.HELLO);
+            session.send(new MessageForgeHandshakeInOutHello());
+            LanternGame.log().info("{}: Start forge handshake.", session.getGameProfile().getName());
         } else {
-            phase.set(ForgeServerHandshakePhase.COMPLETE);
+            LanternGame.log().info("{}: Skip forge handshake.", session.getGameProfile().getName());
+            phase.set(ForgeServerHandshakePhase.DONE);
             session.setProtocolState(ProtocolState.PLAY);
             session.spawnPlayer();
         }

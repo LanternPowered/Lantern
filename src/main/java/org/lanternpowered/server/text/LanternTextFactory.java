@@ -14,7 +14,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 
-public class LanternTextFactory implements TextFactory {
+public final class LanternTextFactory implements TextFactory {
 
     private final LoadingCache<Character, LegacyTextRepresentation> legacyCache = CacheBuilder.newBuilder()
             .maximumSize(53)

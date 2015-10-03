@@ -1,7 +1,10 @@
-package org.lanternpowered.server.network.buf;
+package org.lanternpowered.server.network.channel;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
+import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import java.util.List;
 import java.util.Map;
@@ -59,7 +62,8 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
     public void registerChannel(Object plugin, ChannelListener listener, String channel) throws ChannelRegistrationException {
         PluginContainer container = checkPlugin(plugin, "plugin");
         checkNotNull(listener, "listener");
-        checkNotNull(channel, "channel");
+        checkNotNullOrEmpty(channel, "channel");
+        checkArgument(channel.length() <= 20, "channel length may not be longer then 20");
         if (this.channels.containsKey(channel) || channel.startsWith("MC|") || channel.startsWith("\001") || channel.startsWith("FML")) {
             throw new ChannelRegistrationException("Channel with name \"" + channel + "\" is already registered!");
         }
@@ -87,4 +91,20 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         return this.channels.get(checkNotNull(channel, "channel"));
     }
 
+    /**
+     * Validates whether there is a specified channel registered
+     * with the specified plugin. Throws a exception when it is invalid.
+     * 
+     * @param plugin the plugin
+     * @param channel the channel
+     * @throws IllegalStateException
+     */
+    public void validateChannel(Object plugin, String channel) {
+        PluginContainer container = checkPlugin(plugin, "plugin");
+        checkNotNull(channel, "channel");
+        checkState(this.channels.containsKey(channel), "Channel " + channel + " is not registered.");
+        RegisteredChannel registration = this.channels.get(channel);
+        checkState(registration.plugin == container, "The provided plugin doesn't match the one"
+                + " of the registration. (Got " + container.getId() + ", expected " + registration.plugin.getId() + ")");
+    }
 }

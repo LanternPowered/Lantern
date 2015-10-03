@@ -8,7 +8,7 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.processor.play.AbstractPlayInChannelPayloadProcessor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
-public final class ProcessorPlayOutCustomPayload extends AbstractPlayInChannelPayloadProcessor {
+public final class ProcessorPlayOutChannelPayload extends AbstractPlayInChannelPayloadProcessor {
 
     @Override
     public void process0(CodecContext context, MessagePlayInOutChannelPayload message, List<Message> output) throws CodecException {

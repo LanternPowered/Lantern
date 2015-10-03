@@ -17,7 +17,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 
 import com.google.common.collect.Maps;
 
-public final class ProcessorPlayInCustomPayload extends AbstractPlayInChannelPayloadProcessor {
+public final class ProcessorPlayInChannelPayload extends AbstractPlayInChannelPayloadProcessor {
 
     @Override
     public void process0(CodecContext context, MessagePlayInOutChannelPayload message, List<Message> output) throws CodecException {

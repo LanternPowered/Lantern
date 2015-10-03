@@ -27,7 +27,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
-import org.lanternpowered.server.network.buf.LanternChannelRegistrar;
+import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
@@ -227,8 +227,6 @@ public class LanternServer implements Server {
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
             runnable -> new Thread(runnable, "server"));
 
-    private final LanternChannelRegistrar channelRegistrar = new LanternChannelRegistrar(this);
-
     // The world manager
     private LanternWorldManager worldManager;
 
@@ -371,12 +369,12 @@ public class LanternServer implements Server {
 
     @Override
     public void registerChannel(Object plugin, ChannelListener listener, String channel) throws ChannelRegistrationException {
-        this.channelRegistrar.registerChannel(plugin, listener, channel);
+        this.game.getChannelRegistrar().registerChannel(plugin, listener, channel);
     }
 
     @Override
     public List<String> getRegisteredChannels() {
-        return this.channelRegistrar.getRegisteredChannels();
+        return this.game.getChannelRegistrar().getRegisteredChannels();
     }
 
     @Override

@@ -22,7 +22,7 @@ public final class CodecPlayInOutCustomPayload implements Codec<MessagePlayInOut
     @Override
     public MessagePlayInOutChannelPayload decode(CodecContext context, ByteBuf buf) throws CodecException {
         String channel = context.read(buf, String.class);
-        ByteBuf content = context.byteBufAlloc().buffer(buf.readableBytes());
+        ByteBuf content = context.byteBufAlloc().heapBuffer(buf.readableBytes());
         buf.readBytes(content);
         return new MessagePlayInOutChannelPayload(channel, content);
     }

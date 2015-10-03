@@ -5,7 +5,7 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 
-public class HandlerPlayInClientSettings implements Handler<MessagePlayInClientSettings> {
+public final class HandlerPlayInClientSettings implements Handler<MessagePlayInClientSettings> {
 
     @Override
     public void handle(Session session, MessagePlayInClientSettings message) {

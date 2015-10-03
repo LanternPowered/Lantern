@@ -5,6 +5,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
+import org.lanternpowered.server.text.LegacyTextRepresentation;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -51,6 +52,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
     }
 
     private static boolean isAllowedCharacter(char character) {
-        return character != '§' && character >= ' ' && character != '';
+        return character != LegacyTextRepresentation.DEFAULT_CHAR &&
+                character >= ' ' && character != '\u007F';
     }
 }

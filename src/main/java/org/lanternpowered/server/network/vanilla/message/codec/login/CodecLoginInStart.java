@@ -18,5 +18,4 @@ public final class CodecLoginInStart implements Codec<MessageLoginInStart> {
     public MessageLoginInStart decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessageLoginInStart(context.read(buf, String.class));
     }
-
 }

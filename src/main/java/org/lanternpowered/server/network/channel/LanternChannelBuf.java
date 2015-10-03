@@ -1,4 +1,4 @@
-package org.lanternpowered.server.network.buf;
+package org.lanternpowered.server.network.channel;
 
 import io.netty.buffer.ByteBuf;
 

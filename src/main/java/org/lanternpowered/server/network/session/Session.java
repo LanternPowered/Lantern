@@ -1,5 +1,7 @@
 package org.lanternpowered.server.network.session;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
 import java.util.List;
@@ -24,7 +26,7 @@ import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameProfile;
-import org.lanternpowered.server.network.buf.LanternChannelBuf;
+import org.lanternpowered.server.network.channel.LanternChannelBuf;
 import org.lanternpowered.server.network.message.AsyncHelper;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
@@ -81,6 +83,12 @@ public class Session implements PlayerConnection {
         }
     }
 
+    // A list with all the registered channels (client)
+    private final Set<String> registeredChannels = Sets.newHashSet();
+
+    // A list with all the installed mods (client)
+    private final Set<String> installedMods = Sets.newHashSet();
+
     // The server this session belongs to.
     private final LanternServer server;
 
@@ -106,9 +114,6 @@ public class Session implements PlayerConnection {
     // The player associated with this session (if there is one)
     @Nullable
     private LanternPlayer player;
-
-    // The mods that the owner of this session has installed
-    private Set<String> mods = Sets.newHashSet();
 
     // The current protocol version
     private int protocolVersion = -1;
@@ -138,6 +143,33 @@ public class Session implements PlayerConnection {
         this.server = server;
     }
 
+    /**
+     * Gets the game profile.
+     * 
+     * @return the game profile
+     */
+    public LanternGameProfile getGameProfile() {
+        return this.gameProfile;
+    }
+
+    /**
+     * Gets a list with all the installed mods. (Client side.)
+     * 
+     * @return the installed mods
+     */
+    public Set<String> getInstalledMods() {
+        return this.installedMods;
+    }
+
+    /**
+     * Gets the registered channels. (Client side.)
+     * 
+     * @return the registered channel
+     */
+    public Set<String> getRegisteredChannels() {
+        return this.registeredChannels;
+    }
+
     @Nullable
     public ProxyData getProxyData() {
         return this.proxyData;
@@ -154,15 +186,6 @@ public class Session implements PlayerConnection {
      */
     public Channel getChannel() {
         return this.channel;
-    }
-
-    /**
-     * Adds the mods to the owner of the session.
-     * 
-     * @param mods the mods
-     */
-    public void addMods(List<String> mods) {
-        this.mods.addAll(mods);
     }
 
     /**
@@ -603,13 +626,19 @@ public class Session implements PlayerConnection {
 
     @Override
     public void sendCustomPayload(Object plugin, String channel, byte[] data) {
-        // TODO: Validate registration
+        LanternGame.get().getChannelRegistrar().validateChannel(plugin, channel);
+        if (!this.registeredChannels.contains(channel)) {
+            return;
+        }
         this.send(new MessagePlayInOutChannelPayload(channel, Unpooled.wrappedBuffer(data)));
     }
 
     @Override
     public void sendCustomPayload(Object plugin, String channel, ChannelBuf dataStream) {
-        // TODO: Validate registration
+        LanternGame.get().getChannelRegistrar().validateChannel(plugin, channel);
+        if (!this.registeredChannels.contains(channel)) {
+            return;
+        }
         this.send(new MessagePlayInOutChannelPayload(channel, ((LanternChannelBuf) dataStream).getDelegate()));
     }
 }

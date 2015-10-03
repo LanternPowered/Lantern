@@ -5,14 +5,17 @@ import java.util.UUID;
 
 import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
+import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 import org.lanternpowered.server.util.SecurityHelper;
 
+@Async
 public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
 
     @Override
@@ -32,12 +35,15 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             session.send(new MessageLoginOutEncryptionRequest(publicKey, verifyToken));
         } else {
             ProxyData proxy = session.getProxyData();
+            LanternGameProfile profile;
             if (proxy == null) {
                 UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
-                session.setPlayer(new LanternGameProfile(uuid, username));
+                profile = new LanternGameProfile(uuid, username);
             } else {
-                session.setPlayer(new LanternGameProfile(proxy.getUniqueId(), username, proxy.getProperties()));
+                profile = new LanternGameProfile(proxy.getUniqueId(), username, proxy.getProperties());
             }
+            session.setPlayer(profile);
+            session.send(new MessageLoginOutSuccess(profile.getUniqueId(), username));
             session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
             session.messageReceived(new MessageForgeHandshakeInStart());
         }

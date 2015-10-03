@@ -5,17 +5,16 @@ import org.lanternpowered.server.network.forge.message.handler.handshake.Handler
 import org.lanternpowered.server.network.forge.message.handler.handshake.HandlerForgeHandshakeInModList;
 import org.lanternpowered.server.network.forge.message.handler.handshake.HandlerForgeHandshakeInStart;
 import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorForgeHandshakeOutAck;
-import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorForgeHandshakeOutComplete;
 import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorForgeHandshakeOutHello;
 import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorForgeHandshakeOutModList;
 import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorForgeHandshakeOutReset;
-import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorPlayOutCustomPayload;
+import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorPlayInChannelPayload;
+import org.lanternpowered.server.network.forge.message.processor.handshake.ProcessorPlayOutChannelPayload;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutAck;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutModList;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
-import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutComplete;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutReset;
 import org.lanternpowered.server.network.message.MessageRegistry;
@@ -23,7 +22,8 @@ import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecI
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCustomPayload;
 import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
-import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
@@ -50,10 +50,9 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         outbound.register(MessageForgeHandshakeInOutModList.class, new ProcessorForgeHandshakeOutModList());
         outbound.register(MessageForgeHandshakeOutRegistryData.class, new ProcessorForgeHandshakeOutRegistryData());
         outbound.register(MessageForgeHandshakeOutReset.class, new ProcessorForgeHandshakeOutReset());
-        outbound.register(MessageForgeHandshakeOutComplete.class, new ProcessorForgeHandshakeOutComplete());
         outbound.register(MessagePlayInOutUnregisterChannels.class, new ProcessorPlayOutUnregisterChannels());
         outbound.register(MessagePlayInOutRegisterChannels.class, new ProcessorPlayOutRegisterChannels());
-        outbound.register(MessagePlayInOutChannelPayload.class, new ProcessorPlayOutCustomPayload());
+        outbound.register(MessagePlayInOutChannelPayload.class, new ProcessorPlayOutChannelPayload());
 
         inbound.register(0x00, MessageInOutPing.class, CodecInOutPing.class, new HandlerInPing());
         inbound.register(0x17, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class);
@@ -61,6 +60,8 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         inbound.register(MessageForgeHandshakeInOutHello.class, new HandlerForgeHandshakeInHello());
         inbound.register(MessageForgeHandshakeInOutModList.class, new HandlerForgeHandshakeInModList());
         inbound.register(MessageForgeHandshakeInStart.class, new HandlerForgeHandshakeInStart());
+        inbound.register(MessagePlayInOutRegisterChannels.class, new HandlerPlayInRegisterChannels());
+        inbound.register(MessagePlayInOutUnregisterChannels.class, new HandlerPlayInUnregisterChannels());
 
         outbound.register(0x00, MessageInOutPing.class, CodecInOutPing.class);
         outbound.register(0x3f, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class);

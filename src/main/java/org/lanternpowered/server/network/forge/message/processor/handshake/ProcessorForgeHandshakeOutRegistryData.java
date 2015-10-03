@@ -27,6 +27,7 @@ public final class ProcessorForgeHandshakeOutRegistryData implements Processor<M
             ByteBuf buf = context.byteBufAlloc().buffer();
             buf.writeByte(Constants.FML_HANDSHAKE_REGISTRY_DATA);
             buf.writeBoolean(it.hasNext());
+            context.write(buf, String.class, entry.getName());
             Map<String, Integer> ids = entry.getIds();
             context.writeVarInt(buf, ids.size());
             for (Map.Entry<String, Integer> en : ids.entrySet()) {

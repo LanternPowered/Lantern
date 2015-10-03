@@ -26,6 +26,7 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 import org.lanternpowered.server.util.UUIDHelper;
 
 import com.google.common.collect.Lists;
@@ -172,6 +173,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                     return;
                 }*/
 
+                this.session.send(new MessageLoginOutSuccess(uuid, name));
                 this.session.setPlayer(new LanternGameProfile(uuid, name, properties));
                 this.session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
                 this.session.messageReceived(new MessageForgeHandshakeInStart());

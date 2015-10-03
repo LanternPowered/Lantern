@@ -8,5 +8,4 @@ class Constants {
     public static final int FML_HANDSHAKE_REGISTRY_DATA = 3;
     public static final int FML_HANDSHAKE_ACK = -1;
     public static final int FML_HANDSHAKE_RESET = -2;
-    public static final int FML_HANDSHAKE_COMPLETE = 0;
 }

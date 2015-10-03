@@ -2,6 +2,7 @@ package org.lanternpowered.server.network.forge.message.handler.handshake;
 
 import io.netty.util.Attribute;
 
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutModList;
@@ -20,8 +21,10 @@ public final class HandlerForgeHandshakeInModList implements Handler<MessageForg
             return;
         }
         // We don't need to validate the mods for now, maybe in the future, just poke back
+        session.getInstalledMods().addAll(message.getEntries().keySet());
         // Just use a empty map for now
         session.send(new MessageForgeHandshakeInOutModList(Maps.newHashMap()));
         phase.set(ForgeServerHandshakePhase.WAITING_ACK);
+        LanternGame.log().info("{}: Forge handshake -> Received modList message.", session.getGameProfile().getName());
     }
 }

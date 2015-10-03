@@ -8,6 +8,7 @@ import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.event.LanternEventManager;
+import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
 import org.lanternpowered.server.service.config.LanternConfigService;
@@ -98,6 +99,9 @@ public class LanternGame implements Game {
     // The platform
     private final LanternPlatform platform = new LanternPlatform();
 
+    // The channel registrar
+    private LanternChannelRegistrar channelRegistrar;
+
     // The server
     private LanternServer server;
 
@@ -141,6 +145,9 @@ public class LanternGame implements Game {
     public void initialize(LanternServer server, File configFolder, File pluginsFolder, File worldsFolder) {
         this.worldsFolder = worldsFolder;
         this.server = server;
+
+        // Create the channel registrar
+        this.channelRegistrar =  new LanternChannelRegistrar(server);
 
         // Create the plugin that represents minecraft
         this.minecraft = new MinecraftPluginContainer(this);
@@ -297,5 +304,14 @@ public class LanternGame implements Game {
      */
     public ConfigService getConfigService() {
         return this.configService;
+    }
+
+    /**
+     * Gets the {@link LanternChannelRegistrar}.
+     * 
+     * @return the channel registrar
+     */
+    public LanternChannelRegistrar getChannelRegistrar() {
+        return this.channelRegistrar;
     }
 }

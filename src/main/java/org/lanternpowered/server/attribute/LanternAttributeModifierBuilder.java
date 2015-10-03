@@ -7,7 +7,7 @@ import org.spongepowered.api.attribute.AttributeModifier;
 import org.spongepowered.api.attribute.AttributeModifierBuilder;
 import org.spongepowered.api.attribute.Operation;
 
-public class LanternAttributeModifierBuilder implements AttributeModifierBuilder {
+public final class LanternAttributeModifierBuilder implements AttributeModifierBuilder {
 
     private Double value;
     private Operation operation;

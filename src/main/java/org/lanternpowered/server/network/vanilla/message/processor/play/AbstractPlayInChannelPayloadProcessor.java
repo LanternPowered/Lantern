@@ -37,8 +37,6 @@ public abstract class AbstractPlayInChannelPayloadProcessor implements Processor
             while (it.hasNext()) {
                 String channel0 = it.next();
                 if (channel0.startsWith("FML")) {
-                    context.session().send(new MessagePlayInOutRegisterChannels(Sets.newHashSet(
-                            "FML", "FML|HS", "FML|MP")));
                     it.remove();
                 }
             }

@@ -28,7 +28,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
-import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
@@ -310,14 +309,11 @@ public class LanternServer implements Server {
             }
         }
 
-        this.executor.scheduleAtFixedRate(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    pulse();
-                } catch (Exception e) {
-                    LanternGame.log().error("Error while pulsing", e);
-                }
+        this.executor.scheduleAtFixedRate(() -> {
+            try {
+                pulse();
+            } catch (Exception e) {
+                LanternGame.log().error("Error while pulsing", e);
             }
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
@@ -541,7 +537,7 @@ public class LanternServer implements Server {
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(this.game));
 
         // Debug a message
-        LanternGame.log().info("Stopping the server... (" + Texts.legacy().to(kickMessage) + ")");
+        LanternGame.log().info("Stopping the server... ({})", Texts.legacy().to(kickMessage));
 
         // Stop the console
         this.consoleManager.shutdown();

@@ -12,21 +12,29 @@ public class AtomicShortArray implements Serializable {
         return (index & 0x1) == 0;
     }
 
-    private static int key(short key1, short key2) {
-        return key1 << 16 | key2 & 0xffff;
+    private static int key(short left, short right) {
+        return left << 16 | right & 0xffff;
     }
 
-    private static short key1(int key) {
+    private static short keyLeft(int key) {
         return (short) ((key >> 16) & 0xffff);
     }
 
-    private static short key2(int key) {
+    private static short keyRight(int key) {
         return (short) (key & 0xffff);
     }
 
     private final int length;
     private final int backingArraySize;
     private final AtomicIntegerArray backingArray;
+
+    public static void main(String[] args) {
+        short[] vars = {8, 7, 5, 3};
+        AtomicShortArray array = new AtomicShortArray(vars);
+        System.out.println("DEBUG: " + array.backingArray.get(0));
+        System.out.println("DEBUG: " + array.backingArray.get(1));
+        System.out.println("Got " + Arrays.toString(array.getArray()) + ", expected " + Arrays.toString(vars));
+    }
 
     /**
      * Creates a new {@link AtomicShortArray} of the given length, with all
@@ -53,8 +61,8 @@ public class AtomicShortArray implements Serializable {
         for (int i = 0; i < this.backingArraySize; i++) {
             int j = i << 1;
             int value = array[j];
-            if (j + 1 < array.length) {
-                value |= array[j + 1] << 4;
+            if (++j < array.length) {
+                value |= array[j] << 16;
             }
             array0[i] = value;
         }
@@ -82,7 +90,7 @@ public class AtomicShortArray implements Serializable {
      */
     public final short get(int index) {
         int packed = this.getPacked(index);
-        return even(index) ? key1(packed) : key2(packed);
+        return even(index) ? keyRight(packed) : keyLeft(packed);
     }
 
     /**
@@ -102,15 +110,15 @@ public class AtomicShortArray implements Serializable {
         while (!success) {
             int oldPacked = this.backingArray.get(backingIndex);
             if (evenIndex) {
-                oldValue = key1(oldPacked);
+                oldValue = keyRight(oldPacked);
                 even = value;
-                odd = key2(oldPacked);
+                odd = keyLeft(oldPacked);
             } else {
-                oldValue = key2(oldPacked);
-                even = key1(oldPacked);
+                oldValue = keyLeft(oldPacked);
+                even = keyRight(oldPacked);
                 odd = value;
             }
-            int newPacked = key(even, odd);
+            int newPacked = key(odd, even);
             success = this.backingArray.compareAndSet(backingIndex, oldPacked, newPacked);
         }
         return oldValue;
@@ -127,7 +135,7 @@ public class AtomicShortArray implements Serializable {
         if ((index & 0x1) != 0) {
             throw new IllegalArgumentException("When setting 2 elements at once, the index must be even!");
         }
-        this.backingArray.set(index >> 1, key(even, odd));
+        this.backingArray.set(index >> 1, key(odd, even));
     }
 
     /**
@@ -148,18 +156,18 @@ public class AtomicShortArray implements Serializable {
         while (!success) {
             int oldPacked = this.backingArray.get(backingIndex);
             if (evenIndex) {
-                oldValue = key1(oldPacked);
+                oldValue = keyRight(oldPacked);
                 even = newValue;
-                odd = key2(oldPacked);
+                odd = keyLeft(oldPacked);
             } else {
-                oldValue = key2(oldPacked);
-                even = key1(oldPacked);
+                oldValue = keyLeft(oldPacked);
+                even = keyRight(oldPacked);
                 odd = newValue;
             }
             if (oldValue != expected) {
                 return false;
             }
-            int newPacked = key(even, odd);
+            int newPacked = key(odd, even);
             success = this.backingArray.compareAndSet(backingIndex, oldPacked, newPacked);
         }
         return true;
@@ -191,11 +199,11 @@ public class AtomicShortArray implements Serializable {
         if (array == null || array.length != this.length) {
             array = new short[this.length];
         }
-        for (int i = 0; i < this.length; i += 2) {
+        for (int i = 0; i < this.length; i++) {
             int packed = this.getPacked(i);
-            array[i] = key1(packed);
-            if (i + 1 < this.length) {
-                array[i + 1] = key2(packed);
+            array[i] = keyRight(packed);
+            if (++i < this.length) {
+                array[i] = keyLeft(packed);
             }
         }
         return array;

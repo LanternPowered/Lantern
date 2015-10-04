@@ -81,32 +81,19 @@ public class AtomicNibbleArray implements Serializable {
 
         int[] array = new int[this.backingArraySize];
         for (int i = 0; i < this.backingArraySize; i++) {
-            boolean flag = false;
+            int j = i << (packed ? INDEX_BITS / 2 : INDEX_BITS);
             int value = 0;
-            for (int j = 0; j < PACKED_VALUES; j++) {
-                int k = i + j;
-                if (k >= length) {
+            boolean flag = false;
+            for (int k = 0; k < (packed ? PACKED_VALUES / 2 : PACKED_VALUES); k++) {
+                int l = j + k;
+                if (l >= initialContent.length || l >= length) {
                     flag = true;
                     break;
                 }
-                if (packed) {
-                    k >>= 1;
+                value = key(value, k, initialContent[l]);
+                if (packed && l + 1 >= length) {
+                    value = key(value, k + 1, initialContent[l]);
                 }
-                if (k >= initialContent.length) {
-                    flag = true;
-                    break;
-                }
-                byte value0;
-                if (packed) {
-                    if ((j & 0x1) != 0) {
-                        value0 = (byte) ((initialContent[k] >> VALUE_BITS) & VALUE_MASK);
-                    } else {
-                        value0 = (byte) (initialContent[k] & VALUE_MASK);
-                    }
-                } else {
-                    value0 = (byte) (initialContent[k] & VALUE_MASK);
-                }
-                value = key(value, j, value0);
             }
             array[i] = value;
             if (flag) {
@@ -137,7 +124,7 @@ public class AtomicNibbleArray implements Serializable {
      * @return the element
      */
     public final byte get(int index) {
-        return key(this.getPacked(index), index & INDEX_BITS);
+        return key(this.getPacked(index), index & INDEX_MASK);
     }
 
     /**
@@ -155,7 +142,7 @@ public class AtomicNibbleArray implements Serializable {
         while (!success) {
             int oldPacked = this.backingArray.get(backingIndex);
             oldValue = key(oldPacked, valueIndex);
-            int newPacked = key(oldPacked, backingIndex, value);
+            int newPacked = key(oldPacked, valueIndex, value);
             success = this.backingArray.compareAndSet(backingIndex, oldPacked, newPacked);
         }
         return oldValue;
@@ -180,7 +167,7 @@ public class AtomicNibbleArray implements Serializable {
             if (oldValue != expected) {
                 return false;
             }
-            int newPacked = key(oldPacked, backingIndex, newValue);
+            int newPacked = key(oldPacked, valueIndex, newValue);
             success = this.backingArray.compareAndSet(backingIndex, oldPacked, newPacked);
         }
         return true;

@@ -98,9 +98,9 @@ public final class LanternGameRules implements GameRules {
                 this.valueBoolean = Coerce.asBoolean(object).orElse(null);
                 this.valueNumber = Coerce.asDouble(object).orElse(null);
             }
-            if (!Objects.equals(this.value, oldValue)) {
+            if (world != null && !Objects.equals(this.value, oldValue)) {
                 ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(LanternGame.get(),
-                        cause, oldValue == null ? "" : oldValue, this.value == null ? "" : this.value, name, world);
+                        cause, oldValue == null ? "" : oldValue, this.value == null ? "" : this.value, this.name, world);
                 LanternGame.get().getEventManager().post(event);
             }
         }

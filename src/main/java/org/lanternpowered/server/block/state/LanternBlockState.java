@@ -240,30 +240,15 @@ public final class LanternBlockState implements BlockState {
             }
         }
 
-        return this.setTraitValue(blockTrait, value);
+        return this.withTrait(blockTrait, value);
     }
 
     @Override
     public Optional<BlockState> withTrait(BlockTrait<?> trait, Object value) {
-        if (!this.supportsTraitValue(trait, (Comparable<?>) value)) {
+        if (!this.supportsTraitValue(trait, value)) {
             return Optional.empty();
         }
-        return null;
-    }
-
-    /**
-     * Attempts to set the trait value and gets the new block state. Will return absent
-     * if the block trait or the value isn't supported.
-     * 
-     * @param blockTrait the block trait
-     * @param value the value
-     * @return the new block state if successful
-     */
-    public <T extends Comparable<T>> Optional<BlockState> setTraitValue(BlockTrait<T> blockTrait, T value) {
-        if (!this.supportsTraitValue(blockTrait, value)) {
-            return Optional.empty();
-        }
-        return Optional.of(this.propertyValueTable.row(blockTrait).get(value));
+        return Optional.of(this.propertyValueTable.row(trait).get(value));
     }
 
     /**
@@ -272,7 +257,7 @@ public final class LanternBlockState implements BlockState {
      * @param blockTrait the block trait
      * @return whether the block trait is supported
      */
-    public <T extends Comparable<T>> boolean supportsTrait(BlockTrait<T> blockTrait) {
+    public boolean supportsTrait(BlockTrait<?> blockTrait) {
         return this.traitValues.containsKey(blockTrait);
     }
 

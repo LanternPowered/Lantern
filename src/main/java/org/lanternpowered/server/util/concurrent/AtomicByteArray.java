@@ -74,15 +74,16 @@ public class AtomicByteArray implements Serializable {
 
         int[] array = new int[this.backingArraySize];
         for (int i = 0; i < this.backingArraySize; i++) {
-            boolean flag = false;
+            int j = i << INDEX_BITS;
             int value = 0;
-            for (int j = 0; j < PACKED_VALUES; j++) {
-                int k = i + j;
-                if (k >= initialContent.length || k >= length) {
+            boolean flag = false;
+            for (int k = 0; k < PACKED_VALUES; k++) {
+                int l = j + k;
+                if (l >= initialContent.length || l >= length) {
                     flag = true;
                     break;
                 }
-                value = key(value, j, initialContent[k]);
+                value = key(value, k, initialContent[l]);
             }
             array[i] = value;
             if (flag) {
@@ -113,7 +114,7 @@ public class AtomicByteArray implements Serializable {
      * @return the element
      */
     public final byte get(int index) {
-        return key(this.getPacked(index), index & INDEX_BITS);
+        return key(this.getPacked(index), index & INDEX_MASK);
     }
 
     /**
@@ -131,7 +132,7 @@ public class AtomicByteArray implements Serializable {
         while (!success) {
             int oldPacked = this.backingArray.get(backingIndex);
             oldValue = key(oldPacked, valueIndex);
-            int newPacked = key(oldPacked, backingIndex, value);
+            int newPacked = key(oldPacked, valueIndex, value);
             success = this.backingArray.compareAndSet(backingIndex, oldPacked, newPacked);
         }
         return oldValue;
@@ -156,7 +157,7 @@ public class AtomicByteArray implements Serializable {
             if (oldValue != expected) {
                 return false;
             }
-            int newPacked = key(oldPacked, backingIndex, newValue);
+            int newPacked = key(oldPacked, valueIndex, newValue);
             success = this.backingArray.compareAndSet(backingIndex, oldPacked, newPacked);
         }
         return true;

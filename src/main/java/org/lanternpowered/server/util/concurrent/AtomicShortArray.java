@@ -28,14 +28,6 @@ public class AtomicShortArray implements Serializable {
     private final int backingArraySize;
     private final AtomicIntegerArray backingArray;
 
-    public static void main(String[] args) {
-        short[] vars = {8, 7, 5, 3};
-        AtomicShortArray array = new AtomicShortArray(vars);
-        System.out.println("DEBUG: " + array.backingArray.get(0));
-        System.out.println("DEBUG: " + array.backingArray.get(1));
-        System.out.println("Got " + Arrays.toString(array.getArray()) + ", expected " + Arrays.toString(vars));
-    }
-
     /**
      * Creates a new {@link AtomicShortArray} of the given length, with all
      * elements initially zero.

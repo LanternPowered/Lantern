@@ -1,5 +1,6 @@
 package org.lanternpowered.server.util.concurrent;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.assertFalse;
@@ -10,17 +11,33 @@ public class AtomicNibbleArrayTest {
 
     private static final int SIZE = 15;
 
-    private static final byte ONE = 1;
-    private static final byte TWO = 2;
-    private static final byte THREE = 3;
-    private static final byte FIVE = 5;
-    private static final byte SIX = 5;
+    private static final byte A = 5;
+    private static final byte B = 2;
+    private static final byte C = 7;
+    private static final byte D = 11;
+    private static final byte E = 14;
 
     @Test
     public void testArrayConstructor() {
-        byte[] values = { TWO, ONE, THREE, FIVE, SIX };
+        byte[] values = { B, A, C, D, E };
         AtomicNibbleArray array = new AtomicNibbleArray(values.length, values, false);
         assertEquals(array.length(), values.length);
+        assertArrayEquals(values, array.getArray());
+        for (int i = 0; i < values.length; i++) {
+            assertEquals(array.get(i), values[i]);
+            array.set(i, (byte) i);
+            assertEquals(array.get(i), i);
+        }
+    }
+
+    @Test
+    public void testPackedArrayConstructor() {
+        byte[] valuesPacked = { B | A << 4, (byte) (C | D << 4), E };
+        byte[] values = { B, A, C, D, E };
+        AtomicNibbleArray array = new AtomicNibbleArray(values.length, valuesPacked, true);
+        assertEquals(array.length(), values.length);
+        assertArrayEquals(values, array.getArray());
+        assertArrayEquals(valuesPacked, array.getPackedArray());
         for (int i = 0; i < values.length; i++) {
             assertEquals(array.get(i), values[i]);
             array.set(i, (byte) i);
@@ -32,12 +49,12 @@ public class AtomicNibbleArrayTest {
     public void testGetSet() {
         AtomicNibbleArray array = new AtomicNibbleArray(SIZE);
         for (int i = 0; i < array.length(); i++) {
-            array.set(i, ONE);
-            assertEquals(array.get(i), ONE);
-            array.set(i, TWO);
-            assertEquals(array.get(i), TWO);
-            array.set(i, THREE);
-            assertEquals(array.get(i), THREE);
+            array.set(i, A);
+            assertEquals(array.get(i), A);
+            array.set(i, B);
+            assertEquals(array.get(i), B);
+            array.set(i, C);
+            assertEquals(array.get(i), C);
         }
     }
 
@@ -45,12 +62,12 @@ public class AtomicNibbleArrayTest {
     public void testLazyGetSet() {
         AtomicNibbleArray array = new AtomicNibbleArray(SIZE);
         for (int i = 0; i < array.length(); i++) {
-            array.lazySet(i, ONE);
-            assertEquals(array.get(i), ONE);
-            array.lazySet(i, TWO);
-            assertEquals(array.get(i), TWO);
-            array.lazySet(i, THREE);
-            assertEquals(array.get(i), THREE);
+            array.lazySet(i, A);
+            assertEquals(array.get(i), A);
+            array.lazySet(i, B);
+            assertEquals(array.get(i), B);
+            array.lazySet(i, C);
+            assertEquals(array.get(i), C);
         }
     }
 
@@ -58,14 +75,14 @@ public class AtomicNibbleArrayTest {
     public void testCompareAndSet() {
         AtomicNibbleArray array = new AtomicNibbleArray(SIZE);
         for (int i = 0; i < SIZE; i++) {
-            array.set(i, ONE);
-            assertTrue(array.compareAndSet(i, ONE, TWO));
-            assertTrue(array.compareAndSet(i, TWO, THREE));
-            assertEquals(array.get(i), THREE);
-            assertFalse(array.compareAndSet(i, FIVE, SIX));
-            assertEquals(array.get(i), THREE);
-            assertTrue(array.compareAndSet(i, THREE, SIX));
-            assertEquals(array.get(i), SIX);
+            array.set(i, A);
+            assertTrue(array.compareAndSet(i, A, B));
+            assertTrue(array.compareAndSet(i, B, C));
+            assertEquals(C, array.get(i));
+            assertFalse(array.compareAndSet(i, D, E));
+            assertEquals(C, array.get(i));
+            assertTrue(array.compareAndSet(i, C, E));
+            assertEquals(E, array.get(i));
         }
     }
 
@@ -73,10 +90,10 @@ public class AtomicNibbleArrayTest {
     public void testGetAndSet() {
         AtomicNibbleArray array = new AtomicNibbleArray(SIZE);
         for (int i = 0; i < SIZE; i++) {
-            array.set(i, ONE);
-            assertEquals(array.getAndSet(i, TWO), ONE);
-            assertEquals(array.getAndSet(i, SIX), TWO);
-            assertEquals(array.getAndSet(i, ONE), SIX);
+            array.set(i, A);
+            assertEquals(A, array.getAndSet(i, B));
+            assertEquals(B, array.getAndSet(i, E));
+            assertEquals(E, array.getAndSet(i, A));
         }
     }
 }

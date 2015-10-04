@@ -11,15 +11,23 @@ public class AtomicNibbleArray implements Serializable {
     private static final long serialVersionUID = -8011969936196392062L;
 
     // The amount of nibbles packed in one integer
-    private static final byte PACKED_VALUES = 8;
+    private static final int PACKED_VALUES = 8;
     // The amount of bits in an integer
-    private static final byte PACKED_BITS = 32;
+    private static final int PACKED_BITS = 32;
 
-    private static final byte VALUE_BITS = PACKED_BITS / PACKED_VALUES;
-    private static final byte VALUE_MASK = (VALUE_BITS << 1) - 1;
+    private static final int VALUE_BITS = PACKED_BITS / PACKED_VALUES;
+    private static final int VALUE_MASK = (1 << VALUE_BITS) - 1;
 
-    private static final byte INDEX_MASK = PACKED_VALUES - 1;
-    private static final byte INDEX_BITS = PACKED_VALUES >> 1;
+    private static final int INDEX_MASK = PACKED_VALUES - 1;
+    private static final int INDEX_BITS = PACKED_VALUES >> 1;
+
+    private static final int DOUBLE_VALUE_BITS = VALUE_BITS * 2;
+    private static final int DOUBLE_VALUE_MASK = (1 << DOUBLE_VALUE_BITS) - 1;
+
+    private static final int HALF_PACKED_VALUES = PACKED_VALUES / 2;
+    private static final int HALF_INDEX_BITS = HALF_PACKED_VALUES >> 1;
+
+    private static final int QUARTER_PACKED_VALUES = PACKED_VALUES / 4;
 
     private static int key(int combined, int index, byte value) {
         index *= VALUE_BITS;
@@ -27,7 +35,7 @@ public class AtomicNibbleArray implements Serializable {
         combined &= ~(VALUE_MASK << index);
         // Apply the new content if needed
         if (value != 0) {
-            combined |= value << index;
+            combined |= (value & VALUE_MASK) << index;
         }
         return combined;
     }
@@ -48,7 +56,7 @@ public class AtomicNibbleArray implements Serializable {
      */
     public AtomicNibbleArray(int length) {
         this.length = length;
-        this.backingArraySize = (length & INDEX_MASK) + (length >> INDEX_BITS);
+        this.backingArraySize = (int) Math.ceil(((double) length) / PACKED_VALUES);
         this.backingArray = new AtomicIntegerArray(this.backingArraySize);
     }
 
@@ -77,22 +85,27 @@ public class AtomicNibbleArray implements Serializable {
      */
     public AtomicNibbleArray(int length, byte[] initialContent, boolean packed) {
         this.length = length;
-        this.backingArraySize = (length & INDEX_MASK) + (length >> INDEX_BITS);
+        this.backingArraySize = (int) Math.ceil(((double) length) / PACKED_VALUES);
 
         int[] array = new int[this.backingArraySize];
         for (int i = 0; i < this.backingArraySize; i++) {
-            int j = i << (packed ? INDEX_BITS / 2 : INDEX_BITS);
+            int j = i << (packed ? HALF_INDEX_BITS : INDEX_BITS);
             int value = 0;
             boolean flag = false;
-            for (int k = 0; k < (packed ? PACKED_VALUES / 2 : PACKED_VALUES); k++) {
+            for (int k = 0; k < (packed ? HALF_PACKED_VALUES : PACKED_VALUES); k++) {
                 int l = j + k;
-                if (l >= initialContent.length || l >= length) {
+                int m = packed ? k << 1 : l;
+                if (l >= initialContent.length || m >= length) {
                     flag = true;
                     break;
                 }
-                value = key(value, k, initialContent[l]);
-                if (packed && l + 1 >= length) {
-                    value = key(value, k + 1, initialContent[l]);
+                value = key(value, m, initialContent[l]);
+                if (packed) {
+                    if (++m >= length) {
+                        flag = true;
+                        break;
+                    }
+                    value = key(value, m, (byte) (initialContent[l] >> 4));
                 }
             }
             array[i] = value;
@@ -331,22 +344,24 @@ public class AtomicNibbleArray implements Serializable {
      * @return an array containing the values in the array
      */
     public final byte[] getPackedArray(byte[] array) {
-        int length0 = this.length >> 1; 
-        if (array == null || array.length != length0) {
-            array = new byte[length0];
+        int length = (int) Math.ceil((double) this.length / (double) QUARTER_PACKED_VALUES); 
+        if (array == null || array.length != length) {
+            array = new byte[length];
         }
-        for (int i = 0; i < this.length; i += PACKED_VALUES) {
+        for (int i = 0; i < this.backingArraySize; i++) {
+            boolean flag = false;
             int packed = this.getPacked(i);
-            for (int j = 0; j < 4; j += 2) {
-                int k = i + j;
-                if (k >= this.length) {
+            int index = i << HALF_INDEX_BITS;
+            for (int j = 0; j < HALF_PACKED_VALUES; j++) {
+                int k = index + j;
+                if (k >= length) {
+                    flag = true;
                     break;
                 }
-                array[k] = (byte) (packed & 0xff);
-                if (++k >= this.length) {
-                    break;
-                }
-                array[k] = (byte) ((packed >> 4) & 0xff);
+                array[k] = (byte) ((packed >> (DOUBLE_VALUE_BITS * j)) & DOUBLE_VALUE_MASK);
+            }
+            if (flag) {
+                break;
             }
         }
         return array;

@@ -9,15 +9,15 @@ public class AtomicByteArray implements Serializable {
     private static final long serialVersionUID = 3434275139515033068L;
 
     // The amount of bytes packed in one integer
-    private static final byte PACKED_VALUES = 4;
+    private static final int PACKED_VALUES = 4;
     // The amount of bits in an integer
-    private static final byte PACKED_BITS = 32;
+    private static final int PACKED_BITS = 32;
 
-    private static final byte VALUE_BITS = PACKED_BITS / PACKED_VALUES;
-    private static final byte VALUE_MASK = (VALUE_BITS << 1) - 1;
+    private static final int VALUE_BITS = PACKED_BITS / PACKED_VALUES;
+    private static final int VALUE_MASK = (1 << VALUE_BITS) - 1;
 
-    private static final byte INDEX_MASK = PACKED_VALUES - 1;
-    private static final byte INDEX_BITS = PACKED_VALUES >> 1;
+    private static final int INDEX_MASK = PACKED_VALUES - 1;
+    private static final int INDEX_BITS = PACKED_VALUES >> 1;
 
     private static int key(int combined, int index, byte value) {
         index *= VALUE_BITS;
@@ -25,7 +25,7 @@ public class AtomicByteArray implements Serializable {
         combined &= ~(VALUE_MASK << index);
         // Apply the new content if needed
         if (value != 0) {
-            combined |= value << index;
+            combined |= (value & VALUE_MASK) << index;
         }
         return combined;
     }
@@ -46,7 +46,7 @@ public class AtomicByteArray implements Serializable {
      */
     public AtomicByteArray(int length) {
         this.length = length;
-        this.backingArraySize = (length & INDEX_MASK) + (length >> INDEX_BITS);
+        this.backingArraySize = (int) Math.ceil((double) length / (double) PACKED_VALUES);
         this.backingArray = new AtomicIntegerArray(this.backingArraySize);
     }
 
@@ -70,7 +70,7 @@ public class AtomicByteArray implements Serializable {
      */
     public AtomicByteArray(int length, byte[] initialContent) {
         this.length = length;
-        this.backingArraySize = (length & INDEX_MASK) + (length >> INDEX_BITS);
+        this.backingArraySize = (int) Math.ceil((double) length / (double) PACKED_VALUES);
 
         int[] array = new int[this.backingArraySize];
         for (int i = 0; i < this.backingArraySize; i++) {

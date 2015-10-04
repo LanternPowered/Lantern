@@ -8,23 +8,23 @@ import org.junit.Test;
 
 public class AtomicShortArrayTest {
 
-    private static final int SIZE = 20;
+    private static final int SIZE = 15;
 
-    private static final short ONE = 1;
-    private static final short TWO = 2;
-    private static final short THREE = 3;
-    private static final short FIVE = 5;
-    private static final short SIX = 5;
+    private static final short A = 159;
+    private static final short B = 5796;
+    private static final short C = 15790;
+    private static final short D = 12390;
+    private static final short E = 26870;
 
     @Test
     public void testArrayConstructor() {
-        short[] values = { TWO, ONE, THREE, FIVE, SIX };
+        short[] values = { B, A, C, D, E };
         AtomicShortArray array = new AtomicShortArray(values);
         assertEquals(array.length(), values.length);
         for (int i = 0; i < values.length; i++) {
-            assertEquals(array.get(i), values[i]);
-            array.set(i, (short) i);
-            assertEquals(array.get(i), i);
+            assertEquals(values[i], array.get(i));
+            array.set(i, (byte) i);
+            assertEquals(i, array.get(i));
         }
     }
 
@@ -32,12 +32,12 @@ public class AtomicShortArrayTest {
     public void testGetSet() {
         AtomicShortArray array = new AtomicShortArray(SIZE);
         for (int i = 0; i < array.length(); i++) {
-            array.set(i, ONE);
-            assertEquals(array.get(i), ONE);
-            array.set(i, TWO);
-            assertEquals(array.get(i), TWO);
-            array.set(i, THREE);
-            assertEquals(array.get(i), THREE);
+            array.set(i, A);
+            assertEquals(A, array.get(i));
+            array.set(i, B);
+            assertEquals(B, array.get(i));
+            array.set(i, C);
+            assertEquals(C, array.get(i));
         }
     }
 
@@ -45,12 +45,12 @@ public class AtomicShortArrayTest {
     public void testLazyGetSet() {
         AtomicShortArray array = new AtomicShortArray(SIZE);
         for (int i = 0; i < array.length(); i++) {
-            array.lazySet(i, ONE);
-            assertEquals(array.get(i), ONE);
-            array.lazySet(i, TWO);
-            assertEquals(array.get(i), TWO);
-            array.lazySet(i, THREE);
-            assertEquals(array.get(i), THREE);
+            array.lazySet(i, A);
+            assertEquals(A, array.get(i));
+            array.lazySet(i, B);
+            assertEquals(B, array.get(i));
+            array.lazySet(i, C);
+            assertEquals(C, array.get(i));
         }
     }
 
@@ -58,14 +58,14 @@ public class AtomicShortArrayTest {
     public void testCompareAndSet() {
         AtomicShortArray array = new AtomicShortArray(SIZE);
         for (int i = 0; i < SIZE; i++) {
-            array.set(i, ONE);
-            assertTrue(array.compareAndSet(i, ONE, TWO));
-            assertTrue(array.compareAndSet(i, TWO, THREE));
-            assertEquals(array.get(i), THREE);
-            assertFalse(array.compareAndSet(i, FIVE, SIX));
-            assertEquals(array.get(i), THREE);
-            assertTrue(array.compareAndSet(i, THREE, SIX));
-            assertEquals(array.get(i), SIX);
+            array.set(i, A);
+            assertTrue(array.compareAndSet(i, A, B));
+            assertTrue(array.compareAndSet(i, B, C));
+            assertEquals(C, array.get(i));
+            assertFalse(array.compareAndSet(i, D, E));
+            assertEquals(C, array.get(i));
+            assertTrue(array.compareAndSet(i, C, E));
+            assertEquals(E, array.get(i));
         }
     }
 
@@ -73,10 +73,10 @@ public class AtomicShortArrayTest {
     public void testGetAndSet() {
         AtomicShortArray array = new AtomicShortArray(SIZE);
         for (int i = 0; i < SIZE; i++) {
-            array.set(i, ONE);
-            assertEquals(array.getAndSet(i, TWO), ONE);
-            assertEquals(array.getAndSet(i, SIX), TWO);
-            assertEquals(array.getAndSet(i, ONE), SIX);
+            array.set(i, A);
+            assertEquals(A, array.getAndSet(i, B));
+            assertEquals(B, array.getAndSet(i, E));
+            assertEquals(E, array.getAndSet(i, A));
         }
     }
 }

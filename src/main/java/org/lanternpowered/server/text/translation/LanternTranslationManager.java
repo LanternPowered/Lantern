@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
@@ -14,8 +15,6 @@ import javax.annotation.Nullable;
 import org.spongepowered.api.text.translation.ResourceBundleTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -53,7 +52,7 @@ public class LanternTranslationManager implements TranslationManager {
                             }
                         }
                     }
-                    return Optional.absent();
+                    return Optional.empty();
                 }
 
             });
@@ -90,15 +89,11 @@ public class LanternTranslationManager implements TranslationManager {
 
     @Override
     public Translation get(final String key) {
-        return new ResourceBundleTranslation(checkNotNullOrEmpty(key, "key"), new Function<Locale, ResourceBundle>() {
-            @Nullable
-            @Override
-            public ResourceBundle apply(Locale input) {
-                try {
-                    return resourceBundlesCache.get(new ResourceKey(key, input)).orNull();
-                } catch (ExecutionException e) {
-                    throw new RuntimeException(e);
-                }
+        return new ResourceBundleTranslation(checkNotNullOrEmpty(key, "key"), locale -> {
+            try {
+                return resourceBundlesCache.get(new ResourceKey(key, locale)).orElse(null);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
             }
         });
     }
@@ -113,6 +108,6 @@ public class LanternTranslationManager implements TranslationManager {
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

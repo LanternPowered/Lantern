@@ -2,8 +2,7 @@ package org.lanternpowered.server.world.rules;
 
 import java.util.List;
 import java.util.Map;
-
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public interface GameRules {
 

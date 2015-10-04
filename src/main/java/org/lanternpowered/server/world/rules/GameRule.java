@@ -1,8 +1,8 @@
 package org.lanternpowered.server.world.rules;
 
-import org.spongepowered.api.event.cause.Cause;
+import java.util.Optional;
 
-import com.google.common.base.Optional;
+import org.spongepowered.api.event.cause.Cause;
 
 public interface GameRule {
 

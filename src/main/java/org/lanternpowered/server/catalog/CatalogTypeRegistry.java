@@ -1,11 +1,10 @@
 package org.lanternpowered.server.catalog;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.spongepowered.api.CatalogType;
-
-import com.google.common.base.Optional;
 
 public interface CatalogTypeRegistry<T extends CatalogType> {
 

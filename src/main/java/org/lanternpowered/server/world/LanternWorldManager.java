@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
@@ -19,7 +20,6 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -201,20 +201,20 @@ public class LanternWorldManager {
     }
 
     public Optional<World> getWorld(UUID uniqueId) {
-        return Optional.fromNullable(this.getWorlds().stream().filter(
+        return Optional.ofNullable(this.getWorlds().stream().filter(
                 world -> world.getUniqueId().equals(uniqueId)).findFirst().orElse(null));
     }
 
     public Optional<World> getWorld(String worldName) {
-        return Optional.fromNullable(this.getWorlds().stream().filter(
+        return Optional.ofNullable(this.getWorlds().stream().filter(
                 world -> world.getName().equals(worldName)).findFirst().orElse(null));
     }
 
     public Optional<WorldProperties> getDefaultWorld() {
         if (this.defaultWorld == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
-        return Optional.fromNullable(this.propertiesFromFolder(new File(this.folder, this.defaultWorld), true));
+        return Optional.ofNullable(this.propertiesFromFolder(new File(this.folder, this.defaultWorld), true));
     }
 
     public Optional<World> loadWorld(String worldName) {
@@ -233,12 +233,12 @@ public class LanternWorldManager {
     }
 
     public Optional<WorldProperties> getWorldProperties(String worldName) {
-        return Optional.fromNullable(this.propertiesFromFolder(new File(folder, worldName), true));
+        return Optional.ofNullable(this.propertiesFromFolder(new File(folder, worldName), true));
     }
 
     public Optional<WorldProperties> getWorldProperties(UUID uniqueId) {
         this.getAllWorldProperties(); // Load the properties of all the worlds
-        return Optional.fromNullable(this.propertiesByUUID.get(uniqueId));
+        return Optional.ofNullable(this.propertiesByUUID.get(uniqueId));
     }
 
     public boolean unloadWorld(World world) {
@@ -258,14 +258,14 @@ public class LanternWorldManager {
             public Optional<WorldProperties> call() throws Exception {
                 File worldFolder = new File(folder, copyName);
                 if (worldFolder.exists() && worldFolder.list().length != 0) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
                 String fromWorldName = worldProperties.getWorldName();
                 File fromWorldFolder = new File(folder, fromWorldName);
                 if (!fromWorldFolder.exists() || worldFolder.list().length == 0) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
-                World world = getWorld(fromWorldName).orNull();
+                World world = getWorld(fromWorldName).orElse(null);
                 if (world != null) {
                     // TODO: Save
                     // TODO: Lock saving
@@ -292,7 +292,7 @@ public class LanternWorldManager {
             @Override
             public Boolean call() throws Exception {
                 String name = worldProperties.getWorldName();
-                World world = getWorld(name).orNull();
+                World world = getWorld(name).orElse(null);
                 if (world != null) {
                     return false;
                 }

@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
@@ -17,7 +18,6 @@ import org.spongepowered.api.service.scheduler.SchedulerService;
 import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.service.scheduler.TaskBuilder;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
@@ -44,7 +44,11 @@ public class LanternScheduler implements SchedulerService {
 
     @Override
     public Optional<Task> getTaskById(UUID id) {
-        return this.syncScheduler.getTask(checkNotNull(id, "id")).or(this.asyncScheduler.getTask(id));
+        Optional<Task> task = this.syncScheduler.getTask(id);
+        if (task.isPresent()) {
+            return task;
+        }
+        return this.asyncScheduler.getTask(id);
     }
 
     @Override

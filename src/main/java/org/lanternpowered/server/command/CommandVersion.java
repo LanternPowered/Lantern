@@ -6,14 +6,10 @@ import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
-public class CommandVersion implements Command {
+public final class CommandVersion implements Command {
 
     private final Game game;
 
@@ -37,17 +33,12 @@ public class CommandVersion implements Command {
         return CommandSpec.builder()
                 .permission("minecraft.command.version")
                 .description(Texts.of(this.description))
-                .executor(new CommandExecutor() {
-
-                    @Override
-                    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                        src.sendMessage(Texts.of(minecraftVersion, LanternMinecraftVersion.CURRENT.getName(),
-                                LanternMinecraftVersion.CURRENT.getProtocol()));
-                        src.sendMessage(Texts.of(apiVersion, game.getPlatform().getApiVersion()));
-                        src.sendMessage(Texts.of(implementationVersion, game.getPlatform().getVersion()));
-                        return CommandResult.success();
-                    }
-
+                .executor((src, args) -> {
+                    src.sendMessage(Texts.of(minecraftVersion, LanternMinecraftVersion.CURRENT.getName(),
+                            LanternMinecraftVersion.CURRENT.getProtocol()));
+                    src.sendMessage(Texts.of(apiVersion, game.getPlatform().getApiVersion()));
+                    src.sendMessage(Texts.of(implementationVersion, game.getPlatform().getVersion()));
+                    return CommandResult.success();
                 }).build();
     }
 }

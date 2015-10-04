@@ -2,7 +2,7 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternItemValue;
 import org.spongepowered.api.data.key.Key;

@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -12,7 +13,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.rules.GameRule;
-import org.lanternpowered.server.world.rules.GameRules;
 import org.lanternpowered.server.world.rules.LanternGameRules;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -20,14 +20,12 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 
 public class LanternWorldProperties implements WorldProperties {
 
@@ -269,7 +267,7 @@ public class LanternWorldProperties implements WorldProperties {
     public Optional<String> getGameRule(String gameRule) {
         Optional<GameRule> rule = this.rules.getRule(gameRule);
         if (!rule.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return rule.get().asString();
     }

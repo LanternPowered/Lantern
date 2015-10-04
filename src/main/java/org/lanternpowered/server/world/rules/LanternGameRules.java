@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -14,7 +15,6 @@ import org.spongepowered.api.event.world.ChangeWorldGameRuleEvent;
 import org.spongepowered.api.util.Coerce;
 import org.spongepowered.api.world.World;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
@@ -47,7 +47,7 @@ public final class LanternGameRules implements GameRules {
 
     @Override
     public Optional<GameRule> getRule(String name) {
-        return Optional.fromNullable(this.rules.get(checkNotNull(name, "name")));
+        return Optional.ofNullable(this.rules.get(checkNotNull(name, "name")));
     }
 
     @Override
@@ -95,8 +95,8 @@ public final class LanternGameRules implements GameRules {
                 this.valueNumber = null;
             } else {
                 this.value = Coerce.asString(object).get();
-                this.valueBoolean = Coerce.asBoolean(object).orNull();
-                this.valueNumber = Coerce.asDouble(object).orNull();
+                this.valueBoolean = Coerce.asBoolean(object).orElse(null);
+                this.valueNumber = Coerce.asDouble(object).orElse(null);
             }
             if (!Objects.equals(this.value, oldValue)) {
                 ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(LanternGame.get(),
@@ -107,27 +107,27 @@ public final class LanternGameRules implements GameRules {
 
         @Override
         public Optional<String> asString() {
-            return Optional.fromNullable(this.value);
+            return Optional.ofNullable(this.value);
         }
 
         @Override
         public Optional<Boolean> asBoolean() {
-            return Optional.fromNullable(this.valueBoolean);
+            return Optional.ofNullable(this.valueBoolean);
         }
 
         @Override
         public Optional<Double> asDouble() {
-            return this.valueNumber == null ? Optional.absent() : Optional.of(this.valueNumber.doubleValue());
+            return this.valueNumber == null ? Optional.empty() : Optional.of(this.valueNumber.doubleValue());
         }
 
         @Override
         public Optional<Float> asFloat() {
-            return this.valueNumber == null ? Optional.absent() : Optional.of(this.valueNumber.floatValue());
+            return this.valueNumber == null ? Optional.empty() : Optional.of(this.valueNumber.floatValue());
         }
 
         @Override
         public Optional<Integer> asInt() {
-            return this.valueNumber == null ? Optional.absent() : Optional.of(this.valueNumber.intValue());
+            return this.valueNumber == null ? Optional.empty() : Optional.of(this.valueNumber.intValue());
         }
     }
 }

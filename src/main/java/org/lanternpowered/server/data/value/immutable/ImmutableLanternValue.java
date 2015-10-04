@@ -2,7 +2,7 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 import org.lanternpowered.server.data.value.AbstractBaseValue;
 import org.lanternpowered.server.data.value.mutable.LanternValue;

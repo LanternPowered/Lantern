@@ -50,7 +50,7 @@ public class FlatGeneratorSettingsParser {
         }
         String[] parts = value.split(";");
         int index = 0;
-        int version = parts.length == 1 ? 0 : Coerce.asInteger(parts[index++]).or(0);
+        int version = parts.length == 1 ? 0 : Coerce.asInteger(parts[index++]).orElse(0);
         if (version < 0 || version > 3) {
             return null;
         }
@@ -63,7 +63,7 @@ public class FlatGeneratorSettingsParser {
                 BlockType blockType = null;
                 int blockData = 0;
                 int index1 = 0;
-                int depth = parts1.length > 1 ? Coerce.asInteger(parts1[index1++]).or(1) : 1;
+                int depth = parts1.length > 1 ? Coerce.asInteger(parts1[index1++]).orElse(1) : 1;
                 if (version < 3) {
                     parts1 = parts1[index1].split(":", 2);
                     if (parts1.length > 1) {
@@ -73,9 +73,9 @@ public class FlatGeneratorSettingsParser {
                 } else {
                     parts1 = parts1[index1].split(":", 3);
                     String name = parts1.length > 1 ? parts1[0] + ':' + parts1[1] : parts1[0];
-                    blockType = LanternBlocks.reg().get(name).orNull();
+                    blockType = LanternBlocks.reg().get(name).orElse(null);
                     if (blockType == null) {
-                        blockType = LanternBlocks.reg().get(parts1[0]).orNull();
+                        blockType = LanternBlocks.reg().get(parts1[0]).orElse(null);
                         if (parts1.length > 1) {
                             blockData = Coerce.toInteger(parts1[1]);
                         }
@@ -92,7 +92,7 @@ public class FlatGeneratorSettingsParser {
         }
         BiomeType biomeType = BiomeTypes.PLAINS;
         if (version > 0 && parts.length > index) {
-            Integer biomeId = Coerce.asInteger(parts[index]).orNull();
+            Integer biomeId = Coerce.asInteger(parts[index]).orElse(null);
             if (biomeId != null) {
                 BiomeType biomeType0 = LanternBiomes.getById(biomeId);
                 if (biomeType0 != null) {

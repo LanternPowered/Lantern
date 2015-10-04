@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -20,7 +21,6 @@ import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.TextMessageException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
@@ -266,15 +266,15 @@ public class LegacyTextRepresentation implements TextRepresentation {
             if (color == TextColors.NONE) {
                 color = null;
             }
-            return new ResolvedChatStyle(color, style.isBold().or(false), style.isItalic().or(false),
-                    style.hasUnderline().or(false), style.hasStrikethrough().or(false), style.isObfuscated().or(false));
+            return new ResolvedChatStyle(color, style.isBold().orElse(false), style.isItalic().orElse(false),
+                    style.hasUnderline().orElse(false), style.hasStrikethrough().orElse(false), style.isObfuscated().orElse(false));
         }
         if (color == TextColors.NONE) {
             color = current.color;
         }
-        return new ResolvedChatStyle(color, style.isBold().or(current.bold), style.isItalic().or(current.italic),
-                style.hasUnderline().or(current.underlined), style.hasStrikethrough().or(current.strikethrough),
-                style.isObfuscated().or(current.obfuscated));
+        return new ResolvedChatStyle(color, style.isBold().orElse(current.bold), style.isItalic().orElse(current.italic),
+                style.hasUnderline().orElse(current.underlined), style.hasStrikethrough().orElse(current.strikethrough),
+                style.isObfuscated().orElse(current.obfuscated));
     }
 
     private static class ResolvedChatStyle {

@@ -2,8 +2,10 @@ package org.lanternpowered.server.block;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
@@ -23,17 +25,13 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 public class LanternBlockSnapshot implements BlockSnapshot {
 
-    @Nullable
     private final WeakWorldReference world;
-    @Nullable
-    private final Vector3i position;
+    @Nullable private final Vector3i position;
     private final BlockState state;
 
     public LanternBlockSnapshot(Location<World> location, BlockState blockState) {
@@ -77,11 +75,11 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     @Override
     public Optional<Location<World>> getLocation() {
         if (this.world == null) {
-            return Optional.absent();
+            return Optional.empty();
         }
         Optional<World> world = this.world.getWorld();
         if (!world.isPresent()) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(new Location<>(world.get(), this.position));
     }

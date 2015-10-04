@@ -5,6 +5,7 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
@@ -23,7 +24,6 @@ import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
 public class LanternWorldBuilder implements WorldBuilder {
@@ -224,7 +224,7 @@ public class LanternWorldBuilder implements WorldBuilder {
         if (worldProperties.isPresent()) {
             return this.game.getServer().loadWorld(worldProperties.get());
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

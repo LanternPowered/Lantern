@@ -2,6 +2,8 @@ package org.lanternpowered.server.attribute;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.function.Predicate;
+
 import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.data.DataHolder;
@@ -10,8 +12,6 @@ import org.spongepowered.api.entity.living.animal.Horse;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-
-import com.google.common.base.Predicate;
 
 public class LanternAttribute extends LanternCatalogType implements Attribute {
 

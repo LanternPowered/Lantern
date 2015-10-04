@@ -2,8 +2,6 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-
 import org.lanternpowered.server.data.value.mutable.LanternNextEntityToSpawnValue;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -14,6 +12,7 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.util.weighted.WeightedEntity;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 

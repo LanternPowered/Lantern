@@ -1,7 +1,9 @@
 package org.lanternpowered.server.data;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -13,9 +15,6 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.service.persistence.InvalidDataException;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 public class LanternDataHolder implements DataHolder {
 

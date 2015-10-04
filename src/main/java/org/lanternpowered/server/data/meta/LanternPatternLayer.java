@@ -2,6 +2,8 @@ package org.lanternpowered.server.data.meta;
 
 import static org.spongepowered.api.data.DataQuery.of;
 
+import java.util.Optional;
+
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -12,8 +14,6 @@ import org.spongepowered.api.data.type.BannerPatternShape;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.service.persistence.DataBuilder;
 import org.spongepowered.api.service.persistence.InvalidDataException;
-
-import com.google.common.base.Optional;
 
 public final class LanternPatternLayer implements PatternLayer {
 
@@ -53,15 +53,15 @@ public final class LanternPatternLayer implements PatternLayer {
 
         @Override
         public Optional<PatternLayer> build(DataView container) throws InvalidDataException {
-            String bannerShape = container.getString(BANNER_SHAPE).orNull();
-            String dyeColor = container.getString(DYE_COLOR).orNull();
+            String bannerShape = container.getString(BANNER_SHAPE).orElse(null);
+            String dyeColor = container.getString(DYE_COLOR).orElse(null);
             if (bannerShape == null || dyeColor == null) {
-                return Optional.absent();
+                return Optional.empty();
             }
-            BannerPatternShape shape = this.game.getRegistry().getType(BannerPatternShape.class, bannerShape).orNull();
-            DyeColor color = this.game.getRegistry().getType(DyeColor.class, dyeColor).orNull();
+            BannerPatternShape shape = this.game.getRegistry().getType(BannerPatternShape.class, bannerShape).orElse(null);
+            DyeColor color = this.game.getRegistry().getType(DyeColor.class, dyeColor).orElse(null);
             if (shape == null || color == null) {
-                return Optional.absent();
+                return Optional.empty();
             }
             return Optional.of(new LanternPatternLayer(shape, color));
         }

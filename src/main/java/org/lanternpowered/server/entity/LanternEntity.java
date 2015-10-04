@@ -2,7 +2,9 @@ package org.lanternpowered.server.entity;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -23,8 +25,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 
 public class LanternEntity implements Entity {

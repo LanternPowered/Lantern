@@ -2,8 +2,6 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 
@@ -19,6 +17,8 @@ import org.spongepowered.api.util.weighted.WeightedEntity;
 
 import java.util.Collection;
 import java.util.Random;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -30,7 +30,7 @@ public class ImmutableLanternWeightedEntityCollectionValue extends ImmutableLant
     }
 
     public ImmutableLanternWeightedEntityCollectionValue(Key<? extends BaseValue<WeightedCollection<WeightedEntity>>> key,
-                                                        WeightedCollection<WeightedEntity> actualValue) {
+            WeightedCollection<WeightedEntity> actualValue) {
         super(key, actualValue);
     }
 
@@ -44,7 +44,7 @@ public class ImmutableLanternWeightedEntityCollectionValue extends ImmutableLant
 
     @Override
     public ImmutableWeightedEntityCollectionValue transform(
-        Function<WeightedCollection<WeightedEntity>, WeightedCollection<WeightedEntity>> function) {
+            Function<WeightedCollection<WeightedEntity>, WeightedCollection<WeightedEntity>> function) {
         final WeightedCollection<WeightedEntity> weightedEntities = new WeightedCollection<WeightedEntity>();
         final WeightedCollection<WeightedEntity> temp = new WeightedCollection<WeightedEntity>();
         temp.addAll(this.actualValue);
@@ -94,7 +94,7 @@ public class ImmutableLanternWeightedEntityCollectionValue extends ImmutableLant
     public ImmutableWeightedEntityCollectionValue withoutAll(Predicate<WeightedEntity> predicate) {
         final WeightedCollection<WeightedEntity> weightedEntities = new WeightedCollection<WeightedEntity>();
         for (WeightedEntity entity : this.actualValue) {
-            if (!predicate.apply(entity)) {
+            if (!predicate.test(entity)) {
                 weightedEntities.add(entity);
             }
         }

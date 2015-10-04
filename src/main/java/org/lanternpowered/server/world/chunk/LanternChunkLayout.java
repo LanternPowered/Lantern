@@ -2,6 +2,8 @@ package org.lanternpowered.server.world.chunk;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Optional;
+
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.util.Direction;
@@ -9,7 +11,6 @@ import org.spongepowered.api.world.storage.ChunkLayout;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 
 public class LanternChunkLayout implements ChunkLayout {
 
@@ -101,7 +102,7 @@ public class LanternChunkLayout implements ChunkLayout {
     @Override
     public Optional<Vector3i> toChunk(int x, int y, int z) {
         Vector3i chunkCoords = new Vector3i(x >> 4, y >> 4, z >> 4);
-        return this.isValidChunk(chunkCoords) ? Optional.of(chunkCoords) : Optional.<Vector3i>absent();
+        return this.isValidChunk(chunkCoords) ? Optional.of(chunkCoords) : Optional.empty();
     }
 
     @Override
@@ -112,7 +113,7 @@ public class LanternChunkLayout implements ChunkLayout {
 
     @Override
     public Optional<Vector3i> toWorld(int x, int y, int z) {
-        return this.isValidChunk(x, y, z) ? Optional.of(new Vector3i(x << 4, 0, z << 4)) : Optional.<Vector3i>absent();
+        return this.isValidChunk(x, y, z) ? Optional.of(new Vector3i(x << 4, 0, z << 4)) : Optional.empty();
     }
 
     @Override
@@ -125,7 +126,7 @@ public class LanternChunkLayout implements ChunkLayout {
     @Override
     public Optional<Vector3i> addToChunk(int cx, int cy, int cz, int ox, int oy, int oz) {
         Vector3i newChunkCoords = new Vector3i(cx + ox, cy + oy, cz + oz);
-        return this.isValidChunk(newChunkCoords) ? Optional.of(newChunkCoords) : Optional.<Vector3i>absent();
+        return this.isValidChunk(newChunkCoords) ? Optional.of(newChunkCoords) : Optional.empty();
     }
 
     @Override

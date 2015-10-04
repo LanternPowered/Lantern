@@ -1,13 +1,14 @@
 package org.lanternpowered.server.data.value.immutable;
 
-import com.google.common.base.Function;
 import com.google.common.collect.Iterables;
+
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableCollectionValue;
 import org.spongepowered.api.data.value.mutable.CollectionValue;
 
 import java.util.Collection;
+import java.util.function.Function;
 
 public abstract class ImmutableLanternCollectionValue<E, V extends Collection<E>, I extends ImmutableCollectionValue<E, V, I, L>,
     L extends CollectionValue<E, V, L, I>> extends ImmutableLanternValue<V> implements ImmutableCollectionValue<E, V, I, L> {

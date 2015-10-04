@@ -3,7 +3,10 @@ package org.lanternpowered.server.world;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.lanternpowered.server.effect.LanternViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -34,7 +37,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.persistence.InvalidDataException;
@@ -46,6 +48,7 @@ import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.PlayerSimulator;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
@@ -61,9 +64,6 @@ import org.spongepowered.api.world.weather.Weather;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
@@ -114,79 +114,6 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     @Override
     public Location<World> getLocation(Vector3d position) {
         return this.getLocation(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    public void interactBlock(int x, int y, int z, Direction side) {
-        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.interactBlock(x & 0xf, y, z & 0xf, side);
-        }
-    }
-
-    @Override
-    public void interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side) {
-        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            chunk.interactBlockWith(x & 0xf, y, z & 0xf, itemStack, side);
-        }
-    }
-
-    @Override
-    public boolean digBlock(int x, int y, int z) {
-        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            return chunk.digBlock(x & 0xf, y, z & 0xf);
-        }
-        return false;
-    }
-
-    @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack) {
-        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            return chunk.digBlockWith(x & 0xf, y, z & 0xf, itemStack);
-        }
-        return false;
-    }
-
-    @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack) {
-        LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
-        if (chunk != null) {
-            return chunk.getBlockDigTimeWith(x & 0xf, y, z & 0xf, itemStack);
-        }
-        return 0;
-    }
-
-    @Override
-    public boolean isBlockFacePowered(int x, int y, int z, Direction direction) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isBlockFaceIndirectlyPowered(int x, int y, int z, Direction direction) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Collection<Direction> getPoweredBlockFaces(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Direction> getIndirectlyPoweredBlockFaces(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isBlockFlammable(int x, int y, int z, Direction faceDirection) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Override
@@ -353,10 +280,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
-        int x = coords.getX();
-        int y = coords.getY();
-        int z = coords.getZ();
+    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(new Vector3i(x & 0xf, y, z & 0xf),
                 direction, propertyClass);
     }
@@ -641,7 +565,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public Optional<Chunk> getChunk(Vector3i position) {
-        return Optional.<Chunk>fromNullable(this.chunkManager.getChunk(position));
+        return Optional.<Chunk>ofNullable(this.chunkManager.getChunk(position));
     }
 
     @Override
@@ -657,7 +581,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     @Override
     public Optional<Chunk> loadChunk(int x, int y, int z, boolean generate) {
         if (!VecHelper.inBounds(x, y, z, SPACE_MIN, SPACE_MAX)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         Chunk chunk;
         if (generate) {
@@ -804,5 +728,11 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public PlayerSimulator getPlayerSimulator() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

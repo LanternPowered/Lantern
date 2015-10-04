@@ -1,11 +1,10 @@
 package org.lanternpowered.server.text.translation;
 
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.spongepowered.api.text.translation.Translation;
-
-import com.google.common.base.Optional;
 
 public interface TranslationManager {
 

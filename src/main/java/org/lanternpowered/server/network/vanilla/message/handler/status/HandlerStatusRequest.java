@@ -2,6 +2,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.status;
 
 import java.net.InetSocketAddress;
 import java.util.List;
+import java.util.Optional;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
@@ -24,7 +25,6 @@ import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -52,7 +52,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
         // TODO: Replace the list with the actual profiles
         LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(Lists.<GameProfile>newArrayList(), online, max);
-        LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orNull(), motd, players);
+        LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
         ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(client, response);
 

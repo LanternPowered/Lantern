@@ -2,8 +2,6 @@ package org.lanternpowered.server.text.selector;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -29,7 +27,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -145,7 +145,7 @@ public class LanternSelectorFactory implements SelectorFactory {
 
     @Override
     public Optional<ArgumentType<?>> getArgumentType(String name) {
-        return recast(Optional.fromNullable(this.argumentLookupMap.get(name)));
+        return recast(Optional.ofNullable(this.argumentLookupMap.get(name)));
     }
 
     @Override

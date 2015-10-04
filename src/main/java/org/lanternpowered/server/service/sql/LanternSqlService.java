@@ -1,7 +1,6 @@
 package org.lanternpowered.server.service.sql;
 
 import com.google.common.base.Objects;
-import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -10,6 +9,7 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.regex.Matcher;
@@ -85,7 +86,7 @@ public class LanternSqlService implements SqlService, Closeable {
 
     @Override
     public DataSource getDataSource(String jdbcConnection) throws SQLException {
-        jdbcConnection = getConnectionUrlFromAlias(jdbcConnection).or(jdbcConnection);
+        jdbcConnection = getConnectionUrlFromAlias(jdbcConnection).orElse(jdbcConnection);
         ConnectionInfo info = ConnectionInfo.fromUrl(jdbcConnection);
         try {
             return this.connectionCache.get(info);
@@ -193,7 +194,7 @@ public class LanternSqlService implements SqlService, Closeable {
 
     @Override
     public Optional<String> getConnectionUrlFromAlias(String alias) {
-        return Optional.absent(); // TODO
+        return Optional.empty(); // TODO
     }
 
 }

@@ -1,12 +1,11 @@
 package org.lanternpowered.server.block.trait;
 
 import java.util.Collection;
+import java.util.function.Predicate;
 
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.value.mutable.Value;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 
 @SuppressWarnings({"unchecked","rawtypes"})
@@ -50,6 +49,6 @@ public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T>
 
     @Override
     public Predicate<T> getPredicate() {
-        return Predicates.in(this.possibleValues);
+        return input -> this.possibleValues.contains(input);
     }
 }

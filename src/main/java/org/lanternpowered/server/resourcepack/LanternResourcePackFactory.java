@@ -6,11 +6,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
+import java.util.Optional;
 
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
@@ -68,7 +68,7 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
             is.close();
         }
         id += "}";
-        ResourcePack resourcePack = new LanternResourcePack(uri, plainPath, id, Optional.fromNullable(hash));
+        ResourcePack resourcePack = new LanternResourcePack(uri, plainPath, id, Optional.ofNullable(hash));
         if (hash != null) {
             this.resourcePacksByHash.put(hash, resourcePack);
         }
@@ -78,11 +78,11 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
     }
 
     public Optional<ResourcePack> getById(String id) {
-        return Optional.fromNullable(this.resourcePacks.get(id));
+        return Optional.ofNullable(this.resourcePacks.get(id));
     }
 
     public Optional<ResourcePack> getByHash(String hash) {
-        return Optional.fromNullable(this.resourcePacksByHash.get(hash));
+        return Optional.ofNullable(this.resourcePacksByHash.get(hash));
     }
 
     @Override

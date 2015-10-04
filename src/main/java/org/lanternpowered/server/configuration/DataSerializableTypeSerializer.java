@@ -1,6 +1,7 @@
 package org.lanternpowered.server.configuration;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
+
 import com.google.common.reflect.TypeToken;
 
 import ninja.leaping.configurate.ConfigurationNode;

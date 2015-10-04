@@ -13,6 +13,7 @@ import java.security.KeyPair;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -55,7 +56,6 @@ import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.storage.ChunkLayout;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -352,7 +352,7 @@ public class LanternServer implements Server {
      * @return the favicon
      */
     public Optional<Favicon> getFavicon() {
-        return Optional.fromNullable(this.favicon);
+        return Optional.ofNullable(this.favicon);
     }
 
     /**
@@ -562,7 +562,7 @@ public class LanternServer implements Server {
         // Stop the async scheduler
         this.game.getScheduler().shutdownAsyncScheduler();
 
-        SqlService service = this.game.getServiceManager().provide(SqlService.class).orNull();
+        SqlService service = this.game.getServiceManager().provide(SqlService.class).orElse(null);
         if (service instanceof Closeable) {
             try {
                 ((Closeable) service).close();
@@ -571,7 +571,7 @@ public class LanternServer implements Server {
             }
         }
 
-        GameProfileResolver gameProfileResolver = this.game.getServiceManager().provide(GameProfileResolver.class).orNull();
+        GameProfileResolver gameProfileResolver = this.game.getServiceManager().provide(GameProfileResolver.class).orElse(null);
         if (gameProfileResolver instanceof LanternGameProfileResolver) {
             ((LanternGameProfileResolver) gameProfileResolver).shutdown();
         }

@@ -1,8 +1,8 @@
 package org.lanternpowered.server.text.selector;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.text.selector.Argument;
 import org.spongepowered.api.text.selector.ArgumentType;
@@ -19,6 +19,7 @@ import org.spongepowered.api.world.extent.Extent;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @NonnullByDefault
@@ -44,19 +45,19 @@ public class LanternSelector implements Selector {
     @SuppressWarnings("unchecked")
     public <T> Optional<T> get(ArgumentType<T> type) {
         Argument<T> argument = (Argument<T>) this.arguments.get(type);
-        return argument != null ? Optional.of(argument.getValue()) : Optional.absent();
+        return argument != null ? Optional.of(argument.getValue()) : Optional.empty();
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<Argument<T>> getArgument(ArgumentType<T> type) {
-        return Optional.fromNullable((Argument<T>) this.arguments.get(type));
+        return Optional.ofNullable((Argument<T>) this.arguments.get(type));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T> Optional<Argument.Invertible<T>> getArgument(ArgumentType.Invertible<T> type) {
-        return Optional.fromNullable((Argument.Invertible<T>) this.arguments.get(type));
+        return Optional.ofNullable((Argument.Invertible<T>) this.arguments.get(type));
     }
 
     @Override

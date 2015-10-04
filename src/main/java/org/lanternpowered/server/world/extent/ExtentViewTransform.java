@@ -2,7 +2,11 @@ package org.lanternpowered.server.world.extent;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -24,10 +28,10 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
+import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -36,12 +40,7 @@ import org.spongepowered.api.world.extent.Extent;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableSet;
 
 public class ExtentViewTransform extends AbstractExtent {
 
@@ -202,10 +201,7 @@ public class ExtentViewTransform extends AbstractExtent {
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
-        int x = coords.getX();
-        int y = coords.getY();
-        int z = coords.getZ();
+    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
         return this.extent.getProperty(new Vector3i(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
                 this.inverseTransform.transformZ(x, y, z)), direction, propertyClass);
     }
@@ -247,66 +243,6 @@ public class ExtentViewTransform extends AbstractExtent {
         final Location<World> location = entity.getLocation();
         entity.setLocation(new Location<World>(location.getExtent(), this.inverseTransform(location.getPosition())));
         return this.extent.spawnEntity(entity, cause);
-    }
-
-    @Override
-    public void interactBlock(int x, int y, int z, Direction side) {
-        this.extent.interactBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), side);
-    }
-
-    @Override
-    public void interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side) {
-        this.extent.interactBlockWith(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), itemStack, side);
-    }
-
-    @Override
-    public boolean digBlock(int x, int y, int z) {
-        return this.extent.digBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
-    }
-
-    @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack) {
-        return this.extent.digBlockWith(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), itemStack);
-    }
-
-    @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack) {
-        return this.extent.getBlockDigTimeWith(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), itemStack);
-    }
-
-    @Override
-    public boolean isBlockFacePowered(int x, int y, int z, Direction direction) {
-        return this.extent.isBlockFacePowered(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), direction);
-    }
-
-    @Override
-    public boolean isBlockFaceIndirectlyPowered(int x, int y, int z, Direction direction) {
-        return this.extent.isBlockFaceIndirectlyPowered(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), direction);
-    }
-
-    @Override
-    public Collection<Direction> getPoweredBlockFaces(int x, int y, int z) {
-        return this.extent.getPoweredBlockFaces(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
-    }
-
-    @Override
-    public Collection<Direction> getIndirectlyPoweredBlockFaces(int x, int y, int z) {
-        return this.extent.getIndirectlyPoweredBlockFaces(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
-    }
-
-    @Override
-    public boolean isBlockFlammable(int x, int y, int z, Direction faceDirection) {
-        return this.extent.isBlockFlammable(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), faceDirection);
     }
 
     @Override
@@ -352,7 +288,7 @@ public class ExtentViewTransform extends AbstractExtent {
     }
 
     @Override
-    public ImmutableSet<ImmutableValue<?>> getValues(int x, int y, int z) {
+    public Set<ImmutableValue<?>> getValues(int x, int y, int z) {
         return this.extent.getValues(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
             this.inverseTransform.transformZ(x, y, z));
     }
@@ -406,7 +342,7 @@ public class ExtentViewTransform extends AbstractExtent {
     }
 
     @Override
-    public ImmutableSet<Key<?>> getKeys(int x, int y, int z) {
+    public Set<Key<?>> getKeys(int x, int y, int z) {
         return this.extent.getKeys(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
             this.inverseTransform.transformZ(x, y, z));
     }
@@ -527,10 +463,12 @@ public class ExtentViewTransform extends AbstractExtent {
         return tileEntities;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
-        return this.extent.getTileEntities(Predicates.and(new TileEntityInBounds(this.blockMin, this.blockMax), filter));
+        return this.extent.getTileEntities(Functional.predicateAnd(
+                new TileEntityInBounds(this.blockMin, this.blockMax), filter));
     }
 
     @Override
@@ -561,10 +499,12 @@ public class ExtentViewTransform extends AbstractExtent {
         return entities;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
-        return this.extent.getEntities(Predicates.and(new EntityInBounds(this.blockMin, this.blockMax), filter));
+        return this.extent.getEntities(Functional.predicateAnd(
+                new EntityInBounds(this.blockMin, this.blockMax), filter));
     }
 
     @Override
@@ -575,7 +515,7 @@ public class ExtentViewTransform extends AbstractExtent {
     @Override
     public Optional<Entity> createEntity(DataContainer entityContainer) {
         // TODO once entity containers are implemented
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override
@@ -610,11 +550,10 @@ public class ExtentViewTransform extends AbstractExtent {
         }
 
         @Override
-        public boolean apply(Entity input) {
+        public boolean test(Entity input) {
             final Location<World> block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
         }
-
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {
@@ -628,10 +567,9 @@ public class ExtentViewTransform extends AbstractExtent {
         }
 
         @Override
-        public boolean apply(TileEntity input) {
+        public boolean test(TileEntity input) {
             final Location<World> block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
         }
-
     }
 }

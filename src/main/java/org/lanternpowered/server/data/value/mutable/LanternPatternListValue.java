@@ -1,7 +1,5 @@
 package org.lanternpowered.server.data.value.mutable;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 
 import org.lanternpowered.server.data.meta.LanternPatternLayer;
@@ -15,6 +13,8 @@ import org.spongepowered.api.data.value.immutable.ImmutablePatternListValue;
 import org.spongepowered.api.data.value.mutable.PatternListValue;
 
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class LanternPatternListValue extends LanternListValue<PatternLayer> implements PatternListValue {
 

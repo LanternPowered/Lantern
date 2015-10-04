@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.Map.Entry;
@@ -34,7 +35,6 @@ import org.spongepowered.api.world.gen.WorldGenerator;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -145,12 +145,12 @@ public class LanternChunkManager {
     public Optional<LoadingTicket> createTicket(Object plugin) {
         PluginContainer container = checkPlugin(plugin, "plugin");
         if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
         LanternLoadingTicket ticket = new LanternLoadingTicket(container.getId(), this, chunks);
         this.tickets.add(ticket);
-        return Optional.<LoadingTicket>of(ticket);
+        return Optional.of(ticket);
     }
 
     /**
@@ -162,7 +162,7 @@ public class LanternChunkManager {
     public Optional<EntityLoadingTicket> createEntityTicket(Object plugin) {
         PluginContainer container = checkPlugin(plugin, "plugin");
         if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
         LanternEntityLoadingTicket ticket = new LanternEntityLoadingTicket(container.getId(), this, chunks);
@@ -182,7 +182,7 @@ public class LanternChunkManager {
         PluginContainer container = checkPlugin(plugin, "plugin");
         if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container) ||
                 this.chunkLoadService.getAvailableTickets(player) == 0) {
-            return Optional.absent();
+            return Optional.empty();
         }
         int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
         LanternPlayerLoadingTicket ticket = new LanternPlayerLoadingTicket(container.getId(), this, player, chunks);
@@ -201,7 +201,7 @@ public class LanternChunkManager {
         PluginContainer container = checkPlugin(plugin, "plugin");
         if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container) ||
                 this.chunkLoadService.getAvailableTickets(player) == 0) {
-            return Optional.absent();
+            return Optional.empty();
         }
         int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
         LanternPlayerEntityLoadingTicket ticket = new LanternPlayerEntityLoadingTicket(container.getId(),

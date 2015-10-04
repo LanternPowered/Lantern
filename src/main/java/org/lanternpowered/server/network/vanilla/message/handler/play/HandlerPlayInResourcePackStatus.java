@@ -1,5 +1,7 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import java.util.Optional;
+
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
@@ -7,8 +9,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.resourcepack.ResourcePack;
-
-import com.google.common.base.Optional;
 
 public final class HandlerPlayInResourcePackStatus implements Handler<MessagePlayInResourcePackStatus> {
 

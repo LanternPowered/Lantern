@@ -1,7 +1,9 @@
 package org.lanternpowered.server.block.tile;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -18,9 +20,6 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 public class LanternTileEntity implements TileEntity {
 

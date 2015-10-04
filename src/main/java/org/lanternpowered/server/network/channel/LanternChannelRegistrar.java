@@ -29,7 +29,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
     private final Map<String, RegisteredChannel> channels = Maps.newConcurrentMap();
     private final Server server;
 
-    public static class RegisteredChannel {
+    public static final class RegisteredChannel {
 
         private final ChannelListener listener;
         private final PluginContainer plugin;

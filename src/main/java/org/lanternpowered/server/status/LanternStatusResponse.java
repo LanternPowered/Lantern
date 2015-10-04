@@ -2,12 +2,12 @@ package org.lanternpowered.server.status;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import java.util.Optional;
+
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
-
-import com.google.common.base.Optional;
 
 public class LanternStatusResponse implements ClientPingServerEvent.Response {
 
@@ -38,7 +38,7 @@ public class LanternStatusResponse implements ClientPingServerEvent.Response {
 
     @Override
     public Optional<Favicon> getFavicon() {
-        return Optional.fromNullable(this.favicon);
+        return Optional.ofNullable(this.favicon);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class LanternStatusResponse implements ClientPingServerEvent.Response {
     @Override
     public Optional<Players> getPlayers() {
         if (this.hidePlayers) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(this.players);
     }

@@ -91,7 +91,7 @@ public class LanternServerConfig {
         if (this.parameters.containsKey(setting)) {
             return (T) this.parameters.get(setting);
         }
-        return (T) this.dataContainer.get(setting.path).or(setting.def);
+        return (T) this.dataContainer.get(setting.path).orElse(setting.def);
     }
 
     /**

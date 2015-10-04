@@ -3,12 +3,11 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.lang.ref.WeakReference;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.world.World;
-
-import com.google.common.base.Optional;
 
 public final class WeakWorldReference {
 
@@ -56,12 +55,12 @@ public final class WeakWorldReference {
         if (world != null) {
             return Optional.of(world);
         }
-        world = LanternGame.get().getServer().getWorld(this.uniqueId).orNull();
+        world = LanternGame.get().getServer().getWorld(this.uniqueId).orElse(null);
         if (world != null) {
             this.world = new WeakReference<World>(world);
             return Optional.of(world);
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     /**

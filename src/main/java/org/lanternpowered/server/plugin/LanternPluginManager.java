@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -32,7 +33,6 @@ import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 
-import com.google.common.base.Optional;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -170,12 +170,12 @@ public final class LanternPluginManager implements PluginManager {
         if (checkNotNull(instance, "instance") instanceof PluginContainer) {
             return Optional.of((PluginContainer) instance);
         }
-        return Optional.fromNullable(this.pluginInstances.get(instance));
+        return Optional.ofNullable(this.pluginInstances.get(instance));
     }
 
     @Override
     public Optional<PluginContainer> getPlugin(String id) {
-        return Optional.fromNullable(this.plugins.get(checkNotNull(id, "identifier")));
+        return Optional.ofNullable(this.plugins.get(checkNotNull(id, "identifier")));
     }
 
     @Override

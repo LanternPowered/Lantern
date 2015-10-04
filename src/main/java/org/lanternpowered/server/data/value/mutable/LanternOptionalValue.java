@@ -2,8 +2,8 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
+import java.util.Optional;
+import java.util.function.Function;
 
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternOptionalValue;
 import org.spongepowered.api.data.key.Key;
@@ -17,11 +17,11 @@ import javax.annotation.Nullable;
 public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implements OptionalValue<E> {
 
     public LanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key) {
-        this(key, Optional.<E>absent());
+        this(key, Optional.<E>empty());
     }
 
     public LanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key, Optional<E> actualValue) {
-        this(key, Optional.<E>absent(), actualValue);
+        this(key, Optional.<E>empty(), actualValue);
     }
 
     public LanternOptionalValue(Key<? extends BaseValue<Optional<E>>> key, Optional<E> defaultValue, Optional<E> actualValue) {
@@ -47,7 +47,7 @@ public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implement
 
     @Override
     public OptionalValue<E> setTo(@Nullable E value) {
-        return set(Optional.fromNullable(value));
+        return set(Optional.ofNullable(value));
     }
 
     @Override

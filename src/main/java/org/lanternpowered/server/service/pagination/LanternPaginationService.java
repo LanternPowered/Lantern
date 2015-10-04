@@ -4,7 +4,6 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import static org.spongepowered.api.util.command.args.GenericArguments.integer;
 
 import com.google.common.base.Functions;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
@@ -15,6 +14,7 @@ import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandResult;
@@ -28,6 +28,7 @@ import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -190,8 +191,10 @@ public class LanternPaginationService implements PaginationService {
 
             final Optional<String> optNext = args.nextIfPresent();
             if (optNext.isPresent()) {
-                return ImmutableList.copyOf(Iterables.filter(
-                        Iterables.transform(paginations.keys(), Functions.toStringFunction()), new StartsWithPredicate(optNext.get())));
+                return paginations.keys().stream()
+                        .map(Object::toString)
+                        .filter(new StartsWithPredicate(optNext.get()))
+                        .collect(GuavaCollectors.toImmutableList());
             } else {
                 return ImmutableList.copyOf(Iterables.transform(paginations.keys(), Functions.toStringFunction()));
             }

@@ -1,13 +1,12 @@
 package org.lanternpowered.server.attribute;
 
+import java.util.function.Predicate;
+
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.attribute.AttributeBuilder;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
-
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
@@ -24,10 +23,11 @@ public final class LanternAttributeBuilder implements AttributeBuilder {
     private Double max;
     private Double def;
 
-    private Predicate<DataHolder> targets = Predicates.alwaysTrue();
+    private Predicate<DataHolder> targets;
 
     public LanternAttributeBuilder(CatalogTypeRegistry<Attribute> registry) {
         this.registry = checkNotNull(registry, "registry");
+        this.reset();
     }
 
     @Override
@@ -82,7 +82,7 @@ public final class LanternAttributeBuilder implements AttributeBuilder {
 
     @Override
     public AttributeBuilder reset() {
-        this.targets = Predicates.alwaysTrue();
+        this.targets = target -> true;
         this.identifier = null;
         this.name = null;
         this.max = null;

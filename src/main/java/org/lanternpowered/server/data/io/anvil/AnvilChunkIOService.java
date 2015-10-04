@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
@@ -22,7 +23,6 @@ import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
@@ -118,7 +118,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
         // initialize the chunk
         chunk.initializeSections(sections);
-        chunk.setPopulated(levelTag.getBoolean(POPULATED).or(false));
+        chunk.setPopulated(levelTag.getBoolean(POPULATED).orElse(false));
 
         if (levelTag.contains(BIOMES)) {
             byte[] biomes = (byte[]) levelTag.get(BIOMES).get();
@@ -345,7 +345,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                 int regionZ = z & (REGION_SIZE - 1);
 
                 if (!region.hasChunk(regionX, regionZ)) {
-                    return Optional.absent();
+                    return Optional.empty();
                 }
 
                 DataInputStream is = region.getChunkDataInputStream(regionX, regionZ);

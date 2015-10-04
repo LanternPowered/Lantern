@@ -40,12 +40,12 @@ public class SerializerItemStack implements ObjectSerializer<ItemStack> {
         int amount = 1;
         int data = 0;
 
-        EnchantmentData enchantments = object.get(EnchantmentData.class).orNull();
+        EnchantmentData enchantments = object.get(EnchantmentData.class).orElse(null);
         if (enchantments != null) {
             tag.set(DataQuery.of("ench"), Lists.newArrayList());
         }
 
-        DurabilityData durability = object.get(DurabilityData.class).orNull();
+        DurabilityData durability = object.get(DurabilityData.class).orElse(null);
         if (durability != null) {
             data = durability.durability().get();
             if (!durability.unbreakable().get()) {
@@ -54,12 +54,12 @@ public class SerializerItemStack implements ObjectSerializer<ItemStack> {
         }
 
         DataView display = null;
-        DisplayNameData name = object.get(DisplayNameData.class).orNull();
+        DisplayNameData name = object.get(DisplayNameData.class).orElse(null);
         if (name != null && name.customNameVisible().get()) {
             display = tag.createView(DataQuery.of("display"));
             display.set(DataQuery.of("Name"), Texts.legacy().to(name.displayName().get(), locale));
         }
-        LoreData lore = object.get(LoreData.class).orNull();
+        LoreData lore = object.get(LoreData.class).orElse(null);
         if (lore != null) {
             List<String> lines = Lists.newArrayList();
             for (Text line : lore.lore()) {

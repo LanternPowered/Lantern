@@ -1,12 +1,12 @@
 package org.lanternpowered.server.catalog;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
 
 import org.spongepowered.api.CatalogType;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 
@@ -32,7 +32,7 @@ public class LanternCatalogTypeRegistry<T extends CatalogType> implements Catalo
 
     @Override
     public Optional<T> get(String identifier) {
-        return Optional.fromNullable(this.types.get(checkNotNullOrEmpty(identifier, "identifier")));
+        return Optional.ofNullable(this.types.get(checkNotNullOrEmpty(identifier, "identifier")));
     }
 
     @Override
@@ -41,7 +41,7 @@ public class LanternCatalogTypeRegistry<T extends CatalogType> implements Catalo
         if (type.isInstance(catalogType)) {
             return Optional.<V>of(type.cast(catalogType));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

@@ -1,6 +1,7 @@
 package org.lanternpowered.server.block;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.lanternpowered.server.block.state.BlockStateBase;
 import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
@@ -11,7 +12,6 @@ import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 import org.spongepowered.api.text.translation.Translation;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 public class LanternBlockType extends LanternSimpleCatalogType implements BlockType {

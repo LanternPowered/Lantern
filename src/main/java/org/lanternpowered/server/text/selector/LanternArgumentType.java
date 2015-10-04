@@ -2,8 +2,6 @@ package org.lanternpowered.server.text.selector;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-import com.google.common.base.Functions;
 import com.google.common.collect.Maps;
 
 import org.lanternpowered.server.game.LanternGame;
@@ -14,6 +12,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 import java.util.Map;
+import java.util.function.Function;
 
 @NonnullByDefault
 public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T>> implements ArgumentType<T> {
@@ -21,12 +20,12 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
     private static final Map<String, Function<String, ?>> converters = Maps.newHashMap();
 
     static {
-        converters.put(String.class.getName(), Functions.<String>identity());
+        converters.put(String.class.getName(), Function.<String>identity());
         converters.put(EntityType.class.getName(), new Function<String, EntityType>() {
 
             @Override
             public EntityType apply(String input) {
-                return LanternGame.get().getRegistry().getType(EntityType.class, input).orNull();
+                return LanternGame.get().getRegistry().getType(EntityType.class, input).orElse(null);
             }
 
         });

@@ -1,6 +1,7 @@
 package org.lanternpowered.server.text.gson;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -17,7 +18,6 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 
-import com.google.common.base.Optional;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -33,7 +33,7 @@ abstract class JsonTextBaseSerializer {
 
     public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context, @Nullable JsonArray children) throws JsonParseException {
         if (json.has("color")) {
-            TextColor color = LanternGame.get().getRegistry().getType(TextColor.class, json.get("color").getAsString()).orNull();
+            TextColor color = LanternGame.get().getRegistry().getType(TextColor.class, json.get("color").getAsString()).orElse(null);
             if (color != null) {
                 builder.color(color);
             }
@@ -128,7 +128,7 @@ abstract class JsonTextBaseSerializer {
         if (!children.isEmpty()) {
             json.add("extra", context.serialize(children.toArray(new Text[] {}), Text[].class));
         }
-        ClickAction<?> clickAction = text.getClickAction().orNull();
+        ClickAction<?> clickAction = text.getClickAction().orElse(null);
         if (clickAction != null) {
             RawAction raw = LanternTextHelper.raw(clickAction);
 
@@ -138,7 +138,7 @@ abstract class JsonTextBaseSerializer {
 
             json.add("clickEvent", json0);
         }
-        HoverAction<?> hoverAction = text.getHoverAction().orNull();
+        HoverAction<?> hoverAction = text.getHoverAction().orElse(null);
         if (hoverAction != null) {
             RawAction raw = LanternTextHelper.raw(hoverAction);
 
@@ -148,7 +148,7 @@ abstract class JsonTextBaseSerializer {
 
             json.add("hoverEvent", json0);
         }
-        ShiftClickAction<?> shiftClickAction = text.getShiftClickAction().orNull();
+        ShiftClickAction<?> shiftClickAction = text.getShiftClickAction().orElse(null);
         if (shiftClickAction != null && shiftClickAction instanceof ShiftClickAction.InsertText) {
             json.addProperty("insertion", ((ShiftClickAction.InsertText) shiftClickAction).getResult());
         }

@@ -1,6 +1,6 @@
 package org.lanternpowered.server.text.xml;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.TextBuilder;

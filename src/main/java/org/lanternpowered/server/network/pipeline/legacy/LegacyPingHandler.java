@@ -106,7 +106,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
             LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
             // TODO: Replace the list with the actual profiles, but not used anyway
             LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(Lists.<GameProfile>newArrayList(), online, max);
-            LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orNull(), motd, players);
+            LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
             ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(client, response);
             LanternGame.get().getEventManager().post(event);

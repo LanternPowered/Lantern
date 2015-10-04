@@ -3,8 +3,6 @@ package org.lanternpowered.server.data.value.immutable;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Function;
-
 import org.lanternpowered.server.data.value.mutable.LanternBoundedValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
@@ -12,8 +10,10 @@ import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 
 import java.util.Comparator;
+import java.util.function.Function;
 
 public class ImmutableLanternBoundedValue<E> extends ImmutableLanternValue<E> implements ImmutableBoundedValue<E> {
+
     private final Comparator<E> comparator;
     private final E minimum;
     private final E maximum;

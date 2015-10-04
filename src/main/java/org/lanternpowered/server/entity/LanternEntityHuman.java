@@ -1,6 +1,7 @@
 package org.lanternpowered.server.entity;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.FoodData;
+import java.util.Optional;
+
 import org.spongepowered.api.entity.living.Human;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -11,7 +12,6 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 
 public class LanternEntityHuman extends LanternEntityLiving implements Human {
 
@@ -139,10 +139,4 @@ public class LanternEntityHuman extends LanternEntityLiving implements Human {
         // TODO Auto-generated method stub
         
     }
-
-    @Override
-    public FoodData getFoodData() {
-        return this.get(FoodData.class).get();
-    }
-
 }

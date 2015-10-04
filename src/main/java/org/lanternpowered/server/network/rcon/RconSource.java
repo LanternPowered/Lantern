@@ -1,5 +1,7 @@
 package org.lanternpowered.server.network.rcon;
 
+import java.util.Optional;
+
 import org.lanternpowered.server.permission.SubjectBase;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
@@ -7,8 +9,6 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.command.CommandSource;
-
-import com.google.common.base.Optional;
 
 public class RconSource extends SubjectBase implements org.spongepowered.api.util.command.source.RconSource {
 
@@ -48,7 +48,7 @@ public class RconSource extends SubjectBase implements org.spongepowered.api.uti
 
     @Override
     public Optional<CommandSource> getCommandSource() {
-        return Optional.<CommandSource>of(this);
+        return Optional.of(this);
     }
 
     @Override

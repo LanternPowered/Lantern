@@ -2,17 +2,15 @@ package org.lanternpowered.server.world.extent;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableSet;
-
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -33,10 +31,10 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
+import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -167,10 +165,7 @@ public class ExtentViewDownsize extends AbstractExtent {
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
-        int x = coords.getX();
-        int y = coords.getY();
-        int z = coords.getZ();
+    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
         this.checkRange(x, y, z);
         return this.extent.getProperty(new Vector3i(x, y, z), direction, propertyClass);
     }
@@ -216,66 +211,6 @@ public class ExtentViewDownsize extends AbstractExtent {
     }
 
     @Override
-    public void interactBlock(int x, int y, int z, Direction side) {
-        this.checkRange(x, y, z);
-        this.extent.interactBlock(x, y, z, side);
-    }
-
-    @Override
-    public void interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side) {
-        this.checkRange(x, y, z);
-        this.extent.interactBlockWith(x, y, z, itemStack, side);
-    }
-
-    @Override
-    public boolean digBlock(int x, int y, int z) {
-        this.checkRange(x, y, z);
-        return this.extent.digBlock(x, y, z);
-    }
-
-    @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack) {
-        this.checkRange(x, y, z);
-        return this.extent.digBlockWith(x, y, z, itemStack);
-    }
-
-    @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack) {
-        this.checkRange(x, y, z);
-        return this.extent.getBlockDigTimeWith(x, y, z, itemStack);
-    }
-
-    @Override
-    public boolean isBlockFacePowered(int x, int y, int z, Direction direction) {
-        this.checkRange(x, y, z);
-        return this.extent.isBlockFacePowered(x, y, z, direction);
-    }
-
-    @Override
-    public boolean isBlockFaceIndirectlyPowered(int x, int y, int z, Direction direction) {
-        this.checkRange(x, y, z);
-        return this.extent.isBlockFaceIndirectlyPowered(x, y, z, direction);
-    }
-
-    @Override
-    public Collection<Direction> getPoweredBlockFaces(int x, int y, int z) {
-        this.checkRange(x, y, z);
-        return this.extent.getPoweredBlockFaces(x, y, z);
-    }
-
-    @Override
-    public Collection<Direction> getIndirectlyPoweredBlockFaces(int x, int y, int z) {
-        this.checkRange(x, y, z);
-        return this.extent.getIndirectlyPoweredBlockFaces(x, y, z);
-    }
-
-    @Override
-    public boolean isBlockFlammable(int x, int y, int z, Direction faceDirection) {
-        this.checkRange(x, y, z);
-        return this.extent.isBlockFlammable(x, y, z, faceDirection);
-    }
-
-    @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         this.checkRange(x, y, z);
         return this.extent.getScheduledUpdates(x, y, z);
@@ -318,7 +253,7 @@ public class ExtentViewDownsize extends AbstractExtent {
     }
 
     @Override
-    public ImmutableSet<ImmutableValue<?>> getValues(int x, int y, int z) {
+    public Set<ImmutableValue<?>> getValues(int x, int y, int z) {
         this.checkRange(x, y, z);
         return this.extent.getValues(x, y, z);
     }
@@ -372,7 +307,7 @@ public class ExtentViewDownsize extends AbstractExtent {
     }
 
     @Override
-    public ImmutableSet<Key<?>> getKeys(int x, int y, int z) {
+    public Set<Key<?>> getKeys(int x, int y, int z) {
         this.checkRange(x, y, z);
         return this.extent.getKeys(x, y, z);
     }
@@ -494,10 +429,12 @@ public class ExtentViewDownsize extends AbstractExtent {
         return tileEntities;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
-        return this.extent.getTileEntities(Predicates.<TileEntity>and(new TileEntityInBounds(this.blockMin, this.blockMax), filter));
+        return this.extent.getTileEntities(Functional.predicateAnd(
+                new TileEntityInBounds(this.blockMin, this.blockMax), filter));
     }
 
     @Override
@@ -525,10 +462,12 @@ public class ExtentViewDownsize extends AbstractExtent {
         return entities;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
-        return this.extent.getEntities(Predicates.<Entity>and(new EntityInBounds(this.blockMin, this.blockMax), filter));
+        return this.extent.getEntities(Functional.predicateAnd(
+                new EntityInBounds(this.blockMin, this.blockMax), filter));
     }
 
     @Override
@@ -541,7 +480,7 @@ public class ExtentViewDownsize extends AbstractExtent {
     public Optional<Entity> createEntity(DataContainer entityContainer) {
         // TODO once entity containers are implemented
         // checkRange(position.getX(), position.getY(), position.getZ());
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override
@@ -578,7 +517,7 @@ public class ExtentViewDownsize extends AbstractExtent {
         }
 
         @Override
-        public boolean apply(Entity input) {
+        public boolean test(Entity input) {
             final Location<World> block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
         }
@@ -595,7 +534,7 @@ public class ExtentViewDownsize extends AbstractExtent {
         }
 
         @Override
-        public boolean apply(TileEntity input) {
+        public boolean test(TileEntity input) {
             final Location<World> block = input.getLocation();
             return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
         }

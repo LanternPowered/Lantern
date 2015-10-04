@@ -1,6 +1,7 @@
 package org.lanternpowered.server.world.chunk;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -11,7 +12,6 @@ import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Sets;

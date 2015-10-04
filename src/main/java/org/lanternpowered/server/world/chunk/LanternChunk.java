@@ -2,10 +2,13 @@ package org.lanternpowered.server.world.chunk;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlocks;
@@ -39,7 +42,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
@@ -53,9 +55,6 @@ import org.spongepowered.api.world.extent.Extent;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
@@ -531,72 +530,6 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     }
 
     @Override
-    public void interactBlock(int x, int y, int z, Direction side) {
-        this.interactBlockWith(x, y, z, null, side);
-    }
-
-    @Override
-    public void interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side) {
-        this.interactBlockWith(x, y, z, itemStack, side);
-    }
-
-    public void interactBlockWith0(int x, int y, int z, ItemStack itemStack, Direction side) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public boolean digBlock(int x, int y, int z) {
-        return this.digBlockWith0(x, y, z, null);
-    }
-
-    @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack) {
-        return this.digBlockWith0(x, y, z, itemStack);
-    }
-
-    public boolean digBlockWith0(int x, int y, int z, ItemStack itemStack) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public boolean isBlockFacePowered(int x, int y, int z, Direction direction) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isBlockFaceIndirectlyPowered(int x, int y, int z, Direction direction) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Collection<Direction> getPoweredBlockFaces(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Direction> getIndirectlyPoweredBlockFaces(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isBlockFlammable(int x, int y, int z, Direction faceDirection) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         ImmutableSet.Builder<ScheduledBlockUpdate> builder = ImmutableSet.builder();
         Vector3i position = LanternChunkLayout.INSTANCE.toWorld(x, y, z).get();
@@ -1031,7 +964,7 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coords, Direction direction, Class<T> propertyClass) {
+    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
         // TODO Auto-generated method stub
         return null;
     }

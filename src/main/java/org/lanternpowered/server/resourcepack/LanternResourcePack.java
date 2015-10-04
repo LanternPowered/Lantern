@@ -1,10 +1,9 @@
 package org.lanternpowered.server.resourcepack;
 
 import java.net.URI;
+import java.util.Optional;
 
 import org.spongepowered.api.resourcepack.ResourcePack;
-
-import com.google.common.base.Optional;
 
 public final class LanternResourcePack implements ResourcePack {
 

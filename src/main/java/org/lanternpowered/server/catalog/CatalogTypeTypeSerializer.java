@@ -1,9 +1,10 @@
 package org.lanternpowered.server.catalog;
 
+import java.util.Optional;
+
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
 
-import com.google.common.base.Optional;
 import com.google.common.reflect.TypeToken;
 
 import ninja.leaping.configurate.ConfigurationNode;

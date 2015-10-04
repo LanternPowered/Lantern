@@ -2,6 +2,7 @@ package org.lanternpowered.server.permission;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -13,8 +14,6 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
-
-import com.google.common.base.Optional;
 
 public abstract class SubjectBase implements Subject {
 

@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.Sets2;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.sink.MessageSink;
@@ -43,13 +42,7 @@ public class LanternMessageSinkFactory implements MessageSinkFactory {
                 @Override
                 public Iterable<CommandSource> apply(SubjectCollection input) {
                     return Iterables.filter(Iterables.transform(Maps.filterValues(input.getAllWithPermission(PermissionSink.this.permission),
-                                    Predicates.equalTo(true)).keySet(), new Function<Subject, CommandSource>() {
-                                @Nullable
-                                @Override
-                                public CommandSource apply(@Nullable Subject input) {
-                                    return input.getCommandSource().orNull();
-                                }
-                            }), Predicates.notNull());
+                                    Predicates.equalTo(true)).keySet(), func -> func.getCommandSource().orElse(null)), Predicates.notNull());
                 }
             }));
         }

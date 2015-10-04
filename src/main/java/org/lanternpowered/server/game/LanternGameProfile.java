@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
@@ -16,7 +17,6 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.service.persistence.DataBuilder;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -82,7 +82,7 @@ public final class LanternGameProfile implements GameProfile {
         // Why use both the optional and data exception?
         @Override
         public Optional<GameProfile> build(DataView container) throws InvalidDataException {
-            String uniqueId = container.getString(UNIQUE_ID).orNull();
+            String uniqueId = container.getString(UNIQUE_ID).orElse(null);
             if (uniqueId == null) {
                 throw new InvalidDataException("UniqueId is missing!");
             }
@@ -92,18 +92,18 @@ public final class LanternGameProfile implements GameProfile {
             } catch (IllegalArgumentException e) {
                 throw new InvalidDataException("Unknown uniqueId format!", e);
             }
-            String name = container.getString(NAME).orNull();
+            String name = container.getString(NAME).orElse(null);
             if (name == null) {
                 throw new InvalidDataException("Name is missing!");
             }
-            List<DataView> views = container.getViewList(PROPERTIES).orNull();
+            List<DataView> views = container.getViewList(PROPERTIES).orElse(null);
             List<Property> properties;
             if (views != null && !views.isEmpty()) {
                 properties = Lists.newArrayListWithCapacity(views.size());
                 for (DataView view : views) {
                     if (view.contains(NAME) && view.contains(VALUE)) {
                         properties.add(new Property(view.getString(NAME).get(), view.getString(VALUE).get(),
-                                view.getString(SIGNATURE).orNull()));
+                                view.getString(SIGNATURE).orElse(null)));
                     }
                 }
             } else {

@@ -2,8 +2,6 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 
@@ -14,6 +12,8 @@ import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetValue<E>, ImmutableSetValue<E>> implements SetValue<E> {
 
@@ -39,7 +39,7 @@ public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetVal
     public SetValue<E> filter(Predicate<? super E> predicate) {
         final Set<E> set = Sets.newHashSet();
         for (E element : this.actualValue) {
-            if (checkNotNull(predicate).apply(element)) {
+            if (checkNotNull(predicate).test(element)) {
                 set.add(element);
             }
         }

@@ -4,6 +4,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 import org.lanternpowered.server.effect.LanternViewer;
@@ -15,12 +16,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.permission.SubjectBase;
 import org.spongepowered.api.GameProfile;
-import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
-import org.spongepowered.api.data.manipulator.mutable.entity.AchievementData;
 import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
-import org.spongepowered.api.data.manipulator.mutable.entity.GameModeData;
-import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
-import org.spongepowered.api.data.manipulator.mutable.entity.StatisticData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -42,7 +38,6 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.command.CommandSource;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 
 public class LanternPlayer extends LanternEntityHuman implements Player, LanternViewer {
@@ -269,7 +264,7 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
     @Override
     public void sendResourcePack(ResourcePack resourcePack) {
         checkNotNull(resourcePack, "resourcePack");
-        String hash = resourcePack.getHash().or(resourcePack.getId());
+        String hash = resourcePack.getHash().orElse(resourcePack.getId());
         String location = resourcePack.getUri().toString();
         this.session.send(new MessagePlayOutSendResourcePack(location, hash));
     }
@@ -312,36 +307,8 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
         this.sleepingIgnored = sleepingIgnored;
     }
 
-    // TODO: The following methods need to be removed after the jdk8 update of the api,
-    // they will be implemented using the default methods
-
-    @Override
-    public AchievementData getAchievementData() {
-        return this.get(AchievementData.class).get();
-    }
-
-    @Override
-    public StatisticData getStatisticData() {
-        return this.get(StatisticData.class).get();
-    }
-
     @Override
     public BanData getBanData() {
         return this.get(BanData.class).get();
-    }
-
-    @Override
-    public JoinData getJoinData() {
-        return this.get(JoinData.class).get();
-    }
-
-    @Override
-    public DisplayNameData getDisplayNameData() {
-        return this.get(DisplayNameData.class).get();
-    }
-
-    @Override
-    public GameModeData getGameModeData() {
-        return this.get(GameModeData.class).get();
     }
 }

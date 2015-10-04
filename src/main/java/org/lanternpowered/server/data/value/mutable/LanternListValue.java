@@ -2,8 +2,6 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -15,6 +13,8 @@ import org.spongepowered.api.data.value.mutable.ListValue;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, ListValue<E>, ImmutableListValue<E>> implements ListValue<E> {
 
@@ -40,7 +40,7 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
     public ListValue<E> filter(Predicate<? super E> predicate) {
         final List<E> list = Lists.newArrayList();
         for (E element : this.actualValue) {
-            if (checkNotNull(predicate).apply(element)) {
+            if (checkNotNull(predicate).test(element)) {
                 list.add(element);
             }
         }

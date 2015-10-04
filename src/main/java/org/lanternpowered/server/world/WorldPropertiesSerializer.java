@@ -8,6 +8,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
@@ -23,7 +24,6 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.DimensionType;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Optional;
 
 public class WorldPropertiesSerializer {
 
@@ -86,7 +86,7 @@ public class WorldPropertiesSerializer {
             } catch (IOException e) {
                 LanternGame.log().error("Unable to access {}, ignoring...", SPONGE_LEVEL_DATA, e);
             }
-            spongeContainer = spongeRootContainer.getView(ECOSYSTEM).orNull();
+            spongeContainer = spongeRootContainer.getView(ECOSYSTEM).orElse(null);
             if (spongeContainer != null) {
                 spongeRootContainer.remove(ECOSYSTEM);
             }
@@ -106,8 +106,8 @@ public class WorldPropertiesSerializer {
 
         // Try for the sponge (lantern) storage format
         if (uuid == null && spongeContainer != null) {
-            Long most = spongeContainer.getLong(UUID_MOST).orNull();
-            Long least = spongeContainer.getLong(UUID_LEAST).orNull();
+            Long most = spongeContainer.getLong(UUID_MOST).orElse(null);
+            Long least = spongeContainer.getLong(UUID_LEAST).orElse(null);
             if (most != null && least != null) {
                 uuid = new UUID(most, least);
             }
@@ -124,11 +124,11 @@ public class WorldPropertiesSerializer {
         // Set the uuid
         properties.uniqueId = uuid;
         // Get the world seed
-        properties.seed = container.getLong(SEED).or(new Random().nextLong());
+        properties.seed = container.getLong(SEED).orElse(new Random().nextLong());
         // Get the world age
-        properties.age = container.getLong(AGE).or(0L);
+        properties.age = container.getLong(AGE).orElse(0L);
         // Get the world time
-        properties.time = container.getLong(TIME).or(0L);
+        properties.time = container.getLong(TIME).orElse(0L);
 
         // Get the spawn position
         Optional<Integer> spawnX = container.getInt(SPAWN_X);
@@ -139,7 +139,7 @@ public class WorldPropertiesSerializer {
         }
 
         // Get the game rules
-        DataView rulesView = container.getView(GAME_RULES).orNull();
+        DataView rulesView = container.getView(GAME_RULES).orElse(null);
         if (rulesView != null) {
             for (Entry<DataQuery, Object> en : rulesView.getValues(false).entrySet()) {
                 properties.rules.newRule(en.getKey().toString()).set(en.getValue());

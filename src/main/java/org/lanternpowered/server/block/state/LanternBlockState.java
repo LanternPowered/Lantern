@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.trait.BlockTraitKey;
@@ -24,8 +27,6 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
@@ -84,8 +85,8 @@ public final class LanternBlockState implements BlockState {
 
     @Override
     public <E> Optional<BlockState> with(Key<? extends BaseValue<E>> key, E value) {
-        if (!this.supports(key) || !((BlockTraitKey) key).getBlockTrait().getPredicate().apply(value)) {
-            return Optional.absent();
+        if (!this.supports(key) || !((BlockTraitKey) key).getBlockTrait().getPredicate().test(value)) {
+            return Optional.empty();
         }
         return Optional.of(this.propertyValueTable.row(((BlockTraitKey) key).getBlockTrait()).get(value));
     }
@@ -93,7 +94,7 @@ public final class LanternBlockState implements BlockState {
     @Override
     public Optional<BlockState> with(BaseValue<?> value) {
         if (!this.supports(value)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(this.propertyValueTable.row(((BlockTraitKey) value.getKey()).getBlockTrait())
                 .get(value.get()));
@@ -114,7 +115,7 @@ public final class LanternBlockState implements BlockState {
     @Override
     public Optional<BlockState> without(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
         // You cannot remove any data manipulators from a block state
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override
@@ -132,10 +133,10 @@ public final class LanternBlockState implements BlockState {
     @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
         if (!this.supports(key)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
-        return Optional.fromNullable((E) this.traitValues.get(blockTrait));
+        return Optional.ofNullable((E) this.traitValues.get(blockTrait));
     }
 
     @Override
@@ -155,7 +156,7 @@ public final class LanternBlockState implements BlockState {
     @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
         if (!this.supports(key)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
         return Optional.of((V) new MutableBlockTraitValue(((BlockTraitKey) key), this.traitValues.get(blockTrait)));
@@ -169,7 +170,7 @@ public final class LanternBlockState implements BlockState {
     @Override
     public boolean supports(BaseValue<?> baseValue) {
         Key<?> key = baseValue.getKey();
-        return this.supports(key) && ((BlockTraitKey) key).getBlockTrait().getPredicate().apply(baseValue.get());
+        return this.supports(key) && ((BlockTraitKey) key).getBlockTrait().getPredicate().test(baseValue.get());
     }
 
     @Override
@@ -223,7 +224,7 @@ public final class LanternBlockState implements BlockState {
      */
     public <T extends Comparable<T>> Optional<BlockState> cycleTraitValue(BlockTrait<T> blockTrait) {
         if (!this.supportsTrait(blockTrait)) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         T value = (T) this.traitValues.get(blockTrait);
@@ -242,6 +243,14 @@ public final class LanternBlockState implements BlockState {
         return this.setTraitValue(blockTrait, value);
     }
 
+    @Override
+    public Optional<BlockState> withTrait(BlockTrait<?> trait, Object value) {
+        if (!this.supportsTraitValue(trait, (Comparable<?>) value)) {
+            return Optional.empty();
+        }
+        return null;
+    }
+
     /**
      * Attempts to set the trait value and gets the new block state. Will return absent
      * if the block trait or the value isn't supported.
@@ -252,7 +261,7 @@ public final class LanternBlockState implements BlockState {
      */
     public <T extends Comparable<T>> Optional<BlockState> setTraitValue(BlockTrait<T> blockTrait, T value) {
         if (!this.supportsTraitValue(blockTrait, value)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return Optional.of(this.propertyValueTable.row(blockTrait).get(value));
     }
@@ -274,13 +283,13 @@ public final class LanternBlockState implements BlockState {
      * @param value the value
      * @return whether the block trait and value are supported
      */
-    public <T extends Comparable<T>> boolean supportsTraitValue(BlockTrait<T> blockTrait, T value) {
-        return this.supportsTrait(blockTrait) && blockTrait.getPredicate().apply(value);
+    public boolean supportsTraitValue(BlockTrait<?> blockTrait, Object value) {
+        return this.supportsTrait(blockTrait) && ((Predicate) blockTrait.getPredicate()).test(value);
     }
 
     @Override
     public <T extends Comparable<T>> Optional<T> getTraitValue(BlockTrait<T> blockTrait) {
-        return Optional.fromNullable((T) this.traitValues.get(blockTrait));
+        return Optional.ofNullable((T) this.traitValues.get(blockTrait));
     }
 
     @Override

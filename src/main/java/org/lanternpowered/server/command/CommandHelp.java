@@ -5,8 +5,10 @@ import static org.spongepowered.api.util.command.args.GenericArguments.string;
 
 import java.util.Collection;
 import java.util.Comparator;
-import com.google.common.base.Optional;
+import java.util.Optional;
+
 import com.google.common.collect.Collections2;
+
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationService;
@@ -21,14 +23,12 @@ import org.spongepowered.api.util.command.CommandException;
 import org.spongepowered.api.util.command.CommandMapping;
 import org.spongepowered.api.util.command.CommandResult;
 import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.CommandContext;
 import org.spongepowered.api.util.command.source.ConsoleSource;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
 import org.spongepowered.api.util.command.spec.CommandSpec;
 
 import java.util.TreeSet;
 
-public class CommandHelp implements Command {
+public final class CommandHelp implements Command {
 
     private final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
     private final LanternGame game;
@@ -45,48 +45,43 @@ public class CommandHelp implements Command {
                 .description(Texts.of("View a list of all commands"))
                 .extendedDescription(Texts.of("View a list of all commands. Hover over\n" + " a command to view its description."
                         + " Click\n a command to insert it into your chat bar."))
-                .executor(new CommandExecutor() {
-
-                    @Override
-                    public CommandResult execute(final CommandSource src, CommandContext args) throws CommandException {
-                        Optional<String> command = args.getOne("command");
-                        if (command.isPresent()) {
-                            Optional<? extends CommandMapping> mapping = game.getCommandDispatcher().get(command.get());
-                            if (mapping.isPresent()) {
-                                CommandCallable callable = mapping.get().getCallable();
-                                Optional<? extends Text> desc = callable.getHelp(src);
-                                if (desc.isPresent()) {
-                                    src.sendMessage(desc.get());
-                                } else {
-                                    src.sendMessage(Texts.of("Usage: /", command.get(), callable.getUsage(src)));
-                                }
-                                return CommandResult.success();
+                .executor((src, args) -> {
+                    Optional<String> command = args.getOne("command");
+                    if (command.isPresent()) {
+                        Optional<? extends CommandMapping> mapping = game.getCommandDispatcher().get(command.get());
+                        if (mapping.isPresent()) {
+                            CommandCallable callable = mapping.get().getCallable();
+                            Optional<? extends Text> desc = callable.getHelp(src);
+                            if (desc.isPresent()) {
+                                src.sendMessage(desc.get());
+                            } else {
+                                src.sendMessage(Texts.of("Usage: /", command.get(), callable.getUsage(src)));
                             }
-                            throw new CommandException(Texts.of("No such command: ", command.get()));
+                            return CommandResult.success();
                         }
-
-                        TreeSet<CommandMapping> commands = new TreeSet<CommandMapping>(comparator);
-                        commands.addAll(Collections2.filter(game.getCommandDispatcher().getAll().values(),
-                                input -> input.getCallable().testPermission(src)));
-
-                        // Console sources cannot see/use the pagination
-                        boolean paginate = !(src instanceof ConsoleSource);
-
-                        Text title = Texts.builder("Available commands:").color(TextColors.DARK_GREEN).build();
-                        Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
-
-                        if (paginate) {
-                            PaginationBuilder builder = game.getServiceManager().provide(PaginationService.class).get().builder();
-                            builder.title(title);
-                            builder.contents(lines);
-                            builder.sendTo(src);
-                        } else {
-                            src.sendMessage(title);
-                            src.sendMessage(lines);
-                        }
-                        return CommandResult.success();
+                        throw new CommandException(Texts.of("No such command: ", command.get()));
                     }
 
+                    TreeSet<CommandMapping> commands = new TreeSet<CommandMapping>(comparator);
+                    commands.addAll(Collections2.filter(game.getCommandDispatcher().getAll().values(),
+                            input -> input.getCallable().testPermission(src)));
+
+                    // Console sources cannot see/use the pagination
+                    boolean paginate = !(src instanceof ConsoleSource);
+
+                    Text title = Texts.builder("Available commands:").color(TextColors.DARK_GREEN).build();
+                    Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
+
+                    if (paginate) {
+                        PaginationBuilder builder = game.getServiceManager().provide(PaginationService.class).get().builder();
+                        builder.title(title);
+                        builder.contents(lines);
+                        builder.sendTo(src);
+                    } else {
+                        src.sendMessage(title);
+                        src.sendMessage(lines);
+                    }
+                    return CommandResult.success();
                 }).build();
     }
 
@@ -101,6 +96,6 @@ public class CommandHelp implements Command {
         if (longDescription.isPresent()) {
             text.onHover(TextActions.showText(longDescription.get()));
         }
-        return Texts.of(text, " ", description.or(mapping.getCallable().getUsage(source)));
+        return Texts.of(text, " ", description.orElse(mapping.getCallable().getUsage(source)));
     }
 }

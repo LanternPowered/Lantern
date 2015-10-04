@@ -3,7 +3,6 @@ package org.lanternpowered.server.service.persistence;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
@@ -16,6 +15,7 @@ import org.spongepowered.api.service.persistence.DataBuilder;
 import org.spongepowered.api.service.persistence.SerializationService;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class LanternSerializationService implements SerializationService {
 
@@ -49,7 +49,7 @@ public class LanternSerializationService implements SerializationService {
         if (this.builders.containsKey(clazz)) {
             return Optional.of((DataBuilder<T>) this.builders.get(clazz));
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -59,7 +59,7 @@ public class LanternSerializationService implements SerializationService {
         if (optional.isPresent()) {
             return optional.get().build(dataView);
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 }

@@ -3,6 +3,7 @@ package org.lanternpowered.server.console;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.permission.SubjectBase;
@@ -14,8 +15,6 @@ import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.source.ConsoleSource;
-
-import com.google.common.base.Optional;
 
 public final class LanternConsoleSource extends SubjectBase implements ConsoleSource {
 
@@ -60,7 +59,7 @@ public final class LanternConsoleSource extends SubjectBase implements ConsoleSo
 
     @Override
     public Optional<CommandSource> getCommandSource() {
-        return Optional.<CommandSource>of(this);
+        return Optional.of(this);
     }
 
     @Override

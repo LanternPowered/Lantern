@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
@@ -16,7 +17,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Key;
 
-import com.google.common.base.Optional;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -139,6 +139,6 @@ public final class BlockStateBase {
         if (this.blockTraits.containsKey(checkNotNull(name, "name"))) {
             return Optional.of(this.blockTraits.get(name));
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

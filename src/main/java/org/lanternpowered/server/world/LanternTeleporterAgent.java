@@ -1,10 +1,10 @@
 package org.lanternpowered.server.world;
 
+import java.util.Optional;
+
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
-
-import com.google.common.base.Optional;
 
 public class LanternTeleporterAgent implements TeleporterAgent {
 
@@ -63,16 +63,16 @@ public class LanternTeleporterAgent implements TeleporterAgent {
     @Override
     public Optional<Location<World>> createTeleporter(Location<World> targetLocation) {
         if (!this.canCreateTeleporter) {
-            return Optional.absent();
+            return Optional.empty();
         }
         return this.createTeleporter0(targetLocation);
     }
 
     protected Optional<Location<World>> findTeleporter0(Location<World> targetLocation) {
-        return Optional.absent();
+        return Optional.empty();
     }
 
     protected Optional<Location<World>> createTeleporter0(Location<World> targetLocation) {
-        return Optional.absent();
+        return Optional.empty();
     }
 }

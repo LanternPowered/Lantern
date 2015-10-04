@@ -2,8 +2,6 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Function;
-import com.google.common.base.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
@@ -16,6 +14,8 @@ import org.spongepowered.api.data.value.mutable.ListValue;
 
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 public class ImmutableLanternListValue<E> extends ImmutableLanternCollectionValue<E, List<E>, ImmutableListValue<E>, ListValue<E>>
     implements ImmutableListValue<E> {
@@ -41,6 +41,7 @@ public class ImmutableLanternListValue<E> extends ImmutableLanternCollectionValu
         return new LanternListValue<E>(getKey(), list);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public ImmutableListValue<E> with(E... elements) {
         return new ImmutableLanternListValue<E>(getKey(), ImmutableList.<E>builder().addAll(this.actualValue).add(elements).build());
@@ -77,7 +78,7 @@ public class ImmutableLanternListValue<E> extends ImmutableLanternCollectionValu
     public ImmutableListValue<E> withoutAll(Predicate<E> predicate) {
         final ImmutableList.Builder<E> builder = ImmutableList.builder();
         for (E existing : this.actualValue) {
-            if (checkNotNull(predicate).apply(existing)) {
+            if (checkNotNull(predicate).test(existing)) {
                 builder.add(existing);
             }
         }

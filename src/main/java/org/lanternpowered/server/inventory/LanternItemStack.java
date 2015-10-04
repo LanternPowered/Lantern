@@ -1,7 +1,9 @@
 package org.lanternpowered.server.inventory;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
@@ -19,9 +21,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
-
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
 
 public class LanternItemStack implements ItemStack {
 

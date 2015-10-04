@@ -1,6 +1,6 @@
 package org.lanternpowered.server.data.value.mutable;
 
-import com.google.common.base.Function;
+import java.util.function.Function;
 
 import org.lanternpowered.server.data.value.AbstractBaseValue;
 import org.spongepowered.api.data.key.Key;

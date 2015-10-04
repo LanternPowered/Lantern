@@ -4,6 +4,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 import org.lanternpowered.server.util.gen.ShortArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.ShortArrayImmutableBlockBuffer;
@@ -25,7 +28,6 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform2;
@@ -46,11 +48,13 @@ import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Function;
-import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableSet;
 
 public abstract class AbstractExtent implements Extent {
+
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i position, Direction direction, Class<T> propertyClass) {
+        return this.getProperty(position.getX(), position.getY(), position.getZ(), direction, propertyClass);
+    }
 
     @Override
     public void setBlock(Vector3i position, BlockState block, boolean notifyNeighbors) {
@@ -119,7 +123,7 @@ public abstract class AbstractExtent implements Extent {
 
     @Override
     public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orNull();
+        Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
         checkArgument(location != null, "location is not present in snapshot");
         return this.restoreSnapshot(location.getBlockPosition(), snapshot, force, notifyNeighbors);
     }
@@ -142,56 +146,6 @@ public abstract class AbstractExtent implements Extent {
     @Override
     public boolean containsBlock(Vector3i position) {
         return this.containsBlock(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    public void interactBlock(Vector3i position, Direction side) {
-        this.interactBlock(position.getX(), position.getY(), position.getZ(), side);
-    }
-
-    @Override
-    public void interactBlockWith(Vector3i position, ItemStack itemStack, Direction side) {
-        this.interactBlockWith(position.getX(), position.getY(), position.getZ(), itemStack, side);
-    }
-
-    @Override
-    public int getBlockDigTimeWith(Vector3i position, ItemStack itemStack) {
-        return this.getBlockDigTimeWith(position.getX(), position.getY(), position.getZ(), itemStack);
-    }
-
-    @Override
-    public boolean digBlock(Vector3i position) {
-        return this.digBlock(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    public boolean digBlockWith(Vector3i position, ItemStack itemStack) {
-        return this.digBlockWith(position.getX(), position.getY(), position.getZ(), itemStack);
-    }
-
-    @Override
-    public boolean isBlockFlammable(Vector3i position, Direction faceDirection) {
-        return this.isBlockFlammable(position.getX(), position.getY(), position.getZ(), faceDirection);
-    }
-
-    @Override
-    public boolean isBlockFacePowered(Vector3i position, Direction direction) {
-        return this.isBlockFacePowered(position.getX(), position.getY(), position.getZ(), direction);
-    }
-
-    @Override
-    public boolean isBlockFaceIndirectlyPowered(Vector3i position, Direction direction) {
-        return this.isBlockFaceIndirectlyPowered(position.getX(), position.getY(), position.getZ(), direction);
-    }
-
-    @Override
-    public Collection<Direction> getPoweredBlockFaces(Vector3i position) {
-        return this.getPoweredBlockFaces(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    public Collection<Direction> getIndirectlyPoweredBlockFaces(Vector3i position) {
-        return this.getIndirectlyPoweredBlockFaces(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
@@ -372,12 +326,12 @@ public abstract class AbstractExtent implements Extent {
     }
 
     @Override
-    public ImmutableSet<Key<?>> getKeys(Vector3i coordinates) {
+    public Set<Key<?>> getKeys(Vector3i coordinates) {
         return this.getKeys(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 
     @Override
-    public ImmutableSet<ImmutableValue<?>> getValues(Vector3i coordinates) {
+    public Set<ImmutableValue<?>> getValues(Vector3i coordinates) {
         return this.getValues(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 

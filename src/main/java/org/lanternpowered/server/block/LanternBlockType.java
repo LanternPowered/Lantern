@@ -3,7 +3,7 @@ package org.lanternpowered.server.block;
 import java.util.Collection;
 import java.util.Optional;
 
-import org.lanternpowered.server.block.state.BlockStateBase;
+import org.lanternpowered.server.block.state.LanternBlockStateBase;
 import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 public class LanternBlockType extends LanternSimpleCatalogType implements BlockType {
 
     // The block state base which contains all the possible block states
-    final BlockStateBase blockStateBase;
+    final LanternBlockStateBase blockStateBase;
     private boolean tickRandomly;
 
     public LanternBlockType(String identifier, Matter matter) {
@@ -32,7 +32,7 @@ public class LanternBlockType extends LanternSimpleCatalogType implements BlockT
         super(identifier);
 
         // Create the block state base
-        this.blockStateBase = new BlockStateBase(this, blockTraits);
+        this.blockStateBase = new LanternBlockStateBase(this, blockTraits);
     }
 
     @Override

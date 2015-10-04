@@ -3,13 +3,12 @@ package org.lanternpowered.server.console;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import org.lanternpowered.server.game.LanternGame;
-
 import jline.console.completer.Completer;
+
+import org.lanternpowered.server.game.LanternGame;
 
 public class ConsoleCommandCompleter implements Completer {
 
@@ -36,14 +35,8 @@ public class ConsoleCommandCompleter implements Completer {
         }
 
         final String input = buffer;
-        Future<List<String>> tabComplete = this.game.getScheduler().callSync(new Callable<List<String>>() {
-
-            @Override
-            public List<String> call() throws Exception {
-                return game.getCommandDispatcher().getSuggestions(LanternConsoleSource.INSTANCE, input);
-            }
-
-        });
+        Future<List<String>> tabComplete = this.game.getScheduler().callSync(() ->
+                game.getCommandDispatcher().getSuggestions(LanternConsoleSource.INSTANCE, input));
 
         try {
             List<String> completions = tabComplete.get();

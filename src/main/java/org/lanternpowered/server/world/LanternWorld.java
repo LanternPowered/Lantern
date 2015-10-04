@@ -1,6 +1,7 @@
 package org.lanternpowered.server.world;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.function.Predicate;
 import org.lanternpowered.server.effect.LanternViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.LanternChunk;
@@ -67,6 +69,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
@@ -482,14 +485,28 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
-        // TODO Auto-generated method stub
-        
+        checkNotNull(particleEffect, "particleEffect");
+        checkNotNull(position, "position");
+        this.spawnParticles(this.getPlayers().iterator(), particleEffect, position);
     }
 
     @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position, int radius) {
-        // TODO Auto-generated method stub
-        
+        checkNotNull(particleEffect, "particleEffect");
+        checkNotNull(position, "position");
+        this.spawnParticles(this.getPlayers().stream().filter(
+                player -> player.getLocation().getPosition().distanceSquared(position) < radius * radius).iterator(),
+                particleEffect, position);
+    }
+
+    private void spawnParticles(Iterator<LanternPlayer> players, ParticleEffect particleEffect, Vector3d position) {
+        if (!players.hasNext()) {
+            return;
+        }
+        MessagePlayOutParticleEffect message = new MessagePlayOutParticleEffect(position, particleEffect);
+        while (players.hasNext()) {
+            players.next().getConnection().send(message);
+        }
     }
 
     @Override

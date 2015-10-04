@@ -213,11 +213,14 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
 
     @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
-        this.session.send(new MessagePlayOutParticleEffect(position, particleEffect));
+        this.session.send(new MessagePlayOutParticleEffect(checkNotNull(position, "position"),
+                checkNotNull(particleEffect, "particleEffect")));
     }
 
     @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position, int radius) {
+        checkNotNull(position, "position");
+        checkNotNull(particleEffect, "particleEffect");
         if (this.getLocation().getPosition().distanceSquared(position) < radius * radius) {
             this.spawnParticles(particleEffect, position);
         }
@@ -225,6 +228,8 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
 
     @Override
     public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
+        checkNotNull(sound, "sound");
+        checkNotNull(position, "position");
         this.session.send(new MessagePlayOutSoundEffect(sound.getName(), position,
                 (float) Math.max(minVolume, volume), (float) pitch));
     }

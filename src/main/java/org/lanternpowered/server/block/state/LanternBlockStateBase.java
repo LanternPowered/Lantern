@@ -26,7 +26,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public final class BlockStateBase {
+public final class LanternBlockStateBase {
 
     private final ImmutableMap<String, BlockTrait<?>> blockTraits;
     private final ImmutableList<BlockState> blockStates;
@@ -34,7 +34,7 @@ public final class BlockStateBase {
     private final BlockType blockType;
 
     @SuppressWarnings("rawtypes")
-    public BlockStateBase(BlockType blockType, Iterable<BlockTrait<?>> blockTraits) {
+    public LanternBlockStateBase(BlockType blockType, Iterable<BlockTrait<?>> blockTraits) {
         this.blockType = blockType;
 
         // There are no block traits

@@ -114,12 +114,6 @@ public class LanternTileEntity implements TileEntity {
     }
 
     @Override
-    public DataTransactionResult remove(BaseValue<?> value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public DataTransactionResult remove(Key<?> key) {
         // TODO Auto-generated method stub
         return null;
@@ -156,18 +150,6 @@ public class LanternTileEntity implements TileEntity {
     }
 
     @Override
-    public <E> E getOrNull(Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E> E getOrElse(Key<? extends BaseValue<E>> key, E defaultValue) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
         // TODO Auto-generated method stub
         return null;
@@ -175,12 +157,6 @@ public class LanternTileEntity implements TileEntity {
 
     @Override
     public boolean supports(Key<?> key) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean supports(BaseValue<?> baseValue) {
         // TODO Auto-generated method stub
         return false;
     }

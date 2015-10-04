@@ -41,9 +41,9 @@ public final class LanternBlockState implements BlockState {
     final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
 
     // The base block state
-    private final BlockStateBase baseState;
+    private final LanternBlockStateBase baseState;
 
-    LanternBlockState(BlockStateBase baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
+    LanternBlockState(LanternBlockStateBase baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
         this.traitValues = traitValues;
         this.baseState = baseState;
     }
@@ -140,20 +140,6 @@ public final class LanternBlockState implements BlockState {
     }
 
     @Override
-    public <E> E getOrNull(Key<? extends BaseValue<E>> key) {
-        return this.getOrElse(key, null);
-    }
-
-    @Override
-    public <E> E getOrElse(Key<? extends BaseValue<E>> key, E defaultValue) {
-        if (!this.supports(key)) {
-            return defaultValue;
-        }
-        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
-        return (E) this.traitValues.get(blockTrait);
-    }
-
-    @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
         if (!this.supports(key)) {
             return Optional.empty();
@@ -165,12 +151,6 @@ public final class LanternBlockState implements BlockState {
     @Override
     public boolean supports(Key<?> key) {
         return key instanceof BlockTraitKey && this.supportsTrait(((BlockTraitKey) key).getBlockTrait());
-    }
-
-    @Override
-    public boolean supports(BaseValue<?> baseValue) {
-        Key<?> key = baseValue.getKey();
-        return this.supports(key) && ((BlockTraitKey) key).getBlockTrait().getPredicate().test(baseValue.get());
     }
 
     @Override
@@ -245,6 +225,20 @@ public final class LanternBlockState implements BlockState {
 
     @Override
     public Optional<BlockState> withTrait(BlockTrait<?> trait, Object value) {
+        if (value instanceof String) {
+            if (!this.supportsTrait(trait)) {
+                return Optional.empty();
+            }
+            for (Object object : trait.getPossibleValues()) {
+                if (object.toString().equals(value)) {
+                    value = object;
+                    break;
+                }
+            }
+            if (value instanceof String) {
+                return Optional.empty();
+            }
+        }
         if (!this.supportsTraitValue(trait, value)) {
             return Optional.empty();
         }

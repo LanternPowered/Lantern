@@ -6,6 +6,8 @@ import java.util.concurrent.atomic.AtomicIntegerArray;
 
 import org.lanternpowered.server.util.NibbleArray;
 
+import static org.lanternpowered.server.util.Conditions.checkArrayRange;
+
 public class AtomicNibbleArray implements Serializable {
 
     private static final long serialVersionUID = -8011969936196392062L;
@@ -137,6 +139,7 @@ public class AtomicNibbleArray implements Serializable {
      * @return the element
      */
     public final byte get(int index) {
+        checkArrayRange(index, this.length);
         return key(this.getPacked(index), index & INDEX_MASK);
     }
 
@@ -148,6 +151,7 @@ public class AtomicNibbleArray implements Serializable {
      * @return the old value
      */
     public final byte getAndSet(int index, byte value) {
+        checkArrayRange(index, this.length);
         boolean success = false;
         byte oldValue = 0;
         int backingIndex = index >> INDEX_BITS;
@@ -170,6 +174,7 @@ public class AtomicNibbleArray implements Serializable {
      * @return true on success
      */
     public final boolean compareAndSet(int index, byte expected, byte newValue) {
+        checkArrayRange(index, this.length);
         boolean success = false;
         byte oldValue = 0;
         int backingIndex = index >> INDEX_BITS;
@@ -187,6 +192,7 @@ public class AtomicNibbleArray implements Serializable {
     }
 
     private byte addAndGet(int index, byte delta, boolean old) {
+        checkArrayRange(index, this.length);
         boolean success = false;
         byte newValue = 0;
         byte oldValue = 0;

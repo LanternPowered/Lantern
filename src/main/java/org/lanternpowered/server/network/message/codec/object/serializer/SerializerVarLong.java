@@ -31,5 +31,4 @@ public class SerializerVarLong implements ObjectSerializer<VarLong> {
         }
         return VarLong.of(value | (b << i));
     }
-
 }

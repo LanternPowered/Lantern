@@ -14,7 +14,7 @@ import org.spongepowered.api.world.biome.BiomeTypes;
 import com.flowpowered.math.GenericMath;
 import com.google.common.collect.Lists;
 
-public class FlatGeneratorSettingsParser {
+public final class FlatGeneratorSettingsParser {
 
     public static String toString(FlatGeneratorSettings settings) {
         StringBuilder builder = new StringBuilder();
@@ -87,7 +87,7 @@ public class FlatGeneratorSettingsParser {
                     return null;
                 }
                 layers.add(new FlatLayer(LanternBlocks.reg().getStateByTypeAndData(blockType,
-                        (byte) GenericMath.clamp(blockData, 0x0, 0xf)), depth));
+                        (byte) GenericMath.clamp(blockData, 0x0, 0xff)), depth));
             }
         }
         BiomeType biomeType = BiomeTypes.PLAINS;
@@ -102,5 +102,8 @@ public class FlatGeneratorSettingsParser {
         }
         // TODO: Add structures
         return new FlatGeneratorSettings(biomeType, layers);
+    }
+
+    private FlatGeneratorSettingsParser() {
     }
 }

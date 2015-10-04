@@ -1,5 +1,7 @@
 package org.lanternpowered.server.util.concurrent;
 
+import static org.lanternpowered.server.util.Conditions.checkArrayRange;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicIntegerArray;
@@ -81,6 +83,7 @@ public class AtomicShortArray implements Serializable {
      * @return the element
      */
     public final short get(int index) {
+        checkArrayRange(index, this.length);
         int packed = this.getPacked(index);
         return even(index) ? keyRight(packed) : keyLeft(packed);
     }
@@ -93,6 +96,7 @@ public class AtomicShortArray implements Serializable {
      * @return the old value
      */
     public final int getAndSet(int index, short value) {
+        checkArrayRange(index, this.length);
         boolean success = false;
         short odd = 0;
         short even = 0;
@@ -124,6 +128,7 @@ public class AtomicShortArray implements Serializable {
      * @param odd the new value for the element at (index + 1)
      */
     public final void set(int index, short even, short odd) {
+        checkArrayRange(index, this.length);
         if ((index & 0x1) != 0) {
             throw new IllegalArgumentException("When setting 2 elements at once, the index must be even!");
         }
@@ -139,6 +144,7 @@ public class AtomicShortArray implements Serializable {
      * @return true on success
      */
     public final boolean compareAndSet(int index, short expected, short newValue) {
+        checkArrayRange(index, this.length);
         boolean success = false;
         short odd = 0;
         short even = 0;
@@ -166,6 +172,7 @@ public class AtomicShortArray implements Serializable {
     }
 
     private short addAndGet(int index, short delta, boolean old) {
+        checkArrayRange(index, this.length);
         boolean success = false;
         short newValue = 0;
         short oldValue = 0;

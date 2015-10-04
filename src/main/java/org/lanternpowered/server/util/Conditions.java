@@ -74,7 +74,20 @@ public final class Conditions {
         return object;
     }
 
-    private Conditions() {
+    /**
+     * Checks whether the specified index suitable is to be used for
+     * a array with the specified length, this will throw a {@link 
+     * ArrayIndexOutOfBoundsException} if false.
+     * 
+     * @param index the index to check
+     * @param length the length
+     */
+    public static void checkArrayRange(int index, int length) {
+        if (index < 0 || index >= length) {
+            throw new ArrayIndexOutOfBoundsException(index);
+        }
     }
 
+    private Conditions() {
+    }
 }

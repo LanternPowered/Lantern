@@ -1,5 +1,7 @@
 package org.lanternpowered.server.util;
 
+import static org.lanternpowered.server.util.Conditions.checkArrayRange;
+
 import java.util.Arrays;
 
 public class NibbleArray {
@@ -16,7 +18,7 @@ public class NibbleArray {
      */
     public NibbleArray(int length) {
         this.length = length;
-        this.backingArraySize = (length & 0x1) + (length >> 1);
+        this.backingArraySize = (int) Math.ceil((double) length / 2.0);
         this.backingArray = new byte[this.backingArraySize];
     }
 
@@ -35,7 +37,7 @@ public class NibbleArray {
      */
     public NibbleArray(int length, byte[] initialContent, boolean packed) {
         this.length = length;
-        this.backingArraySize = (length & 0x1) + (length >> 1);
+        this.backingArraySize = (int) Math.ceil((double) length / 2.0);
         if (packed && initialContent.length == this.backingArraySize) {
             this.backingArray = initialContent.clone();
         } else {
@@ -84,10 +86,7 @@ public class NibbleArray {
      * @return the element
      */
     public byte get(int index) {
-        if (index >= this.length) {
-            throw new IndexOutOfBoundsException();
-        }
-
+        checkArrayRange(index, this.length);
         byte value = this.backingArray[index >> 1];
 
         if ((index & 0x1) == 0) {
@@ -104,10 +103,7 @@ public class NibbleArray {
      * @param value the new value
      */
     public void set(int index, byte value) {
-        if (index >= this.length) {
-            throw new IndexOutOfBoundsException();
-        }
-
+        checkArrayRange(index, this.length);
         value &= 0x0f;
 
         int index0 = index >> 1;
@@ -148,7 +144,7 @@ public class NibbleArray {
             int j = i << 1;
             array[j] = (byte) (packed & 0x0f);
             if (++j < this.length) {
-                array[j] = (byte) (packed & 0xf0);
+                array[j] = (byte) ((packed >> 4) & 0x0f);
             }
         }
         return array;
@@ -199,5 +195,4 @@ public class NibbleArray {
     public NibbleArray clone() {
         return new NibbleArray(this.backingArray.clone(), this.length);
     }
-
 }

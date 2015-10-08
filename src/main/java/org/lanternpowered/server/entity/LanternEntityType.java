@@ -2,13 +2,13 @@ package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
 
-public final class LanternEntityType extends LanternSimpleCatalogType implements EntityType {
+public final class LanternEntityType extends SimpleLanternCatalogType implements EntityType {
 
     private final Class<? extends Entity> entityClass;
     private final Translation name;

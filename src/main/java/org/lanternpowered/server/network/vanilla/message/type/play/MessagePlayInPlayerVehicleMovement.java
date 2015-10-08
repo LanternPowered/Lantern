@@ -33,5 +33,4 @@ public final class MessagePlayInPlayerVehicleMovement implements Message {
     public float getSideways() {
         return this.sideways;
     }
-
 }

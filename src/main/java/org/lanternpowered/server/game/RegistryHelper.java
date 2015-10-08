@@ -55,7 +55,7 @@ public class RegistryHelper {
     }
 
     public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping) {
-        return mapFields(apiClass, mapping, Collections.<String>emptyList());
+        return mapFields(apiClass, mapping, Collections.emptyList());
     }
 
     public static boolean setFactory(Class<?> apiClass, Object factory) {

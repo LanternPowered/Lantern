@@ -4,18 +4,38 @@ import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
+import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class LanternMessageRegistry implements MessageRegistry {
 
     private final TIntObjectMap<MessageRegistration<?>> byOpcode = new TIntObjectHashMap<MessageRegistration<?>>();
     private final Map<Class<?>, MessageRegistration<?>> byType = Maps.newHashMap();
+    private final LoadingCache<Class<?>, Optional<MessageRegistration<?>>> byTypeLookup = 
+            CacheBuilder.newBuilder().build(new CacheLoader<Class<?>, Optional<MessageRegistration<?>>>() {
+
+                @Override
+                public Optional<MessageRegistration<?>> load(Class<?> key) throws Exception {
+                    while (key != Object.class) {
+                        if (byType.containsKey(key)) {
+                            return Optional.of(byType.get(key));
+                        }
+                        key = key.getSuperclass();
+                    }
+                    return Optional.empty();
+                }
+            });
 
     private LanternMessageRegistration<?> getOrCreate(Class<? extends Message> type) {
         if (this.byType.containsKey(type)) {
@@ -23,6 +43,7 @@ public class LanternMessageRegistry implements MessageRegistry {
         }
         LanternMessageRegistration<?> registration = new LanternMessageRegistration(type);
         this.byType.put(type, registration);
+        this.byTypeLookup.invalidate(TypeToken.of(type).getTypes().rawTypes());
         return registration;
     }
 
@@ -66,7 +87,11 @@ public class LanternMessageRegistry implements MessageRegistry {
 
     @Override
     public <M extends Message> MessageRegistration<M> find(Class<M> message) {
-        return (MessageRegistration<M>) this.byType.get(message);
+        try {
+            return (MessageRegistration<M>) this.byTypeLookup.get(message).orElse(null);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

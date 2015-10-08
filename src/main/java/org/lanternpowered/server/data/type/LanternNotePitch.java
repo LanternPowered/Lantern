@@ -1,9 +1,9 @@
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.data.type.NotePitch;
 
-public class LanternNotePitch extends LanternSimpleCatalogType implements NotePitch {
+public class LanternNotePitch extends SimpleLanternCatalogType implements NotePitch {
 
     private final byte internalId;
     private NotePitch next;

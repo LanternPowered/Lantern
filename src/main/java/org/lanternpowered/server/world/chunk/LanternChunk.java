@@ -55,6 +55,7 @@ import org.spongepowered.api.world.extent.Extent;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
@@ -585,6 +586,10 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         return this.getExtentView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
     }
 
+    public Entity getEntity(UUID uniqueId) {
+        return null;
+    }
+
     @Override
     public Collection<Entity> getEntities() {
         // TODO Auto-generated method stub
@@ -673,8 +678,7 @@ public class LanternChunk extends AbstractExtent implements Chunk {
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        // TODO Auto-generated method stub
-        
+        this.setBlock(x, y, z, block);
     }
 
     @Override
@@ -723,21 +727,56 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
+    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
+        BlockState blockState = this.getBlock(x, y, z);
+        Optional<T> property = blockState.getProperty(propertyClass);
+        if (!property.isPresent()) {
+            Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            if (tileEntity.isPresent()) {
+                property = tileEntity.get().getProperty(propertyClass);
+            }
+        }
+        return property;
     }
 
     @Override
     public Collection<Property<?, ?>> getProperties(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
+        ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
+        builder.addAll(this.getBlock(x, y, z).getApplicableProperties());
+        this.getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
+        return builder.build();
     }
 
     @Override
     public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
+        BlockState blockState = this.getBlock(x, y, z);
+        Optional<E> value = blockState.get(key);
+        if (!value.isPresent()) {
+            Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            if (tileEntity.isPresent()) {
+                value = tileEntity.get().get(key);
+            }
+        }
+        return value;
+    }
+
+    @Override
+    public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
+        BlockState blockState = this.getBlock(x, y, z);
+        Optional<V> value = blockState.getValue(key);
+        if (!value.isPresent()) {
+            Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            if (tileEntity.isPresent()) {
+                value = tileEntity.get().getValue(key);
+            }
+        }
+        return value;
     }
 
     @Override
@@ -753,31 +792,7 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     }
 
     @Override
-    public <E> E getOrNull(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E> E getOrElse(int x, int y, int z, Key<? extends BaseValue<E>> key, E defaultValue) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public boolean supports(int x, int y, int z, Key<?> key) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean supports(int x, int y, int z, BaseValue<?> value) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -961,12 +976,6 @@ public class LanternChunk extends AbstractExtent implements Chunk {
             return true;
         }
         return false;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

@@ -7,7 +7,7 @@ import java.awt.Color;
 import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.text.format.TextColor;
 
-public class LanternTextColor extends LanternCatalogType implements TextColor {
+public final class LanternTextColor extends LanternCatalogType implements TextColor {
 
     private final Color color;
 

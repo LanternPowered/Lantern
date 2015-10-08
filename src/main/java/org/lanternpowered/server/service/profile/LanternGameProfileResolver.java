@@ -51,7 +51,6 @@ public final class LanternGameProfileResolver implements GameProfileResolver {
                 public GameProfile load(UUID key) throws Exception {
                     return new GetProfile(key).call();
                 }
-
             });
     private final LoadingCache<String, UUID> uuidByNameCache = 
             CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<String, UUID>() {
@@ -60,7 +59,6 @@ public final class LanternGameProfileResolver implements GameProfileResolver {
                 public UUID load(String key) throws Exception {
                     return new GetUUID(Sets.newHashSet(key)).call().get(key);
                 }
-
             });
 
     /**

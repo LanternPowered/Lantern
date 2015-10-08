@@ -9,8 +9,13 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
 
     private final UUID uniqueId;
 
-    public LanternPlayerEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks) {
+    LanternPlayerEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks) {
         super(plugin, chunkManager, maxChunks);
+        this.uniqueId = uniqueId;
+    }
+
+    LanternPlayerEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks, int numChunks) {
+        super(plugin, chunkManager, maxChunks, numChunks);
         this.uniqueId = uniqueId;
     }
 

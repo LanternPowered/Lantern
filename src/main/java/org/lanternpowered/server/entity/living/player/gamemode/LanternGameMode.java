@@ -1,32 +1,22 @@
 package org.lanternpowered.server.entity.living.player.gamemode;
 
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.translation.Translation;
 
-public class LanternGameMode implements GameMode {
+public class LanternGameMode extends SimpleLanternCatalogType implements GameMode {
 
-    private final String name;
     private final int internalId;
 
-    public LanternGameMode(String name, int internalId) {
+    public LanternGameMode(String identifier, int internalId) {
+        super(identifier);
         this.internalId = internalId;
-        this.name = name;
-    }
-
-    @Override
-    public String getId() {
-        return this.name;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 
     @Override
     public Translation getTranslation() {
-        return LanternGame.get().getRegistry().getTranslationManager().get("gameMode." + this.name);
+        return LanternGame.get().getRegistry().getTranslationManager().get("gameMode." + this.getName());
     }
 
     public int getInternalId() {

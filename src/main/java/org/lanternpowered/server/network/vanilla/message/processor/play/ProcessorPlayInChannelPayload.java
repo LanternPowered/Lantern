@@ -53,6 +53,9 @@ public final class ProcessorPlayInChannelPayload extends AbstractPlayInChannelPa
             } else {
                 output.add(new MessagePlayInChangeCommand.Entity(entityId, command, shouldTrackOutput));
             }
+        } else if (channel.equals("MC|AutoCmd")) {
+            // New channel in 1.9
+            // TODO
         } else if (channel.equals("MC|BSign")) {
             // TODO
         } else if (channel.equals("MC|BEdit")) {
@@ -60,6 +63,9 @@ public final class ProcessorPlayInChannelPayload extends AbstractPlayInChannelPa
             
         } else if (channel.equals("MC|Struct")) {
             // Something related to structure placing in minecraft 1.9
+            // TODO
+        } else if (channel.equals("MC|PickItem")) {
+            // Also a new channel in 1.9
             // TODO
         } else if (channel.equals("FML|HS")) {
             throw new CodecException("Received and unexpected message with channel: " + channel);

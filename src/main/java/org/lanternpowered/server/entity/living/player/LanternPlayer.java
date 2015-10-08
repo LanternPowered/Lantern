@@ -14,7 +14,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.permission.SubjectBase;
+import org.lanternpowered.server.text.title.LanternTitles;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -176,8 +178,7 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
 
     @Override
     public String getIdentifier() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getUniqueId().toString();
     }
 
     @Override
@@ -236,20 +237,17 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
 
     @Override
     public void sendTitle(Title title) {
-        // TODO Auto-generated method stub
-        
+        this.session.sendAll(LanternTitles.getCachedMessages(checkNotNull(title, "title")));
     }
 
     @Override
     public void resetTitle() {
-        // TODO Auto-generated method stub
-        
+        this.session.send(new MessagePlayOutTitle.Reset());
     }
 
     @Override
     public void clearTitle() {
-        // TODO Auto-generated method stub
-        
+        this.session.send(new MessagePlayOutTitle.Clear());
     }
 
     @Override

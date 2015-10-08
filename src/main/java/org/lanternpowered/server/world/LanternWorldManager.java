@@ -174,7 +174,7 @@ public class LanternWorldManager {
             if (this.propertiesByName.containsKey(folder)) {
                 return this.propertiesByName.get(name);
             }
-            WorldProperties properties = WorldPropertiesSerializer.read(folder, name);
+            WorldProperties properties = LanternWorldPropertiesIO.read(folder, name);
             this.addProperties(properties);
             return properties;
         } catch (IOException e) {
@@ -274,7 +274,7 @@ public class LanternWorldManager {
                 if (world != null) {
                     // TODO: Unlock saving
                 }
-                LanternWorldProperties properties = WorldPropertiesSerializer.read(worldFolder, copyName);
+                LanternWorldProperties properties = LanternWorldPropertiesIO.read(worldFolder, copyName);
                 addProperties(properties);
                 return Optional.of(properties);
             }
@@ -334,7 +334,7 @@ public class LanternWorldManager {
 
     public boolean saveWorldProperties(WorldProperties properties) {
         try {
-            WorldPropertiesSerializer.write(new File(folder, properties.getWorldName()),
+            LanternWorldPropertiesIO.write(new File(folder, properties.getWorldName()),
                     (LanternWorldProperties) properties);
         } catch (IOException e) {
             return false;

@@ -2,11 +2,11 @@ package org.lanternpowered.server.effect.particle;
 
 import java.awt.Color;
 
-import org.lanternpowered.server.catalog.LanternSimpleCatalogType;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public class LanternParticleType extends LanternSimpleCatalogType implements ParticleType {
+public class LanternParticleType extends SimpleLanternCatalogType implements ParticleType {
 
     private final boolean hasMotion;
     private final int internalId;

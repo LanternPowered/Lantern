@@ -15,6 +15,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerSpawnPosition;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnParticle;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
@@ -60,6 +61,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayInPlayerAction;
@@ -121,6 +123,8 @@ public final class ProtocolPlay extends ProtocolBase {
         // ...
         outbound.register(0x3f, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class);
         outbound.register(0x40, MessageOutDisconnect.class, CodecOutDisconnect.class);
+        // ...
+        outbound.register(0x45, MessagePlayOutTitle.class, CodecPlayOutTitle.class);
         // ...
     }
 }

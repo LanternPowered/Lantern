@@ -1,8 +1,6 @@
 package org.lanternpowered.server.world.chunk;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import org.lanternpowered.server.game.LanternGame;
@@ -12,48 +10,24 @@ import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Sets;
-
+import com.google.common.collect.Multimap;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 public class LanternChunkLoadService implements ChunkLoadService {
 
-    private final Set<RegisteredCallback> callbacks = Sets.newConcurrentHashSet();
-
-    public static class RegisteredCallback {
-
-        private final Callback callback;
-        private final String plugin;
-
-        public RegisteredCallback(String plugin, Callback callback) {
-            this.callback = callback;
-            this.plugin = plugin;
-        }
-
-        public String getPlugin() {
-            return this.plugin;
-        }
-
-        public Callback getCallback() {
-            return this.callback;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.plugin.hashCode() * 37 + this.callback.hashCode();
-        }
-    }
+    private final Multimap<String, Callback> callbacks = HashMultimap.create();
 
     /**
      * Gets all the registered callbacks.
      * 
      * @return the callbacks
      */
-    public List<RegisteredCallback> getCallbacks() {
-        return ImmutableList.copyOf(this.callbacks);
+    public Multimap<String, Callback> getCallbacks() {
+        return ImmutableMultimap.copyOf(this.callbacks);
     }
 
     // TODO: Add values that make more sense, and make the server owner specify the limits
@@ -74,7 +48,17 @@ public class LanternChunkLoadService implements ChunkLoadService {
      * @param plugin the plugin
      * @return the maximum amount of tickets
      */
-    public int getMaxTicketsForPlugin(PluginContainer plugin) {
+    public int getMaxTicketsForPlugin(Object plugin) {
+        return this.getMaxTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
+    }
+
+    /**
+     * Gets the maximum amount of tickets for the plugin per world.
+     * 
+     * @param plugin the plugin
+     * @return the maximum amount of tickets
+     */
+    public int getMaxTicketsForPlugin(String plugin) {
         return 100;
     }
 
@@ -85,13 +69,23 @@ public class LanternChunkLoadService implements ChunkLoadService {
      * @return the maximum amount of forced chunks
      */
     public int getMaxChunksForPluginTicket(PluginContainer plugin) {
+        return this.getMaxChunksForPluginTicket(checkPlugin(plugin, "plugin").getId());
+    }
+
+    /**
+     * Gets the maximum amount of forced chunks each ticket of the plugin can contain.
+     * 
+     * @param plugin the plugin
+     * @return the maximum amount of forced chunks
+     */
+    public int getMaxChunksForPluginTicket(String plugin) {
         return 32;
     }
 
     @Override
     public void registerCallback(Object plugin, Callback callback) {
         PluginContainer container = checkPlugin(plugin, "plugin");
-        this.callbacks.add(new RegisteredCallback(container.getId(), checkNotNull(callback, "callback")));
+        this.callbacks.put(container.getId(), checkNotNull(callback, "callback"));
     }
 
     @Override

@@ -1,7 +1,9 @@
 package org.lanternpowered.server.world.chunk;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -20,12 +22,19 @@ import org.lanternpowered.server.util.gen.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.ShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
+import org.lanternpowered.server.world.chunk.LanternEntityLoadingTicket.EntityReference;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.world.chunk.ForcedChunkEvent;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.world.ChunkLoadService.Callback;
 import org.spongepowered.api.service.world.ChunkLoadService.EntityLoadingTicket;
 import org.spongepowered.api.service.world.ChunkLoadService.LoadingTicket;
+import org.spongepowered.api.service.world.ChunkLoadService.OrderedCallback;
 import org.spongepowered.api.service.world.ChunkLoadService.PlayerEntityLoadingTicket;
 import org.spongepowered.api.service.world.ChunkLoadService.PlayerLoadingTicket;
+import org.spongepowered.api.service.world.ChunkLoadService.PlayerOrderedCallback;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
@@ -40,11 +49,14 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -79,14 +91,16 @@ public class LanternChunkManager {
     private final LanternChunkLoadService chunkLoadService;
     private final ChunkIOService chunkIOService;
     private final LanternWorld world;
+    private final File worldFolder;
 
     private WorldGenerator worldGenerator;
 
     public LanternChunkManager(LanternWorld world, LanternChunkLoadService chunkLoadService,
-            ChunkIOService chunkIOService, WorldGenerator worldGenerator) {
+            ChunkIOService chunkIOService, WorldGenerator worldGenerator, File worldFolder) {
         this.chunkLoadService = checkNotNull(chunkLoadService, "chunkLoadService");
         this.chunkIOService = checkNotNull(chunkIOService, "chunkIOService");
         this.worldGenerator = checkNotNull(worldGenerator, "worldGenerator");
+        this.worldFolder = checkNotNull(worldFolder, "worldFolder");
         this.world = checkNotNull(world, "world");
     }
 
@@ -98,7 +112,54 @@ public class LanternChunkManager {
         return this.worldGenerator;
     }
 
+    void loadTickets() throws IOException {
+        Multimap<String, LanternLoadingTicket> tickets = LanternLoadingTicketIO.load(this.worldFolder, this, this.chunkLoadService);
+        for (Entry<String, Collection<LanternLoadingTicket>> ticket : tickets.asMap().entrySet()) {
+            if (ticket instanceof LanternEntityLoadingTicket) {
+                LanternEntityLoadingTicket ticket0 = (LanternEntityLoadingTicket) ticket;
+                if (ticket0.getBoundEntity() != null) {
+                    EntityReference ref = ticket0.entityRef;
+                    if (ref != null) {
+                        LanternChunk chunk = this.getOrLoadChunk(ref.chunkCoords);
+                        Entity entity = chunk.getEntity(ref.uniqueId);
+                        if (entity != null) {
+                            ticket0.bindToEntity(entity);
+                        }
+                    }
+                }
+            }
+        }
+        for (Entry<String, Collection<LanternLoadingTicket>> ticket : tickets.asMap().entrySet()) {
+            Collection<Callback> callbacks = this.chunkLoadService.getCallbacks().get(ticket.getKey());
+            ImmutableList<LoadingTicket> tickets0 = ImmutableList.copyOf(ticket.getValue());
+            ImmutableListMultimap<UUID, LoadingTicket> map = null;
+            for (Callback callback : callbacks) {
+                if (callback instanceof OrderedCallback) {
+                    tickets0 = ImmutableList.copyOf(((OrderedCallback) callback).onLoaded(
+                            tickets0, this.world, this.chunkLoadService.getMaxTicketsForPlugin(ticket.getKey())));
+                }
+                if (callback instanceof PlayerOrderedCallback) {
+                    if (map == null) {
+                        ImmutableListMultimap.Builder<UUID, LoadingTicket> mapBuilder = ImmutableListMultimap.builder();
+                        for (LoadingTicket ticket0 : tickets0) {
+                            if (ticket0 instanceof PlayerLoadingTicket) {
+                                mapBuilder.put(((PlayerLoadingTicket) ticket0).getPlayerUniqueId(), ticket0);
+                            }
+                        }
+                        map = mapBuilder.build();
+                    }
+                    map = ImmutableListMultimap.copyOf(((PlayerOrderedCallback) callback).onPlayerLoaded(map, this.world));
+                }
+                callback.onLoaded(tickets0, this.world);
+            }
+        }
+    }
+
     void force(LanternLoadingTicket ticket, Vector2i coords) {
+        this.force(ticket, coords, true);
+    }
+
+    void force(LanternLoadingTicket ticket, Vector2i coords, boolean callEvents) {
         Set<LanternLoadingTicket> set = this.ticketsByPos.get(ticket);
         if (set == null) {
             set = Sets.newConcurrentHashSet();
@@ -108,6 +169,15 @@ public class LanternChunkManager {
             } else if (!this.chunkLoadingQueue.contains(coords)) {
                 // Queue the chunk for loading
                 this.chunkLoadingQueue.add(coords);
+            }
+            if (callEvents) {
+                LanternChunk chunk = this.getChunk(coords);
+                if (chunk != null) {
+                    Vector3i coords0 = LanternChunk.fromVector2(coords);
+                    ForcedChunkEvent event = SpongeEventFactory.createForcedChunkEvent(
+                            LanternGame.get(), coords0, chunk, ticket);
+                    LanternGame.get().getEventManager().post(event);
+                }
             }
         }
         set.add(ticket);
@@ -129,10 +199,20 @@ public class LanternChunkManager {
         }
     }
 
-    void pulse() {
+    public void pulse() {
         Vector2i coords;
         while ((coords = this.chunkLoadingQueue.poll()) != null) {
-            this.forcedChunks.add(this.getOrLoadChunk(coords, true));
+            LanternChunk chunk = this.getOrLoadChunk(coords, true);
+            this.forcedChunks.add(chunk);
+            Set<LanternLoadingTicket> set = this.ticketsByPos.get(coords);
+            if (set != null && !set.isEmpty()) {
+                Vector3i coords0 = LanternChunk.fromVector2(coords);
+                for (LanternLoadingTicket ticket : set) {
+                    ForcedChunkEvent event = SpongeEventFactory.createForcedChunkEvent(
+                            LanternGame.get(), coords0, chunk, ticket);
+                    LanternGame.get().getEventManager().post(event);
+                }
+            }
         }
     }
 
@@ -487,7 +567,7 @@ public class LanternChunkManager {
         }
         // TODO: Add cause
         LanternGame.get().getEventManager().post(SpongeEventFactory.createLoadChunkEvent(
-                LanternGame.get(), null, chunk));
+                LanternGame.get(), Cause.empty(), chunk));
         return true;
     }
 

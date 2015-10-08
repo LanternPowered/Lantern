@@ -6,15 +6,20 @@ import org.spongepowered.api.service.world.ChunkLoadService.PlayerLoadingTicket;
 
 class LanternPlayerLoadingTicket extends LanternLoadingTicket implements PlayerLoadingTicket {
 
-    private final UUID uuid;
+    private final UUID uniqueId;
 
-    public LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uuid, int maxChunks) {
+    LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks) {
         super(plugin, chunkManager, maxChunks);
-        this.uuid = uuid;
+        this.uniqueId = uniqueId;
+    }
+
+    LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks, int numChunks) {
+        super(plugin, chunkManager, maxChunks, numChunks);
+        this.uniqueId = uniqueId;
     }
 
     @Override
     public UUID getPlayerUniqueId() {
-        return this.uuid;
+        return this.uniqueId;
     }
 }

@@ -7,7 +7,7 @@ import javax.annotation.Nullable;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.text.format.TextStyle;
 
-public class LanternTextStyle extends TextStyle.Base implements SimpleCatalogType {
+public final class LanternTextStyle extends TextStyle.Base implements SimpleCatalogType {
 
     private final String identifier;
 

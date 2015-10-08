@@ -166,18 +166,22 @@ public class AtomicFloat extends Number {
         return Float.toString(this.get());
     }
 
+    @Override
     public int intValue() {
         return (int) this.get();
     }
 
+    @Override
     public long longValue() {
         return (long) this.get();
     }
 
+    @Override
     public float floatValue() {
         return this.get();
     }
 
+    @Override
     public double doubleValue() {
         return (double) this.get();
     }

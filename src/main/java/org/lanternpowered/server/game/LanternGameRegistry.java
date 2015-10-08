@@ -20,7 +20,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder;
@@ -80,6 +79,7 @@ import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.attribute.AttributeBuilder;
 import org.spongepowered.api.attribute.AttributeCalculator;
 import org.spongepowered.api.attribute.AttributeModifierBuilder;
+import org.spongepowered.api.attribute.AttributeTargets;
 import org.spongepowered.api.attribute.Attributes;
 import org.spongepowered.api.block.BlockSnapshotBuilder;
 import org.spongepowered.api.block.BlockStateBuilder;
@@ -109,6 +109,9 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.EntitySnapshotBuilder;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.animal.Horse;
+import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSourceBuilder;
@@ -174,6 +177,7 @@ import org.spongepowered.api.world.explosion.ExplosionBuilder;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
 import org.spongepowered.api.world.gen.PopulatorFactory;
+import org.spongepowered.api.world.gen.PopulatorType;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -214,6 +218,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final CatalogTypeRegistry<DirtType> dirtTypeRegistry = new LanternCatalogTypeRegistry<DirtType>();
     private final CatalogTypeRegistry<StoneType> stoneTypeRegistry = new LanternCatalogTypeRegistry<StoneType>();
     private final CatalogTypeRegistry<ParticleType> particleTypeRegistry = new LanternCatalogTypeRegistry<ParticleType>();
+    private final CatalogTypeRegistry<PopulatorType> populatorTypeRegistry = new LanternCatalogTypeRegistry<PopulatorType>();
     private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
             .put(Attribute.class, this.attributeRegistry)
             .put(BiomeType.class, this.biomeRegistry)
@@ -238,6 +243,7 @@ public class LanternGameRegistry implements GameRegistry {
             .put(DirtType.class, this.dirtTypeRegistry)
             .put(StoneType.class, this.stoneTypeRegistry)
             .put(ParticleType.class, this.particleTypeRegistry)
+            .put(PopulatorType.class, this.populatorTypeRegistry)
             .build();
 
     {
@@ -389,25 +395,30 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private void registerAttributes() {
+        Map<String, Predicate<DataHolder>> targetMappings = Maps.newHashMap();
+        targetMappings.put("generic", target -> target instanceof Living);
+        targetMappings.put("horse", target -> target instanceof Horse);
+        targetMappings.put("zombie", target -> target instanceof Zombie);
+        RegistryHelper.mapFields(AttributeTargets.class, targetMappings);
         Map<String, Attribute> mappings = Maps.newHashMap();
         mappings.put("GENERIC_ARMOR", this.registerDefaultAttribute(
-                "generic.armor", 0.0, 0.0, Double.MAX_VALUE, LanternAttribute.Target.LIVING));
+                "generic.armor", 0.0, 0.0, Double.MAX_VALUE, AttributeTargets.GENERIC));
         mappings.put("GENERIC_MAX_HEALTH", this.registerDefaultAttribute(
-                "generic.maxHealth", 20.0, 0.0, Double.MAX_VALUE, LanternAttribute.Target.LIVING));
+                "generic.maxHealth", 20.0, 0.0, Double.MAX_VALUE, AttributeTargets.GENERIC));
         mappings.put("GENERIC_FOLLOW_RANGE", this.registerDefaultAttribute(
-                "generic.followRange", 32.0D, 0.0D, 2048.0D, LanternAttribute.Target.LIVING));
+                "generic.followRange", 32.0D, 0.0D, 2048.0D, AttributeTargets.GENERIC));
         mappings.put("GENERIC_ATTACK_DAMAGE", this.registerDefaultAttribute(
-                "generic.attackDamage", 2.0D, 0.0D, Double.MAX_VALUE, LanternAttribute.Target.LIVING));
+                "generic.attackDamage", 2.0D, 0.0D, Double.MAX_VALUE, AttributeTargets.GENERIC));
         mappings.put("GENERIC_ATTACK_SPEED", this.registerDefaultAttribute(
-                "generic.attackSpeed", 4.0, 0.0, 1024.0D, LanternAttribute.Target.LIVING));
+                "generic.attackSpeed", 4.0, 0.0, 1024.0D, AttributeTargets.GENERIC));
         mappings.put("GENERIC_KNOCKBACK_RESISTANCE", this.registerDefaultAttribute(
-                "generic.knockbackResistance", 0.0D, 0.0D, 1.0D, LanternAttribute.Target.LIVING));
+                "generic.knockbackResistance", 0.0D, 0.0D, 1.0D, AttributeTargets.GENERIC));
         mappings.put("GENERIC_MOVEMENT_SPEED", this.registerDefaultAttribute(
-                "generic.movementSpeed", 0.7D, 0.0D, Double.MAX_VALUE, LanternAttribute.Target.LIVING));
+                "generic.movementSpeed", 0.7D, 0.0D, Double.MAX_VALUE, AttributeTargets.GENERIC));
         mappings.put("HORSE_JUMP_STRENGTH", this.registerDefaultAttribute(
-                "horse.jumpStrength", 0.7D, 0.0D, 2.0D, LanternAttribute.Target.HORSE));
+                "horse.jumpStrength", 0.7D, 0.0D, 2.0D, AttributeTargets.HORSE));
         mappings.put("ZOMBIE_SPAWN_REINFORCEMENTS", this.registerDefaultAttribute(
-                "zombie.spawnReinforcements", 0.0D, 0.0D, 1.0D, LanternAttribute.Target.ZOMBIE));
+                "zombie.spawnReinforcements", 0.0D, 0.0D, 1.0D, AttributeTargets.ZOMBIE));
         RegistryHelper.mapFields(Attributes.class, mappings);
     }
 

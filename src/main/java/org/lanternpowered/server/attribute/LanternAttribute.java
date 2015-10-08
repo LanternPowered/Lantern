@@ -7,9 +7,6 @@ import java.util.function.Predicate;
 import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.animal.Horse;
-import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
@@ -63,12 +60,5 @@ public class LanternAttribute extends LanternCatalogType implements Attribute {
      */
     public Text getDisplayName() {
         return this.name;
-    }
-
-    public static class Target {
-
-        public static final Predicate<DataHolder> LIVING = input -> input instanceof Living;
-        public static final Predicate<DataHolder> ZOMBIE = input -> input instanceof Zombie;
-        public static final Predicate<DataHolder> HORSE = input -> input instanceof Horse;
     }
 }

@@ -11,13 +11,18 @@ import java.util.function.Predicate;
 
 import org.lanternpowered.server.effect.LanternViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
+import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
 import org.lanternpowered.server.world.extent.AbstractExtent;
+import org.lanternpowered.server.world.extent.ExtentViewDownsize;
+import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -47,13 +52,13 @@ import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
+import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.PlayerSimulator;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -81,6 +86,9 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     public static final Vector2i BIOME_MIN = BLOCK_MIN.toVector2(true);
     public static final Vector2i BIOME_MAX = BLOCK_MAX.toVector2(true);
     public static final Vector2i BIOME_SIZE = BIOME_MAX.sub(BIOME_MIN).add(1, 1);
+
+    // The world border
+    private final LanternWorldBorder worldBorder = new LanternWorldBorder(this);
 
     private final LanternChunkManager chunkManager = null;
     private final LanternWorldProperties properties = null;
@@ -146,22 +154,27 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
         return false;
     }
 
+    private void checkVolumeBounds(int x, int y, int z) {
+        if (!this.containsBlock(x, y, z)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), BLOCK_MIN, BLOCK_MAX);
+        }
+    }
+
     @Override
     public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
-        // TODO Auto-generated method stub
-        return null;
+        this.checkVolumeBounds(newMin.getX(), newMin.getY(), newMin.getZ());
+        this.checkVolumeBounds(newMax.getX(), newMax.getY(), newMax.getZ());
+        return new ExtentViewDownsize(this, newMin, newMax);
     }
 
     @Override
     public Extent getExtentView(DiscreteTransform3 transform) {
-        // TODO Auto-generated method stub
-        return null;
+        return new ExtentViewTransform(this, transform);
     }
 
     @Override
     public Extent getRelativeExtentView() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getExtentView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
     }
 
     @Override
@@ -280,6 +293,21 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     @Override
     public BiomeType getBiome(int x, int z) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBiome(x & 0xf, z & 0xf);
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
+        this.chunkManager.getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xf, y, z & 0xf, block, notifyNeighbors);
+    }
+
+    @Override
+    public BlockSnapshot createSnapshot(int x, int y, int z) {
+        return this.chunkManager.getOrCreateChunk(x >> 4, z >> 4).createSnapshot(x & 0xf, y, z & 0xf);
+    }
+
+    @Override
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+        return this.chunkManager.getOrCreateChunk(x >> 4, z >> 4).restoreSnapshot(x & 0xf, y, z & 0xf, snapshot, force, notifyNeighbors);
     }
 
     @Override
@@ -523,33 +551,42 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public void sendMessage(ChatType type, Iterable<Text> messages) {
+        checkNotNull(type, "chatType");
+        checkNotNull(messages, "messages");
         List<LanternPlayer> players = this.getPlayers();
         if (!players.isEmpty()) {
-            for (Text message : messages) {
-                MessagePlayOutChatMessage networkMessage = new MessagePlayOutChatMessage(message, type);
-                for (LanternPlayer player : players) {
-                    player.getConnection().send(networkMessage);
-                }
-            }
+            List<Message> networkMessages = Lists.newArrayList();
+            messages.forEach(message -> networkMessages.add(new MessagePlayOutChatMessage(message, type)));
+            players.forEach(player -> player.getConnection().sendAll(networkMessages));
         }
     }
 
     @Override
     public void sendTitle(Title title) {
-        // TODO Auto-generated method stub
-        
+        checkNotNull(title, "title");
+        List<LanternPlayer> players = this.getPlayers();
+        if (!players.isEmpty()) {
+            List<Message> networkMessages = LanternTitles.getCachedMessages(title);
+            players.forEach(player -> player.getConnection().sendAll(networkMessages));
+        }
     }
 
     @Override
     public void resetTitle() {
-        // TODO Auto-generated method stub
-        
+        List<LanternPlayer> players = this.getPlayers();
+        if (!players.isEmpty()) {
+            Message message = new MessagePlayOutTitle.Reset();
+            players.forEach(player -> player.getConnection().send(message));
+        }
     }
 
     @Override
     public void clearTitle() {
-        // TODO Auto-generated method stub
-        
+        List<LanternPlayer> players = this.getPlayers();
+        if (!players.isEmpty()) {
+            Message message = new MessagePlayOutTitle.Clear();
+            players.forEach(player -> player.getConnection().send(message));
+        }
     }
 
     @Override
@@ -626,9 +663,8 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     }
 
     @Override
-    public WorldBorder getWorldBorder() {
-        // TODO Auto-generated method stub
-        return null;
+    public LanternWorldBorder getWorldBorder() {
+        return this.worldBorder;
     }
 
     @Override
@@ -708,18 +744,6 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     }
 
     @Override
-    public BlockSnapshot createSnapshot(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
         // TODO Auto-generated method stub
         return null;
@@ -737,14 +761,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     }
 
     public void pulse() {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        // TODO Auto-generated method stub
-        
+        this.chunkManager.pulse();
     }
 
     @Override

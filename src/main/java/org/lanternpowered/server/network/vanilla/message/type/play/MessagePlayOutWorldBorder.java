@@ -10,7 +10,7 @@ public final class MessagePlayOutWorldBorder implements Message {
      * @param radius the new radius
      * @return the message
      */
-    public static MessagePlayOutWorldBorder setSize(float radius) {
+    public static MessagePlayOutWorldBorder setSize(double radius) {
         MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
         message.action = Action.SET_SIZE;
         message.radiusNew = radius;
@@ -25,7 +25,7 @@ public final class MessagePlayOutWorldBorder implements Message {
      * @param lerpTime the lerp time in seconds
      * @return the message
      */
-    public static MessagePlayOutWorldBorder lerpSize(float radiusOld, float radiusNew, long lerpTime) {
+    public static MessagePlayOutWorldBorder lerpSize(double radiusOld, double radiusNew, long lerpTime) {
         MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
         message.action = Action.LERP_SIZE;
         message.radiusOld = radiusOld;
@@ -41,7 +41,7 @@ public final class MessagePlayOutWorldBorder implements Message {
      * @param z the z coordinate
      * @return the message
      */
-    public static MessagePlayOutWorldBorder setCenter(float x, float z) {
+    public static MessagePlayOutWorldBorder setCenter(double x, double z) {
         MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
         message.action = Action.SET_CENTER;
         message.x = x;
@@ -62,8 +62,8 @@ public final class MessagePlayOutWorldBorder implements Message {
      * @param warningBlocks the amount of blocks from the border
      * @return the message
      */
-    public static MessagePlayOutWorldBorder initialize(float x, float z, float radiusOld,
-            float radiusNew, long lerpTime, int worldSize, int warningBlocks, int warningTime) {
+    public static MessagePlayOutWorldBorder initialize(double x, double z, double radiusOld,
+            double radiusNew, long lerpTime, int worldSize, int warningBlocks, int warningTime) {
         MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
         message.action = Action.INITIALIZE;
         message.worldSize = worldSize;
@@ -107,11 +107,11 @@ public final class MessagePlayOutWorldBorder implements Message {
 
     private Action action;
 
-    private float x;
-    private float z;
+    private double x;
+    private double z;
 
-    private float radiusOld;
-    private float radiusNew;
+    private double radiusOld;
+    private double radiusNew;
 
     private long lerpTime;
 
@@ -138,7 +138,7 @@ public final class MessagePlayOutWorldBorder implements Message {
      * 
      * @return the x coordinate
      */
-    public float getX() {
+    public double getX() {
         return this.x;
     }
 
@@ -147,7 +147,7 @@ public final class MessagePlayOutWorldBorder implements Message {
      * 
      * @return the z coordinate
      */
-    public float getZ() {
+    public double getZ() {
         return this.z;
     }
 
@@ -156,7 +156,7 @@ public final class MessagePlayOutWorldBorder implements Message {
      * 
      * @return the radius
      */
-    public float getOldRadius() {
+    public double getOldRadius() {
         return this.radiusOld;
     }
 
@@ -165,7 +165,7 @@ public final class MessagePlayOutWorldBorder implements Message {
      * 
      * @return the radius
      */
-    public float getNewRadius() {
+    public double getNewRadius() {
         return this.radiusNew;
     }
 

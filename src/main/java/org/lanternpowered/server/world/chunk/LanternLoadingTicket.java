@@ -5,6 +5,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import javax.annotation.Nullable;
+
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.service.world.ChunkLoadService.LoadingTicket;
 
 import com.flowpowered.math.vector.Vector2i;
@@ -19,13 +22,22 @@ class LanternLoadingTicket implements LoadingTicket {
     private final LanternChunkManager chunkManager;
     private final String plugin;
 
+    // The extra data, can be attached by mods, just keep it safe until
+    // sponge decides to add a api for it
+    @Nullable DataContainer extraData;
+
     // The maximum amount of chunks that can be loaded by this ticket
     private final int maxChunks;
 
     // The amount of chunks that may be loaded by this ticket
     private volatile int numChunks;
 
-    public LanternLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks) {
+    LanternLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks) {
+        this(plugin, chunkManager, maxChunks, maxChunks);
+    }
+
+    LanternLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks, int numChunks) {
+        this.numChunks = Math.min(numChunks, maxChunks);
         this.chunkManager = chunkManager;
         this.maxChunks = maxChunks;
         this.plugin = plugin;

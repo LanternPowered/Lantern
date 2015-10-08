@@ -2,14 +2,14 @@ package org.lanternpowered.server.world.biome;
 
 import java.util.List;
 
-import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.util.NonNullArrayList;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.GroundCoverLayer;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
 
-public class LanternBiomeType extends LanternCatalogType implements BiomeType {
+public class LanternBiomeType extends SimpleLanternCatalogType implements BiomeType {
 
     private final List<GroundCoverLayer> groundCoverLayers = new NonNullArrayList<GroundCoverLayer>();
     private final List<GeneratorPopulator> generatorPopulators = new NonNullArrayList<GeneratorPopulator>();
@@ -21,8 +21,8 @@ public class LanternBiomeType extends LanternCatalogType implements BiomeType {
     private float minHeight;
     private float maxHeight;
 
-    public LanternBiomeType(String identifier, String name) {
-        super(identifier, name);
+    public LanternBiomeType(String identifier) {
+        super(identifier);
     }
 
     @Override

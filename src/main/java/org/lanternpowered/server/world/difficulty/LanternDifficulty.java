@@ -5,10 +5,10 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 public class LanternDifficulty implements Difficulty {
 
     private final String name;
-    private final int internalId;
+    private final byte internalId;
 
     public LanternDifficulty(String name, int internalId) {
-        this.internalId = internalId;
+        this.internalId = (byte) internalId;
         this.name = name;
     }
 
@@ -22,7 +22,7 @@ public class LanternDifficulty implements Difficulty {
         return this.name;
     }
 
-    public int getInternalId() {
+    public byte getInternalId() {
         return this.internalId;
     }
 }

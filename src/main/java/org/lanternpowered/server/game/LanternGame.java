@@ -21,6 +21,7 @@ import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -135,6 +136,9 @@ public class LanternGame implements Game {
     // The folder where the worlds are saved
     private File worldsFolder;
 
+    // The current game state
+    private GameState gameState = GameState.CONSTRUCTION;
+
     public LanternGame() {
         if (game != null) {
             throw new IllegalStateException("The game can only be initialized once!");
@@ -205,17 +209,29 @@ public class LanternGame implements Game {
         // Load the default translations
         this.gameRegistry.getTranslationManager().addResourceBundle("translations/en_US", Locale.ENGLISH);
 
+        // Call the construction events
+        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(this));
+
         // Load the plugin instances
         this.pluginManager.loadPlugins();
 
-        // Call the init events
+        // Load-complete phase
+        this.setGameState(GameState.LOAD_COMPLETE);
+        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(this));
+
+        // Pre-init phase
+        this.setGameState(GameState.PRE_INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(this));
         // TODO: Initialize the permission service
 
         // Create the default sql service
         this.registerService(SqlService.class, new LanternSqlService());
 
+        // Init phase
+        this.setGameState(GameState.INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(this));
+        // Post-init phase
+        this.setGameState(GameState.POST_INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(this));
     }
 
@@ -227,6 +243,15 @@ public class LanternGame implements Game {
             log().warn("Non-Lantern {} already registered: {}", serviceClass.getSimpleName(), e.getLocalizedMessage());
             return false;
         }
+    }
+
+    public void setGameState(GameState gameState) {
+        this.gameState = gameState;
+    }
+
+    @Override
+    public GameState getState() {
+        return this.gameState;
     }
 
     /**

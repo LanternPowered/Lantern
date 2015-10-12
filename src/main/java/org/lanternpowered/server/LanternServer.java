@@ -34,6 +34,7 @@ import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
+import org.spongepowered.api.GameState;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -294,7 +295,9 @@ public class LanternServer implements Server {
         }
         this.worldManager = new LanternWorldManager(this.game.getSavesDirectory(), defaultWorld);
 
+        this.game.setGameState(GameState.SERVER_ABOUT_TO_START);
         this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game));
+        this.game.setGameState(GameState.SERVER_STARTING);
         this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game));
 
         this.maxPlayers = this.config.get(Settings.MAX_PLAYERS);
@@ -317,6 +320,7 @@ public class LanternServer implements Server {
             }
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
+        this.game.setGameState(GameState.SERVER_STARTED);
         this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(this.game));
     }
 
@@ -533,7 +537,7 @@ public class LanternServer implements Server {
         }
         this.shuttingDown = true;
 
-        // Call the event
+        this.game.setGameState(GameState.SERVER_STOPPING);
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(this.game));
 
         // Debug a message
@@ -572,7 +576,7 @@ public class LanternServer implements Server {
             ((LanternGameProfileResolver) gameProfileResolver).shutdown();
         }
 
-        // Call the event
+        this.game.setGameState(GameState.SERVER_STOPPED);
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game));
 
         // Wait for a while and terminate any rogue threads

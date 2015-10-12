@@ -7,11 +7,11 @@ import org.spongepowered.api.text.translation.Translation;
 
 public class LanternGameMode extends SimpleLanternCatalogType implements GameMode {
 
-    private final int internalId;
+    private final byte internalId;
 
     public LanternGameMode(String identifier, int internalId) {
         super(identifier);
-        this.internalId = internalId;
+        this.internalId = (byte) internalId;
     }
 
     @Override
@@ -19,7 +19,7 @@ public class LanternGameMode extends SimpleLanternCatalogType implements GameMod
         return LanternGame.get().getRegistry().getTranslationManager().get("gameMode." + this.getName());
     }
 
-    public int getInternalId() {
+    public byte getInternalId() {
         return this.internalId;
     }
 }

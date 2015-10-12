@@ -31,7 +31,7 @@ public class LanternAttributeCalculator implements AttributeCalculator {
             Operation operation = modifier.getOperation();
 
             if (lastOperation == null || operation.equals(lastOperation)) {
-                double value1 = modifier.getOperation().getIncrementation(base, modifier.getValue(), value);
+                double value1 = operation.getIncrementation(base, modifier.getValue(), value);
                 if (operation.changeValueImmediately()) {
                     value += value1;
                 } else {

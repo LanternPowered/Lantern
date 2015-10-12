@@ -23,6 +23,7 @@ import java.util.function.Predicate;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder;
+import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.block.LanternBlockRegistry;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.block.type.BlockAir;
@@ -70,6 +71,7 @@ import org.lanternpowered.server.world.dimension.LanternDimensionOverworld;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.lanternpowered.server.world.gen.LanternGeneratorTypeNether;
+import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameDictionary;
@@ -81,6 +83,8 @@ import org.spongepowered.api.attribute.AttributeCalculator;
 import org.spongepowered.api.attribute.AttributeModifierBuilder;
 import org.spongepowered.api.attribute.AttributeTargets;
 import org.spongepowered.api.attribute.Attributes;
+import org.spongepowered.api.attribute.Operation;
+import org.spongepowered.api.attribute.Operations;
 import org.spongepowered.api.block.BlockSnapshotBuilder;
 import org.spongepowered.api.block.BlockStateBuilder;
 import org.spongepowered.api.block.BlockType;
@@ -202,6 +206,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final CatalogTypeRegistry<Difficulty> difficultyRegistry = new LanternCatalogTypeRegistry<Difficulty>();
     private final CatalogTypeRegistry<GameMode> gameModeRegistry = new LanternCatalogTypeRegistry<GameMode>();
     private final CatalogTypeRegistry<Attribute> attributeRegistry = new LanternCatalogTypeRegistry<Attribute>();
+    private final CatalogTypeRegistry<Operation> attributeOperationRegistry = new LanternCatalogTypeRegistry<Operation>();
     private final CatalogTypeRegistry<TextColor> textColorRegistry = new LanternCatalogTypeRegistry<TextColor>();
     private final CatalogTypeRegistry<TextStyle.Base> textStyleRegistry = new LanternCatalogTypeRegistry<TextStyle.Base>();
     private final CatalogTypeRegistry<WorldGeneratorModifier> worldGeneratorModifierRegistry =
@@ -244,6 +249,10 @@ public class LanternGameRegistry implements GameRegistry {
             .put(StoneType.class, this.stoneTypeRegistry)
             .put(ParticleType.class, this.particleTypeRegistry)
             .put(PopulatorType.class, this.populatorTypeRegistry)
+            .build();
+    private final Map<Class<?>, BuilderFactory> builderFactories = ImmutableMap.<Class<?>, BuilderFactory>builder()
+            .put(AttributeBuilder.class, type -> createAttributeBuilder())
+            .put(WorldBuilder.class, type -> createWorldBuilder())
             .build();
 
     {
@@ -381,6 +390,7 @@ public class LanternGameRegistry implements GameRegistry {
     private void registerGeneratorTypes() {
         this.generatorTypeRegistry.register(new LanternGeneratorTypeNether("nether"));
         this.generatorTypeRegistry.register(new FlatGeneratorType("flat"));
+        this.generatorTypeRegistry.register(new DebugGeneratorType("debug"));
         RegistryHelper.mapFields(GeneratorTypes.class, this.generatorTypeRegistry.getDelegateMap());
     }
 
@@ -395,6 +405,13 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private void registerAttributes() {
+        this.attributeOperationRegistry.register(new LanternOperation("add_amount", 3, false,
+                (base, modifier, current) -> modifier));
+        this.attributeOperationRegistry.register(new LanternOperation("multiply", 2, false,
+                (base, modifier, current) -> current * modifier - current));
+        this.attributeOperationRegistry.register(new LanternOperation("multiply_base", 1, false,
+                (base, modifier, current) -> base * modifier - current));
+        RegistryHelper.mapFields(Operations.class, this.attributeOperationRegistry.getDelegateMap());
         Map<String, Predicate<DataHolder>> targetMappings = Maps.newHashMap();
         targetMappings.put("generic", target -> target instanceof Living);
         targetMappings.put("horse", target -> target instanceof Horse);
@@ -1084,10 +1101,13 @@ public class LanternGameRegistry implements GameRegistry {
         return this.translationManager.getIfPresent(id);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<T> createBuilderOfType(Class<T> builderClass) {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.builderFactories.containsKey(builderClass)) {
+            return Optional.of((T) this.builderFactories.get(builderClass).create(builderClass));
+        }
+        return Optional.empty();
     }
 
     @Override

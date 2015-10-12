@@ -9,8 +9,11 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 import org.lanternpowered.server.effect.LanternViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -67,6 +70,7 @@ import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
+import org.spongepowered.api.world.weather.Weathers;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
@@ -87,11 +91,19 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     public static final Vector2i BIOME_MAX = BLOCK_MAX.toVector2(true);
     public static final Vector2i BIOME_SIZE = BIOME_MAX.sub(BIOME_MIN).add(1, 1);
 
+    // The game instance
+    final LanternGame game;
+
     // The world border
-    private final LanternWorldBorder worldBorder = new LanternWorldBorder(this);
+    final LanternWorldBorder worldBorder = new LanternWorldBorder(this);
+
+    // The weather universe
+    // TODO: This can be null depending on whether the sky can use weather
+    @Nullable
+    final LanternWeatherUniverse weatherUniverse = new LanternWeatherUniverse(this);
 
     private final LanternChunkManager chunkManager = null;
-    private final LanternWorldProperties properties = null;
+    final LanternWorldProperties properties = null;
 
     private final String name;
     private final UUID uniqueId;
@@ -99,8 +111,9 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     private final TeleporterAgent teleporterAgent = null;
     private Context worldContext;
 
-    public LanternWorld(String name, UUID uniqueId) {
+    public LanternWorld(LanternGame game, String name, UUID uniqueId) {
         this.uniqueId = uniqueId;
+        this.game = game;
         this.name = name;
     }
 
@@ -483,32 +496,42 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public Weather getWeather() {
-        // TODO Auto-generated method stub
-        return null;
+        if (this.weatherUniverse != null) {
+            return this.weatherUniverse.getWeather();
+        }
+        return Weathers.CLEAR;
     }
 
     @Override
     public long getRemainingDuration() {
-        // TODO Auto-generated method stub
-        return 0;
+        if (this.weatherUniverse != null) {
+            return this.weatherUniverse.getRemainingDuration();
+        }
+        // Will always be clear
+        return Long.MAX_VALUE;
     }
 
     @Override
     public long getRunningDuration() {
-        // TODO Auto-generated method stub
-        return 0;
+        if (this.weatherUniverse != null) {
+            return this.weatherUniverse.getRunningDuration();
+        }
+        // Will always be clear
+        return Long.MAX_VALUE;
     }
 
     @Override
     public void forecast(Weather weather) {
-        // TODO Auto-generated method stub
-        
+        if (this.weatherUniverse != null) {
+            this.weatherUniverse.forecast(weather);
+        }
     }
 
     @Override
     public void forecast(Weather weather, long duration) {
-        // TODO Auto-generated method stub
-        
+        if (this.weatherUniverse != null) {
+            this.weatherUniverse.forecast(weather, duration);
+        }
     }
 
     @Override
@@ -760,13 +783,18 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
         return this.teleporterAgent;
     }
 
-    public void pulse() {
-        this.chunkManager.pulse();
-    }
-
     @Override
     public PlayerSimulator getPlayerSimulator() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public void pulse() {
+        this.chunkManager.pulse();
+        if (++this.properties.time > 24000) {
+            this.properties.time %= 24000;
+        }
+        this.properties.age++;
+        this.weatherUniverse.pulse();
     }
 }

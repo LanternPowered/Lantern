@@ -12,7 +12,7 @@ import org.spongepowered.api.world.gen.GeneratorPopulator;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 
-public class FlatGeneratorPopulator implements GeneratorPopulator {
+public final class FlatGeneratorPopulator implements GeneratorPopulator {
 
     // Using a cache to increase generation performance
     private final BlockState[] blockStateCache;

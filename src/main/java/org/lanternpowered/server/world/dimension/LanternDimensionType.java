@@ -1,11 +1,11 @@
 package org.lanternpowered.server.world.dimension;
 
+import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 
-public class LanternDimensionType implements DimensionType {
+public class LanternDimensionType extends LanternPluginCatalogType implements DimensionType {
 
-    private final String name;
     private final Class<? extends Dimension> dimensionClass;
     private final boolean keepSpawnLoaded;
     private final boolean waterEvaporates;
@@ -14,22 +14,17 @@ public class LanternDimensionType implements DimensionType {
 
     public LanternDimensionType(String name, int internalId, Class<? extends Dimension> dimensionClass,
             boolean keepSpawnLoaded, boolean waterEvaporates, boolean hasSky) {
+        this("minecraft", name, internalId, dimensionClass, keepSpawnLoaded, waterEvaporates, hasSky);
+    }
+
+    public LanternDimensionType(String pluginId, String name, int internalId, Class<? extends Dimension> dimensionClass,
+            boolean keepSpawnLoaded, boolean waterEvaporates, boolean hasSky) {
+        super(pluginId, name);
         this.keepSpawnLoaded = keepSpawnLoaded;
         this.waterEvaporates = waterEvaporates;
         this.dimensionClass = dimensionClass;
         this.internalId = internalId;
         this.hasSky = hasSky;
-        this.name = name;
-    }
-
-    @Override
-    public String getId() {
-        return this.name;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 
     @Override

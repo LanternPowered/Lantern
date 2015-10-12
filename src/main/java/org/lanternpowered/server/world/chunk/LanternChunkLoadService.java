@@ -68,7 +68,7 @@ public class LanternChunkLoadService implements ChunkLoadService {
      * @param plugin the plugin
      * @return the maximum amount of forced chunks
      */
-    public int getMaxChunksForPluginTicket(PluginContainer plugin) {
+    public int getMaxChunksForPluginTicket(Object plugin) {
         return this.getMaxChunksForPluginTicket(checkPlugin(plugin, "plugin").getId());
     }
 

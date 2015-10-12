@@ -14,7 +14,7 @@ import org.spongepowered.api.world.gen.WorldGenerator;
 
 import com.google.common.collect.Lists;
 
-public class FlatGeneratorType extends LanternGeneratorType {
+public final class FlatGeneratorType extends LanternGeneratorType {
 
     private final static DataQuery STRING_VALUE = DataQuery.of("customSettings");
 

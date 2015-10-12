@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class LanternGameDictionary implements GameDictionary {
+public final class LanternGameDictionary implements GameDictionary {
 
     private final Map<String, Set<ItemType>> map = Maps.newConcurrentMap();
 
@@ -22,7 +22,6 @@ public class LanternGameDictionary implements GameDictionary {
     public void register(String key, ItemType type) {
         checkNotNullOrEmpty(key, "key");
         checkNotNull(type, "type");
-
         Set<ItemType> set = this.map.get(key);
         if (set == null) {
             set = Sets.newConcurrentHashSet();
@@ -33,13 +32,10 @@ public class LanternGameDictionary implements GameDictionary {
 
     @Override
     public Set<ItemType> get(String key) {
-        checkNotNullOrEmpty(key, "key");
-
-        Set<ItemType> set = this.map.get(key);
+        Set<ItemType> set = this.map.get(checkNotNull(key, "key"));
         if (set != null) {
             return ImmutableSet.copyOf(set);
         }
-
         return ImmutableSet.of();
     }
 

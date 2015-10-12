@@ -142,7 +142,7 @@ public class AtomicFloatArray implements Serializable {
         float oldValue = 0;
         while (!success) {
             oldValue = this.get(index);
-            newValue = (short) (oldValue + delta);
+            newValue = oldValue + delta;
             success = this.compareAndSet(index, oldValue, newValue);
         }
         return old ? oldValue : newValue;

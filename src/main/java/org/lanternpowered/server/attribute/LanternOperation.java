@@ -3,18 +3,20 @@ package org.lanternpowered.server.attribute;
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.attribute.Operation;
 
-import static com.google.common.base.Preconditions.checkArgument;
+public class LanternOperation extends SimpleLanternCatalogType implements Operation {
 
-public abstract class LanternOperation extends SimpleLanternCatalogType implements Operation {
-
-    // The priority of the operation
     private final int priority;
+    private final boolean changeValueImmediately;
 
-    public LanternOperation(String name, int priority) {
+    private final OperationFunction function;
+
+    public LanternOperation(String name, int priority, boolean changeValueImmediately,
+            OperationFunction function) {
         super(name);
 
-        checkArgument(priority >= 0, "priority may not be negative");
+        this.function = function;
         this.priority = priority;
+        this.changeValueImmediately = changeValueImmediately;
     }
 
     @Override
@@ -22,7 +24,16 @@ public abstract class LanternOperation extends SimpleLanternCatalogType implemen
         if (operation instanceof LanternOperation) {
             return this.priority - ((LanternOperation) operation).priority;
         }
-        // TODO: How will we handle custom (plugin) operations?
         return operation.compareTo(this);
+    }
+
+    @Override
+    public double getIncrementation(double base, double modifier, double currentValue) {
+        return this.function.getIncrementation(base, modifier, currentValue);
+    }
+
+    @Override
+    public boolean changeValueImmediately() {
+        return this.changeValueImmediately;
     }
 }

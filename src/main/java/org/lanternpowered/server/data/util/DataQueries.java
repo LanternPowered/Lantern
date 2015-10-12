@@ -23,4 +23,6 @@ public final class DataQueries {
     public static final DataQuery BLOCK_TYPE = of("BlockType");
     public static final DataQuery BLOCK_STATE_UNSAFE_META = of("UnsafeMeta");
 
+    // Sponge data
+    public static final DataQuery SPONGE_DATA = of("SpongeData");
 }

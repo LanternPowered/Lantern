@@ -80,4 +80,14 @@ public class LanternBlockType extends SimpleLanternCatalogType implements BlockT
     public Collection<Property<?, ?>> getApplicableProperties() {
         return this.getDefaultState().getApplicableProperties();
     }
+
+    /**
+     * Gets a collection with all the {@link BlockState}s of
+     * this block type.
+     * 
+     * @return the block states
+     */
+    public Collection<BlockState> getAllStates() {
+        return this.blockStateBase.getBlockStates();
+    }
 }

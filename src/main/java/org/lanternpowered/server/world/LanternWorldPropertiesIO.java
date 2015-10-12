@@ -1,7 +1,6 @@
 package org.lanternpowered.server.world;
 
 import java.io.DataInputStream;
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,13 +10,11 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
-
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
-import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
+import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
+import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameRegistry;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
@@ -31,11 +28,16 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class LanternWorldPropertiesIO {
 
     private final static String LEVEL_DATA = "level.dat";
+    private final static String LEVEL_DATA_OLD = "level.dat_old";
+    private final static String LEVEL_DATA_NEW = "level.dat_new";
     private final static String SPONGE_LEVEL_DATA = "level_sponge.dat";
+    private final static String SPONGE_LEVEL_DATA_OLD = "level_sponge.dat_old";
+    private final static String SPONGE_LEVEL_DATA_NEW = "level_sponge.dat_new";
     private final static String BUKKIT_UUID_DATA = "uid.dat";
 
     // The current version of the worlds
@@ -61,6 +63,8 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery LAST_PLAYED = DataQuery.of("LastPlayed");
     private final static DataQuery DIFFICULTY = DataQuery.of("Difficulty");
     private final static DataQuery SIZE_ON_DISK = DataQuery.of("SizeOnDisk");
+    private final static DataQuery MAP_FEATURES = DataQuery.of("MapFeatures");
+    private final static DataQuery GAME_MODE = DataQuery.of("GameType");
 
     private final static DataQuery BORDER_CENTER_X = DataQuery.of("BorderCenterX");
     private final static DataQuery BORDER_CENTER_Z = DataQuery.of("BorderCenterZ");
@@ -73,7 +77,6 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery BORDER_WARNING_TIME = DataQuery.of("BorderWarningBlocks");
 
     // Sponge properties
-    private final static DataQuery ECOSYSTEM = DataQuery.of("Sponge");
     private final static DataQuery UUID_MOST = DataQuery.of("uuid_most");
     private final static DataQuery UUID_LEAST = DataQuery.of("uuid_least");
     private final static DataQuery ENABLED = DataQuery.of("enabled");
@@ -81,6 +84,7 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery LOAD_ON_STARTUP = DataQuery.of("loadOnStartup");
     private final static DataQuery DIMENSION_TYPE = DataQuery.of("dimensionType");
     private final static DataQuery GENERATOR_MODIFIERS = DataQuery.of("generatorModifiers");
+    private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
 
     private LanternWorldPropertiesIO() {
     }
@@ -96,9 +100,8 @@ public class LanternWorldPropertiesIO {
         }
 
         DataView dataView;
-        try (NbtDataContainerInputStream is = new NbtDataContainerInputStream(
-                new DataInputStream(new GZIPInputStream(new FileInputStream(levelFile))))) {
-            dataView = is.read().getView(DATA).get();
+        try {
+            dataView = NbtStreamUtils.read(new FileInputStream(levelFile), true).getView(DATA).get();
         } catch (IOException e) {
             throw new IOException("Unable to access " + LEVEL_DATA + "!", e);
         }
@@ -108,15 +111,14 @@ public class LanternWorldPropertiesIO {
 
         File spongeLevelFile = new File(folder, SPONGE_LEVEL_DATA);
         if (spongeLevelFile.exists()) {
-            try (NbtDataContainerInputStream is = new NbtDataContainerInputStream(
-                    new DataInputStream(new GZIPInputStream(new FileInputStream(spongeLevelFile))))) {
-                spongeRootContainer = is.read();
+            try {
+                spongeRootContainer = NbtStreamUtils.read(new FileInputStream(spongeLevelFile), true);
             } catch (IOException e) {
                 LanternGame.log().error("Unable to access {}, ignoring...", SPONGE_LEVEL_DATA, e);
             }
-            spongeContainer = spongeRootContainer.getView(ECOSYSTEM).orElse(null);
+            spongeContainer = spongeRootContainer.getView(DataQueries.SPONGE_DATA).orElse(null);
             if (spongeContainer != null) {
-                spongeRootContainer.remove(ECOSYSTEM);
+                spongeRootContainer.remove(DataQueries.SPONGE_DATA);
             }
         }
 
@@ -157,12 +159,14 @@ public class LanternWorldPropertiesIO {
         properties.seed = dataView.getLong(SEED).get();
         properties.age = dataView.getLong(AGE).get();
         properties.time = dataView.getLong(TIME).orElse(properties.age % 24000);
+        properties.setLastPlayedTime(dataView.getLong(LAST_PLAYED).get());
         properties.raining = dataView.getInt(RAINING).get() > 0;
         properties.rainTime = dataView.getInt(RAIN_TIME).get();
         properties.thundering = dataView.getInt(THUNDERING).get() > 0;
         properties.thunderTime = dataView.getInt(THUNDER_TIME).get();
         properties.clearWeatherTime = dataView.getInt(CLEAR_WEATHER_TIME).get();
         properties.hardcore = dataView.getInt(HARDCORE).get() > 0;
+        properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
         byte difficulty = dataView.getInt(DIFFICULTY).get().byteValue();
         for (Difficulty difficulty0 : LanternGame.get().getRegistry().getAllOf(Difficulty.class)) {
             if (((LanternDifficulty) difficulty0).getInternalId() == difficulty) {
@@ -242,6 +246,15 @@ public class LanternWorldPropertiesIO {
                             " not found. Missing plugin?");
                 }
             }
+
+            if (spongeContainer.contains(PLAYER_UUID_TABLE)) {
+                List<DataView> views = spongeContainer.getViewList(PLAYER_UUID_TABLE).get();
+                for (DataView view : views) {
+                    long most = view.getLong(UUID_MOST).get();
+                    long least = view.getLong(UUID_LEAST).get();
+                    properties.pendingUniqueIds.add(new UUID(most, least));
+                }
+            }
         } else {
             properties.properties = new MemoryDataContainer();
         }
@@ -255,6 +268,7 @@ public class LanternWorldPropertiesIO {
 
         dataView.set(SEED, properties.seed);
         dataView.set(VERSION, CURRENT_VERSION);
+        dataView.set(NAME, properties.name);
         DataView rulesView = container.createView(GAME_RULES);
         for (Entry<String, String> en : properties.rules.getValues().entrySet()) {
             rulesView.set(DataQuery.of(en.getKey()), en.getValue());
@@ -267,9 +281,11 @@ public class LanternWorldPropertiesIO {
         dataView.set(THUNDER_TIME, properties.thunderTime);
         dataView.set(HARDCORE, properties.hardcore);
         dataView.set(CLEAR_WEATHER_TIME, properties.clearWeatherTime);
-        dataView.set(LAST_PLAYED, System.currentTimeMillis());
+        dataView.set(LAST_PLAYED, properties.getLastPlayedTime());
         dataView.set(SIZE_ON_DISK, 0L);
         dataView.set(DIFFICULTY, ((LanternDifficulty) properties.difficulty).getInternalId());
+        dataView.set(GAME_MODE, ((LanternGameMode) properties.gameMode).getInternalId());
+        dataView.set(MAP_FEATURES, properties.mapFeatures);
         dataView.set(BORDER_CENTER_X, properties.borderCenterX);
         dataView.set(BORDER_CENTER_Z, properties.borderCenterZ);
         dataView.set(BORDER_DAMAGE, properties.borderDamage);
@@ -278,7 +294,7 @@ public class LanternWorldPropertiesIO {
         dataView.set(BORDER_SIZE_START, properties.getWorldBorderDiameter());
         dataView.set(BORDER_SIZE_LERP_TIME, properties.getWorldBorderTimeRemaining());
         dataView.set(BORDER_WARNING_BLOCKS, properties.borderWarningDistance);
-        container.set(BORDER_WARNING_TIME, properties.borderWarningTime);
+        dataView.set(BORDER_WARNING_TIME, properties.borderWarningTime);
         Vector3i spawn = properties.spawnPosition;
         dataView.set(SPAWN_X, spawn.getX());
         dataView.set(SPAWN_Y, spawn.getY());
@@ -287,28 +303,30 @@ public class LanternWorldPropertiesIO {
         if (levelFile.exists()) {
             levelFile.delete();
         }
-        try (NbtDataContainerOutputStream os = new NbtDataContainerOutputStream(
-                new DataOutputStream(new GZIPOutputStream(new FileOutputStream(levelFile))))) {
-            os.write(container);
-            os.flush();
-        }
+        NbtStreamUtils.write(container, new FileOutputStream(levelFile), true);
         DataContainer spongeRootContainer = properties.properties.copy();
-        DataView spongeContainer = spongeRootContainer.createView(ECOSYSTEM);
+        DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
+        spongeContainer.set(NAME, properties.name);
         spongeContainer.set(UUID_MOST, properties.uniqueId.getMostSignificantBits());
         spongeContainer.set(UUID_LEAST, properties.uniqueId.getLeastSignificantBits());
         spongeContainer.set(ENABLED, properties.enabled);
         spongeContainer.set(KEEP_SPAWN_LOADED, properties.keepSpawnLoaded);
         spongeContainer.set(LOAD_ON_STARTUP, properties.loadOnStartup);
         // Why not just use the id?
-        spongeContainer.set(DIMENSION_TYPE, properties.dimensionType.getDimensionClass().getCanonicalName());
+        if (properties.dimensionType != null) {
+            spongeContainer.set(DIMENSION_TYPE, properties.dimensionType.getDimensionClass().getCanonicalName());
+        }
+        List<DataView> pendingUniqueIds = Lists.newArrayListWithCapacity(properties.pendingUniqueIds.size());
+        for (UUID uuid : properties.pendingUniqueIds) {
+            pendingUniqueIds.add(new MemoryDataContainer()
+                    .set(UUID_MOST, uuid.getMostSignificantBits())
+                    .set(UUID_LEAST, uuid.getLeastSignificantBits()));
+        }
+        spongeContainer.set(PLAYER_UUID_TABLE, pendingUniqueIds);
         levelFile = new File(folder, SPONGE_LEVEL_DATA);
         if (levelFile.exists()) {
             levelFile.delete();
         }
-        try (NbtDataContainerOutputStream os = new NbtDataContainerOutputStream(
-                new DataOutputStream(new GZIPOutputStream(new FileOutputStream(levelFile))))) {
-            os.write(spongeRootContainer);
-            os.flush();
-        }
+        NbtStreamUtils.write(spongeRootContainer, new FileOutputStream(levelFile), true);
     }
 }

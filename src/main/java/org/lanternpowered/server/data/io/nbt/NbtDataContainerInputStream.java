@@ -6,8 +6,9 @@ import static org.lanternpowered.server.data.io.nbt.NbtConstants.*;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
-
+import java.util.zip.GZIPInputStream;
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.data.io.DataContainerInput;
@@ -32,6 +33,27 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
      */
     public NbtDataContainerInputStream(DataInputStream dataInputStream) {
         this.dis = checkNotNull(dataInputStream, "dataInputStream");
+    }
+
+    /**
+     * Creates a new nbt data view input stream.
+     * 
+     * @param inputStream the data input stream
+     */
+    public NbtDataContainerInputStream(InputStream inputStream) {
+        this(checkNotNull(inputStream, "inputStream") instanceof DataInputStream ?
+                (DataInputStream) inputStream : new DataInputStream(inputStream));
+    }
+
+    /**
+     * Creates a new nbt data view input stream.
+     * 
+     * @param inputStream the data input stream
+     * @param compressed whether the content is compressed
+     * @throws IOException 
+     */
+    public NbtDataContainerInputStream(InputStream inputStream, boolean compressed) throws IOException {
+        this(compressed ? new GZIPInputStream(checkNotNull(inputStream, "inputStream")) : inputStream);
     }
 
     @Override

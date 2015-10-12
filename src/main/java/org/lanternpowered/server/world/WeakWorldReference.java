@@ -20,8 +20,7 @@ public final class WeakWorldReference {
      * @param world the world
      */
     public WeakWorldReference(World world) {
-        checkNotNull(world, "world");
-        this.world = new WeakReference<World>(world);
+        this.world = new WeakReference<World>(checkNotNull(world, "world"));
         this.uniqueId = world.getUniqueId();
     }
 
@@ -31,8 +30,7 @@ public final class WeakWorldReference {
      * @param uniqueId the unique id
      */
     public WeakWorldReference(UUID uniqueId) {
-        checkNotNull(uniqueId, "uniqueId");
-        this.uniqueId = uniqueId;
+        this.uniqueId = checkNotNull(uniqueId, "uniqueId");
     }
 
     /**

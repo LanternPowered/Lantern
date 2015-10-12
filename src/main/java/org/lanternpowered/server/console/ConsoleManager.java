@@ -48,7 +48,7 @@ public class ConsoleManager {
                 this.reader.setExpandEvents(false);
                 // Set the prompt icon
                 this.reader.setPrompt(">");
-                // Not error caught, we are using jline!
+                // No error caught, we are using jline!
                 this.jline = true;
             } catch (Exception e) {
                 flag = true;

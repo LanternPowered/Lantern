@@ -10,7 +10,7 @@ import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
-public class LanternWorldCreationSettings implements WorldCreationSettings {
+public final class LanternWorldCreationSettings implements WorldCreationSettings {
 
     private final String name;
     private final GameMode gameMode;

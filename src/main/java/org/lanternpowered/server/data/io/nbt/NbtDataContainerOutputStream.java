@@ -7,9 +7,11 @@ import java.io.Closeable;
 import java.io.DataOutputStream;
 import java.io.Flushable;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.zip.GZIPOutputStream;
 
 import org.lanternpowered.server.data.io.DataContainerOutput;
 import org.spongepowered.api.data.DataQuery;
@@ -30,6 +32,27 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
      */
     public NbtDataContainerOutputStream(DataOutputStream dataOutputStream) {
         this.dos = checkNotNull(dataOutputStream, "dataOutputStream");
+    }
+
+    /**
+     * Creates a new nbt data view output stream.
+     * 
+     * @param outputStream the output stream
+     */
+    public NbtDataContainerOutputStream(OutputStream outputStream) {
+        this(checkNotNull(outputStream, "outputStream") instanceof DataOutputStream ?
+                (DataOutputStream) outputStream : new DataOutputStream(outputStream));
+    }
+
+    /**
+     * Creates a new nbt data view output stream.
+     * 
+     * @param outputStream the output stream
+     * @param compressed whether the content is compressed
+     * @throws IOException 
+     */
+    public NbtDataContainerOutputStream(OutputStream outputStream, boolean compressed) throws IOException {
+        this(compressed ? new GZIPOutputStream(checkNotNull(outputStream, "outputStream")) : outputStream);
     }
 
     @Override

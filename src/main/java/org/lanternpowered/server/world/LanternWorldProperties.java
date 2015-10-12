@@ -10,6 +10,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
@@ -21,8 +23,10 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -30,12 +34,16 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 public class LanternWorldProperties implements WorldProperties {
 
     private static final int BOUNDARY = 29999984;
 
     final LanternGameRules rules = new LanternGameRules();
+
+    // This is a map added by sponge, not sure what it is supposed to do yet
+    final List<UUID> pendingUniqueIds = Lists.newArrayList();
 
     // The extra properties
     DataContainer properties;
@@ -53,12 +61,14 @@ public class LanternWorldProperties implements WorldProperties {
     DataContainer generatorSettings;
 
     // The difficulty
-    Difficulty difficulty;
+    Difficulty difficulty = Difficulties.NORMAL;
+
+    // The game mode
+    GameMode gameMode = GameModes.NOT_SET;
 
     protected String name;
     protected UUID uniqueId;
     protected Vector3i spawnPosition;
-    protected GameMode gameMode;
 
     boolean enabled;
     boolean loadOnStartup;
@@ -78,7 +88,8 @@ public class LanternWorldProperties implements WorldProperties {
     long time;
     long age;
 
-    protected LanternWorld world;
+    @Nullable
+    private LanternWorld world;
 
     // World border properties
     double borderCenterX;
@@ -101,6 +112,32 @@ public class LanternWorldProperties implements WorldProperties {
     // Shrink or growing times
     private long borderTimeStart = -1;
     private long borderTimeEnd;
+
+    // The last time the world was played in
+    private long lastPlayed;
+
+    long getLastPlayedTime() {
+        if (this.world != null) {
+            return this.lastPlayed = System.currentTimeMillis();
+        }
+        return this.lastPlayed;
+    }
+
+    void setLastPlayedTime(long time) {
+        this.lastPlayed = time;
+    }
+
+    @Nullable
+    LanternWorld getWorld() {
+        return this.world;
+    }
+
+    void setWorld(@Nullable LanternWorld world) {
+        this.world = world;
+        if (this.world != null && world == null) {
+            this.lastPlayed = System.currentTimeMillis();
+        }
+    }
 
     @Override
     public DataContainer toContainer() {
@@ -201,6 +238,9 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setRaining(boolean state) {
         this.raining = state;
+        if (this.world != null && this.world.weatherUniverse != null) {
+            this.world.weatherUniverse.setRaining(state);
+        }
     }
 
     @Override
@@ -211,6 +251,9 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setRainTime(int time) {
         this.rainTime = time;
+        if (this.world != null && this.world.weatherUniverse != null) {
+            this.world.weatherUniverse.setRainTime(time);
+        }
     }
 
     @Override
@@ -221,6 +264,9 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setThundering(boolean state) {
         this.thundering = state;
+        if (this.world != null && this.world.weatherUniverse != null) {
+            this.world.weatherUniverse.setThundering(state);
+        }
     }
 
     @Override
@@ -231,6 +277,9 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setThunderTime(int time) {
         this.thunderTime = time;
+        if (this.world != null && this.world.weatherUniverse != null) {
+            this.world.weatherUniverse.setThunderTime(time);
+        }
     }
 
     @Override
@@ -312,7 +361,7 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public void setGameRule(String gameRule, String value) {
-        this.rules.newRule(checkNotNull(gameRule, "gameRule")).set(value);
+        this.rules.newRule(gameRule).set(value);
     }
 
     @Override

@@ -28,14 +28,15 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             return;
         }
         if (message0.startsWith("/")) {
-            LanternGame.get().getCommandDispatcher().process(player, message0);
+            LanternGame.get().getCommandDispatcher().process(player, message1);
         } else {
             Translation translation = LanternGame.get().getRegistry().getTranslationManager().get("chat.type.text");
             Object displayName = player.getName(); // TODO: player.getDisplayNameData().displayName().get();
-            Text.Translatable text = Texts.builder(translation, displayName, message1).build();
+            Text rawMessage = Texts.of(message0);
+            Text.Translatable text = Texts.builder(translation, displayName, rawMessage).build();
             MessageSink sink = MessageSinks.toAll();
             MessageSinkEvent.Chat event = SpongeEventFactory.createMessageSinkEventChat(LanternGame.get(),
-                    Cause.of(player), text, text, sink, sink);
+                    Cause.of(player), text, text, sink, sink, rawMessage);
             if (!LanternGame.get().getEventManager().post(event)) {
                 event.getSink().sendMessage(event.getMessage());
             }

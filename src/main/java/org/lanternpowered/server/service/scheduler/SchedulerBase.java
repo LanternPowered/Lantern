@@ -153,7 +153,7 @@ abstract class SchedulerBase {
             public void run() {
                 task.setState(ScheduledTask.ScheduledTaskState.RUNNING);
                 try {
-                    task.getRunnable().run();
+                    task.getConsumer().accept(task);
                 } catch (Throwable t) {
                     LanternGame.log().error("The Scheduler tried to run the task {} owned by {}, but an error occured.", task.getName(),
                             task.getOwner(), t);

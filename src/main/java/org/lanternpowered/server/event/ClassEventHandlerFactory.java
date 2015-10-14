@@ -119,7 +119,6 @@ public final class ClassEventHandlerFactory implements AnnotatedEventHandlerFact
         private <T> Class<T> defineClass(String name, byte[] b) {
             return (Class<T>) this.defineClass(name, b, 0, b.length);
         }
-
     }
 
 }

@@ -12,12 +12,13 @@ import org.spongepowered.api.service.scheduler.Task;
 import org.spongepowered.api.service.scheduler.TaskBuilder;
 
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 public class LanternTaskBuilder implements TaskBuilder {
 
     private final LanternScheduler scheduler;
 
-    private Runnable runnable;
+    private Consumer<Task> executor;
     private ScheduledTask.TaskSynchronicity syncType;
     private String name;
     private long delay;
@@ -45,24 +46,28 @@ public class LanternTaskBuilder implements TaskBuilder {
     }
 
     @Override
-    public TaskBuilder execute(Runnable runnable) {
-        this.runnable = runnable;
-        return this;
+    public TaskBuilder execute(Consumer<Task> executor) {
+        this.executor = executor;
+        return null;
     }
 
     @Override
     public TaskBuilder delay(long delay, TimeUnit unit) {
         checkArgument(delay >= 0, "delay cannot be negative");
-        this.delay = checkNotNull(unit, "unit").toMillis(delay);
-        this.tickDelay = -1;
+        long millis = checkNotNull(unit, "unit").toMillis(delay);
+        if (this.syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
+            this.delay = millis;
+        } else {
+            this.tickDelay = millis / LanternGame.TICK_DURATION;
+        }
         return this;
     }
 
     @Override
-    public TaskBuilder delay(long delay) {
+    public TaskBuilder delayTicks(long delay) {
         checkArgument(delay >= 0, "delay cannot be negative");
         if (this.syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
-            this.delay = delay;
+            this.delay = delay * LanternGame.TICK_DURATION;
         } else {
             this.tickDelay = delay;
         }
@@ -72,16 +77,20 @@ public class LanternTaskBuilder implements TaskBuilder {
     @Override
     public TaskBuilder interval(long interval, TimeUnit unit) {
         checkArgument(interval >= 0, "interval cannot be negative");
-        this.interval = checkNotNull(unit, "unit").toMillis(interval);
-        this.tickInterval = -1;
+        long millis = checkNotNull(unit, "unit").toMillis(interval);
+        if (this.syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
+            this.interval = millis;
+        } else {
+            this.tickInterval = millis / LanternGame.TICK_DURATION;
+        }
         return this;
     }
 
     @Override
-    public TaskBuilder interval(long interval) {
+    public TaskBuilder intervalTicks(long interval) {
         checkArgument(interval >= 0, "interval cannot be negative");
         if (this.syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
-            this.interval = interval;
+            this.interval = interval * LanternGame.TICK_DURATION;
         } else {
             this.tickInterval = interval;
         }
@@ -97,7 +106,7 @@ public class LanternTaskBuilder implements TaskBuilder {
     @Override
     public Task submit(Object plugin) {
         PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        checkState(this.runnable != null, "runnable task not set");
+        checkState(this.executor != null, "runnable task not set");
         String name;
         if (this.name == null) {
             name = this.scheduler.getNameFor(pluginContainer, this.syncType);
@@ -106,7 +115,7 @@ public class LanternTaskBuilder implements TaskBuilder {
         }
         long delay = this.tickDelay != -1 ? this.tickDelay : this.delay;
         long interval = this.tickInterval != -1 ? this.tickInterval : this.interval;
-        ScheduledTask task = new ScheduledTask(this.syncType, this.runnable, name, delay, this.tickDelay != -1,
+        ScheduledTask task = new ScheduledTask(this.syncType, this.executor, name, delay, this.tickDelay != -1,
                 interval, this.tickInterval != -1, pluginContainer);
         this.scheduler.submit(task);
         return task;

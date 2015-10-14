@@ -4,6 +4,8 @@ import java.util.Set;
 
 import io.netty.util.Attribute;
 
+import org.spongepowered.api.Platform;
+
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
@@ -27,7 +29,8 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         }
         boolean fml = session.getChannel().attr(Session.FML_MARKER).get();
 
-        Set<String> channels = Sets.newHashSet(LanternGame.get().getServer().getRegisteredChannels());
+        Set<String> channels = Sets.newHashSet(LanternGame.get().getChannelRegistrar()
+                .getRegisteredChannels(Platform.Type.SERVER));
         if (fml) {
             channels.add("FML");
             channels.add("FML|HS");

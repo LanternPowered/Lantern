@@ -86,6 +86,8 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery GENERATOR_MODIFIERS = DataQuery.of("generatorModifiers");
     private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
 
+    // Lantern properties
+
     private LanternWorldPropertiesIO() {
     }
 

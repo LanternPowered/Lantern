@@ -210,18 +210,21 @@ public class LanternGame implements Game {
         this.gameRegistry.getTranslationManager().addResourceBundle("translations/en_US", Locale.ENGLISH);
 
         // Call the construction events
-        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(this));
+        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(this, 
+                GameState.CONSTRUCTION));
 
         // Load the plugin instances
         this.pluginManager.loadPlugins();
 
         // Load-complete phase
         this.setGameState(GameState.LOAD_COMPLETE);
-        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(this));
+        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(this, 
+                GameState.LOAD_COMPLETE));
 
         // Pre-init phase
         this.setGameState(GameState.PRE_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(this));
+        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(this, 
+                GameState.PRE_INITIALIZATION));
         // TODO: Initialize the permission service
 
         // Create the default sql service
@@ -229,10 +232,12 @@ public class LanternGame implements Game {
 
         // Init phase
         this.setGameState(GameState.INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(this));
+        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(this, 
+                GameState.INITIALIZATION));
         // Post-init phase
         this.setGameState(GameState.POST_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(this));
+        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(this, 
+                GameState.POST_INITIALIZATION));
     }
 
     private <T> boolean registerService(Class<T> serviceClass, T serviceImpl) {
@@ -332,7 +337,7 @@ public class LanternGame implements Game {
     }
 
     /**
-     * Gets the {@link LanternChannelRegistrar}.
+     * Gets the {@link LanternChannelRegistrarOld}.
      * 
      * @return the channel registrar
      */

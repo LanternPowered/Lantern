@@ -101,6 +101,11 @@ public class LanternScheduler implements SchedulerService {
         return allTasks;
     }
 
+    @Override
+    public int getPreferredTickInterval() {
+        return LanternGame.TICK_DURATION;
+    }
+
     /**
      * Calls the callable from the main thread.
      * 

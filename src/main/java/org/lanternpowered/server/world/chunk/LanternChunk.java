@@ -36,6 +36,8 @@ import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
+import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
@@ -496,6 +498,42 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         return this.getType(x, y, z) & 0xf;
     }
 
+    /**
+     * Gets the block light at the coordinates.
+     * 
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @return the biome value
+     */
+    public byte getBlockLight(int x, int y, int z) {
+        ChunkSection section = this.getSectionAtHeight(y);
+
+        if (section != null) {
+            return section.lightFromBlock.get(section.index(x, y, z));
+        }
+
+        return 0;
+    }
+
+    /**
+     * Gets the block light at the coordinates.
+     * 
+     * @param x the x coordinate
+     * @param y the y coordinate
+     * @param z the z coordinate
+     * @return the biome value
+     */
+    public byte getSkyLight(int x, int y, int z) {
+        ChunkSection section = this.getSectionAtHeight(y);
+
+        if (section != null) {
+            return section.lightFromSky.get(section.index(x, y, z));
+        }
+
+        return 0;
+    }
+
     @Override
     public Location<Chunk> getLocation(Vector3i position) {
         return this.getLocation(position.getX(), position.getY(), position.getZ());
@@ -728,13 +766,18 @@ public class LanternChunk extends AbstractExtent implements Chunk {
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getProperty(x, y, z, direction, propertyClass);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
         BlockState blockState = this.getBlock(x, y, z);
+        if (propertyClass.equals(GroundLuminanceProperty.class)) {
+            return (Optional<T>) Optional.of(new GroundLuminanceProperty(this.getBlockLight(x, y, z) / 15f));
+        } else if (propertyClass.equals(SkyLuminanceProperty.class)) {
+            return (Optional<T>) Optional.of(new SkyLuminanceProperty(this.getSkyLight(x, y, z) / 15f));
+        }
         Optional<T> property = blockState.getProperty(propertyClass);
         if (!property.isPresent()) {
             Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
@@ -748,6 +791,8 @@ public class LanternChunk extends AbstractExtent implements Chunk {
     @Override
     public Collection<Property<?, ?>> getProperties(int x, int y, int z) {
         ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
+        builder.add(new GroundLuminanceProperty(this.getBlockLight(x, y, z) / 15f));
+        builder.add(new SkyLuminanceProperty(this.getSkyLight(x, y, z) / 15f));
         builder.addAll(this.getBlock(x, y, z).getApplicableProperties());
         this.getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
         return builder.build();

@@ -346,24 +346,24 @@ public class LanternChannelBuf implements ChannelBuf {
     }
 
     @Override
-    public LanternChannelBuf writeUuid(UUID data) {
+    public LanternChannelBuf writeUniqueId(UUID data) {
         CONTEXT.write(this.buf, UUID.class, data);
         return this;
     }
 
     @Override
-    public LanternChannelBuf setUuid(int index, UUID data) {
+    public LanternChannelBuf setUniqueId(int index, UUID data) {
         CONTEXT.writeAt(this.buf, index, UUID.class, data);
         return this;
     }
 
     @Override
-    public UUID readUuid() {
+    public UUID readUniqueId() {
         return CONTEXT.read(this.buf, UUID.class);
     }
 
     @Override
-    public UUID getUuid(int index) {
+    public UUID getUniqueId(int index) {
         return CONTEXT.readAt(this.buf, index, UUID.class);
     }
 

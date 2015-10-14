@@ -11,7 +11,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.KeyPair;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -38,8 +37,6 @@ import org.spongepowered.api.GameState;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.network.ChannelListener;
-import org.spongepowered.api.network.ChannelRegistrationException;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.service.profile.GameProfileResolver;
 import org.spongepowered.api.service.sql.SqlService;
@@ -296,9 +293,11 @@ public class LanternServer implements Server {
         this.worldManager = new LanternWorldManager(this.game.getSavesDirectory(), defaultWorld);
 
         this.game.setGameState(GameState.SERVER_ABOUT_TO_START);
-        this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game));
+        this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game,
+                GameState.SERVER_ABOUT_TO_START));
         this.game.setGameState(GameState.SERVER_STARTING);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game));
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game, 
+                GameState.SERVER_STARTING));
 
         this.maxPlayers = this.config.get(Settings.MAX_PLAYERS);
         this.motd = Texts.json().fromUnchecked(this.config.get(Settings.MOTD));
@@ -321,7 +320,8 @@ public class LanternServer implements Server {
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
         this.game.setGameState(GameState.SERVER_STARTED);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(this.game));
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(this.game, 
+                GameState.SERVER_STARTED));
     }
 
     /**
@@ -365,16 +365,6 @@ public class LanternServer implements Server {
         commandSources.add(this.getConsole());
         commandSources.addAll(this.getOnlinePlayers());
         return commandSources.build();
-    }
-
-    @Override
-    public void registerChannel(Object plugin, ChannelListener listener, String channel) throws ChannelRegistrationException {
-        this.game.getChannelRegistrar().registerChannel(plugin, listener, channel);
-    }
-
-    @Override
-    public List<String> getRegisteredChannels() {
-        return this.game.getChannelRegistrar().getRegisteredChannels();
     }
 
     @Override
@@ -538,7 +528,8 @@ public class LanternServer implements Server {
         this.shuttingDown = true;
 
         this.game.setGameState(GameState.SERVER_STOPPING);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(this.game));
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(this.game, 
+                GameState.SERVER_STOPPING));
 
         // Debug a message
         LanternGame.log().info("Stopping the server... ({})", Texts.legacy().to(kickMessage));
@@ -577,7 +568,8 @@ public class LanternServer implements Server {
         }
 
         this.game.setGameState(GameState.SERVER_STOPPED);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game));
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game, 
+                GameState.SERVER_STOPPED));
 
         // Wait for a while and terminate any rogue threads
         new ShutdownMonitorThread().start();

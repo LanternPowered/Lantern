@@ -141,7 +141,7 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
     }
 
     @Override
-    public Weather getWeather() {
+    public LanternWeather getWeather() {
         return this.weather;
     }
 

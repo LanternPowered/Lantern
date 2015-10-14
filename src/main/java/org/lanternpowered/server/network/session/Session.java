@@ -1,15 +1,11 @@
 package org.lanternpowered.server.network.session;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
-import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -26,7 +22,6 @@ import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameProfile;
-import org.lanternpowered.server.network.channel.LanternChannelBuf;
 import org.lanternpowered.server.network.message.AsyncHelper;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
@@ -40,8 +35,6 @@ import org.lanternpowered.server.network.vanilla.message.type.compression.Messag
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
-import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -622,23 +615,5 @@ public class Session implements PlayerConnection {
     @Override
     public int getPing() {
         return this.ping;
-    }
-
-    @Override
-    public void sendCustomPayload(Object plugin, String channel, byte[] data) {
-        LanternGame.get().getChannelRegistrar().validateChannel(plugin, channel);
-        if (!this.registeredChannels.contains(channel)) {
-            return;
-        }
-        this.send(new MessagePlayInOutChannelPayload(channel, Unpooled.wrappedBuffer(data)));
-    }
-
-    @Override
-    public void sendCustomPayload(Object plugin, String channel, ChannelBuf dataStream) {
-        LanternGame.get().getChannelRegistrar().validateChannel(plugin, channel);
-        if (!this.registeredChannels.contains(channel)) {
-            return;
-        }
-        this.send(new MessagePlayInOutChannelPayload(channel, ((LanternChannelBuf) dataStream).getDelegate()));
     }
 }

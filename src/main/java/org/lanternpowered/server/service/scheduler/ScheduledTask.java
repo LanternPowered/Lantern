@@ -1,6 +1,7 @@
 package org.lanternpowered.server.service.scheduler;
 
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.scheduler.Task;
@@ -17,7 +18,7 @@ public class ScheduledTask implements Task {
     final boolean delayIsTicks;
     final boolean intervalIsTicks;
     private final PluginContainer owner;
-    private final Runnable runnableBody;
+    private final Consumer<Task> executor;
     private long timestamp;
     private ScheduledTaskState state;
     private final UUID id;
@@ -51,7 +52,7 @@ public class ScheduledTask implements Task {
         }
     }
 
-    ScheduledTask(TaskSynchronicity syncType, Runnable task, String taskName, long delay, boolean delayIsTicks, long interval,
+    ScheduledTask(TaskSynchronicity syncType, Consumer<Task> executor, String taskName, long delay, boolean delayIsTicks, long interval,
             boolean intervalIsTicks, PluginContainer pluginContainer) {
         // All tasks begin waiting.
         this.setState(ScheduledTaskState.WAITING);
@@ -60,7 +61,7 @@ public class ScheduledTask implements Task {
         this.period = interval;
         this.intervalIsTicks = intervalIsTicks;
         this.owner = pluginContainer;
-        this.runnableBody = task;
+        this.executor = executor;
         this.id = UUID.randomUUID();
         this.name = taskName;
         this.syncType = syncType;
@@ -101,8 +102,8 @@ public class ScheduledTask implements Task {
     }
 
     @Override
-    public Runnable getRunnable() {
-        return this.runnableBody;
+    public Consumer<Task> getConsumer() {
+        return this.executor;
     }
 
     @Override
@@ -145,5 +146,4 @@ public class ScheduledTask implements Task {
         SYNCHRONOUS,
         ASYNCHRONOUS
     }
-
 }

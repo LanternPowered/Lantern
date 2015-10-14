@@ -2,109 +2,132 @@ package org.lanternpowered.server.network.channel;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+import static org.lanternpowered.server.util.Conditions.checkPlugin;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.network.ChannelListener;
+import org.spongepowered.api.network.ChannelBinding;
+import org.spongepowered.api.network.ChannelBinding.IndexedMessageChannel;
+import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.network.ChannelRegistrationException;
+import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public final class LanternChannelRegistrar implements ChannelRegistrar {
+public class LanternChannelRegistrar implements ChannelRegistrar {
 
-    private final Map<String, RegisteredChannel> channels = Maps.newConcurrentMap();
+    private final Map<String, LanternChannelBinding> bindings = Maps.newConcurrentMap();
     private final Server server;
-
-    public static final class RegisteredChannel {
-
-        private final ChannelListener listener;
-        private final PluginContainer plugin;
-        private final String channel;
-
-        private RegisteredChannel(String channel, PluginContainer plugin, ChannelListener listener) {
-            this.listener = listener;
-            this.channel = channel;
-            this.plugin = plugin;
-        }
-
-        public String getChannel() {
-            return this.channel;
-        }
-
-        public ChannelListener getListener() {
-            return this.listener;
-        }
-
-        public PluginContainer getPlugin() {
-            return this.plugin;
-        }
-    }
 
     public LanternChannelRegistrar(Server server) {
         this.server = server;
     }
 
     @Override
-    public void registerChannel(Object plugin, ChannelListener listener, String channel) throws ChannelRegistrationException {
+    public IndexedMessageChannel createChannel(Object plugin, String channel) throws ChannelRegistrationException {
+        return (IndexedMessageChannel) this.create(plugin, channel, false);
+    }
+
+    @Override
+    public LanternRawDataChannel createRawChannel(Object plugin, String channel) throws ChannelRegistrationException {
+        return (LanternRawDataChannel) this.create(plugin, channel, true);
+    }
+
+    private LanternChannelBinding create(Object plugin, String channel, boolean rawChannel) throws ChannelRegistrationException {
         PluginContainer container = checkPlugin(plugin, "plugin");
-        checkNotNull(listener, "listener");
         checkNotNullOrEmpty(channel, "channel");
         checkArgument(channel.length() <= 20, "channel length may not be longer then 20");
-        if (this.channels.containsKey(channel) || channel.startsWith("MC|") || channel.startsWith("\001") || channel.startsWith("FML")) {
+        if (!this.isChannelAvailable(channel)) {
             throw new ChannelRegistrationException("Channel with name \"" + channel + "\" is already registered!");
         }
-        this.channels.put(channel, new RegisteredChannel(channel, container, listener));
+        LanternChannelBinding binding;
+        if (rawChannel) {
+            binding = new LanternRawDataChannel(this, channel, container);
+        } else {
+            binding = new LanternIndexedMessageChannel(this, channel, container);
+        }
+        binding.bound = true;
         MessagePlayInOutRegisterChannels message = new MessagePlayInOutRegisterChannels(Sets.newHashSet(channel));
         for (Player player : this.server.getOnlinePlayers()) {
             ((Session) player.getConnection()).send(message);
         }
+        return binding;
     }
 
     @Override
-    public List<String> getRegisteredChannels() {
-        return ImmutableList.copyOf(this.channels.keySet());
+    public void unbindChannel(ChannelBinding channel) {
+        LanternChannelBinding binding = (LanternChannelBinding) checkNotNull(channel, "channel");
+        binding.bound = false;
+        this.bindings.remove(channel.getName());
     }
 
-    /**
-     * Gets the registered channel instance for the specified channel
-     * name, may return null if absent.
-     * 
-     * @param channel the channel name
-     * @return the registered channel
-     */
-    @Nullable
-    public RegisteredChannel getRegisteredChannel(String channel) {
-        return this.channels.get(checkNotNull(channel, "channel"));
+    @Override
+    public Set<String> getRegisteredChannels(Platform.Type side) {
+        return ImmutableSet.copyOf(this.bindings.keySet());
     }
 
-    /**
-     * Validates whether there is a specified channel registered
-     * with the specified plugin. Throws a exception when it is invalid.
-     * 
-     * @param plugin the plugin
-     * @param channel the channel
-     * @throws IllegalStateException
-     */
-    public void validateChannel(Object plugin, String channel) {
-        PluginContainer container = checkPlugin(plugin, "plugin");
-        checkNotNull(channel, "channel");
-        checkState(this.channels.containsKey(channel), "Channel " + channel + " is not registered.");
-        RegisteredChannel registration = this.channels.get(channel);
-        checkState(registration.plugin == container, "The provided plugin doesn't match the one"
-                + " of the registration. (Got " + container.getId() + ", expected " + registration.plugin.getId() + ")");
+    @Override
+    public boolean isChannelAvailable(String channelName) {
+        if (this.bindings.containsKey(channelName) || channelName.startsWith("MC|") ||
+                channelName.startsWith("\001") || channelName.startsWith("FML")) {
+            return false;
+        }
+        return true;
+    }
+
+    void sendPayloadChannelBuf(Player player, String channel, Consumer<ChannelBuf> payload) {
+        this.sendPayloadToAll(channel, buf -> payload.accept(new LanternChannelBuf(buf)));
+    }
+
+    void sendPayload(Player player, String channel, Consumer<ByteBuf> payload) {
+        checkNotNull(player, "player");
+        checkNotNull(payload, "payload");
+        Session session = ((LanternPlayer) player).getConnection();
+        if (session.getRegisteredChannels().contains(channel)) {
+            ByteBuf buf = Unpooled.buffer();
+            payload.accept(buf);
+            session.send(new MessagePlayInOutChannelPayload(channel, buf));
+        }
+    }
+
+    void sendPayloadToAllChannelBuf(String channel, Consumer<ChannelBuf> payload) {
+        this.sendPayloadToAll(channel, buf -> payload.accept(new LanternChannelBuf(buf)));
+    }
+
+    void sendPayloadToAll(String channel, Consumer<ByteBuf> payload) {
+        checkNotNull(payload, "payload");
+        Iterator<Player> players = this.server.getOnlinePlayers().stream().filter(
+                player -> ((LanternPlayer) player).getConnection().getRegisteredChannels().contains(channel)).iterator();
+        if (players.hasNext()) {
+            ByteBuf buf = Unpooled.buffer();
+            payload.accept(buf);
+            Message msg = new MessagePlayInOutChannelPayload(channel, buf);
+            players.forEachRemaining(player -> ((LanternPlayer) player).getConnection().send(msg));
+        }
+    }
+
+    public void handlePlayload(ByteBuf buf, String channel, RemoteConnection connection) {
+        LanternChannelBinding binding = this.bindings.get(channel);
+        if (binding != null) {
+            binding.handlePayload(buf, connection);
+        }
     }
 }

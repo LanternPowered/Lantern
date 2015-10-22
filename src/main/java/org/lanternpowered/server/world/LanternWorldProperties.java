@@ -1,3 +1,27 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) Contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -45,6 +69,9 @@ public class LanternWorldProperties implements WorldProperties {
     // This is a map added by sponge, not sure what it is supposed to do yet
     final List<UUID> pendingUniqueIds = Lists.newArrayList();
 
+    // The settings that were used to create the properties
+    @Nullable final LanternWorldCreationSettings creationSettings;
+
     // The extra properties
     DataContainer properties;
 
@@ -88,8 +115,7 @@ public class LanternWorldProperties implements WorldProperties {
     long time;
     long age;
 
-    @Nullable
-    private LanternWorld world;
+    @Nullable private LanternWorld world;
 
     // World border properties
     double borderCenterX;
@@ -115,6 +141,51 @@ public class LanternWorldProperties implements WorldProperties {
 
     // The last time the world was played in
     private long lastPlayed;
+
+    // Custom properties (the ones moved from the dimension instances)
+    boolean waterEvaporates;
+    boolean allowPlayerRespawns;
+
+    int buildHeight;
+
+    public LanternWorldProperties(@Nullable LanternWorldCreationSettings creationSettings) {
+        this.creationSettings = creationSettings;
+        if (creationSettings != null) {
+            this.keepSpawnLoaded = creationSettings.doesKeepSpawnLoaded();
+            this.commandsAllowed = creationSettings.commandsAllowed();
+            this.hardcore = creationSettings.isHardcore();
+            this.dimensionType = creationSettings.getDimensionType();
+            this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();
+            this.setGeneratorModifiers(creationSettings.getGeneratorModifiers());
+            this.gameMode = creationSettings.getGameMode();
+            this.enabled = creationSettings.isEnabled();
+            this.name = creationSettings.getWorldName();
+        }
+    }
+
+    public boolean doesWaterEvaporate() {
+        return this.waterEvaporates;
+    }
+
+    public void setWaterEvaporates(boolean evaporates) {
+        this.waterEvaporates = evaporates;
+    }
+
+    public boolean allowsPlayerRespawns() {
+        return this.allowPlayerRespawns;
+    }
+
+    public void setAllowsPlayerRespawns(boolean allow) {
+        this.allowPlayerRespawns = allow;
+    }
+
+    public int getBuildHeight() {
+        return this.buildHeight;
+    }
+
+    public void setBuildHeight(int buildHeight) {
+        this.buildHeight = buildHeight;
+    }
 
     long getLastPlayedTime() {
         if (this.world != null) {

@@ -1,3 +1,27 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) Contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.world.LanternWorld;
@@ -6,22 +30,16 @@ import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 
-public class LanternDimension implements Dimension {
+public abstract class LanternDimension implements Dimension {
 
     private final String name;
     private final LanternDimensionType dimensionType;
     private final LanternWorld world;
-    private final int buildHeight;
 
     private volatile Context dimContext;
 
-    private boolean allowPlayerRespawns = true;
-    private boolean waterEvaporates = false;
-
-    public LanternDimension(LanternWorld world, String name, LanternDimensionType dimensionType,
-            int buildHeight) {
+    public LanternDimension(LanternWorld world, String name, LanternDimensionType dimensionType) {
         this.dimensionType = dimensionType;
-        this.buildHeight = buildHeight;
         this.world = world;
         this.name = name;
     }
@@ -41,28 +59,27 @@ public class LanternDimension implements Dimension {
 
     @Override
     public boolean allowsPlayerRespawns() {
-        return this.allowPlayerRespawns;
+        return this.world.getProperties().allowsPlayerRespawns();
     }
 
     @Override
     public void setAllowsPlayerRespawns(boolean allow) {
-        this.allowPlayerRespawns = allow;
+        this.world.getProperties().setAllowsPlayerRespawns(allow);
     }
 
     @Override
     public int getMinimumSpawnHeight() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.getGeneratorType().getGeneratorHeight();
     }
 
     @Override
     public boolean doesWaterEvaporate() {
-        return this.waterEvaporates;
+        return this.world.getProperties().doesWaterEvaporate();
     }
 
     @Override
     public void setWaterEvaporates(boolean evaporates) {
-        this.waterEvaporates = evaporates;
+        this.world.getProperties().setWaterEvaporates(evaporates);
     }
 
     @Override
@@ -82,12 +99,11 @@ public class LanternDimension implements Dimension {
 
     @Override
     public int getBuildHeight() {
-        return this.buildHeight;
+        return this.world.getProperties().getBuildHeight();
     }
 
     @Override
     public LanternGeneratorType getGeneratorType() {
-        // TODO: Is this supposed to return this?
         return this.world.getProperties().getGeneratorType();
     }
 }

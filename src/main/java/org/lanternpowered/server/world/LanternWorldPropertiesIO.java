@@ -1,3 +1,27 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) Contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.world;
 
 import java.io.DataInputStream;
@@ -87,6 +111,9 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
 
     // Lantern properties
+    private final static DataQuery WATER_EVAPORATES = DataQuery.of("waterEvaporates");
+    private final static DataQuery ALLOW_PLAYER_RESPAWNS = DataQuery.of("allowPlayerRespawns");
+    private final static DataQuery BUILD_HEIGHT = DataQuery.of("buildHeight");
 
     private LanternWorldPropertiesIO() {
     }
@@ -155,7 +182,7 @@ public class LanternWorldPropertiesIO {
             worldName = dataView.getString(NAME).get();
         }
 
-        LanternWorldProperties properties = new LanternWorldProperties();
+        LanternWorldProperties properties = new LanternWorldProperties(null);
         properties.uniqueId = uuid;
         properties.name = worldName;
         properties.seed = dataView.getLong(SEED).get();
@@ -256,6 +283,17 @@ public class LanternWorldPropertiesIO {
                     long least = view.getLong(UUID_LEAST).get();
                     properties.pendingUniqueIds.add(new UUID(most, least));
                 }
+            }
+
+            // Lantern properties, store them for now in the sponge data file
+            if (spongeContainer.contains(ALLOW_PLAYER_RESPAWNS)) {
+                properties.allowPlayerRespawns = spongeContainer.getInt(ALLOW_PLAYER_RESPAWNS).get() > 0;
+            }
+            if (spongeContainer.contains(WATER_EVAPORATES)) {
+                properties.waterEvaporates = spongeContainer.getInt(WATER_EVAPORATES).get() > 0;
+            }
+            if (spongeContainer.contains(BUILD_HEIGHT)) {
+                properties.buildHeight = spongeContainer.getInt(BUILD_HEIGHT).get();
             }
         } else {
             properties.properties = new MemoryDataContainer();

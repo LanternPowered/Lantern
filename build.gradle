@@ -1,16 +1,13 @@
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
-    }
+plugins {
+    id "com.github.hierynomus.license" version "0.12.0"
+    id "com.github.johnrengelman.shadow" version "1.2.2"
 }
 
 // Apply plugin
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
+apply plugin: 'license'
 
 // Apply shadow plugin
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -80,6 +77,12 @@ jar {
     }
 }
 
+test {
+    testLogging {
+        exceptionFormat = 'full' // Always print full stack trace if something goes wrong in the unit tests
+    }
+}
+
 shadowJar {
     classifier = ''
 
@@ -135,3 +138,22 @@ shadowJar {
 
 // Run shadowJar on build
 assemble.dependsOn shadowJar
+
+license {
+    header project.file('HEADER.txt')
+    sourceSets = project.sourceSets
+    include '**/*.java'
+
+    strictCheck true
+    ignoreFailures = false
+
+	ext {
+        name = project.name
+        url = project.url
+        organization = project.organization
+    }
+
+	mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}

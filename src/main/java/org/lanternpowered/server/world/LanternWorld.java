@@ -1,3 +1,27 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) Contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.world;
 
 import java.util.Collection;
@@ -18,7 +42,6 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.LanternChunk;
@@ -91,6 +114,9 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     public static final Vector2i BIOME_MAX = BLOCK_MAX.toVector2(true);
     public static final Vector2i BIOME_SIZE = BIOME_MAX.sub(BIOME_MIN).add(1, 1);
 
+    // The shared player simulator, without an actual player attached to it
+    private final LanternPlayerSimulator sharedPlayerSimulator = new LanternPlayerSimulator(this, null);
+
     // The game instance
     final LanternGame game;
 
@@ -99,22 +125,16 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     // The weather universe
     // TODO: This can be null depending on whether the sky can use weather
-    @Nullable
-    final LanternWeatherUniverse weatherUniverse = new LanternWeatherUniverse(this);
+    @Nullable final LanternWeatherUniverse weatherUniverse = new LanternWeatherUniverse(this);
 
     private final LanternChunkManager chunkManager = null;
     final LanternWorldProperties properties = null;
 
-    private final String name;
-    private final UUID uniqueId;
-
     private final TeleporterAgent teleporterAgent = null;
     private Context worldContext;
 
-    public LanternWorld(LanternGame game, String name, UUID uniqueId) {
-        this.uniqueId = uniqueId;
+    public LanternWorld(LanternGame game) {
         this.game = game;
-        this.name = name;
     }
 
     /**
@@ -491,7 +511,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public UUID getUniqueId() {
-        return this.uniqueId;
+        return this.properties.uniqueId;
     }
 
     @Override
@@ -595,24 +615,6 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     }
 
     @Override
-    public void resetTitle() {
-        List<LanternPlayer> players = this.getPlayers();
-        if (!players.isEmpty()) {
-            Message message = new MessagePlayOutTitle.Reset();
-            players.forEach(player -> player.getConnection().send(message));
-        }
-    }
-
-    @Override
-    public void clearTitle() {
-        List<LanternPlayer> players = this.getPlayers();
-        if (!players.isEmpty()) {
-            Message message = new MessagePlayOutTitle.Clear();
-            players.forEach(player -> player.getConnection().send(message));
-        }
-    }
-
-    @Override
     public Context getContext() {
         if (this.worldContext == null) {
             this.worldContext = new Context(Context.WORLD_KEY, this.getName());
@@ -637,7 +639,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public String getName() {
-        return this.name;
+        return this.properties.name;
     }
 
     @Override
@@ -785,8 +787,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public PlayerSimulator getPlayerSimulator() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.sharedPlayerSimulator;
     }
 
     public void pulse() {

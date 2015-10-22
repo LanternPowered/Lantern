@@ -1,3 +1,27 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) Contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
 package org.lanternpowered.server.game;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -62,9 +86,12 @@ import org.lanternpowered.server.text.sink.LanternMessageSinkFactory;
 import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.rotation.LanternRotation;
+import org.lanternpowered.server.world.LanternWeather;
+import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeRegistry;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.lanternpowered.server.world.dimension.LanternDimension;
 import org.lanternpowered.server.world.dimension.LanternDimensionEnd;
 import org.lanternpowered.server.world.dimension.LanternDimensionNether;
 import org.lanternpowered.server.world.dimension.LanternDimensionOverworld;
@@ -73,6 +100,7 @@ import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.lanternpowered.server.world.gen.LanternGeneratorTypeNether;
 import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
+import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameProfile;
@@ -129,6 +157,7 @@ import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCauseBuilder;
 import org.spongepowered.api.event.cause.entity.spawn.MobSpawnerSpawnCauseBuilder;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCauseBuilder;
 import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCauseBuilder;
+import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
 import org.spongepowered.api.item.FireworkEffectBuilder;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackBuilder;
@@ -183,6 +212,8 @@ import org.spongepowered.api.world.gamerule.DefaultGameRules;
 import org.spongepowered.api.world.gen.PopulatorFactory;
 import org.spongepowered.api.world.gen.PopulatorType;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
+import org.spongepowered.api.world.weather.Weather;
+import org.spongepowered.api.world.weather.Weathers;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -224,6 +255,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final CatalogTypeRegistry<StoneType> stoneTypeRegistry = new LanternCatalogTypeRegistry<StoneType>();
     private final CatalogTypeRegistry<ParticleType> particleTypeRegistry = new LanternCatalogTypeRegistry<ParticleType>();
     private final CatalogTypeRegistry<PopulatorType> populatorTypeRegistry = new LanternCatalogTypeRegistry<PopulatorType>();
+    private final CatalogTypeRegistry<LanternWeather> weatherRegistry = new LanternCatalogTypeRegistry<LanternWeather>();
     private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
             .put(Attribute.class, this.attributeRegistry)
             .put(BiomeType.class, this.biomeRegistry)
@@ -249,6 +281,7 @@ public class LanternGameRegistry implements GameRegistry {
             .put(StoneType.class, this.stoneTypeRegistry)
             .put(ParticleType.class, this.particleTypeRegistry)
             .put(PopulatorType.class, this.populatorTypeRegistry)
+            .put(Weather.class, this.weatherRegistry)
             .build();
     private final Map<Class<?>, BuilderFactory> builderFactories = ImmutableMap.<Class<?>, BuilderFactory>builder()
             .put(AttributeBuilder.class, type -> createAttributeBuilder())
@@ -280,6 +313,7 @@ public class LanternGameRegistry implements GameRegistry {
             throw new IllegalStateException("You can only register the game objects once!");
         }
         this.registered = true;
+        this.registerWeathers();
         this.registerParticleTypes();
         this.registerTextFactory();
         this.registerTextStyles();
@@ -292,6 +326,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerDirtTypes();
         this.registerStoneTypes();
         this.registerNotePitches();
+        this.registerGeneratorModifiers();
         this.registerGeneratorTypes();
         this.registerDimensionTypes();
         this.registerDifficulties();
@@ -302,6 +337,15 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerBlockTypes();
     }
 
+    private void registerWeathers() {
+        Map<String, LanternWeather> mappings = Maps.newHashMap();
+        mappings.put("clear", new LanternWeather("minecraft", "clear", 0f, 0f, 0f, 0f));
+        mappings.put("rain", new LanternWeather("minecraft", "rain", 1f, 0f, 0f, 0f));
+        mappings.put("thunder_storm", new LanternWeather("minecraft", "thunderStorm", 1f, 1f, 0.00001f, 0.00001f));
+        mappings.forEach((key, value) -> this.weatherRegistry.register(value));
+        RegistryHelper.mapFields(Weathers.class, mappings);
+    }
+ 
     private void registerParticleTypes() {
         Map<String, ParticleType> mappings = Maps.newHashMap();
         mappings.put("explosion_normal", new LanternParticleType(0, "explode", true));
@@ -346,9 +390,7 @@ public class LanternGameRegistry implements GameRegistry {
         mappings.put("water_drop", new LanternParticleType(39, "droplet", false));
         mappings.put("item_take", new LanternParticleType(40, "take", false));
         mappings.put("mob_appearance", new LanternParticleType(41, "mobappearance", false));
-        for (ParticleType particleType : mappings.values()) {
-            this.particleTypeRegistry.register(particleType);
-        }
+        mappings.forEach((key, value) -> this.particleTypeRegistry.register(value));
         RegistryHelper.mapFields(ParticleTypes.class, this.particleTypeRegistry.getDelegateMap());
     }
 
@@ -387,20 +429,40 @@ public class LanternGameRegistry implements GameRegistry {
         RegistryHelper.mapFields(ShrubTypes.class, this.shrubTypeRegistry.getDelegateMap());
     }
 
+    private void registerGeneratorModifiers() {
+        this.worldGeneratorModifierRegistry.register(new SkylandsWorldGeneratorModifier());
+    }
+
     private void registerGeneratorTypes() {
-        this.generatorTypeRegistry.register(new LanternGeneratorTypeNether("nether"));
-        this.generatorTypeRegistry.register(new FlatGeneratorType("flat"));
-        this.generatorTypeRegistry.register(new DebugGeneratorType("debug"));
+        this.generatorTypeRegistry.register(new LanternGeneratorTypeNether("minecraft", "nether"));
+        this.generatorTypeRegistry.register(new FlatGeneratorType("minecraft", "flat"));
+        this.generatorTypeRegistry.register(new DebugGeneratorType("minecraft", "debug"));
+        this.generatorTypeRegistry.register(new SkylandsGeneratorType("sponge", "skylands"));
         RegistryHelper.mapFields(GeneratorTypes.class, this.generatorTypeRegistry.getDelegateMap());
     }
 
     private void registerDimensionTypes() {
-        this.dimensionTypeRegistry.register(new LanternDimensionType("end", -1,
-                LanternDimensionEnd.class, true, false, false));
-        this.dimensionTypeRegistry.register(new LanternDimensionType("overworld", 0,
-                LanternDimensionOverworld.class, true, false, true));
-        this.dimensionTypeRegistry.register(new LanternDimensionType("nether", 1,
-                LanternDimensionNether.class, false, true, false));
+        this.dimensionTypeRegistry.register(new LanternDimensionType("minecraft", "end", -1,
+                LanternDimensionEnd.class, true, false, false) {
+                    @Override
+                    public LanternDimension create(LanternWorld world) {
+                        return new LanternDimensionEnd(world, this.getName(), this);
+                    }
+        });
+        this.dimensionTypeRegistry.register(new LanternDimensionType("minecraft", "overworld", 0,
+                LanternDimensionOverworld.class, true, false, true) {
+                    @Override
+                    public LanternDimension create(LanternWorld world) {
+                        return new LanternDimensionOverworld(world, this.getName(), this);
+                    }
+        });
+        this.dimensionTypeRegistry.register(new LanternDimensionType("minecraft", "nether", 1,
+                LanternDimensionNether.class, false, true, false) {
+                    @Override
+                    public LanternDimension create(LanternWorld world) {
+                        return new LanternDimensionNether(world, this.getName(), this);
+                    }
+        });
         RegistryHelper.mapFields(DimensionTypes.class, this.dimensionTypeRegistry.getDelegateMap());
     }
 

@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -27,8 +27,6 @@ package org.lanternpowered.server.attribute;
 import java.util.function.Predicate;
 
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
-import org.spongepowered.api.attribute.Attribute;
-import org.spongepowered.api.attribute.AttributeBuilder;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
 
@@ -36,9 +34,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-public final class LanternAttributeBuilder implements AttributeBuilder {
+public final class LanternAttributeBuilder {
 
-    private final CatalogTypeRegistry<Attribute> registry;
+    private final CatalogTypeRegistry<LanternAttribute> registry;
 
     private String identifier;
     private Text name;
@@ -49,49 +47,42 @@ public final class LanternAttributeBuilder implements AttributeBuilder {
 
     private Predicate<DataHolder> targets;
 
-    public LanternAttributeBuilder(CatalogTypeRegistry<Attribute> registry) {
+    public LanternAttributeBuilder(CatalogTypeRegistry<LanternAttribute> registry) {
         this.registry = checkNotNull(registry, "registry");
         this.reset();
     }
 
-    @Override
-    public AttributeBuilder id(String id) {
+    public LanternAttributeBuilder id(String id) {
         this.identifier = checkNotNullOrEmpty(id, "identifier");
         return this;
     }
 
-    @Override
-    public AttributeBuilder minimum(double minimum) {
+    public LanternAttributeBuilder minimum(double minimum) {
         this.min = minimum;
         return this;
     }
 
-    @Override
-    public AttributeBuilder maximum(double maximum) {
+    public LanternAttributeBuilder maximum(double maximum) {
         this.max = maximum;
         return this;
     }
 
-    @Override
-    public AttributeBuilder defaultValue(double defaultValue) {
+    public LanternAttributeBuilder defaultValue(double defaultValue) {
         this.def = defaultValue;
         return this;
     }
 
-    @Override
-    public AttributeBuilder targets(Predicate<DataHolder> targets) {
+    public LanternAttributeBuilder targets(Predicate<DataHolder> targets) {
         this.targets = checkNotNull(targets, "targets");
         return this;
     }
 
-    @Override
-    public AttributeBuilder name(Text name) {
+    public LanternAttributeBuilder name(Text name) {
         this.name = checkNotNull(name, "name");
         return this;
     }
 
-    @Override
-    public Attribute build() {
+    public LanternAttribute build() {
         checkState(this.identifier != null, "identifier is not set");
         checkState(!this.registry.get(this.identifier).isPresent(), "identifier already in use");
         checkState(this.name != null, "name is not set");
@@ -104,8 +95,7 @@ public final class LanternAttributeBuilder implements AttributeBuilder {
         return attribute;
     }
 
-    @Override
-    public AttributeBuilder reset() {
+    public LanternAttributeBuilder reset() {
         this.targets = target -> true;
         this.identifier = null;
         this.name = null;

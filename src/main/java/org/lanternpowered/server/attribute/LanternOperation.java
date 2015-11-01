@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -25,9 +25,8 @@
 package org.lanternpowered.server.attribute;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.spongepowered.api.attribute.Operation;
 
-public class LanternOperation extends SimpleLanternCatalogType implements Operation {
+public class LanternOperation extends SimpleLanternCatalogType implements Comparable<LanternOperation> {
 
     private final int priority;
     private final boolean changeValueImmediately;
@@ -44,19 +43,17 @@ public class LanternOperation extends SimpleLanternCatalogType implements Operat
     }
 
     @Override
-    public int compareTo(Operation operation) {
+    public int compareTo(LanternOperation operation) {
         if (operation instanceof LanternOperation) {
             return this.priority - ((LanternOperation) operation).priority;
         }
         return operation.compareTo(this);
     }
 
-    @Override
     public double getIncrementation(double base, double modifier, double currentValue) {
         return this.function.getIncrementation(base, modifier, currentValue);
     }
 
-    @Override
     public boolean changeValueImmediately() {
         return this.changeValueImmediately;
     }

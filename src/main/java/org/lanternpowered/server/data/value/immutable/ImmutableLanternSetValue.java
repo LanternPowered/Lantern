@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -62,10 +62,9 @@ public class ImmutableLanternSetValue<E> extends ImmutableLanternCollectionValue
         return new ImmutableLanternSetValue<E>(getKey(), checkNotNull(checkNotNull(function).apply(this.actualValue)));
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public ImmutableSetValue<E> with(E... elements) {
-        return new ImmutableLanternSetValue<E>(getKey(), ImmutableSet.<E>builder().addAll(this.actualValue).add(elements).build());
+    public ImmutableSetValue<E> withElement(E element) {
+        return new ImmutableLanternSetValue<E>(getKey(), ImmutableSet.<E>builder().addAll(this.actualValue).add(element).build());
     }
 
     @Override

@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -27,40 +27,32 @@ package org.lanternpowered.server.attribute;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.spongepowered.api.attribute.AttributeModifier;
-import org.spongepowered.api.attribute.AttributeModifierBuilder;
-import org.spongepowered.api.attribute.Operation;
-
-public final class LanternAttributeModifierBuilder implements AttributeModifierBuilder {
+public final class LanternAttributeModifierBuilder {
 
     private Double value;
-    private Operation operation;
+    private LanternOperation operation;
 
     /**
      * How can you check whether the value scales between the min and max value
      * if there is no way to access the attribute?
      */
-    @Override
-    public AttributeModifierBuilder value(double value) throws IllegalArgumentException {
+    public LanternAttributeModifierBuilder value(double value) throws IllegalArgumentException {
         this.value = value;
         return this;
     }
 
-    @Override
-    public AttributeModifierBuilder operation(Operation operation) {
+    public LanternAttributeModifierBuilder operation(LanternOperation operation) {
         this.operation = checkNotNull(operation, "operation");
         return this;
     }
 
-    @Override
-    public AttributeModifier build() {
+    public LanternAttributeModifier build() {
         checkState(this.value != null, "value is not set");
         checkState(this.operation != null, "operation is not set");
         return new LanternAttributeModifier(this.operation, this.value);
     }
 
-    @Override
-    public AttributeModifierBuilder reset() {
+    public LanternAttributeModifierBuilder reset() {
         this.value = null;
         this.operation = null;
         return this;

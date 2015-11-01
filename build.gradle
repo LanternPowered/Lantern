@@ -133,7 +133,7 @@ shadowJar {
         include dependency('org.xerial:sqlite-jdbc')
     }
 
-    exclude 'LICENSE', 'NOTICE'
+   	exclude 'LICENSE', 'NOTICE'
 }
 
 // Run shadowJar on build

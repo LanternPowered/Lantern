@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -26,25 +26,20 @@ package org.lanternpowered.server.attribute;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.attribute.AttributeModifier;
-import org.spongepowered.api.attribute.Operation;
+public class LanternAttributeModifier {
 
-public class LanternAttributeModifier implements AttributeModifier {
-
-    private final Operation operation;
+    private final LanternOperation operation;
     private final double value;
 
-    public LanternAttributeModifier(Operation operation, double value) {
+    public LanternAttributeModifier(LanternOperation operation, double value) {
         this.operation = checkNotNull(operation, "operation");
         this.value = value;
     }
 
-    @Override
-    public Operation getOperation() {
+    public LanternOperation getOperation() {
         return this.operation;
     }
 
-    @Override
     public double getValue() {
         return this.value;
     }

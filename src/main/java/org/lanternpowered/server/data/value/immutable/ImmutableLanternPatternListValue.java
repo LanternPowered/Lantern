@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -69,8 +69,8 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
     }
 
     @Override
-    public ImmutablePatternListValue with(PatternLayer... elements) {
-        return new ImmutableLanternPatternListValue(getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).add(elements).build());
+    public ImmutablePatternListValue withElement(PatternLayer element) {
+        return new ImmutableLanternPatternListValue(getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).add(element).build());
     }
 
     @Override
@@ -165,7 +165,7 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
 
     @Override
     public ImmutablePatternListValue with(BannerPatternShape patternShape, DyeColor color) {
-        return with(new LanternPatternLayer(patternShape, color));
+        return withElement(new LanternPatternLayer(patternShape, color));
     }
 
     @Override

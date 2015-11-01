@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -29,12 +29,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.function.Predicate;
 
 import org.lanternpowered.server.catalog.LanternCatalogType;
-import org.spongepowered.api.attribute.Attribute;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-public class LanternAttribute extends LanternCatalogType implements Attribute {
+public class LanternAttribute extends LanternCatalogType {
 
     private final Text name;
     private final Predicate<DataHolder> targets;
@@ -55,22 +54,18 @@ public class LanternAttribute extends LanternCatalogType implements Attribute {
         this.def = def;
     }
 
-    @Override
     public double getMinimum() {
         return this.min;
     }
 
-    @Override
     public double getMaximum() {
         return this.max;
     }
 
-    @Override
     public double getDefaultValue() {
         return this.def;
     }
 
-    @Override
     public Predicate<DataHolder> getTargets() {
         return this.targets;
     }

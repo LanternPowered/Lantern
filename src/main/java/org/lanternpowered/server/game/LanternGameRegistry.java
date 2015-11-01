@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -44,6 +44,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import org.lanternpowered.server.attribute.AttributeTargets;
+import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternAttributeModifierBuilder;
@@ -105,14 +107,6 @@ import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.GameRegistry;
-import org.spongepowered.api.attribute.Attribute;
-import org.spongepowered.api.attribute.AttributeBuilder;
-import org.spongepowered.api.attribute.AttributeCalculator;
-import org.spongepowered.api.attribute.AttributeModifierBuilder;
-import org.spongepowered.api.attribute.AttributeTargets;
-import org.spongepowered.api.attribute.Attributes;
-import org.spongepowered.api.attribute.Operation;
-import org.spongepowered.api.attribute.Operations;
 import org.spongepowered.api.block.BlockSnapshotBuilder;
 import org.spongepowered.api.block.BlockStateBuilder;
 import org.spongepowered.api.block.BlockType;
@@ -236,8 +230,8 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternItemRegistry itemRegistry = new LanternItemRegistry();
     private final CatalogTypeRegistry<Difficulty> difficultyRegistry = new LanternCatalogTypeRegistry<Difficulty>();
     private final CatalogTypeRegistry<GameMode> gameModeRegistry = new LanternCatalogTypeRegistry<GameMode>();
-    private final CatalogTypeRegistry<Attribute> attributeRegistry = new LanternCatalogTypeRegistry<Attribute>();
-    private final CatalogTypeRegistry<Operation> attributeOperationRegistry = new LanternCatalogTypeRegistry<Operation>();
+    private final CatalogTypeRegistry<LanternAttribute> attributeRegistry = new LanternCatalogTypeRegistry<LanternAttribute>();
+    private final CatalogTypeRegistry<LanternOperation> attributeOperationRegistry = new LanternCatalogTypeRegistry<LanternOperation>();
     private final CatalogTypeRegistry<TextColor> textColorRegistry = new LanternCatalogTypeRegistry<TextColor>();
     private final CatalogTypeRegistry<TextStyle.Base> textStyleRegistry = new LanternCatalogTypeRegistry<TextStyle.Base>();
     private final CatalogTypeRegistry<WorldGeneratorModifier> worldGeneratorModifierRegistry =
@@ -257,7 +251,8 @@ public class LanternGameRegistry implements GameRegistry {
     private final CatalogTypeRegistry<PopulatorType> populatorTypeRegistry = new LanternCatalogTypeRegistry<PopulatorType>();
     private final CatalogTypeRegistry<LanternWeather> weatherRegistry = new LanternCatalogTypeRegistry<LanternWeather>();
     private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
-            .put(Attribute.class, this.attributeRegistry)
+            .put(LanternAttribute.class, this.attributeRegistry)
+            .put(LanternOperation.class, this.attributeOperationRegistry)
             .put(BiomeType.class, this.biomeRegistry)
             .put(BlockType.class, this.blockRegistry)
             .put(ItemType.class, this.itemRegistry)
@@ -284,7 +279,7 @@ public class LanternGameRegistry implements GameRegistry {
             .put(Weather.class, this.weatherRegistry)
             .build();
     private final Map<Class<?>, BuilderFactory> builderFactories = ImmutableMap.<Class<?>, BuilderFactory>builder()
-            .put(AttributeBuilder.class, type -> createAttributeBuilder())
+            .put(LanternAttributeBuilder.class, type -> createAttributeBuilder())
             .put(WorldBuilder.class, type -> createWorldBuilder())
             .build();
 
@@ -473,13 +468,13 @@ public class LanternGameRegistry implements GameRegistry {
                 (base, modifier, current) -> current * modifier - current));
         this.attributeOperationRegistry.register(new LanternOperation("multiply_base", 1, false,
                 (base, modifier, current) -> base * modifier - current));
-        RegistryHelper.mapFields(Operations.class, this.attributeOperationRegistry.getDelegateMap());
+        // RegistryHelper.mapFields(Operations.class, this.attributeOperationRegistry.getDelegateMap());
         Map<String, Predicate<DataHolder>> targetMappings = Maps.newHashMap();
         targetMappings.put("generic", target -> target instanceof Living);
         targetMappings.put("horse", target -> target instanceof Horse);
         targetMappings.put("zombie", target -> target instanceof Zombie);
         RegistryHelper.mapFields(AttributeTargets.class, targetMappings);
-        Map<String, Attribute> mappings = Maps.newHashMap();
+        Map<String, LanternAttribute> mappings = Maps.newHashMap();
         mappings.put("GENERIC_ARMOR", this.registerDefaultAttribute(
                 "generic.armor", 0.0, 0.0, Double.MAX_VALUE, AttributeTargets.GENERIC));
         mappings.put("GENERIC_MAX_HEALTH", this.registerDefaultAttribute(
@@ -498,10 +493,10 @@ public class LanternGameRegistry implements GameRegistry {
                 "horse.jumpStrength", 0.7D, 0.0D, 2.0D, AttributeTargets.HORSE));
         mappings.put("ZOMBIE_SPAWN_REINFORCEMENTS", this.registerDefaultAttribute(
                 "zombie.spawnReinforcements", 0.0D, 0.0D, 1.0D, AttributeTargets.ZOMBIE));
-        RegistryHelper.mapFields(Attributes.class, mappings);
+        // RegistryHelper.mapFields(Attributes.class, mappings);
     }
 
-    private Attribute registerDefaultAttribute(String id, double def, double min, double max, Predicate<DataHolder> targets) {
+    private LanternAttribute registerDefaultAttribute(String id, double def, double min, double max, Predicate<DataHolder> targets) {
         return this.createAttributeBuilder().id(id)
                 .defaultValue(def)
                 .maximum(max)
@@ -960,7 +955,7 @@ public class LanternGameRegistry implements GameRegistry {
      * 
      * @return the attribute registry
      */
-    public CatalogTypeRegistry<Attribute> getAttributeRegistry() {
+    public CatalogTypeRegistry<LanternAttribute> getAttributeRegistry() {
         return this.attributeRegistry;
     }
 
@@ -1027,8 +1022,7 @@ public class LanternGameRegistry implements GameRegistry {
         return ImmutableList.of();
     }
 
-    @Override
-    public AttributeCalculator getAttributeCalculator() {
+    public LanternAttributeCalculator getAttributeCalculator() {
         return this.attributeCalculator;
     }
 
@@ -1250,13 +1244,11 @@ public class LanternGameRegistry implements GameRegistry {
         return null;
     }
 
-    @Override
-    public AttributeModifierBuilder createAttributeModifierBuilder() {
+    public LanternAttributeModifierBuilder createAttributeModifierBuilder() {
         return new LanternAttributeModifierBuilder();
     }
 
-    @Override
-    public AttributeBuilder createAttributeBuilder() {
+    public LanternAttributeBuilder createAttributeBuilder() {
         return new LanternAttributeBuilder(this.attributeRegistry);
     }
 

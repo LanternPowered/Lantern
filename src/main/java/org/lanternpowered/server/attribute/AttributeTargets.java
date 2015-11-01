@@ -22,32 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.status;
+package org.lanternpowered.server.attribute;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.util.function.Predicate;
 
-import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.data.DataHolder;
 
-public final class MessageStatusOutResponse implements Message {
+public class AttributeTargets {
 
-    private final String response;
-
-    /**
-     * Creates a status response.
-     * 
-     * @param response The json response
-     */
-    public MessageStatusOutResponse(String response) {
-        this.response = checkNotNull(response, "response");
-    }
-
-    /**
-     * Gets the json response.
-     * 
-     * @return The json response
-     */
-    public String getResponse() {
-        return this.response;
-    }
-
+    public static final Predicate<DataHolder> GENERIC = null;
+    public static final Predicate<DataHolder> HORSE = null;
+    public static final Predicate<DataHolder> ZOMBIE = null;
 }

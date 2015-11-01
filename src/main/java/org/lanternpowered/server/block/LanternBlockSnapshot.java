@@ -7,7 +7,7 @@
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal
  * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and or sell
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions
  *
@@ -40,6 +40,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -77,13 +78,19 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     @Override
     public DataContainer toContainer() {
         return new MemoryDataContainer()
-            .set(Location.WORLD_ID, this.world.getUniqueId().toString())
+            .set(Queries.WORLD_ID, this.world.getUniqueId().toString())
             .createView(DataQueries.SNAPSHOT_WORLD_POSITION)
-                .set(Location.POSITION_X, this.position.getX())
-                .set(Location.POSITION_Y, this.position.getY())
-                .set(Location.POSITION_Z, this.position.getZ())
+                .set(Queries.POSITION_X, this.position.getX())
+                .set(Queries.POSITION_Y, this.position.getY())
+                .set(Queries.POSITION_Z, this.position.getZ())
             .getContainer()
             .set(DataQueries.BLOCK_STATE, this.state);
+    }
+
+    @Override
+    public BlockState getExtendedState() {
+        // TODO Auto-generated method stub
+        return this.state;
     }
 
     @Override

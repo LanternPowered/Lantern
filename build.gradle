@@ -45,7 +45,7 @@ dependencies {
     compile 'org.xerial:sqlite-jdbc:3.8.+'
     compile 'com.zaxxer:HikariCP-java6:2.1.0'
     compile 'com.google.guava:guava:18.0'
-    compile 'com.google.inject:guice:4.0-beta5'
+    compile 'com.google.inject:guice:4.0'
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.flowpowered:flow-math:1.0.0'
     compile 'com.flowpowered:flow-noise:1.0.1-SNAPSHOT'
@@ -66,6 +66,7 @@ jar {
     manifest {
         attributes(
                 'Main-Class': 'org.lanternpowered.server.LanternServer',
+                'Agent-Class': 'org.lanternpowered.server.transformer.Agent',
                 'Implementation-Title': 'LanternServer',
                 'Implementation-Version': version,
        	        'Implementation-Vendor': 'LanternPowered',

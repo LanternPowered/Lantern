@@ -1046,5 +1046,4 @@ public class LanternChunk extends AbstractExtent implements Chunk {
         }
         return false;
     }
-
 }

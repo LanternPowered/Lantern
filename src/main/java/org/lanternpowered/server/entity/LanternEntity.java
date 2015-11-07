@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 
+import org.lanternpowered.server.component.BaseComponentHolder;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -51,7 +52,7 @@ import org.spongepowered.api.world.World;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableSet;
 
-public class LanternEntity implements Entity {
+public class LanternEntity extends BaseComponentHolder implements Entity {
 
     protected final static float EPSILON = 1.0e-004f;
 

@@ -99,8 +99,10 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
     @Override
     public void unbindChannel(ChannelBinding channel) {
         LanternChannelBinding binding = (LanternChannelBinding) checkNotNull(channel, "channel");
-        binding.bound = false;
-        this.bindings.remove(channel.getName());
+        if (binding.bound) {
+            binding.bound = false;
+            this.bindings.remove(channel.getName());
+        }
     }
 
     @Override

@@ -22,54 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.component.injector.asm;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.service.config.ConfigDir;
+import org.lanternpowered.server.transformer.ClassTransformer;
 
-import java.lang.annotation.Annotation;
-
-@SuppressWarnings("all")
-public class ConfigDirAnnotation implements ConfigDir {
-
-    private final boolean shared;
-
-    public ConfigDirAnnotation(boolean shared) {
-        this.shared = shared;
-    }
+public final class ComponentClassTransformer implements ClassTransformer {
 
     @Override
-    public boolean sharedRoot() {
-        return this.shared;
+    public byte[] transform(ClassLoader loader, String className, byte[] byteCode) {
+        // TODO: Implement IComponent for Component classes.
+        return byteCode;
     }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return ConfigDir.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ConfigDir)) {
-            return false;
-        }
-        ConfigDir that = (ConfigDir) o;
-        return this.sharedRoot() == that.sharedRoot();
-    }
-
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
-
 }

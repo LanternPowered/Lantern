@@ -22,54 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.network.vanilla.message.processor.play;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.service.config.ConfigDir;
+import io.netty.handler.codec.CodecException;
 
-import java.lang.annotation.Annotation;
+import java.util.List;
 
-@SuppressWarnings("all")
-public class ConfigDirAnnotation implements ConfigDir {
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.processor.Processor;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetOpLevel;
+import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutEntityStatus;
 
-    private final boolean shared;
-
-    public ConfigDirAnnotation(boolean shared) {
-        this.shared = shared;
-    }
+public final class ProcessorPlayOutSetOpLevel implements Processor<MessagePlayOutSetOpLevel> {
 
     @Override
-    public boolean sharedRoot() {
-        return this.shared;
+    public void process(CodecContext context, MessagePlayOutSetOpLevel message, List<Message> output) throws CodecException {
+        int entityId = context.channel().attr(ProcessorPlayOutPlayerJoinGame.PLAYER_ENTITY_ID).get();
+        int statusId = 24 + Math.max(0, Math.min(4, message.getOpLevel()));
+        output.add(new MessagePlayOutEntityStatus(entityId, statusId));
     }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return ConfigDir.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ConfigDir)) {
-            return false;
-        }
-        ConfigDir that = (ConfigDir) o;
-        return this.sharedRoot() == that.sharedRoot();
-    }
-
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
-
 }

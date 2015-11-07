@@ -58,7 +58,7 @@ public class ConfigFileAnnotation implements DefaultConfig {
             return false;
         }
         DefaultConfig that = (DefaultConfig) o;
-        return sharedRoot() == that.sharedRoot();
+        return this.sharedRoot() == that.sharedRoot();
     }
 
     @Override

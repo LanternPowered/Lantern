@@ -175,6 +175,5 @@ public class LanternServerConfig {
         public static List<Setting<?>> getDefaults() {
             return defaults;
         }
-
     }
 }

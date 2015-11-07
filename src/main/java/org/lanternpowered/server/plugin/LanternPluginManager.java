@@ -70,6 +70,21 @@ public final class LanternPluginManager implements PluginManager {
     private static final String CLASS_EXTENSION = ".class";
 
     private static final FilenameFilter ARCHIVE = (dir, name) -> name.endsWith(".jar") || name.endsWith(".zip");
+    private static final Comparator<PluginEntry> ENTRY_COMPARATOR = (x, y) -> {
+        if (x.loadAfter != null && x.loadAfter.contains(y.id)) {
+            return 1;
+        }
+        if (y.loadAfter != null && y.loadAfter.contains(x.id)) {
+            return -1;
+        }
+        if (x.loadBefore != null && x.loadBefore.contains(y.id)) {
+            return -1;
+        }
+        if (y.loadBefore != null && y.loadBefore.contains(x.id)) {
+            return 1;
+        }
+        return 0;
+    };
 
     private final Map<String, PluginContainer> plugins = Maps.newHashMap();
     private final Map<Object, PluginContainer> pluginInstances = Maps.newIdentityHashMap();
@@ -145,7 +160,7 @@ public final class LanternPluginManager implements PluginManager {
         plugins.addAll(identifiers.values());
 
         // Sort the plugins by load order
-        Collections.sort(plugins, PluginEntryComparer.INSTANCE);
+        Collections.sort(plugins, ENTRY_COMPARATOR);
 
         // Check for required dependencies and loading instances
         for (PluginEntry entry : plugins) {
@@ -234,28 +249,6 @@ public final class LanternPluginManager implements PluginManager {
         public List<String> required;
     }
 
-    private static class PluginEntryComparer implements Comparator<PluginEntry> {
-
-        public static final PluginEntryComparer INSTANCE = new PluginEntryComparer();
-
-        @Override
-        public int compare(PluginEntry x, PluginEntry y) {
-            if (x.loadAfter != null && x.loadAfter.contains(y.id)) {
-                return 1;
-            }
-            if (y.loadAfter != null && y.loadAfter.contains(x.id)) {
-                return -1;
-            }
-            if (x.loadBefore != null && x.loadBefore.contains(y.id)) {
-                return -1;
-            }
-            if (y.loadBefore != null && y.loadBefore.contains(x.id)) {
-                return 1;
-            }
-            return 0;
-        }
-    }
-
     private static void scanZip(File file, List<PluginEntry> plugins) {
         if (!ARCHIVE.accept(null, file.getName())) {
             return;
@@ -271,7 +264,6 @@ public final class LanternPluginManager implements PluginManager {
                     if (entry.isDirectory() || !entry.getName().endsWith(CLASS_EXTENSION)) {
                         continue;
                     }
-
                     InputStream in = zip.getInputStream(entry);
                     try {
                         PluginEntry plugin = findPlugin(in);

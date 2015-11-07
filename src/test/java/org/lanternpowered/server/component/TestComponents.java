@@ -22,54 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.component;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.service.config.ConfigDir;
+import static org.junit.Assert.assertNotNull;
 
-import java.lang.annotation.Annotation;
+import org.junit.Test;
+import org.lanternpowered.server.component.test.TestComponent;
 
-@SuppressWarnings("all")
-public class ConfigDirAnnotation implements ConfigDir {
+public class TestComponents {
 
-    private final boolean shared;
-
-    public ConfigDirAnnotation(boolean shared) {
-        this.shared = shared;
+    @Test
+    public void test() {
+        long time = System.currentTimeMillis();
+        BaseComponentHolder holder = new BaseComponentHolder();
+        System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
+        time = System.currentTimeMillis();
+        TestComponent test = holder.addComponent(TestComponent.class);
+        System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
+        time = System.currentTimeMillis();
+        assertNotNull(test.holder);
+        System.out.println(test.holder.getClass());
+        assertNotNull(test.other);
+        System.out.println(test.other.getClass());
+        holder = new BaseComponentHolder();
+        System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
+        time = System.currentTimeMillis();
+        holder.addComponent(TestComponent.class);
+        System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
     }
-
-    @Override
-    public boolean sharedRoot() {
-        return this.shared;
-    }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return ConfigDir.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ConfigDir)) {
-            return false;
-        }
-        ConfigDir that = (ConfigDir) o;
-        return this.sharedRoot() == that.sharedRoot();
-    }
-
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
-
 }

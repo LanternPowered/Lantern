@@ -22,54 +22,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.component.test;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.service.config.ConfigDir;
+import org.lanternpowered.server.component.AttachableTo;
+import org.lanternpowered.server.component.Component;
+import org.lanternpowered.server.component.ComponentHolder;
+import org.lanternpowered.server.component.Inject;
+import org.lanternpowered.server.component.OnAttach;
+import org.lanternpowered.server.component.OnDetach;
+import org.lanternpowered.server.component.Require;
 
-import java.lang.annotation.Annotation;
+@AttachableTo(ComponentHolder.class)
+public class TestComponent implements Component {
 
-@SuppressWarnings("all")
-public class ConfigDirAnnotation implements ConfigDir {
+    @Inject public ComponentHolder holder;
+    @Inject @Require public ExtendedOtherComponent other;
 
-    private final boolean shared;
-
-    public ConfigDirAnnotation(boolean shared) {
-        this.shared = shared;
+    @OnAttach
+    public void onAttach() {
+        System.out.println("onAttach");
     }
 
-    @Override
-    public boolean sharedRoot() {
-        return this.shared;
+    @OnDetach
+    public void onDetach() {
     }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return ConfigDir.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ConfigDir)) {
-            return false;
-        }
-        ConfigDir that = (ConfigDir) o;
-        return this.sharedRoot() == that.sharedRoot();
-    }
-
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
-
 }

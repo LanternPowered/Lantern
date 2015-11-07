@@ -22,54 +22,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.component;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.service.config.ConfigDir;
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-import java.lang.annotation.Annotation;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-@SuppressWarnings("all")
-public class ConfigDirAnnotation implements ConfigDir {
+/**
+ * Can be applied to a component type that is required for this component
+ * and will be automatically attached to the component holder.
+ * 
+ * This is only applicable to component types that aren't interfaces
+ * or abstract classes.
+ */
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface Require {
 
-    private final boolean shared;
-
-    public ConfigDirAnnotation(boolean shared) {
-        this.shared = shared;
-    }
-
-    @Override
-    public boolean sharedRoot() {
-        return this.shared;
-    }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return ConfigDir.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ConfigDir)) {
-            return false;
-        }
-        ConfigDir that = (ConfigDir) o;
-        return this.sharedRoot() == that.sharedRoot();
-    }
-
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
-
+    /**
+     * Gets whether the required component should be automatically attached to
+     * component holder.
+     * 
+     * @return auto attach
+     */
+    boolean autoAttach() default true;
 }

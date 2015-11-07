@@ -60,6 +60,7 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutSetGameMode;
+import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutSetOpLevel;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutWorldSky;
@@ -83,6 +84,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerSpawnPosition;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetOpLevel;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
@@ -115,6 +117,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.register(MessagePlayOutSetGameMode.class, new ProcessorPlayOutSetGameMode());
         outbound.register(MessagePlayOutSetReducedDebug.class, new ProcessorPlayOutSetReducedDebug());
         outbound.register(MessagePlayOutWorldSky.class, new ProcessorPlayOutWorldSky());
+        outbound.register(MessagePlayOutSetOpLevel.class, new ProcessorPlayOutSetOpLevel());
 
         // Register handlers of the missing messages
         inbound.register(MessagePlayInOutRegisterChannels.class, new HandlerPlayInRegisterChannels());

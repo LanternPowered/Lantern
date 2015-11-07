@@ -22,54 +22,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.transformer;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.service.config.ConfigDir;
+public interface Exclusion {
 
-import java.lang.annotation.Annotation;
+    /**
+     * Gets whether this exclusion applicable is for the class name.
+     * 
+     * @param className the class name
+     * @return is applicable
+     */
+    boolean isApplicableFor(String className);
 
-@SuppressWarnings("all")
-public class ConfigDirAnnotation implements ConfigDir {
+    public final class Package implements Exclusion {
 
-    private final boolean shared;
+        final String name;
 
-    public ConfigDirAnnotation(boolean shared) {
-        this.shared = shared;
-    }
-
-    @Override
-    public boolean sharedRoot() {
-        return this.shared;
-    }
-
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return ConfigDir.class;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
+        /**
+         * Creates a new package exclusion.
+         * 
+         * @param name the package name
+         */
+        public Package(String name) {
+            this.name = name;
         }
-        if (!(o instanceof ConfigDir)) {
-            return false;
+
+        @Override
+        public boolean isApplicableFor(String className) {
+            int index = className.lastIndexOf('.');
+            return index != -1 && className.substring(0, index).startsWith(this.name);
         }
-        ConfigDir that = (ConfigDir) o;
-        return this.sharedRoot() == that.sharedRoot();
     }
 
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
-    }
+    public final class Class implements Exclusion {
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
-    }
+        final String name;
 
+        /**
+         * Creates a new class exclusion.
+         * 
+         * @param name the class name (path)
+         */
+        public Class(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public boolean isApplicableFor(String className) {
+            return this.name.equals(className);
+        }
+    }
 }

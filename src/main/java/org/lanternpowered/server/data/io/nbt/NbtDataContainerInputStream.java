@@ -173,5 +173,4 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             this.type = type;
         }
     }
-
 }

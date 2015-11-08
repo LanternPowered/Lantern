@@ -260,7 +260,7 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
 
     @Override
     public void sendTitle(Title title) {
-        this.session.sendAll(LanternTitles.getCachedMessages(checkNotNull(title, "title")));
+        this.session.sendAll(LanternTitles.getMessages(checkNotNull(title, "title")));
     }
 
     @Override

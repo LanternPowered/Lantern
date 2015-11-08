@@ -22,28 +22,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc.entity;
+package org.lanternpowered.server.inject.impl;
 
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Require;
-import org.lanternpowered.server.component.misc.Attributes;
-import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.lanternpowered.server.inject.Inject;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
-@AttachableTo(LanternEntityLiving.class)
-public class HealthLiving extends HealthBase {
+import org.lanternpowered.server.inject.Binding;
+import org.lanternpowered.server.inject.BindingBuilder;
+import org.lanternpowered.server.inject.Module;
+import org.lanternpowered.server.inject.ModuleBuilder;
 
-    @Inject @Require private Attributes attributes;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+
+public final class SimpleModuleBuilder implements ModuleBuilder {
+
+    final List<Binding<?>> bindings = Lists.newArrayList();
+    final Map<Class<?>, Supplier<?>> suppliers = Maps.newHashMap();
 
     @Override
-    public double getMaxHealth() {
-        // TODO Auto-generated method stub
-        return 0;
+    public <T> BindingBuilder<T> bind(Class<T> type) {
+        return new SimpleBindingBuilder<T>(type, this);
     }
 
     @Override
-    public void setMaxHealth(double maxHealth) {
-        // TODO Auto-generated method stub
-        
+    public Module build() {
+        return new SimpleModule(this.bindings, this.suppliers);
+    }
+
+    @Override
+    public <T> ModuleBuilder bindInstantiator(Class<T> type, Supplier<? extends T> supplier) {
+        this.suppliers.put(type, supplier);
+        return this;
     }
 }

@@ -22,11 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.injector;
+package org.lanternpowered.server.inject;
 
-import org.lanternpowered.server.component.Component;
+import java.lang.annotation.Annotation;
+import java.util.Optional;
+import java.util.function.Supplier;
 
-public interface InjectorFactory {
+public interface Module {
 
-    Injector create(Class<? extends Component> type);
+    <T> Binding<T> getBinding(Class<? extends T> type);
+
+    <T> Binding<T> getBinding(Class<? extends T> type, Iterable<Class<? extends Annotation>> annotationTypes);
+
+    <T> Optional<Supplier<T>> getSupplier(Class<T> type);
 }

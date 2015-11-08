@@ -22,28 +22,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc.entity;
+package org.lanternpowered.launch;
 
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Require;
-import org.lanternpowered.server.component.misc.Attributes;
-import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.lanternpowered.server.inject.Inject;
+public interface Exclusion {
 
-@AttachableTo(LanternEntityLiving.class)
-public class HealthLiving extends HealthBase {
+    /**
+     * Gets whether this exclusion applicable is for the class name.
+     * 
+     * @param className the class name
+     * @return is applicable
+     */
+    boolean isApplicableFor(String className);
 
-    @Inject @Require private Attributes attributes;
+    /**
+     * A exclusion that will exclude a package.
+     */
+    public final class Package implements Exclusion {
 
-    @Override
-    public double getMaxHealth() {
-        // TODO Auto-generated method stub
-        return 0;
+        private final String name;
+
+        /**
+         * Creates a new package exclusion.
+         * 
+         * @param name the package name
+         */
+        public Package(String name) {
+            this.name = name.isEmpty() ? name : name + '.';
+        }
+
+        @Override
+        public boolean isApplicableFor(String className) {
+            return className.startsWith(this.name);
+        }
     }
 
-    @Override
-    public void setMaxHealth(double maxHealth) {
-        // TODO Auto-generated method stub
-        
+    /**
+     * A exclusion that will exclude a class.
+     */
+    public final class Class implements Exclusion {
+
+        private final String name;
+
+        /**
+         * Creates a new class exclusion.
+         * 
+         * @param name the class name (path)
+         */
+        public Class(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public boolean isApplicableFor(String className) {
+            return this.name.equals(className);
+        }
     }
 }

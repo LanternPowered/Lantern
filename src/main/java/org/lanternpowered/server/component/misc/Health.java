@@ -25,14 +25,53 @@
 package org.lanternpowered.server.component.misc;
 
 import org.lanternpowered.server.component.Component;
+import org.spongepowered.api.event.cause.Cause;
 
 public interface Health extends Component {
 
+    /**
+     * Damages the component with the specified amount of
+     * damage and a specific cause.
+     * 
+     * @param damage the damage
+     * @param cause the cause
+     */
+    void damage(double damage, Cause cause);
+
+    /**
+     * Heals the component with the specified amount of
+     * health and a specific cause.
+     * 
+     * @param health the health
+     * @param cause the cause
+     */
+    void heal(double health, Cause cause);
+
+    /**
+     * Gets the health.
+     * 
+     * @return the health
+     */
     double getHealth();
 
+    /**
+     * Sets the health.
+     * 
+     * @param health the health
+     */
     void setHealth(double health);
 
+    /**
+     * Gets the maximum amount of health.
+     * 
+     * @return the max health
+     */
     double getMaxHealth();
 
+    /**
+     * Sets the maximum amount of health.
+     * 
+     * @param maxHealth the max health
+     */
     void setMaxHealth(double maxHealth);
 }

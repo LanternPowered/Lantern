@@ -27,10 +27,10 @@ package org.lanternpowered.server.component.test;
 import org.lanternpowered.server.component.AttachableTo;
 import org.lanternpowered.server.component.Component;
 import org.lanternpowered.server.component.ComponentHolder;
-import org.lanternpowered.server.component.Inject;
 import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.component.OnDetach;
 import org.lanternpowered.server.component.Require;
+import org.lanternpowered.server.inject.Inject;
 
 @AttachableTo(ComponentHolder.class)
 public class TestComponent implements Component {

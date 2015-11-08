@@ -22,28 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc.entity;
+package org.lanternpowered.server.inject;
 
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Require;
-import org.lanternpowered.server.component.misc.Attributes;
-import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.lanternpowered.server.inject.Inject;
+import org.lanternpowered.server.inject.impl.SimpleModuleBuilder;
 
-@AttachableTo(LanternEntityLiving.class)
-public class HealthLiving extends HealthBase {
+public final class Modules {
 
-    @Inject @Require private Attributes attributes;
-
-    @Override
-    public double getMaxHealth() {
-        // TODO Auto-generated method stub
-        return 0;
+    /**
+     * Gets a new module builder.
+     * 
+     * @return the module builder
+     */
+    public static ModuleBuilder builder() {
+        return new SimpleModuleBuilder();
     }
 
-    @Override
-    public void setMaxHealth(double maxHealth) {
-        // TODO Auto-generated method stub
-        
+    private Modules() {
     }
 }

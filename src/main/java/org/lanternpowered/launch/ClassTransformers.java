@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.transformer;
+package org.lanternpowered.launch;
 
 import java.util.List;
 import java.util.Set;
@@ -33,29 +33,31 @@ import com.google.common.collect.Sets;
 public final class ClassTransformers {
 
     final static List<ClassTransformer> transformers = Lists.newCopyOnWriteArrayList();
-    final static Set<Exclusion> exclusions = Sets.newConcurrentHashSet();
+    final static Set<Exclusion> loaderExclusions = Sets.newConcurrentHashSet();
+    final static Set<Exclusion> transformerExclusions = Sets.newConcurrentHashSet();
 
     /**
      * Initializes the transformers.
      */
     static void init() {
-        addExclusion(new Exclusion.Package("ninja.leaping.configurate"));
-        addExclusion(new Exclusion.Package("com.google"));
-        addExclusion(new Exclusion.Package("com.typesafe.config"));
-        addExclusion(new Exclusion.Package("com.flowpowered.noise"));
-        addExclusion(new Exclusion.Package("com.flowpowered.math"));
-        addExclusion(new Exclusion.Package("com.zaxxer.hikari"));
-        addExclusion(new Exclusion.Package("org.yaml.snakeyaml"));
-        addExclusion(new Exclusion.Package("org.sqlite"));
-        addExclusion(new Exclusion.Package("org.mariadb.jdbc"));
-        addExclusion(new Exclusion.Package("org.objectweb.asm"));
-        addExclusion(new Exclusion.Package("org.fusesource"));
-        addExclusion(new Exclusion.Package("org.apache"));
-        addExclusion(new Exclusion.Package("org.aopalliance"));
-        addExclusion(new Exclusion.Package("io.netty"));
-        addExclusion(new Exclusion.Package("gnu.trove"));
-        addExclusion(new Exclusion.Package("javax"));
-        addExclusion(new Exclusion.Package("jline"));
+        addTransformerExclusion(new Exclusion.Package("ninja.leaping.configurate"));
+        addTransformerExclusion(new Exclusion.Package("com.google"));
+        addTransformerExclusion(new Exclusion.Package("com.typesafe.config"));
+        addTransformerExclusion(new Exclusion.Package("com.flowpowered.noise"));
+        addTransformerExclusion(new Exclusion.Package("com.flowpowered.math"));
+        addTransformerExclusion(new Exclusion.Package("com.zaxxer.hikari"));
+        addTransformerExclusion(new Exclusion.Package("org.yaml.snakeyaml"));
+        addTransformerExclusion(new Exclusion.Package("org.sqlite"));
+        addTransformerExclusion(new Exclusion.Package("org.mariadb.jdbc"));
+        addTransformerExclusion(new Exclusion.Package("org.objectweb.asm"));
+        addTransformerExclusion(new Exclusion.Package("org.fusesource"));
+        addTransformerExclusion(new Exclusion.Package("org.apache"));
+        addTransformerExclusion(new Exclusion.Package("org.aopalliance"));
+        addTransformerExclusion(new Exclusion.Package("io.netty"));
+        addTransformerExclusion(new Exclusion.Package("gnu.trove"));
+        addLoaderExclusion(new Exclusion.Package("org.lanternpowered.launch"));
+        addLoaderExclusion(new Exclusion.Package("java"));
+        addLoaderExclusion(new Exclusion.Package("sun"));
     }
 
     /**
@@ -65,28 +67,26 @@ public final class ClassTransformers {
      */
     public static void addTransformer(ClassTransformer classTransformer) {
         transformers.add(classTransformer);
+        // All the transformer classes should be excluded
+        transformerExclusions.add(new Exclusion.Class(classTransformer.getClass().getName()));
     }
 
     /**
-     * Adds a new exclusion that is parsed from the provided string.
+     * Adds a new transformer exclusion.
      * 
      * @param exclusion the exclusion
      */
-    public static void addExclusion(String exclusion) {
-        if (exclusion.endsWith(".")) {
-            addExclusion(new Exclusion.Package(exclusion.substring(0, exclusion.length() - 1)));
-        } else {
-            addExclusion(new Exclusion.Class(exclusion));
-        }
+    public static void addLoaderExclusion(Exclusion exclusion) {
+        transformerExclusions.add(exclusion);
     }
 
     /**
-     * Adds a new exclusion.
+     * Adds a new transformer exclusion.
      * 
      * @param exclusion the exclusion
      */
-    public static void addExclusion(Exclusion exclusion) {
-        exclusions.add(exclusion);
+    public static void addTransformerExclusion(Exclusion exclusion) {
+        transformerExclusions.add(exclusion);
     }
 
     private ClassTransformers() {

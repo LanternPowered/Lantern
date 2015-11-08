@@ -22,15 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.injector.asm;
+package org.lanternpowered.server.inject;
 
-import org.lanternpowered.server.transformer.ClassTransformer;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
-public final class ComponentClassTransformer implements ClassTransformer {
+public interface Binding<T> {
 
-    @Override
-    public byte[] transform(ClassLoader loader, String className, byte[] byteCode) {
-        // TODO: Implement IComponent for Component classes.
-        return byteCode;
-    }
+    /**
+     * Gets the object type.
+     * 
+     * @return the type
+     */
+    Class<T> getType();
+
+    /**
+     * Gets the provider.
+     * 
+     * @return the provider
+     */
+    Provider<T> getProvider();
+
+    /**
+     * Gets the annotations.
+     * 
+     * @return the annotations
+     */
+    List<Class<? extends Annotation>> getAnnotations();
 }

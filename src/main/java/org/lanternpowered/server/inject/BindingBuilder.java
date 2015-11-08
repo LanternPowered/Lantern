@@ -22,28 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc.entity;
+package org.lanternpowered.server.inject;
 
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Require;
-import org.lanternpowered.server.component.misc.Attributes;
-import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.lanternpowered.server.inject.Inject;
+import java.lang.annotation.Annotation;
+import java.util.function.Supplier;
 
-@AttachableTo(LanternEntityLiving.class)
-public class HealthLiving extends HealthBase {
+public interface BindingBuilder<T> {
 
-    @Inject @Require private Attributes attributes;
+    @SuppressWarnings("unchecked")
+    BindingBuilder<T> annotatedWith(Class<? extends Annotation>... annotations);
 
-    @Override
-    public double getMaxHealth() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
+    ModuleBuilder toSupplier(Supplier<? extends T> supplier);
 
-    @Override
-    public void setMaxHealth(double maxHealth) {
-        // TODO Auto-generated method stub
-        
-    }
+    ModuleBuilder toProvider(Provider<? extends T> provider);
+
+    ModuleBuilder toInstance(T instance);
 }

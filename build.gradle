@@ -66,7 +66,6 @@ jar {
     manifest {
         attributes(
                 'Main-Class': 'org.lanternpowered.server.LanternServer',
-                'Agent-Class': 'org.lanternpowered.server.transformer.Agent',
                 'Implementation-Title': 'LanternServer',
                 'Implementation-Version': version,
        	        'Implementation-Vendor': 'LanternPowered',

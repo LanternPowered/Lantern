@@ -22,20 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.injector;
+package org.lanternpowered.launch;
 
-import org.lanternpowered.server.component.Component;
-import org.lanternpowered.server.component.ComponentHolder;
+public interface ClassTransformer {
 
-public interface Injector {
-
-    Component create();
-
-    void inject(Component component, ComponentHolder holder);
-
-    void inject(Component component, Component componentToInject);
-
-    void attach(Component component);
-
-    void detach(Component component);
+    byte[] transform(ClassLoader loader, String className, byte[] byteCode);
 }

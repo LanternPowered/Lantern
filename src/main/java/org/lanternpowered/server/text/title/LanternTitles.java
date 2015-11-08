@@ -70,7 +70,7 @@ public final class LanternTitles {
                 }
             });
 
-    public static List<Message> getCachedMessages(Title title) {
+    public static List<Message> getMessages(Title title) {
         try {
             return messagesCache.get(title);
         } catch (ExecutionException e) {

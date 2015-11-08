@@ -22,18 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.injector.asm;
+package org.lanternpowered.server.inject;
 
-import org.lanternpowered.server.component.Component;
-import org.lanternpowered.server.component.ComponentHolder;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
-public interface IComponent {
+public interface FieldInfo<T> {
 
-    void inject(Component componentToInject);
+    Class<? extends T> getType();
 
-    void inject(ComponentHolder holder);
+    <A extends Annotation> A getAnnotation(Class<A> type);
 
-    void attach();
+    List<Annotation> getAnnotations();
 
-    void detach();
+    List<Class<? extends Annotation>> getAnnotationTypes();
 }

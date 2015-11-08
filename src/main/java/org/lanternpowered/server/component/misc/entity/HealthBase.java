@@ -24,10 +24,22 @@
  */
 package org.lanternpowered.server.component.misc.entity;
 
+import org.lanternpowered.server.component.ComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.inject.Inject;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.HealEntityEvent;
+
+import com.flowpowered.math.GenericMath;
+import com.google.common.collect.Lists;
 
 public abstract class HealthBase implements Health {
 
+    @Inject private ComponentHolder holder;
     private double health;
 
     @Override
@@ -37,6 +49,40 @@ public abstract class HealthBase implements Health {
 
     @Override
     public void setHealth(double health) {
-        this.health = health;
+        this.health = GenericMath.clamp(health, 0.0, this.getMaxHealth());
+    }
+
+    @Override
+    public void heal(double health, Cause cause) {
+        if (this.holder instanceof Entity) {
+            // TODO: Health modifiers, etc.
+            HealEntityEvent event = SpongeEventFactory.createHealEntityEvent(LanternGame.get(),
+                    cause, Lists.newArrayList(), (Entity) this.holder, health);
+            if (event.isCancelled()) {
+                return;
+            }
+            health = event.getFinalHealAmount();
+        }
+        if (health > 0) {
+            this.setHealth(this.getHealth() + health);
+        }
+    }
+
+    @Override
+    public void damage(double damage, Cause cause) {
+        if (this.holder instanceof Entity) {
+            // TODO: Damage modifiers, etc.
+            DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(LanternGame.get(),
+                    cause, Lists.newArrayList(), (Entity) this.holder, damage);
+            // TODO: Not cancellable?
+            damage = event.getFinalDamage();
+        }
+        if (damage > 0) {
+            double health = this.getHealth() - damage;
+            this.setHealth(health);
+            if (health <= 0.0) {
+                // TODO: Notify stuff
+            }
+        }
     }
 }

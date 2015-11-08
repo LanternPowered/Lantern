@@ -22,16 +22,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component;
+package org.lanternpowered.server.inject;
 
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.Map;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
+public interface Injector {
 
-@Target(FIELD)
-@Retention(RUNTIME)
-public @interface Inject {
+    /**
+     * Attempts to inject all the objects for the specified type.
+     * 
+     * @param targetObject the target object
+     * @param objectType the object type to inject
+     */
+    void injectFields(Object targetObject, Map<String, Object> parameters, Class<?> objectType);
 
+    /**
+     * Attempts to inject all the objects for the fields annotated
+     * with {@link Inject}.
+     * 
+     * @param targetObject the target object
+     */
+    void injectFields(Object targetObject, Map<String, Object> parameters);
 }

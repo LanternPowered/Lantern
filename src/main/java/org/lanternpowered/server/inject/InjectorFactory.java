@@ -22,28 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc.entity;
+package org.lanternpowered.server.inject;
 
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Require;
-import org.lanternpowered.server.component.misc.Attributes;
-import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.lanternpowered.server.inject.Inject;
+public interface InjectorFactory {
 
-@AttachableTo(LanternEntityLiving.class)
-public class HealthLiving extends HealthBase {
-
-    @Inject @Require private Attributes attributes;
-
-    @Override
-    public double getMaxHealth() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    @Override
-    public void setMaxHealth(double maxHealth) {
-        // TODO Auto-generated method stub
-        
-    }
+    /**
+     * Creates a injector for the specified object type.
+     * 
+     * @param objectType the object type
+     * @param module the module that should be used
+     * @return the injector
+     */
+    Injector create(Class<?> objectType, Module module);
 }

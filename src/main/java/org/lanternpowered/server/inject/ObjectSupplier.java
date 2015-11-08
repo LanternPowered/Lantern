@@ -22,9 +22,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.transformer;
+package org.lanternpowered.server.inject;
 
-public interface ClassTransformer {
+public interface ObjectSupplier {
 
-    byte[] transform(ClassLoader loader, String className, byte[] byteCode);
+    <T> T get(Class<T> type, Module module);
 }

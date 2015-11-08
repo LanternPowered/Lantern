@@ -22,54 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.transformer;
+package org.lanternpowered.server.inject;
 
-public interface Exclusion {
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-    /**
-     * Gets whether this exclusion applicable is for the class name.
-     * 
-     * @param className the class name
-     * @return is applicable
-     */
-    boolean isApplicableFor(String className);
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-    public final class Package implements Exclusion {
+@Target(FIELD)
+@Retention(RUNTIME)
+public @interface Inject {
 
-        final String name;
-
-        /**
-         * Creates a new package exclusion.
-         * 
-         * @param name the package name
-         */
-        public Package(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public boolean isApplicableFor(String className) {
-            int index = className.lastIndexOf('.');
-            return index != -1 && className.substring(0, index).startsWith(this.name);
-        }
-    }
-
-    public final class Class implements Exclusion {
-
-        final String name;
-
-        /**
-         * Creates a new class exclusion.
-         * 
-         * @param name the class name (path)
-         */
-        public Class(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public boolean isApplicableFor(String className) {
-            return this.name.equals(className);
-        }
-    }
 }

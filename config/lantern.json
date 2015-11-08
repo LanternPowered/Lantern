@@ -1,0 +1,18 @@
+{
+  "server": {
+    "ip": "",
+    "port": 25565,
+    "name": "Lantern Server",
+    "online-mode": true,
+    "max-players": 20,
+    "whitelist": false,
+    "reduced-debug": false,
+    "main-world": "world",
+    "favicon": "favicon.png",
+    "motd": "A Lantern Mincraft Server"
+  },
+  "folders": {
+    "plugins": "plugins",
+    "worlds": "worlds"
+  }
+}

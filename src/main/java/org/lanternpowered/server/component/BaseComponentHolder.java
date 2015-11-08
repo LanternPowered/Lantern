@@ -25,36 +25,72 @@
 package org.lanternpowered.server.component;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 
-import org.lanternpowered.server.component.injector.Injector;
-import org.lanternpowered.server.component.injector.reflect.ReflectInjectorFactory;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.inject.InjectorFactory;
+import org.lanternpowered.server.inject.Injectors;
+import org.lanternpowered.server.inject.Module;
+import org.lanternpowered.server.inject.Modules;
+import org.lanternpowered.server.inject.ObjectSuppliers;
+import org.spongepowered.api.Game;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 public class BaseComponentHolder implements ComponentHolder {
 
+    private static final String HOLDER = "holder";
+    private static final String ALLOWED = "ignore";
+
+    @SuppressWarnings("unchecked")
+    private static final Module MODULE = Modules.builder()
+            .bind(ComponentHolder.class).toProvider((target, params, info) -> {
+                return (ComponentHolder) params.get(HOLDER);
+            })
+            .bind(Component.class).toProvider((target, params, info) -> {
+                Require req = info.getAnnotation(Require.class);
+                BaseComponentHolder holder = (BaseComponentHolder) params.get(HOLDER);
+                if (req != null && req.autoAttach()) {
+                    return holder.addComponent(info.getType(), (List<Component>) params.get(ALLOWED));
+                } else {
+                    return holder.getComponent(info.getType()).orElse(null);
+                }
+            })
+            .bind(Game.class).toInstance(LanternGame.get())
+            .build();
+
     private final Map<Class<? extends Component>, Component> components = Maps.newConcurrentMap();
 
     @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Component> T addComponent(Class<T> type) {
+    private <T extends Component> T addComponent(Class<T> type, List<Component> allowed) {
         T component = (T) this.components.get(type);
         if (component != null) {
             return component;
         }
-        Injector injector = ReflectInjectorFactory.instance().create(type);
-        component = (T) injector.create();
-        this.components.put(type, component);
-        injector.inject(component, this);
-        for (Entry<Class<? extends Component>, Component> entry : this.components.entrySet()) {
-            ReflectInjectorFactory.instance().create(entry.getKey()).inject(entry.getValue(), component);
+        component = ObjectSuppliers.get().get(type, MODULE);
+        if (allowed == null) {
+            allowed = ImmutableList.copyOf(this.components.values());
         }
-        injector.attach(component);
+        this.components.put(type, component);
+        InjectorFactory factory = Injectors.get();
+        Map<String, Object> params = ImmutableMap.of(HOLDER, this, ALLOWED, allowed);
+        factory.create(type, MODULE).injectFields(component, params);
+        for (Entry<Class<? extends Component>, Component> entry : this.components.entrySet()) {
+            if (allowed == null || allowed.contains(entry.getValue())) {
+                factory.create(entry.getKey(), MODULE).injectFields(entry.getValue(), params);
+            }
+        }
         return component;
+    }
+
+    @Override
+    public <T extends Component> T addComponent(Class<T> type) {
+        return this.addComponent(type, null);
     }
 
     @SuppressWarnings("unchecked")

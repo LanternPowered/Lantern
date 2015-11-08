@@ -22,28 +22,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc.entity;
+package org.lanternpowered.server.inject.impl;
 
-import org.lanternpowered.server.component.AttachableTo;
-import org.lanternpowered.server.component.Require;
-import org.lanternpowered.server.component.misc.Attributes;
-import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.lanternpowered.server.inject.Inject;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
-@AttachableTo(LanternEntityLiving.class)
-public class HealthLiving extends HealthBase {
+import org.lanternpowered.server.inject.Binding;
+import org.lanternpowered.server.inject.Provider;
 
-    @Inject @Require private Attributes attributes;
+import com.google.common.collect.ImmutableList;
 
-    @Override
-    public double getMaxHealth() {
-        // TODO Auto-generated method stub
-        return 0;
+final class SimpleBinding<T> implements Binding<T> {
+
+    private final Class<T> type;
+    private final Provider<T> provider;
+    private final ImmutableList<Class<? extends Annotation>> annotations;
+
+    public SimpleBinding(Class<T> type, Provider<T> provider,
+            ImmutableList<Class<? extends Annotation>> annotations) {
+        this.annotations = annotations;
+        this.provider = provider;
+        this.type = type;
     }
 
     @Override
-    public void setMaxHealth(double maxHealth) {
-        // TODO Auto-generated method stub
-        
+    public Class<T> getType() {
+        return this.type;
+    }
+
+    @Override
+    public Provider<T> getProvider() {
+        return this.provider;
+    }
+
+    @Override
+    public List<Class<? extends Annotation>> getAnnotations() {
+        return this.annotations;
     }
 }

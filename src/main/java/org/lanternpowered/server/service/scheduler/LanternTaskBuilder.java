@@ -64,7 +64,7 @@ public class LanternTaskBuilder implements TaskBuilder {
     @Override
     public TaskBuilder execute(Consumer<Task> consumer) {
         this.consumer = consumer;
-        return null;
+        return this;
     }
 
     @Override

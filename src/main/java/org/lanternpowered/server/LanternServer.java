@@ -106,6 +106,7 @@ public class LanternServer implements Server {
             // Create the server instance
             final LanternServer server = new LanternServer(game, config, consoleManager);
 
+            System.out.println(LanternServer.class.getClassLoader().getClass().getName());
             // Send some startup info
             LanternGame.log().info("Starting Lantern Server (Minecraft: {} (Protocol: {}))",
                     LanternMinecraftVersion.CURRENT.getName(),

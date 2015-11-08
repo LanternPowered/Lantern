@@ -609,7 +609,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
         checkNotNull(title, "title");
         List<LanternPlayer> players = this.getPlayers();
         if (!players.isEmpty()) {
-            List<Message> networkMessages = LanternTitles.getCachedMessages(title);
+            List<Message> networkMessages = LanternTitles.getMessages(title);
             players.forEach(player -> player.getConnection().sendAll(networkMessages));
         }
     }

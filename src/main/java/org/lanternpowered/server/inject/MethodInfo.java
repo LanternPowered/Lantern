@@ -24,10 +24,35 @@
  */
 package org.lanternpowered.server.inject;
 
-import java.util.Map;
+import java.lang.annotation.Annotation;
+import java.util.List;
 
-@FunctionalInterface
-public interface Provider<T> {
+import com.google.common.collect.ImmutableList;
 
-    T get(Object targetObject, Map<String, Object> parameters, ParameterInfo<? extends T> info);
+public final class MethodInfo<T> {
+
+    private final Class<? extends T> returnType;
+    private final List<Class<?>> parameterTypes;
+
+    // A list with all the annotation types
+    private final List<Class<? extends Annotation>> annotationTypes;
+
+    public MethodInfo(Class<? extends T> returnType, List<Class<?>> parameterTypes,
+            List<Class<? extends Annotation>> annotations) {
+        this.parameterTypes = ImmutableList.copyOf(parameterTypes);
+        this.annotationTypes = ImmutableList.copyOf(annotations);
+        this.returnType = returnType;
+    }
+
+    public Class<? extends T> getReturnType() {
+        return this.returnType;
+    }
+
+    public List<Class<?>> getParameterTypes() {
+        return this.parameterTypes;
+    }
+
+    public List<Class<? extends Annotation>> getAnnotationTypes() {
+        return this.annotationTypes;
+    }
 }

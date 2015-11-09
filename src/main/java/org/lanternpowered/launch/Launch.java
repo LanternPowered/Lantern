@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.launch;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -39,7 +38,7 @@ import static org.lanternpowered.launch.ClassTransformers.loaderExclusions;
 import static org.lanternpowered.launch.ClassTransformers.transformerExclusions;
 import static org.lanternpowered.launch.ClassTransformers.transformers;
 
-public class Launch {
+final class Launch {
 
     public static void main(String[] args) {
         ClassLoader classLoader = new LaunchClassLoader(
@@ -53,7 +52,7 @@ public class Launch {
             // Start the server instance
             Class.forName("org.lanternpowered.server.LanternServer", true, classLoader)
                     .getMethod("main", String[].class).invoke(null, new Object[] { args });
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }
@@ -62,7 +61,7 @@ public class Launch {
 
         private final Map<String, Class<?>> cachedClasses =
                 new ConcurrentHashMap<>();
-        private final Set<String> missingClasses = Collections.newSetFromMap(
+        private final Set<String> invalidClasses = Collections.newSetFromMap(
                 new ConcurrentHashMap<String, Boolean>());
         private final ClassLoader parent = this.getClass().getClassLoader();
 
@@ -71,15 +70,10 @@ public class Launch {
         }
 
         @Override
-        public Class<?> loadClass(final String name) throws ClassNotFoundException {
-            System.out.println(name);
-            return super.loadClass(name);
-        }
-
-        @Override
         public Class<?> findClass(final String name) throws ClassNotFoundException {
             System.out.println(name);
-            if (this.missingClasses.contains(name)) {
+
+            if (this.invalidClasses.contains(name)) {
                 throw new ClassNotFoundException(name);
             }
 
@@ -99,9 +93,14 @@ public class Launch {
             // Skip the classes that are excluded
             for (Exclusion exclusion : transformerExclusions) {
                 if (exclusion.isApplicableFor(name)) {
-                    Class<?> clazz = super.findClass(name);
-                    this.cachedClasses.put(name, clazz);
-                    return clazz;
+                    try {
+                        Class<?> clazz = super.findClass(name);
+                        this.cachedClasses.put(name, clazz);
+                        return clazz;
+                    } catch (ClassNotFoundException e) {
+                        this.invalidClasses.add(name);
+                        throw e;
+                    }
                 }
             }
 
@@ -111,7 +110,7 @@ public class Launch {
 
             // The class file could not be found
             if (resource == null) {
-                this.missingClasses.add(name);
+                this.invalidClasses.add(name);
                 throw new ClassNotFoundException(name);
             }
 
@@ -143,9 +142,10 @@ public class Launch {
                 Class<?> clazz = this.defineClass(name, bytes, 0, bytes.length);
                 this.cachedClasses.put(name, clazz);
                 return clazz;
-            } catch (IOException e) {
+            } catch (Throwable e) {
                 // An error occurred while reading the class
-                throw new RuntimeException(e);
+                this.invalidClasses.add(name);
+                throw new ClassNotFoundException(name, e);
             }
         }
     }

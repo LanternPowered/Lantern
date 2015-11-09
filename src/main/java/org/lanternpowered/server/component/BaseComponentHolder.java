@@ -31,8 +31,10 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.inject.Injector;
 import org.lanternpowered.server.inject.InjectorFactory;
 import org.lanternpowered.server.inject.Injectors;
+import org.lanternpowered.server.inject.MethodInfo;
 import org.lanternpowered.server.inject.Module;
 import org.lanternpowered.server.inject.Modules;
 import org.lanternpowered.server.inject.ObjectSuppliers;
@@ -40,12 +42,15 @@ import org.spongepowered.api.Game;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class BaseComponentHolder implements ComponentHolder {
 
     private static final String HOLDER = "holder";
-    private static final String ALLOWED = "ignore";
+    // The allowed values is passed through to avoid injecting already
+    // injected objects
+    private static final String ALLOWED = "allowed";
 
     @SuppressWarnings("unchecked")
     private static final Module MODULE = Modules.builder()
@@ -63,6 +68,12 @@ public class BaseComponentHolder implements ComponentHolder {
             })
             .bind(Game.class).toInstance(LanternGame.get())
             .build();
+    @SuppressWarnings("unchecked")
+    private static final MethodInfo<Void> ON_ATTACH = new MethodInfo<>(
+            Void.class, Lists.newArrayList(), Lists.newArrayList(OnAttach.class));
+    @SuppressWarnings("unchecked")
+    private static final MethodInfo<Void> ON_DETACH = new MethodInfo<>(
+            Void.class, Lists.newArrayList(), Lists.newArrayList(OnDetach.class));
 
     private final Map<Class<? extends Component>, Component> components = Maps.newConcurrentMap();
 
@@ -78,13 +89,15 @@ public class BaseComponentHolder implements ComponentHolder {
         }
         this.components.put(type, component);
         InjectorFactory factory = Injectors.get();
+        Injector injector = factory.create(type, MODULE);
         Map<String, Object> params = ImmutableMap.of(HOLDER, this, ALLOWED, allowed);
-        factory.create(type, MODULE).injectFields(component, params);
+        injector.injectObjects(component, params);
         for (Entry<Class<? extends Component>, Component> entry : this.components.entrySet()) {
             if (allowed == null || allowed.contains(entry.getValue())) {
-                factory.create(entry.getKey(), MODULE).injectFields(entry.getValue(), params);
+                factory.create(entry.getKey(), MODULE).injectObjects(entry.getValue(), params);
             }
         }
+        injector.injectMethod(component, ON_ATTACH);
         return component;
     }
 

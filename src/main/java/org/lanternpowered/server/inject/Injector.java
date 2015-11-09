@@ -28,13 +28,15 @@ import java.util.Map;
 
 public interface Injector {
 
+    <T> T injectMethod(Object targetObject, MethodInfo<T> methodInfo, Object... parameters);
+
     /**
      * Attempts to inject all the objects for the specified type.
      * 
      * @param targetObject the target object
      * @param objectType the object type to inject
      */
-    void injectFields(Object targetObject, Map<String, Object> parameters, Class<?> objectType);
+    void injectObjects(Object targetObject, Map<String, Object> parameters, Class<?> objectType);
 
     /**
      * Attempts to inject all the objects for the fields annotated
@@ -42,5 +44,5 @@ public interface Injector {
      * 
      * @param targetObject the target object
      */
-    void injectFields(Object targetObject, Map<String, Object> parameters);
+    void injectObjects(Object targetObject, Map<String, Object> parameters);
 }

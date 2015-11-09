@@ -22,18 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inject;
+package org.lanternpowered.server.component.test;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
+import org.lanternpowered.server.component.Component;
 
-public interface FieldInfo<T> {
+public class AnotherTestComponent implements Component {
 
-    Class<? extends T> getType();
-
-    <A extends Annotation> A getAnnotation(Class<A> type);
-
-    List<Annotation> getAnnotations();
-
-    List<Class<? extends Annotation>> getAnnotationTypes();
 }

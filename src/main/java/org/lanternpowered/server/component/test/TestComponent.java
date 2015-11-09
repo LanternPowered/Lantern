@@ -37,6 +37,7 @@ public class TestComponent implements Component {
 
     @Inject public ComponentHolder holder;
     @Inject @Require public ExtendedOtherComponent other;
+    public AnotherTestComponent another;
 
     @OnAttach
     public void onAttach() {
@@ -45,5 +46,11 @@ public class TestComponent implements Component {
 
     @OnDetach
     public void onDetach() {
+    }
+
+    @Inject
+    private void setOtherComponent(@Require AnotherTestComponent another) {
+        System.out.println("Set other test component: " + another);
+        this.another = another;
     }
 }

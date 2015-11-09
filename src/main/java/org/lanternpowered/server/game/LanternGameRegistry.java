@@ -43,6 +43,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 import org.lanternpowered.server.attribute.AttributeTargets;
 import org.lanternpowered.server.attribute.LanternAttribute;
@@ -104,10 +105,8 @@ import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.GameRegistry;
-import org.spongepowered.api.block.BlockSnapshotBuilder;
 import org.spongepowered.api.block.BlockStateBuilder;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -128,54 +127,28 @@ import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.StoneTypes;
-import org.spongepowered.api.data.value.ValueBuilder;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.entity.EntitySnapshotBuilder;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.animal.Horse;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSourceBuilder;
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSourceBuilder;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSourceBuilder;
-import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSourceBuilder;
-import org.spongepowered.api.event.cause.entity.damage.source.ProjectileDamageSourceBuilder;
-import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCauseBuilder;
-import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCauseBuilder;
-import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCauseBuilder;
-import org.spongepowered.api.event.cause.entity.spawn.MobSpawnerSpawnCauseBuilder;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCauseBuilder;
-import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCauseBuilder;
 import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
-import org.spongepowered.api.item.FireworkEffectBuilder;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
-import org.spongepowered.api.item.merchant.TradeOfferBuilder;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
-import org.spongepowered.api.potion.PotionEffectBuilder;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
-import org.spongepowered.api.scoreboard.ScoreboardBuilder;
-import org.spongepowered.api.scoreboard.TeamBuilder;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
-import org.spongepowered.api.scoreboard.objective.ObjectiveBuilder;
 import org.spongepowered.api.statistic.BlockStatistic;
 import org.spongepowered.api.statistic.EntityStatistic;
 import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticBuilder;
-import org.spongepowered.api.statistic.StatisticBuilder.BlockStatisticBuilder;
-import org.spongepowered.api.statistic.StatisticBuilder.EntityStatisticBuilder;
-import org.spongepowered.api.statistic.StatisticBuilder.ItemStatisticBuilder;
-import org.spongepowered.api.statistic.StatisticBuilder.TeamStatisticBuilder;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.statistic.TeamStatistic;
-import org.spongepowered.api.statistic.achievement.AchievementBuilder;
 import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColor;
@@ -200,7 +173,6 @@ import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
-import org.spongepowered.api.world.explosion.ExplosionBuilder;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
 import org.spongepowered.api.world.gen.PopulatorFactory;
@@ -222,7 +194,6 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternGame game;
     private final Set<String> defaultGameRules;
     private final LanternTranslationManager translationManager = new LanternTranslationManager();
-    private final LanternGameDictionary gameDictionary = new LanternGameDictionary();
     private final LanternResourcePackFactory resourcePackFactory = new LanternResourcePackFactory();
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
     private final LanternBiomeRegistry biomeRegistry = new LanternBiomeRegistry();
@@ -278,10 +249,18 @@ public class LanternGameRegistry implements GameRegistry {
             .put(PopulatorType.class, this.populatorTypeRegistry)
             .put(Weather.class, this.weatherRegistry)
             .build();
-    private final Map<Class<?>, BuilderFactory> builderFactories = ImmutableMap.<Class<?>, BuilderFactory>builder()
-            .put(LanternAttributeBuilder.class, type -> createAttributeBuilder())
-            .put(WorldBuilder.class, type -> createWorldBuilder())
+    private final Map<Class<?>, Supplier<Object>> builderFactories = ImmutableMap.<Class<?>, Supplier<Object>>builder()
+            .put(LanternAttributeBuilder.class, () -> new LanternAttributeBuilder(this.attributeRegistry))
+            .put(BlockStateBuilder.class, LanternBlockStateBuilder::new)
+            .put(WorldBuilder.class, () -> createWorldBuilder())
             .build();
+
+    // We cannot add this method directly in builderFactories map,
+    // the compiler will throw a error that the game parameter may
+    // not be initialized yet.
+    private LanternWorldBuilder createWorldBuilder() {
+        return new LanternWorldBuilder(this.game);
+    }
 
     {
         ImmutableSet.Builder<String> builder = ImmutableSet.builder();
@@ -1022,6 +1001,15 @@ public class LanternGameRegistry implements GameRegistry {
         return ImmutableList.of();
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> T createBuilder(Class<T> builderClass) throws IllegalArgumentException {
+        if (this.builderFactories.containsKey(builderClass)) {
+            return (T) this.builderFactories.get(builderClass).get();
+        }
+        throw new IllegalArgumentException();
+    }
+
     public LanternAttributeCalculator getAttributeCalculator() {
         return this.attributeCalculator;
     }
@@ -1110,11 +1098,6 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public GameDictionary getGameDictionary() {
-        return this.gameDictionary;
-    }
-
-    @Override
     public RecipeRegistry getRecipeRegistry() {
         // TODO Auto-generated method stub
         return null;
@@ -1126,12 +1109,8 @@ public class LanternGameRegistry implements GameRegistry {
         return null;
     }
 
-    /**
-     * This method should be renamed in the sponge api,
-     * this can cause collisions.
-     */
     @Override
-    public Optional<ResourcePack> getById(String id) {
+    public Optional<ResourcePack> getResourcePackById(String id) {
         return this.resourcePackFactory.getById(id);
     }
 
@@ -1157,116 +1136,12 @@ public class LanternGameRegistry implements GameRegistry {
         return this.translationManager.getIfPresent(id);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T> Optional<T> createBuilderOfType(Class<T> builderClass) {
-        if (this.builderFactories.containsKey(builderClass)) {
-            return Optional.of((T) this.builderFactories.get(builderClass).create(builderClass));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public ItemStackBuilder createItemBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public TradeOfferBuilder createTradeOfferBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public FireworkEffectBuilder createFireworkEffectBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public PotionEffectBuilder createPotionEffectBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ObjectiveBuilder createObjectiveBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public TeamBuilder createTeamBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ScoreboardBuilder createScoreboardBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public StatisticBuilder createStatisticBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public EntityStatisticBuilder createEntityStatisticBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BlockStatisticBuilder createBlockStatisticBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ItemStatisticBuilder createItemStatisticBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public TeamStatisticBuilder createTeamStatisticBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public AchievementBuilder createAchievementBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public LanternAttributeModifierBuilder createAttributeModifierBuilder() {
         return new LanternAttributeModifierBuilder();
     }
 
     public LanternAttributeBuilder createAttributeBuilder() {
         return new LanternAttributeBuilder(this.attributeRegistry);
-    }
-
-    @Override
-    public WorldBuilder createWorldBuilder() {
-        return new LanternWorldBuilder(this.game);
-    }
-
-    @Override
-    public ExplosionBuilder createExplosionBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ValueBuilder createValueBuilder() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -1294,88 +1169,5 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public ExtentBufferFactory getExtentBufferFactory() {
         return LanternExtentBufferFactory.INSTANCE;
-    }
-
-    @Override
-    public BlockStateBuilder createBlockStateBuilder() {
-        return new LanternBlockStateBuilder();
-    }
-
-    @Override
-    public BlockSnapshotBuilder createBlockSnapshotBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public EntitySnapshotBuilder createEntitySnapshotBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BlockDamageSourceBuilder createBlockDamageSourceBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DamageSourceBuilder createDamageSourceBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public EntityDamageSourceBuilder createEntityDamageSourceBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public FallingBlockDamageSourceBuilder createFallingBlockDamageSourceBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ProjectileDamageSourceBuilder createProjectileDamageSourceBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SpawnCauseBuilder createSpawnCauseBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BlockSpawnCauseBuilder createBlockSpawnCauseBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public EntitySpawnCauseBuilder createEntitySpawnCauseBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BreedingSpawnCauseBuilder createBreedingSpawnCauseBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public MobSpawnerSpawnCauseBuilder createMobSpawnerSpawnCauseBuilder() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public WeatherSpawnCauseBuilder createWeatherSpawnCauseBuilder() {
-        // TODO Auto-generated method stub
-        return null;
     }
 }

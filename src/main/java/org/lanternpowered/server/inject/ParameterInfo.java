@@ -22,14 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game;
+package org.lanternpowered.server.inject;
 
-/**
- * A simple factory interface that is used to create
- * builder instances in the game registry.
- */
-@FunctionalInterface
-interface BuilderFactory {
+import java.lang.annotation.Annotation;
+import java.util.List;
 
-    Object create(Class<?> objectType);
+public interface ParameterInfo<T> {
+
+    Class<? extends T> getType();
+
+    <A extends Annotation> A getAnnotation(Class<A> type);
+
+    List<Annotation> getAnnotations();
+
+    List<Class<? extends Annotation>> getAnnotationTypes();
 }

@@ -75,3 +75,5 @@ nb-configuration.xml
 ###############
 /openCmd.bat
 /run
+/config
+/plugins

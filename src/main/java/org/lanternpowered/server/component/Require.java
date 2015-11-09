@@ -25,6 +25,7 @@
 package org.lanternpowered.server.component;
 
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
@@ -37,8 +38,8 @@ import java.lang.annotation.Target;
  * This is only applicable to component types that aren't interfaces
  * or abstract classes.
  */
-@Target(FIELD)
 @Retention(RUNTIME)
+@Target({ FIELD, PARAMETER })
 public @interface Require {
 
     /**

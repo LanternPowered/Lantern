@@ -45,6 +45,7 @@ import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
@@ -142,6 +143,9 @@ public class LanternGame implements Game {
     // The game registry
     private LanternGameRegistry gameRegistry;
 
+    // The game dictionary
+    private LanternGameDictionary gameDictionary;
+
     // The scheduler
     private LanternScheduler scheduler;
 
@@ -181,6 +185,7 @@ public class LanternGame implements Game {
         this.minecraft = new MinecraftPluginContainer(this);
 
         // Register the game objects
+        this.gameDictionary = new LanternGameDictionary();
         this.gameRegistry = new LanternGameRegistry(this);
         this.gameRegistry.registerGameObjects();
 
@@ -310,6 +315,11 @@ public class LanternGame implements Game {
     @Override
     public LanternGameRegistry getRegistry() {
         return this.gameRegistry;
+    }
+
+    @Override
+    public GameDictionary getGameDictionary() {
+        return this.gameDictionary;
     }
 
     @Override

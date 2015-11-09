@@ -62,19 +62,23 @@ public interface Exclusion {
     public final class Class implements Exclusion {
 
         private final String name;
+        private final String excludeInnerPref;
 
         /**
          * Creates a new class exclusion.
          * 
          * @param name the class name (path)
+         * @param excludeInnerClasses whether the inner classes should also be excluded
          */
-        public Class(String name) {
+        public Class(String name, boolean excludeInnerClasses) {
+            this.excludeInnerPref = excludeInnerClasses ? name + "$" : null;
             this.name = name;
         }
 
         @Override
         public boolean isApplicableFor(String className) {
-            return this.name.equals(className);
+            return this.name.equals(className) || (this.excludeInnerPref != null &&
+                    className.startsWith(this.excludeInnerPref));
         }
     }
 }

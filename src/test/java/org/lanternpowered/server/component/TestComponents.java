@@ -44,6 +44,8 @@ public class TestComponents {
         System.out.println(test.holder.getClass());
         assertNotNull(test.other);
         System.out.println(test.other.getClass());
+        assertNotNull(test.another);
+        System.out.println(test.another.getClass());
         holder = new BaseComponentHolder();
         System.out.println("Took: " + (System.currentTimeMillis() - time) + "ms");
         time = System.currentTimeMillis();

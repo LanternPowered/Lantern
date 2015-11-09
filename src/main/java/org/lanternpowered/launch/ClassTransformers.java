@@ -24,17 +24,19 @@
  */
 package org.lanternpowered.launch;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public final class ClassTransformers {
 
-    final static List<ClassTransformer> transformers = Lists.newCopyOnWriteArrayList();
-    final static Set<Exclusion> loaderExclusions = Sets.newConcurrentHashSet();
-    final static Set<Exclusion> transformerExclusions = Sets.newConcurrentHashSet();
+    final static List<ClassTransformer> transformers = new CopyOnWriteArrayList<>();
+    final static Set<Exclusion> loaderExclusions = Collections.newSetFromMap(
+            new ConcurrentHashMap<Exclusion, Boolean>());
+    final static Set<Exclusion> transformerExclusions = Collections.newSetFromMap(
+            new ConcurrentHashMap<Exclusion, Boolean>());
 
     /**
      * Initializes the transformers.
@@ -55,6 +57,7 @@ public final class ClassTransformers {
         addTransformerExclusion(new Exclusion.Package("org.aopalliance"));
         addTransformerExclusion(new Exclusion.Package("io.netty"));
         addTransformerExclusion(new Exclusion.Package("gnu.trove"));
+        addLoaderExclusion(new Exclusion.Class("com.google.common.io.ByteStreams", true));
         addLoaderExclusion(new Exclusion.Package("org.lanternpowered.launch"));
         addLoaderExclusion(new Exclusion.Package("java"));
         addLoaderExclusion(new Exclusion.Package("sun"));
@@ -68,7 +71,7 @@ public final class ClassTransformers {
     public static void addTransformer(ClassTransformer classTransformer) {
         transformers.add(classTransformer);
         // All the transformer classes should be excluded
-        transformerExclusions.add(new Exclusion.Class(classTransformer.getClass().getName()));
+        transformerExclusions.add(new Exclusion.Class(classTransformer.getClass().getName(), true));
     }
 
     /**

@@ -57,6 +57,11 @@ public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T>
     }
 
     @Override
+    public String getId() {
+        return this.name;
+    }
+
+    @Override
     public String getName() {
         return this.name;
     }

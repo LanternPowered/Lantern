@@ -31,6 +31,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.spongepowered.api.service.config.ConfigRoot;
 
 import java.io.File;
+import java.nio.file.Path;
 
 /**
  * Root for lantern configurations.
@@ -46,23 +47,23 @@ public class LanternConfigRoot implements ConfigRoot {
     }
 
     @Override
-    public File getConfigFile() {
+    public Path getConfigPath() {
         File configFile = new File(this.baseDir, this.pluginName + ".conf");
         if (configFile.getParentFile().isDirectory()) {
             configFile.getParentFile().mkdirs();
         }
-        return configFile;
+        return configFile.toPath();
     }
 
     @Override
     public ConfigurationLoader<CommentedConfigurationNode> getConfig() {
         return HoconConfigurationLoader.builder()
-                .setFile(this.getConfigFile())
+                .setPath(this.getConfigPath())
                 .build();
     }
 
     @Override
-    public File getDirectory() {
-        return this.baseDir;
+    public Path getDirectory() {
+        return this.baseDir.toPath();
     }
 }

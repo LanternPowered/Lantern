@@ -25,6 +25,7 @@
 package org.lanternpowered.server.game;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Locale;
 
 import org.lanternpowered.server.LanternServer;
@@ -348,8 +349,8 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public File getSavesDirectory() {
-        return this.worldsFolder;
+    public Path getSavesDirectory() {
+        return this.worldsFolder.toPath();
     }
 
     /**

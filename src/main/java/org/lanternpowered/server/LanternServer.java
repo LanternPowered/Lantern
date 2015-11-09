@@ -315,7 +315,7 @@ public class LanternServer implements Server {
         if (defaultWorld.isEmpty()) {
             defaultWorld = null;
         }
-        this.worldManager = new LanternWorldManager(this.game.getSavesDirectory(), defaultWorld);
+        this.worldManager = new LanternWorldManager(this.game.getSavesDirectory().toFile(), defaultWorld);
 
         this.game.setGameState(GameState.SERVER_ABOUT_TO_START);
         this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game,
@@ -330,7 +330,7 @@ public class LanternServer implements Server {
         File file = new File(this.config.get(Settings.FAVICON));
         if (file.exists()) {
             try {
-                this.favicon = LanternFavicon.load(file);
+                this.favicon = LanternFavicon.load(file.toPath());
             } catch (IOException e) {
                 LanternGame.log().error("Failed to load the favicon", e);
             }

@@ -31,11 +31,11 @@ import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.base64.Base64;
 
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 
 import javax.imageio.ImageIO;
 
@@ -122,8 +122,8 @@ public class LanternFavicon implements Favicon {
      * @param file the file
      * @return the favicon
      */
-    public static Favicon load(File file) throws IOException {
-        return load(ImageIO.read(checkNotNull(file, "file")));
+    public static Favicon load(Path path) throws IOException {
+        return load(ImageIO.read(checkNotNull(path, "path").toFile()));
     }
 
     /**

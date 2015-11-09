@@ -28,12 +28,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -1078,8 +1078,8 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public Favicon loadFavicon(File file) throws IOException {
-        return LanternFavicon.load(file);
+    public Favicon loadFavicon(Path path) throws IOException {
+        return LanternFavicon.load(path);
     }
 
     @Override

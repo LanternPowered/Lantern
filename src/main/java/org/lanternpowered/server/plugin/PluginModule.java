@@ -24,7 +24,7 @@
  */
 package org.lanternpowered.server.plugin;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
@@ -75,9 +75,9 @@ public final class PluginModule extends AbstractModule {
         this.bind(Game.class).toInstance(this.game);
 
         // Plugin-private config directory (shared dir is in the global guice module)
-        this.bind(File.class).annotatedWith(privateConfigDir).toProvider(PrivateConfigDirProvider.class);
-        this.bind(File.class).annotatedWith(sharedConfigFile).toProvider(SharedConfigFileProvider.class); // Shared-directory config file
-        this.bind(File.class).annotatedWith(privateConfigFile).toProvider(PrivateConfigFileProvider.class); // Plugin-private directory config file
+        this.bind(Path.class).annotatedWith(privateConfigDir).toProvider(PrivateConfigDirProvider.class);
+        this.bind(Path.class).annotatedWith(sharedConfigFile).toProvider(SharedConfigFileProvider.class); // Shared-directory config file
+        this.bind(Path.class).annotatedWith(privateConfigFile).toProvider(PrivateConfigFileProvider.class); // Plugin-private directory config file
 
         this.bind(new TypeLiteral<ConfigurationLoader<CommentedConfigurationNode>>() {
         }).annotatedWith(sharedConfigFile).toProvider(SharedHoconConfigProvider.class); // Loader for shared-directory config file
@@ -85,7 +85,7 @@ public final class PluginModule extends AbstractModule {
         }).annotatedWith(privateConfigFile).toProvider(PrivateHoconConfigProvider.class); // Loader for plugin-private directory config file
     }
 
-    private static class PrivateConfigDirProvider implements Provider<File> {
+    private static class PrivateConfigDirProvider implements Provider<Path> {
 
         private final PluginContainer container;
         private final LanternGame game;
@@ -97,12 +97,12 @@ public final class PluginModule extends AbstractModule {
         }
 
         @Override
-        public File get() {
+        public Path get() {
             return this.game.getConfigService().getPluginConfig(this.container).getDirectory();
         }
     }
 
-    private static class PrivateConfigFileProvider implements Provider<File> {
+    private static class PrivateConfigFileProvider implements Provider<Path> {
 
         private final PluginContainer container;
         private final LanternGame game;
@@ -114,12 +114,12 @@ public final class PluginModule extends AbstractModule {
         }
 
         @Override
-        public File get() {
-            return this.game.getConfigService().getPluginConfig(this.container).getConfigFile();
+        public Path get() {
+            return this.game.getConfigService().getPluginConfig(this.container).getConfigPath();
         }
     }
 
-    private static class SharedConfigFileProvider implements Provider<File> {
+    private static class SharedConfigFileProvider implements Provider<Path> {
 
         private final PluginContainer container;
         private final LanternGame game;
@@ -131,8 +131,8 @@ public final class PluginModule extends AbstractModule {
         }
 
         @Override
-        public File get() {
-            return this.game.getConfigService().getSharedConfig(this.container).getConfigFile();
+        public Path get() {
+            return this.game.getConfigService().getSharedConfig(this.container).getConfigPath();
         }
     }
 

@@ -26,9 +26,14 @@ package org.lanternpowered.server.effect.particle;
 
 import java.awt.Color;
 
+import org.spongepowered.api.data.type.NotePitch;
+import org.spongepowered.api.effect.particle.ColoredParticle;
+import org.spongepowered.api.effect.particle.ItemParticle;
+import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.effect.particle.ResizableParticle;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import com.flowpowered.math.vector.Vector3d;
 
@@ -66,7 +71,7 @@ public class LanternParticleEffect implements ParticleEffect {
         return this.count;
     }
 
-    public static class Colorable extends LanternParticleEffect implements ParticleEffect.Colorable {
+    public static class Colorable extends LanternParticleEffect implements ColoredParticle {
 
         private final Color color;
 
@@ -81,7 +86,7 @@ public class LanternParticleEffect implements ParticleEffect {
         }
     }
 
-    public static class Resizable extends LanternParticleEffect implements ParticleEffect.Resizable {
+    public static class Resizable extends LanternParticleEffect implements ResizableParticle {
 
         private final float size;
 
@@ -96,32 +101,32 @@ public class LanternParticleEffect implements ParticleEffect {
         }
     }
 
-    public static class Note extends LanternParticleEffect implements ParticleEffect.Note {
+    public static class Note extends LanternParticleEffect implements NoteParticle {
 
-        private final float note;
+        private final NotePitch note;
 
-        Note(ParticleType type, Vector3d motion, Vector3d offset, int count, float note) {
+        Note(ParticleType type, Vector3d motion, Vector3d offset, int count, NotePitch note) {
             super(type, motion, offset, count);
             this.note = note;
         }
 
         @Override
-        public float getNote() {
+        public NotePitch getNote() {
             return this.note;
         }
     }
 
-    public static class Material extends LanternParticleEffect implements ParticleEffect.Material {
+    public static class Material extends LanternParticleEffect implements ItemParticle {
 
-        private final ItemStack item;
+        private final ItemStackSnapshot item;
 
-        Material(ParticleType type, Vector3d motion, Vector3d offset, int count, ItemStack item) {
+        Material(ParticleType type, Vector3d motion, Vector3d offset, int count, ItemStackSnapshot item) {
             super(type, motion, offset, count);
             this.item = item;
         }
 
         @Override
-        public ItemStack getItem() {
+        public ItemStackSnapshot getItem() {
             return this.item.copy();
         }
     }

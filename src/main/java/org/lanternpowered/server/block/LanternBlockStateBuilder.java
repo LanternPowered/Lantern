@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Optional;
 
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockStateBuilder;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataView;
@@ -37,7 +36,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.service.persistence.InvalidDataException;
 
-public class LanternBlockStateBuilder implements BlockStateBuilder {
+public class LanternBlockStateBuilder implements BlockState.Builder {
 
     private BlockState blockState;
 
@@ -46,25 +45,25 @@ public class LanternBlockStateBuilder implements BlockStateBuilder {
     }
 
     @Override
-    public BlockStateBuilder reset() {
+    public LanternBlockStateBuilder reset() {
         this.blockState = BlockTypes.STONE.getDefaultState();
         return this;
     }
 
     @Override
-    public BlockStateBuilder blockType(BlockType blockType) {
+    public LanternBlockStateBuilder blockType(BlockType blockType) {
         this.blockState = checkNotNull(blockType, "blockType").getDefaultState();
         return this;
     }
 
     @SuppressWarnings("rawtypes")
     @Override
-    public BlockStateBuilder add(DataManipulator<?, ?> manipulator) {
+    public LanternBlockStateBuilder add(DataManipulator<?, ?> manipulator) {
         return this.add((ImmutableDataManipulator) manipulator.asImmutable());
     }
 
     @Override
-    public BlockStateBuilder add(ImmutableDataManipulator<?, ?> manipulator) {
+    public LanternBlockStateBuilder add(ImmutableDataManipulator<?, ?> manipulator) {
         final Optional<BlockState> optional = this.blockState.with(manipulator);
         if (optional.isPresent()) {
             this.blockState = optional.get();
@@ -73,7 +72,7 @@ public class LanternBlockStateBuilder implements BlockStateBuilder {
     }
 
     @Override
-    public BlockStateBuilder from(BlockState holder) {
+    public LanternBlockStateBuilder from(BlockState holder) {
         this.blockState = checkNotNull(holder, "holder");
         return this;
     }

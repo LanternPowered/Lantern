@@ -40,7 +40,6 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.scheduler.SchedulerService;
 import org.spongepowered.api.service.scheduler.Task;
-import org.spongepowered.api.service.scheduler.TaskBuilder;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFutureTask;
@@ -62,7 +61,7 @@ public class LanternScheduler implements SchedulerService {
     private final SyncScheduler syncScheduler = new SyncScheduler();
 
     @Override
-    public TaskBuilder createTaskBuilder() {
+    public LanternTaskBuilder createTaskBuilder() {
         return new LanternTaskBuilder(this);
     }
 

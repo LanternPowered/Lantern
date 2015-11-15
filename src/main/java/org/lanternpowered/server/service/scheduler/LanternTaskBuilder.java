@@ -33,12 +33,11 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.scheduler.Task;
-import org.spongepowered.api.service.scheduler.TaskBuilder;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
-public class LanternTaskBuilder implements TaskBuilder {
+public class LanternTaskBuilder implements Task.Builder {
 
     private final LanternScheduler scheduler;
 
@@ -51,24 +50,34 @@ public class LanternTaskBuilder implements TaskBuilder {
     private boolean intervalIsTicks;
 
     public LanternTaskBuilder(LanternScheduler scheduler) {
-        this.syncType = ScheduledTask.TaskSynchronicity.SYNCHRONOUS;
         this.scheduler = scheduler;
+        this.reset();
     }
 
     @Override
-    public TaskBuilder async() {
+    public LanternTaskBuilder reset() {
+        this.name = null;
+        this.consumer = null;
+        this.syncType = ScheduledTask.TaskSynchronicity.SYNCHRONOUS;
+        this.delay = 0;
+        this.interval = 0;
+        return this;
+    }
+
+    @Override
+    public LanternTaskBuilder async() {
         this.syncType = ScheduledTask.TaskSynchronicity.ASYNCHRONOUS;
         return this;
     }
 
     @Override
-    public TaskBuilder execute(Consumer<Task> consumer) {
+    public LanternTaskBuilder execute(Consumer<Task> consumer) {
         this.consumer = consumer;
         return this;
     }
 
     @Override
-    public TaskBuilder delay(long delay, TimeUnit unit) {
+    public LanternTaskBuilder delay(long delay, TimeUnit unit) {
         checkArgument(delay >= 0, "delay cannot be negative");
         this.delay = checkNotNull(unit, "unit").toMillis(delay);
         this.delayIsTicks = false;
@@ -76,7 +85,7 @@ public class LanternTaskBuilder implements TaskBuilder {
     }
 
     @Override
-    public TaskBuilder delayTicks(long delay) {
+    public LanternTaskBuilder delayTicks(long delay) {
         checkArgument(delay >= 0, "delay cannot be negative");
         this.delay = delay;
         this.delayIsTicks = true;
@@ -84,7 +93,7 @@ public class LanternTaskBuilder implements TaskBuilder {
     }
 
     @Override
-    public TaskBuilder interval(long interval, TimeUnit unit) {
+    public LanternTaskBuilder interval(long interval, TimeUnit unit) {
         checkArgument(interval >= 0, "interval cannot be negative");
         this.interval = checkNotNull(unit, "unit").toMillis(interval);
         this.intervalIsTicks = false;
@@ -92,7 +101,7 @@ public class LanternTaskBuilder implements TaskBuilder {
     }
 
     @Override
-    public TaskBuilder intervalTicks(long interval) {
+    public LanternTaskBuilder intervalTicks(long interval) {
         checkArgument(interval >= 0, "interval cannot be negative");
         this.interval = interval;
         this.intervalIsTicks = true;
@@ -100,7 +109,7 @@ public class LanternTaskBuilder implements TaskBuilder {
     }
 
     @Override
-    public TaskBuilder name(String name) {
+    public LanternTaskBuilder name(String name) {
         this.name = checkNotNullOrEmpty(name, "name");
         return this;
     }

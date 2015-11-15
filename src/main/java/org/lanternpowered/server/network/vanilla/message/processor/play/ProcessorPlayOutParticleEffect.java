@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.lanternpowered.server.block.LanternBlocks;
+import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.item.LanternItems;
 import org.lanternpowered.server.network.message.Message;
@@ -40,11 +41,16 @@ import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutSpawnParticle;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.type.NotePitch;
+import org.spongepowered.api.effect.particle.ColoredParticle;
+import org.spongepowered.api.effect.particle.ItemParticle;
+import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ParticleTypes;
+import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
 import com.flowpowered.math.vector.Vector3f;
 
@@ -75,9 +81,9 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         // Depends on behavior
         // Note: If the count > 0 -> speed = 0f else if count = 0 -> speed = 1f
 
-        if (effect instanceof ParticleEffect.Material) {
-            ItemStack item = ((ParticleEffect.Material) effect).getItem();
-            ItemType itemType = item.getItem();
+        if (effect instanceof ItemParticle) {
+            ItemStackSnapshot item = ((ItemParticle) effect).getItem();
+            ItemType itemType = item.getType();
             int extraData = 0;
             if (type == ParticleTypes.ITEM_CRACK) {
                 extraData = LanternItems.getId(itemType);
@@ -96,8 +102,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             extra = new int[] { extraData };
         }
 
-        if (effect instanceof ParticleEffect.Resizable) {
-            float size = ((ParticleEffect.Resizable) effect).getSize();
+        if (effect instanceof ResizableParticle) {
+            float size = ((ResizableParticle) effect).getSize();
 
             // The formula of the large explosion acts strange
             // Client formula: sizeClient = 1 - sizeServer * 0.5
@@ -113,8 +119,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             }
 
             f0 = size;
-        } else if (effect instanceof ParticleEffect.Colorable) {
-            Color color0 = ((ParticleEffect.Colorable) effect).getColor();
+        } else if (effect instanceof ColoredParticle) {
+            Color color0 = ((ColoredParticle) effect).getColor();
             Color color1 = ((ParticleType.Colorable) type).getDefaultColor();
 
             if (color0.equals(color1)) {
@@ -130,15 +136,16 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             if (f0 == 0f && type == ParticleTypes.REDSTONE) {
                 f0 = 0.00001f;
             }
-        } else if (effect instanceof ParticleEffect.Note) {
-            float note = ((ParticleEffect.Note) effect).getNote();
+        } else if (effect instanceof NoteParticle) {
+            NotePitch note = ((NoteParticle) effect).getNote();
+            int internalId = ((LanternNotePitch) note).getInternalId();
 
-            if (note == 0f) {
+            if (internalId == 0) {
                 output.add(new MessagePlayOutSpawnParticle(count, position, offset, 0f, count, extra));
                 return;
             }
 
-            f0 = note / 24f;
+            f0 = (float) internalId / 24f;
         } else if (type.hasMotion()) {
             Vector3f motion = effect.getMotion().toFloat();
 

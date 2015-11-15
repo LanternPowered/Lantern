@@ -24,8 +24,6 @@
  */
 package org.lanternpowered.server.game;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -71,7 +69,6 @@ import org.lanternpowered.server.data.type.LanternShrubType;
 import org.lanternpowered.server.data.type.LanternShrubTypes;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternStoneTypes;
-import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
@@ -107,13 +104,12 @@ import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.GameRegistry;
-import org.spongepowered.api.block.BlockStateBuilder;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.ImmutableDataRegistry;
 import org.spongepowered.api.data.manipulator.DataManipulatorRegistry;
-import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.DirtTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
@@ -122,7 +118,6 @@ import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.NotePitches;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.data.type.PlantTypes;
-import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.StoneType;
@@ -163,6 +158,7 @@ import org.spongepowered.api.text.selector.SelectorTypes;
 import org.spongepowered.api.text.selector.Selectors;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.util.rotation.Rotations;
 import org.spongepowered.api.world.DimensionType;
@@ -251,7 +247,7 @@ public class LanternGameRegistry implements GameRegistry {
             .build();
     private final Map<Class<?>, Supplier<Object>> builderFactories = ImmutableMap.<Class<?>, Supplier<Object>>builder()
             .put(LanternAttributeBuilder.class, () -> new LanternAttributeBuilder(this.attributeRegistry))
-            .put(BlockStateBuilder.class, LanternBlockStateBuilder::new)
+            .put(BlockState.Builder.class, LanternBlockStateBuilder::new)
             .put(WorldBuilder.class, () -> createWorldBuilder())
             .build();
 
@@ -288,6 +284,8 @@ public class LanternGameRegistry implements GameRegistry {
         }
         this.registered = true;
         this.registerWeathers();
+        this.registerNotePitches();
+        // The particle types, requires NotePitches
         this.registerParticleTypes();
         this.registerTextFactory();
         this.registerTextStyles();
@@ -345,7 +343,7 @@ public class LanternGameRegistry implements GameRegistry {
         mappings.put("villager_angry", new LanternParticleType(20, "angryVillager", false));
         mappings.put("villager_happy", new LanternParticleType(21, "happyVillager", true));
         mappings.put("town_aura", new LanternParticleType(22, "townaura", true));
-        mappings.put("note", new LanternParticleType.Note(23, "note", false, 0f));
+        mappings.put("note", new LanternParticleType.Note(23, "note", false, NotePitches.F_SHARP0));
         mappings.put("portal", new LanternParticleType(24, "portal", true));
         mappings.put("enchantment_table", new LanternParticleType(25, "enchantmenttable", true));
         mappings.put("flame", new LanternParticleType(26, "flame", true));
@@ -1003,7 +1001,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T createBuilder(Class<T> builderClass) throws IllegalArgumentException {
+    public <T extends ResettableBuilder<T>> T createBuilder(Class<T> builderClass) throws IllegalArgumentException {
         if (this.builderFactories.containsKey(builderClass)) {
             return (T) this.builderFactories.get(builderClass).get();
         }
@@ -1012,12 +1010,6 @@ public class LanternGameRegistry implements GameRegistry {
 
     public LanternAttributeCalculator getAttributeCalculator() {
         return this.attributeCalculator;
-    }
-
-    @Override
-    public Collection<Career> getCareers(Profession profession) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -1142,22 +1134,6 @@ public class LanternGameRegistry implements GameRegistry {
 
     public LanternAttributeBuilder createAttributeBuilder() {
         return new LanternAttributeBuilder(this.attributeRegistry);
-    }
-
-    @Override
-    public LanternParticleEffectBuilder createParticleEffectBuilder(ParticleType particle) {
-        checkNotNull(particle, "particleType");
-        if (particle instanceof ParticleType.Colorable) {
-            return new LanternParticleEffectBuilder.Colorable((ParticleType.Colorable) particle);
-        } else if (particle instanceof ParticleType.Material) {
-            return new LanternParticleEffectBuilder.Material((ParticleType.Material) particle);
-        } else if (particle instanceof ParticleType.Note) {
-            return new LanternParticleEffectBuilder.Note((ParticleType.Note) particle);
-        } else if (particle instanceof ParticleType.Resizable) {
-            return new LanternParticleEffectBuilder.Resizable((ParticleType.Resizable) particle);
-        } else {
-            return new LanternParticleEffectBuilder(particle);
-        }
     }
 
     @Override

@@ -27,6 +27,8 @@ package org.lanternpowered.server.effect.particle;
 import java.awt.Color;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.data.type.LanternNotePitch;
+import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.item.inventory.ItemStack;
 
@@ -97,15 +99,19 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
 
     public static class Note extends LanternParticleType implements ParticleType.Note {
 
-        private final float defaultNote;
+        private final NotePitch defaultNote;
 
-        public Note(int internalId, String name, boolean hasMotion, float defaultNote) {
+        public Note(int internalId, String name, boolean hasMotion, NotePitch defaultNote) {
             super(internalId, name, hasMotion);
             this.defaultNote = defaultNote;
         }
 
         @Override
         public float getDefaultNote() {
+            return ((LanternNotePitch) this.defaultNote).getInternalId();
+        }
+
+        public NotePitch getDefaultNotePitch() {
             return this.defaultNote;
         }
     }

@@ -39,7 +39,11 @@ public final class CodecPlayOutPlayerJoinGame implements Codec<MessagePlayOutPla
     public ByteBuf encode(CodecContext context, MessagePlayOutPlayerJoinGame message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
         buf.writeInt(message.getEntityId());
-        buf.writeByte(message.getGameMode().getInternalId());
+        byte gameMode = message.getGameMode().getInternalId();
+        if (message.isHardcore()) {
+            gameMode |= 0x8;
+        }
+        buf.writeByte(gameMode);
         buf.writeByte(message.getDimensionType().getInternalId());
         buf.writeByte(message.getDifficulty().getInternalId());
         buf.writeByte(Math.min(message.getPlayerListSize(), 255));

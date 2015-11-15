@@ -27,11 +27,10 @@ package org.lanternpowered.server.inject;
 public interface InjectorFactory {
 
     /**
-     * Creates a injector for the specified object type.
+     * Creates a injector for the specified module.
      * 
-     * @param objectType the object type
      * @param module the module that should be used
      * @return the injector
      */
-    Injector create(Class<?> objectType, Module module);
+    Injector create(Module module);
 }

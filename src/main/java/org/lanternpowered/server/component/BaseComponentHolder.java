@@ -32,17 +32,15 @@ import java.util.Optional;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inject.Injector;
-import org.lanternpowered.server.inject.InjectorFactory;
 import org.lanternpowered.server.inject.Injectors;
-import org.lanternpowered.server.inject.MethodInfo;
-import org.lanternpowered.server.inject.Module;
+import org.lanternpowered.server.inject.MethodSpec;
 import org.lanternpowered.server.inject.Modules;
-import org.lanternpowered.server.inject.ObjectSuppliers;
+import org.lanternpowered.server.inject.ParameterSpec;
+
 import org.spongepowered.api.Game;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public class BaseComponentHolder implements ComponentHolder {
@@ -52,12 +50,15 @@ public class BaseComponentHolder implements ComponentHolder {
     // injected objects
     private static final String ALLOWED = "allowed";
 
+    private static final MethodSpec<Void> ON_ATTACH = MethodSpec.ofAnnotated(Void.class, OnAttach.class);
+    private static final MethodSpec<Void> ON_DETACH = MethodSpec.ofAnnotated(Void.class, OnDetach.class);
+
     @SuppressWarnings("unchecked")
-    private static final Module MODULE = Modules.builder()
-            .bind(ComponentHolder.class).toProvider((target, params, info) -> {
+    private static final Injector INJECTOR = Injectors.get().create(Modules.builder()
+            .bind(ParameterSpec.of(ComponentHolder.class), (target, params, info) -> {
                 return (ComponentHolder) params.get(HOLDER);
             })
-            .bind(Component.class).toProvider((target, params, info) -> {
+            .bind(ParameterSpec.of(Component.class), (target, params, info) -> {
                 Require req = info.getAnnotation(Require.class);
                 BaseComponentHolder holder = (BaseComponentHolder) params.get(HOLDER);
                 if (req != null && req.autoAttach()) {
@@ -66,38 +67,32 @@ public class BaseComponentHolder implements ComponentHolder {
                     return holder.getComponent(info.getType()).orElse(null);
                 }
             })
-            .bind(Game.class).toInstance(LanternGame.get())
-            .build();
-    @SuppressWarnings("unchecked")
-    private static final MethodInfo<Void> ON_ATTACH = new MethodInfo<>(
-            Void.class, Lists.newArrayList(), Lists.newArrayList(OnAttach.class));
-    @SuppressWarnings("unchecked")
-    private static final MethodInfo<Void> ON_DETACH = new MethodInfo<>(
-            Void.class, Lists.newArrayList(), Lists.newArrayList(OnDetach.class));
+            .bind(ParameterSpec.of(Game.class), LanternGame.get())
+            .bind(ON_ATTACH)
+            .bind(ON_DETACH)
+            .build());
 
     private final Map<Class<? extends Component>, Component> components = Maps.newConcurrentMap();
 
     @SuppressWarnings("unchecked")
-    private <T extends Component> T addComponent(Class<T> type, List<Component> allowed) {
+    private <T extends Component> T addComponent(Class<? extends T> type, List<Component> allowed) {
         T component = (T) this.components.get(type);
         if (component != null) {
             return component;
         }
-        component = ObjectSuppliers.get().get(type, MODULE);
+        component = INJECTOR.instantiate(type);
         if (allowed == null) {
             allowed = ImmutableList.copyOf(this.components.values());
         }
         this.components.put(type, component);
-        InjectorFactory factory = Injectors.get();
-        Injector injector = factory.create(type, MODULE);
         Map<String, Object> params = ImmutableMap.of(HOLDER, this, ALLOWED, allowed);
-        injector.injectObjects(component, params);
+        INJECTOR.injectObjects(component, params);
         for (Entry<Class<? extends Component>, Component> entry : this.components.entrySet()) {
             if (allowed == null || allowed.contains(entry.getValue())) {
-                factory.create(entry.getKey(), MODULE).injectObjects(entry.getValue(), params);
+                INJECTOR.injectObjects(entry.getValue(), params);
             }
         }
-        injector.injectMethod(component, ON_ATTACH);
+        INJECTOR.injectMethod(component, ON_ATTACH);
         return component;
     }
 

@@ -31,6 +31,8 @@ import org.lanternpowered.server.game.LanternGame;
 import com.google.common.base.Equivalence;
 import com.google.common.cache.CacheBuilder;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 public final class CacheBuilderHelper {
 
     private static Method keyEquivalenceMethod;
@@ -48,6 +50,7 @@ public final class CacheBuilderHelper {
      */
     public static <K, V> CacheBuilder<K, V> keyEquivalence(CacheBuilder<K, V> builder,
             Equivalence<K> equivalence) {
+        checkNotNull(builder, "cacheBuilder");
         try {
             if (keyEquivalenceMethod == null) {
                 keyEquivalenceMethod = CacheBuilder.class.getDeclaredMethod(
@@ -76,6 +79,7 @@ public final class CacheBuilderHelper {
      */
     public static <K, V> CacheBuilder<K, V> valueEquivalence(CacheBuilder<K, V> builder,
             Equivalence<K> equivalence) {
+        checkNotNull(builder, "cacheBuilder");
         try {
             if (valueEquivalenceMethod == null) {
                 valueEquivalenceMethod = CacheBuilder.class.getDeclaredMethod(

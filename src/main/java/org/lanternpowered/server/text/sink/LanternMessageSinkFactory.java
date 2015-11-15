@@ -118,6 +118,7 @@ public class LanternMessageSinkFactory implements MessageSinkFactory {
     }
 
     private static class CombinedSink extends MessageSink {
+
         private final Iterable<MessageSink> contents;
 
         private CombinedSink(Iterable<MessageSink> contents) {

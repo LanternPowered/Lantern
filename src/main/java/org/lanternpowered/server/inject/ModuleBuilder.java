@@ -28,9 +28,47 @@ import java.util.function.Supplier;
 
 public interface ModuleBuilder {
 
-    <T> BindingBuilder<T> bind(Class<T> type);
-
     <T> ModuleBuilder bindInstantiator(Class<T> type, Supplier<? extends T> supplier);
 
+    /**
+     * Binds the method spec.
+     * 
+     * @param methodSpec the method spec
+     * @return the module builder
+     */
+    <T> ModuleBuilder bind(MethodSpec<T> methodSpec);
+
+    /**
+     * Binds the parameter spec to the specified provider.
+     * 
+     * @param spec the parameter spec
+     * @param provider the provider
+     * @return the module builder for chaining
+     */
+    <T> ModuleBuilder bind(ParameterSpec<T> spec, Provider<? extends T> provider);
+
+    /**
+     * Binds the parameter spec to the specified supplier.
+     * 
+     * @param spec the parameter spec
+     * @param supplier the supplier
+     * @return the module builder for chaining
+     */
+    <T> ModuleBuilder bind(ParameterSpec<T> spec, Supplier<? extends T> supplier);
+
+    /**
+     * Binds the parameter spec to the specified instance.
+     * 
+     * @param spec the parameter spec
+     * @param instance the instance
+     * @return the module builder for chaining
+     */
+    <T, V extends T> ModuleBuilder bind(ParameterSpec<T> spec, V instance);
+
+    /**
+     * Builds to the module.
+     * 
+     * @return the module
+     */
     Module build();
 }

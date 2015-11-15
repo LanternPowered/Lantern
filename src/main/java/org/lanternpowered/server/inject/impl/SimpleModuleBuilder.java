@@ -24,36 +24,64 @@
  */
 package org.lanternpowered.server.inject.impl;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
 import org.lanternpowered.server.inject.Binding;
-import org.lanternpowered.server.inject.BindingBuilder;
+import org.lanternpowered.server.inject.MethodSpec;
 import org.lanternpowered.server.inject.Module;
 import org.lanternpowered.server.inject.ModuleBuilder;
+import org.lanternpowered.server.inject.ParameterSpec;
+import org.lanternpowered.server.inject.Provider;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 public final class SimpleModuleBuilder implements ModuleBuilder {
 
-    final List<Binding<?>> bindings = Lists.newArrayList();
-    final Map<Class<?>, Supplier<?>> suppliers = Maps.newHashMap();
-
-    @Override
-    public <T> BindingBuilder<T> bind(Class<T> type) {
-        return new SimpleBindingBuilder<T>(type, this);
-    }
+    private final List<MethodSpec<?>> methodBindings = Lists.newArrayList();
+    private final List<Binding<?>> bindings = Lists.newArrayList();
+    private final Map<Class<?>, Supplier<?>> suppliers = Maps.newHashMap();
 
     @Override
     public Module build() {
-        return new SimpleModule(this.bindings, this.suppliers);
+        return new SimpleModule(this.bindings, this.suppliers, this.methodBindings);
     }
 
     @Override
     public <T> ModuleBuilder bindInstantiator(Class<T> type, Supplier<? extends T> supplier) {
+        checkNotNull(supplier, "supplier");
+        checkNotNull(type, "type");
         this.suppliers.put(type, supplier);
+        return this;
+    }
+
+    @Override
+    public <T> ModuleBuilder bind(ParameterSpec<T> spec, Provider<? extends T> provider) {
+        checkNotNull(spec, "spec");
+        checkNotNull(provider, "provider");
+        this.bindings.add(new SimpleBinding<T>(spec, provider));
+        return this;
+    }
+
+    @Override
+    public <T> ModuleBuilder bind(ParameterSpec<T> spec, Supplier<? extends T> supplier) {
+        checkNotNull(supplier, "supplier");
+        return this.bind(spec, (target, params, info) -> supplier.get());
+    }
+
+    @Override
+    public <T, V extends T> ModuleBuilder bind(ParameterSpec<T> spec, V instance) {
+        return this.bind(spec, (target, params, info) -> instance);
+    }
+
+    @Override
+    public <T> ModuleBuilder bind(MethodSpec<T> methodSpec) {
+        checkNotNull(methodSpec, "methodSpec");
+        this.methodBindings.add(methodSpec);
         return this;
     }
 }

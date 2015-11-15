@@ -24,25 +24,55 @@
  */
 package org.lanternpowered.server.inject;
 
+import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public interface Injector {
 
-    <T> T injectMethod(Object targetObject, MethodInfo<T> methodInfo, Object... parameters);
+    /**
+     * Attempts for instantiate a object of the given type.
+     * 
+     * @param objectType the object type
+     * @return the created object
+     */
+    <T> T instantiate(Class<T> objectType);
 
     /**
      * Attempts to inject all the objects for the specified type.
      * 
      * @param targetObject the target object
+     * @param parameters the parameters that should be passed through to the providers
      * @param objectType the object type to inject
      */
     void injectObjects(Object targetObject, Map<String, Object> parameters, Class<?> objectType);
+
+    /**
+     * Attempts to inject all the objects for the specified type that
+     * are valid for the predicate.
+     * 
+     * @param targetObject the target object
+     * @param parameters the parameters that should be passed through to the providers
+     * @param predicate the predicate
+     */
+    void injectObjects(Object targetObject, Map<String, Object> parameters, Predicate<ParameterInfo<?>> info);
 
     /**
      * Attempts to inject all the objects for the fields annotated
      * with {@link Inject}.
      * 
      * @param targetObject the target object
+     * @param parameters the parameters that should be passed through to the providers
      */
     void injectObjects(Object targetObject, Map<String, Object> parameters);
+
+    /**
+     * Attempts to inject the method with the specified spec and parameters.
+     * 
+     * @param targetObject the target object
+     * @param spec the spec that should be used
+     * @param parameters the parameters
+     * @return the returned value
+     */
+    <T> List<T> injectMethod(Object targetObject, MethodSpec<T> spec, Object... parameters);
 }

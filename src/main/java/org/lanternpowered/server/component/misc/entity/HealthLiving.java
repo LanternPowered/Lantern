@@ -46,4 +46,5 @@ public class HealthLiving extends HealthBase {
         // TODO Auto-generated method stub
         
     }
+
 }

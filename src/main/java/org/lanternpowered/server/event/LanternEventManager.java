@@ -67,12 +67,10 @@ public class LanternEventManager implements EventManager {
      */
     private final LoadingCache<Class<? extends Event>, RegisteredHandlerCache> handlersCache =
             CacheBuilder.newBuilder().build(new CacheLoader<Class<? extends Event>, RegisteredHandlerCache>() {
-
                 @Override
                 public RegisteredHandlerCache load(Class<? extends Event> eventClass) throws Exception {
                     return bakeHandlers(eventClass);
                 }
-
             });
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

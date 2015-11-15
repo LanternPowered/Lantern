@@ -40,7 +40,9 @@ import com.google.common.collect.Lists;
 public abstract class HealthBase implements Health {
 
     @Inject private ComponentHolder holder;
+
     private double health;
+    private double absorptionHealth;
 
     @Override
     public double getHealth() {
@@ -50,6 +52,16 @@ public abstract class HealthBase implements Health {
     @Override
     public void setHealth(double health) {
         this.health = GenericMath.clamp(health, 0.0, this.getMaxHealth());
+    }
+
+    @Override
+    public double getAbsorptionHealth() {
+        return this.absorptionHealth;
+    }
+
+    @Override
+    public void setAbsorptionHealth(double absorptionHealth) {
+        this.absorptionHealth = Math.max(0.0, absorptionHealth);
     }
 
     @Override

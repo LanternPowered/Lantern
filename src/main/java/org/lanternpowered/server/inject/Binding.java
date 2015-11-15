@@ -24,29 +24,19 @@
  */
 package org.lanternpowered.server.inject;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-
 public interface Binding<T> {
 
     /**
-     * Gets the object type.
+     * Gets the parameter spec.
      * 
-     * @return the type
+     * @return the parameter spec
      */
-    Class<T> getType();
+    ParameterSpec<T> getParameterSpec();
 
     /**
      * Gets the provider.
      * 
      * @return the provider
      */
-    Provider<T> getProvider();
-
-    /**
-     * Gets the annotations.
-     * 
-     * @return the annotations
-     */
-    List<Class<? extends Annotation>> getAnnotations();
+    Provider<? extends T> getProvider();
 }

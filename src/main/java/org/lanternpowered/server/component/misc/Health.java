@@ -74,4 +74,8 @@ public interface Health extends Component {
      * @param maxHealth the max health
      */
     void setMaxHealth(double maxHealth);
+
+    double getAbsorptionHealth();
+
+    void setAbsorptionHealth(double absorptionHealth);
 }

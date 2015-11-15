@@ -43,14 +43,30 @@ public final class MessagePlayOutPlayerJoinGame implements Message {
     // Reduce info on the debug screen
     private final boolean reducedDebug;
 
+    // Whether the hardcore mode is enabled, there is currently
+    // no other way to change this on the client.
+    // This will change the appearance of the hearts.
+    private final boolean hardcore;
+
     public MessagePlayOutPlayerJoinGame(LanternGameMode gameMode, LanternDimensionType dimensionType,
-            LanternDifficulty difficulty, int entityId, int playerListSize, boolean reducedDebug) {
+            LanternDifficulty difficulty, int entityId, int playerListSize,
+            boolean reducedDebug, boolean hardcore) {
         this.dimensionType = checkNotNull(dimensionType, "dimensionType");
         this.difficulty = checkNotNull(difficulty, "difficulty");
         this.gameMode = checkNotNull(gameMode, "gameMode");
         this.playerListSize = playerListSize;
         this.reducedDebug = reducedDebug;
+        this.hardcore = hardcore;
         this.entityId = entityId;
+    }
+
+    /**
+     * Gets whether the hardcore mode is enabled.
+     * 
+     * @return hardcore mode
+     */
+    public boolean isHardcore() {
+        return this.hardcore;
     }
 
     /**

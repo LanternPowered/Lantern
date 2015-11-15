@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.plugin;
 
+import java.io.File;
 import java.nio.file.Path;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -76,8 +77,11 @@ public final class PluginModule extends AbstractModule {
 
         // Plugin-private config directory (shared dir is in the global guice module)
         this.bind(Path.class).annotatedWith(privateConfigDir).toProvider(PrivateConfigDirProvider.class);
+        this.bind(File.class).annotatedWith(privateConfigDir).toProvider(FilePrivateConfigDirProvider.class);
         this.bind(Path.class).annotatedWith(sharedConfigFile).toProvider(SharedConfigFileProvider.class); // Shared-directory config file
+        this.bind(File.class).annotatedWith(sharedConfigFile).toProvider(FileSharedConfigFileProvider.class);
         this.bind(Path.class).annotatedWith(privateConfigFile).toProvider(PrivateConfigFileProvider.class); // Plugin-private directory config file
+        this.bind(File.class).annotatedWith(privateConfigFile).toProvider(FilePrivateConfigFileProvider.class);
 
         this.bind(new TypeLiteral<ConfigurationLoader<CommentedConfigurationNode>>() {
         }).annotatedWith(sharedConfigFile).toProvider(SharedHoconConfigProvider.class); // Loader for shared-directory config file
@@ -167,6 +171,51 @@ public final class PluginModule extends AbstractModule {
         @Override
         public ConfigurationLoader<CommentedConfigurationNode> get() {
             return this.game.getConfigService().getPluginConfig(this.container).getConfig();
+        }
+    }
+
+    private static class FilePrivateConfigDirProvider implements Provider<File> {
+
+        private final Path configDir;
+
+        @Inject
+        private FilePrivateConfigDirProvider(@ConfigDir(sharedRoot = false) Path configDir) {
+            this.configDir = configDir;
+        }
+
+        @Override
+        public File get() {
+            return this.configDir.toFile();
+        }
+    }
+
+    private static class FilePrivateConfigFileProvider implements Provider<File> {
+
+        private final Path configPath;
+
+        @Inject
+        private FilePrivateConfigFileProvider(@DefaultConfig(sharedRoot = false) Path configPath) {
+            this.configPath = configPath;
+        }
+
+        @Override
+        public File get() {
+            return this.configPath.toFile();
+        }
+    }
+
+    private static class FileSharedConfigFileProvider implements Provider<File> {
+
+        private final Path configPath;
+
+        @Inject
+        private FileSharedConfigFileProvider(@DefaultConfig(sharedRoot = true) Path configPath) {
+            this.configPath = configPath;
+        }
+
+        @Override
+        public File get() {
+            return this.configPath.toFile();
         }
     }
 }

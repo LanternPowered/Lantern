@@ -24,15 +24,15 @@
  */
 package org.lanternpowered.server.inject;
 
-import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
 public interface Module {
 
-    <T> Binding<T> getBinding(Class<? extends T> type);
+    <T> Binding<T> getBinding(ParameterSpec<? extends T> spec);
 
-    <T> Binding<T> getBinding(Class<? extends T> type, Iterable<Class<? extends Annotation>> annotationTypes);
+    List<MethodSpec<?>> getMethodBindings();
 
     <T> Optional<Supplier<T>> getSupplier(Class<T> type);
 }

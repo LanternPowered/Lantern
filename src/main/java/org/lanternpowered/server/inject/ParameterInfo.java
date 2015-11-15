@@ -29,11 +29,33 @@ import java.util.List;
 
 public interface ParameterInfo<T> {
 
+    /**
+     * Gets the type of the parameter.
+     * 
+     * @return the type
+     */
     Class<? extends T> getType();
 
+    /**
+     * Gets the annotation instance of the specified type.
+     * 
+     * @param type the annotation type
+     * @return the annotation
+     */
     <A extends Annotation> A getAnnotation(Class<A> type);
 
-    List<Annotation> getAnnotations();
+    /**
+     * Gets whether the annotation of the specified type is present.
+     * 
+     * @param type the annotation type
+     * @return whether the annotation is present
+     */
+    <A extends Annotation> boolean hasAnnotation(Class<A> type);
 
-    List<Class<? extends Annotation>> getAnnotationTypes();
+    /**
+     * Gets all the annotation instances.
+     * 
+     * @return the annotations
+     */
+    List<Annotation> getAnnotations();
 }

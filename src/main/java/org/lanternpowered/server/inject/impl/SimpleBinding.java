@@ -24,39 +24,27 @@
  */
 package org.lanternpowered.server.inject.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-
 import org.lanternpowered.server.inject.Binding;
+import org.lanternpowered.server.inject.ParameterSpec;
 import org.lanternpowered.server.inject.Provider;
-
-import com.google.common.collect.ImmutableList;
 
 final class SimpleBinding<T> implements Binding<T> {
 
-    private final Class<T> type;
-    private final Provider<T> provider;
-    private final ImmutableList<Class<? extends Annotation>> annotations;
+    private final ParameterSpec<T> spec;
+    private final Provider<? extends T> provider;
 
-    public SimpleBinding(Class<T> type, Provider<T> provider,
-            ImmutableList<Class<? extends Annotation>> annotations) {
-        this.annotations = annotations;
+    public SimpleBinding(ParameterSpec<T> spec, Provider<? extends T> provider) {
         this.provider = provider;
-        this.type = type;
+        this.spec = spec;
     }
 
     @Override
-    public Class<T> getType() {
-        return this.type;
-    }
-
-    @Override
-    public Provider<T> getProvider() {
+    public Provider<? extends T> getProvider() {
         return this.provider;
     }
 
     @Override
-    public List<Class<? extends Annotation>> getAnnotations() {
-        return this.annotations;
+    public ParameterSpec<T> getParameterSpec() {
+        return this.spec;
     }
 }

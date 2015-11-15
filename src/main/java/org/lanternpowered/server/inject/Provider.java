@@ -29,5 +29,14 @@ import java.util.Map;
 @FunctionalInterface
 public interface Provider<T> {
 
+    /**
+     * Gets the value that should be injected into the target
+     * object for the specified parameter info.
+     * 
+     * @param targetObject the target object
+     * @param parameters the parameters that were passed through
+     * @param info the parameter info
+     * @return the object to set
+     */
     T get(Object targetObject, Map<String, Object> parameters, ParameterInfo<? extends T> info);
 }

@@ -172,7 +172,6 @@ public class LanternChunk extends AbstractExtent implements Chunk {
                 }
             }
         }
-
     }
 
     private final PriorityBlockingQueue<LanternScheduledBlockUpdate> scheduledBlockUpdateQueue =

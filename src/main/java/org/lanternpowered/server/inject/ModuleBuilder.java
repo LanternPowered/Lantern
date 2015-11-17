@@ -63,7 +63,7 @@ public interface ModuleBuilder {
      * @param instance the instance
      * @return the module builder for chaining
      */
-    <T, V extends T> ModuleBuilder bind(ParameterSpec<T> spec, V instance);
+    <T, V extends T> ModuleBuilder bindInstance(ParameterSpec<T> spec, V instance);
 
     /**
      * Builds to the module.

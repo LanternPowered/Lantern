@@ -36,6 +36,11 @@ public final class Sets2 {
     private Sets2() {
     }
 
+    /**
+     * Creates a new <strong>weak</strong> {@link HashSet}.
+     * 
+     * @return the weak hash set
+     */
     public static <T> Set<T> newWeakHashSet() {
         return Collections.newSetFromMap(new WeakHashMap<T, Boolean>());
     }

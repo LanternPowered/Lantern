@@ -67,7 +67,7 @@ public class BaseComponentHolder implements ComponentHolder {
                     return holder.getComponent(info.getType()).orElse(null);
                 }
             })
-            .bind(ParameterSpec.of(Game.class), LanternGame.get())
+            .bindInstance(ParameterSpec.of(Game.class), LanternGame.get())
             .bind(ON_ATTACH)
             .bind(ON_DETACH)
             .build());

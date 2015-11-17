@@ -87,11 +87,9 @@ import org.lanternpowered.server.text.translation.LanternTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.rotation.LanternRotation;
 import org.lanternpowered.server.world.LanternWeather;
-import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeRegistry;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
-import org.lanternpowered.server.world.dimension.LanternDimension;
 import org.lanternpowered.server.world.dimension.LanternDimensionEnd;
 import org.lanternpowered.server.world.dimension.LanternDimensionNether;
 import org.lanternpowered.server.world.dimension.LanternDimensionOverworld;
@@ -297,7 +295,6 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerDoublePlantTypes();
         this.registerDirtTypes();
         this.registerStoneTypes();
-        this.registerNotePitches();
         this.registerGeneratorModifiers();
         this.registerGeneratorTypes();
         this.registerDimensionTypes();
@@ -414,27 +411,15 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private void registerDimensionTypes() {
-        this.dimensionTypeRegistry.register(new LanternDimensionType("minecraft", "end", -1,
-                LanternDimensionEnd.class, true, false, false) {
-                    @Override
-                    public LanternDimension create(LanternWorld world) {
-                        return new LanternDimensionEnd(world, this.getName(), this);
-                    }
-        });
-        this.dimensionTypeRegistry.register(new LanternDimensionType("minecraft", "overworld", 0,
-                LanternDimensionOverworld.class, true, false, true) {
-                    @Override
-                    public LanternDimension create(LanternWorld world) {
-                        return new LanternDimensionOverworld(world, this.getName(), this);
-                    }
-        });
-        this.dimensionTypeRegistry.register(new LanternDimensionType("minecraft", "nether", 1,
-                LanternDimensionNether.class, false, true, false) {
-                    @Override
-                    public LanternDimension create(LanternWorld world) {
-                        return new LanternDimensionNether(world, this.getName(), this);
-                    }
-        });
+        this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "end", -1,
+                LanternDimensionEnd.class, true, false, false,
+                (world, type) -> new LanternDimensionEnd(world, type.getName(), type)));
+        this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "overworld", 0,
+                LanternDimensionOverworld.class, true, false, false,
+                (world, type) -> new LanternDimensionOverworld(world, type.getName(), type)));
+        this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "nether", 1,
+                LanternDimensionNether.class, true, false, false,
+                (world, type) -> new LanternDimensionNether(world, type.getName(), type)));
         RegistryHelper.mapFields(DimensionTypes.class, this.dimensionTypeRegistry.getDelegateMap());
     }
 
@@ -1001,7 +986,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends ResettableBuilder<T>> T createBuilder(Class<T> builderClass) throws IllegalArgumentException {
+    public <T extends ResettableBuilder<? super T>> T createBuilder(Class<T> builderClass) throws IllegalArgumentException {
         if (this.builderFactories.containsKey(builderClass)) {
             return (T) this.builderFactories.get(builderClass).get();
         }

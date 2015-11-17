@@ -44,7 +44,7 @@ public final class SkylandsGeneratorType extends LanternGeneratorType {
 
     @Override
     public WorldGenerator createGenerator(World world) {
-        LanternWorldGenerator generator = new LanternWorldGenerator(new SkylandsTerrainGenerator(),
+        final LanternWorldGenerator generator = new LanternWorldGenerator(new SkylandsTerrainGenerator(),
                 new SkylandsBiomeGenerator());
         final List<GeneratorPopulator> generatorPopulators = generator.getGeneratorPopulators();
         generatorPopulators.clear();

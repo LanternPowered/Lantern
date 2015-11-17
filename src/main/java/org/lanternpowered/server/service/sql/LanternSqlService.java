@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.service.sql;
 
-import com.google.common.base.Objects;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -42,6 +41,7 @@ import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
@@ -180,16 +180,16 @@ public class LanternSqlService implements SqlService, Closeable {
                 return false;
             }
             ConnectionInfo that = (ConnectionInfo) o;
-            return Objects.equal(this.user, that.user)
-                    && Objects.equal(this.password, that.password)
-                    && Objects.equal(this.driverClassName, that.driverClassName)
-                    && Objects.equal(this.authlessUrl, that.authlessUrl)
-                    && Objects.equal(this.fullUrl, that.fullUrl);
+            return Objects.equals(this.user, that.user)
+                    && Objects.equals(this.password, that.password)
+                    && Objects.equals(this.driverClassName, that.driverClassName)
+                    && Objects.equals(this.authlessUrl, that.authlessUrl)
+                    && Objects.equals(this.fullUrl, that.fullUrl);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hashCode(this.user, this.password, this.driverClassName, this.authlessUrl, this.fullUrl);
+            return Objects.hash(this.user, this.password, this.driverClassName, this.authlessUrl, this.fullUrl);
         }
 
         /**

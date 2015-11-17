@@ -42,8 +42,8 @@ public class SingleBiomeGenerator implements BiomeGenerator {
 
     @Override
     public void generateBiomes(MutableBiomeArea buffer) {
-        Vector2i min = buffer.getBiomeMin();
-        Vector2i max = buffer.getBiomeMax();
+        final Vector2i min = buffer.getBiomeMin();
+        final Vector2i max = buffer.getBiomeMax();
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getY(); z <= max.getY(); z++) {
                 buffer.setBiome(x, z, this.biomeType);

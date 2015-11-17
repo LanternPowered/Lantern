@@ -33,12 +33,12 @@ import org.spongepowered.api.world.DimensionType;
 public abstract class LanternDimension implements Dimension {
 
     private final String name;
-    private final LanternDimensionType dimensionType;
+    private final LanternDimensionType<?> dimensionType;
     private final LanternWorld world;
 
     private volatile Context dimContext;
 
-    public LanternDimension(LanternWorld world, String name, LanternDimensionType dimensionType) {
+    public LanternDimension(LanternWorld world, String name, LanternDimensionType<?> dimensionType) {
         this.dimensionType = dimensionType;
         this.world = world;
         this.name = name;

@@ -27,17 +27,20 @@ package org.lanternpowered.server.world.biome;
 import java.util.List;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.util.NonNullArrayList;
+import org.lanternpowered.server.util.Lists2;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.GroundCoverLayer;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
 
+import com.google.common.collect.Lists;
+
 public class LanternBiomeType extends SimpleLanternCatalogType implements BiomeType {
 
-    private final List<GroundCoverLayer> groundCoverLayers = new NonNullArrayList<GroundCoverLayer>();
-    private final List<GeneratorPopulator> generatorPopulators = new NonNullArrayList<GeneratorPopulator>();
-    private final List<Populator> populators = new NonNullArrayList<Populator>();
+    // Using concurrent lists, we have no idea what plugin devs will do with them...
+    private final List<GroundCoverLayer> groundCoverLayers = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
+    private final List<GeneratorPopulator> generatorPopulators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
+    private final List<Populator> populators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
 
     private double temperature;
     private double humidity;

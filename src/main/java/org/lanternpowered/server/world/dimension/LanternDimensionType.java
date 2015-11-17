@@ -29,22 +29,34 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 
-public abstract class LanternDimensionType extends LanternPluginCatalogType implements DimensionType {
+public final class LanternDimensionType<T extends LanternDimension> extends LanternPluginCatalogType implements DimensionType {
 
-    private final Class<? extends Dimension> dimensionClass;
+    private final Class<T> dimensionClass;
+    private final DimensionSupplier<T> supplier;
     private final boolean keepSpawnLoaded;
     private final boolean waterEvaporates;
     private final boolean hasSky;
     private final int internalId;
 
-    public LanternDimensionType(String pluginId, String name, int internalId, Class<? extends Dimension> dimensionClass,
-            boolean keepSpawnLoaded, boolean waterEvaporates, boolean hasSky) {
+    public LanternDimensionType(String pluginId, String name, int internalId, Class<T> dimensionClass,
+            boolean keepSpawnLoaded, boolean waterEvaporates, boolean hasSky, DimensionSupplier<T> supplier) {
         super(pluginId, name);
         this.keepSpawnLoaded = keepSpawnLoaded;
         this.waterEvaporates = waterEvaporates;
         this.dimensionClass = dimensionClass;
         this.internalId = internalId;
+        this.supplier = supplier;
         this.hasSky = hasSky;
+    }
+
+    /**
+     * Creates a new dimension instance for the specified world.
+     * 
+     * @param world the world
+     * @return the dimension instance
+     */
+    public T newDimension(LanternWorld world) {
+        return this.supplier.get(world, this);
     }
 
     @Override
@@ -68,6 +80,4 @@ public abstract class LanternDimensionType extends LanternPluginCatalogType impl
     public int getInternalId() {
         return this.internalId;
     }
-
-    public abstract LanternDimension create(LanternWorld world);
 }

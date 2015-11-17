@@ -28,16 +28,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
 
-import org.lanternpowered.server.util.NonNullArrayList;
+import org.lanternpowered.server.util.Lists2;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GeneratorPopulator;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
-public class LanternWorldGenerator implements WorldGenerator {
+import com.google.common.collect.Lists;
 
-    private final List<GeneratorPopulator> generatorPopulators = new NonNullArrayList<>();
-    private final List<Populator> populators = new NonNullArrayList<>();
+public final class LanternWorldGenerator implements WorldGenerator {
+
+    // Using concurrent lists, we have no idea what plugin devs will do with them...
+    private final List<GeneratorPopulator> generatorPopulators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
+    private final List<Populator> populators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
 
     private GeneratorPopulator baseGeneratorPopulator;
     private BiomeGenerator biomeGenerator;

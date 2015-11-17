@@ -74,7 +74,7 @@ public final class SimpleModuleBuilder implements ModuleBuilder {
     }
 
     @Override
-    public <T, V extends T> ModuleBuilder bind(ParameterSpec<T> spec, V instance) {
+    public <T, V extends T> ModuleBuilder bindInstance(ParameterSpec<T> spec, V instance) {
         return this.bind(spec, (target, params, info) -> instance);
     }
 

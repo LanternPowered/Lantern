@@ -28,7 +28,8 @@ import org.lanternpowered.server.world.LanternWorld;
 
 public final class LanternDimensionOverworld extends LanternDimension {
 
-    public LanternDimensionOverworld(LanternWorld world, String name, LanternDimensionType dimensionType) {
+    public LanternDimensionOverworld(LanternWorld world, String name,
+            LanternDimensionType<LanternDimensionOverworld> dimensionType) {
         super(world, name, dimensionType);
     }
 }

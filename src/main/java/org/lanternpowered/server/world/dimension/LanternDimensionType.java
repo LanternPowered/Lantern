@@ -28,9 +28,11 @@ import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.GeneratorType;
 
 public final class LanternDimensionType<T extends LanternDimension> extends LanternPluginCatalogType implements DimensionType {
 
+    private final GeneratorType defaultGeneratorType;
     private final Class<T> dimensionClass;
     private final DimensionSupplier<T> supplier;
     private final boolean keepSpawnLoaded;
@@ -39,14 +41,26 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
     private final int internalId;
 
     public LanternDimensionType(String pluginId, String name, int internalId, Class<T> dimensionClass,
-            boolean keepSpawnLoaded, boolean waterEvaporates, boolean hasSky, DimensionSupplier<T> supplier) {
+            GeneratorType defaultGeneratorType, boolean keepSpawnLoaded, boolean waterEvaporates,
+            boolean hasSky, DimensionSupplier<T> supplier) {
         super(pluginId, name);
+        this.defaultGeneratorType = defaultGeneratorType;
         this.keepSpawnLoaded = keepSpawnLoaded;
         this.waterEvaporates = waterEvaporates;
         this.dimensionClass = dimensionClass;
         this.internalId = internalId;
         this.supplier = supplier;
         this.hasSky = hasSky;
+    }
+
+    /**
+     * Gets the default generator type of this dimension type. This one will be used
+     * if there can't be one found in the world data.
+     * 
+     * @return the default generator type
+     */
+    public GeneratorType getDefaultGeneratorType() {
+        return this.defaultGeneratorType;
     }
 
     /**

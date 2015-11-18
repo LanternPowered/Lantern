@@ -38,7 +38,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
 
     private final String name;
     private final GameMode gameMode;
-    private final LanternDimensionType dimensionType;
+    private final LanternDimensionType<?> dimensionType;
     private final GeneratorType generatorType;
     private final Collection<WorldGeneratorModifier> generatorModifiers;
     private final DataContainer generatorSettings;
@@ -56,7 +56,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     private final int buildHeight;
     private final long seed;
 
-    LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType dimensionType, GeneratorType generatorType,
+    LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
             boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
             boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, long seed, int buildHeight) {
@@ -144,7 +144,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     }
 
     @Override
-    public LanternDimensionType getDimensionType() {
+    public LanternDimensionType<?> getDimensionType() {
         return this.dimensionType;
     }
 

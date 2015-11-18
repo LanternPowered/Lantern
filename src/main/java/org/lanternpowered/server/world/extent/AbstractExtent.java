@@ -73,122 +73,122 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 
-public abstract class AbstractExtent implements Extent {
+public interface AbstractExtent extends Extent {
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i position, Direction direction, Class<T> propertyClass) {
+    default <T extends Property<?, ?>> Optional<T> getProperty(Vector3i position, Direction direction, Class<T> propertyClass) {
         return this.getProperty(position.getX(), position.getY(), position.getZ(), direction, propertyClass);
     }
 
     @Override
-    public void setBlock(Vector3i position, BlockState block, boolean notifyNeighbors) {
+    default void setBlock(Vector3i position, BlockState block, boolean notifyNeighbors) {
         this.setBlock(position.getX(), position.getY(), position.getZ(), block, notifyNeighbors);
     }
 
     @Override
-    public void setBlockType(Vector3i position, BlockType type, boolean notifyNeighbors) {
+    default void setBlockType(Vector3i position, BlockType type, boolean notifyNeighbors) {
         this.setBlockType(position.getX(), position.getY(), position.getZ(), type, notifyNeighbors);
     }
 
     @Override
-    public void setBlockType(int x, int y, int z, BlockType type, boolean notifyNeighbors) {
+    default void setBlockType(int x, int y, int z, BlockType type, boolean notifyNeighbors) {
         this.setBlock(x, y, z, type.getDefaultState(), notifyNeighbors);
     }
 
     @Override
-    public Location<? extends Extent> getLocation(Vector3i position) {
+    default Location<? extends Extent> getLocation(Vector3i position) {
         return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public Location<? extends Extent> getLocation(Vector3d position) {
+    default Location<? extends Extent> getLocation(Vector3d position) {
         return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public BiomeType getBiome(Vector2i position) {
+    default BiomeType getBiome(Vector2i position) {
         return this.getBiome(position.getX(), position.getY());
     }
 
     @Override
-    public void setBiome(Vector2i position, BiomeType biome) {
+    default void setBiome(Vector2i position, BiomeType biome) {
         this.setBiome(position.getX(), position.getY(), biome);
     }
 
     @Override
-    public BlockState getBlock(Vector3i position) {
+    default BlockState getBlock(Vector3i position) {
         return this.getBlock(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public void setBlock(Vector3i position, BlockState block) {
+    default void setBlock(Vector3i position, BlockState block) {
         this.setBlock(position.getX(), position.getY(), position.getZ(), block);
     }
 
     @Override
-    public BlockType getBlockType(Vector3i position) {
+    default BlockType getBlockType(Vector3i position) {
         return this.getBlockType(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public void setBlockType(Vector3i position, BlockType type) {
+    default void setBlockType(Vector3i position, BlockType type) {
         this.setBlockType(position.getX(), position.getY(), position.getZ(), type);
     }
 
     @Override
-    public void setBlockType(int x, int y, int z, BlockType type) {
+    default void setBlockType(int x, int y, int z, BlockType type) {
         this.setBlock(x, y, z, type.getDefaultState());
     }
 
     @Override
-    public BlockSnapshot createSnapshot(Vector3i position) {
+    default BlockSnapshot createSnapshot(Vector3i position) {
         return this.createSnapshot(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    default boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
         checkArgument(location != null, "location is not present in snapshot");
         return this.restoreSnapshot(location.getBlockPosition(), snapshot, force, notifyNeighbors);
     }
 
     @Override
-    public boolean restoreSnapshot(Vector3i position, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    default boolean restoreSnapshot(Vector3i position, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         return this.restoreSnapshot(position.getX(), position.getY(), position.getZ(), snapshot, force, notifyNeighbors);
     }
 
     @Override
-    public Optional<TileEntity> getTileEntity(Vector3i position) {
+    default Optional<TileEntity> getTileEntity(Vector3i position) {
         return this.getTileEntity(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public boolean containsBiome(Vector2i position) {
+    default boolean containsBiome(Vector2i position) {
         return this.containsBiome(position.getX(), position.getY());
     }
 
     @Override
-    public boolean containsBlock(Vector3i position) {
+    default boolean containsBlock(Vector3i position) {
         return this.containsBlock(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public Collection<ScheduledBlockUpdate> getScheduledUpdates(Vector3i position) {
+    default Collection<ScheduledBlockUpdate> getScheduledUpdates(Vector3i position) {
         return this.getScheduledUpdates(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
-    public ScheduledBlockUpdate addScheduledUpdate(Vector3i position, int priority, int ticks) {
+    default ScheduledBlockUpdate addScheduledUpdate(Vector3i position, int priority, int ticks) {
         return this.addScheduledUpdate(position.getX(), position.getY(), position.getZ(), priority, ticks);
     }
 
     @Override
-    public void removeScheduledUpdate(Vector3i position, ScheduledBlockUpdate update) {
+    default void removeScheduledUpdate(Vector3i position, ScheduledBlockUpdate update) {
         this.removeScheduledUpdate(position.getX(), position.getY(), position.getZ(), update);
     }
 
     @Override
-    public MutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
+    default MutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
         if (!this.containsBiome(newMin.getX(), newMin.getY())) {
             throw new PositionOutOfBoundsException(newMin, this.getBiomeMin(), this.getBiomeMax());
         }
@@ -199,27 +199,27 @@ public abstract class AbstractExtent implements Extent {
     }
 
     @Override
-    public MutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
+    default MutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
         return new MutableBiomeViewTransform(this, transform);
     }
 
     @Override
-    public MutableBiomeArea getRelativeBiomeView() {
+    default MutableBiomeArea getRelativeBiomeView() {
         return this.getBiomeView(DiscreteTransform2.fromTranslation(this.getBiomeMin().negate()));
     }
 
     @Override
-    public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
+    default UnmodifiableBiomeArea getUnmodifiableBiomeView() {
         return new UnmodifiableBiomeAreaWrapper(this);
     }
 
     @Override
-    public MutableBiomeArea getBiomeCopy() {
+    default MutableBiomeArea getBiomeCopy() {
         return this.getBiomeCopy(StorageType.STANDARD);
     }
 
     @Override
-    public MutableBiomeArea getBiomeCopy(StorageType type) {
+    default MutableBiomeArea getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
                 return new ShortArrayMutableBiomeBuffer(ExtentBufferUtil.copyToArray(this, this.getBiomeMin(),
@@ -233,13 +233,13 @@ public abstract class AbstractExtent implements Extent {
     }
 
     @Override
-    public ImmutableBiomeArea getImmutableBiomeCopy() {
+    default ImmutableBiomeArea getImmutableBiomeCopy() {
         return ShortArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, this.getBiomeMin(),
                 this.getBiomeMax(), this.getBiomeSize()), this.getBiomeMin(), this.getBiomeSize());
     }
 
     @Override
-    public MutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
+    default MutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
         if (!this.containsBlock(newMin.getX(), newMin.getY(), newMin.getZ())) {
             throw new PositionOutOfBoundsException(newMin, this.getBlockMin(), this.getBlockMax());
         }
@@ -250,27 +250,27 @@ public abstract class AbstractExtent implements Extent {
     }
 
     @Override
-    public MutableBlockVolume getBlockView(DiscreteTransform3 transform) {
+    default MutableBlockVolume getBlockView(DiscreteTransform3 transform) {
         return new MutableBlockViewTransform(this, transform);
     }
 
     @Override
-    public MutableBlockVolume getRelativeBlockView() {
+    default MutableBlockVolume getRelativeBlockView() {
         return this.getBlockView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
     }
 
     @Override
-    public UnmodifiableBlockVolume getUnmodifiableBlockView() {
+    default UnmodifiableBlockVolume getUnmodifiableBlockView() {
         return new UnmodifiableBlockVolumeWrapper(this);
     }
 
     @Override
-    public MutableBlockVolume getBlockCopy() {
+    default MutableBlockVolume getBlockCopy() {
         return this.getBlockCopy(StorageType.STANDARD);
     }
 
     @Override
-    public MutableBlockVolume getBlockCopy(StorageType type) {
+    default MutableBlockVolume getBlockCopy(StorageType type) {
         switch (type) {
             case STANDARD:
                 return new ShortArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, this.getBlockMin(),
@@ -284,160 +284,160 @@ public abstract class AbstractExtent implements Extent {
     }
 
     @Override
-    public ImmutableBlockVolume getImmutableBlockCopy() {
+    default ImmutableBlockVolume getImmutableBlockCopy() {
         return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, this.getBlockMin(),
                 this.getBlockMax(), this.getBlockSize()), this.getBlockMin(), this.getBlockSize());
     }
 
     @Override
-    public void setRawData(Vector3i position, DataView container) throws InvalidDataException {
+    default void setRawData(Vector3i position, DataView container) throws InvalidDataException {
         this.setRawData(position.getX(), position.getY(), position.getZ(), container);
     }
 
     @Override
-    public boolean validateRawData(Vector3i position, DataView container) {
+    default boolean validateRawData(Vector3i position, DataView container) {
         return this.validateRawData(position.getX(), position.getY(), position.getZ(), container);
     }
 
     @Override
-    public Collection<DataManipulator<?, ?>> getManipulators(Vector3i coordinates) {
+    default Collection<DataManipulator<?, ?>> getManipulators(Vector3i coordinates) {
         return this.getManipulators(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 
     @Override
-    public <E> Optional<E> get(Vector3i coordinates, Key<? extends BaseValue<E>> key) {
+    default <E> Optional<E> get(Vector3i coordinates, Key<? extends BaseValue<E>> key) {
         return this.get(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key);
     }
 
     @Override
-    public <T extends DataManipulator<?, ?>> Optional<T> get(Vector3i coordinates, Class<T> manipulatorClass) {
+    default <T extends DataManipulator<?, ?>> Optional<T> get(Vector3i coordinates, Class<T> manipulatorClass) {
         return this.get(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulatorClass);
     }
 
     @Override
-    public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(Vector3i coordinates, Class<T> manipulatorClass) {
+    default <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(Vector3i coordinates, Class<T> manipulatorClass) {
         return this.getOrCreate(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulatorClass);
     }
 
     @Override
-    public <E> E getOrNull(Vector3i coordinates, Key<? extends BaseValue<E>> key) {
+    default <E> E getOrNull(Vector3i coordinates, Key<? extends BaseValue<E>> key) {
         return this.getOrNull(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key);
     }
 
     @Override
-    public <E> E getOrElse(Vector3i coordinates, Key<? extends BaseValue<E>> key, E defaultValue) {
+    default <E> E getOrElse(Vector3i coordinates, Key<? extends BaseValue<E>> key, E defaultValue) {
         return this.getOrElse(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key, defaultValue);
     }
 
     @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(Vector3i coordinates, Key<V> key) {
+    default <E, V extends BaseValue<E>> Optional<V> getValue(Vector3i coordinates, Key<V> key) {
         return this.getValue(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key);
     }
 
     @Override
-    public boolean supports(Vector3i coordinates, Key<?> key) {
+    default boolean supports(Vector3i coordinates, Key<?> key) {
         return this.supports(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key);
     }
 
     @Override
-    public boolean supports(Vector3i coordinates, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
+    default boolean supports(Vector3i coordinates, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
         return this.supports(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulatorClass);
     }
 
     @Override
-    public boolean supports(Vector3i coordinates, DataManipulator<?, ?> manipulator) {
+    default boolean supports(Vector3i coordinates, DataManipulator<?, ?> manipulator) {
         return this.supports(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulator);
     }
 
     @Override
-    public Set<Key<?>> getKeys(Vector3i coordinates) {
+    default Set<Key<?>> getKeys(Vector3i coordinates) {
         return this.getKeys(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 
     @Override
-    public Set<ImmutableValue<?>> getValues(Vector3i coordinates) {
+    default Set<ImmutableValue<?>> getValues(Vector3i coordinates) {
         return this.getValues(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 
     @Override
-    public <E> DataTransactionResult offer(Vector3i coordinates, BaseValue<E> value) {
+    default <E> DataTransactionResult offer(Vector3i coordinates, BaseValue<E> value) {
         return this.offer(coordinates.getX(), coordinates.getY(), coordinates.getZ(), value);
     }
 
     @Override
-    public DataTransactionResult offer(Vector3i coordinates, DataManipulator<?, ?> manipulator) {
+    default DataTransactionResult offer(Vector3i coordinates, DataManipulator<?, ?> manipulator) {
         return this.offer(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulator);
     }
 
     @Override
-    public DataTransactionResult offer(Vector3i coordinates, Iterable<DataManipulator<?, ?>> manipulators) {
+    default DataTransactionResult offer(Vector3i coordinates, Iterable<DataManipulator<?, ?>> manipulators) {
         return this.offer(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulators);
     }
 
     @Override
-    public DataTransactionResult remove(Vector3i coordinates, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
+    default DataTransactionResult remove(Vector3i coordinates, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
         return this.remove(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulatorClass);
     }
 
     @Override
-    public DataTransactionResult remove(Vector3i coordinates, Key<?> key) {
+    default DataTransactionResult remove(Vector3i coordinates, Key<?> key) {
         return this.remove(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key);
     }
 
     @Override
-    public DataTransactionResult undo(Vector3i coordinates, DataTransactionResult result) {
+    default DataTransactionResult undo(Vector3i coordinates, DataTransactionResult result) {
         return this.undo(coordinates.getX(), coordinates.getY(), coordinates.getZ(), result);
     }
 
     @Override
-    public DataTransactionResult copyFrom(Vector3i coordinatesTo, Vector3i coordinatesFrom) {
+    default DataTransactionResult copyFrom(Vector3i coordinatesTo, Vector3i coordinatesFrom) {
         return this.copyFrom(coordinatesTo.getX(), coordinatesTo.getY(), coordinatesTo.getZ(), coordinatesFrom.getX(),
             coordinatesFrom.getY(), coordinatesFrom.getZ());
     }
 
     @Override
-    public DataTransactionResult copyFrom(Vector3i coordinatesTo, Vector3i coordinatesFrom, MergeFunction function) {
+    default DataTransactionResult copyFrom(Vector3i coordinatesTo, Vector3i coordinatesFrom, MergeFunction function) {
         return this.copyFrom(coordinatesTo.getX(), coordinatesTo.getY(), coordinatesTo.getZ(), coordinatesFrom.getX(),
             coordinatesFrom.getY(), coordinatesFrom.getZ(), function);
     }
 
     @Override
-    public DataTransactionResult copyFrom(Vector3i to, DataHolder from, MergeFunction function) {
+    default DataTransactionResult copyFrom(Vector3i to, DataHolder from, MergeFunction function) {
         return this.copyFrom(to.getX(), to.getY(), to.getZ(), from, function);
     }
 
     @Override
-    public DataTransactionResult copyFrom(Vector3i to, DataHolder from) {
+    default DataTransactionResult copyFrom(Vector3i to, DataHolder from) {
         return this.copyFrom(to.getX(), to.getY(), to.getZ(), from);
     }
 
     @Override
-    public DataTransactionResult offer(Vector3i coordinates, DataManipulator<?, ?> manipulator, MergeFunction function) {
+    default DataTransactionResult offer(Vector3i coordinates, DataManipulator<?, ?> manipulator, MergeFunction function) {
         return this.offer(coordinates.getX(), coordinates.getY(), coordinates.getZ(), manipulator, function);
     }
 
     @Override
-    public <E> DataTransactionResult transform(Vector3i coordinates, Key<? extends BaseValue<E>> key, Function<E, E> function) {
+    default <E> DataTransactionResult transform(Vector3i coordinates, Key<? extends BaseValue<E>> key, Function<E, E> function) {
         return this.transform(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key, function);
     }
 
     @Override
-    public <E> DataTransactionResult offer(Vector3i coordinates, Key<? extends BaseValue<E>> key, E value) {
+    default <E> DataTransactionResult offer(Vector3i coordinates, Key<? extends BaseValue<E>> key, E value) {
         return this.offer(coordinates.getX(), coordinates.getY(), coordinates.getZ(), key, value);
     }
 
     @Override
-    public boolean supports(Vector3i coordinates, BaseValue<?> value) {
+    default boolean supports(Vector3i coordinates, BaseValue<?> value) {
         return this.supports(coordinates.getX(), coordinates.getY(), coordinates.getZ(), value);
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coordinates, Class<T> propertyClass) {
+    default <T extends Property<?, ?>> Optional<T> getProperty(Vector3i coordinates, Class<T> propertyClass) {
         return this.getProperty(coordinates.getX(), coordinates.getY(), coordinates.getZ(), propertyClass);
     }
 
     @Override
-    public Collection<Property<?, ?>> getProperties(Vector3i coordinates) {
+    default Collection<Property<?, ?>> getProperties(Vector3i coordinates) {
         return this.getProperties(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 }

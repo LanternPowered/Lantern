@@ -35,6 +35,7 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.effect.LanternViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
@@ -46,6 +47,7 @@ import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.ExtentViewTransform;
@@ -105,7 +107,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
-public class LanternWorld extends AbstractExtent implements World, LanternViewer {
+public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, LanternViewer {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -128,13 +130,25 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
     @Nullable final LanternWeatherUniverse weatherUniverse = new LanternWeatherUniverse(this);
 
     private final LanternChunkManager chunkManager = null;
-    final LanternWorldProperties properties = null;
+
+    // The dimension instance attached to this world
+    private final Dimension dimension;
+
+    // The properties of this world
+    final LanternWorldProperties properties;
 
     private final TeleporterAgent teleporterAgent = null;
-    private Context worldContext;
 
-    public LanternWorld(LanternGame game) {
+    // The context of this world
+    private volatile Context worldContext;
+
+    public LanternWorld(LanternGame game, LanternWorldProperties properties) {
+        this.properties = properties;
         this.game = game;
+        LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
+        // Create the new dimension instance, doing this
+        // after all the other fields are initialized.
+        this.dimension = dimensionType.newDimension(this);
     }
 
     /**
@@ -704,8 +718,7 @@ public class LanternWorld extends AbstractExtent implements World, LanternViewer
 
     @Override
     public Dimension getDimension() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.dimension;
     }
 
     @Override

@@ -412,13 +412,13 @@ public class LanternGameRegistry implements GameRegistry {
 
     private void registerDimensionTypes() {
         this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "end", -1,
-                LanternDimensionEnd.class, true, false, false,
+                LanternDimensionEnd.class, GeneratorTypes.END, true, false, false,
                 (world, type) -> new LanternDimensionEnd(world, type.getName(), type)));
         this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "overworld", 0,
-                LanternDimensionOverworld.class, true, false, false,
+                LanternDimensionOverworld.class, GeneratorTypes.OVERWORLD, true, false, false,
                 (world, type) -> new LanternDimensionOverworld(world, type.getName(), type)));
         this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "nether", 1,
-                LanternDimensionNether.class, true, false, false,
+                LanternDimensionNether.class, GeneratorTypes.NETHER, true, false, false,
                 (world, type) -> new LanternDimensionNether(world, type.getName(), type)));
         RegistryHelper.mapFields(DimensionTypes.class, this.dimensionTypeRegistry.getDelegateMap());
     }

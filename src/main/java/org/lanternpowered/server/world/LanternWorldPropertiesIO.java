@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.world;
 
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -34,27 +33,38 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
+import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameRegistry;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
+import org.lanternpowered.server.world.gen.LanternGeneratorType;
+import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
-public class LanternWorldPropertiesIO {
+public final class LanternWorldPropertiesIO {
+
+    private final static Gson GSON = new Gson();
 
     private final static String LEVEL_DATA = "level.dat";
     private final static String LEVEL_DATA_OLD = "level.dat_old";
@@ -62,7 +72,7 @@ public class LanternWorldPropertiesIO {
     private final static String SPONGE_LEVEL_DATA = "level_sponge.dat";
     private final static String SPONGE_LEVEL_DATA_OLD = "level_sponge.dat_old";
     private final static String SPONGE_LEVEL_DATA_NEW = "level_sponge.dat_new";
-    private final static String BUKKIT_UUID_DATA = "uid.dat";
+    // private final static String BUKKIT_UUID_DATA = "uid.dat";
 
     // The current version of the worlds
     private final static int CURRENT_VERSION = 19133;
@@ -100,6 +110,10 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery BORDER_WARNING_BLOCKS = DataQuery.of("BorderWarningBlocks");
     private final static DataQuery BORDER_WARNING_TIME = DataQuery.of("BorderWarningBlocks");
 
+    private final static DataQuery GENERATOR_NAME = DataQuery.of("generatorName");
+    private final static DataQuery GENERATOR_VERSION = DataQuery.of("generatorVersion");
+    private final static DataQuery GENERATOR_OPTIONS = DataQuery.of("generatorOptions");
+
     // Sponge properties
     private final static DataQuery UUID_MOST = DataQuery.of("uuid_most");
     private final static DataQuery UUID_LEAST = DataQuery.of("uuid_least");
@@ -107,6 +121,7 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery KEEP_SPAWN_LOADED = DataQuery.of("keepSpawnLoaded");
     private final static DataQuery LOAD_ON_STARTUP = DataQuery.of("loadOnStartup");
     private final static DataQuery DIMENSION_TYPE = DataQuery.of("dimensionType");
+    private final static DataQuery DIMENSION_INT_ID = DataQuery.of("dimensionId");
     private final static DataQuery GENERATOR_MODIFIERS = DataQuery.of("generatorModifiers");
     private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
 
@@ -114,6 +129,11 @@ public class LanternWorldPropertiesIO {
     private final static DataQuery WATER_EVAPORATES = DataQuery.of("waterEvaporates");
     private final static DataQuery ALLOW_PLAYER_RESPAWNS = DataQuery.of("allowPlayerRespawns");
     private final static DataQuery BUILD_HEIGHT = DataQuery.of("buildHeight");
+    // Also adding the "string id" for the dimension types, because I don't think
+    // that the Class names make much sense
+    private final static DataQuery DIMENSION_ID = DataQuery.of("dimensionStrId");
+    // Extra generator options for the flat world generator type
+    private final static DataQuery GENERATOR_OPTIONS_EXTRA = DataQuery.of("generatorOptionsExtra");
 
     private LanternWorldPropertiesIO() {
     }
@@ -125,7 +145,10 @@ public class LanternWorldPropertiesIO {
     public static LanternWorldProperties read(File folder, @Nullable String worldName) throws IOException {
         File levelFile = new File(folder, LEVEL_DATA);
         if (!levelFile.exists()) {
-            throw new FileNotFoundException("Unable to find " + LEVEL_DATA + "!");
+            levelFile = new File(folder, LEVEL_DATA_OLD);
+        }
+        if (!levelFile.exists()) {
+            throw new FileNotFoundException("Unable to find " + LEVEL_DATA + " or " + LEVEL_DATA_OLD + "!");
         }
 
         DataView dataView;
@@ -139,6 +162,9 @@ public class LanternWorldPropertiesIO {
         DataView spongeContainer = null;
 
         File spongeLevelFile = new File(folder, SPONGE_LEVEL_DATA);
+        if (!spongeLevelFile.exists()) {
+            spongeLevelFile = new File(folder, SPONGE_LEVEL_DATA_OLD);
+        }
         if (spongeLevelFile.exists()) {
             try {
                 spongeRootContainer = NbtStreamUtils.read(new FileInputStream(spongeLevelFile), true);
@@ -152,6 +178,11 @@ public class LanternWorldPropertiesIO {
         }
 
         UUID uuid = null;
+        /*
+         * Ignore Bukkit for now, there are more different world
+         * file formats/managing
+         */
+        /*
         // The uuid storage bukkit used, try this one first
         File uuidFile = new File(folder, BUKKIT_UUID_DATA);
         if (uuidFile.exists()) {
@@ -162,6 +193,7 @@ public class LanternWorldPropertiesIO {
             }
             uuidFile.delete();
         }
+        */
 
         // Try for the sponge (lantern) storage format
         if (uuid == null && spongeContainer != null) {
@@ -231,6 +263,42 @@ public class LanternWorldPropertiesIO {
             properties.borderWarningTime = dataView.getInt(BORDER_WARNING_TIME).get();
         }
 
+        if (dataView.contains(GENERATOR_NAME)) {
+            final String genName0 = dataView.getString(GENERATOR_NAME).get();
+            String genName = genName0;
+            if (genName.indexOf(':') == -1) {
+                genName = "minecraft:" + genName;
+            }
+            properties.generatorType = (LanternGeneratorType) LanternGame.get().getRegistry()
+                    .getType(GeneratorType.class, genName).orElse(null);
+            if (properties.generatorType != null && dataView.contains(GENERATOR_OPTIONS)) {
+                String options = dataView.getString(GENERATOR_OPTIONS).get();
+                String customSettings = null;
+                if (genName0.equalsIgnoreCase("flat")) {
+                    customSettings = options;
+                    // Added in the lantern-server to allow to attach
+                    // custom generator options to the flat generator
+                    if (dataView.contains(GENERATOR_OPTIONS_EXTRA)) {
+                        options = dataView.getString(GENERATOR_OPTIONS_EXTRA).get();
+                    }
+                }
+                if (!options.isEmpty()) {
+                    try {
+                        JsonObject json = GSON.fromJson(options, JsonObject.class);
+                        properties.generatorSettings = JsonTranslator.instance().translateFrom(json).copy();
+                    } catch (Exception e) {
+                        LanternGame.log().warn("Unknown generator settings format ({}) for type {}, using defaults... ({})",
+                                options, genName, e);
+                    }
+                } else {
+                    properties.generatorSettings = new MemoryDataContainer();
+                }
+                if (customSettings != null && properties.generatorSettings != null) {
+                    properties.generatorSettings.set(FlatGeneratorType.SETTINGS, customSettings);
+                }
+            }
+        }
+
         // Get the spawn position
         Optional<Integer> spawnX = dataView.getInt(SPAWN_X);
         Optional<Integer> spawnY = dataView.getInt(SPAWN_Y);
@@ -254,13 +322,46 @@ public class LanternWorldPropertiesIO {
             properties.keepSpawnLoaded = spongeContainer.getInt(KEEP_SPAWN_LOADED).get() > 0;
             properties.loadOnStartup = spongeContainer.getInt(LOAD_ON_STARTUP).get() > 0;
 
+            DimensionType dimensionTypeById = null;
+            DimensionType dimensionTypeByStrId = null;
+            int dimensionId = spongeContainer.getInt(DIMENSION_INT_ID).get();
+            // This can be null, this is provided in the lantern-server
+            String dimensionStrId = spongeContainer.getString(DIMENSION_ID).orElse(null);
             String dimensionType = spongeContainer.getString(DIMENSION_TYPE).get();
             for (DimensionType type : LanternGame.get().getRegistry().getAllOf(DimensionType.class)) {
-                // Why not just use the id?
+                // Try to use the internal id of the dimension as last fallback option
+                if (((LanternDimensionType<?>) type).getInternalId() == dimensionId &&
+                        dimensionTypeById == null) {
+                    dimensionTypeById = type;
+                }
+                // Try the actual dimension id as second first option
+                if (type.getId().equalsIgnoreCase(dimensionStrId) &&
+                        dimensionTypeByStrId == null) {
+                    dimensionTypeByStrId = type;
+                }
+                // Try to find the dimension type using the canonical name of the class, I don't
+                // know what is wrong with the identifiers of the dimension types (in Sponge)
                 if (type.getDimensionClass().getCanonicalName().equalsIgnoreCase(dimensionType)) {
                     properties.dimensionType = type;
                     break;
                 }
+            }
+            if (properties.dimensionType == null) {
+                if (dimensionTypeByStrId != null) {
+                    properties.dimensionType = dimensionTypeByStrId;
+                } else if (dimensionTypeById != null) {
+                    properties.dimensionType = dimensionTypeById;
+                } else {
+                    // There is no dimension type found, falling back to overworld
+                    properties.dimensionType = DimensionTypes.OVERWORLD;
+                }
+            }
+            if (properties.generatorType == null) {
+                properties.generatorType = (LanternGeneratorType) ((LanternDimensionType<?>)
+                        properties.dimensionType).getDefaultGeneratorType();
+            }
+            if (properties.generatorSettings == null) {
+                properties.generatorSettings = properties.generatorType.getGeneratorSettings();
             }
 
             List<String> modifiers = spongeContainer.getStringList(GENERATOR_MODIFIERS).get();
@@ -323,6 +424,20 @@ public class LanternWorldPropertiesIO {
         dataView.set(CLEAR_WEATHER_TIME, properties.clearWeatherTime);
         dataView.set(LAST_PLAYED, properties.getLastPlayedTime());
         dataView.set(SIZE_ON_DISK, 0L);
+        String genId = properties.generatorType.getId();
+        if (genId.startsWith("minecraft:")) {
+            genId = genId.replaceFirst("minecraft:", "");
+        }
+        dataView.set(GENERATOR_NAME, genId);
+        // The default world generator has a version of one
+        dataView.set(GENERATOR_VERSION, genId.equalsIgnoreCase("default") ? 1 : 0);
+        // The flat world generator has a different settings format
+        if (genId.equalsIgnoreCase("flat")) {
+            dataView.set(GENERATOR_OPTIONS, properties.generatorSettings.getString(FlatGeneratorType.SETTINGS).get());
+            dataView.set(GENERATOR_OPTIONS_EXTRA, properties.generatorSettings.copy().remove(FlatGeneratorType.SETTINGS));
+        } else {
+            dataView.set(GENERATOR_OPTIONS, properties.generatorSettings);
+        }
         dataView.set(DIFFICULTY, ((LanternDifficulty) properties.difficulty).getInternalId());
         dataView.set(GAME_MODE, ((LanternGameMode) properties.gameMode).getInternalId());
         dataView.set(MAP_FEATURES, properties.mapFeatures);
@@ -339,11 +454,21 @@ public class LanternWorldPropertiesIO {
         dataView.set(SPAWN_X, spawn.getX());
         dataView.set(SPAWN_Y, spawn.getY());
         dataView.set(SPAWN_Z, spawn.getZ());
+        File levelFileNew = new File(folder, LEVEL_DATA_NEW);
+        File levelFileOld = new File(folder, LEVEL_DATA_OLD);
         File levelFile = new File(folder, LEVEL_DATA);
+        NbtStreamUtils.write(container, new FileOutputStream(levelFileNew), true);
+        if (levelFileOld.exists()) {
+            levelFileOld.delete();
+        }
+        levelFile.renameTo(levelFileOld);
         if (levelFile.exists()) {
             levelFile.delete();
         }
-        NbtStreamUtils.write(container, new FileOutputStream(levelFile), true);
+        levelFileNew.renameTo(levelFile);
+        if (levelFileNew.exists()) {
+            levelFileNew.delete();
+        }
         DataContainer spongeRootContainer = properties.properties.copy();
         DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
         spongeContainer.set(NAME, properties.name);
@@ -352,10 +477,9 @@ public class LanternWorldPropertiesIO {
         spongeContainer.set(ENABLED, properties.enabled);
         spongeContainer.set(KEEP_SPAWN_LOADED, properties.keepSpawnLoaded);
         spongeContainer.set(LOAD_ON_STARTUP, properties.loadOnStartup);
-        // Why not just use the id?
-        if (properties.dimensionType != null) {
-            spongeContainer.set(DIMENSION_TYPE, properties.dimensionType.getDimensionClass().getCanonicalName());
-        }
+        spongeContainer.set(DIMENSION_INT_ID, ((LanternDimensionType<?>) properties.dimensionType).getInternalId());
+        spongeContainer.set(DIMENSION_ID, properties.dimensionType.getId());
+        spongeContainer.set(DIMENSION_TYPE, properties.dimensionType.getDimensionClass().getCanonicalName());
         List<DataView> pendingUniqueIds = Lists.newArrayListWithCapacity(properties.pendingUniqueIds.size());
         for (UUID uuid : properties.pendingUniqueIds) {
             pendingUniqueIds.add(new MemoryDataContainer()
@@ -363,10 +487,20 @@ public class LanternWorldPropertiesIO {
                     .set(UUID_LEAST, uuid.getLeastSignificantBits()));
         }
         spongeContainer.set(PLAYER_UUID_TABLE, pendingUniqueIds);
+        levelFileNew = new File(folder, SPONGE_LEVEL_DATA_NEW);
+        levelFileOld = new File(folder, SPONGE_LEVEL_DATA_OLD);
         levelFile = new File(folder, SPONGE_LEVEL_DATA);
+        NbtStreamUtils.write(spongeRootContainer, new FileOutputStream(levelFileNew), true);
+        if (levelFileOld.exists()) {
+            levelFileOld.delete();
+        }
+        levelFile.renameTo(levelFileOld);
         if (levelFile.exists()) {
             levelFile.delete();
         }
-        NbtStreamUtils.write(spongeRootContainer, new FileOutputStream(levelFile), true);
+        levelFileNew.renameTo(levelFile);
+        if (levelFileNew.exists()) {
+            levelFileNew.delete();
+        }
     }
 }

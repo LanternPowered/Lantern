@@ -26,16 +26,18 @@ package org.lanternpowered.server.data.io.anvil;
 
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
 
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
@@ -57,6 +59,8 @@ import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_FIL
 public class AnvilChunkIOService implements ChunkIOService {
 
     private static final int REGION_SIZE = 32;
+    private static final int REGION_AREA = REGION_SIZE * REGION_SIZE;
+    private static final int REGION_MASK = REGION_SIZE - 1;
 
     private static final DataQuery LEVEL = DataQuery.of("Level");
     private static final DataQuery SECTIONS = DataQuery.of("Sections");
@@ -89,8 +93,8 @@ public class AnvilChunkIOService implements ChunkIOService {
     public boolean exists(int x, int z) throws IOException {
         RegionFile region = this.cache.getRegionFile(x, z);
 
-        int regionX = x & (REGION_SIZE - 1);
-        int regionZ = z & (REGION_SIZE - 1);
+        int regionX = x & REGION_MASK;
+        int regionZ = z & REGION_MASK;
 
         return region.hasChunk(regionX, regionZ);
     }
@@ -101,8 +105,8 @@ public class AnvilChunkIOService implements ChunkIOService {
         int z = chunk.getZ();
 
         RegionFile region = this.cache.getRegionFile(x, z);
-        int regionX = x & (REGION_SIZE - 1);
-        int regionZ = z & (REGION_SIZE - 1);
+        int regionX = x & REGION_MASK;
+        int regionZ = z & REGION_MASK;
 
         if (!region.hasChunk(regionX, regionZ)) {
             return false;
@@ -220,13 +224,13 @@ public class AnvilChunkIOService implements ChunkIOService {
         DataContainer root = new MemoryDataContainer();
         DataView levelTags = root.createView(LEVEL);
 
-        // core properties
+        // Core properties
         levelTags.set(X, chunk.getX());
         levelTags.set(Z, chunk.getZ());
         levelTags.set(POPULATED, chunk.isPopulated());
         levelTags.set(LAST_UPDATE, 0L);
 
-        // chunk sections
+        // Chunk sections
         ChunkSection[] sections = chunk.getSections();
         List<DataView> sectionTags = Lists.newArrayList();
 
@@ -304,40 +308,112 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public ChunkDataStream getGeneratedChunks() {
-        // TODO: Lets see how sponge will do this without opening all the files...
-        final File[] files = this.dir.listFiles(new FileFilter() {
-            @Override
-            public boolean accept(File file) {
-                return REGION_FILE_PATTERN.matcher(file.getName()).matches();
-            }
-        });
         return new ChunkDataStream() {
 
-            private int index = -1;
+            // All the region files
+            private File[] files;
+
+            // The current region file that we opened
+            private RegionFile region;
+
+            // The coordinates of the chunk inside the region
+            private int chunkX;
+            private int chunkZ;
+
+            // The next index of the chunk in the region file
+            private int regionChunkIndex = -1;
+            // The next index that we are in the file array
+            private int regionFileIndex = -1;
+
+            // Done, no new chunks can be found
+            private boolean done;
+
+            {
+                // Use the reset to initialize
+                this.reset();
+            }
 
             @Override
             public DataContainer next() {
                 if (!this.hasNext()) {
-                    return null;
+                    throw new NoSuchElementException();
                 }
-                return null;
+
+                try {
+                    DataInputStream is = region.getChunkDataInputStream(this.chunkX, this.chunkZ);
+                    DataContainer data;
+
+                    try (NbtDataContainerInputStream nbt = new NbtDataContainerInputStream(is)) {
+                        data = nbt.read();
+                    }
+
+                    return data;
+                } catch (IOException e) {
+                    // This shouldn't happen
+                    throw new IllegalStateException(e);
+                }
             }
 
             @Override
             public boolean hasNext() {
-                // TODO
-                return false;
+                // Fast fail
+                if (this.done) {
+                    return false;
+                }
+                // Use the cached index if set
+                if (this.regionChunkIndex != -1) {
+                    return true;
+                }
+                // Try first to search for more chunks in the current region
+                while (true) {
+                    if (this.region != null) {
+                        while (++this.regionChunkIndex < REGION_AREA) {
+                            this.chunkX = this.regionChunkIndex / REGION_SIZE;
+                            this.chunkZ = this.regionChunkIndex % REGION_SIZE;
+                            if (this.region.hasChunk(this.chunkX, this.chunkZ)) {
+                                return true;
+                            }
+                        }
+                    }
+                    // There no chunk available in the current region,
+                    // reset the chunk index for the next one
+                    this.regionChunkIndex = -1;
+                    // There was no chunk present in the current region,
+                    // try the next region
+                    this.regionFileIndex++;
+                    if (this.regionFileIndex >= this.files.length) {
+                        this.done = true;
+                        return false;
+                    }
+                    File nextRegionFile = this.files[this.regionFileIndex];
+                    if (nextRegionFile.exists()) {
+                        Matcher matcher = REGION_FILE_PATTERN.matcher(nextRegionFile.getName());
+                        int regionX = Integer.parseInt(matcher.group(0));
+                        int regionZ = Integer.parseInt(matcher.group(1));
+                        try {
+                            this.region = cache.getRegionFile(regionX << 5, regionZ << 5);
+                        } catch (IOException e) {
+                            LanternGame.log().error("Failed to read the region file ({};{}) in the world folder {}",
+                                    regionX, regionZ, dir.getPath(), e);
+                        }
+                    }
+                }
             }
 
             @Override
             public int available() {
-                // TODO
+                // TODO: Not sure how we will be able to do this without opening all
+                // the region files
                 return 0;
             }
 
             @Override
             public void reset() {
-                this.index = -1;
+                this.files = dir.listFiles((file) -> REGION_FILE_PATTERN.matcher(file.getName()).matches());
+                this.regionFileIndex = -1;
+                this.regionChunkIndex = -1;
+                this.region = null;
+                this.done = false;
             }
 
         };
@@ -345,14 +421,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public ListenableFuture<Boolean> doesChunkExist(final Vector3i chunkCoords) {
-        return this.service.submit(new Callable<Boolean>() {
-
-            @Override
-            public Boolean call() throws Exception {
-                return exists(chunkCoords.getX(), chunkCoords.getZ());
-            }
-
-        });
+        return this.service.submit(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
     }
 
     @Override

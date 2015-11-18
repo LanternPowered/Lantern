@@ -91,6 +91,7 @@ public final class WeakWorldReference {
      * @return the copy
      */
     public WeakWorldReference copy() {
-        return !this.world.isEnqueued() ? new WeakWorldReference(this.world.get()) : new WeakWorldReference(this.uniqueId);
+        return !this.world.isEnqueued() ? new WeakWorldReference(this.world.get()) :
+            new WeakWorldReference(this.uniqueId);
     }
 }

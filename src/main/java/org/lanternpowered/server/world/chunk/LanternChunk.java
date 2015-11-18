@@ -91,7 +91,7 @@ import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SEC
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTION_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTION_MASK;
 
-public class LanternChunk extends AbstractExtent implements Chunk {
+public class LanternChunk implements AbstractExtent, Chunk {
 
     /**
      * Converts the vector2i into a vector3i with x -> x and y -> z.

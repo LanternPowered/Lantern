@@ -60,7 +60,7 @@ public class LanternWorldBuilder implements WorldBuilder {
 
     private String name;
     private GameMode gameMode;
-    private LanternDimensionType dimensionType;
+    private LanternDimensionType<?> dimensionType;
     private GeneratorType generatorType;
     private Collection<WorldGeneratorModifier> generatorModifiers;
     private DataContainer generatorSettings;
@@ -117,7 +117,7 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.seed = properties.getSeed();
         this.generatorModifiers = properties.getGeneratorModifiers();
         this.name = properties.getWorldName();
-        this.dimensionType = (LanternDimensionType) properties.getDimensionType();
+        this.dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
         this.generatorType = properties.getGeneratorType();
         if (properties.creationSettings != null) {
             this.waterEvaporates = properties.waterEvaporates;
@@ -188,7 +188,7 @@ public class LanternWorldBuilder implements WorldBuilder {
 
     @Override
     public LanternWorldBuilder dimensionType(DimensionType type) {
-        this.dimensionType = (LanternDimensionType) checkNotNull(type, "type");
+        this.dimensionType = (LanternDimensionType<?>) checkNotNull(type, "type");
         return this;
     }
 

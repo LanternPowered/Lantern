@@ -61,10 +61,10 @@ public final class FlatGeneratorPopulator implements GeneratorPopulator {
 
     @Override
     public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeArea biomes) {
-        Vector3i min = buffer.getBlockMin();
-        Vector3i max = buffer.getBlockMax();
+        final Vector3i min = buffer.getBlockMin();
+        final Vector3i max = buffer.getBlockMax();
 
-        int height = this.blockStateCache.length;
+        final int height = this.blockStateCache.length;
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
                 for (int y = min.getY(); y <= max.getY(); y++) {

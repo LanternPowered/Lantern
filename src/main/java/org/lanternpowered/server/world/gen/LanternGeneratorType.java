@@ -58,10 +58,39 @@ public abstract class LanternGeneratorType extends LanternPluginCatalogType impl
         return new MemoryDataContainer();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null || this.getClass() != obj.getClass()) {
+            return false;
+        }
+        final LanternGeneratorType other = (LanternGeneratorType) obj;
+        if (!this.getId().equals(other.getId())) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.getId().hashCode();
+    }
+
+    /**
+     * Gets the minimal spawn height that is required with
+     * this generator type.
+     * 
+     * @return the minimal spawn height
+     */
     public int getMinimalSpawnHeight() {
         return this.minimalSpawnHeight;
     }
 
+    /**
+     * Gets the maximum height that will generator type will
+     * generate.
+     * 
+     * @return the generator height
+     */
     public int getGeneratorHeight() {
         return this.generatorHeight;
     }

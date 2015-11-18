@@ -65,7 +65,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
 
-public class ExtentViewDownsize extends AbstractExtent {
+public class ExtentViewDownsize implements AbstractExtent {
 
     private final Extent extent;
     private final Vector3i blockMin;
@@ -453,7 +453,6 @@ public class ExtentViewDownsize extends AbstractExtent {
         return tileEntities;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
@@ -486,7 +485,6 @@ public class ExtentViewDownsize extends AbstractExtent {
         return entities;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities

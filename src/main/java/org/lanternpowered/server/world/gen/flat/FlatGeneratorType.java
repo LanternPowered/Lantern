@@ -40,7 +40,7 @@ import com.google.common.collect.Lists;
 
 public final class FlatGeneratorType extends LanternGeneratorType {
 
-    private final static DataQuery STRING_VALUE = DataQuery.of("customSettings");
+    public final static DataQuery SETTINGS = DataQuery.of("customSettings");
 
     /**
      * Creates the default settings of the flat generator.
@@ -61,7 +61,7 @@ public final class FlatGeneratorType extends LanternGeneratorType {
 
     @Override
     public DataContainer getGeneratorSettings() {
-        return super.getGeneratorSettings().set(STRING_VALUE, FlatGeneratorSettingsParser.toString(
+        return super.getGeneratorSettings().set(SETTINGS, FlatGeneratorSettingsParser.toString(
                 getDefaultSettings()));
     }
 
@@ -69,8 +69,8 @@ public final class FlatGeneratorType extends LanternGeneratorType {
     public WorldGenerator createGenerator(World world) {
         DataContainer generatorSettings = world.getProperties().getGeneratorSettings();
         FlatGeneratorSettings settings = null;
-        if (generatorSettings.contains(STRING_VALUE)) {
-            settings = FlatGeneratorSettingsParser.fromString(generatorSettings.getString(STRING_VALUE).get());
+        if (generatorSettings.contains(SETTINGS)) {
+            settings = FlatGeneratorSettingsParser.fromString(generatorSettings.getString(SETTINGS).get());
         }
         if (settings == null) {
             settings = getDefaultSettings();

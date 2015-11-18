@@ -70,6 +70,7 @@ public class LanternLoadingTicketIO {
     private static final DataQuery TICKETS = DataQuery.of("Tickets");
     private static final DataQuery TICKET_TYPE = DataQuery.of("Type");
     private static final DataQuery CHUNK_LIST_DEPTH = DataQuery.of("Type");
+    // Lantern property
     private static final DataQuery CHUNK_NUMBER = DataQuery.of("ChunksNum");
     private static final DataQuery CHUNK_X = DataQuery.of("chunkX");
     private static final DataQuery CHUNK_Z = DataQuery.of("chunkZ");
@@ -106,7 +107,7 @@ public class LanternLoadingTicketIO {
                 // Store the list depth for backwards compatible or something,
                 // the current forge version doesn't use it either
                 ticketData.set(CHUNK_LIST_DEPTH, (byte) Math.min(numChunks, 127));
-                // Storing the chunks number, this number is added by lantern
+                // Storing the chunks number, this number is added by us
                 ticketData.set(CHUNK_NUMBER, numChunks);
                 if (ticket0 instanceof PlayerLoadingTicket) {
                     PlayerLoadingTicket ticket1 = (PlayerLoadingTicket) ticket0;
@@ -134,13 +135,13 @@ public class LanternLoadingTicketIO {
                 ticketEntries.add(ticketData);
             }
 
-            DataContainer ticketHolder = new MemoryDataContainer();
-            ticketHolder.set(HOLDER_NAME, entry.getKey());
-            ticketHolder.set(TICKETS, ticketEntries);
+            ticketHolders.add(new MemoryDataContainer()
+                    .set(HOLDER_NAME, entry.getKey())
+                    .set(TICKETS, ticketEntries));
         }
 
-        DataContainer dataContainer = new MemoryDataContainer();
-        dataContainer.set(HOLDER_LIST, ticketHolders);
+        DataContainer dataContainer = new MemoryDataContainer()
+                .set(HOLDER_LIST, ticketHolders);
 
         NbtDataContainerOutputStream os = new NbtDataContainerOutputStream(
                 new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file))));

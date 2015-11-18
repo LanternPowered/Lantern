@@ -66,7 +66,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Preconditions;
 
-public class ExtentViewTransform extends AbstractExtent {
+public class ExtentViewTransform implements AbstractExtent {
 
     public static class DiscreteTransform3to2 {
 

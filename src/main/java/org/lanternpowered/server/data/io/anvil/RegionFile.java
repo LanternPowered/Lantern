@@ -312,11 +312,19 @@ public class RegionFile {
     }
 
     private int getOffset(int x, int z) {
-        return offsets[x + z * 32];
+        return this.offsets[x + z * 32];
     }
 
+    /**
+     * Gets whether there chunk data exists for the chunk at the
+     * coordinates (relative to the region coordinates).
+     * 
+     * @param x the x coordinate
+     * @param z the z coordinate
+     * @return whether the chunk data exists
+     */
     public boolean hasChunk(int x, int z) {
-        return getOffset(x, z) != 0;
+        return this.getOffset(x, z) != 0;
     }
 
     private void setOffset(int x, int z, int offset) throws IOException {

@@ -198,5 +198,4 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
         }
         return 0;
     }
-
 }

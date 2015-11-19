@@ -61,13 +61,15 @@ public class LanternWorldBuilder implements WorldBuilder {
     private String name;
     private GameMode gameMode;
     private LanternDimensionType<?> dimensionType;
-    private GeneratorType generatorType;
+    // If not specified, fall back to dimension default
+    @Nullable private GeneratorType generatorType;
     private Collection<WorldGeneratorModifier> generatorModifiers;
     private DataContainer generatorSettings;
     private TeleporterAgent teleporterAgent;
 
     @Nullable private Boolean keepsSpawnLoaded;
     @Nullable private Boolean waterEvaporates; // Non-sponge property
+    @Nullable private Boolean allowPlayerRespawns; // Non-sponge property
 
     private int buildHeight; // Non-sponge property
 
@@ -87,7 +89,8 @@ public class LanternWorldBuilder implements WorldBuilder {
 
     @Override
     public LanternWorldBuilder fill(WorldCreationSettings settings) {
-        LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) checkNotNull(settings, "settings");
+        final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings)
+                checkNotNull(settings, "settings");
         this.hardcore = settings0.isHardcore();
         this.enabled = settings0.isEnabled();
         this.gameMode = settings0.getGameMode();
@@ -98,33 +101,34 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.name = settings0.getWorldName();
         this.dimensionType = settings0.getDimensionType();
         this.generatorType = settings0.getGeneratorType();
+        this.generatorSettings = settings0.getGeneratorSettings();
         this.bonusChestEnabled = settings0.bonusChestEnabled();
         this.commandsAllowed = settings0.commandsAllowed();
         this.teleporterAgent = settings0.getTeleporterAgent();
         this.waterEvaporates = settings0.waterEvaporates();
         this.buildHeight = settings0.getBuildHeight();
+        this.allowPlayerRespawns = settings0.allowPlayerRespawns();
         return this;
     }
 
     @Override
-    public LanternWorldBuilder fill(WorldProperties properties0) {
-        LanternWorldProperties properties = (LanternWorldProperties) checkNotNull(properties0, "properties");
-        this.hardcore = properties.isHardcore();
-        this.enabled = properties.isEnabled();
-        this.gameMode = properties.getGameMode();
-        this.keepsSpawnLoaded = properties.doesKeepSpawnLoaded();
-        this.usesMapFeatures = properties.usesMapFeatures();
-        this.seed = properties.getSeed();
-        this.generatorModifiers = properties.getGeneratorModifiers();
-        this.name = properties.getWorldName();
-        this.dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
-        this.generatorType = properties.getGeneratorType();
-        if (properties.creationSettings != null) {
-            this.waterEvaporates = properties.waterEvaporates;
-            this.buildHeight = properties.buildHeight;
-        } else {
-            
-        }
+    public LanternWorldBuilder fill(WorldProperties properties) {
+        final LanternWorldProperties properties0 = (LanternWorldProperties)
+                checkNotNull(properties, "properties");
+        this.hardcore = properties0.isHardcore();
+        this.enabled = properties0.isEnabled();
+        this.gameMode = properties0.getGameMode();
+        this.keepsSpawnLoaded = properties0.doesKeepSpawnLoaded();
+        this.usesMapFeatures = properties0.usesMapFeatures();
+        this.seed = properties0.getSeed();
+        this.generatorModifiers = properties0.getGeneratorModifiers();
+        this.name = properties0.getWorldName();
+        this.dimensionType = properties0.dimensionType;
+        this.generatorType = properties0.getGeneratorType();
+        this.generatorSettings = properties0.generatorSettings.copy();
+        this.bonusChestEnabled = properties0.bonusChestEnabled;
+        this.waterEvaporates = properties0.waterEvaporates;
+        this.buildHeight = properties0.buildHeight;
         return this;
     }
 
@@ -137,7 +141,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     @Override
     public LanternWorldBuilder enabled(boolean state) {
         this.enabled = state;
-        return null;
+        return this;
     }
 
     @Override
@@ -263,22 +267,23 @@ public class LanternWorldBuilder implements WorldBuilder {
     public LanternWorldCreationSettings buildSettings() throws IllegalStateException {
         checkState(this.name != null, "name is not set");
         checkState(this.dimensionType != null, "dimensionType is not set");
-        checkState(this.generatorType != null, "generatorType is not set");
         DataContainer generatorSettings = this.generatorSettings;
         if (generatorSettings == null) {
             generatorSettings = this.generatorType.getGeneratorSettings();
         }
-        boolean keepsSpawnLoaded = this.keepsSpawnLoaded;
-        if (this.keepsSpawnLoaded == null) {
-            keepsSpawnLoaded = this.dimensionType.doesKeepSpawnLoaded();
+        GeneratorType generatorType = this.generatorType;
+        if (generatorType == null) {
+            generatorType = this.dimensionType.getDefaultGeneratorType();
         }
-        boolean waterEvaporates = this.waterEvaporates;
-        if (this.waterEvaporates == null) {
-            waterEvaporates = this.dimensionType.doesWaterEvaporate();
-        }
-        return new LanternWorldCreationSettings(this.name, this.gameMode, this.dimensionType, this.generatorType,
+        final boolean keepsSpawnLoaded = this.keepsSpawnLoaded == null ?
+                this.dimensionType.doesKeepSpawnLoaded() : this.keepsSpawnLoaded;
+        final boolean waterEvaporates = this.waterEvaporates == null ?
+                this.dimensionType.doesWaterEvaporate() : this.waterEvaporates;
+        final boolean allowPlayerRespawns = this.allowPlayerRespawns == null ?
+                this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
+        return new LanternWorldCreationSettings(this.name, this.gameMode, this.dimensionType, generatorType,
                 this.generatorModifiers, generatorSettings, this.teleporterAgent, this.hardcore, this.enabled,
                 this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.bonusChestEnabled, this.commandsAllowed,
-                waterEvaporates, this.seed, this.buildHeight);
+                waterEvaporates, allowPlayerRespawns, this.seed, this.buildHeight);
     }
 }

@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.world;
 
+import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -36,6 +37,8 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.component.BaseComponentHolder;
+import org.lanternpowered.server.data.io.ChunkIOService;
+import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.effect.LanternViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
@@ -46,6 +49,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.LanternChunk;
+import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
@@ -126,10 +130,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     final LanternWorldBorder worldBorder = new LanternWorldBorder(this);
 
     // The weather universe
-    // TODO: This can be null depending on whether the sky can use weather
-    @Nullable final LanternWeatherUniverse weatherUniverse = new LanternWeatherUniverse(this);
+    @Nullable final LanternWeatherUniverse weatherUniverse;
 
-    private final LanternChunkManager chunkManager = null;
+    // The chunk manager of this world
+    private final LanternChunkManager chunkManager;
 
     // The dimension instance attached to this world
     private final Dimension dimension;
@@ -142,13 +146,29 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private volatile Context worldContext;
 
-    public LanternWorld(LanternGame game, LanternWorldProperties properties) {
+    public LanternWorld(LanternGame game, File worldFolder, LanternWorldProperties properties) {
         this.properties = properties;
         this.game = game;
-        LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
-        // Create the new dimension instance, doing this
-        // after all the other fields are initialized.
+        // The folder that the region files are stored
+        final File regionFolder = new File(worldFolder, "region");
+        // Create the chunk io service
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(regionFolder);
+        // Get the chunk load service
+        final LanternChunkLoadService chunkLoadService = game.getChunkLoadService();
+        // Get the dimension type
+        final LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
+        // Create the weather universe if needed
+        if (dimensionType.hasSky()) {
+            this.weatherUniverse = this.addComponent(LanternWeatherUniverse.class);
+        } else {
+            this.weatherUniverse = null;
+        }
+        // Create the new dimension instance
         this.dimension = dimensionType.newDimension(this);
+        // Create a new world generator
+        final WorldGenerator worldGenerator = properties.generatorType.createGenerator(this);
+        // Finally, create the chunk manager
+        this.chunkManager = new LanternChunkManager(this, chunkLoadService, chunkIOService, worldGenerator, worldFolder);
     }
 
     /**

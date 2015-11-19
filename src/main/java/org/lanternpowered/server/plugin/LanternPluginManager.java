@@ -126,18 +126,18 @@ public final class LanternPluginManager implements PluginManager {
 
         // Search for all the plugin jar/zip files
         for (File jar : this.pluginsFolder.listFiles(ARCHIVE)) {
-            // Add the jar/zip to the class loader, even if the
-            // jar doesn't contain a plugin, it may be used as
-            // a library
-            try {
-                this.addLibrary(jar.toURI().toURL());
-            } catch (MalformedURLException e) {
-                LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
-                continue;
-            }
-
             // Search the jar for plugins
-            scanZip(jar, plugins);
+            if (scanZip(jar, plugins)) {
+                // Add the jar/zip to the class loader, even if the
+                // jar doesn't contain a plugin, it may be used as
+                // a library
+                try {
+                    this.addLibrary(jar.toURI().toURL());
+                } catch (MalformedURLException e) {
+                    LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
+                    continue;
+                }
+            }
         }
 
         // Get all the unique identifiers and notify if duplicates are found
@@ -249,12 +249,7 @@ public final class LanternPluginManager implements PluginManager {
         public List<String> required;
     }
 
-    private static void scanZip(File file, List<PluginEntry> plugins) {
-        if (!ARCHIVE.accept(null, file.getName())) {
-            return;
-        }
-
-        // Open the zip file so we can scan for plugins
+    private static boolean scanZip(File file, List<PluginEntry> plugins) {
         try {
             ZipFile zip = new ZipFile(file);
             try {
@@ -278,8 +273,10 @@ public final class LanternPluginManager implements PluginManager {
                 zip.close();
             }
         } catch (IOException e) {
-            LanternGame.log().error("Failed to load plugin JAR: {}", file, e);
+            LanternGame.log().error("Failed to load plugin/library JAR: {}", file, e);
+            return false;
         }
+        return true;
     }
 
     @SuppressWarnings("unchecked")

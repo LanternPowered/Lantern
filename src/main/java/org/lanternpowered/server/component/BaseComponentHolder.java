@@ -46,8 +46,8 @@ import com.google.common.collect.Maps;
 public class BaseComponentHolder implements ComponentHolder {
 
     private static final String HOLDER = "holder";
-    // The allowed values is passed through to avoid injecting already
-    // injected objects
+    // The allowed values is passed through to avoid
+    // injecting already injected objects
     private static final String ALLOWED = "allowed";
 
     private static final MethodSpec<Void> ON_ATTACH = MethodSpec.ofAnnotated(Void.class, OnAttach.class);
@@ -84,12 +84,16 @@ public class BaseComponentHolder implements ComponentHolder {
         if (allowed == null) {
             allowed = ImmutableList.copyOf(this.components.values());
         }
-        this.components.put(type, component);
+        // Check if a component was created while instantiating a new component instance
+        T component0 = (T) this.components.putIfAbsent(type, component);
+        if (component0 != null) {
+            return component0;
+        }
         Map<String, Object> params = ImmutableMap.of(HOLDER, this, ALLOWED, allowed);
         INJECTOR.injectObjects(component, params);
         for (Entry<Class<? extends Component>, Component> entry : this.components.entrySet()) {
             if (allowed == null || allowed.contains(entry.getValue())) {
-                INJECTOR.injectObjects(entry.getValue(), params);
+                INJECTOR.injectObjects(entry.getValue(), params, Component.class);
             }
         }
         INJECTOR.injectMethod(component, ON_ATTACH);

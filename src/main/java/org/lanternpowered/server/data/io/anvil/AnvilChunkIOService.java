@@ -62,22 +62,24 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final int REGION_AREA = REGION_SIZE * REGION_SIZE;
     private static final int REGION_MASK = REGION_SIZE - 1;
 
-    private static final DataQuery LEVEL = DataQuery.of("Level");
-    private static final DataQuery SECTIONS = DataQuery.of("Sections");
-    private static final DataQuery X = DataQuery.of("xPos");
-    private static final DataQuery Z = DataQuery.of("zPos");
-    private static final DataQuery Y = DataQuery.of("Y");
-    private static final DataQuery BLOCKS = DataQuery.of("Blocks");
-    private static final DataQuery EXTRA_TYPES = DataQuery.of("Add");
-    private static final DataQuery DATA = DataQuery.of("Data");
-    private static final DataQuery BLOCK_LIGHT = DataQuery.of("BlockLight");
-    private static final DataQuery SKY_LIGHT = DataQuery.of("SkyLight");
-    private static final DataQuery POPULATED = DataQuery.of("TerrainPopulated");
-    private static final DataQuery BIOMES = DataQuery.of("Biomes");
+    // TODO: Not sure if it's actually the version, but is set to 1 in 1.8 (forge)
+    private static final DataQuery VERSION = DataQuery.of("V"); // byte
+    private static final DataQuery LEVEL = DataQuery.of("Level"); // compound
+    private static final DataQuery SECTIONS = DataQuery.of("Sections"); // array
+    private static final DataQuery X = DataQuery.of("xPos"); // int
+    private static final DataQuery Z = DataQuery.of("zPos"); // int
+    private static final DataQuery Y = DataQuery.of("Y"); // byte
+    private static final DataQuery BLOCKS = DataQuery.of("Blocks"); // byte array
+    private static final DataQuery BLOCKS_EXTRA = DataQuery.of("Add"); // byte array
+    private static final DataQuery DATA = DataQuery.of("Data"); // (nibble) byte array
+    private static final DataQuery BLOCK_LIGHT = DataQuery.of("BlockLight"); // (nibble) byte array
+    private static final DataQuery SKY_LIGHT = DataQuery.of("SkyLight"); // (nibble) byte array
+    private static final DataQuery POPULATED = DataQuery.of("TerrainPopulated"); // (boolean) byte
+    private static final DataQuery BIOMES = DataQuery.of("Biomes"); // byte array
     // A extra tag for the biomes to support the custom biomes
-    private static final DataQuery BIOMES_EXTRA = DataQuery.of("BiomesExtra");
-    private static final DataQuery HEIGHT_MAP = DataQuery.of("HeightMap");
-    private static final DataQuery LAST_UPDATE = DataQuery.of("LastUpdate");
+    private static final DataQuery BIOMES_EXTRA = DataQuery.of("BiomesE"); // byte array
+    private static final DataQuery HEIGHT_MAP = DataQuery.of("HeightMap");  // int array
+    private static final DataQuery LAST_UPDATE = DataQuery.of("LastUpdate"); // long
 
     private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     private final RegionFileCache cache;
@@ -127,7 +129,7 @@ public class AnvilChunkIOService implements ChunkIOService {
             int y = (int) sectionTag.getInt(Y).get();
             byte[] rawTypes = (byte[]) sectionTag.get(BLOCKS).get();
 
-            byte[] extTypes = sectionTag.contains(EXTRA_TYPES) ? (byte[]) sectionTag.get(EXTRA_TYPES).get() : null;
+            byte[] extTypes = sectionTag.contains(BLOCKS_EXTRA) ? (byte[]) sectionTag.get(BLOCKS_EXTRA).get() : null;
             byte[] data = (byte[]) sectionTag.get(DATA).get();
             byte[] blockLight = (byte[]) sectionTag.get(BLOCK_LIGHT).get();
             byte[] skyLight = (byte[]) sectionTag.get(SKY_LIGHT).get();
@@ -225,6 +227,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         DataView levelTags = root.createView(LEVEL);
 
         // Core properties
+        levelTags.set(VERSION, (byte) 1);
         levelTags.set(X, chunk.getX());
         levelTags.set(Z, chunk.getZ());
         levelTags.set(POPULATED, chunk.isPopulated());
@@ -262,7 +265,7 @@ public class AnvilChunkIOService implements ChunkIOService {
             }
             sectionTag.set(BLOCKS, rawTypes);
             if (extTypes != null) {
-                sectionTag.set(EXTRA_TYPES, extTypes.getPackedArray());
+                sectionTag.set(BLOCKS_EXTRA, extTypes.getPackedArray());
             }
             sectionTag.set(DATA, data.getPackedArray());
             sectionTag.set(BLOCK_LIGHT, section.lightFromBlock.getPackedArray());
@@ -321,9 +324,12 @@ public class AnvilChunkIOService implements ChunkIOService {
             private int chunkZ;
 
             // The next index of the chunk in the region file
-            private int regionChunkIndex = -1;
+            private int regionChunkIndex;
             // The next index that we are in the file array
-            private int regionFileIndex = -1;
+            private int regionFileIndex;
+
+            // Whether the current fields are cached
+            private boolean cached;
 
             // Done, no new chunks can be found
             private boolean done;
@@ -340,13 +346,14 @@ public class AnvilChunkIOService implements ChunkIOService {
                 }
 
                 try {
-                    DataInputStream is = region.getChunkDataInputStream(this.chunkX, this.chunkZ);
+                    DataInputStream is = this.region.getChunkDataInputStream(this.chunkX, this.chunkZ);
                     DataContainer data;
 
                     try (NbtDataContainerInputStream nbt = new NbtDataContainerInputStream(is)) {
                         data = nbt.read();
                     }
 
+                    this.cached = false;
                     return data;
                 } catch (IOException e) {
                     // This shouldn't happen
@@ -361,7 +368,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                     return false;
                 }
                 // Use the cached index if set
-                if (this.regionChunkIndex != -1) {
+                if (this.cached) {
                     return true;
                 }
                 // Try first to search for more chunks in the current region
@@ -371,6 +378,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                             this.chunkX = this.regionChunkIndex / REGION_SIZE;
                             this.chunkZ = this.regionChunkIndex % REGION_SIZE;
                             if (this.region.hasChunk(this.chunkX, this.chunkZ)) {
+                                this.cached = true;
                                 return true;
                             }
                         }
@@ -380,8 +388,8 @@ public class AnvilChunkIOService implements ChunkIOService {
                     this.regionChunkIndex = -1;
                     // There was no chunk present in the current region,
                     // try the next region
-                    this.regionFileIndex++;
-                    if (this.regionFileIndex >= this.files.length) {
+                    if (++this.regionFileIndex >= this.files.length) {
+                        this.region = null;
                         this.done = true;
                         return false;
                     }
@@ -395,7 +403,10 @@ public class AnvilChunkIOService implements ChunkIOService {
                         } catch (IOException e) {
                             LanternGame.log().error("Failed to read the region file ({};{}) in the world folder {}",
                                     regionX, regionZ, dir.getPath(), e);
+                            this.region = null;
                         }
+                    } else {
+                        this.region = null;
                     }
                 }
             }
@@ -404,18 +415,18 @@ public class AnvilChunkIOService implements ChunkIOService {
             public int available() {
                 // TODO: Not sure how we will be able to do this without opening all
                 // the region files
-                return 0;
+                throw new UnsupportedOperationException();
             }
 
             @Override
             public void reset() {
-                this.files = dir.listFiles((file) -> REGION_FILE_PATTERN.matcher(file.getName()).matches());
+                this.files = dir.listFiles(file -> REGION_FILE_PATTERN.matcher(file.getName()).matches());
                 this.regionFileIndex = -1;
                 this.regionChunkIndex = -1;
                 this.region = null;
+                this.cached = false;
                 this.done = false;
             }
-
         };
     }
 
@@ -434,8 +445,8 @@ public class AnvilChunkIOService implements ChunkIOService {
                 int z = chunkCoords.getZ();
 
                 RegionFile region = cache.getRegionFile(x, z);
-                int regionX = x & (REGION_SIZE - 1);
-                int regionZ = z & (REGION_SIZE - 1);
+                int regionX = x & REGION_MASK;
+                int regionZ = z & REGION_MASK;
 
                 if (!region.hasChunk(regionX, regionZ)) {
                     return Optional.empty();
@@ -450,7 +461,6 @@ public class AnvilChunkIOService implements ChunkIOService {
 
                 return Optional.of(data);
             }
-
         });
     }
 

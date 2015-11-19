@@ -31,6 +31,7 @@ import java.util.UUID;
 import java.util.function.Function;
 
 import org.lanternpowered.server.component.BaseComponentHolder;
+import org.lanternpowered.server.component.misc.Health;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -395,7 +396,10 @@ public class LanternEntity extends BaseComponentHolder implements Entity {
 
     @Override
     public boolean damage(double damage, Cause cause) {
-        // TODO Auto-generated method stub
+        Optional<Health> health = this.getComponent(Health.class);
+        if (health.isPresent()) {
+            return health.get().damage(damage, cause);
+        }
         return false;
     }
 

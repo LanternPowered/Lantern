@@ -81,7 +81,7 @@ public abstract class HealthBase implements Health {
     }
 
     @Override
-    public void damage(double damage, Cause cause) {
+    public boolean damage(double damage, Cause cause) {
         if (this.holder instanceof Entity) {
             // TODO: Damage modifiers, etc.
             DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(LanternGame.get(),
@@ -95,6 +95,8 @@ public abstract class HealthBase implements Health {
             if (health <= 0.0) {
                 // TODO: Notify stuff
             }
+            return true;
         }
+        return false;
     }
 }

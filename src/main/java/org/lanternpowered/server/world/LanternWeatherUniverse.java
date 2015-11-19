@@ -29,7 +29,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.List;
 import java.util.Random;
 
+import org.lanternpowered.server.component.AttachableTo;
+import org.lanternpowered.server.component.Component;
+import org.lanternpowered.server.component.Locked;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.world.weather.Weather;
@@ -38,7 +42,9 @@ import org.spongepowered.api.world.weather.Weathers;
 
 import com.google.common.collect.Lists;
 
-public final class LanternWeatherUniverse implements WeatherUniverse {
+@Locked
+@AttachableTo(LanternWorld.class)
+public final class LanternWeatherUniverse implements Component, WeatherUniverse {
 
     private static final float FADE_SPEED = 0.01f;
 
@@ -46,7 +52,7 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
     private final Random random = new Random();
 
     // The world this weather universe is attached to
-    private final LanternWorld world;
+    @Inject private LanternWorld world;
 
     // The current weather
     private LanternWeather weather = (LanternWeather) Weathers.CLEAR;
@@ -59,10 +65,6 @@ public final class LanternWeatherUniverse implements WeatherUniverse {
 
     private float darknessTarget;
     private float darkness;
-
-    LanternWeatherUniverse(LanternWorld world) {
-        this.world = world;
-    }
 
     void setRaining(boolean raining) {
         if (raining && this.world.properties.rainTime > 0) {

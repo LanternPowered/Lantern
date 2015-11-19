@@ -151,7 +151,7 @@ public class LanternGame implements Game {
     private LanternScheduler scheduler;
 
     // The chunk load service
-    private ChunkLoadService chunkLoadService;
+    private LanternChunkLoadService chunkLoadService;
 
     // The config service
     private ConfigService configService;
@@ -358,7 +358,7 @@ public class LanternGame implements Game {
      * 
      * @return the chunk load service
      */
-    public ChunkLoadService getChunkLoadService() {
+    public LanternChunkLoadService getChunkLoadService() {
         return this.chunkLoadService;
     }
 

@@ -47,7 +47,6 @@ public final class SkylandsGeneratorType extends LanternGeneratorType {
         final LanternWorldGenerator generator = new LanternWorldGenerator(new SkylandsTerrainGenerator(),
                 new SkylandsBiomeGenerator());
         final List<GeneratorPopulator> generatorPopulators = generator.getGeneratorPopulators();
-        generatorPopulators.clear();
         generatorPopulators.add(new SkylandsGroundCoverPopulator());
         generatorPopulators.add(new SkylandsGrassPopulator());
         return generator;

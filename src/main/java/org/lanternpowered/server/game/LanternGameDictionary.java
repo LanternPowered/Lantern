@@ -47,12 +47,7 @@ public final class LanternGameDictionary implements GameDictionary {
     public void register(String key, ItemType type) {
         checkNotNullOrEmpty(key, "key");
         checkNotNull(type, "type");
-        Set<ItemType> set = this.map.get(key);
-        if (set == null) {
-            set = Sets.newConcurrentHashSet();
-            this.map.put(key, set);
-        }
-        set.add(type);
+        this.map.computeIfAbsent(key, key0 -> Sets.newConcurrentHashSet()).add(type);
     }
 
     @Override

@@ -52,6 +52,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     private final boolean bonusChestEnabled;
     private final boolean commandsAllowed;
     private final boolean waterEvaporates;
+    private final boolean allowPlayerRespawns;
 
     private final int buildHeight;
     private final long seed;
@@ -59,7 +60,9 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
             boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
-            boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, long seed, int buildHeight) {
+            boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns,
+            long seed, int buildHeight) {
+        this.allowPlayerRespawns = allowPlayerRespawns;
         this.generatorModifiers = generatorModifiers;
         this.generatorSettings = generatorSettings;
         this.bonusChestEnabled = bonusChestEnabled;
@@ -150,7 +153,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
 
     @Override
     public DataContainer getGeneratorSettings() {
-        return this.generatorSettings;
+        return this.generatorSettings.copy();
     }
 
     public TeleporterAgent getTeleporterAgent() {
@@ -159,5 +162,9 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
 
     public int getBuildHeight() {
         return this.buildHeight;
+    }
+
+    public boolean allowPlayerRespawns() {
+        return this.allowPlayerRespawns;
     }
 }

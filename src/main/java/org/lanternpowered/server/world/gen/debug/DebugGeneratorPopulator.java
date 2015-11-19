@@ -52,7 +52,7 @@ public final class DebugGeneratorPopulator implements GeneratorPopulator {
     // All the block states that should be used
     private final BlockState[] blockStateCache;
 
-    // The x size of the plane
+    // The x/z size of the plane
     private final int size;
 
     public DebugGeneratorPopulator(GameRegistry registry) {
@@ -73,21 +73,23 @@ public final class DebugGeneratorPopulator implements GeneratorPopulator {
 
     @Override
     public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeArea biomes) {
-        Vector3i min = buffer.getBlockMin();
-        Vector3i max = buffer.getBlockMax();
+        final Vector3i min = buffer.getBlockMin();
+        final Vector3i max = buffer.getBlockMax();
+
+        final boolean placeBarriers = min.getY() <= BARRIER_PLANE && max.getY() >= BARRIER_PLANE;
+        final boolean placeBlocks = min.getY() <= BLOCKS_PLANE && max.getY() >= BLOCKS_PLANE;
 
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
-                if (min.getY() <= BARRIER_PLANE && max.getY() >= BARRIER_PLANE) {
+                if (placeBarriers) {
                     buffer.setBlock(x, BARRIER_PLANE, z, BlockTypes.BARRIER.getDefaultState());
                 }
-                if (min.getY() <= BLOCKS_PLANE && max.getY() >= BLOCKS_PLANE &&
-                        (x & 0x1) != 0 && (z & 0x1) != 0) {
+                if (placeBlocks && (x & 0x1) != 0 && (z & 0x1) != 0) {
                     int i = x >> 1;
                     int j = z >> 1;
 
-                    int index = Math.abs(i * this.size + j);
-                    if (index < this.blockStateCache.length) {
+                    int index = i * this.size + j;
+                    if (index >= 0 && index < this.blockStateCache.length) {
                         buffer.setBlock(x, BLOCKS_PLANE, z, this.blockStateCache[index]);
                     }
                 }

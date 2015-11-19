@@ -40,6 +40,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.rules.GameRule;
 import org.lanternpowered.server.world.rules.LanternGameRules;
@@ -76,7 +77,7 @@ public class LanternWorldProperties implements WorldProperties {
     DataContainer properties;
 
     // The type of the dimension
-    DimensionType dimensionType;
+    LanternDimensionType<?> dimensionType;
 
     // The world generator modifiers
     ImmutableSet<WorldGeneratorModifier> generatorModifiers = ImmutableSet.of();
@@ -90,13 +91,19 @@ public class LanternWorldProperties implements WorldProperties {
     // The difficulty
     Difficulty difficulty = Difficulties.NORMAL;
 
+    // Whether the difficulty is locked
+    boolean difficultyLocked;
+
     // The game mode
     GameMode gameMode = GameModes.NOT_SET;
 
-    protected String name;
+    // The name of the world
+    String name;
+
     protected UUID uniqueId;
     protected Vector3i spawnPosition;
 
+    boolean bonusChestEnabled;
     boolean enabled;
     boolean loadOnStartup;
     boolean keepSpawnLoaded;
@@ -148,19 +155,29 @@ public class LanternWorldProperties implements WorldProperties {
 
     int buildHeight;
 
-    public LanternWorldProperties(@Nullable LanternWorldCreationSettings creationSettings) {
+    public LanternWorldProperties() {
+        this.creationSettings = null;
+    }
+
+    public LanternWorldProperties(LanternWorldCreationSettings creationSettings) {
         this.creationSettings = creationSettings;
-        if (creationSettings != null) {
-            this.keepSpawnLoaded = creationSettings.doesKeepSpawnLoaded();
-            this.commandsAllowed = creationSettings.commandsAllowed();
-            this.hardcore = creationSettings.isHardcore();
-            this.dimensionType = creationSettings.getDimensionType();
-            this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();
-            this.setGeneratorModifiers(creationSettings.getGeneratorModifiers());
-            this.gameMode = creationSettings.getGameMode();
-            this.enabled = creationSettings.isEnabled();
-            this.name = creationSettings.getWorldName();
-        }
+        this.keepSpawnLoaded = creationSettings.doesKeepSpawnLoaded();
+        this.commandsAllowed = creationSettings.commandsAllowed();
+        this.hardcore = creationSettings.isHardcore();
+        this.dimensionType = creationSettings.getDimensionType();
+        this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();
+        this.generatorSettings = creationSettings.getGeneratorSettings();
+        this.setGeneratorModifiers(creationSettings.getGeneratorModifiers());
+        this.waterEvaporates = creationSettings.waterEvaporates();
+        this.bonusChestEnabled = creationSettings.bonusChestEnabled();
+        this.buildHeight = creationSettings.getBuildHeight();
+        this.mapFeatures = creationSettings.usesMapFeatures();
+        this.gameMode = creationSettings.getGameMode();
+        this.enabled = creationSettings.isEnabled();
+        this.name = creationSettings.getWorldName();
+        this.seed = creationSettings.getSeed();
+        this.allowPlayerRespawns = creationSettings.allowPlayerRespawns();
+        this.uniqueId = UUID.randomUUID();
     }
 
     public boolean doesWaterEvaporate() {

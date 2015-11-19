@@ -22,61 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc;
+package org.lanternpowered.server.component;
 
-import org.lanternpowered.server.component.Component;
-import org.spongepowered.api.event.cause.Cause;
+import static java.lang.annotation.ElementType.TYPE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public interface Health extends Component {
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 
-    /**
-     * Damages the component with the specified amount of
-     * damage and a specific cause.
-     * 
-     * @param damage the damage
-     * @param cause the cause
-     * @return whether it was successful
-     */
-    boolean damage(double damage, Cause cause);
+/**
+ * Apply this annotation to a component type that may not be removed
+ * from it's holder.
+ */
+@Target(TYPE)
+@Retention(RUNTIME)
+public @interface Locked {
 
-    /**
-     * Heals the component with the specified amount of
-     * health and a specific cause.
-     * 
-     * @param health the health
-     * @param cause the cause
-     */
-    void heal(double health, Cause cause);
-
-    /**
-     * Gets the health.
-     * 
-     * @return the health
-     */
-    double getHealth();
-
-    /**
-     * Sets the health.
-     * 
-     * @param health the health
-     */
-    void setHealth(double health);
-
-    /**
-     * Gets the maximum amount of health.
-     * 
-     * @return the max health
-     */
-    double getMaxHealth();
-
-    /**
-     * Sets the maximum amount of health.
-     * 
-     * @param maxHealth the max health
-     */
-    void setMaxHealth(double maxHealth);
-
-    double getAbsorptionHealth();
-
-    void setAbsorptionHealth(double absorptionHealth);
 }

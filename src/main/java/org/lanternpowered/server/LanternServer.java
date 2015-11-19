@@ -86,13 +86,41 @@ public class LanternServer implements Server {
 
     public static void main(String[] args) {
         try {
+            // The server wasn't run from a terminal, we will just display
+            // a message and the server won't be run.
+            /*
+             * TODO: Currently disabled until the IDE bug is fixed...
+             * https://bugs.eclipse.org/bugs/show_bug.cgi?id=122429
+             */
+            /*
+            if (System.console() == null) {
+                JFrame jFrame = new JFrame();
+                jFrame.setTitle("Lantern Server");
+                jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                // Create the label that should be displayed
+                JLabel label = new JLabel("You have to run LanternServer through a terminal (bash).");
+                // Make the size of the font a bit bigger
+                Font font = label.getFont();
+                label.setFont(font.deriveFont(font.getSize() * 1.4f));
+                // Add the label
+                jFrame.getContentPane().add(label);
+                // Make the frame fit around the added content
+                jFrame.pack();
+                // Make it visible
+                jFrame.setVisible(true);
+                // Disable resizing
+                jFrame.setResizable(false);
+                return;
+            }
+            */
+
             // Create the console instance
-            ConsoleManager consoleManager = new ConsoleManager();
+            final ConsoleManager consoleManager = new ConsoleManager();
             // Initialize the console manager (setup basic logging)
             consoleManager.init();
 
             // Parse launch arguments
-            LanternServerConfig config = parseArguments(args);
+            final LanternServerConfig config = parseArguments(args);
             if (config == null) {
                 return;
             }
@@ -106,7 +134,6 @@ public class LanternServer implements Server {
             // Create the server instance
             final LanternServer server = new LanternServer(game, config, consoleManager);
 
-            System.out.println(LanternServer.class.getClassLoader().getClass().getName());
             // Send some startup info
             LanternGame.log().info("Starting Lantern Server (Minecraft: {} (Protocol: {}))",
                     LanternMinecraftVersion.CURRENT.getName(),
@@ -115,8 +142,8 @@ public class LanternServer implements Server {
             // Load the config file
             config.load();
 
-            File pluginsFolder = new File(config.get(Settings.PLUGIN_FOLDER));
-            File worldsFolder = new File(config.get(Settings.WORLD_FOLDER));
+            final File pluginsFolder = new File(config.get(Settings.PLUGIN_FOLDER));
+            final File worldsFolder = new File(config.get(Settings.WORLD_FOLDER));
 
             // Initialize the game
             game.initialize(server, config.getFolder(), pluginsFolder, worldsFolder);
@@ -315,7 +342,7 @@ public class LanternServer implements Server {
         if (defaultWorld.isEmpty()) {
             defaultWorld = null;
         }
-        this.worldManager = new LanternWorldManager(this.game.getSavesDirectory().toFile(), defaultWorld);
+        this.worldManager = new LanternWorldManager(this.game.getSavesDirectory().toFile());
 
         this.game.setGameState(GameState.SERVER_ABOUT_TO_START);
         this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game,

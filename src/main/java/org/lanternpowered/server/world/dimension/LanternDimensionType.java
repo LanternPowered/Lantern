@@ -37,14 +37,16 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
     private final DimensionSupplier<T> supplier;
     private final boolean keepSpawnLoaded;
     private final boolean waterEvaporates;
+    private final boolean allowsPlayerRespawns;
     private final boolean hasSky;
     private final int internalId;
 
     public LanternDimensionType(String pluginId, String name, int internalId, Class<T> dimensionClass,
             GeneratorType defaultGeneratorType, boolean keepSpawnLoaded, boolean waterEvaporates,
-            boolean hasSky, DimensionSupplier<T> supplier) {
+            boolean hasSky, boolean allowsPlayerRespawns, DimensionSupplier<T> supplier) {
         super(pluginId, name);
         this.defaultGeneratorType = defaultGeneratorType;
+        this.allowsPlayerRespawns = allowsPlayerRespawns;
         this.keepSpawnLoaded = keepSpawnLoaded;
         this.waterEvaporates = waterEvaporates;
         this.dimensionClass = dimensionClass;
@@ -81,6 +83,10 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
     @Override
     public Class<? extends Dimension> getDimensionClass() {
         return this.dimensionClass;
+    }
+
+    public boolean allowsPlayerRespawns() {
+        return this.allowsPlayerRespawns;
     }
 
     public boolean doesWaterEvaporate() {

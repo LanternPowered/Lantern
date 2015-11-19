@@ -48,7 +48,7 @@ public final class FlatGeneratorType extends LanternGeneratorType {
      * @return the default settings
      */
     public static FlatGeneratorSettings getDefaultSettings() {
-        List<FlatLayer> layers = Lists.newArrayListWithCapacity(3);
+        final List<FlatLayer> layers = Lists.newArrayListWithCapacity(3);
         layers.add(new FlatLayer(BlockTypes.BEDROCK, 1));
         layers.add(new FlatLayer(BlockTypes.DIRT, 2));
         layers.add(new FlatLayer(BlockTypes.GRASS, 1));
@@ -67,16 +67,15 @@ public final class FlatGeneratorType extends LanternGeneratorType {
 
     @Override
     public WorldGenerator createGenerator(World world) {
-        DataContainer generatorSettings = world.getProperties().getGeneratorSettings();
-        FlatGeneratorSettings settings = null;
+        final DataContainer generatorSettings = world.getProperties().getGeneratorSettings();
+        final FlatGeneratorSettings settings;
         if (generatorSettings.contains(SETTINGS)) {
             settings = FlatGeneratorSettingsParser.fromString(generatorSettings.getString(SETTINGS).get());
-        }
-        if (settings == null) {
+        } else {
             settings = getDefaultSettings();
         }
-        SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(settings.getBiomeType());
-        FlatGeneratorPopulator populatorGenerator = new FlatGeneratorPopulator(settings,
+        final SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(settings.getBiomeType());
+        final FlatGeneratorPopulator populatorGenerator = new FlatGeneratorPopulator(settings,
                 (LanternGeneratorType) world.getProperties().getGeneratorType());
         return new LanternWorldGenerator(populatorGenerator, biomeGenerator);
     }

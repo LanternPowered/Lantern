@@ -41,7 +41,7 @@ import org.lanternpowered.server.game.LanternGame;
 public class RegionFileCache {
 
     public static final String REGION_FILE_EXTENSION = "mca";
-    public static final Pattern REGION_FILE_PATTERN = Pattern.compile("r\\.([-+]?[0-9])+.([-+]?[0-9])+\\." + REGION_FILE_EXTENSION);
+    public static final Pattern REGION_FILE_PATTERN = Pattern.compile("^r\\.([-]?[0-9]+)\\.([-]?[0-9]+)\\.mca" + REGION_FILE_EXTENSION);
 
     private static final int MAX_CACHE_SIZE = 256;
 

@@ -69,7 +69,7 @@ public class LanternLoadingTicketIO {
     private static final DataQuery HOLDER_NAME = DataQuery.of("Owner");
     private static final DataQuery TICKETS = DataQuery.of("Tickets");
     private static final DataQuery TICKET_TYPE = DataQuery.of("Type");
-    private static final DataQuery CHUNK_LIST_DEPTH = DataQuery.of("Type");
+    private static final DataQuery CHUNK_LIST_DEPTH = DataQuery.of("ChunkListDepth");
     // Lantern property
     private static final DataQuery CHUNK_NUMBER = DataQuery.of("ChunksNum");
     private static final DataQuery CHUNK_X = DataQuery.of("chunkX");

@@ -32,12 +32,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import org.lanternpowered.server.util.gen.ShortArrayImmutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayImmutableBlockBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayMutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayMutableBlockBuffer;
-import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -222,10 +222,10 @@ public interface AbstractExtent extends Extent {
     default MutableBiomeArea getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBiomeBuffer(ExtentBufferUtil.copyToArray(this, this.getBiomeMin(),
+                return new ObjectArrayMutableBiomeBuffer(ExtentBufferHelper.copyToObjectArray(this, this.getBiomeMin(),
                         this.getBiomeMax(), this.getBiomeSize()), this.getBiomeMin(), this.getBiomeSize());
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBiomeBuffer(ExtentBufferUtil.copyToArray(this, this.getBiomeMin(),
+                return new AtomicObjectArrayMutableBiomeBuffer(ExtentBufferHelper.copyToObjectArray(this, this.getBiomeMin(),
                         this.getBiomeMax(), this.getBiomeSize()), this.getBiomeMin(), this.getBiomeSize());
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -234,7 +234,7 @@ public interface AbstractExtent extends Extent {
 
     @Override
     default ImmutableBiomeArea getImmutableBiomeCopy() {
-        return ShortArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, this.getBiomeMin(),
+        return ShortArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToArray(this, this.getBiomeMin(),
                 this.getBiomeMax(), this.getBiomeSize()), this.getBiomeMin(), this.getBiomeSize());
     }
 
@@ -273,10 +273,10 @@ public interface AbstractExtent extends Extent {
     default MutableBlockVolume getBlockCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, this.getBlockMin(),
+                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(this, this.getBlockMin(),
                         this.getBlockMax(), this.getBlockSize()), this.getBlockMin(), this.getBlockSize());
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, this.getBlockMin(),
+                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(this, this.getBlockMin(),
                         this.getBlockMax(), this.getBlockSize()), this.getBlockMin(), this.getBlockSize());
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -285,7 +285,7 @@ public interface AbstractExtent extends Extent {
 
     @Override
     default ImmutableBlockVolume getImmutableBlockCopy() {
-        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, this.getBlockMin(),
+        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToArray(this, this.getBlockMin(),
                 this.getBlockMax(), this.getBlockSize()), this.getBlockMin(), this.getBlockSize());
     }
 

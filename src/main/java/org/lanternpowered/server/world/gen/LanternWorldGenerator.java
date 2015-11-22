@@ -42,8 +42,8 @@ public final class LanternWorldGenerator implements WorldGenerator {
     private final List<GeneratorPopulator> generatorPopulators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
     private final List<Populator> populators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
 
-    private GeneratorPopulator baseGeneratorPopulator;
-    private BiomeGenerator biomeGenerator;
+    private volatile GeneratorPopulator baseGeneratorPopulator;
+    private volatile BiomeGenerator biomeGenerator;
 
     public LanternWorldGenerator(GeneratorPopulator baseGeneratorPopulator,
             BiomeGenerator biomeGenerator) {

@@ -22,19 +22,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.component.misc.entity;
+package org.lanternpowered.server.world.chunk;
 
-public class HealthSimple extends HealthBase {
+import org.spongepowered.api.service.world.ChunkLoadService.LoadingTicket;
 
-    private double maxHealth = 1.0;
+public interface ChunkLoadingTicket extends LoadingTicket {
 
-    @Override
-    public double getMaxHealth() {
-        return this.maxHealth;
-    }
-
-    @Override
-    public void setMaxHealth(double maxHealth) {
-        this.maxHealth = maxHealth;
-    }
+    /**
+     * Unforces all the chunks that are attached
+     * to this loading ticket.
+     */
+    void unforceChunks();
 }

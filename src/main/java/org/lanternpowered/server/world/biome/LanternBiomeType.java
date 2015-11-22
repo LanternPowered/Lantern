@@ -26,7 +26,7 @@ package org.lanternpowered.server.world.biome;
 
 import java.util.List;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.util.Lists2;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.GroundCoverLayer;
@@ -35,7 +35,7 @@ import org.spongepowered.api.world.gen.Populator;
 
 import com.google.common.collect.Lists;
 
-public class LanternBiomeType extends SimpleLanternCatalogType implements BiomeType {
+public class LanternBiomeType extends LanternPluginCatalogType implements BiomeType {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...
     private final List<GroundCoverLayer> groundCoverLayers = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
@@ -48,8 +48,8 @@ public class LanternBiomeType extends SimpleLanternCatalogType implements BiomeT
     private float minHeight;
     private float maxHeight;
 
-    public LanternBiomeType(String identifier) {
-        super(identifier);
+    public LanternBiomeType(String pluginId, String identifier) {
+        super(pluginId, identifier);
     }
 
     @Override

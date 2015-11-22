@@ -36,12 +36,13 @@ public class AtomicNibbleArray implements Serializable {
 
     private static final long serialVersionUID = -8011969936196392062L;
 
-    // The amount of nibbles packed in one integer
-    private static final int PACKED_VALUES = 8;
-    // The amount of bits in an integer
-    private static final int PACKED_BITS = 32;
+    // The amount of bits in a nibble
+    private static final int NIBBLE_SIZE = 4;
 
-    private static final int VALUE_BITS = PACKED_BITS / PACKED_VALUES;
+    // The amount of nibbles packed in one integer
+    private static final int PACKED_VALUES = Integer.SIZE / NIBBLE_SIZE;
+
+    private static final int VALUE_BITS = Integer.SIZE / PACKED_VALUES;
     private static final int VALUE_MASK = (1 << VALUE_BITS) - 1;
 
     private static final int INDEX_MASK = PACKED_VALUES - 1;

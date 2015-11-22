@@ -26,9 +26,9 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
 
-import org.lanternpowered.server.util.gen.ShortArrayImmutableBlockBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayMutableBlockBuffer;
-import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.DiscreteTransform3;
@@ -81,8 +81,8 @@ public abstract class AbstractBlockViewTransform<V extends BlockVolume> implemen
 
     @Override
     public boolean containsBlock(int x, int y, int z) {
-        return this.volume.containsBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-            .transformZ(x, y, z));
+        return this.volume.containsBlock(this.inverseTransform.transformX(x, y, z),
+                this.inverseTransform.transformY(x, y, z), this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
@@ -102,8 +102,8 @@ public abstract class AbstractBlockViewTransform<V extends BlockVolume> implemen
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return this.volume.getBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-            .transformZ(x, y, z));
+        return this.volume.getBlock(this.inverseTransform.transformX(x, y, z),
+                this.inverseTransform.transformY(x, y, z), this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
@@ -115,9 +115,11 @@ public abstract class AbstractBlockViewTransform<V extends BlockVolume> implemen
     public MutableBlockVolume getBlockCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, this.min, this.max, this.size), this.min, this.size);
+                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                        this, this.min, this.max, this.size), this.min, this.size);
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferUtil.copyToArray(this, this.min, this.max, this.size), this.min, this.size);
+                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                        this, this.min, this.max, this.size), this.min, this.size);
             default:
                 throw new UnsupportedOperationException(type.name());
         }
@@ -125,8 +127,8 @@ public abstract class AbstractBlockViewTransform<V extends BlockVolume> implemen
 
     @Override
     public ImmutableBlockVolume getImmutableBlockCopy() {
-        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, this.min, this.max, this.size), this.min,
-            this.size);
+        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToArray(
+                this, this.min, this.max, this.size), this.min, this.size);
     }
 
 }

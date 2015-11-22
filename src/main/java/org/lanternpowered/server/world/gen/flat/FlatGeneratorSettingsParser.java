@@ -50,14 +50,14 @@ public final class FlatGeneratorSettingsParser {
             if (i > 0) {
                 builder.append(",");
             }
-            FlatLayer layer = layers.get(i);
-            int depth = layer.getDepth();
+            final FlatLayer layer = layers.get(i);
+            final int depth = layer.getDepth();
             if (depth > 1) {
                 builder.append(depth).append('*');
             }
-            BlockState block = layer.getBlockState();
+            final BlockState block = layer.getBlockState();
             builder.append(block.getType().getId());
-            int data = LanternBlocks.reg().getStateData(block);
+            final int data = LanternBlocks.reg().getStateData(block);
             if (data > 0) {
                 builder.append(':').append(data);
             }

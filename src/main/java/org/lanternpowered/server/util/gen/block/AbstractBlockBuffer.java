@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.gen;
+package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
@@ -46,13 +46,14 @@ public abstract class AbstractBlockBuffer implements BlockVolume {
     protected final Vector3i start;
     protected final Vector3i size;
     protected final Vector3i end;
+
     private final int yLine;
     private final int yzSlice;
 
     protected AbstractBlockBuffer(Vector3i start, Vector3i size) {
+        this.end = start.add(size).sub(Vector3i.ONE);
         this.start = start;
         this.size = size;
-        this.end = this.start.add(this.size).sub(Vector3i.ONE);
 
         this.yLine = size.getY();
         this.yzSlice = this.yLine * size.getZ();
@@ -64,12 +65,8 @@ public abstract class AbstractBlockBuffer implements BlockVolume {
         }
     }
 
-    public int getIndex(int x, int y, int z) {
-        // return (x - this.start.getX()) * this.yzSlice + (z - this.start.getZ()) * this.yLine + (y - this.start.getY());
-
-        // Using a different formula to make it easier to copy the contents of the array,
-        // this should increase the performance wile generating chunks
-        return (y - this.start.getY()) * this.yzSlice + (z - this.start.getZ()) * this.yLine + (x - this.start.getX());
+    protected int index(int x, int y, int z) {
+        return (x - this.start.getX()) * this.yzSlice + (z - this.start.getZ()) * this.yLine + (y - this.start.getY());
     }
 
     @Override
@@ -124,5 +121,4 @@ public abstract class AbstractBlockBuffer implements BlockVolume {
             .add("max", this.getBlockMax())
             .toString();
     }
-
 }

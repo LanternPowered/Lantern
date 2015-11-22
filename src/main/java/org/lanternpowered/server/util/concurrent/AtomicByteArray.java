@@ -35,11 +35,9 @@ public class AtomicByteArray implements Serializable {
     private static final long serialVersionUID = 3434275139515033068L;
 
     // The amount of bytes packed in one integer
-    private static final int PACKED_VALUES = 4;
-    // The amount of bits in an integer
-    private static final int PACKED_BITS = 32;
+    private static final int PACKED_VALUES = Integer.SIZE / Byte.SIZE;
 
-    private static final int VALUE_BITS = PACKED_BITS / PACKED_VALUES;
+    private static final int VALUE_BITS = Integer.SIZE / PACKED_VALUES;
     private static final int VALUE_MASK = (1 << VALUE_BITS) - 1;
 
     private static final int INDEX_MASK = PACKED_VALUES - 1;

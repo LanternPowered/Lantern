@@ -56,12 +56,12 @@ public class LanternCatalogTypeRegistry<T extends CatalogType> implements Catalo
 
     @Override
     public Optional<T> get(String identifier) {
-        return Optional.ofNullable(this.types.get(checkNotNullOrEmpty(identifier, "identifier")));
+        return Optional.ofNullable(this.types.get(checkNotNullOrEmpty(identifier, "identifier").toLowerCase()));
     }
 
     @Override
     public <V extends T> Optional<V> getOf(String identifier, Class<V> type) {
-        T catalogType = this.types.get(checkNotNullOrEmpty(identifier, "identifier"));
+        T catalogType = this.types.get(checkNotNullOrEmpty(identifier, "identifier").toLowerCase());
         if (type.isInstance(catalogType)) {
             return Optional.<V>of(type.cast(catalogType));
         }
@@ -91,6 +91,6 @@ public class LanternCatalogTypeRegistry<T extends CatalogType> implements Catalo
 
     @Override
     public boolean has(String identifier) {
-        return this.types.containsKey(checkNotNull(identifier, "identifier"));
+        return this.types.containsKey(checkNotNull(identifier, "identifier").toLowerCase());
     }
 }

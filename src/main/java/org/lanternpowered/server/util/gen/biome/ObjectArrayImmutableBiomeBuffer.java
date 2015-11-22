@@ -22,98 +22,81 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.gen.concurrent;
+package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector2i;
 
-import org.lanternpowered.server.util.concurrent.AtomicShortArray;
-import org.lanternpowered.server.util.gen.AbstractBiomeBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayImmutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayMutableBiomeBuffer;
-import org.lanternpowered.server.world.biome.LanternBiomes;
-import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
-import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
-import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
+import org.lanternpowered.server.world.extent.ImmutableBiomeViewDownsize;
+import org.lanternpowered.server.world.extent.ImmutableBiomeViewTransform;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 
 /**
- * Mutable biome area backed by a atomic short array.
+ * Mutable view of a {@link BiomeType} array.
+ *
+ * <p>Normally, the {@link ShortArrayMutableBiomeBuffer} class uses memory more
+ * efficiently, but when the {@link BiomeType} array is already created (for
+ * example for a contract specified by Minecraft) this implementation becomes
+ * more efficient.</p>
  */
 @NonnullByDefault
-public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeArea {
+public final class ObjectArrayImmutableBiomeBuffer extends AbstractBiomeBuffer implements ImmutableBiomeArea {
 
-    private final AtomicShortArray biomes;
+    private final BiomeType[] biomes;
 
-    public AtomicShortArrayMutableBiomeBuffer(Vector2i start, Vector2i size) {
+    /**
+     * Creates a new instance.
+     *
+     * @param biomes The biome array. The array is not copied, so changes made
+     *        by this object will write through.
+     * @param start The start position
+     * @param size The size
+     */
+    public ObjectArrayImmutableBiomeBuffer(BiomeType[] biomes, Vector2i start, Vector2i size) {
         super(start, size);
-        this.biomes = new AtomicShortArray(size.getX() * size.getY());
-    }
-
-    public AtomicShortArrayMutableBiomeBuffer(short[] biomes, Vector2i start, Vector2i size) {
-        super(start, size);
-        this.biomes = new AtomicShortArray(biomes);
-    }
-
-    @Override
-    public void setBiome(Vector2i position, BiomeType biome) {
-        this.setBiome(position.getX(), position.getY(), biome);
-    }
-
-    @Override
-    public void setBiome(int x, int z, BiomeType biome) {
-        this.checkRange(x, z);
-        this.biomes.set(this.getIndex(x, z), LanternBiomes.getId(biome));
-    }
-
-    @Override
-    public BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
+        this.biomes = biomes.clone();
     }
 
     @Override
     public BiomeType getBiome(int x, int z) {
         this.checkRange(x, z);
-        short biomeId = this.biomes.get(this.getIndex(x, z));
-        BiomeType biomeType = LanternBiomes.getById(biomeId);
-        return biomeType == null ? BiomeTypes.OCEAN : biomeType;
+        return (BiomeType) this.biomes[this.index(x, z)];
     }
 
     @Override
-    public MutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
+    public ImmutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
         this.checkRange(newMin.getX(), newMin.getY());
         this.checkRange(newMax.getX(), newMax.getY());
-        return new MutableBiomeViewDownsize(this, newMin, newMax);
+        return new ImmutableBiomeViewDownsize(this, newMin, newMax);
     }
 
     @Override
-    public MutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
-        return new MutableBiomeViewTransform(this, transform);
+    public ImmutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
+        return new ImmutableBiomeViewTransform(this, transform);
     }
 
     @Override
-    public MutableBiomeArea getRelativeBiomeView() {
+    public ImmutableBiomeArea getRelativeBiomeView() {
         return this.getBiomeView(DiscreteTransform2.fromTranslation(this.start.negate()));
     }
 
     @Override
     public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
-        return new UnmodifiableBiomeAreaWrapper(this);
+        return this;
     }
 
     @Override
     public MutableBiomeArea getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBiomeBuffer(this.biomes.getArray(), this.start, this.size);
+                return new ObjectArrayMutableBiomeBuffer(this.biomes.clone(), this.start, this.size);
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBiomeBuffer(this.biomes.getArray(), this.start, this.size);
+                return new AtomicObjectArrayMutableBiomeBuffer(this.biomes, this.start, this.size);
             default:
                 throw new UnsupportedOperationException(type.name());
         }
@@ -121,6 +104,6 @@ public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffe
 
     @Override
     public ImmutableBiomeArea getImmutableBiomeCopy() {
-        return new ShortArrayImmutableBiomeBuffer(this.biomes.getArray(), this.start, this.size);
+        return this;
     }
 }

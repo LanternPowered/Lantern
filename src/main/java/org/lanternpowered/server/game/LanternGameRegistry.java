@@ -44,6 +44,7 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.lanternpowered.server.attribute.AttributeTargets;
+import org.lanternpowered.server.attribute.LanternAttributes;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
@@ -89,6 +90,7 @@ import org.lanternpowered.server.util.rotation.LanternRotation;
 import org.lanternpowered.server.world.LanternWeather;
 import org.lanternpowered.server.world.LanternWorldBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeRegistry;
+import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionEnd;
 import org.lanternpowered.server.world.dimension.LanternDimensionNether;
@@ -165,6 +167,7 @@ import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
@@ -295,6 +298,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerDoublePlantTypes();
         this.registerDirtTypes();
         this.registerStoneTypes();
+        this.registerBiomeTypes();
         this.registerGeneratorModifiers();
         this.registerGeneratorTypes();
         this.registerDimensionTypes();
@@ -402,12 +406,19 @@ public class LanternGameRegistry implements GameRegistry {
         this.worldGeneratorModifierRegistry.register(new SkylandsWorldGeneratorModifier());
     }
 
+    private void registerBiomeTypes() {
+        this.biomeRegistry.register((byte) 0, new LanternBiomeType("minecraft", "ocean"));
+        this.biomeRegistry.register((byte) 1, new LanternBiomeType("minecraft", "plains"));
+        RegistryHelper.mapFields(BiomeTypes.class, name -> this.biomeRegistry.get("minecraft:" + name).orElse(null));
+    }
+
     private void registerGeneratorTypes() {
         this.generatorTypeRegistry.register(new LanternGeneratorTypeNether("minecraft", "nether"));
         this.generatorTypeRegistry.register(new FlatGeneratorType("minecraft", "flat"));
         this.generatorTypeRegistry.register(new DebugGeneratorType("minecraft", "debug"));
         this.generatorTypeRegistry.register(new SkylandsGeneratorType("sponge", "skylands"));
-        RegistryHelper.mapFields(GeneratorTypes.class, this.generatorTypeRegistry.getDelegateMap());
+        RegistryHelper.mapFields(GeneratorTypes.class, name -> this.generatorTypeRegistry.get(
+                "minecraft:" + name).orElse(null));
     }
 
     private void registerDimensionTypes() {
@@ -420,7 +431,8 @@ public class LanternGameRegistry implements GameRegistry {
         this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "nether", 1,
                 LanternDimensionNether.class, GeneratorTypes.NETHER, true, false, false, false,
                 (world, type) -> new LanternDimensionNether(world, type.getName(), type)));
-        RegistryHelper.mapFields(DimensionTypes.class, this.dimensionTypeRegistry.getDelegateMap());
+        RegistryHelper.mapFields(DimensionTypes.class, name -> this.dimensionTypeRegistry.get(
+                "minecraft:" + name).orElse(null));
     }
 
     private void registerAttributes() {
@@ -455,7 +467,7 @@ public class LanternGameRegistry implements GameRegistry {
                 "horse.jumpStrength", 0.7D, 0.0D, 2.0D, AttributeTargets.HORSE));
         mappings.put("ZOMBIE_SPAWN_REINFORCEMENTS", this.registerDefaultAttribute(
                 "zombie.spawnReinforcements", 0.0D, 0.0D, 1.0D, AttributeTargets.ZOMBIE));
-        // RegistryHelper.mapFields(Attributes.class, mappings);
+        RegistryHelper.mapFields(LanternAttributes.class, mappings);
     }
 
     private LanternAttribute registerDefaultAttribute(String id, double def, double min, double max, Predicate<DataHolder> targets) {
@@ -895,12 +907,8 @@ public class LanternGameRegistry implements GameRegistry {
                 state -> state.getTraitValue(BlockDirt.TYPE).get().getInternalId());
         this.blockRegistry.register(7, new BlockBedrock("minecraft:bedrock"));
 
-        Map<String, BlockType> mappings = Maps.newHashMap();
-        for (BlockType blockType : this.blockRegistry.getAll()) {
-            String id = blockType.getId();
-            mappings.put(id.replaceFirst("minecraft:", ""), blockType);
-        }
-        RegistryHelper.mapFields(BlockTypes.class, mappings);
+        RegistryHelper.mapFields(BlockTypes.class, name -> this.blockRegistry.get(
+                "minecraft:" + name).orElse(null));
     }
 
     /**

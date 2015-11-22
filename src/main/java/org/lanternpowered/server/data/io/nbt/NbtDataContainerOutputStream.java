@@ -112,7 +112,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                     array1[i] = array0[i];
                 }
             }
-            this.dos.writeShort(array0.length);
+            this.dos.writeInt(array0.length);
             this.dos.write(array0);
         } else if (type == COMPOUND) {
             // Convert the object in something we can serialize
@@ -134,13 +134,13 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
         } else if (type == INT_ARRAY) {
             if (object instanceof int[]) {
                 int[] array0 = (int[]) object;
-                this.dos.writeShort(array0.length);
+                this.dos.writeInt(array0.length);
                 for (int i = 0; i < array0.length; i++) {
                     this.dos.writeInt(array0[i]);
                 }
             } else {
                 Integer[] array0 = (Integer[]) object;
-                this.dos.writeShort(array0.length);
+                this.dos.writeInt(array0.length);
                 for (int i = 0; i < array0.length; i++) {
                     this.dos.writeInt(array0[i]);
                 }

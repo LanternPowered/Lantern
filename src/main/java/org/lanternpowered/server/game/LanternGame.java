@@ -163,7 +163,7 @@ public class LanternGame implements Game {
     private PluginContainer minecraft;
 
     // The folder where the worlds are saved
-    private File worldsFolder;
+    private File rootWorldFolder;
 
     // The current game state
     private GameState gameState = GameState.CONSTRUCTION;
@@ -175,8 +175,8 @@ public class LanternGame implements Game {
         game = this;
     }
 
-    public void initialize(LanternServer server, File configFolder, File pluginsFolder, File worldsFolder) {
-        this.worldsFolder = worldsFolder;
+    public void initialize(LanternServer server, File configFolder, File pluginsFolder, File rootWorldFolder) {
+        this.rootWorldFolder = rootWorldFolder;
         this.server = server;
 
         // Create the channel registrar
@@ -284,6 +284,15 @@ public class LanternGame implements Game {
         this.gameState = gameState;
     }
 
+    /**
+     * Gets the plugin container that represents the minecraft (lantern) server.
+     * 
+     * @return the plugin container
+     */
+    public PluginContainer getPlugin() {
+        return this.minecraft;
+    }
+
     @Override
     public GameState getState() {
         return this.gameState;
@@ -350,7 +359,7 @@ public class LanternGame implements Game {
 
     @Override
     public Path getSavesDirectory() {
-        return this.worldsFolder.toPath();
+        return this.rootWorldFolder.toPath();
     }
 
     /**

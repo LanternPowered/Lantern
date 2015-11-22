@@ -139,9 +139,8 @@ public class LanternChunkLoadService implements ChunkLoadService {
 
     @Override
     public int getAvailableTickets(Object plugin, World world) {
-        PluginContainer container = checkPlugin(plugin, "plugin");
-        LanternWorld world0 = (LanternWorld) checkNotNull(world, "world");
-        return this.getMaxTicketsForPlugin(container) - world0.getChunkManager().getTicketsForPlugin(container);
+        final LanternWorld world0 = (LanternWorld) checkNotNull(world, "world");
+        return this.getMaxTicketsForPlugin(world0) - world0.getChunkManager().getTicketsForPlugin(plugin);
     }
 
     @Override

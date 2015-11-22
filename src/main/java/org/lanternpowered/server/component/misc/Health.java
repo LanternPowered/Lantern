@@ -24,10 +24,102 @@
  */
 package org.lanternpowered.server.component.misc;
 
+import org.lanternpowered.server.attribute.LanternAttributes;
 import org.lanternpowered.server.component.Component;
+import org.lanternpowered.server.component.ComponentHolder;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.inject.Inject;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.HealEntityEvent;
 
-public interface Health extends Component {
+import com.flowpowered.math.GenericMath;
+import com.google.common.collect.Lists;
+
+public final class Health implements Component {
+
+    @Inject private ComponentHolder holder;
+    @Inject private Attributes attributes;
+
+    private double maxHealth = 1.0;
+    private double health = this.maxHealth;
+    private double absorptionHealth = 0.0;
+
+    /**
+     * Gets the maximum amount of health.
+     * 
+     * @return the max health
+     */
+    public double getMaxHealth() {
+        if (this.attributes != null) {
+            return this.attributes.getValue(LanternAttributes.MAX_HEALTH);
+        } else {
+            return this.maxHealth;
+        }
+    }
+
+    /**
+     * Sets the maximum amount of health.
+     * 
+     * @param maxHealth the max health
+     */
+    public void setMaxHealth(double maxHealth) {
+        if (this.attributes != null) {
+            // TODO
+        } else {
+            this.maxHealth = maxHealth;
+        }
+    }
+
+    /**
+     * Gets the health.
+     * 
+     * @return the health
+     */
+    public double getHealth() {
+        return this.health;
+    }
+
+    /**
+     * Sets the health.
+     * 
+     * @param health the health
+     */
+    public void setHealth(double health) {
+        this.health = GenericMath.clamp(health, 0.0, this.getMaxHealth());
+    }
+
+    public double getAbsorptionHealth() {
+        return this.absorptionHealth;
+    }
+
+    public void setAbsorptionHealth(double absorptionHealth) {
+        this.absorptionHealth = Math.max(0.0, absorptionHealth);
+    }
+
+    /**
+     * Heals the component with the specified amount of
+     * health and a specific cause.
+     * 
+     * @param health the health
+     * @param cause the cause
+     */
+    public void heal(double health, Cause cause) {
+        if (this.holder instanceof Entity) {
+            // TODO: Health modifiers, etc.
+            HealEntityEvent event = SpongeEventFactory.createHealEntityEvent(LanternGame.get(),
+                    cause, Lists.newArrayList(), (Entity) this.holder, health);
+            if (event.isCancelled()) {
+                return;
+            }
+            health = event.getFinalHealAmount();
+        }
+        if (health > 0) {
+            this.setHealth(this.getHealth() + health);
+        }
+    }
 
     /**
      * Damages the component with the specified amount of
@@ -37,46 +129,22 @@ public interface Health extends Component {
      * @param cause the cause
      * @return whether it was successful
      */
-    boolean damage(double damage, Cause cause);
-
-    /**
-     * Heals the component with the specified amount of
-     * health and a specific cause.
-     * 
-     * @param health the health
-     * @param cause the cause
-     */
-    void heal(double health, Cause cause);
-
-    /**
-     * Gets the health.
-     * 
-     * @return the health
-     */
-    double getHealth();
-
-    /**
-     * Sets the health.
-     * 
-     * @param health the health
-     */
-    void setHealth(double health);
-
-    /**
-     * Gets the maximum amount of health.
-     * 
-     * @return the max health
-     */
-    double getMaxHealth();
-
-    /**
-     * Sets the maximum amount of health.
-     * 
-     * @param maxHealth the max health
-     */
-    void setMaxHealth(double maxHealth);
-
-    double getAbsorptionHealth();
-
-    void setAbsorptionHealth(double absorptionHealth);
+    public boolean damage(double damage, Cause cause) {
+        if (this.holder instanceof Entity) {
+            // TODO: Damage modifiers, etc.
+            DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(LanternGame.get(),
+                    cause, Lists.newArrayList(), (Entity) this.holder, damage);
+            // TODO: Not cancellable?
+            damage = event.getFinalDamage();
+        }
+        if (damage > 0) {
+            double health = this.getHealth() - damage;
+            this.setHealth(health);
+            if (health <= 0.0) {
+                // TODO: Notify stuff
+            }
+            return true;
+        }
+        return false;
+    }
 }

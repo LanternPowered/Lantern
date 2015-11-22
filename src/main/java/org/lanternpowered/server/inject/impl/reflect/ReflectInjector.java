@@ -41,7 +41,6 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.inject.Injector;
@@ -135,10 +134,7 @@ final class ReflectInjector implements Injector {
 
             @Override
             public int hashCode() {
-                return new HashCodeBuilder(17, 37)
-                        .append(this.method)
-                        .append(this.spec)
-                        .build();
+                return Objects.hash(this.method, this.spec);
             }
 
             @Override

@@ -78,7 +78,7 @@ final class ReflectParameterInfo<T, O> implements ParameterInfo<T> {
         if (other == null || other.getClass() != this.getClass()) {
             return false;
         }
-        return ((ReflectParameterInfo<?,?>) other).accessor == this.accessor;
+        return ((ReflectParameterInfo<?,?>) other).accessor.equals(this.accessor);
     }
 
     @Override

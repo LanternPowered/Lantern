@@ -32,12 +32,14 @@ class LanternPlayerLoadingTicket extends LanternLoadingTicket implements PlayerL
 
     private final UUID uniqueId;
 
-    LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks) {
+    LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager,
+            UUID uniqueId, int maxChunks) {
         super(plugin, chunkManager, maxChunks);
         this.uniqueId = uniqueId;
     }
 
-    LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks, int numChunks) {
+    LanternPlayerLoadingTicket(String plugin, LanternChunkManager chunkManager,
+            UUID uniqueId, int maxChunks, int numChunks) {
         super(plugin, chunkManager, maxChunks, numChunks);
         this.uniqueId = uniqueId;
     }

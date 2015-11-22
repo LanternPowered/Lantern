@@ -34,6 +34,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -59,7 +60,6 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -81,6 +81,7 @@ public final class LanternWorldPropertiesIO {
     // Vanilla properties
     private final static DataQuery DATA = DataQuery.of("Data");
     private final static DataQuery SEED = DataQuery.of("RandomSeed");
+    private final static DataQuery INITIALIZED = DataQuery.of("initialized");
     private final static DataQuery CLEAR_WEATHER_TIME = DataQuery.of("clearWeatherTime");
     private final static DataQuery THUNDERING = DataQuery.of("thundering");
     private final static DataQuery THUNDER_TIME = DataQuery.of("thunderTime");
@@ -151,11 +152,7 @@ public final class LanternWorldPropertiesIO {
     private LanternWorldPropertiesIO() {
     }
 
-    public static boolean exists(File folder) {
-        return new File(folder, LEVEL_DATA).exists();
-    }
-
-    public static LevelData read(File folder, @Nullable String worldName) throws IOException {
+    static LevelData read(File folder, @Nullable String worldName) throws IOException {
         File levelFile = new File(folder, LEVEL_DATA);
         if (!levelFile.exists()) {
             levelFile = new File(folder, LEVEL_DATA_OLD);
@@ -227,8 +224,7 @@ public final class LanternWorldPropertiesIO {
             worldName = dataView.getString(NAME).get();
         }
 
-        LanternWorldProperties properties = new LanternWorldProperties();
-        properties.uniqueId = uuid;
+        final LanternWorldProperties properties = new LanternWorldProperties(uuid);
         properties.name = worldName;
         properties.seed = dataView.getLong(SEED).get();
         properties.age = dataView.getLong(AGE).get();
@@ -241,6 +237,7 @@ public final class LanternWorldPropertiesIO {
         properties.clearWeatherTime = dataView.getInt(CLEAR_WEATHER_TIME).get();
         properties.hardcore = dataView.getInt(HARDCORE).get() > 0;
         properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
+        properties.initialized = dataView.getInt(INITIALIZED).get() > 0;
         byte difficulty = dataView.getInt(DIFFICULTY).get().byteValue();
         for (Difficulty difficulty0 : LanternGame.get().getRegistry().getAllOf(Difficulty.class)) {
             if (((LanternDifficulty) difficulty0).getInternalId() == difficulty) {
@@ -296,6 +293,8 @@ public final class LanternWorldPropertiesIO {
                     // custom generator options to the flat generator
                     if (dataView.contains(GENERATOR_OPTIONS_EXTRA)) {
                         options = dataView.getString(GENERATOR_OPTIONS_EXTRA).get();
+                    } else {
+                        options = "";
                     }
                 }
                 if (!options.isEmpty()) {
@@ -303,8 +302,9 @@ public final class LanternWorldPropertiesIO {
                         JsonObject json = GSON.fromJson(options, JsonObject.class);
                         properties.generatorSettings = JsonTranslator.instance().translateFrom(json).copy();
                     } catch (Exception e) {
-                        LanternGame.log().warn("Unknown generator settings format ({}) for type {}, using defaults... ({})",
-                                options, genName, e);
+                        LanternGame.log().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",
+                                options, genName);
+                        e.printStackTrace();
                     }
                 } else {
                     properties.generatorSettings = new MemoryDataContainer();
@@ -316,15 +316,15 @@ public final class LanternWorldPropertiesIO {
         }
 
         // Get the spawn position
-        Optional<Integer> spawnX = dataView.getInt(SPAWN_X);
-        Optional<Integer> spawnY = dataView.getInt(SPAWN_Y);
-        Optional<Integer> spawnZ = dataView.getInt(SPAWN_Z);
+        final Optional<Integer> spawnX = dataView.getInt(SPAWN_X);
+        final Optional<Integer> spawnY = dataView.getInt(SPAWN_Y);
+        final Optional<Integer> spawnZ = dataView.getInt(SPAWN_Z);
         if (spawnX.isPresent() && spawnY.isPresent() && spawnZ.isPresent()) {
             properties.spawnPosition = new Vector3i(spawnX.get(), spawnY.get(), spawnZ.get());
         }
 
         // Get the game rules
-        DataView rulesView = dataView.getView(GAME_RULES).orElse(null);
+        final DataView rulesView = dataView.getView(GAME_RULES).orElse(null);
         if (rulesView != null) {
             for (Entry<DataQuery, Object> en : rulesView.getValues(false).entrySet()) {
                 properties.rules.newRule(en.getKey().toString()).set(en.getValue());
@@ -338,7 +338,7 @@ public final class LanternWorldPropertiesIO {
 
         // Get the sponge properties
         if (spongeContainer != null) {
-            properties.properties = spongeRootContainer;
+            properties.properties = spongeRootContainer.copy().remove(DataQueries.SPONGE_DATA);
             properties.enabled = spongeContainer.getInt(ENABLED).get() > 0;
             properties.keepSpawnLoaded = spongeContainer.getInt(KEEP_SPAWN_LOADED).get() > 0;
             properties.loadOnStartup = spongeContainer.getInt(LOAD_ON_STARTUP).get() > 0;
@@ -429,6 +429,10 @@ public final class LanternWorldPropertiesIO {
         if (properties.generatorSettings == null) {
             properties.generatorSettings = properties.generatorType.getGeneratorSettings();
         }
+        // Create extra properties container if not present
+        if (properties.properties == null) {
+            properties.properties = new MemoryDataContainer();
+        }
 
         properties.waterEvaporates = waterEvaporates == null ? 
                 properties.dimensionType.doesWaterEvaporate() : waterEvaporates;
@@ -438,13 +442,13 @@ public final class LanternWorldPropertiesIO {
 
         BitSet dimensionMap = null;
         if (rootDataView.contains(FORGE)) {
-            DataView forgeView = rootDataView.getView(FORGE).get();
+            final DataView forgeView = rootDataView.getView(FORGE).get();
             if (forgeView.contains(DIMENSION_DATA)) {
                 dimensionMap = new BitSet(LanternWorldManager.DIMENSION_MAP_SIZE);
-                List<Integer> intArray = forgeView.getView(DIMENSION_DATA).get().getIntegerList(DIMENSION_ARRAY).get();
-                for (int i = 0; i < intArray.size(); i++) {
+                final int[] intArray = (int[]) forgeView.getView(DIMENSION_DATA).get().get(DIMENSION_ARRAY).get();
+                for (int i = 0; i < intArray.length; i++) {
                     for (int j = 0; j < Integer.SIZE; j++) {
-                        dimensionMap.set(i * Integer.SIZE + j, (intArray.get(i) & (1 << j)) != 0);
+                        dimensionMap.set(i * Integer.SIZE + j, (intArray[i] & (1 << j)) != 0);
                     }
                 }
             }
@@ -453,16 +457,16 @@ public final class LanternWorldPropertiesIO {
         return new LevelData(properties, dimensionId, dimensionMap);
     }
 
-    public static void write(File folder, LevelData levelData) throws IOException {
-        LanternWorldProperties properties = levelData.properties;
+    static void write(File folder, LevelData levelData) throws IOException {
+        final LanternWorldProperties properties = levelData.properties;
 
-        DataContainer container = new MemoryDataContainer();
-        DataView dataView = container.createView(DATA);
+        final DataContainer container = new MemoryDataContainer();
+        final DataView dataView = container.createView(DATA);
 
         dataView.set(SEED, properties.seed);
         dataView.set(VERSION, CURRENT_VERSION);
         dataView.set(NAME, properties.name);
-        DataView rulesView = container.createView(GAME_RULES);
+        final DataView rulesView = dataView.createView(GAME_RULES);
         for (Entry<String, String> en : properties.rules.getValues().entrySet()) {
             rulesView.set(DataQuery.of(en.getKey()), en.getValue());
         }
@@ -476,6 +480,7 @@ public final class LanternWorldPropertiesIO {
         dataView.set(CLEAR_WEATHER_TIME, properties.clearWeatherTime);
         dataView.set(LAST_PLAYED, properties.getLastPlayedTime());
         dataView.set(SIZE_ON_DISK, 0L);
+        dataView.set(INITIALIZED, properties.initialized);
         String genId = properties.generatorType.getId();
         if (genId.startsWith("minecraft:")) {
             genId = genId.replaceFirst("minecraft:", "");
@@ -486,7 +491,8 @@ public final class LanternWorldPropertiesIO {
         // The flat world generator has a different settings format
         if (genId.equalsIgnoreCase("flat")) {
             dataView.set(GENERATOR_OPTIONS, properties.generatorSettings.getString(FlatGeneratorType.SETTINGS).get());
-            dataView.set(GENERATOR_OPTIONS_EXTRA, properties.generatorSettings.copy().remove(FlatGeneratorType.SETTINGS));
+            dataView.set(GENERATOR_OPTIONS_EXTRA, GSON.toJson(JsonTranslator.instance().translateData(
+                    properties.generatorSettings.copy().remove(FlatGeneratorType.SETTINGS))));
         } else {
             dataView.set(GENERATOR_OPTIONS, properties.generatorSettings);
         }
@@ -503,13 +509,13 @@ public final class LanternWorldPropertiesIO {
         dataView.set(BORDER_SIZE_LERP_TIME, properties.getWorldBorderTimeRemaining());
         dataView.set(BORDER_WARNING_BLOCKS, properties.borderWarningDistance);
         dataView.set(BORDER_WARNING_TIME, properties.borderWarningTime);
-        Vector3i spawn = properties.spawnPosition;
+        final Vector3i spawn = properties.spawnPosition;
         dataView.set(SPAWN_X, spawn.getX());
         dataView.set(SPAWN_Y, spawn.getY());
         dataView.set(SPAWN_Z, spawn.getZ());
         if (levelData.dimensionMap != null) {
-            BitSet dimensionMap = levelData.dimensionMap;
-            DataView dimensionData = container.createView(FORGE).createView(DIMENSION_DATA);
+            final BitSet dimensionMap = levelData.dimensionMap;
+            final DataView dimensionData = container.createView(FORGE).createView(DIMENSION_DATA);
             int[] data = new int[(dimensionMap.length() + Integer.SIZE - 1) / Integer.SIZE];
             for (int i = 0; i < data.length; i++) {
                 int val = 0;
@@ -535,8 +541,8 @@ public final class LanternWorldPropertiesIO {
         if (levelFileNew.exists()) {
             levelFileNew.delete();
         }
-        DataContainer spongeRootContainer = properties.properties.copy();
-        DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
+        final DataContainer spongeRootContainer = properties.properties.copy();
+        final DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
         spongeContainer.set(NAME, properties.name);
         spongeContainer.set(UUID_MOST, properties.uniqueId.getMostSignificantBits());
         spongeContainer.set(UUID_LEAST, properties.uniqueId.getLeastSignificantBits());
@@ -562,13 +568,13 @@ public final class LanternWorldPropertiesIO {
             dimensionName = properties.dimensionType.getDimensionClass().getCanonicalName();
         }
         spongeContainer.set(DIMENSION_TYPE, dimensionName);
-        List<DataView> pendingUniqueIds = Lists.newArrayListWithCapacity(properties.pendingUniqueIds.size());
-        for (UUID uuid : properties.pendingUniqueIds) {
-            pendingUniqueIds.add(new MemoryDataContainer()
-                    .set(UUID_MOST, uuid.getMostSignificantBits())
-                    .set(UUID_LEAST, uuid.getLeastSignificantBits()));
-        }
-        spongeContainer.set(PLAYER_UUID_TABLE, pendingUniqueIds);
+        spongeContainer.set(GENERATOR_MODIFIERS, properties.generatorModifiers.stream().map(
+                modifier -> modifier.getId()).collect(Collectors.toList()));
+        spongeContainer.set(PLAYER_UUID_TABLE, properties.pendingUniqueIds.stream().map(
+                uuid -> new MemoryDataContainer()
+                            .set(UUID_MOST, uuid.getMostSignificantBits())
+                            .set(UUID_LEAST, uuid.getLeastSignificantBits()))
+                .collect(Collectors.toList()));
         levelFileNew = new File(folder, SPONGE_LEVEL_DATA_NEW);
         levelFileOld = new File(folder, SPONGE_LEVEL_DATA_OLD);
         levelFile = new File(folder, SPONGE_LEVEL_DATA);

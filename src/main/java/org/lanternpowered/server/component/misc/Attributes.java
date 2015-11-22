@@ -24,8 +24,12 @@
  */
 package org.lanternpowered.server.component.misc;
 
+import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.component.Component;
 
 public class Attributes implements Component {
 
+    public double getValue(LanternAttribute attribute) {
+        return 0;
+    }
 }

@@ -111,7 +111,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
         if (type == BYTE) {
             return this.dis.readByte();
         } else if (type == BYTE_ARRAY) {
-            byte[] array = new byte[this.dis.readShort()];
+            byte[] array = new byte[this.dis.readInt()];
             this.dis.read(array);
             return array;
         } else if (type == COMPOUND) {
@@ -134,7 +134,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
         } else if (type == INT) {
             return this.dis.readInt();
         } else if (type == INT_ARRAY) {
-            int[] array = new int[this.dis.readShort()];
+            int[] array = new int[this.dis.readInt()];
             for (int i = 0; i < array.length; i++) {
                 array[i] = this.dis.readInt();
             }

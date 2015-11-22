@@ -142,11 +142,11 @@ public class LanternServer implements Server {
             // Load the config file
             config.load();
 
-            final File pluginsFolder = new File(config.get(Settings.PLUGIN_FOLDER));
-            final File worldsFolder = new File(config.get(Settings.WORLD_FOLDER));
+            final File pluginsFolder = new File(config.get(Settings.PLUGINS_FOLDER));
+            final File rootWorldFolder = new File(config.get(Settings.ROOT_WORLD));
 
             // Initialize the game
-            game.initialize(server, config.getFolder(), pluginsFolder, worldsFolder);
+            game.initialize(server, config.getFolder(), pluginsFolder, rootWorldFolder);
 
             // Bind the network channel
             server.bind();
@@ -206,10 +206,9 @@ public class LanternServer implements Server {
                 LanternGame.log().info("  --onlinemode, -o <onlinemode>  Sets the server's online-mode.");
                 LanternGame.log().info("  --jline <true/false>           Enables or disables JLine console.");
                 LanternGame.log().info("  --plugins-dir, -P <directory>  Sets the plugin directory to use.");
-                LanternGame.log().info("  --worlds-dir, -W <directory>   Sets the world directory to use.");
                 LanternGame.log().info("  --update-dir, -U <directory>   Sets the plugin update folder to use.");
                 LanternGame.log().info("  --max-players, -M <director>   Sets the maximum amount of players.");
-                LanternGame.log().info("  --world-name, -N <name>        Sets the main world name.");
+                LanternGame.log().info("  --world-name, -N <name>        Sets the root world name.");
                 LanternGame.log().info("  --log-pattern, -L <pattern>    Sets the log file pattern (%D for date).");
                 return null;
             } else if ("--version".equals(opt) || "-v".equals(opt)) {
@@ -247,11 +246,7 @@ public class LanternServer implements Server {
                     break;
                 case "--plugins-dir":
                 case "-P":
-                    parameters.put(Settings.PLUGIN_FOLDER, args[++i]);
-                    break;
-                case "--worlds-dir":
-                case "-W":
-                    parameters.put(Settings.WORLD_FOLDER, args[++i]);
+                    parameters.put(Settings.PLUGINS_FOLDER, args[++i]);
                     break;
                 case "--max-players":
                 case "-M":
@@ -259,7 +254,7 @@ public class LanternServer implements Server {
                     break;
                 case "--world-name":
                 case "-N":
-                    parameters.put(Settings.MAIN_WORLD, args[++i]);
+                    parameters.put(Settings.ROOT_WORLD, args[++i]);
                     break;
                 default:
                     LanternGame.log().warn("Ignored invalid option: " + opt);
@@ -338,11 +333,8 @@ public class LanternServer implements Server {
     }
 
     public void start() {
-        String defaultWorld = this.config.get(Settings.MAIN_WORLD);
-        if (defaultWorld.isEmpty()) {
-            defaultWorld = null;
-        }
-        this.worldManager = new LanternWorldManager(this.game.getSavesDirectory().toFile());
+        this.worldManager = new LanternWorldManager(this.game, this.game.getSavesDirectory().toFile());
+        this.worldManager.init();
 
         this.game.setGameState(GameState.SERVER_ABOUT_TO_START);
         this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game,
@@ -605,19 +597,23 @@ public class LanternServer implements Server {
         // Stop the async scheduler
         this.game.getScheduler().shutdownAsyncScheduler();
 
-        SqlService service = this.game.getServiceManager().provide(SqlService.class).orElse(null);
-        if (service instanceof Closeable) {
-            try {
-                ((Closeable) service).close();
-            } catch (IOException e) {
-                LanternGame.log().error("A error occurred while closing the sql service.", e);
+        // Close the sql service if possible
+        this.game.getServiceManager().provide(SqlService.class).ifPresent(service -> {
+            if (service instanceof Closeable) {
+                try {
+                    ((Closeable) service).close();
+                } catch (IOException e) {
+                    LanternGame.log().error("A error occurred while closing the sql service.", e);
+                }
             }
-        }
+        });
 
-        GameProfileResolver gameProfileResolver = this.game.getServiceManager().provide(GameProfileResolver.class).orElse(null);
-        if (gameProfileResolver instanceof LanternGameProfileResolver) {
-            ((LanternGameProfileResolver) gameProfileResolver).shutdown();
-        }
+        // Shutdown the game profile resolver if possible
+        this.game.getServiceManager().provide(GameProfileResolver.class).ifPresent(gameProfileResolver -> {
+            if (gameProfileResolver instanceof LanternGameProfileResolver) {
+                ((LanternGameProfileResolver) gameProfileResolver).shutdown();
+            }
+        });
 
         this.game.setGameState(GameState.SERVER_STOPPED);
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game, 

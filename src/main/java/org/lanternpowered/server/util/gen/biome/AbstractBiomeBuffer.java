@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.gen;
+package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.base.MoreObjects;
@@ -30,6 +30,7 @@ import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
@@ -49,7 +50,7 @@ public abstract class AbstractBiomeBuffer implements BiomeArea {
     protected AbstractBiomeBuffer(Vector2i start, Vector2i size) {
         this.start = start;
         this.size = size;
-        this.end = this.start.add(this.size).sub(Vector2i.ONE);
+        this.end = start.add(size).sub(Vector2i.ONE);
         this.xLine = size.getX();
     }
 
@@ -59,8 +60,13 @@ public abstract class AbstractBiomeBuffer implements BiomeArea {
         }
     }
 
-    protected int getIndex(int x, int y) {
+    protected int index(int x, int y) {
         return (y - this.start.getY()) * this.xLine + (x - this.start.getX());
+    }
+
+    @Override
+    public BiomeType getBiome(Vector2i position) {
+        return this.getBiome(position.getX(), position.getY());
     }
 
     @Override

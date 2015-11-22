@@ -22,67 +22,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.gen;
+package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
 
 import org.lanternpowered.server.block.LanternBlocks;
-import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBlockBuffer;
-import org.lanternpowered.server.world.extent.ImmutableBlockViewDownsize;
-import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 
 @NonnullByDefault
-public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implements ImmutableBlockVolume {
+public class ShortArrayMutableBlockBuffer extends AbstractMutableBlockBuffer {
 
     private final BlockState air = BlockTypes.AIR.getDefaultState();
     private final short[] blocks;
 
-    public ShortArrayImmutableBlockBuffer(short[] blocks, Vector3i start, Vector3i size) {
-        super(start, size);
-        this.blocks = blocks.clone();
+    public ShortArrayMutableBlockBuffer(Vector3i start, Vector3i size) {
+        this(new short[size.getX() * size.getY() * size.getZ()], start, size);
     }
 
-    private ShortArrayImmutableBlockBuffer(Vector3i start, Vector3i size, short[] blocks) {
+    public ShortArrayMutableBlockBuffer(short[] blocks, Vector3i start, Vector3i size) {
         super(start, size);
         this.blocks = blocks;
     }
 
     @Override
+    public void setBlock(int x, int y, int z, BlockState block) {
+        this.checkRange(x, y, z);
+        this.blocks[this.index(x, y, z)] = LanternBlocks.reg().getInternalStateId(block);
+    }
+
+    @Override
     public BlockState getBlock(int x, int y, int z) {
         this.checkRange(x, y, z);
-        short blockState = this.blocks[this.getIndex(x, y, z)];
-        BlockState block = LanternBlocks.reg().getStateByInternalId(blockState);
+        final short blockState = this.blocks[this.index(x, y, z)];
+        final BlockState block = LanternBlocks.reg().getStateByInternalId(blockState);
         return block == null ? this.air : block;
-    }
-
-    @Override
-    public ImmutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkRange(newMax.getX(), newMax.getY(), newMax.getZ());
-        return new ImmutableBlockViewDownsize(this, newMin, newMax);
-    }
-
-    @Override
-    public ImmutableBlockVolume getBlockView(DiscreteTransform3 transform) {
-        return new ImmutableBlockViewTransform(this, transform);
-    }
-
-    @Override
-    public ImmutableBlockVolume getRelativeBlockView() {
-        return this.getBlockView(DiscreteTransform3.fromTranslation(this.start.negate()));
-    }
-
-    @Override
-    public UnmodifiableBlockVolume getUnmodifiableBlockView() {
-        return this;
     }
 
     @Override
@@ -99,19 +77,6 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
 
     @Override
     public ImmutableBlockVolume getImmutableBlockCopy() {
-        return this;
-    }
-
-    /**
-     * This method doesn't clone the array passed into it. INTERNAL USE ONLY.
-     * Make sure your code doesn't leak the reference if you're using it.
-     *
-     * @param blocks The blocks to store
-     * @param start The start of the volume
-     * @param size The size of the volume
-     * @return A new buffer using the same array reference
-     */
-    public static ImmutableBlockVolume newWithoutArrayClone(short[] blocks, Vector3i start, Vector3i size) {
-        return new ShortArrayImmutableBlockBuffer(start, size, blocks);
+        return new ShortArrayImmutableBlockBuffer(this.blocks, this.start, this.size);
     }
 }

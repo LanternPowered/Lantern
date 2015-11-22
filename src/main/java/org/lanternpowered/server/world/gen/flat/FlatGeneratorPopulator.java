@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.List;
 
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
@@ -42,11 +44,12 @@ public final class FlatGeneratorPopulator implements GeneratorPopulator {
     private final BlockState[] blockStateCache;
 
     public FlatGeneratorPopulator(FlatGeneratorSettings settings, LanternGeneratorType generatorType) {
-        List<BlockState> blockStates = Lists.newArrayList();
-        List<FlatLayer> layers = settings.getLayers();
+        checkNotNull(settings, "settings");
+        checkNotNull(generatorType, "generatorType");
 
-        for (FlatLayer layer : layers) {
-            BlockState blockState = layer.getBlockState();
+        List<BlockState> blockStates = Lists.newArrayList();
+        for (FlatLayer layer : settings.getLayers()) {
+            final BlockState blockState = layer.getBlockState();
             for (int i = 0; i < layer.getDepth(); i++) {
                 blockStates.add(blockState);
             }

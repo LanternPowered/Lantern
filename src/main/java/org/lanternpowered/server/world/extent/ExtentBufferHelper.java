@@ -24,15 +24,16 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
-
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.world.biome.LanternBiomes;
+import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
 import org.spongepowered.api.world.extent.BlockVolume;
 
-public class ExtentBufferUtil {
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
+
+public final class ExtentBufferHelper {
 
     public static short[] copyToArray(BiomeArea area, Vector2i min, Vector2i max, Vector2i size) {
         // Check if the area has more biomes than can be stored in an array
@@ -46,6 +47,23 @@ public class ExtentBufferUtil {
         for (int y = min.getY(); y <= max.getY(); y++) {
             for (int x = min.getX(); x <= max.getX(); x++) {
                 copy[i++] = LanternBiomes.getId(area.getBiome(y, x));
+            }
+        }
+        return copy;
+    }
+
+    public static BiomeType[] copyToObjectArray(BiomeArea area, Vector2i min, Vector2i max, Vector2i size) {
+        // Check if the area has more biomes than can be stored in an array
+        final long memory = (long) size.getX() * (long) size.getY();
+        // Leave 8 bytes for a header used in some JVMs
+        if (memory > Integer.MAX_VALUE - 8) {
+            throw new OutOfMemoryError("Cannot copy the biomes to an array because the size limit was reached!");
+        }
+        final BiomeType[] copy = new BiomeType[(int) memory];
+        int i = 0;
+        for (int y = min.getY(); y <= max.getY(); y++) {
+            for (int x = min.getX(); x <= max.getX(); x++) {
+                copy[i++] = area.getBiome(y, x);
             }
         }
         return copy;
@@ -70,4 +88,6 @@ public class ExtentBufferUtil {
         return copy;
     }
 
+    private ExtentBufferHelper() {
+    }
 }

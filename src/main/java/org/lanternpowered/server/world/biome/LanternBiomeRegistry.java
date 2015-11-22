@@ -90,12 +90,12 @@ public class LanternBiomeRegistry extends LanternCatalogTypeRegistry<BiomeType> 
      */
     @Override
     public void register(BiomeType catalogType) {
-        int biomeId = biomeIdCounter.getAndIncrement();
+        int biomeId = this.biomeIdCounter.getAndIncrement();
         if (biomeId > Short.MAX_VALUE) {
             throw new IllegalStateException("Exceeded the biome limit. (" + Short.MAX_VALUE + ")");
         }
-        biomesById.put((short) biomeId, catalogType);
-        idsByBiome.put(catalogType, (short) biomeId);
+        this.biomesById.put((short) biomeId, catalogType);
+        this.idsByBiome.put(catalogType, (short) biomeId);
         super.register(catalogType);
     }
 }

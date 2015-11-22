@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.world;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -48,7 +50,12 @@ import javax.annotation.Nullable;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -117,6 +124,9 @@ public final class LanternWorldManager {
     // The folder of the root world
     private final File rootWorldFolder;
 
+    // The game instance
+    private final LanternGame game;
+
     // The phasers to synchronize the world threads
     private final Phaser tickBegin = new Phaser(1);
     private final Phaser tickEnd = new Phaser(1);
@@ -124,10 +134,12 @@ public final class LanternWorldManager {
     /**
      * Creates a new world manager.
      * 
+     * @param game the game instance
      * @param rootWorldFolder the folder of the root (default) world
      */
-    public LanternWorldManager(File rootWorldFolder) {
+    public LanternWorldManager(LanternGame game, File rootWorldFolder) {
         this.rootWorldFolder = rootWorldFolder;
+        this.game = game;
     }
 
     /**
@@ -137,6 +149,7 @@ public final class LanternWorldManager {
      * @return the world, if found
      */
     public Optional<World> getWorld(String worldName) {
+        checkNotNull(worldName, "worldName");
         return this.worldByName.containsKey(worldName) ? Optional.ofNullable(
                 this.worldByName.get(worldName).world) : Optional.empty();
     }
@@ -159,6 +172,7 @@ public final class LanternWorldManager {
      * @return the world, if found
      */
     public Optional<World> getWorld(UUID uniqueId) {
+        checkNotNull(uniqueId, "uniqueId");
         return this.worldByUUID.containsKey(uniqueId) ? Optional.ofNullable(
                 this.worldByUUID.get(uniqueId).world) : Optional.empty();
     }
@@ -193,6 +207,7 @@ public final class LanternWorldManager {
      * @return the world properties, if found
      */
     public Optional<WorldProperties> getWorldProperties(String worldName) {
+        checkNotNull(worldName, "worldName");
         return this.worldByName.containsKey(worldName) ? Optional.ofNullable(
                 this.worldByName.get(worldName).properties) : Optional.empty();
     }
@@ -207,6 +222,7 @@ public final class LanternWorldManager {
      * @return the world properties, if found
      */
     public Optional<WorldProperties> getWorldProperties(UUID uniqueId) {
+        checkNotNull(uniqueId, "uniqueId");
         return this.worldByUUID.containsKey(uniqueId) ? Optional.ofNullable(
                 this.worldByUUID.get(uniqueId).properties) : Optional.empty();
     }
@@ -236,9 +252,28 @@ public final class LanternWorldManager {
      * @return whether the operation was successful
      */
     public boolean unloadWorld(World world) {
+        checkNotNull(world, "world");
         final LanternWorld world0 = (LanternWorld) world;
-        // TODO Auto-generated method stub
-        return false;
+        // We cannot unload the world if there are
+        // still players active
+        if (world0.getPlayers().isEmpty()) {
+            return false;
+        }
+        // Post the unload world event
+        this.game.getEventManager().post(SpongeEventFactory.createUnloadWorldEvent(
+                this.game, Cause.empty(), world));
+        // Save all the world data
+        world0.shutdown();
+        // Remove the tick task
+        this.removeWorldTask(world0);
+        // Get the lookup entry and properties to remove all the references
+        final LanternWorldProperties properties = world0.getProperties();
+        final WorldLookupEntry entry = this.worldByProperties.get(properties);
+        properties.setWorld(null);
+        entry.world = null;
+        // Save the world properties
+        this.saveWorldProperties(properties);
+        return true;
     }
 
     /**
@@ -261,6 +296,8 @@ public final class LanternWorldManager {
      */
     public ListenableFuture<Optional<WorldProperties>> copyWorld(
             WorldProperties worldProperties, String copyName) {
+        checkNotNull(worldProperties, "worldProperties");
+        checkNotNull(copyName, "copyName");
         return this.executor.submit(() -> {
             // Get the new dimension id
             final int dimensionId = this.getNextFreeDimensionId();
@@ -327,6 +364,8 @@ public final class LanternWorldManager {
      *         if the rename was successful
      */
     public Optional<WorldProperties> renameWorld(WorldProperties worldProperties, String newName) {
+        checkNotNull(worldProperties, "worldProperties");
+        checkNotNull(newName, "newName");
         final WorldLookupEntry entry = this.worldByProperties.get(worldProperties);
         // You cannot rename a active world or if there is
         // already a world present with that name
@@ -350,6 +389,7 @@ public final class LanternWorldManager {
      * @return true if the deletion was successful
      */
     public ListenableFuture<Boolean> deleteWorld(WorldProperties worldProperties) {
+        checkNotNull(worldProperties, "worldProperties");
         return this.executor.submit(() -> {
             final WorldLookupEntry entry = this.worldByProperties.get(worldProperties);
             if (entry.world != null) {
@@ -371,6 +411,7 @@ public final class LanternWorldManager {
             this.worldByDimensionId.remove(entry.dimensionId);
             this.worldByProperties.remove(worldProperties);
             this.worldByUUID.remove(worldProperties.getUniqueId());
+            this.dimensionMap.clear(entry.dimensionId);
             return entry.folder.delete();
         });
     }
@@ -383,6 +424,7 @@ public final class LanternWorldManager {
      * @return true if the save was successful
      */
     public boolean saveWorldProperties(WorldProperties worldProperties) {
+        checkNotNull(worldProperties, "worldProperties");
         final WorldLookupEntry entry = this.worldByProperties.get(worldProperties);
         final LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
         final BitSet dimensionMap = entry.dimensionId == 0 ? (BitSet) this.dimensionMap.clone() : null;
@@ -416,12 +458,25 @@ public final class LanternWorldManager {
      * @return the new or existing world properties, if creation was successful
      */
     public Optional<WorldProperties> createWorld(WorldCreationSettings settings) {
-        final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) settings;
+        checkNotNull(settings, "settings");
         if (this.worldByName.containsKey(settings.getWorldName())) {
             return Optional.empty();
         }
         // Get the next dimension id
         final int dimensionId = this.getNextFreeDimensionId();
+        // Create the world properties
+        return this.createWorld(settings, dimensionId);
+    }
+
+    /**
+     * Creates the world properties for the specified settings and the dimension id.
+     * 
+     * @param settings the creation settings
+     * @param dimensionId the dimension id
+     * @return the new or existing world properties, if creation was successful
+     */
+    Optional<WorldProperties> createWorld(WorldCreationSettings settings, int dimensionId) {
+        final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) settings;
         // Create the world properties
         final LanternWorldProperties worldProperties = new LanternWorldProperties(settings0);
         // Get the world folder
@@ -442,6 +497,7 @@ public final class LanternWorldManager {
      * @return the world, if found
      */
     public Optional<World> loadWorld(UUID uniqueId) {
+        checkNotNull(uniqueId, "uniqueId");
         return this.loadWorld(this.worldByUUID.get(uniqueId));
     }
 
@@ -450,11 +506,12 @@ public final class LanternWorldManager {
      * associated with the given properties is already loaded then it is
      * returned instead.
      *
-     * @param properties the properties of the world to load
+     * @param worldProperties the properties of the world to load
      * @return the world, if found
      */
-    public Optional<World> loadWorld(WorldProperties properties) {
-        return this.loadWorld(this.worldByProperties.get(properties));
+    public Optional<World> loadWorld(WorldProperties worldProperties) {
+        checkNotNull(worldProperties, "worldProperties");
+        return this.loadWorld(this.worldByProperties.get(worldProperties));
     }
 
     /**
@@ -465,6 +522,7 @@ public final class LanternWorldManager {
      * @return the world, if found
      */
     public Optional<World> loadWorld(String worldName) {
+        checkNotNull(worldName, "worldName");
         return this.loadWorld(this.worldByName.get(worldName));
     }
 
@@ -481,8 +539,21 @@ public final class LanternWorldManager {
         if (worldEntry.world != null) {
             return Optional.of(worldEntry.world);
         }
-        // TODO Auto-generated method stub
-        return null;
+        // Create the world instance
+        final LanternWorld world = new LanternWorld(this.game, worldEntry.folder,
+                worldEntry.properties);
+        // Share the world instance
+        worldEntry.world = world;
+        worldEntry.properties.setWorld(world);
+        // Initialize the world if not done before
+        world.initialize();
+        // Generate the spawn if needed
+        if (worldEntry.properties.keepSpawnLoaded) {
+            world.enableSpawnArea(true);
+        }
+        // The world is ready for ticks
+        this.addWorldTask(world);
+        return Optional.of(world);
     }
 
     /**
@@ -501,7 +572,7 @@ public final class LanternWorldManager {
                         try {
                             world.pulse();
                         } catch (Exception e) {
-                            LanternGame.log().error("Error occurred while pulsing world {}",
+                            LanternGame.log().error("Error occurred while pulsing the world {}",
                                     world.getName(), e);
                         } finally {
                             tickEnd.arriveAndAwaitAdvance();
@@ -565,14 +636,18 @@ public final class LanternWorldManager {
     }
 
     /**
-     * Shutdown the all the world threads and the executor.
+     * Shutdown the all the world threads, the executor and
+     * unloads all the active worlds.
      */
     public void shutdown() {
+        // Unload all the active worlds
+        for (WorldLookupEntry entry : this.worldByProperties.values()) {
+            if (entry.world != null) {
+                this.unloadWorld(entry.world);
+            }
+        }
         this.tickBegin.forceTermination();
         this.tickEnd.forceTermination();
-        for (Thread thread : this.worldThreads.values()) {
-            thread.interrupt();
-        }
         this.worldThreads.clear();
         this.executor.shutdown();
     }
@@ -646,10 +721,15 @@ public final class LanternWorldManager {
     /**
      * Initializes the root world and the dimension id map.
      */
-    void init() {
+    public void init() {
+        // The properties of the root world
+        WorldProperties rootWorldProperties = null;
+
         if (this.rootWorldFolder.exists()) {
             try {
                 final LevelData data = LanternWorldPropertiesIO.read(this.rootWorldFolder, null);
+                // The world exists, continue
+                rootWorldProperties = data.properties;
                 // Already store the data
                 this.addWorld(this.rootWorldFolder, data);
                 // Get the dimension map (nullable)
@@ -661,30 +741,71 @@ public final class LanternWorldManager {
                 LanternGame.log().error("Unable to load world folder.", e);
             }
         }
+
+        // Whether we should load dimension worlds
+        final boolean loadDimensionWorlds = this.dimensionMap != null;
+
         // Create a new dimension map if it wasn't possible to load it
-        if (this.dimensionMap == null) {
+        if (!loadDimensionWorlds) {
             this.dimensionMap = new BitSet(DIMENSION_MAP_SIZE);
-        } else {
-            // Get all the dimensions (worlds) that should be loaded
-            final List<WorldLookupEntry> loadQueue = Lists.newArrayList();
-            // Add the root dimension
-            loadQueue.add(this.worldByDimensionId.get(0));
+        }
+
+        // Generate the root (default) world if missing
+        if (rootWorldProperties == null) {
+            final LanternWorldCreationSettings settings = new LanternWorldBuilder(this.game)
+                    .name(this.rootWorldFolder.getName())
+                    .dimensionType(DimensionTypes.OVERWORLD)
+                    .generator(GeneratorTypes.FLAT) // TODO: Use the default generator type once implemented
+                    .gameMode(GameModes.SURVIVAL)
+                    .keepsSpawnLoaded(true)
+                    .loadsOnStartup(true)
+                    .enabled(true)
+                    .buildSettings();
+            rootWorldProperties = (LanternWorldProperties) this.createWorld(settings, 0).get();
+        }
+
+        // Get all the dimensions (worlds) that should be loaded
+        final List<WorldLookupEntry> loadQueue = Lists.newArrayList();
+        // Add the root dimension
+        loadQueue.add(this.worldByDimensionId.get(0));
+
+        // Load the dimension worlds if available
+        if (loadDimensionWorlds) {
             for (int i = 0; i < DIMENSION_MAP_SIZE; i++) {
                 if (this.dimensionMap.get(i)) {
                     final File folder = this.getWorldFolder(i);
                     try {
-                        final LevelData data = LanternWorldPropertiesIO.read(folder, null);
+                        LevelData data = LanternWorldPropertiesIO.read(folder, null);
+                        // Modify the dimension to make sure that the ids will
+                        // match the ones of the folder.
+                        if (data.dimensionId != null) {
+                            if (data.dimensionId != i) {
+                                LanternGame.log().warn("Dimension id ({}) stored in the world save ({})"
+                                        + "does not match the one of the world folder ({}), modifying...",
+                                        data.dimensionId, i, data.properties.getWorldName());
+                            }
+                            data = new LevelData(data.properties, i, null);
+                        }
                         // Store the data
                         this.addWorld(folder, data);
                         // Check if it should be loaded on startup
                         if (data.properties.loadOnStartup) {
                             loadQueue.add(this.worldByProperties.get(data.properties));
                         }
+                    } catch (FileNotFoundException e) {
+                        LanternGame.log().warn("Missing dimension (level file) with id {}, skipping...", i);
+                        // The world (dimension) is missing, so remove it
+                        this.dimensionMap.clear(i);
                     } catch (IOException e) {
                         LanternGame.log().error("Unable to load world (dimension) folder: {}", folder.getName(), e);
                     }
                 }
             }
+        }
+
+        // Load all the worlds
+        for (WorldLookupEntry entry : loadQueue) {
+            this.loadWorld(entry);
         }
     }
 }

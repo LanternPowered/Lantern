@@ -47,6 +47,7 @@ import org.lanternpowered.server.world.rules.LanternGameRules;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
@@ -65,6 +66,10 @@ public class LanternWorldProperties implements WorldProperties {
 
     private static final int BOUNDARY = 29999984;
 
+    // The unique id of the world
+    final UUID uniqueId;
+
+    // The rules of the world
     final LanternGameRules rules = new LanternGameRules();
 
     // This is a map added by sponge, not sure what it is supposed to do yet
@@ -100,9 +105,11 @@ public class LanternWorldProperties implements WorldProperties {
     // The name of the world
     String name;
 
-    protected UUID uniqueId;
-    protected Vector3i spawnPosition;
+    // The spawn position
+    Vector3i spawnPosition = Vector3i.ZERO;
 
+    // Whether the world is initialized
+    boolean initialized;
     boolean bonusChestEnabled;
     boolean enabled;
     boolean loadOnStartup;
@@ -155,11 +162,13 @@ public class LanternWorldProperties implements WorldProperties {
 
     int buildHeight;
 
-    public LanternWorldProperties() {
+    public LanternWorldProperties(UUID uniqueId) {
         this.creationSettings = null;
+        this.uniqueId = uniqueId;
     }
 
     public LanternWorldProperties(LanternWorldCreationSettings creationSettings) {
+        this.properties = new MemoryDataContainer();
         this.creationSettings = creationSettings;
         this.keepSpawnLoaded = creationSettings.doesKeepSpawnLoaded();
         this.commandsAllowed = creationSettings.commandsAllowed();
@@ -180,6 +189,13 @@ public class LanternWorldProperties implements WorldProperties {
         this.uniqueId = UUID.randomUUID();
     }
 
+    /**
+     * Sets whether the world is initialized.
+     */
+    public void setInitialized() {
+        this.initialized = true;
+    }
+
     public boolean doesWaterEvaporate() {
         return this.waterEvaporates;
     }
@@ -194,6 +210,9 @@ public class LanternWorldProperties implements WorldProperties {
 
     public void setAllowsPlayerRespawns(boolean allow) {
         this.allowPlayerRespawns = allow;
+        if (this.world != null) {
+            this.world.enableSpawnArea(allow);
+        }
     }
 
     public int getBuildHeight() {
@@ -281,6 +300,11 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setSpawnPosition(Vector3i position) {
         this.spawnPosition = checkNotNull(position, "position");
+        // Generate the spawn are at the new spawn position
+        // if the world is present
+        if (this.world != null) {
+            this.world.enableSpawnArea(this.keepSpawnLoaded);
+        }
     }
 
     @Override
@@ -412,8 +436,7 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public boolean isInitialized() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.initialized;
     }
 
     @Override

@@ -56,22 +56,23 @@ public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> 
         checkNotNull(blockType, "blockType");
         checkState(internalId >= 0, "Block id cannot be negative.");
         checkState(internalId <= 0xfff, "Exceeded the block id limit. (" + 0xfff + ")");
-        short internalId0 = (short) internalId;
+        final short internalId0 = (short) internalId;
         checkState(!this.blocksById.containsKey(internalId0), "Block id already present! (" + internalId + ")");
         super.register(blockType);
         this.blocksById.put(internalId0, blockType);
         this.idsByBlock.put(blockType, internalId0);
         if (dataValueGenerator != null && blockType.blockStateBase.getBlockStates().size() > 1) {
             for (BlockState state : blockType.blockStateBase.getBlockStates()) {
-                byte dataValue = dataValueGenerator.apply((LanternBlockState) state);
-                short stateValue = (short) ((internalId & 0xfff) << 4 | dataValue & 0xf);
+                final byte dataValue = dataValueGenerator.apply((LanternBlockState) state);
+                final short stateValue = (short) ((internalId & 0xfff) << 4 | dataValue & 0xf);
                 this.blockStatesById.put(stateValue, state);
                 this.idsByBlockState.put(state, stateValue);
             }
         } else {
-            BlockState state = blockType.getDefaultState();
-            this.blockStatesById.put(internalId0, state);
-            this.idsByBlockState.put(state, internalId0);
+            final BlockState state = blockType.getDefaultState();
+            final short stateValue = (short) (internalId << 4);
+            this.blockStatesById.put(stateValue, state);
+            this.idsByBlockState.put(state, stateValue);
         }
     }
 

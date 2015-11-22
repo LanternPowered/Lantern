@@ -34,6 +34,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
@@ -87,31 +89,23 @@ import com.google.common.collect.ImmutableSet;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_MASK;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTIONS;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTION_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTION_MASK;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class LanternChunk implements AbstractExtent, Chunk {
 
-    /**
-     * Converts the vector2i into a vector3i with x -> x and y -> z.
-     * 
-     * @param vector2 the vector2
-     * @return the vector3
-     */
-    public static Vector3i fromVector2(Vector2i vector2) {
-        return new Vector3i(vector2.getX(), 0, vector2.getY());
-    }
-
-    /**
-     * Converts the vector3i into a vector2i with x -> x and z -> y.
-     * 
-     * @param vector3 the vector3
-     * @return the vector2
-     */
-    public static Vector2i toVector2(Vector3i vector3) {
-        return vector3.toVector2(true);
-    }
+    // The size of a chunk section in the x, y and z directions
+    public static final int CHUNK_SECTION_SIZE = 16;
+    // The area of a chunk and a chunk section (xz plane)
+    public static final int CHUNK_AREA = CHUNK_SECTION_SIZE * CHUNK_SECTION_SIZE;
+    // The volume of a chunk section
+    public static final int CHUNK_SECTION_VOLUME = CHUNK_AREA * CHUNK_SECTION_SIZE;
+    // The amount of sections inside one chunk
+    public static final int CHUNK_SECTIONS = 8;
+    // The volume of a chunk
+    public static final int CHUNK_VOLUME = CHUNK_SECTION_VOLUME * CHUNK_SECTIONS;
+    // The height of a chunk
+    public static final int CHUNK_HEIGHT = CHUNK_SECTION_SIZE * CHUNK_SECTIONS;
 
     public static class ChunkSection {
 
@@ -123,32 +117,50 @@ public class LanternChunk implements AbstractExtent, Chunk {
         public final AtomicNibbleArray lightFromBlock;
 
         // The amount of non air blocks
-        public volatile int count;
+        public volatile int nonAirCount;
 
         public ChunkSection() {
-            int length = CHUNK_SECTION_SIZE.lengthSquared();
-
-            this.lightFromBlock = new AtomicNibbleArray(length);
-            this.lightFromSky = new AtomicNibbleArray(length);
-            this.types = new AtomicShortArray(length);
+            this(null, (Integer) 0);
         }
 
         public ChunkSection(short[] types) {
-            this.lightFromBlock = new AtomicNibbleArray(types.length);
-            this.lightFromSky = new AtomicNibbleArray(types.length);
-            this.types = new AtomicShortArray(types);
+            this(types, null);
+        }
 
-            // Count the non air blocks.
-            this.recount();
+        public ChunkSection(short[] types, int nonAirCount) {
+            this(types, (Integer) nonAirCount);
+        }
+
+        private ChunkSection(@Nullable short[] types, @Nullable Integer nonAirCount) {
+            if (types != null) {
+                checkArgument(types.length == CHUNK_SECTION_VOLUME, "Type array length mismatch: Got "
+                        + types.length + ", but expected " + CHUNK_SECTION_VOLUME);
+                this.types = new AtomicShortArray(types);
+            } else {
+                this.types = new AtomicShortArray(CHUNK_SECTION_VOLUME);
+            }
+            this.lightFromBlock = new AtomicNibbleArray(CHUNK_SECTION_VOLUME);
+            this.lightFromSky = new AtomicNibbleArray(CHUNK_SECTION_VOLUME);
+            if (nonAirCount != null) {
+                this.nonAirCount = nonAirCount;
+            } else {
+                this.recountNonAir();
+            }
         }
 
         public ChunkSection(short[] types, NibbleArray lightFromSky, NibbleArray lightFromBlock) {
+            checkArgument(types.length == CHUNK_SECTION_VOLUME, "Type array length mismatch: Got "
+                    + types.length + ", but expected " + CHUNK_SECTION_VOLUME);
+            checkArgument(lightFromSky.length() == CHUNK_SECTION_VOLUME, "Sky light nibble array length mismatch: Got "
+                    + lightFromSky.length() + ", but expected " + CHUNK_SECTION_VOLUME);
+            checkArgument(lightFromSky.length() == CHUNK_SECTION_VOLUME, "Block light nibble array length mismatch: Got "
+                    + lightFromBlock.length() + ", but expected " + CHUNK_SECTION_VOLUME);
             this.lightFromBlock = new AtomicNibbleArray(lightFromBlock);
             this.lightFromSky = new AtomicNibbleArray(lightFromSky);
             this.types = new AtomicShortArray(types);
 
             // Count the non air blocks.
-            this.recount();
+            this.recountNonAir();
         }
 
         /**
@@ -164,18 +176,18 @@ public class LanternChunk implements AbstractExtent, Chunk {
         /**
          * Recounts the amount of non air blocks.
          */
-        public void recount() {
-            this.count = 0;
+        public void recountNonAir() {
+            this.nonAirCount = 0;
             for (int i = 0; i < this.types.length(); i++) {
                 if (this.types.get(i) != 0) {
-                    this.count++;
+                    this.nonAirCount++;
                 }
             }
         }
     }
 
     private final PriorityBlockingQueue<LanternScheduledBlockUpdate> scheduledBlockUpdateQueue =
-            new PriorityBlockingQueue<LanternScheduledBlockUpdate>();
+            new PriorityBlockingQueue<>();
     private final AtomicInteger scheduledBlockUpdateCounter = new AtomicInteger();
 
     private final Vector3i min;
@@ -197,7 +209,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     private volatile boolean populated;
 
     private AtomicByteArray heightMap;
-    private AtomicReferenceArray<ChunkSection> sections = new AtomicReferenceArray<ChunkSection>(CHUNK_SECTIONS);
+    private AtomicReferenceArray<ChunkSection> sections = new AtomicReferenceArray<>(CHUNK_SECTIONS);
     private AtomicShortArray biomes;
 
     public LanternChunk(LanternWorld world, int x, int z) {
@@ -212,13 +224,25 @@ public class LanternChunk implements AbstractExtent, Chunk {
         this.areaMax = this.max.toVector2(true);
     }
 
+    /**
+     * Initializes the chunk sections.
+     * 
+     * @param sections the sections
+     */
+    public void initializeSections(ChunkSection[] sections) {
+        checkArgument(sections.length == CHUNK_SECTIONS, "Sections array length mismatch: Got "
+                + sections.length + ", but expected " + CHUNK_SECTION_VOLUME);
+        this.sections = new AtomicReferenceArray<>(sections);
+        this.loaded = true;
+    }
+
     public void initializeEmpty() {
         if (this.sections != null || this.biomes != null) {
             throw new IllegalStateException("Chunk is already initialized!");
         }
-        this.heightMap = new AtomicByteArray(CHUNK_AREA_SIZE.lengthSquared());
-        this.sections = new AtomicReferenceArray<ChunkSection>(CHUNK_SECTIONS);
-        this.biomes = new AtomicShortArray(CHUNK_AREA_SIZE.lengthSquared());
+        this.heightMap = new AtomicByteArray(CHUNK_AREA);
+        this.sections = new AtomicReferenceArray<>(CHUNK_SECTIONS);
+        this.biomes = new AtomicShortArray(CHUNK_AREA);
         this.loaded = true;
     }
 
@@ -230,23 +254,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return array;
     }
 
-    public void initializeSections(ChunkSection[] sections) {
-        if (this.sections != null) {
-            throw new IllegalStateException("Sections are already initialized!");
-        }
-        if (sections.length != CHUNK_SECTIONS) {
-            throw new IllegalStateException("Sections array not of length " + CHUNK_SECTIONS);
-        }
-        this.sections = new AtomicReferenceArray<ChunkSection>(sections);
-        this.loaded = true;
-    }
-
     public void initializeBiomes(short[] biomes) {
         if (this.biomes != null) {
             throw new IllegalStateException("Biomes are already initialized!");
         }
-        if (biomes.length != CHUNK_AREA_SIZE.lengthSquared()) {
-            throw new IllegalStateException("Biomes array not of length " + CHUNK_AREA_SIZE.lengthSquared());
+        if (biomes.length != CHUNK_AREA) {
+            throw new IllegalStateException("Biomes array not of length " + CHUNK_AREA);
         }
         this.biomes = new AtomicShortArray(biomes);
     }
@@ -289,7 +302,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * Automatically fill the height map after chunks have been initialized.
      */
     public void automaticHeightMap() {
-        byte[] heightMap = this.heightMap == null ? new byte[CHUNK_AREA_SIZE.lengthSquared()] : null;
+        byte[] heightMap = this.heightMap == null ? new byte[CHUNK_AREA] : null;
 
         // Determine max Y chunk section at a time
         int sy = this.sections.length() - 1;
@@ -299,14 +312,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
         }
 
-        int wx = CHUNK_AREA_SIZE.getX();
-        int wz = CHUNK_AREA_SIZE.getY();
         int y = (sy + 1) * 16;
-
-        for (int x = 0; x < wx; ++x) {
-            for (int z = 0; z < wz; ++z) {
+        for (int x = 0; x < CHUNK_SECTION_SIZE; ++x) {
+            for (int z = 0; z < CHUNK_SECTION_SIZE; ++z) {
                 byte value = (byte) this.lowerHeightMap(x, y, z);
-                int index = z * wx + x;
+                int index = z * CHUNK_SECTION_SIZE + x;
                 if (heightMap != null) {
                     heightMap[index] = value;
                 } else {
@@ -445,11 +455,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
         int index = section.index(x, y & 0xf, z);
         if (type == 0) {
             if (section.types.get(index) != 0) {
-                section.count--;
+                section.nonAirCount--;
             }
         } else {
             if (section.types.get(index) == 0) {
-                section.count++;
+                section.nonAirCount++;
             }
         }
 
@@ -457,7 +467,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         section.types.set(index, type);
 
         // Destroy empty sections
-        if (section.count <= 0) {
+        if (section.nonAirCount <= 0) {
             this.sections.set(y >> 4, null);
         }
     }
@@ -1030,7 +1040,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean loadChunk(boolean generate) {
-        if (this.world.getChunkManager().load(this, generate)) {
+        if (this.world.getChunkManager().load(this, Cause.of(), generate)) {
             this.loaded = true;
             return true;
         }
@@ -1039,7 +1049,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean unloadChunk() {
-        if (this.world.getChunkManager().unload(this)) {
+        if (this.world.getChunkManager().unload(this, Cause.of())) {
             this.loaded = false;
             return true;
         }

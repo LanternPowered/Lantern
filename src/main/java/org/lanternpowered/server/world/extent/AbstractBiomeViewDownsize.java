@@ -27,9 +27,9 @@ package org.lanternpowered.server.world.extent;
 import com.flowpowered.math.vector.Vector2i;
 
 import org.lanternpowered.server.util.VecHelper;
-import org.lanternpowered.server.util.gen.ShortArrayImmutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayMutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
@@ -102,9 +102,11 @@ public abstract class AbstractBiomeViewDownsize<A extends BiomeArea> implements 
     public MutableBiomeArea getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBiomeBuffer(ExtentBufferUtil.copyToArray(this, this.min, this.max, this.size), this.min, this.size);
+                return new ObjectArrayMutableBiomeBuffer(ExtentBufferHelper.copyToObjectArray(
+                        this, this.min, this.max, this.size), this.min, this.size);
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBiomeBuffer(ExtentBufferUtil.copyToArray(this, this.min, this.max, this.size), this.min, this.size);
+                return new AtomicObjectArrayMutableBiomeBuffer(ExtentBufferHelper.copyToObjectArray(
+                        this, this.min, this.max, this.size), this.min, this.size);
             default:
                 throw new UnsupportedOperationException(type.name());
         }
@@ -112,8 +114,8 @@ public abstract class AbstractBiomeViewDownsize<A extends BiomeArea> implements 
 
     @Override
     public ImmutableBiomeArea getImmutableBiomeCopy() {
-        return ShortArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferUtil.copyToArray(this, this.min, this.max, this.size), this.min,
-            this.size);
+        return ShortArrayImmutableBiomeBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToArray(
+                this, this.min, this.max, this.size), this.min, this.size);
     }
 
 }

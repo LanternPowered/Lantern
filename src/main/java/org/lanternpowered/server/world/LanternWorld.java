@@ -48,6 +48,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
+import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
@@ -120,6 +121,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public static final Vector2i BIOME_MAX = BLOCK_MAX.toVector2(true);
     public static final Vector2i BIOME_SIZE = BIOME_MAX.sub(BIOME_MIN).add(1, 1);
 
+    // The spawn size starting from the spawn point and expanded
+    // by this size in the directions +x, +z, -x, -z
+    private final static int SPAWN_SIZE = 12;
+
+    // The loading ticket to keep the spawn chunks loaded
+    private volatile ChunkLoadingTicket spawnLoadingTicket;
+
     // The shared player simulator, without an actual player attached to it
     private final LanternPlayerSimulator sharedPlayerSimulator = new LanternPlayerSimulator(this, null);
 
@@ -149,10 +157,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public LanternWorld(LanternGame game, File worldFolder, LanternWorldProperties properties) {
         this.properties = properties;
         this.game = game;
-        // The folder that the region files are stored
-        final File regionFolder = new File(worldFolder, "region");
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(regionFolder);
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder);
         // Get the chunk load service
         final LanternChunkLoadService chunkLoadService = game.getChunkLoadService();
         // Get the dimension type
@@ -168,7 +174,65 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Create a new world generator
         final WorldGenerator worldGenerator = properties.generatorType.createGenerator(this);
         // Finally, create the chunk manager
-        this.chunkManager = new LanternChunkManager(this, chunkLoadService, chunkIOService, worldGenerator, worldFolder);
+        this.chunkManager = new LanternChunkManager(this.game, this, chunkLoadService,
+                chunkIOService, worldGenerator, worldFolder);
+    }
+
+    public void initialize() {
+        // Initialize the world if needed
+        if (this.properties.isInitialized()) {
+            return;
+        }
+        this.properties.setInitialized();
+    }
+
+    /**
+     * Shuts the world down and saves all the
+     * data in the process.
+     */
+    void shutdown() {
+        // Release the spawn ticket to avoid it
+        // getting saved
+        if (this.spawnLoadingTicket != null) {
+            this.spawnLoadingTicket.release();
+            this.spawnLoadingTicket = null;
+        }
+        // Shut the chunk manager down
+        this.chunkManager.shutdown();
+    }
+
+    /**
+     * Enables whether the spawn area should be generated and keeping it loaded.
+     * 
+     * @param keepSpawnLoaded keep spawn loaded
+     */
+    void enableSpawnArea(boolean keepSpawnLoaded) {
+        if (keepSpawnLoaded) {
+            final Vector3i spawnPoint = this.properties.getSpawnPosition();
+
+            if (this.spawnLoadingTicket == null) {
+                this.spawnLoadingTicket = (ChunkLoadingTicket) this.chunkManager.createTicket(
+                        this.game.getPlugin()).get();
+            } else {
+                this.spawnLoadingTicket.unforceChunks();
+            }
+
+            final int chunkX = spawnPoint.getX() >> 4;
+            final int chunkZ = spawnPoint.getZ() >> 4;
+
+            LanternGame.log().info("Generating spawn area...");
+
+            for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
+                for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
+                    this.chunkManager.getOrCreateChunk(x, z, Cause.of(), true);
+                    this.spawnLoadingTicket.forceChunk(new Vector3i(x, 0, z));
+                }
+            }
+
+            LanternGame.log().info("Finished generating spawn area.");
+        } else if (this.spawnLoadingTicket != null) {
+            this.spawnLoadingTicket.unforceChunks();
+        }
     }
 
     /**
@@ -180,6 +244,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         return Lists.newArrayList();
     }
 
+    /**
+     * Gets the chunk manager of this world.
+     * 
+     * @return the chunk manager.
+     */
     public LanternChunkManager getChunkManager() {
         return this.chunkManager;
     }
@@ -364,17 +433,17 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        this.chunkManager.getOrCreateChunk(x >> 4, z >> 4).setBlock(x & 0xf, y, z & 0xf, block, notifyNeighbors);
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x & 0xf, y, z & 0xf, block, notifyNeighbors);
     }
 
     @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
-        return this.chunkManager.getOrCreateChunk(x >> 4, z >> 4).createSnapshot(x & 0xf, y, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).createSnapshot(x & 0xf, y, z & 0xf);
     }
 
     @Override
     public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        return this.chunkManager.getOrCreateChunk(x >> 4, z >> 4).restoreSnapshot(x & 0xf, y, z & 0xf, snapshot, force, notifyNeighbors);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).restoreSnapshot(x & 0xf, y, z & 0xf, snapshot, force, notifyNeighbors);
     }
 
     @Override
@@ -678,12 +747,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Optional<Chunk> getChunk(Vector3i position) {
-        return Optional.<Chunk>ofNullable(this.chunkManager.getChunk(position));
+        return Optional.ofNullable(this.chunkManager.getChunk(position.toVector2(true)));
     }
 
     @Override
     public Optional<Chunk> getChunk(int x, int y, int z) {
-        return this.getChunk(new Vector3i(x, y, z));
+        return Optional.ofNullable(this.chunkManager.getChunk(x, z));
     }
 
     @Override
@@ -696,13 +765,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         if (!VecHelper.inBounds(x, y, z, SPACE_MIN, SPACE_MAX)) {
             return Optional.empty();
         }
-        Chunk chunk;
         if (generate) {
-            chunk = this.chunkManager.getOrLoadChunk(new Vector2i(x, z), generate);
+            return Optional.of(this.chunkManager.getOrCreateChunk(
+                    new Vector2i(x, z), Cause.of(), generate));
         } else {
-            chunk = this.chunkManager.getOrLoadChunkIfPresent(new Vector2i(x, z));
+            return Optional.ofNullable(this.chunkManager.getChunk(x, z));
         }
-        return Optional.of(chunk);
     }
 
     @Override
@@ -829,6 +897,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             this.properties.time %= 24000;
         }
         this.properties.age++;
-        this.weatherUniverse.pulse();
+        if (this.weatherUniverse != null) {
+            this.weatherUniverse.pulse();
+        }
     }
 }

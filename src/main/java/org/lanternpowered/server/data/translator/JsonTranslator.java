@@ -98,6 +98,7 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
                     container.set(DataQuery.of(key), this.fromJson(null, json));
                 }
             }
+            return container;
         } else if (json.isJsonArray()) {
             JsonArray array = json.getAsJsonArray();
             List<Object> objects = Lists.newArrayListWithCapacity(array.size());

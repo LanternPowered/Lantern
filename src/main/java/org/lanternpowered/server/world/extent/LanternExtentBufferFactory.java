@@ -24,13 +24,17 @@
  */
 package org.lanternpowered.server.world.extent;
 
+import java.util.Arrays;
+
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 
-import org.lanternpowered.server.util.gen.ShortArrayMutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.ShortArrayMutableBlockBuffer;
-import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.concurrent.AtomicShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
+import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -44,7 +48,9 @@ public final class LanternExtentBufferFactory implements ExtentBufferFactory {
 
     @Override
     public MutableBiomeArea createBiomeBuffer(Vector2i size) {
-        return new ShortArrayMutableBiomeBuffer(Vector2i.ZERO, size);
+        final BiomeType[] array = new BiomeType[size.getX() * size.getY()];
+        Arrays.fill(array, BiomeTypes.OCEAN);
+        return new ObjectArrayMutableBiomeBuffer(array, Vector2i.ZERO, size);
     }
 
     @Override
@@ -54,7 +60,9 @@ public final class LanternExtentBufferFactory implements ExtentBufferFactory {
 
     @Override
     public MutableBiomeArea createThreadSafeBiomeBuffer(Vector2i size) {
-        return new AtomicShortArrayMutableBiomeBuffer(Vector2i.ZERO, size);
+        final BiomeType[] array = new BiomeType[size.getX() * size.getY()];
+        Arrays.fill(array, BiomeTypes.OCEAN);
+        return new AtomicObjectArrayMutableBiomeBuffer(array, Vector2i.ZERO, size);
     }
 
     @Override

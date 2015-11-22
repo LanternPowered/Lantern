@@ -36,6 +36,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.configuration.LanternConfig;
+import org.lanternpowered.server.configuration.LanternConfig.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
@@ -114,8 +116,14 @@ public final class LanternChunkManager {
     // The world
     private final LanternWorld world;
 
+    // The world configuration
+    private final LanternConfig<WorldConfig> worldConfig;
+
     // The chunk I/O service
     private final ChunkIOService chunkIOService;
+
+    // The chunk load (ticket) service
+    private final LanternChunkLoadService chunkLoadService;
 
     // The world folder
     private final File worldFolder;
@@ -130,6 +138,29 @@ public final class LanternChunkManager {
 
     // The world generator
     private volatile WorldGenerator worldGenerator;
+
+    /**
+     * Creates a new chunk manager.
+     * 
+     * @param game the game instance
+     * @param world the world this chunk manage is attached to
+     * @param worldConfig the configuration file of the world
+     * @param chunkLoadService the chunk load (ticket) service
+     * @param chunkIOService the chunk i/o service
+     * @param worldGenerator the world generator
+     * @param worldFolder the world data folder
+     */
+    public LanternChunkManager(LanternGame game, LanternWorld world, LanternConfig<WorldConfig> worldConfig,
+            LanternChunkLoadService chunkLoadService, ChunkIOService chunkIOService,
+            WorldGenerator worldGenerator, File worldFolder) {
+        this.chunkLoadService = chunkLoadService;
+        this.chunkIOService = chunkIOService;
+        this.worldGenerator = worldGenerator;
+        this.worldFolder = worldFolder;
+        this.worldConfig = worldConfig;
+        this.world = world;
+        this.game = game;
+    }
 
     /**
      * Sets the generator of the world (chunk manager).
@@ -209,8 +240,135 @@ public final class LanternChunkManager {
      * @return the tickets
      */
     public int getTicketsForPlugin(Object plugin) {
-        final String id = checkPlugin(plugin, "plugin").getId();
-        return (int) this.tickets.stream().filter(ticket -> ticket.getPlugin().equals(id)).count();
+        return this.getTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
+    }
+
+    /**
+     * Gets the amount of tickets that are attached to the plugin.
+     * 
+     * @param pluginId the plugin id
+     * @return the tickets
+     */
+    public int getTicketsForPlugin(String pluginId) {
+        checkNotNull(pluginId, "pluginId");
+        return (int) this.tickets.stream().filter(ticket -> ticket.getPlugin().equals(pluginId)).count();
+    }
+
+    /**
+     * Gets the maximum amount of tickets for the plugin per world.
+     * 
+     * @param plugin the plugin
+     * @return the maximum amount of tickets
+     */
+    public int getMaxTicketsForPlugin(Object plugin) {
+        return this.getMaxTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
+    }
+
+    /**
+     * Gets the maximum amount of tickets for the plugin per world.
+     * 
+     * @param plugin the plugin
+     * @return the maximum amount of tickets
+     */
+    public int getMaxTicketsForPlugin(String plugin) {
+        return this.worldConfig.getBase().getChunkLoadingTickets(plugin).getMaximumTicketCount();
+    }
+
+    /**
+     * Gets the maximum amount of forced chunks each ticket of the plugin can contain.
+     * 
+     * @param plugin the plugin
+     * @return the maximum amount of forced chunks
+     */
+    public int getMaxChunksForPluginTicket(Object plugin) {
+        return this.getMaxChunksForPluginTicket(checkPlugin(plugin, "plugin").getId());
+    }
+
+    /**
+     * Gets the maximum amount of forced chunks each ticket of the plugin can contain.
+     * 
+     * @param plugin the plugin
+     * @return the maximum amount of forced chunks
+     */
+    public int getMaxChunksForPluginTicket(String plugin) {
+        return this.worldConfig.getBase().getChunkLoadingTickets(plugin).getMaximumChunksPerTicket();
+    }
+
+    /**
+     * Attempts to create a new loading ticket for the specified plugin.
+     * 
+     * @param plugin the plugin
+     * @return the loading ticket if available
+     */
+    public Optional<LoadingTicket> createTicket(Object plugin) {
+        final String pluginId = checkPlugin(plugin, "plugin").getId();
+        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId)) {
+            return Optional.empty();
+        }
+        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final LanternLoadingTicket ticket = new LanternLoadingTicket(pluginId, this, maxChunks);
+        this.tickets.add(ticket);
+        return Optional.of(ticket);
+    }
+
+    /**
+     * Attempts to create a new entity loading ticket for the specified plugin.
+     * 
+     * @param plugin the plugin
+     * @return the loading ticket if available
+     */
+    public Optional<EntityLoadingTicket> createEntityTicket(Object plugin) {
+        final String pluginId = checkPlugin(plugin, "plugin").getId();
+        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId)) {
+            return Optional.empty();
+        }
+        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final LanternEntityLoadingTicket ticket = new LanternEntityLoadingTicket(
+                pluginId, this, maxChunks);
+        this.tickets.add(ticket);
+        return Optional.of(ticket);
+    }
+
+    /**
+     * Attempts to create a new player loading ticket for the specified plugin.
+     * 
+     * @param plugin the plugin
+     * @param player the unique id of the player
+     * @return the loading ticket if available
+     */
+    public Optional<PlayerLoadingTicket> createPlayerTicket(Object plugin, UUID player) {
+        checkNotNull(player, "player");
+        final String pluginId = checkPlugin(plugin, "plugin").getId();
+        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId) ||
+                this.chunkLoadService.getAvailableTickets(player) <= 0) {
+            return Optional.empty();
+        }
+        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final LanternPlayerLoadingTicket ticket = new LanternPlayerLoadingTicket(
+                pluginId, this, player, maxChunks);
+        this.tickets.add(ticket);
+        return Optional.of(ticket);
+    }
+
+    /**
+     * Attempts to create a new player loading ticket for the specified plugin.
+     * 
+     * @param plugin the plugin
+     * @param player the unique id of the player
+     * @return the loading ticket if available
+     */
+    public Optional<PlayerEntityLoadingTicket> createPlayerEntityTicket(Object plugin, UUID player) {
+        checkNotNull(player, "player");
+        final String pluginId = checkPlugin(plugin, "plugin").getId();
+        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId) ||
+                this.chunkLoadService.getAvailableTickets(player) <= 0) {
+            return Optional.empty();
+        }
+        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final LanternPlayerEntityLoadingTicket ticket = new LanternPlayerEntityLoadingTicket(
+                pluginId, this, player, maxChunks);
+        this.tickets.add(ticket);
+        return Optional.of(ticket);
     }
 
     /**
@@ -424,6 +582,12 @@ public final class LanternChunkManager {
             super(start, size);
             this.biomeTypes = new BiomeType[size.getX() * size.getY()];
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
+        }
+
+        @Override
+        public void setBiome(int x, int z, BiomeType biome) {
+            super.setBiome(x, z, biome);
+            this.biomeTypes[this.index(x, z)] = biome;
         }
 
         @Override
@@ -679,18 +843,6 @@ public final class LanternChunkManager {
         }
     }
 
-    private final LanternChunkLoadService chunkLoadService;
-
-    public LanternChunkManager(LanternGame game, LanternWorld world, LanternChunkLoadService chunkLoadService,
-            ChunkIOService chunkIOService, WorldGenerator worldGenerator, File worldFolder) {
-        this.chunkLoadService = checkNotNull(chunkLoadService, "chunkLoadService");
-        this.chunkIOService = checkNotNull(chunkIOService, "chunkIOService");
-        this.worldGenerator = checkNotNull(worldGenerator, "worldGenerator");
-        this.worldFolder = checkNotNull(worldFolder, "worldFolder");
-        this.world = checkNotNull(world, "world");
-        this.game = game;
-    }
-
     /*
     void loadTickets() throws IOException {
         Multimap<String, LanternLoadingTicket> tickets = LanternLoadingTicketIO.load(this.worldFolder, this, this.chunkLoadService);
@@ -734,78 +886,4 @@ public final class LanternChunkManager {
             }
         }
     }*/
-
-    /**
-     * Creates a new loading ticket.
-     * 
-     * @param plugin the plugin
-     * @return the loading ticket if available
-     */
-    public Optional<LoadingTicket> createTicket(Object plugin) {
-        PluginContainer container = checkPlugin(plugin, "plugin");
-        if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container)) {
-            return Optional.empty();
-        }
-        int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
-        LanternLoadingTicket ticket = new LanternLoadingTicket(container.getId(), this, chunks);
-        this.tickets.add(ticket);
-        return Optional.of(ticket);
-    }
-
-    /**
-     * Creates a new entity loading ticket.
-     * 
-     * @param plugin the plugin
-     * @return the loading ticket if available
-     */
-    public Optional<EntityLoadingTicket> createEntityTicket(Object plugin) {
-        PluginContainer container = checkPlugin(plugin, "plugin");
-        if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container)) {
-            return Optional.empty();
-        }
-        int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
-        LanternEntityLoadingTicket ticket = new LanternEntityLoadingTicket(container.getId(), this, chunks);
-        this.tickets.add(ticket);
-        return Optional.<EntityLoadingTicket>of(ticket);
-    }
-
-    /**
-     * Creates a new player loading ticket.
-     * 
-     * @param plugin the plugin
-     * @param player the player uuid
-     * @return the loading ticket if available
-     */
-    public Optional<PlayerLoadingTicket> createPlayerTicket(Object plugin, UUID player) {
-        checkNotNull(player, "player");
-        PluginContainer container = checkPlugin(plugin, "plugin");
-        if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container) ||
-                this.chunkLoadService.getAvailableTickets(player) == 0) {
-            return Optional.empty();
-        }
-        int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
-        LanternPlayerLoadingTicket ticket = new LanternPlayerLoadingTicket(container.getId(), this, player, chunks);
-        this.tickets.add(ticket);
-        return Optional.<PlayerLoadingTicket>of(ticket);
-    }
-
-    /**
-     * Creates a new player entity loading ticket.
-     * 
-     * @param plugin the plugin
-     * @return the loading ticket if available
-     */
-    public Optional<PlayerEntityLoadingTicket> createPlayerEntityTicket(Object plugin, UUID player) {
-        checkNotNull(player, "player");
-        PluginContainer container = checkPlugin(plugin, "plugin");
-        if (this.getTicketsForPlugin(container) >= this.chunkLoadService.getMaxTicketsForPlugin(container) ||
-                this.chunkLoadService.getAvailableTickets(player) == 0) {
-            return Optional.empty();
-        }
-        int chunks = this.chunkLoadService.getMaxChunksForPluginTicket(container);
-        LanternPlayerEntityLoadingTicket ticket = new LanternPlayerEntityLoadingTicket(container.getId(),
-                this, player, chunks);
-        this.tickets.add(ticket);
-        return Optional.<PlayerEntityLoadingTicket>of(ticket);
-    }
 }

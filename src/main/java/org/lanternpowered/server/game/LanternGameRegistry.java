@@ -108,8 +108,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.ImmutableDataRegistry;
-import org.spongepowered.api.data.manipulator.DataManipulatorRegistry;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.DirtTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
@@ -279,6 +277,16 @@ public class LanternGameRegistry implements GameRegistry {
         this.game = game;
     }
 
+    /**
+     * Pre register some objects that are required
+     * for some initial steps.
+     */
+    public void preRegisterGameObjects() {
+        this.registerTextFactory();
+        this.registerTextStyles();
+        this.registerTextColors();
+    }
+
     public void registerGameObjects() {
         if (this.registered) {
             throw new IllegalStateException("You can only register the game objects once!");
@@ -288,9 +296,6 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerNotePitches();
         // The particle types, requires NotePitches
         this.registerParticleTypes();
-        this.registerTextFactory();
-        this.registerTextStyles();
-        this.registerTextColors();
         this.registerMessageSinkFactory();
         this.registerSoundTypes();
         this.registerShrubTypes();
@@ -1089,12 +1094,6 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public ImmutableDataRegistry getImmutableDataRegistry() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Optional<ResourcePack> getResourcePackById(String id) {
         return this.resourcePackFactory.getById(id);
     }
@@ -1127,12 +1126,6 @@ public class LanternGameRegistry implements GameRegistry {
 
     public LanternAttributeBuilder createAttributeBuilder() {
         return new LanternAttributeBuilder(this.attributeRegistry);
-    }
-
-    @Override
-    public DataManipulatorRegistry getManipulatorRegistry() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

@@ -32,12 +32,15 @@ import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
+import org.lanternpowered.server.configuration.LanternConfig;
+import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
 import org.lanternpowered.server.service.config.LanternConfigService;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
+import org.lanternpowered.server.service.persistence.LanternSerializationService;
 import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.service.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.sql.LanternSqlService;
@@ -50,6 +53,9 @@ import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.data.ImmutableDataRegistry;
+import org.spongepowered.api.data.manipulator.DataManipulatorRegistry;
+import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
@@ -61,6 +67,7 @@ import org.spongepowered.api.service.command.SimpleCommandService;
 import org.spongepowered.api.service.config.ConfigService;
 import org.spongepowered.api.service.event.EventManager;
 import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.service.persistence.SerializationManager;
 import org.spongepowered.api.service.profile.GameProfileResolver;
 import org.spongepowered.api.service.scheduler.SchedulerService;
 import org.spongepowered.api.service.sql.SqlService;
@@ -69,6 +76,15 @@ import org.spongepowered.api.util.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.world.TeleportHelper;
 
 public class LanternGame implements Game {
+
+    // The name of the config folder
+    public static final String CONFIG_FOLDER = "config";
+
+    // The name of the global config file
+    public static final String GLOBAL_CONFIG = "global.conf";
+
+    // The name of the config folder
+    public static final String PLUGINS_FOLDER = "plugins";
 
     // The singleton instance of the game
     private static LanternGame game;
@@ -126,6 +142,12 @@ public class LanternGame implements Game {
     // The platform
     private final LanternPlatform platform = new LanternPlatform();
 
+    // The config folder
+    private File configFolder;
+
+    // The plugins folder
+    private File pluginsFolder;
+
     // The channel registrar
     private LanternChannelRegistrar channelRegistrar;
 
@@ -153,6 +175,9 @@ public class LanternGame implements Game {
     // The chunk load service
     private LanternChunkLoadService chunkLoadService;
 
+    // The serialization service 
+    private LanternSerializationService serializationService;
+
     // The config service
     private ConfigService configService;
 
@@ -165,6 +190,9 @@ public class LanternGame implements Game {
     // The folder where the worlds are saved
     private File rootWorldFolder;
 
+    // The global config
+    private LanternConfig<GlobalConfig> globalConfig;
+
     // The current game state
     private GameState gameState = GameState.CONSTRUCTION;
 
@@ -175,7 +203,20 @@ public class LanternGame implements Game {
         game = this;
     }
 
-    public void initialize(LanternServer server, File configFolder, File pluginsFolder, File rootWorldFolder) {
+    public void preInitialize() {
+        this.configFolder = new File(CONFIG_FOLDER);
+        this.pluginsFolder = new File(PLUGINS_FOLDER);
+
+        // Pre register some game objects
+        this.gameRegistry = new LanternGameRegistry(this);
+        this.gameRegistry.preRegisterGameObjects();
+
+        // Create the global config
+        this.globalConfig = new LanternConfig<>(new GlobalConfig(),
+                new File(this.configFolder, GLOBAL_CONFIG).toPath());
+    }
+
+    public void initialize(LanternServer server, File rootWorldFolder) {
         this.rootWorldFolder = rootWorldFolder;
         this.server = server;
 
@@ -187,7 +228,6 @@ public class LanternGame implements Game {
 
         // Register the game objects
         this.gameDictionary = new LanternGameDictionary();
-        this.gameRegistry = new LanternGameRegistry(this);
         this.gameRegistry.registerGameObjects();
 
         // Create the plugin manager instance
@@ -209,9 +249,15 @@ public class LanternGame implements Game {
         }
 
         // Create the chunk load service
-        this.chunkLoadService = new LanternChunkLoadService();
+        this.chunkLoadService = new LanternChunkLoadService(this.globalConfig);
         if (!this.registerService(ChunkLoadService.class, this.chunkLoadService)) {
             throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ChunkLoadService!");
+        }
+
+        // Create the chunk serialization manager
+        this.serializationService = new LanternSerializationService();
+        if (!this.registerService(SerializationManager.class, this.serializationService)) {
+            throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern SerializationManager!");
         }
 
         // Register the game profile resolver
@@ -291,6 +337,15 @@ public class LanternGame implements Game {
      */
     public PluginContainer getPlugin() {
         return this.minecraft;
+    }
+
+    /**
+     * Gets the global configuration.
+     * 
+     * @return the global configuration
+     */
+    public LanternConfig<GlobalConfig> getGlobalConfig() {
+        return this.globalConfig;
     }
 
     @Override
@@ -387,5 +442,28 @@ public class LanternGame implements Game {
      */
     public LanternChannelRegistrar getChannelRegistrar() {
         return this.channelRegistrar;
+    }
+
+    @Override
+    public SerializationManager getSerializationService() {
+        return this.serializationService;
+    }
+
+    @Override
+    public PropertyRegistry getPropertyRegistry() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DataManipulatorRegistry getManipulatorRegistry() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ImmutableDataRegistry getImmutableDataRegistry() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

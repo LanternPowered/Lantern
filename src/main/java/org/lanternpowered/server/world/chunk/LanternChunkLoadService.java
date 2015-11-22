@@ -27,9 +27,10 @@ package org.lanternpowered.server.world.chunk;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.lanternpowered.server.configuration.LanternConfig;
+import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.world.ChunkLoadService;
 import org.spongepowered.api.world.World;
 
@@ -38,12 +39,18 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 public class LanternChunkLoadService implements ChunkLoadService {
 
     private final Multimap<String, Callback> callbacks = HashMultimap.create();
+    private final LanternConfig<GlobalConfig> globalConfig;
+
+    public LanternChunkLoadService(LanternConfig<GlobalConfig> globalConfig) {
+        this.globalConfig = globalConfig;
+    }
 
     /**
      * Gets all the registered callbacks.
@@ -63,53 +70,12 @@ public class LanternChunkLoadService implements ChunkLoadService {
      * @return the maximum amount of tickets
      */
     public int getMaxTicketsForPlayer(UUID playerUUID) {
-        return 50;
-    }
-
-    /**
-     * Gets the maximum amount of tickets for the plugin per world.
-     * 
-     * @param plugin the plugin
-     * @return the maximum amount of tickets
-     */
-    public int getMaxTicketsForPlugin(Object plugin) {
-        return this.getMaxTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
-    }
-
-    /**
-     * Gets the maximum amount of tickets for the plugin per world.
-     * 
-     * @param plugin the plugin
-     * @return the maximum amount of tickets
-     */
-    public int getMaxTicketsForPlugin(String plugin) {
-        return 100;
-    }
-
-    /**
-     * Gets the maximum amount of forced chunks each ticket of the plugin can contain.
-     * 
-     * @param plugin the plugin
-     * @return the maximum amount of forced chunks
-     */
-    public int getMaxChunksForPluginTicket(Object plugin) {
-        return this.getMaxChunksForPluginTicket(checkPlugin(plugin, "plugin").getId());
-    }
-
-    /**
-     * Gets the maximum amount of forced chunks each ticket of the plugin can contain.
-     * 
-     * @param plugin the plugin
-     * @return the maximum amount of forced chunks
-     */
-    public int getMaxChunksForPluginTicket(String plugin) {
-        return 32;
+        return 500;
     }
 
     @Override
     public void registerCallback(Object plugin, Callback callback) {
-        PluginContainer container = checkPlugin(plugin, "plugin");
-        this.callbacks.put(container.getId(), checkNotNull(callback, "callback"));
+        this.callbacks.put(checkPlugin(plugin, "plugin").getId(), checkNotNull(callback, "callback"));
     }
 
     @Override
@@ -134,13 +100,15 @@ public class LanternChunkLoadService implements ChunkLoadService {
 
     @Override
     public int getMaxTickets(Object plugin) {
-        return this.getMaxTicketsForPlugin(checkPlugin(plugin, "plugin"));
+        return this.globalConfig.getBase().getChunkLoadingTickets(
+                checkPlugin(plugin, "plugin").getId()).getMaximumTicketCount();
     }
 
     @Override
     public int getAvailableTickets(Object plugin, World world) {
-        final LanternWorld world0 = (LanternWorld) checkNotNull(world, "world");
-        return this.getMaxTicketsForPlugin(world0) - world0.getChunkManager().getTicketsForPlugin(plugin);
+        final LanternChunkManager chunkManager = ((LanternWorld) checkNotNull(world, "world")).getChunkManager();
+        final String pluginId = checkPlugin(plugin, "plugin").getId();
+        return chunkManager.getMaxTicketsForPlugin(pluginId) - chunkManager.getTicketsForPlugin(pluginId);
     }
 
     @Override

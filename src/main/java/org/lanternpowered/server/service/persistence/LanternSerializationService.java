@@ -36,12 +36,12 @@ import org.lanternpowered.server.configuration.DataSerializableTypeSerializer;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.service.persistence.DataBuilder;
-import org.spongepowered.api.service.persistence.SerializationService;
+import org.spongepowered.api.service.persistence.SerializationManager;
 
 import java.util.Map;
 import java.util.Optional;
 
-public class LanternSerializationService implements SerializationService {
+public class LanternSerializationService implements SerializationManager {
 
     static {
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(DataSerializable.class),

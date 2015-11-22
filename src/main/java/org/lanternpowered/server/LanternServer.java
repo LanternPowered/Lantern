@@ -35,7 +35,6 @@ import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.security.KeyPair;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -43,8 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.lanternpowered.server.LanternServerConfig.Setting;
-import org.lanternpowered.server.LanternServerConfig.Settings;
+import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -79,7 +77,6 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class LanternServer implements Server {
@@ -119,34 +116,27 @@ public class LanternServer implements Server {
             // Initialize the console manager (setup basic logging)
             consoleManager.init();
 
-            // Parse launch arguments
-            final LanternServerConfig config = parseArguments(args);
-            if (config == null) {
-                return;
-            }
-
             // Create the game instance
             final LanternGame game = new LanternGame();
+            game.preInitialize();
 
             // Start the console (command input/completer)
             consoleManager.start(game);
 
             // Create the server instance
-            final LanternServer server = new LanternServer(game, config, consoleManager);
+            final LanternServer server = new LanternServer(game, consoleManager);
 
             // Send some startup info
             LanternGame.log().info("Starting Lantern Server (Minecraft: {} (Protocol: {}))",
                     LanternMinecraftVersion.CURRENT.getName(),
                     LanternMinecraftVersion.CURRENT.getProtocol()); 
 
-            // Load the config file
-            config.load();
-
-            final File pluginsFolder = new File(config.get(Settings.PLUGINS_FOLDER));
-            final File rootWorldFolder = new File(config.get(Settings.ROOT_WORLD));
+            // The root world folder
+            final File worldFolder = new File(game.getGlobalConfig().getBase()
+                    .getWorld().getWorldFolder());
 
             // Initialize the game
-            game.initialize(server, config.getFolder(), pluginsFolder, rootWorldFolder);
+            game.initialize(server, worldFolder);
 
             // Bind the network channel
             server.bind();
@@ -179,94 +169,6 @@ public class LanternServer implements Server {
         }
     }
 
-    private static LanternServerConfig parseArguments(String[] args) throws IOException {
-        final Map<Setting<?>, Object> parameters = Maps.newHashMap();
-
-        String configDirName = "config";
-        String configFileName = "lantern.json";
-
-        // Calculate acceptable parameters
-        for (int i = 0; i < args.length; i++) {
-            final String opt = args[i];
-
-            if (!opt.startsWith("-")) {
-                LanternGame.log().warn("Ignored invalid option: " + opt);
-                continue;
-            }
-
-            // Help and version
-            if ("--help".equals(opt) || "-h".equals(opt) || "-?".equals(opt)) {
-                LanternGame.log().info("Available command-line options:");
-                LanternGame.log().info("  --help, -h, -?                 Shows this help message and exits.");
-                LanternGame.log().info("  --version, -v                  Shows version information and exits.");
-                LanternGame.log().info("  --config-dir <directory>       Sets the configuration directory.");
-                LanternGame.log().info("  --config-file <file>           Sets the configuration file.");
-                LanternGame.log().info("  --port, -p <port>              Sets the server listening port.");
-                LanternGame.log().info("  --host, -H <ip | hostname>     Sets the server listening address.");
-                LanternGame.log().info("  --onlinemode, -o <onlinemode>  Sets the server's online-mode.");
-                LanternGame.log().info("  --jline <true/false>           Enables or disables JLine console.");
-                LanternGame.log().info("  --plugins-dir, -P <directory>  Sets the plugin directory to use.");
-                LanternGame.log().info("  --update-dir, -U <directory>   Sets the plugin update folder to use.");
-                LanternGame.log().info("  --max-players, -M <director>   Sets the maximum amount of players.");
-                LanternGame.log().info("  --world-name, -N <name>        Sets the root world name.");
-                LanternGame.log().info("  --log-pattern, -L <pattern>    Sets the log file pattern (%D for date).");
-                return null;
-            } else if ("--version".equals(opt) || "-v".equals(opt)) {
-                LanternGame.log().info("Lantern version:   {}", LanternServer.class.getPackage().getImplementationVersion());
-                LanternGame.log().info("SpongeAPI version: {}", LanternServer.class.getPackage().getSpecificationVersion());
-                LanternGame.log().info("Minecraft version: {} (protocol: {})", LanternMinecraftVersion.CURRENT.getName(),
-                        LanternMinecraftVersion.CURRENT.getProtocol());
-                return null;
-            }
-
-            // Below this point, options require parameters
-            if (i == args.length - 1) {
-                LanternGame.log().warn("Ignored option specified without value: " + opt);
-                continue;
-            }
-
-            switch (opt) {
-                case "--config-dir":
-                    configDirName = args[++i];
-                    break;
-                case "--config-file":
-                    configFileName = args[++i];
-                    break;
-                case "--port":
-                case "-p":
-                    parameters.put(Settings.SERVER_PORT, Integer.valueOf(args[++i]));
-                    break;
-                case "--host":
-                case "-H":
-                    parameters.put(Settings.SERVER_IP, args[++i]);
-                    break;
-                case "--onlinemode":
-                case "-o":
-                    parameters.put(Settings.ONLINE_MODE, Boolean.valueOf(args[++i]));
-                    break;
-                case "--plugins-dir":
-                case "-P":
-                    parameters.put(Settings.PLUGINS_FOLDER, args[++i]);
-                    break;
-                case "--max-players":
-                case "-M":
-                    parameters.put(Settings.MAX_PLAYERS, Integer.valueOf(args[++i]));
-                    break;
-                case "--world-name":
-                case "-N":
-                    parameters.put(Settings.ROOT_WORLD, args[++i]);
-                    break;
-                default:
-                    LanternGame.log().warn("Ignored invalid option: " + opt);
-            }
-        }
-
-        final File configDir = new File(configDirName);
-        final File configFile = new File(configDir, configFileName);
-
-        return new LanternServerConfig(configDir, configFile, parameters);
-    }
-
     // The executor service for the server ticks
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
             runnable -> new Thread(runnable, "server"));
@@ -280,9 +182,6 @@ public class LanternServer implements Server {
     // The key pair used for authentication
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
 
-    // The settings
-    private final LanternServerConfig config;
-
     // The game instance
     private final LanternGame game;
 
@@ -295,34 +194,34 @@ public class LanternServer implements Server {
     // The amount of ticks the server is running
     private final AtomicInteger runningTimeTicks = new AtomicInteger(0);
 
-    private Text motd;
     private Favicon favicon;
     private boolean onlineMode;
     private boolean whitelist;
 
     private volatile boolean shuttingDown;
 
-    public LanternServer(LanternGame game, LanternServerConfig config, ConsoleManager consoleManager) {
+    public LanternServer(LanternGame game, ConsoleManager consoleManager) {
         this.consoleManager = consoleManager;
-        this.config = config;
         this.game = game;
     }
 
     public void bind() throws BindException {
-        SocketAddress address;
+        final SocketAddress address;
 
-        String ip = this.config.get(Settings.SERVER_IP);
-        int port = this.config.get(Settings.SERVER_PORT);
+        final GlobalConfig config = this.game.getGlobalConfig().getBase();
+        final String ip = config.getServer().getIp();
+        final int port = config.getServer().getPort();
+
         if (ip.isEmpty()) {
             address = new InetSocketAddress(port);
         } else {
             address = new InetSocketAddress(ip, port);
         }
 
-        ChannelFuture future = this.networkManager.init(address);
-        Channel channel = future.awaitUninterruptibly().channel();
+        final ChannelFuture future = this.networkManager.init(address);
+        final Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
-            Throwable cause = future.cause();
+            final Throwable cause = future.cause();
             if (cause instanceof BindException) {
                 throw (BindException) cause;
             }
@@ -343,13 +242,14 @@ public class LanternServer implements Server {
         this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game, 
                 GameState.SERVER_STARTING));
 
-        this.maxPlayers = this.config.get(Settings.MAX_PLAYERS);
-        this.motd = Texts.json().fromUnchecked(this.config.get(Settings.MOTD));
+        final GlobalConfig config = this.game.getGlobalConfig().getBase();
+        this.maxPlayers = config.getServer().getMaxPlayers();
+        this.onlineMode = config.getServer().isOnlineMode();
 
-        File file = new File(this.config.get(Settings.FAVICON));
-        if (file.exists()) {
+        final File faviconFile = new File(config.getServer().getFavicon());
+        if (faviconFile.exists()) {
             try {
-                this.favicon = LanternFavicon.load(file.toPath());
+                this.favicon = LanternFavicon.load(faviconFile.toPath());
             } catch (IOException e) {
                 LanternGame.log().error("Failed to load the favicon", e);
             }
@@ -555,7 +455,7 @@ public class LanternServer implements Server {
 
     @Override
     public Text getMotd() {
-        return this.motd;
+        return this.game.getGlobalConfig().getBase().getServer().getMotd();
     }
 
     @Override

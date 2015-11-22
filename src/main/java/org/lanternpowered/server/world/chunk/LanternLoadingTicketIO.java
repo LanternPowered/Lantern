@@ -181,7 +181,7 @@ public class LanternLoadingTicketIO {
                 continue;
             }
 
-            int maxNumChunks = service.getMaxChunksForPluginTicket(holderName);
+            final int maxNumChunks = chunkManager.getMaxChunksForPluginTicket(holderName);
 
             List<DataView> ticketEntries = ticketHolder.getViewList(TICKETS).get();
             for (DataView ticketEntry : ticketEntries) {

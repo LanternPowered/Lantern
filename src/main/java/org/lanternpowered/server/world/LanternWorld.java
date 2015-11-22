@@ -37,6 +37,8 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.component.BaseComponentHolder;
+import org.lanternpowered.server.configuration.LanternConfig;
+import org.lanternpowered.server.configuration.LanternConfig.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.effect.LanternViewer;
@@ -146,6 +148,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The dimension instance attached to this world
     private final Dimension dimension;
 
+    // The world configuration
+    private final LanternConfig<WorldConfig> worldConfig;
+
     // The properties of this world
     final LanternWorldProperties properties;
 
@@ -154,7 +159,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private volatile Context worldContext;
 
-    public LanternWorld(LanternGame game, File worldFolder, LanternWorldProperties properties) {
+    public LanternWorld(LanternGame game, LanternConfig<WorldConfig> worldConfig, File worldFolder,
+            LanternWorldProperties properties) {
+        this.worldConfig = worldConfig;
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
@@ -174,7 +181,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Create a new world generator
         final WorldGenerator worldGenerator = properties.generatorType.createGenerator(this);
         // Finally, create the chunk manager
-        this.chunkManager = new LanternChunkManager(this.game, this, chunkLoadService,
+        this.chunkManager = new LanternChunkManager(this.game, this, this.worldConfig, chunkLoadService,
                 chunkIOService, worldGenerator, worldFolder);
     }
 

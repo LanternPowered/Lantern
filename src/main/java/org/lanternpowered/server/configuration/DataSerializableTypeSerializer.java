@@ -38,7 +38,7 @@ import org.spongepowered.api.data.translator.ConfigurateTranslator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.service.persistence.DataBuilder;
-import org.spongepowered.api.service.persistence.SerializationService;
+import org.spongepowered.api.service.persistence.SerializationManager;
 
 /**
  * An implementation of {@link TypeSerializer} so that DataSerializables can be
@@ -49,7 +49,7 @@ public class DataSerializableTypeSerializer implements TypeSerializer<DataSerial
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public DataSerializable deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        Optional<SerializationService> serviceOpt = LanternGame.get().getServiceManager().provide(SerializationService.class);
+        Optional<SerializationManager> serviceOpt = LanternGame.get().getServiceManager().provide(SerializationManager.class);
         if (!serviceOpt.isPresent()) {
             throw new ObjectMappingException("No serialization service is present!");
         }

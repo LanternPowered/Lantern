@@ -48,6 +48,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.configuration.LanternConfig;
+import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
+import org.lanternpowered.server.configuration.LanternConfig.WorldConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -73,6 +76,9 @@ public final class LanternWorldManager {
     // The executor for async world manager operations
     private final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(
             runnable -> new Thread(runnable, "worlds-" + this.counter.getAndIncrement())));
+
+    // The name of the world configs
+    static final String WORLD_CONFIG = "world.conf";
 
     // The prefix used for (dimension) world folders
     static final String DIMENSION_PREFIX = "DIM";
@@ -124,6 +130,9 @@ public final class LanternWorldManager {
     // The folder of the root world
     private final File rootWorldFolder;
 
+    // The global configuration file
+    private final LanternConfig<GlobalConfig> globalConfig;
+
     // The game instance
     private final LanternGame game;
 
@@ -135,10 +144,11 @@ public final class LanternWorldManager {
      * Creates a new world manager.
      * 
      * @param game the game instance
-     * @param rootWorldFolder the folder of the root (default) world
+     * @param globalConfig the global configuration
      */
     public LanternWorldManager(LanternGame game, File rootWorldFolder) {
         this.rootWorldFolder = rootWorldFolder;
+        this.globalConfig = game.getGlobalConfig();
         this.game = game;
     }
 
@@ -486,6 +496,8 @@ public final class LanternWorldManager {
         this.addWorldProperties(worldProperties, worldFolder, dimensionId);
         // Save the world properties to reserve the world folder
         this.saveWorldProperties(worldProperties);
+        // Create already a config
+        this.getOrCreateWorldConfig(worldProperties);
         return Optional.of(worldProperties);
     }
 
@@ -540,8 +552,8 @@ public final class LanternWorldManager {
             return Optional.of(worldEntry.world);
         }
         // Create the world instance
-        final LanternWorld world = new LanternWorld(this.game, worldEntry.folder,
-                worldEntry.properties);
+        final LanternWorld world = new LanternWorld(this.game, this.getOrCreateWorldConfig(
+                worldEntry.properties), worldEntry.folder, worldEntry.properties);
         // Share the world instance
         worldEntry.world = world;
         worldEntry.properties.setWorld(world);
@@ -554,6 +566,18 @@ public final class LanternWorldManager {
         // The world is ready for ticks
         this.addWorldTask(world);
         return Optional.of(world);
+    }
+
+    /**
+     * Gets or creates a new world config for the specified world.
+     * 
+     * @param worldProperties the world properties
+     * @return the world config
+     */
+    LanternConfig<WorldConfig> getOrCreateWorldConfig(WorldProperties worldProperties) {
+        return new LanternConfig<>(new LanternConfig.WorldConfig(this.globalConfig.getBase()),
+                this.globalConfig.getPath().getParent().resolve("worlds/" + worldProperties.getWorldName()
+                        + "/" + WORLD_CONFIG));
     }
 
     /**

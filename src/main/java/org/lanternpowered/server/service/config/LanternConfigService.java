@@ -28,10 +28,10 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import java.io.File;
 
-import org.spongepowered.api.service.config.ConfigRoot;
-import org.spongepowered.api.service.config.ConfigService;
+import org.spongepowered.api.config.ConfigManager;
+import org.spongepowered.api.config.ConfigRoot;
 
-public class LanternConfigService implements ConfigService {
+public class LanternConfigService implements ConfigManager {
 
     private final File configRoot;
 

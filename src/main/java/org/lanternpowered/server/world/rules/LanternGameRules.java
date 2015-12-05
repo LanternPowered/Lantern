@@ -107,7 +107,7 @@ public final class LanternGameRules implements GameRules {
 
         @Override
         public <T> void set(T object) {
-            this.set(object, Cause.empty());
+            this.set(object, Cause.of());
         }
 
         @Override

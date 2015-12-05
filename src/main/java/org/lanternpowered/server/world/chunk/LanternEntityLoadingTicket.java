@@ -29,7 +29,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.service.world.ChunkLoadService.EntityLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 
 import com.flowpowered.math.vector.Vector2i;
 

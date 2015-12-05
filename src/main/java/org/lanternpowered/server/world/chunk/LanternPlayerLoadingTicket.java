@@ -26,7 +26,7 @@ package org.lanternpowered.server.world.chunk;
 
 import java.util.UUID;
 
-import org.spongepowered.api.service.world.ChunkLoadService.PlayerLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 
 class LanternPlayerLoadingTicket extends LanternLoadingTicket implements PlayerLoadingTicket {
 

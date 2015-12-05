@@ -53,10 +53,10 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.chunk.ForcedChunkEvent;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.world.ChunkLoadService.EntityLoadingTicket;
-import org.spongepowered.api.service.world.ChunkLoadService.LoadingTicket;
-import org.spongepowered.api.service.world.ChunkLoadService.PlayerEntityLoadingTicket;
-import org.spongepowered.api.service.world.ChunkLoadService.PlayerLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -123,7 +123,7 @@ public final class LanternChunkManager {
     private final ChunkIOService chunkIOService;
 
     // The chunk load (ticket) service
-    private final LanternChunkLoadService chunkLoadService;
+    private final LanternChunkTicketManager chunkLoadService;
 
     // The world folder
     private final File worldFolder;
@@ -135,6 +135,9 @@ public final class LanternChunkManager {
                 buffer.detach();
                 return buffer;
             });
+
+    // The block buffers that will be reused
+    private final ThreadLocal<ChunkBlockBuffer> blockBuffer = ThreadLocal.withInitial(ChunkBlockBuffer::new);
 
     // The world generator
     private volatile WorldGenerator worldGenerator;
@@ -151,7 +154,7 @@ public final class LanternChunkManager {
      * @param worldFolder the world data folder
      */
     public LanternChunkManager(LanternGame game, LanternWorld world, LanternConfig<WorldConfig> worldConfig,
-            LanternChunkLoadService chunkLoadService, ChunkIOService chunkIOService,
+            LanternChunkTicketManager chunkLoadService, ChunkIOService chunkIOService,
             WorldGenerator worldGenerator, File worldFolder) {
         this.chunkLoadService = chunkLoadService;
         this.chunkIOService = chunkIOService;
@@ -535,7 +538,8 @@ public final class LanternChunkManager {
         final ImmutableBiomeArea immutableBiomeArea = biomeBuffer.getImmutableBiomeCopy();
         chunk.initializeBiomes(biomeBuffer.detach());
 
-        final ChunkBlockBuffer blockBuffer = new ChunkBlockBuffer(chunk.getX(), chunk.getZ());
+        final ChunkBlockBuffer blockBuffer = this.blockBuffer.get();
+        blockBuffer.reuse(new Vector3i(chunk.getX() << 4, 0, chunk.getZ() << 4));
 
         // Apply the main world generator
         final GeneratorPopulator baseGenerator = this.worldGenerator.getBaseGeneratorPopulator();
@@ -606,8 +610,17 @@ public final class LanternChunkManager {
         private final short[][] types = new short[CHUNK_SECTIONS][CHUNK_SECTION_VOLUME];
         private final int[] nonAirCount = new int[CHUNK_SECTIONS];
 
-        protected ChunkBlockBuffer(int chunkX, int chunkZ) {
-            super(new Vector3i(chunkX << 4 , 0, chunkZ << 4), CHUNK_SIZE);
+        protected ChunkBlockBuffer() {
+            super(new Vector3i(0 , 0, 0), CHUNK_SIZE);
+        }
+
+        public void reuse(Vector3i start) {
+            this.start = checkNotNull(start, "start");
+            this.end = this.start.add(this.size).sub(Vector3i.ONE);
+            for (int i = 0; i < CHUNK_SECTIONS; i++) {
+                Arrays.fill(this.types[i], (short) 0);
+            }
+            Arrays.fill(this.nonAirCount, 0);
         }
 
         @Override
@@ -617,13 +630,14 @@ public final class LanternChunkManager {
             final int sy = y >> 4;
             final int index = ((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf;
             final short[] types = this.types[sy];
-            final int type = game.getRegistry().getBlockRegistry()
+            final short type = game.getRegistry().getBlockRegistry()
                     .getInternalStateId(block);
             if (type == 0 && types[index] != 0) {
                 this.nonAirCount[sy]--;
             } else if (type != 0 && types[index] == 0) {
                 this.nonAirCount[sy]++;
             }
+            types[index] = type;
         }
 
         @Override

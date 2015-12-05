@@ -63,11 +63,6 @@ public final class LanternPluginContainer implements PluginContainer {
         return this.instance;
     }
 
-    /**
-     * Gets the logger of the plugin.
-     * 
-     * @return the logger
-     */
     public Logger getLogger() {
         return LoggerFactory.getLogger(this.id);
     }

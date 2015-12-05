@@ -26,6 +26,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import java.util.Collection;
 import java.util.List;
+
 import gnu.trove.TCollections;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
@@ -33,11 +34,11 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
-import org.lanternpowered.server.game.LanternGameProfile.Property;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries.Entry;
+import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.spongepowered.api.text.Text;
 
 public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTabListEntries> {

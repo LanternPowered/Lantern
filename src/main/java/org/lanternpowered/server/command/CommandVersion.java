@@ -30,8 +30,8 @@ import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.spec.CommandSpec;
 
 public final class CommandVersion implements Command {
 

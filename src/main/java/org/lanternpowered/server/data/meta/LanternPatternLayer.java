@@ -36,8 +36,8 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.type.BannerPatternShape;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.service.persistence.DataBuilder;
-import org.spongepowered.api.service.persistence.InvalidDataException;
+import org.spongepowered.api.util.persistence.DataBuilder;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 
 public final class LanternPatternLayer implements PatternLayer {
 

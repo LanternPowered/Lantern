@@ -36,8 +36,8 @@ import org.lanternpowered.server.inject.Injectors;
 import org.lanternpowered.server.inject.MethodSpec;
 import org.lanternpowered.server.inject.Modules;
 import org.lanternpowered.server.inject.ParameterSpec;
-
 import org.spongepowered.api.Game;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -123,13 +123,8 @@ public class BaseComponentHolder implements ComponentHolder {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Component> Collection<T> getAllComponents(Class<T> type) {
-        ImmutableList.Builder<T> builder = ImmutableList.builder();
-        for (Component component : this.components.values()) {
-            if (type.isInstance(component)) {
-                builder.add((T) component);
-            }
-        }
-        return builder.build();
+        return this.components.values().stream().filter(component -> type.isInstance(component))
+                .map(component -> (T) component).collect(GuavaCollectors.toImmutableList());
     }
 
     @SuppressWarnings("unchecked")

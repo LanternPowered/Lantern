@@ -26,9 +26,9 @@ package org.lanternpowered.server.console;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Iterator;
 import java.util.Optional;
 
+import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.permission.SubjectBase;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -37,10 +37,10 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.source.ConsoleSource;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.ConsoleSource;
 
-public final class LanternConsoleSource extends SubjectBase implements ConsoleSource {
+public final class LanternConsoleSource extends SubjectBase implements AbstractCommandSource, ConsoleSource {
 
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
 
@@ -56,24 +56,8 @@ public final class LanternConsoleSource extends SubjectBase implements ConsoleSo
 
     @SuppressWarnings("deprecation")
     @Override
-    public void sendMessage(Text... messages) {
-        for (Text message : messages) {
-            if (message != null) {
-                LanternGame.log().info(Texts.legacy().to(message));
-            }
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void sendMessage(Iterable<Text> messages) {
-        Iterator<Text> it = messages.iterator();
-        while (it.hasNext()) {
-            Text message = it.next();
-            if (message != null) {
-                LanternGame.log().info(Texts.legacy().to(message));
-            }
-        }
+    public void sendMessage(Text message) {
+        LanternGame.log().info(Texts.legacy().to(message));
     }
 
     @Override

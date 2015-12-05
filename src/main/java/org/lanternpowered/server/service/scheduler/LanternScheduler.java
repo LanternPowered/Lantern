@@ -38,13 +38,13 @@ import java.util.regex.Pattern;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.scheduler.SchedulerService;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Scheduler;
+import org.spongepowered.api.scheduler.Task;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFutureTask;
 
-public class LanternScheduler implements SchedulerService {
+public class LanternScheduler implements Scheduler {
 
     private static final LanternScheduler INSTANCE = new LanternScheduler();
 

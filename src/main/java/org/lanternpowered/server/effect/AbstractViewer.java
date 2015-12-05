@@ -24,21 +24,26 @@
  */
 package org.lanternpowered.server.effect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.Lists;
+import com.google.common.collect.ImmutableList;
 
-public interface LanternViewer extends Viewer {
+public interface AbstractViewer extends Viewer {
 
     @Override
-    default void sendMessage(ChatType type, Text... messages) {
-        this.sendMessage(type, Lists.newArrayList(checkNotNull(messages, "messages")));
+    default void sendMessages(ChatType type, Iterable<Text> messages) {
+        for (Text message : messages) {
+            this.sendMessage(type, message);
+        }
+    }
+
+    @Override
+    default void sendMessages(ChatType type, Text... messages) {
+        this.sendMessages(type, ImmutableList.copyOf(messages));
     }
 
     @Override

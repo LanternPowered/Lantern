@@ -129,7 +129,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
             sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
             return;
         }
-        LanternGame.get().getCommandDispatcher().process(source, payload);
+        LanternGame.get().getCommandManager().process(source, payload);
         sendLargeResponse(ctx, requestId, source.flush());
     }
 

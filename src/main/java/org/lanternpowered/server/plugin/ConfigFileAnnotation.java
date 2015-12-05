@@ -28,7 +28,7 @@ import java.lang.annotation.Annotation;
 
 import com.google.common.base.MoreObjects;
 
-import org.spongepowered.api.service.config.DefaultConfig;
+import org.spongepowered.api.config.DefaultConfig;
 
 @SuppressWarnings("all")
 public class ConfigFileAnnotation implements DefaultConfig {

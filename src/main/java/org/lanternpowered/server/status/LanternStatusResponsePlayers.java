@@ -26,8 +26,8 @@ package org.lanternpowered.server.status;
 
 import java.util.List;
 
-import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
+import org.spongepowered.api.profile.GameProfile;
 
 import com.google.common.collect.ImmutableList;
 

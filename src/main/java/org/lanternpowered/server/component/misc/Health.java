@@ -32,6 +32,7 @@ import org.lanternpowered.server.inject.Inject;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.HealEntityEvent;
 
@@ -126,10 +127,11 @@ public final class Health implements Component {
      * damage and a specific cause.
      * 
      * @param damage the damage
+     * @param damageSource the source of damage
      * @param cause the cause
      * @return whether it was successful
      */
-    public boolean damage(double damage, Cause cause) {
+    public boolean damage(double damage, DamageSource damageSource, Cause cause) {
         if (this.holder instanceof Entity) {
             // TODO: Damage modifiers, etc.
             DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(LanternGame.get(),

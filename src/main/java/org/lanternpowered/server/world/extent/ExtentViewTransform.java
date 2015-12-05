@@ -52,7 +52,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.service.persistence.InvalidDataException;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
@@ -230,9 +230,12 @@ public class ExtentViewTransform implements AbstractExtent {
                 this.inverseTransform.transformZ(x, y, z)), direction, propertyClass);
     }
 
-    /**
-     * TODO: Use true/false as default notifyNeighbors setting?
-     */
+    @Override
+    public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
+        return this.extent.getFacesWithProperty(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), propertyClass);
+    }
+
     @Override
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
         this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform

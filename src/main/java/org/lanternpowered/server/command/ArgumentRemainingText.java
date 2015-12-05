@@ -28,11 +28,11 @@ import java.util.List;
 
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.ArgumentParseException;
-import org.spongepowered.api.util.command.args.CommandArgs;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.args.CommandElement;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.ArgumentParseException;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.CommandElement;
 
 import com.google.common.collect.Lists;
 

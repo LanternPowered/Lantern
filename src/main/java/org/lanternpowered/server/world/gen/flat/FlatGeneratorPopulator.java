@@ -44,8 +44,11 @@ public final class FlatGeneratorPopulator implements GeneratorPopulator {
     private final BlockState[] blockStateCache;
 
     public FlatGeneratorPopulator(FlatGeneratorSettings settings, LanternGeneratorType generatorType) {
+        this(settings, checkNotNull(generatorType, "generatorType").getGeneratorHeight());
+    }
+
+    public FlatGeneratorPopulator(FlatGeneratorSettings settings, int generatorHeight) {
         checkNotNull(settings, "settings");
-        checkNotNull(generatorType, "generatorType");
 
         List<BlockState> blockStates = Lists.newArrayList();
         for (FlatLayer layer : settings.getLayers()) {
@@ -55,8 +58,8 @@ public final class FlatGeneratorPopulator implements GeneratorPopulator {
             }
         }
 
-        if (blockStates.size() > generatorType.getGeneratorHeight()) {
-            blockStates = blockStates.subList(0, generatorType.getGeneratorHeight());
+        if (blockStates.size() > generatorHeight) {
+            blockStates = blockStates.subList(0, generatorHeight);
         }
 
         this.blockStateCache = blockStates.toArray(new BlockState[] {});

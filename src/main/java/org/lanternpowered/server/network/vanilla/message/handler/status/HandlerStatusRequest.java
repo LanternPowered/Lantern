@@ -41,11 +41,11 @@ import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusResponse;
 import org.lanternpowered.server.status.LanternStatusResponsePlayers;
 import org.lanternpowered.server.text.gson.JsonTextRepresentation;
-import org.spongepowered.api.GameProfile;
+import org.spongepowered.api.network.status.Favicon;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
-import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 

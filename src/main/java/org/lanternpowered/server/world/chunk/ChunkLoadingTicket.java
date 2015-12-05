@@ -24,7 +24,7 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import org.spongepowered.api.service.world.ChunkLoadService.LoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
 
 public interface ChunkLoadingTicket extends LoadingTicket {
 

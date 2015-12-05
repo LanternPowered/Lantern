@@ -22,40 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.status;
+package org.lanternpowered.server.command;
 
-import java.net.InetSocketAddress;
-import java.util.Optional;
+import java.util.Iterator;
 
-import javax.annotation.Nullable;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.text.Text;
 
-import org.spongepowered.api.MinecraftVersion;
-import org.spongepowered.api.network.status.StatusClient;
+public interface AbstractCommandSource extends CommandSource {
 
-public class LanternStatusClient implements StatusClient {
-
-    private final InetSocketAddress address;
-    private final Optional<InetSocketAddress> virtualHost;
-    private final MinecraftVersion version;
-
-    public LanternStatusClient(InetSocketAddress address, MinecraftVersion version, @Nullable InetSocketAddress virtualHost) {
-        this.virtualHost = Optional.ofNullable(virtualHost);
-        this.address = address;
-        this.version = version;
+    @Override
+    default void sendMessages(Text... messages) {
+        for (Text message : messages) {
+            if (message != null) {
+                this.sendMessage(message);
+            }
+        }
     }
 
     @Override
-    public InetSocketAddress getAddress() {
-        return this.address;
-    }
-
-    @Override
-    public MinecraftVersion getVersion() {
-        return this.version;
-    }
-
-    @Override
-    public Optional<InetSocketAddress> getVirtualHost() {
-        return this.virtualHost;
+    default void sendMessages(Iterable<Text> messages) {
+        Iterator<Text> it = messages.iterator();
+        while (it.hasNext()) {
+            Text message = it.next();
+            if (message != null) {
+                this.sendMessage(message);
+            }
+        }
     }
 }

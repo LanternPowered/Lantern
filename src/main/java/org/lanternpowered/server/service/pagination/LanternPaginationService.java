@@ -25,7 +25,7 @@
 package org.lanternpowered.server.service.pagination;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-import static org.spongepowered.api.util.command.args.GenericArguments.integer;
+import static org.spongepowered.api.command.args.GenericArguments.integer;
 
 import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
@@ -40,15 +40,15 @@ import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.args.ArgumentParseException;
-import org.spongepowered.api.util.command.args.CommandArgs;
-import org.spongepowered.api.util.command.args.CommandContext;
-import org.spongepowered.api.util.command.args.CommandElement;
-import org.spongepowered.api.util.command.spec.CommandExecutor;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.ArgumentParseException;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 
 import java.util.List;
 import java.util.Map;
@@ -99,7 +99,7 @@ public class LanternPaginationService implements PaginationService {
 
     void registerCommandOnce() {
         if (this.commandRegistered.compareAndSet(false, true)) {
-            this.game.getCommandDispatcher().register(LanternGame.plugin(), CommandSpec.builder()
+            this.game.getCommandManager().register(LanternGame.plugin(), CommandSpec.builder()
                     .description(t("Helper command for paginations occurring"))
                     .arguments(new ActivePaginationCommandElement(t("pagination-id")))
                     .child(CommandSpec.builder()

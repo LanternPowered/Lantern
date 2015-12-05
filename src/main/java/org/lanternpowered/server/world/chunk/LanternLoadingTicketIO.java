@@ -47,8 +47,8 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.service.world.ChunkLoadService.EntityLoadingTicket;
-import org.spongepowered.api.service.world.ChunkLoadService.PlayerLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
@@ -150,7 +150,7 @@ public class LanternLoadingTicketIO {
         os.close();
     }
 
-    static Multimap<String, LanternLoadingTicket> load(File worldFolder, LanternChunkManager chunkManager, LanternChunkLoadService service) throws IOException {
+    static Multimap<String, LanternLoadingTicket> load(File worldFolder, LanternChunkManager chunkManager, LanternChunkTicketManager service) throws IOException {
         Multimap<String, LanternLoadingTicket> tickets = HashMultimap.create();
 
         File file = new File(worldFolder, TICKETS_FILE);

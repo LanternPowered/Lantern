@@ -60,7 +60,7 @@ public class ConsoleCommandCompleter implements Completer {
 
         final String input = buffer;
         Future<List<String>> tabComplete = this.game.getScheduler().callSync(() ->
-                game.getCommandDispatcher().getSuggestions(LanternConsoleSource.INSTANCE, input));
+                this.game.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, input));
 
         try {
             List<String> completions = tabComplete.get();

@@ -24,8 +24,8 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.optional;
-import static org.spongepowered.api.util.command.args.GenericArguments.string;
+import static org.spongepowered.api.command.args.GenericArguments.optional;
+import static org.spongepowered.api.command.args.GenericArguments.string;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -42,13 +42,13 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.command.CommandCallable;
-import org.spongepowered.api.util.command.CommandException;
-import org.spongepowered.api.util.command.CommandMapping;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.source.ConsoleSource;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandMapping;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.command.spec.CommandSpec;
 
 import java.util.TreeSet;
 
@@ -72,7 +72,7 @@ public final class CommandHelp implements Command {
                 .executor((src, args) -> {
                     Optional<String> command = args.getOne("command");
                     if (command.isPresent()) {
-                        Optional<? extends CommandMapping> mapping = game.getCommandDispatcher().get(command.get());
+                        Optional<? extends CommandMapping> mapping = game.getCommandManager().get(command.get());
                         if (mapping.isPresent()) {
                             CommandCallable callable = mapping.get().getCallable();
                             Optional<? extends Text> desc = callable.getHelp(src);
@@ -87,7 +87,7 @@ public final class CommandHelp implements Command {
                     }
 
                     TreeSet<CommandMapping> commands = new TreeSet<CommandMapping>(comparator);
-                    commands.addAll(Collections2.filter(game.getCommandDispatcher().getAll().values(),
+                    commands.addAll(Collections2.filter(game.getCommandManager().getAll().values(),
                             input -> input.getCallable().testPermission(src)));
 
                     // Console sources cannot see/use the pagination
@@ -103,7 +103,7 @@ public final class CommandHelp implements Command {
                         builder.sendTo(src);
                     } else {
                         src.sendMessage(title);
-                        src.sendMessage(lines);
+                        src.sendMessages(lines);
                     }
                     return CommandResult.success();
                 }).build();

@@ -37,8 +37,8 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.translator.ConfigurateTranslator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataSerializable;
-import org.spongepowered.api.service.persistence.DataBuilder;
-import org.spongepowered.api.service.persistence.SerializationManager;
+import org.spongepowered.api.util.persistence.DataBuilder;
+import org.spongepowered.api.util.persistence.SerializationManager;
 
 /**
  * An implementation of {@link TypeSerializer} so that DataSerializables can be

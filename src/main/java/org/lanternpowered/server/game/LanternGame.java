@@ -38,14 +38,14 @@ import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
+import org.lanternpowered.server.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.service.config.LanternConfigService;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.persistence.LanternSerializationService;
-import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.service.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.world.LanternTeleportHelper;
-import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
+import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
@@ -59,20 +59,20 @@ import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
+import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.SimpleServiceManager;
-import org.spongepowered.api.service.command.CommandService;
-import org.spongepowered.api.service.command.SimpleCommandService;
-import org.spongepowered.api.service.config.ConfigService;
-import org.spongepowered.api.service.event.EventManager;
+import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.command.SimpleCommandManager;
+import org.spongepowered.api.config.ConfigManager;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.service.persistence.SerializationManager;
-import org.spongepowered.api.service.profile.GameProfileResolver;
-import org.spongepowered.api.service.scheduler.SchedulerService;
+import org.spongepowered.api.util.persistence.SerializationManager;
+import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.service.sql.SqlService;
-import org.spongepowered.api.service.world.ChunkLoadService;
-import org.spongepowered.api.util.command.dispatcher.SimpleDispatcher;
+import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
+import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.TeleportHelper;
 
 public class LanternGame implements Game {
@@ -173,13 +173,13 @@ public class LanternGame implements Game {
     private LanternScheduler scheduler;
 
     // The chunk load service
-    private LanternChunkLoadService chunkLoadService;
+    private LanternChunkTicketManager chunkLoadService;
 
     // The serialization service 
     private LanternSerializationService serializationService;
 
     // The config service
-    private ConfigService configService;
+    private ConfigManager configService;
 
     // The teleport helper
     private TeleportHelper teleportHelper;
@@ -238,19 +238,19 @@ public class LanternGame implements Game {
 
         // Register the config service
         this.configService = new LanternConfigService(configFolder);
-        if (!this.registerService(ConfigService.class, this.configService)) {
+        if (!this.registerService(ConfigManager.class, this.configService)) {
             throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ConfigService!");
         }
 
         // Create the scheduler
         this.scheduler = new LanternScheduler();
-        if (!this.registerService(SchedulerService.class, this.scheduler)) {
+        if (!this.registerService(Scheduler.class, this.scheduler)) {
             throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern Scheduler!");
         }
 
         // Create the chunk load service
-        this.chunkLoadService = new LanternChunkLoadService(this.globalConfig);
-        if (!this.registerService(ChunkLoadService.class, this.chunkLoadService)) {
+        this.chunkLoadService = new LanternChunkTicketManager(this.globalConfig);
+        if (!this.registerService(ChunkTicketManager.class, this.chunkLoadService)) {
             throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ChunkLoadService!");
         }
 
@@ -261,15 +261,15 @@ public class LanternGame implements Game {
         }
 
         // Register the game profile resolver
-        this.registerService(GameProfileResolver.class, new LanternGameProfileResolver());
+        this.registerService(GameProfileManager.class, new LanternGameProfileResolver());
 
         // Register the pagination service
         this.registerService(PaginationService.class, new LanternPaginationService(this));
 
         // Register the command service
-        SimpleCommandService commandService = new SimpleCommandService(this, log(),
+        SimpleCommandManager commandService = new SimpleCommandManager(this, log(),
                 SimpleDispatcher.FIRST_DISAMBIGUATOR); // TODO: Use custom disambiguator like in sponge
-        if (this.registerService(CommandService.class, commandService)) {
+        if (this.registerService(CommandManager.class, commandService)) {
             commandService.register(this.minecraft, new CommandStop(this).build(), "stop", "shutdown");
             commandService.register(this.minecraft, new CommandHelp(this).build(), "help", "?");
             // TODO: Use a different plugin for this command?
@@ -393,8 +393,8 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public CommandService getCommandDispatcher() {
-        return this.serviceManager.provideUnchecked(CommandService.class);
+    public CommandManager getCommandManager() {
+        return this.serviceManager.provideUnchecked(CommandManager.class);
     }
 
     @Override
@@ -422,16 +422,12 @@ public class LanternGame implements Game {
      * 
      * @return the chunk load service
      */
-    public LanternChunkLoadService getChunkLoadService() {
+    public LanternChunkTicketManager getChunkTicketManager() {
         return this.chunkLoadService;
     }
 
-    /**
-     * Gets the {@link ConfigService}.
-     * 
-     * @return the config service
-     */
-    public ConfigService getConfigService() {
+    @Override
+    public ConfigManager getConfigManager() {
         return this.configService;
     }
 
@@ -445,7 +441,7 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public SerializationManager getSerializationService() {
+    public SerializationManager getSerializationManager() {
         return this.serializationService;
     }
 

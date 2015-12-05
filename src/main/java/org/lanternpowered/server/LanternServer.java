@@ -49,7 +49,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
-import org.lanternpowered.server.service.profile.LanternGameProfileResolver;
+import org.lanternpowered.server.profile.LanternGameProfileResolver;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
@@ -57,19 +57,19 @@ import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.network.status.Favicon;
+import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
-import org.spongepowered.api.service.profile.GameProfileResolver;
 import org.spongepowered.api.service.sql.SqlService;
-import org.spongepowered.api.service.world.ChunkLoadService;
-import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
-import org.spongepowered.api.util.command.CommandSource;
-import org.spongepowered.api.util.command.source.ConsoleSource;
+import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.storage.ChunkLayout;
@@ -509,7 +509,7 @@ public class LanternServer implements Server {
         });
 
         // Shutdown the game profile resolver if possible
-        this.game.getServiceManager().provide(GameProfileResolver.class).ifPresent(gameProfileResolver -> {
+        this.game.getServiceManager().provide(GameProfileManager.class).ifPresent(gameProfileResolver -> {
             if (gameProfileResolver instanceof LanternGameProfileResolver) {
                 ((LanternGameProfileResolver) gameProfileResolver).shutdown();
             }
@@ -529,8 +529,8 @@ public class LanternServer implements Server {
     }
 
     @Override
-    public ChunkLoadService getChunkLoadService() {
-        return this.game.getChunkLoadService();
+    public ChunkTicketManager getChunkTicketManager() {
+        return this.game.getChunkTicketManager();
     }
 
     @Override
@@ -541,6 +541,12 @@ public class LanternServer implements Server {
 
     @Override
     public Optional<ResourcePack> getDefaultResourcePack() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public GameProfileManager getGameProfileManager() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -75,6 +75,7 @@ import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.LanternItemRegistry;
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.LanternTextFactory;
@@ -102,7 +103,6 @@ import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -120,11 +120,15 @@ import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.StoneTypes;
+import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.ai.task.AITaskType;
+import org.spongepowered.api.entity.ai.task.AbstractAITask;
+import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.animal.Horse;
 import org.spongepowered.api.entity.living.monster.Zombie;
@@ -133,6 +137,8 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
+import org.spongepowered.api.network.status.Favicon;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
@@ -142,7 +148,6 @@ import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.statistic.TeamStatistic;
-import org.spongepowered.api.status.Favicon;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
@@ -1131,5 +1136,17 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public ExtentBufferFactory getExtentBufferFactory() {
         return LanternExtentBufferFactory.INSTANCE;
+    }
+
+    @Override
+    public AITaskType registerAITaskType(Object plugin, String id, String name, Class<? extends AbstractAITask<? extends Agent>> aiClass) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public ValueFactory getValueFactory() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

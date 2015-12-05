@@ -31,7 +31,7 @@ import org.lanternpowered.server.configuration.LanternConfig;
 import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.service.world.ChunkLoadService;
+import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3i;
@@ -43,12 +43,12 @@ import com.google.common.collect.Multimap;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
-public class LanternChunkLoadService implements ChunkLoadService {
+public class LanternChunkTicketManager implements ChunkTicketManager {
 
     private final Multimap<String, Callback> callbacks = HashMultimap.create();
     private final LanternConfig<GlobalConfig> globalConfig;
 
-    public LanternChunkLoadService(LanternConfig<GlobalConfig> globalConfig) {
+    public LanternChunkTicketManager(LanternConfig<GlobalConfig> globalConfig) {
         this.globalConfig = globalConfig;
     }
 

@@ -32,12 +32,12 @@ import java.util.UUID;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
-import org.lanternpowered.server.game.LanternGameProfile.Property;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.object.VarInt;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
+import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.lanternpowered.server.util.UUIDHelper;
 
 import com.google.common.collect.Lists;

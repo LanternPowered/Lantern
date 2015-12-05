@@ -30,7 +30,7 @@ import java.util.Optional;
 
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
-import org.spongepowered.api.status.Favicon;
+import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.text.Text;
 
 public class LanternStatusResponse implements ClientPingServerEvent.Response {
@@ -96,5 +96,4 @@ public class LanternStatusResponse implements ClientPingServerEvent.Response {
     public Players getPlayerSafely() {
         return this.players;
     }
-
 }

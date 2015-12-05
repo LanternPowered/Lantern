@@ -31,8 +31,9 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 
-import org.lanternpowered.server.effect.LanternViewer;
-import org.lanternpowered.server.entity.LanternEntityHuman;
+import org.lanternpowered.server.command.AbstractCommandSource;
+import org.lanternpowered.server.effect.AbstractViewer;
+import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -40,12 +41,12 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.permission.SubjectBase;
 import org.lanternpowered.server.text.title.LanternTitles;
-import org.spongepowered.api.GameProfile;
 import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.tab.TabList;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -60,12 +61,11 @@ import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandSource;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.Lists;
 
-public class LanternPlayer extends LanternEntityHuman implements Player, LanternViewer {
+public class LanternPlayer extends LanternEntityHumanoid implements Player, AbstractViewer, AbstractCommandSource {
 
     // We cannot extend the subject base directly, so we have to forward the methods
     private final SubjectBase permissionSubject = new SubjectBase() {
@@ -205,24 +205,15 @@ public class LanternPlayer extends LanternEntityHuman implements Player, Lantern
     }
 
     @Override
-    public void sendMessage(ChatType type, Iterable<Text> messages) {
-        checkNotNull(messages, "messages");
+    public void sendMessage(ChatType type, Text message) {
+        checkNotNull(message, "message");
         checkNotNull(type, "type");
-        for (Text message : messages) {
-            if (message != null) {
-                this.session.send(new MessagePlayOutChatMessage(message, type));
-            }
-        }
+        this.session.send(new MessagePlayOutChatMessage(message, type));
     }
 
     @Override
-    public void sendMessage(Text... messages) {
-        this.sendMessage(Lists.newArrayList(checkNotNull(messages, "messages")));
-    }
-
-    @Override
-    public void sendMessage(Iterable<Text> messages) {
-        this.sendMessage(ChatTypes.CHAT, checkNotNull(messages, "messages"));
+    public void sendMessage(Text message) {
+        this.sendMessage(ChatTypes.CHAT, message);
     }
 
     @Override

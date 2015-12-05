@@ -32,7 +32,7 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Task;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;

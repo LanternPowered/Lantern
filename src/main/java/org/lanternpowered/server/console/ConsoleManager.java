@@ -197,7 +197,7 @@ public class ConsoleManager {
                         if (!command.isEmpty()) {
                             final String runCommand = command;
                             this.game.getScheduler().createTaskBuilder().execute(() -> {
-                                LanternGame.get().getCommandDispatcher().process(
+                                LanternGame.get().getCommandManager().process(
                                         LanternConsoleSource.INSTANCE, runCommand);
                             }).submit(LanternGame.plugin());
                         }

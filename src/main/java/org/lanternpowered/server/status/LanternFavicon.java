@@ -39,7 +39,7 @@ import java.nio.file.Path;
 
 import javax.imageio.ImageIO;
 
-import org.spongepowered.api.status.Favicon;
+import org.spongepowered.api.network.status.Favicon;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;

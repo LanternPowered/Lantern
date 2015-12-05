@@ -26,15 +26,16 @@ package org.lanternpowered.server.network.rcon;
 
 import java.util.Optional;
 
+import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.permission.SubjectBase;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.command.CommandSource;
 
-public class RconSource extends SubjectBase implements org.spongepowered.api.util.command.source.RconSource {
+public class RconSource extends SubjectBase implements AbstractCommandSource, org.spongepowered.api.command.source.RconSource {
 
     private final StringBuffer buffer = new StringBuffer();
     private final RconConnection connection;
@@ -52,17 +53,8 @@ public class RconSource extends SubjectBase implements org.spongepowered.api.uti
     }
 
     @Override
-    public void sendMessage(Text... messages) {
-        for (Text message : messages) {
-            this.buffer.append(Texts.toPlain(message)).append('\n');
-        }
-    }
-
-    @Override
-    public void sendMessage(Iterable<Text> messages) {
-        for (Text message : messages) {
-            this.buffer.append(Texts.toPlain(message)).append('\n');
-        }
+    public void sendMessage(Text message) {
+        this.buffer.append(Texts.toPlain(message)).append('\n');
     }
 
     @Override
@@ -114,5 +106,4 @@ public class RconSource extends SubjectBase implements org.spongepowered.api.uti
     @Override
     public void setMessageSink(MessageSink sink) {
     }
-
 }

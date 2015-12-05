@@ -27,6 +27,7 @@ package org.lanternpowered.server.entity;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -45,7 +46,8 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.service.persistence.InvalidDataException;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -395,18 +397,24 @@ public class LanternEntity extends BaseComponentHolder implements Entity {
     }
 
     @Override
-    public boolean damage(double damage, Cause cause) {
-        Optional<Health> health = this.getComponent(Health.class);
-        if (health.isPresent()) {
-            return health.get().damage(damage, cause);
-        }
-        return false;
-    }
-
-    @Override
     public Collection<Property<?, ?>> getApplicableProperties() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public Random getRandom() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public boolean damage(double damage, DamageSource damageSource, Cause cause) {
+        Optional<Health> health = this.getComponent(Health.class);
+        if (health.isPresent()) {
+            return health.get().damage(damage, damageSource, cause);
+        }
+        return false;
     }
 
 }

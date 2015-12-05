@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.chunk;
 import java.util.UUID;
 
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.service.world.ChunkLoadService.PlayerEntityLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
 
 class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implements PlayerEntityLoadingTicket {
 

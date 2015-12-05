@@ -70,7 +70,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.service.persistence.InvalidDataException;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
@@ -85,6 +85,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SIZE;
@@ -269,7 +270,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      */
     private int lowerHeightMap(int x, int y, int z) {
         for (--y; y >= 0; --y) {
-            if (getType(x, z, y) != 0) {
+            if (this.getType(x, y, z) != 0) {
                 break;
             }
         }
@@ -829,6 +830,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
         builder.addAll(this.getBlock(x, y, z).getApplicableProperties());
         this.getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
         return builder.build();
+    }
+
+    @Override
+    public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override

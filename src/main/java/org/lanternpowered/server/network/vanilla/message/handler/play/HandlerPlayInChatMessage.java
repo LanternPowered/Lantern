@@ -52,7 +52,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             return;
         }
         if (message0.startsWith("/")) {
-            LanternGame.get().getCommandDispatcher().process(player, message1);
+            LanternGame.get().getCommandManager().process(player, message1);
         } else {
             Translation translation = LanternGame.get().getRegistry().getTranslationManager().get("chat.type.text");
             Object displayName = player.getName(); // TODO: player.getDisplayNameData().displayName().get();

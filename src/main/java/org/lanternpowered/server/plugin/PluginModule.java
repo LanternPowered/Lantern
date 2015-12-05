@@ -37,9 +37,9 @@ import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.service.ServiceManager;
-import org.spongepowered.api.service.config.ConfigDir;
-import org.spongepowered.api.service.config.DefaultConfig;
-import org.spongepowered.api.service.event.EventManager;
+import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.event.EventManager;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -102,7 +102,7 @@ public final class PluginModule extends AbstractModule {
 
         @Override
         public Path get() {
-            return this.game.getConfigService().getPluginConfig(this.container).getDirectory();
+            return this.game.getConfigManager().getPluginConfig(this.container).getDirectory();
         }
     }
 
@@ -119,7 +119,7 @@ public final class PluginModule extends AbstractModule {
 
         @Override
         public Path get() {
-            return this.game.getConfigService().getPluginConfig(this.container).getConfigPath();
+            return this.game.getConfigManager().getPluginConfig(this.container).getConfigPath();
         }
     }
 
@@ -136,7 +136,7 @@ public final class PluginModule extends AbstractModule {
 
         @Override
         public Path get() {
-            return this.game.getConfigService().getSharedConfig(this.container).getConfigPath();
+            return this.game.getConfigManager().getSharedConfig(this.container).getConfigPath();
         }
     }
 
@@ -153,7 +153,7 @@ public final class PluginModule extends AbstractModule {
 
         @Override
         public ConfigurationLoader<CommentedConfigurationNode> get() {
-            return this.game.getConfigService().getSharedConfig(this.container).getConfig();
+            return this.game.getConfigManager().getSharedConfig(this.container).getConfig();
         }
     }
 
@@ -170,7 +170,7 @@ public final class PluginModule extends AbstractModule {
 
         @Override
         public ConfigurationLoader<CommentedConfigurationNode> get() {
-            return this.game.getConfigService().getPluginConfig(this.container).getConfig();
+            return this.game.getConfigManager().getPluginConfig(this.container).getConfig();
         }
     }
 

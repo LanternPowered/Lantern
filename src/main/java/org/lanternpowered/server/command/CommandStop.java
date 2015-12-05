@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.spongepowered.api.util.command.args.GenericArguments.optional;
+import static org.spongepowered.api.command.args.GenericArguments.optional;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.command.CommandResult;
-import org.spongepowered.api.util.command.spec.CommandSpec;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.spec.CommandSpec;
 
 public final class CommandStop implements Command {
 

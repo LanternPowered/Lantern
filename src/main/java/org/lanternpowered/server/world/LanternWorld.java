@@ -41,7 +41,7 @@ import org.lanternpowered.server.configuration.LanternConfig;
 import org.lanternpowered.server.configuration.LanternConfig.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
-import org.lanternpowered.server.effect.LanternViewer;
+import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
@@ -52,7 +52,7 @@ import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.chunk.LanternChunk;
-import org.lanternpowered.server.world.chunk.LanternChunkLoadService;
+import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
@@ -81,7 +81,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.service.persistence.InvalidDataException;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.title.Title;
@@ -114,7 +114,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
-public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, LanternViewer {
+public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, AbstractViewer {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -167,7 +167,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Create the chunk io service
         final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder);
         // Get the chunk load service
-        final LanternChunkLoadService chunkLoadService = game.getChunkLoadService();
+        final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type
         final LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) properties.getDimensionType();
         // Create the weather universe if needed
@@ -460,6 +460,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(x & 0xf, y, z & 0xf, propertyClass);
     }
@@ -703,14 +709,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public void sendMessage(ChatType type, Iterable<Text> messages) {
-        checkNotNull(type, "chatType");
-        checkNotNull(messages, "messages");
+    public void sendMessage(ChatType type, Text message) {
         List<LanternPlayer> players = this.getPlayers();
         if (!players.isEmpty()) {
-            List<Message> networkMessages = Lists.newArrayList();
-            messages.forEach(message -> networkMessages.add(new MessagePlayOutChatMessage(message, type)));
-            players.forEach(player -> player.getConnection().sendAll(networkMessages));
+            Message netwMessage = new MessagePlayOutChatMessage(message, type);
+            for (LanternPlayer player : players) {
+                player.getConnection().send(netwMessage);
+            }
         }
     }
 

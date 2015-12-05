@@ -44,7 +44,7 @@ import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.event.EventManager;
+import org.spongepowered.api.event.EventManager;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;

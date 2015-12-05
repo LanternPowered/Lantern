@@ -28,7 +28,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.scheduler.Task;
+import org.spongepowered.api.scheduler.Task;
 
 import com.google.common.base.MoreObjects;
 

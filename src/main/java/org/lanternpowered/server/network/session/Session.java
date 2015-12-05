@@ -45,7 +45,6 @@ import javax.crypto.SecretKey;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternGameProfile;
 import org.lanternpowered.server.network.message.AsyncHelper;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
@@ -59,6 +58,7 @@ import org.lanternpowered.server.network.vanilla.message.type.compression.Messag
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;

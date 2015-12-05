@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.service.profile;
+package org.lanternpowered.server.profile;
 
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -40,11 +40,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.lanternpowered.server.game.LanternGameProfile;
-import org.lanternpowered.server.game.LanternGameProfile.Property;
+import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.lanternpowered.server.util.UUIDHelper;
-import org.spongepowered.api.GameProfile;
-import org.spongepowered.api.service.profile.GameProfileResolver;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.GameProfileManager;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -61,7 +60,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public final class LanternGameProfileResolver implements GameProfileResolver {
+public final class LanternGameProfileResolver implements GameProfileManager {
 
     private final AtomicInteger counter = new AtomicInteger();
     private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(

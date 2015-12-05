@@ -43,9 +43,9 @@ import org.spongepowered.api.world.extent.StorageType;
 @NonnullByDefault
 public abstract class AbstractBlockBuffer implements BlockVolume {
 
-    protected final Vector3i start;
-    protected final Vector3i size;
-    protected final Vector3i end;
+    protected Vector3i start;
+    protected Vector3i size;
+    protected Vector3i end;
 
     private final int yLine;
     private final int yzSlice;

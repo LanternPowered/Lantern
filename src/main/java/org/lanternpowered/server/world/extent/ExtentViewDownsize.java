@@ -35,6 +35,7 @@ import java.util.function.Predicate;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -55,7 +56,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.service.persistence.InvalidDataException;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
@@ -191,12 +192,15 @@ public class ExtentViewDownsize implements AbstractExtent {
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
         this.checkRange(x, y, z);
-        return this.extent.getProperty(new Vector3i(x, y, z), direction, propertyClass);
+        return this.extent.getProperty(x, y, z, direction, propertyClass);
     }
 
-    /**
-     * TODO: Use true/false as default notifyNeighbors setting?
-     */
+    @Override
+    public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
+        this.checkRange(x, y, z);
+        return this.extent.getFacesWithProperty(x, y, z, propertyClass);
+    }
+
     @Override
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
         this.checkRange(x, y, z);

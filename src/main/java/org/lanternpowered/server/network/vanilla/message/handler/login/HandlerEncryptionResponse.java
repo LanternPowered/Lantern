@@ -43,14 +43,14 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternGameProfile;
-import org.lanternpowered.server.game.LanternGameProfile.Property;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
+import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.lanternpowered.server.util.UUIDHelper;
 
 import com.google.common.collect.Lists;

@@ -35,8 +35,8 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.lanternpowered.server.configuration.DataSerializableTypeSerializer;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.service.persistence.DataBuilder;
-import org.spongepowered.api.service.persistence.SerializationManager;
+import org.spongepowered.api.util.persistence.DataBuilder;
+import org.spongepowered.api.util.persistence.SerializationManager;
 
 import java.util.Map;
 import java.util.Optional;

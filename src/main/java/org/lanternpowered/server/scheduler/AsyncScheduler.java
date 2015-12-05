@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.service.scheduler;
+package org.lanternpowered.server.scheduler;
 
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -49,12 +49,7 @@ public class AsyncScheduler extends SchedulerBase {
     AsyncScheduler() {
         super(ScheduledTask.TaskSynchronicity.ASYNCHRONOUS);
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mainLoop();
-            }
-        });
+        Thread thread = new Thread(AsyncScheduler.this::mainLoop);
         thread.setName("Lantern Async Scheduler Thread");
         thread.setDaemon(true);
         thread.start();

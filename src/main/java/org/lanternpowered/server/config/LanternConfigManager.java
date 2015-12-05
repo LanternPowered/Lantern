@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.service.config;
+package org.lanternpowered.server.config;
 
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
@@ -31,11 +31,11 @@ import java.io.File;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.ConfigRoot;
 
-public class LanternConfigService implements ConfigManager {
+public class LanternConfigManager implements ConfigManager {
 
     private final File configRoot;
 
-    public LanternConfigService(File configRoot) {
+    public LanternConfigManager(File configRoot) {
         this.configRoot = configRoot;
     }
 

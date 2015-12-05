@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -101,6 +102,24 @@ public final class LanternGameProfile implements GameProfile {
         return this.properties;
     }
 
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || other.getClass() != this.getClass()) {
+            return false;
+        }
+        final LanternGameProfile o = (LanternGameProfile) other;
+        return this.name.equals(o.name) && this.uniqueId.equals(o.uniqueId) &&
+                this.properties.equals(o.properties);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.uniqueId, this.name, this.properties);
+    }
+
     public static class LanternDataBuilder implements DataBuilder<GameProfile> {
 
         // Why use both the optional and data exception?
@@ -161,6 +180,24 @@ public final class LanternGameProfile implements GameProfile {
         @Nullable
         public String getSignature() {
             return this.signature;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other) {
+                return true;
+            }
+            if (other == null || other.getClass() != this.getClass()) {
+                return false;
+            }
+            final Property o = (Property) other;
+            return this.name.equals(o.name) && this.value.equals(o.value) && Objects.equals(
+                    this.signature, o.signature);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.name, this.value, this.signature);
         }
     }
 }

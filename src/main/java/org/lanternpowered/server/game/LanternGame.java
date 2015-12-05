@@ -32,18 +32,18 @@ import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
+import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.configuration.LanternConfig;
 import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
-import org.lanternpowered.server.profile.LanternGameProfileResolver;
-import org.lanternpowered.server.service.config.LanternConfigService;
+import org.lanternpowered.server.profile.LanternGameProfileManager;
+import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
-import org.lanternpowered.server.service.persistence.LanternSerializationService;
-import org.lanternpowered.server.service.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.sql.LanternSqlService;
+import org.lanternpowered.server.util.persistence.LanternSerializationService;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
@@ -59,7 +59,6 @@ import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
-import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.SimpleServiceManager;
@@ -69,10 +68,8 @@ import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.util.persistence.SerializationManager;
-import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
-import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.TeleportHelper;
 
 public class LanternGame implements Game {
@@ -154,6 +151,9 @@ public class LanternGame implements Game {
     // The server
     private LanternServer server;
 
+    // The game profile manager
+    private LanternGameProfileManager gameProfileManager;
+
     // The plugin manager
     private LanternPluginManager pluginManager;
 
@@ -173,13 +173,13 @@ public class LanternGame implements Game {
     private LanternScheduler scheduler;
 
     // The chunk load service
-    private LanternChunkTicketManager chunkLoadService;
+    private LanternChunkTicketManager chunkTicketManager;
 
     // The serialization service 
     private LanternSerializationService serializationService;
 
-    // The config service
-    private ConfigManager configService;
+    // The config manager
+    private ConfigManager configManager;
 
     // The teleport helper
     private TeleportHelper teleportHelper;
@@ -237,22 +237,13 @@ public class LanternGame implements Game {
         this.serviceManager = new SimpleServiceManager(this.pluginManager);
 
         // Register the config service
-        this.configService = new LanternConfigService(configFolder);
-        if (!this.registerService(ConfigManager.class, this.configService)) {
-            throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ConfigService!");
-        }
+        this.configManager = new LanternConfigManager(this.configFolder);
 
         // Create the scheduler
         this.scheduler = new LanternScheduler();
-        if (!this.registerService(Scheduler.class, this.scheduler)) {
-            throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern Scheduler!");
-        }
 
         // Create the chunk load service
-        this.chunkLoadService = new LanternChunkTicketManager(this.globalConfig);
-        if (!this.registerService(ChunkTicketManager.class, this.chunkLoadService)) {
-            throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern ChunkLoadService!");
-        }
+        this.chunkTicketManager = new LanternChunkTicketManager(this.globalConfig);
 
         // Create the chunk serialization manager
         this.serializationService = new LanternSerializationService();
@@ -261,7 +252,7 @@ public class LanternGame implements Game {
         }
 
         // Register the game profile resolver
-        this.registerService(GameProfileManager.class, new LanternGameProfileResolver());
+        this.gameProfileManager = new LanternGameProfileManager();
 
         // Register the pagination service
         this.registerService(PaginationService.class, new LanternPaginationService(this));
@@ -418,26 +409,35 @@ public class LanternGame implements Game {
     }
 
     /**
-     * Gets the {@link ChunkLoadService}.
+     * Gets the {@link LanternChunkTicketManager}.
      * 
-     * @return the chunk load service
+     * @return the chunk ticket manager
      */
     public LanternChunkTicketManager getChunkTicketManager() {
-        return this.chunkLoadService;
+        return this.chunkTicketManager;
     }
 
     @Override
     public ConfigManager getConfigManager() {
-        return this.configService;
+        return this.configManager;
     }
 
     /**
-     * Gets the {@link LanternChannelRegistrarOld}.
+     * Gets the {@link LanternChannelRegistrar}.
      * 
      * @return the channel registrar
      */
     public LanternChannelRegistrar getChannelRegistrar() {
         return this.channelRegistrar;
+    }
+
+    /**
+     * Gets the {@link LanternGameProfileManager}.
+     * 
+     * @return the game profile manager
+     */
+    public LanternGameProfileManager getGameProfileManager() {
+        return this.gameProfileManager;
     }
 
     @Override

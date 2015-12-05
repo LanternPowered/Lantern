@@ -44,6 +44,7 @@ import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.lanternpowered.server.util.UUIDHelper;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
+import org.spongepowered.api.profile.ProfileNotFoundException;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -60,7 +61,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-public final class LanternGameProfileResolver implements GameProfileManager {
+public final class LanternGameProfileManager implements GameProfileManager {
 
     private final AtomicInteger counter = new AtomicInteger();
     private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(
@@ -69,7 +70,6 @@ public final class LanternGameProfileResolver implements GameProfileManager {
 
     private final LoadingCache<UUID, GameProfile> profileCache = 
             CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<UUID, GameProfile>() {
-
                 @Override
                 public GameProfile load(UUID key) throws Exception {
                     return new GetProfile(key).call();
@@ -77,7 +77,6 @@ public final class LanternGameProfileResolver implements GameProfileManager {
             });
     private final LoadingCache<String, UUID> uuidByNameCache = 
             CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<String, UUID>() {
-
                 @Override
                 public UUID load(String key) throws Exception {
                     return new GetUUID(Sets.newHashSet(key)).call().get(key);
@@ -221,7 +220,7 @@ public final class LanternGameProfileResolver implements GameProfileManager {
 
                 // Can be empty if the unique id invalid is
                 if (is.available() == 0) {
-                    return null;
+                    throw new ProfileNotFoundException("Failed to find game profile with uuid: " + this.uniqueId);
                 }
 
                 int attempts = 0;
@@ -230,7 +229,8 @@ public final class LanternGameProfileResolver implements GameProfileManager {
                 if (json.has("error")) {
                     // If it fails too many times, just leave it
                     if (++attempts > 6) {
-                        return null;
+                        throw new ProfileNotFoundException(
+                                "Failed to retrieve the game profile after 6 attempts: " + this.uniqueId);
                     }
                     // Too many requests, lets wait for 10 seconds
                     Thread.sleep(10000);

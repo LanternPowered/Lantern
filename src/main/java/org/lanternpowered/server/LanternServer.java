@@ -49,7 +49,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
-import org.lanternpowered.server.profile.LanternGameProfileResolver;
+import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
@@ -510,8 +510,8 @@ public class LanternServer implements Server {
 
         // Shutdown the game profile resolver if possible
         this.game.getServiceManager().provide(GameProfileManager.class).ifPresent(gameProfileResolver -> {
-            if (gameProfileResolver instanceof LanternGameProfileResolver) {
-                ((LanternGameProfileResolver) gameProfileResolver).shutdown();
+            if (gameProfileResolver instanceof LanternGameProfileManager) {
+                ((LanternGameProfileManager) gameProfileResolver).shutdown();
             }
         });
 
@@ -547,7 +547,6 @@ public class LanternServer implements Server {
 
     @Override
     public GameProfileManager getGameProfileManager() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.game.getGameProfileManager();
     }
 }

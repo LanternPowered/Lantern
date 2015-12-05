@@ -22,48 +22,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.service.config;
+package org.lanternpowered.server.scheduler;
 
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
+public class SyncScheduler extends SchedulerBase {
 
-import org.spongepowered.api.config.ConfigRoot;
+    // The number of ticks elapsed since this scheduler began.
+    private volatile long counter = 0L;
 
-import java.io.File;
-import java.nio.file.Path;
+    SyncScheduler() {
+        super(ScheduledTask.TaskSynchronicity.SYNCHRONOUS);
+    }
 
-/**
- * Root for lantern configurations.
- */
-public class LanternConfigRoot implements ConfigRoot {
-
-    private final String pluginName;
-    private final File baseDir;
-
-    public LanternConfigRoot(String pluginName, File baseDir) {
-        this.pluginName = pluginName;
-        this.baseDir = baseDir;
+    /**
+     * The hook to update the Ticks known by the SyncScheduler.
+     */
+    void tick() {
+        this.counter++;
+        this.runTick();
     }
 
     @Override
-    public Path getConfigPath() {
-        File configFile = new File(this.baseDir, this.pluginName + ".conf");
-        if (configFile.getParentFile().isDirectory()) {
-            configFile.getParentFile().mkdirs();
+    protected long getTimestamp(ScheduledTask task) {
+        if (task.getState() == ScheduledTask.ScheduledTaskState.WAITING) {
+            // The timestamp is based on the initial offset
+            if (task.delayIsTicks) {
+                return this.counter;
+            } else {
+                return super.getTimestamp(task);
+            }
+        } else if (task.getState().isActive) {
+            // The timestamp is based on the period
+            if (task.intervalIsTicks) {
+                return this.counter;
+            } else {
+                return super.getTimestamp(task);
+            }
         }
-        return configFile.toPath();
+        return 0L;
     }
 
     @Override
-    public ConfigurationLoader<CommentedConfigurationNode> getConfig() {
-        return HoconConfigurationLoader.builder()
-                .setPath(this.getConfigPath())
-                .build();
+    protected void executeTaskRunnable(Runnable runnable) {
+        runnable.run();
     }
 
-    @Override
-    public Path getDirectory() {
-        return this.baseDir.toPath();
-    }
 }

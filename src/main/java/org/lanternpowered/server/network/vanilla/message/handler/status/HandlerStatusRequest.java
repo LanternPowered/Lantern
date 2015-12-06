@@ -99,7 +99,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         JsonObject versionObject = new JsonObject();
         JsonObject playersObject = new JsonObject();
 
-        versionObject.addProperty("name", LanternGame.get().getPlatform().getName());
+        versionObject.addProperty("name", LanternGame.get().getPlatform().getImplementation().getName());
         versionObject.addProperty("protocol", ((LanternMinecraftVersion) version0).getProtocol());
 
         playersObject.addProperty("max", max);

@@ -92,12 +92,15 @@ public final class LanternPluginManager implements PluginManager {
     private final LanternGame game;
     private final File pluginsFolder;
 
-    public LanternPluginManager(LanternGame game, File pluginsFolder, PluginContainer minecraft) {
+    public LanternPluginManager(LanternGame game, File pluginsFolder,
+            PluginContainer... preInstalledPlugins) {
         this.pluginsFolder = checkNotNull(pluginsFolder, "pluginsFolder");
         this.game = checkNotNull(game, "game");
 
-        // Register the minecraft plugin (the actual server)
-        this.registerPlugin(checkNotNull(minecraft, "minecraft"));
+        // Register the inbuilt plugins
+        for (PluginContainer pluginContainer : preInstalledPlugins) {
+            this.registerPlugin(checkNotNull(pluginContainer, "pluginContainer"));
+        }
     }
 
     private void registerPlugin(PluginContainer plugin) {

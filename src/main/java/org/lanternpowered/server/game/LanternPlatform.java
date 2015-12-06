@@ -27,17 +27,32 @@ package org.lanternpowered.server.game;
 import java.util.Map;
 
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.plugin.PluginContainer;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class LanternPlatform implements Platform {
 
-    // The name of the platform
-    private final String name = "Lantern";
+    public static final String API_NAME = firstNonNull(Platform.class.getPackage()
+            .getSpecificationTitle(), LanternGame.API_NAME);
+    public static final String API_VERSION = firstNonNull(Platform.class.getPackage()
+            .getSpecificationVersion(), LanternGame.API_VERSION);
 
-    private final String apiVersion = MoreObjects.firstNonNull(LanternPlatform.class.getPackage().getSpecificationVersion(), "UNKNOWN");
-    private final String version = MoreObjects.firstNonNull(LanternPlatform.class.getPackage().getImplementationVersion(), "UNKNOWN");
+    public static final String IMPL_NAME = firstNonNull(LanternPlatform.class.getPackage()
+            .getSpecificationTitle(), LanternGame.IMPL_NAME);
+    public static final String IMPL_VERSION = firstNonNull(LanternPlatform.class.getPackage()
+            .getSpecificationVersion(), LanternGame.IMPL_VERSION);
+
+    private final PluginContainer apiContainer;
+    private final PluginContainer implContainer;
+
+    public LanternPlatform(PluginContainer apiContainer, PluginContainer implContainer) {
+        this.implContainer = implContainer;
+        this.apiContainer = apiContainer;
+    }
 
     @Override
     public Type getType() {
@@ -45,18 +60,13 @@ public class LanternPlatform implements Platform {
     }
 
     @Override
-    public String getName() {
-        return this.name;
+    public PluginContainer getApi() {
+        return this.apiContainer;
     }
 
     @Override
-    public String getVersion() {
-        return this.version;
-    }
-
-    @Override
-    public String getApiVersion() {
-        return this.apiVersion;
+    public PluginContainer getImplementation() {
+        return this.implContainer;
     }
 
     @Override
@@ -67,10 +77,10 @@ public class LanternPlatform implements Platform {
     @Override
     public Map<String, Object> asMap() {
         final Map<String, Object> map = Maps.newHashMap();
-        map.put("Name", this.getName());
+        map.put("Name", this.implContainer.getName());
         map.put("Type", this.getType());
-        map.put("ApiVersion", this.getApiVersion());
-        map.put("ImplementationVersion", this.getVersion());
+        map.put("ApiVersion", this.apiContainer.getVersion());
+        map.put("ImplementationVersion", this.implContainer.getVersion());
         map.put("MinecraftVersion", this.getMinecraftVersion());
         return map;
     }
@@ -85,8 +95,8 @@ public class LanternPlatform implements Platform {
         return MoreObjects.toStringHelper(this)
                 .add("type", this.getType())
                 .add("executionType", this.getExecutionType())
-                .add("version", this.getVersion())
-                .add("apiVersion", this.getApiVersion())
+                .add("version", this.implContainer.getVersion())
+                .add("apiVersion", this.apiContainer.getVersion())
                 .add("minecraftVersion", this.getMinecraftVersion())
                 .toString();
     }

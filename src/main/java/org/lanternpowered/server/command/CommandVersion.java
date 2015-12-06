@@ -58,10 +58,12 @@ public final class CommandVersion implements Command {
                 .permission("minecraft.command.version")
                 .description(Texts.of(this.description))
                 .executor((src, args) -> {
-                    src.sendMessage(Texts.of(minecraftVersion, LanternMinecraftVersion.CURRENT.getName(),
+                    src.sendMessage(Texts.of(this.minecraftVersion, LanternMinecraftVersion.CURRENT.getName(),
                             LanternMinecraftVersion.CURRENT.getProtocol()));
-                    src.sendMessage(Texts.of(apiVersion, game.getPlatform().getApiVersion()));
-                    src.sendMessage(Texts.of(implementationVersion, game.getPlatform().getVersion()));
+                    src.sendMessage(Texts.of(this.apiVersion, this.game.getPlatform()
+                            .getApi().getVersion()));
+                    src.sendMessage(Texts.of(this.implementationVersion, this.game.getPlatform()
+                            .getImplementation().getVersion()));
                     return CommandResult.success();
                 }).build();
     }

@@ -38,7 +38,9 @@ import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.LanternPluginManager;
+import org.lanternpowered.server.plugin.LanternServerContainer;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
+import org.lanternpowered.server.plugin.SpongeApiContainer;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
@@ -73,6 +75,14 @@ import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.world.TeleportHelper;
 
 public class LanternGame implements Game {
+
+    public static final String API_NAME = "SpongeAPI";
+    public static final String API_ID = "spongeapi";
+    public static final String API_VERSION = "DEV";
+
+    public static final String IMPL_NAME = "LanternServer";
+    public static final String IMPL_ID = "lanternserver";
+    public static final String IMPL_VERSION = "DEV";
 
     // The name of the config folder
     public static final String CONFIG_FOLDER = "config";
@@ -137,7 +147,7 @@ public class LanternGame implements Game {
     }
 
     // The platform
-    private final LanternPlatform platform = new LanternPlatform();
+    private LanternPlatform platform;
 
     // The config folder
     private File configFolder;
@@ -184,8 +194,10 @@ public class LanternGame implements Game {
     // The teleport helper
     private TeleportHelper teleportHelper;
 
-    // The minecraft plugin instance
+    // The inbuilt plugin containers
     private PluginContainer minecraft;
+    private PluginContainer apiContainer;
+    private PluginContainer implContainer;
 
     // The folder where the worlds are saved
     private File rootWorldFolder;
@@ -207,6 +219,12 @@ public class LanternGame implements Game {
         this.configFolder = new File(CONFIG_FOLDER);
         this.pluginsFolder = new File(PLUGINS_FOLDER);
 
+        // Create the inbuilt plugin containers and platform
+        this.minecraft = new MinecraftPluginContainer(this);
+        this.apiContainer = new SpongeApiContainer();
+        this.implContainer = new LanternServerContainer();
+        this.platform = new LanternPlatform(this.apiContainer, this.implContainer);
+
         // Pre register some game objects
         this.gameRegistry = new LanternGameRegistry(this);
         this.gameRegistry.preRegisterGameObjects();
@@ -223,15 +241,13 @@ public class LanternGame implements Game {
         // Create the channel registrar
         this.channelRegistrar =  new LanternChannelRegistrar(server);
 
-        // Create the plugin that represents minecraft
-        this.minecraft = new MinecraftPluginContainer(this);
-
         // Register the game objects
         this.gameDictionary = new LanternGameDictionary();
         this.gameRegistry.registerGameObjects();
 
         // Create the plugin manager instance
-        this.pluginManager = new LanternPluginManager(this, pluginsFolder, this.minecraft);
+        this.pluginManager = new LanternPluginManager(this, pluginsFolder, this.minecraft,
+                this.apiContainer, this.implContainer);
 
         // Create the service manager instance
         this.serviceManager = new SimpleServiceManager(this.pluginManager);

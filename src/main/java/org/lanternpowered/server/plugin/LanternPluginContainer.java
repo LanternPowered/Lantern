@@ -24,8 +24,8 @@
  */
 package org.lanternpowered.server.plugin;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Optional;
+
 import org.spongepowered.api.plugin.PluginContainer;
 
 public final class LanternPluginContainer implements PluginContainer {
@@ -59,12 +59,8 @@ public final class LanternPluginContainer implements PluginContainer {
     }
 
     @Override
-    public Object getInstance() {
-        return this.instance;
-    }
-
-    public Logger getLogger() {
-        return LoggerFactory.getLogger(this.id);
+    public Optional<Object> getInstance() {
+        return Optional.ofNullable(this.instance);
     }
 
     void setInstance(Object instance) {

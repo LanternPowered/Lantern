@@ -27,34 +27,28 @@ package org.lanternpowered.server.plugin;
 import java.util.Optional;
 
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.Game;
+import org.lanternpowered.server.game.LanternPlatform;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public final class MinecraftPluginContainer implements PluginContainer {
-
-    private final Game game;
-
-    public MinecraftPluginContainer(Game game) {
-        this.game = game;
-    }
+public final class SpongeApiContainer implements PluginContainer {
 
     @Override
     public String getId() {
-        return "minecraft";
+        return LanternGame.API_ID;
     }
 
     @Override
     public String getName() {
-        return "Minecraft";
+        return LanternPlatform.API_NAME;
     }
 
     @Override
     public String getVersion() {
-        return LanternGame.IMPL_VERSION;
+        return LanternPlatform.API_VERSION;
     }
 
     @Override
     public Optional<Object> getInstance() {
-        return Optional.of(this.game.getServer());
+        return Optional.of(LanternGame.get());
     }
 }

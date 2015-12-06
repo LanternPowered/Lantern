@@ -165,7 +165,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                     .append(127)
                     .append('\u0000')
                     // The version/name string of the server.
-                    .append(LanternGame.get().getPlatform().getName())
+                    .append(LanternGame.get().getPlatform().getImplementation().getName())
                     .append('\u0000')
                     // The motd of the server. In legacy format.
                     .append(motd0)

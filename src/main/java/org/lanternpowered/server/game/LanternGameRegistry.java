@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.game;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -161,6 +160,7 @@ import org.spongepowered.api.text.selector.SelectorTypes;
 import org.spongepowered.api.text.selector.Selectors;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.util.rotation.Rotations;
@@ -522,20 +522,20 @@ public class LanternGameRegistry implements GameRegistry {
 
     private void registerTextColors() {
         this.textColorRegistry.register(new LanternTextColor("black", Color.BLACK));
-        this.textColorRegistry.register(new LanternTextColor("dark_blue", new Color(0x0000AA)));
-        this.textColorRegistry.register(new LanternTextColor("dark_green", new Color(0x00AA00)));
-        this.textColorRegistry.register(new LanternTextColor("dark_aqua", new Color(0x00AAAA)));
-        this.textColorRegistry.register(new LanternTextColor("dark_red", new Color(0xAA0000)));
-        this.textColorRegistry.register(new LanternTextColor("dark_purple", new Color(0xAA00AA)));
-        this.textColorRegistry.register(new LanternTextColor("gold", new Color(0xFFAA00)));
-        this.textColorRegistry.register(new LanternTextColor("gray", new Color(0xAAAAAA)));
-        this.textColorRegistry.register(new LanternTextColor("dark_gray", new Color(0x555555)));
-        this.textColorRegistry.register(new LanternTextColor("blue", new Color(0x5555FF)));
-        this.textColorRegistry.register(new LanternTextColor("green", new Color(0x55FF55)));
-        this.textColorRegistry.register(new LanternTextColor("aqua", new Color(0x00FFFF)));
-        this.textColorRegistry.register(new LanternTextColor("red", new Color(0xFF5555)));
-        this.textColorRegistry.register(new LanternTextColor("light_purple", new Color(0xFF55FF)));
-        this.textColorRegistry.register(new LanternTextColor("yellow", new Color(0xFFFF55)));
+        this.textColorRegistry.register(new LanternTextColor("dark_blue", Color.ofRgb(0x0000AA)));
+        this.textColorRegistry.register(new LanternTextColor("dark_green", Color.ofRgb(0x00AA00)));
+        this.textColorRegistry.register(new LanternTextColor("dark_aqua", Color.ofRgb(0x00AAAA)));
+        this.textColorRegistry.register(new LanternTextColor("dark_red", Color.ofRgb(0xAA0000)));
+        this.textColorRegistry.register(new LanternTextColor("dark_purple", Color.ofRgb(0xAA00AA)));
+        this.textColorRegistry.register(new LanternTextColor("gold", Color.ofRgb(0xFFAA00)));
+        this.textColorRegistry.register(new LanternTextColor("gray", Color.ofRgb(0xAAAAAA)));
+        this.textColorRegistry.register(new LanternTextColor("dark_gray", Color.ofRgb(0x555555)));
+        this.textColorRegistry.register(new LanternTextColor("blue", Color.ofRgb(0x5555FF)));
+        this.textColorRegistry.register(new LanternTextColor("green", Color.ofRgb(0x55FF55)));
+        this.textColorRegistry.register(new LanternTextColor("aqua", Color.ofRgb(0x00FFFF)));
+        this.textColorRegistry.register(new LanternTextColor("red", Color.ofRgb(0xFF5555)));
+        this.textColorRegistry.register(new LanternTextColor("light_purple", Color.ofRgb(0xFF55FF)));
+        this.textColorRegistry.register(new LanternTextColor("yellow", Color.ofRgb(0xFFFF55)));
         this.textColorRegistry.register(new LanternTextColor("white", Color.WHITE));
         this.textColorRegistry.register(new LanternTextColor("reset", Color.WHITE));
         this.textColorRegistry.register(TextColors.NONE);

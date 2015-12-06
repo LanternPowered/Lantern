@@ -26,10 +26,9 @@ package org.lanternpowered.server.text.format;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.awt.Color;
-
 import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.util.Color;
 
 public final class LanternTextColor extends LanternCatalogType implements TextColor {
 

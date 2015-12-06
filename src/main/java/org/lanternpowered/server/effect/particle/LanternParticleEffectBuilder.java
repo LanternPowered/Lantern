@@ -27,8 +27,6 @@ package org.lanternpowered.server.effect.particle;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.awt.Color;
-
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ColoredParticle;
 import org.spongepowered.api.effect.particle.ItemParticle;
@@ -37,6 +35,7 @@ import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Color;
 
 import com.flowpowered.math.vector.Vector3d;
 

@@ -26,7 +26,6 @@ package org.lanternpowered.server.network.vanilla.message.processor.play;
 
 import io.netty.handler.codec.CodecException;
 
-import java.awt.Color;
 import java.util.List;
 import java.util.Random;
 
@@ -51,6 +50,7 @@ import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.util.Color;
 
 import com.flowpowered.math.vector.Vector3f;
 

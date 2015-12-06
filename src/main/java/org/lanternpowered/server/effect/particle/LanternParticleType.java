@@ -24,13 +24,12 @@
  */
 package org.lanternpowered.server.effect.particle;
 
-import java.awt.Color;
-
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Color;
 
 public class LanternParticleType extends SimpleLanternCatalogType implements ParticleType {
 

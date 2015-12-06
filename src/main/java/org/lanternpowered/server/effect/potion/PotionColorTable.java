@@ -27,6 +27,7 @@ package org.lanternpowered.server.effect.potion;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 import org.spongepowered.api.util.Color;
 
@@ -43,14 +44,14 @@ public final class PotionColorTable {
      * @throws IOException
      */
     public static PotionColorTable load(InputStream is) throws IOException {
-        final DataInputStream dis = new DataInputStream(is);
+        final DataInputStream dis = new DataInputStream(new GZIPInputStream(is));
         final int[][] colorTable = new int[64 * 64 * 64][];
         @SuppressWarnings("unused")
         int version = dis.readInt();
         for (int r = 0; r < 64; r++) {
             for (int g = 0; g < 64; g++) {
                 for (int b = 0; b < 64; b++) {
-                    int rgb = b << 16 | g << 8 | r;
+                    int rgb = b << 12 | g << 6 | r;
                     int[] ids = new int[dis.readByte()];
                     for (int i = 0; i < ids.length; i++) {
                         ids[i] = dis.readByte();
@@ -93,7 +94,7 @@ public final class PotionColorTable {
         if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0) {
             throw new IndexOutOfBoundsException();
         }
-        return this.colorTable[(blue / 4) << 16 | (green / 4) << 8 | (red / 4)].clone();
+        return this.colorTable[(blue / 4) << 12 | (green / 4) << 6 | (red / 4)].clone();
     }
 
     /**

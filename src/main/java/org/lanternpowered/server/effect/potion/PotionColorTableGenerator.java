@@ -24,11 +24,15 @@
  */
 package org.lanternpowered.server.effect.potion;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+import java.util.zip.GZIPOutputStream;
 
 import com.google.common.collect.Lists;
 
@@ -40,6 +44,9 @@ public final class PotionColorTableGenerator {
     // The maximum amount of colors that may be combined
     private static final int MAX_COLOR_DEPTH = 4;
 
+    // The amount of actions that should run parallel
+    private static final int PARALLEL_ACTIONS_COUNT = 10;
+
     /**
      * Generates a potion color table file, this process can take a long time
      * because it will try to search for all the potion color combinations to
@@ -48,16 +55,16 @@ public final class PotionColorTableGenerator {
      * <p>Launch options:</p>
      * <table>
      *   <tr>
-     *      <td>--path</td><td>The path of the output file.</td>
+     *      <td><strong>--path</td><td>The path of the output file.</td>
      *   </tr>
      *   <tr>
-     *      <td>--maxColorDepth</td><td>The maximum amount of potion colors
+     *      <td><strong>--maxColorDepth</td><td>The maximum amount of potion colors
      *      that may be combined into one. A higher value gives a better result
      *      but takes longer.</td>
      *   </tr>
      * </table>
      * 
-     * @param args
+     * @param args the launch parameters
      */
     public static void main(String[] args) {
         String path = "potionColorTable.dat";
@@ -117,7 +124,7 @@ public final class PotionColorTableGenerator {
 
     private PotionColorTableGenerator(String path, int maxColorDepth) throws IOException {
         final File file = new File(path);
-        System.out.println("Generating potion color table, this may take a while...");
+        System.out.println("Generating the potion color table, this may take a while...");
         // Process all color combinations
         for (int key : knownColorsById.keys()) {
             int[] t = knownColorsById.get(key);
@@ -126,42 +133,108 @@ public final class PotionColorTableGenerator {
                 this.process(Lists.newArrayList(key), t, maxColorDepth - 1);
             }
         }
+        // The pool we will use to make the following process go faster
+        final ForkJoinPool pool = new ForkJoinPool();
         // Start writing the cache file
-        final DataOutputStream dos = new DataOutputStream(new FileOutputStream(file));
+        final DataOutputStream dos = new DataOutputStream(new GZIPOutputStream(new FileOutputStream(file)));
         dos.writeInt(PotionColorTable.VERSION);
         // Check for missing colors and search for the closest
-        for (int r = 0; r < 64; r++) {
-            for (int g = 0; g < 64; g++) {
-                for (int b = 0; b < 64; b++) {
-                    int rgb = b << 16 | g << 8 | r;
-                    int[] types;
-                    if (!this.colorTable.containsKey(rgb)) {
-                        int closestDistance = Integer.MAX_VALUE;
-                        int closest = 0;
-                        for (int color : this.colorTable.keys()) {
-                            int r0 = color & 0xff;
-                            int g0 = (color >> 8) & 0xff;
-                            int b0 = (color >> 16) & 0xff;
-                            int distance = (int) Math.sqrt(Math.pow(r - r0, 2) - Math.pow(g - g0, 2) - Math.pow(b - b0, 2));
-                            if (closestDistance > distance) {
-                                closestDistance = distance;
-                                closest = color;
+        final MissingColorsAction action = new MissingColorsAction();
+        pool.invoke(action);
+        for (MissingColorsPartAction part : action.actions) {
+            part.dos.flush();
+            dos.write(part.baos.toByteArray());
+            part.dos.close();
+            this.colorTable.putAll(part.colorTableChanges);
+        }
+        dos.flush();
+        dos.close();
+        System.out.println("Finished generating the potion color table.");
+    }
+
+    private class MissingColorsAction extends RecursiveAction {
+
+        private static final long serialVersionUID = -7556112770347635348L;
+        private final MissingColorsPartAction[] actions;
+
+        private MissingColorsAction() {
+            this.actions = new MissingColorsPartAction[PARALLEL_ACTIONS_COUNT];
+            final int step = 64 / PARALLEL_ACTIONS_COUNT;
+            int start = 0;
+            for (int i = 0; i < PARALLEL_ACTIONS_COUNT; i++) {
+                int end;
+                if ((i + 1) == PARALLEL_ACTIONS_COUNT) {
+                    end = 64;
+                } else {
+                    end = start + step;
+                }
+                this.actions[i] = new MissingColorsPartAction(start, end);
+                start += step;
+            }
+        }
+
+        @Override
+        protected void compute() {
+            invokeAll(this.actions);
+        }
+    }
+
+    private class MissingColorsPartAction extends RecursiveAction {
+
+        private static final long serialVersionUID = -7284819313377189480L;
+
+        // The bytes stream that will be appended to the data stream once finished
+        private final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        private final DataOutputStream dos = new DataOutputStream(this.baos);
+
+        // The changes that should be added to the color table once finished
+        private final TIntObjectMap<int[]> colorTableChanges = new TIntObjectHashMap<>();
+
+        private final int redStart;
+        private final int redEnd;
+
+        public MissingColorsPartAction(int redStart, int redEnd) {
+            this.redStart = redStart;
+            this.redEnd = redEnd;
+        }
+
+        @Override
+        protected void compute() {
+            for (int r = this.redStart; r < this.redEnd; r++) {
+                for (int g = 0; g < 64; g++) {
+                    for (int b = 0; b < 64; b++) {
+                        int rgb = b << 16 | g << 8 | r;
+                        int[] types;
+                        if (!colorTable.containsKey(rgb)) {
+                            int closestDistance = Integer.MAX_VALUE;
+                            int closest = 0;
+                            for (int color : colorTable.keys()) {
+                                int r0 = color & 0xff;
+                                int g0 = (color >> 8) & 0xff;
+                                int b0 = (color >> 16) & 0xff;
+                                int distance = (int) Math.sqrt(Math.pow(r - r0, 2) -
+                                        Math.pow(g - g0, 2) - Math.pow(b - b0, 2));
+                                if (closestDistance > distance) {
+                                    closestDistance = distance;
+                                    closest = color;
+                                }
                             }
+                            colorTableChanges.put(rgb, types = colorTable.get(closest));
+                        } else {
+                            types = colorTable.get(rgb);
                         }
-                        this.colorTable.put(rgb, types = this.colorTable.get(closest));
-                    } else {
-                        types = this.colorTable.get(rgb);
-                    }
-                    dos.writeByte(types.length);
-                    for (int type : types) {
-                        dos.writeByte(type);
+                        try {
+                            this.dos.writeByte(types.length);
+                            for (int type : types) {
+                                this.dos.writeByte(type);
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
                 }
             }
         }
-        dos.flush();
-        dos.close();
-        System.out.println("Finished generating potion color table.");
     }
 
     private void process(List<Integer> entries, int[] t, int depth) {

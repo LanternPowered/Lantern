@@ -35,6 +35,7 @@ import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.configuration.LanternConfig;
 import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
+import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.LanternPluginManager;
@@ -45,7 +46,6 @@ import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
-import org.lanternpowered.server.util.persistence.LanternSerializationService;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
@@ -55,8 +55,6 @@ import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.data.ImmutableDataRegistry;
-import org.spongepowered.api.data.manipulator.DataManipulatorRegistry;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -69,7 +67,6 @@ import org.spongepowered.api.command.SimpleCommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.util.persistence.SerializationManager;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.world.TeleportHelper;
@@ -186,7 +183,7 @@ public class LanternGame implements Game {
     private LanternChunkTicketManager chunkTicketManager;
 
     // The serialization service 
-    private LanternSerializationService serializationService;
+    private LanternDataManager dataManager;
 
     // The config manager
     private ConfigManager configManager;
@@ -261,11 +258,8 @@ public class LanternGame implements Game {
         // Create the chunk load service
         this.chunkTicketManager = new LanternChunkTicketManager(this.globalConfig);
 
-        // Create the chunk serialization manager
-        this.serializationService = new LanternSerializationService();
-        if (!this.registerService(SerializationManager.class, this.serializationService)) {
-            throw new ExceptionInInitializerError("Cannot continue with a Non-Lantern SerializationManager!");
-        }
+        // Create the data manager
+        this.dataManager = new LanternDataManager();
 
         // Register the game profile resolver
         this.gameProfileManager = new LanternGameProfileManager();
@@ -457,25 +451,13 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public SerializationManager getSerializationManager() {
-        return this.serializationService;
-    }
-
-    @Override
     public PropertyRegistry getPropertyRegistry() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public DataManipulatorRegistry getManipulatorRegistry() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ImmutableDataRegistry getImmutableDataRegistry() {
-        // TODO Auto-generated method stub
-        return null;
+    public LanternDataManager getDataManager() {
+        return this.dataManager;
     }
 }

@@ -51,7 +51,7 @@ public final class PotionColorTable {
         for (int r = 0; r < 64; r++) {
             for (int g = 0; g < 64; g++) {
                 for (int b = 0; b < 64; b++) {
-                    int rgb = b << 12 | g << 6 | r;
+                    int rgb = r << 12 | g << 6 | b;
                     int[] ids = new int[dis.readByte()];
                     for (int i = 0; i < ids.length; i++) {
                         ids[i] = dis.readByte();
@@ -94,7 +94,7 @@ public final class PotionColorTable {
         if (red > 255 || green > 255 || blue > 255 || red < 0 || green < 0 || blue < 0) {
             throw new IndexOutOfBoundsException();
         }
-        return this.colorTable[(blue / 4) << 12 | (green / 4) << 6 | (red / 4)].clone();
+        return this.colorTable[(red / 4) << 12 | (green / 4) << 6 | (blue / 4)].clone();
     }
 
     /**
@@ -105,6 +105,6 @@ public final class PotionColorTable {
      * @return the potion ids
      */
     public int[] getPotionIds(int rgb) {
-        return this.getPotionIds(rgb & 0xff, rgb & 0xff00, rgb & 0xff0000);
+        return this.getPotionIds((rgb >> 16) & 0xff, (rgb >> 8) & 0xff, rgb & 0xff);
     }
 }

@@ -55,6 +55,9 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
+/**
+ * TODO: Update all the event manager classes for the added filter api.
+ */
 @Singleton
 public class LanternEventManager implements EventManager {
 
@@ -160,7 +163,7 @@ public class LanternEventManager implements EventManager {
 
     private static <T extends Event> RegisteredHandler<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
             Listener subscribe, EventListener<? super T> handler) {
-        return createRegistration(plugin, eventClass, subscribe.order(), subscribe.ignoreCancelled(), handler);
+        return createRegistration(plugin, eventClass, subscribe.order(), false, handler);
     }
 
     private static <T extends Event> RegisteredHandler<T> createRegistration(PluginContainer plugin, Class<T> eventClass,

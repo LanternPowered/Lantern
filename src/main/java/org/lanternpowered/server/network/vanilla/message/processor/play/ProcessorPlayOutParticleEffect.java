@@ -39,8 +39,10 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutSpawnParticle;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.type.NotePitch;
+import org.spongepowered.api.effect.particle.BlockParticle;
 import org.spongepowered.api.effect.particle.ColoredParticle;
 import org.spongepowered.api.effect.particle.ItemParticle;
 import org.spongepowered.api.effect.particle.NoteParticle;
@@ -100,6 +102,15 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 return;
             }
             extra = new int[] { extraData };
+        } else if (effect instanceof BlockParticle) {
+            if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
+                BlockState blockState = ((BlockParticle) effect).getBlockState();
+                int id = LanternBlocks.reg().getInternalTypeId(blockState.getType());
+                int data = LanternBlocks.reg().getStateData(blockState);
+                extra = new int[] { data << 12 | id };
+            } else {
+                return;
+            }
         }
 
         if (effect instanceof ResizableParticle) {

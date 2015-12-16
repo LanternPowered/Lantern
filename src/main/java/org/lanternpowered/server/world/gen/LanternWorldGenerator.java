@@ -27,48 +27,67 @@ package org.lanternpowered.server.world.gen;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.List;
+import java.util.Map;
 
 import org.lanternpowered.server.util.Lists2;
+import org.lanternpowered.server.world.biome.LanternBiomeType;
+import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
+import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.BiomeGenerator;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
+import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 public final class LanternWorldGenerator implements WorldGenerator {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...
-    private final List<GeneratorPopulator> generatorPopulators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
+    private final List<GenerationPopulator> generationPopulators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
     private final List<Populator> populators = Lists2.nonNullOf(Lists.newCopyOnWriteArrayList());
 
-    private volatile GeneratorPopulator baseGeneratorPopulator;
+    // The biome generation settings
+    private final Map<LanternBiomeType, BiomeGenerationSettings> biomeGenSettings = Maps.newConcurrentMap();
+
+    private volatile GenerationPopulator baseGenerationPopulator;
     private volatile BiomeGenerator biomeGenerator;
 
-    public LanternWorldGenerator(GeneratorPopulator baseGeneratorPopulator,
+    public LanternWorldGenerator(GenerationPopulator baseGenerationPopulator,
             BiomeGenerator biomeGenerator) {
-        this.baseGeneratorPopulator = checkNotNull(baseGeneratorPopulator, "baseGeneratorPopulator");
+        this.baseGenerationPopulator = checkNotNull(baseGenerationPopulator, "baseGenerationPopulator");
         this.biomeGenerator = checkNotNull(biomeGenerator, "biomeGenerator");
     }
 
     @Override
-    public GeneratorPopulator getBaseGeneratorPopulator() {
-        return this.baseGeneratorPopulator;
+    public GenerationPopulator getBaseGenerationPopulator() {
+        return this.baseGenerationPopulator;
     }
 
     @Override
-    public void setBaseGeneratorPopulator(GeneratorPopulator generator) {
-        this.baseGeneratorPopulator = checkNotNull(generator, "generator");
+    public void setBaseGenerationPopulator(GenerationPopulator generator) {
+        this.baseGenerationPopulator = checkNotNull(generator, "generator");
     }
 
     @Override
-    public List<GeneratorPopulator> getGeneratorPopulators() {
-        return this.generatorPopulators;
+    public List<GenerationPopulator> getGenerationPopulators() {
+        return this.generationPopulators;
+    }
+
+    @Override
+    public List<GenerationPopulator> getGenerationPopulators(Class<? extends GenerationPopulator> type) {
+        return this.generationPopulators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
     }
 
     @Override
     public List<Populator> getPopulators() {
         return this.populators;
+    }
+
+    @Override
+    public List<Populator> getPopulators(Class<? extends Populator> type) {
+        return this.populators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
     }
 
     @Override
@@ -79,5 +98,11 @@ public final class LanternWorldGenerator implements WorldGenerator {
     @Override
     public void setBiomeGenerator(BiomeGenerator biomeGenerator) {
         this.biomeGenerator = checkNotNull(biomeGenerator, "biomeGenerator");
+    }
+
+    @Override
+    public BiomeGenerationSettings getBiomeSettings(BiomeType type) {
+        final LanternBiomeType biomeType = (LanternBiomeType) checkNotNull(type, "type");
+        return this.biomeGenSettings.computeIfAbsent(biomeType, t -> t.getDefaultGenerationSettings().copy());
     }
 }

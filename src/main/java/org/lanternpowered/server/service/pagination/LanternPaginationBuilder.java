@@ -31,6 +31,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+
 import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
@@ -91,6 +92,7 @@ class LanternPaginationBuilder implements PaginationBuilder {
         return this;
     }
 
+    @SuppressWarnings("rawtypes")
     @Override
     public void sendTo(final CommandSource source) {
         checkNotNull(this.contents, "contents");

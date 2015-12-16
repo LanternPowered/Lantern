@@ -26,22 +26,17 @@ package org.lanternpowered.server.entity;
 
 import java.util.Optional;
 
-import org.spongepowered.api.entity.ai.Goal;
-import org.spongepowered.api.entity.ai.GoalType;
-import org.spongepowered.api.entity.living.Agent;
-import org.spongepowered.api.entity.living.Human;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import com.flowpowered.math.vector.Vector3d;
 
-public class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid {
+public class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
 
     @Override
     public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
@@ -53,56 +48,6 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
     public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public Optional<ItemStack> getHelmet() {
-        return this.getEquipped(EquipmentTypes.HEADWEAR);
-    }
-
-    @Override
-    public void setHelmet(ItemStack helmet) {
-        this.equip(EquipmentTypes.HEADWEAR, helmet);
-    }
-
-    @Override
-    public Optional<ItemStack> getChestplate() {
-        return this.getEquipped(EquipmentTypes.CHESTPLATE);
-    }
-
-    @Override
-    public void setChestplate(ItemStack chestplate) {
-        this.equip(EquipmentTypes.CHESTPLATE, chestplate);
-    }
-
-    @Override
-    public Optional<ItemStack> getLeggings() {
-        return this.getEquipped(EquipmentTypes.LEGGINGS);
-    }
-
-    @Override
-    public void setLeggings(ItemStack leggings) {
-        this.equip(EquipmentTypes.LEGGINGS, leggings);
-    }
-
-    @Override
-    public Optional<ItemStack> getBoots() {
-        return this.getEquipped(EquipmentTypes.BOOTS);
-    }
-
-    @Override
-    public void setBoots(ItemStack boots) {
-        this.equip(EquipmentTypes.BOOTS, boots);
-    }
-
-    @Override
-    public Optional<ItemStack> getItemInHand() {
-        return this.getEquipped(EquipmentTypes.EQUIPPED);
-    }
-
-    @Override
-    public void setItemInHand(ItemStack itemInHand) {
-        this.equip(EquipmentTypes.EQUIPPED, itemInHand);
     }
 
     @Override

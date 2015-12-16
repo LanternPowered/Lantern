@@ -37,8 +37,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.component.BaseComponentHolder;
-import org.lanternpowered.server.configuration.LanternConfig;
-import org.lanternpowered.server.configuration.LanternConfig.WorldConfig;
+import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.effect.AbstractViewer;
@@ -94,6 +93,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.PlayerSimulator;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -149,7 +149,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     private final Dimension dimension;
 
     // The world configuration
-    private final LanternConfig<WorldConfig> worldConfig;
+    private final WorldConfig worldConfig;
 
     // The properties of this world
     final LanternWorldProperties properties;
@@ -159,13 +159,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private volatile Context worldContext;
 
-    public LanternWorld(LanternGame game, LanternConfig<WorldConfig> worldConfig, File worldFolder,
+    public LanternWorld(LanternGame game, WorldConfig worldConfig, File worldFolder,
             LanternWorldProperties properties) {
         this.worldConfig = worldConfig;
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder);
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder, properties);
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type
@@ -827,11 +827,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public void setWorldGenerator(WorldGenerator generator) {
-        this.chunkManager.setWorldGenerator(generator);
-    }
-
-    @Override
     public boolean doesKeepSpawnLoaded() {
         return this.properties.doesKeepSpawnLoaded();
     }
@@ -901,6 +896,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public PlayerSimulator getPlayerSimulator() {
         return this.sharedPlayerSimulator;
+    }
+
+    @Override
+    public ChunkPreGenerate newChunkPreGenerate(Vector3d center, double diameter) {
+        return new LanternChunkPreGenerate(this, checkNotNull(center, "center"), diameter);
     }
 
     public void pulse() {

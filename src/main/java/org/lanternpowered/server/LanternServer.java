@@ -42,7 +42,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
+import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -132,8 +132,7 @@ public class LanternServer implements Server {
                     LanternMinecraftVersion.CURRENT.getProtocol()); 
 
             // The root world folder
-            final File worldFolder = new File(game.getGlobalConfig().getBase()
-                    .getWorld().getWorldFolder());
+            final File worldFolder = new File(game.getGlobalConfig().getRootWorldFolder());
 
             // Initialize the game
             game.initialize(server, worldFolder);
@@ -208,9 +207,9 @@ public class LanternServer implements Server {
     public void bind() throws BindException {
         final SocketAddress address;
 
-        final GlobalConfig config = this.game.getGlobalConfig().getBase();
-        final String ip = config.getServer().getIp();
-        final int port = config.getServer().getPort();
+        final GlobalConfig config = this.game.getGlobalConfig();
+        final String ip = config.getServerIp();
+        final int port = config.getServerPort();
 
         if (ip.isEmpty()) {
             address = new InetSocketAddress(port);
@@ -231,7 +230,7 @@ public class LanternServer implements Server {
         LanternGame.log().info("Successfully bound to: " + channel.localAddress());
     }
 
-    public void start() {
+    public void start() throws IOException {
         this.worldManager = new LanternWorldManager(this.game, this.game.getSavesDirectory().toFile());
         this.worldManager.init();
 
@@ -242,11 +241,11 @@ public class LanternServer implements Server {
         this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game, 
                 GameState.SERVER_STARTING));
 
-        final GlobalConfig config = this.game.getGlobalConfig().getBase();
-        this.maxPlayers = config.getServer().getMaxPlayers();
-        this.onlineMode = config.getServer().isOnlineMode();
+        final GlobalConfig config = this.game.getGlobalConfig();
+        this.maxPlayers = config.getMaxPlayers();
+        this.onlineMode = config.isOnlineMode();
 
-        final File faviconFile = new File(config.getServer().getFavicon());
+        final File faviconFile = new File(config.getFavicon());
         if (faviconFile.exists()) {
             try {
                 this.favicon = LanternFavicon.load(faviconFile.toPath());
@@ -455,7 +454,7 @@ public class LanternServer implements Server {
 
     @Override
     public Text getMotd() {
-        return this.game.getGlobalConfig().getBase().getServer().getMotd();
+        return this.game.getGlobalConfig().getMotd();
     }
 
     @Override

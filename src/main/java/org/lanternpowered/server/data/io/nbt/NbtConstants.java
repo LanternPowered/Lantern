@@ -43,4 +43,7 @@ class NbtConstants {
     public static final int COMPOUND = 10;
     public static final int INT_ARRAY = 11;
 
+    // Boolean suffix introduced in sponge common NbtTranslator
+    public static final int BOOLEAN = 99;
+    public static final String BOOLEAN_IDENTIFER = "$Boolean";
 }

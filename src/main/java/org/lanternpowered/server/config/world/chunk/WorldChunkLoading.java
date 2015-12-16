@@ -22,38 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.biome;
+package org.lanternpowered.server.config.world.chunk;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.spongepowered.api.world.biome.BiomeType;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-public class LanternBiomeType extends LanternPluginCatalogType implements BiomeType {
+import static org.lanternpowered.server.config.ConfigConstants.*;
 
-    private final LanternBiomeGenerationSettings defaultSettings = new LanternBiomeGenerationSettings();
+@ConfigSerializable
+public class WorldChunkLoading extends ChunkLoading {
 
-    private double temperature;
-    private double humidity;
-
-    public LanternBiomeType(String pluginId, String identifier) {
-        super(pluginId, identifier);
-    }
-
-    @Override
-    public double getTemperature() {
-        return this.temperature;
-    }
-
-    @Override
-    public double getHumidity() {
-        return this.humidity;
-    }
+    @Setting(value = ENABLED, comment =
+            "Whether this configuration file should override the globally specified chunk\n " +
+            "loading settings, if set false, this sections won't affect anything.")
+    private boolean enabled = false;
 
     /**
-     * Gets the default biome generation settings.
+     * Gets whether this section is enabled.
      * 
-     * @return the default biome generation settings
+     * @return is enabled
      */
-    public LanternBiomeGenerationSettings getDefaultGenerationSettings() {
-        return this.defaultSettings;
+    public boolean isEnabled() {
+        return this.enabled;
     }
 }

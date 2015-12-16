@@ -24,7 +24,9 @@
  */
 package org.lanternpowered.server.effect.particle;
 
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.NotePitch;
+import org.spongepowered.api.effect.particle.BlockParticle;
 import org.spongepowered.api.effect.particle.ColoredParticle;
 import org.spongepowered.api.effect.particle.ItemParticle;
 import org.spongepowered.api.effect.particle.NoteParticle;
@@ -115,11 +117,11 @@ public class LanternParticleEffect implements ParticleEffect {
         }
     }
 
-    public static class Material extends LanternParticleEffect implements ItemParticle {
+    public static class Item extends LanternParticleEffect implements ItemParticle {
 
         private final ItemStackSnapshot item;
 
-        Material(ParticleType type, Vector3d motion, Vector3d offset, int count, ItemStackSnapshot item) {
+        Item(ParticleType type, Vector3d motion, Vector3d offset, int count, ItemStackSnapshot item) {
             super(type, motion, offset, count);
             this.item = item;
         }
@@ -127,6 +129,21 @@ public class LanternParticleEffect implements ParticleEffect {
         @Override
         public ItemStackSnapshot getItem() {
             return this.item.copy();
+        }
+    }
+
+    public static class Block extends LanternParticleEffect implements BlockParticle {
+
+        private final BlockState blockState;
+
+        Block(ParticleType type, Vector3d motion, Vector3d offset, int count, BlockState blockState) {
+            super(type, motion, offset, count);
+            this.blockState = blockState;
+        }
+
+        @Override
+        public BlockState getBlockState() {
+            return this.blockState;
         }
     }
 }

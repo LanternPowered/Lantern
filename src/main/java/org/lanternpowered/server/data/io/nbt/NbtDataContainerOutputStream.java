@@ -168,6 +168,10 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
     private void writeEntry(String key, Object object) throws IOException {
         byte type = this.typeFor(object);
         this.dos.writeByte(type);
+        // Reflect the sponge NbtTranslator boolean suffix in our output stream
+        if (object instanceof Boolean) {
+            key += BOOLEAN_IDENTIFER;
+        }
         this.dos.writeUTF(key);
         this.writePayload(type, object);
     }

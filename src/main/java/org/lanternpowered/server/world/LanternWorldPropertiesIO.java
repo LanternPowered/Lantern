@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.util.DataQueries;
@@ -125,29 +126,16 @@ public final class LanternWorldPropertiesIO {
     // Sponge properties
     private final static DataQuery UUID_MOST = DataQuery.of("uuid_most");
     private final static DataQuery UUID_LEAST = DataQuery.of("uuid_least");
-    private final static DataQuery ENABLED = DataQuery.of("enabled");
-    private final static DataQuery KEEP_SPAWN_LOADED = DataQuery.of("keepSpawnLoaded");
-    private final static DataQuery LOAD_ON_STARTUP = DataQuery.of("loadOnStartup");
     private final static DataQuery DIMENSION_TYPE = DataQuery.of("dimensionType");
     private final static DataQuery DIMENSION_INDEX = DataQuery.of("dimensionId");
     private final static DataQuery GENERATOR_MODIFIERS = DataQuery.of("generatorModifiers");
     private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
 
     // Lantern properties
-    private final static DataQuery WATER_EVAPORATES = DataQuery.of("waterEvaporates");
-    private final static DataQuery ALLOW_PLAYER_RESPAWNS = DataQuery.of("allowPlayerRespawns");
     private final static DataQuery BUILD_HEIGHT = DataQuery.of("buildHeight");
     private final static DataQuery BONUS_CHEST_ENABLED = DataQuery.of("bonusChestEnabled");
-    // Also adding the "string id" for the dimension types, because I don't think
-    // that the Class names make much sense
-    private final static DataQuery DIMENSION_ID = DataQuery.of("dimensionStrId");
     // Extra generator options for the flat world generator type
     private final static DataQuery GENERATOR_OPTIONS_EXTRA = DataQuery.of("generatorOptionsExtra");
-
-    // Provider class names in vanilla
-    private final static String OVERWORLD = "net.minecraft.world.WorldProviderSurface";
-    private final static String NETHER = "net.minecraft.world.WorldProviderHell";
-    private final static String END = "net.minecraft.world.WorldProviderEnd";
 
     private LanternWorldPropertiesIO() {
     }
@@ -332,48 +320,17 @@ public final class LanternWorldPropertiesIO {
         }
 
         Integer dimensionId = null;
-        Boolean allowPlayerRespawns = null;
-        Boolean waterEvaporates = null;
         Integer buildHeight = null;
 
         // Get the sponge properties
         if (spongeContainer != null) {
             properties.properties = spongeRootContainer.copy().remove(DataQueries.SPONGE_DATA);
-            properties.enabled = spongeContainer.getInt(ENABLED).get() > 0;
-            properties.keepSpawnLoaded = spongeContainer.getInt(KEEP_SPAWN_LOADED).get() > 0;
-            properties.loadOnStartup = spongeContainer.getInt(LOAD_ON_STARTUP).get() > 0;
 
-            DimensionType dimensionTypeByStrId = null;
             dimensionId = spongeContainer.getInt(DIMENSION_INDEX).orElse(null);
             // This can be null, this is provided in the lantern-server
-            String dimensionStrId = spongeContainer.getString(DIMENSION_ID).orElse(null);
             String dimensionType = spongeContainer.getString(DIMENSION_TYPE).get();
-            // Lets try some defaults first, also here I am not happy with the
-            // Class#getCanonicalName() usage :/
-            if (dimensionType.equalsIgnoreCase(OVERWORLD)) {
-                properties.dimensionType = (LanternDimensionType<?>) DimensionTypes.OVERWORLD;
-            } else if (dimensionType.equalsIgnoreCase(NETHER)) {
-                properties.dimensionType = (LanternDimensionType<?>) DimensionTypes.NETHER;
-            } else if (dimensionType.equalsIgnoreCase(END)) {
-                properties.dimensionType = (LanternDimensionType<?>) DimensionTypes.END;
-            } else {
-                for (DimensionType type : LanternGame.get().getRegistry().getAllOf(DimensionType.class)) {
-                    // Try the actual dimension id as fallback option
-                    if (type.getId().equalsIgnoreCase(dimensionStrId) &&
-                            dimensionTypeByStrId == null) {
-                        dimensionTypeByStrId = type;
-                    }
-                    // Try to find the dimension type using the canonical name of the class
-                    if (type.getDimensionClass().getCanonicalName().equalsIgnoreCase(dimensionType)) {
-                        properties.dimensionType = (LanternDimensionType<?>) type;
-                        break;
-                    }
-                }
-            }
-
-            if (properties.dimensionType == null) {
-                properties.dimensionType = (LanternDimensionType<?>) dimensionTypeByStrId;
-            }
+            properties.dimensionType = (LanternDimensionType<?>) LanternGame.get().getRegistry()
+                    .getType(DimensionType.class, dimensionType).orElse(null);
 
             List<String> modifiers = spongeContainer.getStringList(GENERATOR_MODIFIERS).get();
             ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
@@ -399,12 +356,6 @@ public final class LanternWorldPropertiesIO {
             }
 
             // Lantern properties, store them for now in the sponge data file
-            if (spongeContainer.contains(ALLOW_PLAYER_RESPAWNS)) {
-                allowPlayerRespawns = spongeContainer.getInt(ALLOW_PLAYER_RESPAWNS).get() > 0;
-            }
-            if (spongeContainer.contains(WATER_EVAPORATES)) {
-                waterEvaporates = spongeContainer.getInt(WATER_EVAPORATES).get() > 0;
-            }
             if (spongeContainer.contains(BUILD_HEIGHT)) {
                 buildHeight = spongeContainer.getInt(BUILD_HEIGHT).get();
             }
@@ -434,10 +385,6 @@ public final class LanternWorldPropertiesIO {
             properties.properties = new MemoryDataContainer();
         }
 
-        properties.waterEvaporates = waterEvaporates == null ? 
-                properties.dimensionType.doesWaterEvaporate() : waterEvaporates;
-        properties.allowPlayerRespawns = allowPlayerRespawns == null ?
-                properties.dimensionType.allowsPlayerRespawns() : allowPlayerRespawns;
         properties.buildHeight = buildHeight == null ? 256 : buildHeight;
 
         BitSet dimensionMap = null;
@@ -472,15 +419,15 @@ public final class LanternWorldPropertiesIO {
         }
         dataView.set(AGE, properties.age);
         dataView.set(TIME, properties.time);
-        dataView.set(RAINING, properties.raining);
+        dataView.set(RAINING, (byte) (properties.raining ? 1 : 0));
         dataView.set(RAIN_TIME, properties.rainTime);
-        dataView.set(THUNDERING, properties.thundering);
+        dataView.set(THUNDERING, (byte) (properties.thundering ? 1 : 0));
         dataView.set(THUNDER_TIME, properties.thunderTime);
-        dataView.set(HARDCORE, properties.hardcore);
+        dataView.set(HARDCORE, (byte) (properties.hardcore ? 1 : 0));
         dataView.set(CLEAR_WEATHER_TIME, properties.clearWeatherTime);
         dataView.set(LAST_PLAYED, properties.getLastPlayedTime());
         dataView.set(SIZE_ON_DISK, 0L);
-        dataView.set(INITIALIZED, properties.initialized);
+        dataView.set(INITIALIZED, (byte) (properties.initialized ? 1 : 0));
         String genId = properties.generatorType.getId();
         if (genId.startsWith("minecraft:")) {
             genId = genId.replaceFirst("minecraft:", "");
@@ -497,9 +444,9 @@ public final class LanternWorldPropertiesIO {
             dataView.set(GENERATOR_OPTIONS, properties.generatorSettings);
         }
         dataView.set(DIFFICULTY, ((LanternDifficulty) properties.difficulty).getInternalId());
-        dataView.set(DIFFICULTY_LOCKED, properties.difficultyLocked);
+        dataView.set(DIFFICULTY_LOCKED, (byte) (properties.difficultyLocked ? 1 : 0));
         dataView.set(GAME_MODE, ((LanternGameMode) properties.gameMode).getInternalId());
-        dataView.set(MAP_FEATURES, properties.mapFeatures);
+        dataView.set(MAP_FEATURES, (byte) (properties.mapFeatures ? 1 : 0));
         dataView.set(BORDER_CENTER_X, properties.borderCenterX);
         dataView.set(BORDER_CENTER_Z, properties.borderCenterZ);
         dataView.set(BORDER_DAMAGE, properties.borderDamage);
@@ -546,28 +493,12 @@ public final class LanternWorldPropertiesIO {
         spongeContainer.set(NAME, properties.name);
         spongeContainer.set(UUID_MOST, properties.uniqueId.getMostSignificantBits());
         spongeContainer.set(UUID_LEAST, properties.uniqueId.getLeastSignificantBits());
-        spongeContainer.set(ENABLED, properties.enabled);
-        spongeContainer.set(KEEP_SPAWN_LOADED, properties.keepSpawnLoaded);
-        spongeContainer.set(LOAD_ON_STARTUP, properties.loadOnStartup);
-        spongeContainer.set(WATER_EVAPORATES, properties.waterEvaporates);
         spongeContainer.set(BUILD_HEIGHT, properties.buildHeight);
-        spongeContainer.set(ALLOW_PLAYER_RESPAWNS, properties.allowPlayerRespawns);
-        spongeContainer.set(BONUS_CHEST_ENABLED, properties.bonusChestEnabled);
+        spongeContainer.set(BONUS_CHEST_ENABLED, (byte) (properties.bonusChestEnabled ? 1 : 0));
         if (levelData.dimensionId != null) {
             spongeContainer.set(DIMENSION_INDEX, levelData.dimensionId);
         }
-        spongeContainer.set(DIMENSION_ID, properties.dimensionType.getId());
-        final String dimensionName;
-        if (properties.dimensionType == DimensionTypes.OVERWORLD) {
-            dimensionName = OVERWORLD;
-        } else if (properties.dimensionType == DimensionTypes.NETHER) {
-            dimensionName = NETHER;
-        } else if (properties.dimensionType == DimensionTypes.END) {
-            dimensionName = END;
-        } else {
-            dimensionName = properties.dimensionType.getDimensionClass().getCanonicalName();
-        }
-        spongeContainer.set(DIMENSION_TYPE, dimensionName);
+        spongeContainer.set(DIMENSION_TYPE, properties.dimensionType.getId());
         spongeContainer.set(GENERATOR_MODIFIERS, properties.generatorModifiers.stream().map(
                 modifier -> modifier.getId()).collect(Collectors.toList()));
         spongeContainer.set(PLAYER_UUID_TABLE, properties.pendingUniqueIds.stream().map(

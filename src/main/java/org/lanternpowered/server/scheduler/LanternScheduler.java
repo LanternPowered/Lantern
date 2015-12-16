@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Scheduler;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
 
 import com.google.common.collect.ImmutableSet;
@@ -174,5 +175,17 @@ public class LanternScheduler implements Scheduler {
 
     public void shutdownAsyncScheduler() {
         this.asyncScheduler.shutdown();
+    }
+
+    @Override
+    public SpongeExecutorService createSyncExecutor(Object plugin) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SpongeExecutorService createAsyncExecutor(Object plugin) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

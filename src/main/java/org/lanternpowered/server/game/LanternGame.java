@@ -25,6 +25,7 @@
 package org.lanternpowered.server.game;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Locale;
 
@@ -32,9 +33,8 @@ import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
+import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
-import org.lanternpowered.server.configuration.LanternConfig;
-import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
@@ -80,6 +80,10 @@ public class LanternGame implements Game {
     public static final String IMPL_NAME = "LanternServer";
     public static final String IMPL_ID = "lanternserver";
     public static final String IMPL_VERSION = "DEV";
+
+    public static final String MINECRAFT_ID = "minecraft";
+    public static final String MINECRAFT_NAME = "Minecraft";
+    public static final String MINECRAFT_VERSION = "1.8.9";
 
     // The name of the config folder
     public static final String CONFIG_FOLDER = "config";
@@ -200,7 +204,7 @@ public class LanternGame implements Game {
     private File rootWorldFolder;
 
     // The global config
-    private LanternConfig<GlobalConfig> globalConfig;
+    private GlobalConfig globalConfig;
 
     // The current game state
     private GameState gameState = GameState.CONSTRUCTION;
@@ -212,7 +216,7 @@ public class LanternGame implements Game {
         game = this;
     }
 
-    public void preInitialize() {
+    public void preInitialize() throws IOException {
         this.configFolder = new File(CONFIG_FOLDER);
         this.pluginsFolder = new File(PLUGINS_FOLDER);
 
@@ -227,8 +231,8 @@ public class LanternGame implements Game {
         this.gameRegistry.preRegisterGameObjects();
 
         // Create the global config
-        this.globalConfig = new LanternConfig<>(new GlobalConfig(),
-                new File(this.configFolder, GLOBAL_CONFIG).toPath());
+        this.globalConfig = new GlobalConfig(new File(this.configFolder, GLOBAL_CONFIG).toPath());
+        this.globalConfig.load();
     }
 
     public void initialize(LanternServer server, File rootWorldFolder) {
@@ -345,7 +349,7 @@ public class LanternGame implements Game {
      * 
      * @return the global configuration
      */
-    public LanternConfig<GlobalConfig> getGlobalConfig() {
+    public GlobalConfig getGlobalConfig() {
         return this.globalConfig;
     }
 

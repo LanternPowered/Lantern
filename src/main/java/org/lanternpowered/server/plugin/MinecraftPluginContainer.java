@@ -40,17 +40,17 @@ public final class MinecraftPluginContainer implements PluginContainer {
 
     @Override
     public String getId() {
-        return "minecraft";
+        return LanternGame.MINECRAFT_ID;
     }
 
     @Override
     public String getName() {
-        return "Minecraft";
+        return LanternGame.MINECRAFT_NAME;
     }
 
     @Override
     public String getVersion() {
-        return LanternGame.IMPL_VERSION;
+        return LanternGame.MINECRAFT_VERSION;
     }
 
     @Override

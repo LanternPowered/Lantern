@@ -27,6 +27,7 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
@@ -68,6 +70,9 @@ public class LanternWorldProperties implements WorldProperties {
 
     // The unique id of the world
     final UUID uniqueId;
+
+    // The world config
+    @Nullable WorldConfig worldConfig;
 
     // The rules of the world
     final LanternGameRules rules = new LanternGameRules();
@@ -111,14 +116,12 @@ public class LanternWorldProperties implements WorldProperties {
     // Whether the world is initialized
     boolean initialized;
     boolean bonusChestEnabled;
-    boolean enabled;
-    boolean loadOnStartup;
-    boolean keepSpawnLoaded;
     boolean commandsAllowed;
     boolean mapFeatures;
     boolean hardcore;
     boolean thundering;
     boolean raining;
+    boolean pvpEnabled;
 
     int rainTime;
     int thunderTime;
@@ -170,23 +173,37 @@ public class LanternWorldProperties implements WorldProperties {
     public LanternWorldProperties(LanternWorldCreationSettings creationSettings) {
         this.properties = new MemoryDataContainer();
         this.creationSettings = creationSettings;
-        this.keepSpawnLoaded = creationSettings.doesKeepSpawnLoaded();
         this.commandsAllowed = creationSettings.commandsAllowed();
         this.hardcore = creationSettings.isHardcore();
         this.dimensionType = creationSettings.getDimensionType();
         this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();
         this.generatorSettings = creationSettings.getGeneratorSettings();
-        this.setGeneratorModifiers(creationSettings.getGeneratorModifiers());
         this.waterEvaporates = creationSettings.waterEvaporates();
         this.bonusChestEnabled = creationSettings.bonusChestEnabled();
         this.buildHeight = creationSettings.getBuildHeight();
         this.mapFeatures = creationSettings.usesMapFeatures();
         this.gameMode = creationSettings.getGameMode();
-        this.enabled = creationSettings.isEnabled();
         this.name = creationSettings.getWorldName();
         this.seed = creationSettings.getSeed();
         this.allowPlayerRespawns = creationSettings.allowPlayerRespawns();
+        this.pvpEnabled = creationSettings.isPVPEnabled();
         this.uniqueId = UUID.randomUUID();
+    }
+
+    public void setConfig(WorldConfig worldConfig, boolean save) throws IOException {
+        this.worldConfig = worldConfig;
+        if (save) {
+            this.setKeepSpawnLoaded(this.creationSettings.doesKeepSpawnLoaded());
+            this.setGeneratorModifiers(this.creationSettings.getGeneratorModifiers());
+            this.setEnabled(this.creationSettings.isEnabled());
+            worldConfig.save();
+        } else {
+            worldConfig.load();
+        }
+    }
+
+    public WorldConfig getConfig() {
+        return this.worldConfig;
     }
 
     /**
@@ -197,20 +214,21 @@ public class LanternWorldProperties implements WorldProperties {
     }
 
     public boolean doesWaterEvaporate() {
-        return this.waterEvaporates;
+        return this.worldConfig.doesWaterEvaporate();
     }
 
     public void setWaterEvaporates(boolean evaporates) {
-        this.waterEvaporates = evaporates;
+        this.worldConfig.setDoesWaterEvaporate(evaporates);
     }
 
     public boolean allowsPlayerRespawns() {
-        return this.allowPlayerRespawns;
+        return this.worldConfig.allowPlayerRespawns();
     }
 
     public void setAllowsPlayerRespawns(boolean allow) {
-        this.allowPlayerRespawns = allow;
-        if (this.world != null) {
+        boolean update = this.worldConfig.allowPlayerRespawns() != allow;
+        this.worldConfig.setAllowPlayerRespawns(allow);
+        if (update && this.world != null) {
             this.world.enableSpawnArea(allow);
         }
     }
@@ -254,32 +272,32 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public boolean isEnabled() {
-        return this.enabled;
+        return this.worldConfig.isWorldEnabled();
     }
 
     @Override
     public void setEnabled(boolean state) {
-        this.enabled = state;
+        this.worldConfig.setWorldEnabled(state);
     }
 
     @Override
     public boolean loadOnStartup() {
-        return this.loadOnStartup;
+        return this.worldConfig.loadOnStartup();
     }
 
     @Override
     public void setLoadOnStartup(boolean state) {
-        this.loadOnStartup = state;
+        this.worldConfig.setLoadOnStartup(state);
     }
 
     @Override
     public boolean doesKeepSpawnLoaded() {
-        return this.keepSpawnLoaded;
+        return this.worldConfig.getKeepSpawnLoaded();
     }
 
     @Override
     public void setKeepSpawnLoaded(boolean state) {
-        this.keepSpawnLoaded = state;
+        this.worldConfig.setKeepSpawnLoaded(state);
     }
 
     @Override
@@ -302,8 +320,9 @@ public class LanternWorldProperties implements WorldProperties {
         this.spawnPosition = checkNotNull(position, "position");
         // Generate the spawn are at the new spawn position
         // if the world is present
-        if (this.world != null) {
-            this.world.enableSpawnArea(this.keepSpawnLoaded);
+        boolean keepSpawnLoaded = this.worldConfig.getKeepSpawnLoaded();
+        if (keepSpawnLoaded && this.world != null) {
+            this.world.enableSpawnArea(true);
         }
     }
 
@@ -696,5 +715,15 @@ public class LanternWorldProperties implements WorldProperties {
             MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.setWarningBlocks(distance);
             players.forEach(player -> player.getConnection().send(message));
         });
+    }
+
+    @Override
+    public boolean isPVPEnabled() {
+        return this.pvpEnabled;
+    }
+
+    @Override
+    public void setPVPEnabled(boolean enabled) {
+        this.pvpEnabled = enabled;
     }
 }

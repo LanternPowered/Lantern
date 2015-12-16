@@ -22,38 +22,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.biome;
+package org.lanternpowered.server.config.serializer;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.spongepowered.api.world.biome.BiomeType;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-public class LanternBiomeType extends LanternPluginCatalogType implements BiomeType {
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.TextMessageException;
 
-    private final LanternBiomeGenerationSettings defaultSettings = new LanternBiomeGenerationSettings();
+import com.google.common.reflect.TypeToken;
 
-    private double temperature;
-    private double humidity;
+public final class TextTypeSerializer implements TypeSerializer<Text> {
 
-    public LanternBiomeType(String pluginId, String identifier) {
-        super(pluginId, identifier);
+    @Override
+    public Text deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+        final String value0 = value.getString();
+        try {
+            // Try to deserialize as xml
+            return Texts.xml().from(value0);
+        } catch (TextMessageException e0) {
+            try {
+                // Try to deserialize as json
+                return Texts.json().from(value0);
+            } catch (TextMessageException e1) {
+                // No format is possible, use plain
+                return Texts.of(value0);
+            }
+        }
     }
 
     @Override
-    public double getTemperature() {
-        return this.temperature;
-    }
-
-    @Override
-    public double getHumidity() {
-        return this.humidity;
-    }
-
-    /**
-     * Gets the default biome generation settings.
-     * 
-     * @return the default biome generation settings
-     */
-    public LanternBiomeGenerationSettings getDefaultGenerationSettings() {
-        return this.defaultSettings;
+    public void serialize(TypeToken<?> type, Text obj, ConfigurationNode value) throws ObjectMappingException {
+        value.setValue(Texts.xml().to(obj));
     }
 }

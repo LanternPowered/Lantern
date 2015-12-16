@@ -71,8 +71,6 @@ final class Launch {
 
         @Override
         public Class<?> findClass(final String name) throws ClassNotFoundException {
-            System.out.println(name);
-
             if (this.invalidClasses.contains(name)) {
                 throw new ClassNotFoundException(name);
             }

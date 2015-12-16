@@ -75,7 +75,7 @@ public final class FlatGeneratorType extends LanternGeneratorType {
             settings = getDefaultSettings();
         }
         final SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(settings.getBiomeType());
-        final FlatGeneratorPopulator populatorGenerator = new FlatGeneratorPopulator(settings,
+        final FlatGenerationPopulator populatorGenerator = new FlatGenerationPopulator(settings,
                 (LanternGeneratorType) world.getProperties().getGeneratorType());
         return new LanternWorldGenerator(populatorGenerator, biomeGenerator);
     }

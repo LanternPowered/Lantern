@@ -79,6 +79,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     private boolean usesMapFeatures;
     private boolean bonusChestEnabled; // No builder method available
     private boolean commandsAllowed; // No builder method available
+    private boolean pvpEnabled;
 
     private long seed;
 
@@ -108,6 +109,7 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.waterEvaporates = settings0.waterEvaporates();
         this.buildHeight = settings0.getBuildHeight();
         this.allowPlayerRespawns = settings0.allowPlayerRespawns();
+        this.pvpEnabled = settings0.isPVPEnabled();
         return this;
     }
 
@@ -129,6 +131,7 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.bonusChestEnabled = properties0.bonusChestEnabled;
         this.waterEvaporates = properties0.waterEvaporates;
         this.buildHeight = properties0.buildHeight;
+        this.pvpEnabled = properties0.isPVPEnabled();
         return this;
     }
 
@@ -283,7 +286,13 @@ public class LanternWorldBuilder implements WorldBuilder {
                 this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
         return new LanternWorldCreationSettings(this.name, this.gameMode, this.dimensionType, generatorType,
                 this.generatorModifiers, generatorSettings, this.teleporterAgent, this.hardcore, this.enabled,
-                this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.bonusChestEnabled, this.commandsAllowed,
-                waterEvaporates, allowPlayerRespawns, this.seed, this.buildHeight);
+                this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled, this.bonusChestEnabled,
+                this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.seed, this.buildHeight);
+    }
+
+    @Override
+    public LanternWorldBuilder pvp(boolean enabled) {
+        this.pvpEnabled = enabled;
+        return this;
     }
 }

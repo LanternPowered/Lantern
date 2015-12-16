@@ -27,8 +27,7 @@ package org.lanternpowered.server.world.chunk;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.lanternpowered.server.configuration.LanternConfig;
-import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
+import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.world.ChunkTicketManager;
@@ -46,9 +45,9 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 public class LanternChunkTicketManager implements ChunkTicketManager {
 
     private final Multimap<String, Callback> callbacks = HashMultimap.create();
-    private final LanternConfig<GlobalConfig> globalConfig;
+    private final GlobalConfig globalConfig;
 
-    public LanternChunkTicketManager(LanternConfig<GlobalConfig> globalConfig) {
+    public LanternChunkTicketManager(GlobalConfig globalConfig) {
         this.globalConfig = globalConfig;
     }
 
@@ -100,7 +99,7 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
 
     @Override
     public int getMaxTickets(Object plugin) {
-        return this.globalConfig.getBase().getChunkLoadingTickets(
+        return this.globalConfig.getChunkLoadingTickets(
                 checkPlugin(plugin, "plugin").getId()).getMaximumTicketCount();
     }
 

@@ -48,9 +48,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.configuration.LanternConfig;
-import org.lanternpowered.server.configuration.LanternConfig.GlobalConfig;
-import org.lanternpowered.server.configuration.LanternConfig.WorldConfig;
+import org.lanternpowered.server.config.GlobalConfig;
+import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -131,7 +130,7 @@ public final class LanternWorldManager {
     private final File rootWorldFolder;
 
     // The global configuration file
-    private final LanternConfig<GlobalConfig> globalConfig;
+    private final GlobalConfig globalConfig;
 
     // The game instance
     private final LanternGame game;
@@ -351,6 +350,16 @@ public final class LanternWorldManager {
                 LanternGame.log().error("Unable to open the copied world properties of {}", copyName, e);
                 return Optional.empty();
             }
+
+            // Create a config
+            try {
+                final WorldConfig worldConfig = this.getOrCreateWorldConfig(copyName);
+                data.properties.setConfig(worldConfig, true);
+            } catch (IOException e) {
+                this.game.getLogger().error("Unable to read/write the world config, please fix this issue before loading the world.", e);
+                return Optional.empty();
+            }
+
             final LanternWorldProperties properties = data.properties;
             final LevelData newData = new LevelData(properties, dimensionId, null);
 
@@ -489,6 +498,14 @@ public final class LanternWorldManager {
         final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) settings;
         // Create the world properties
         final LanternWorldProperties worldProperties = new LanternWorldProperties(settings0);
+        // Create a config
+        try {
+            final WorldConfig worldConfig = this.getOrCreateWorldConfig(settings0.getWorldName());
+            worldProperties.setConfig(worldConfig, true);
+        } catch (IOException e) {
+            this.game.getLogger().error("Unable to read/write the world config, please fix this issue before loading the world.", e);
+            return Optional.empty();
+        }
         // Get the world folder
         final File worldFolder = this.getWorldFolder(dimensionId);
         worldFolder.mkdirs();
@@ -496,8 +513,7 @@ public final class LanternWorldManager {
         this.addWorldProperties(worldProperties, worldFolder, dimensionId);
         // Save the world properties to reserve the world folder
         this.saveWorldProperties(worldProperties);
-        // Create already a config
-        this.getOrCreateWorldConfig(worldProperties);
+        
         return Optional.of(worldProperties);
     }
 
@@ -551,16 +567,22 @@ public final class LanternWorldManager {
         if (worldEntry.world != null) {
             return Optional.of(worldEntry.world);
         }
+        WorldConfig config;
+        try {
+            config = this.getOrCreateWorldConfig(worldEntry.properties.getWorldName());
+        } catch (IOException e) {
+            this.game.getLogger().error("Unable to read the world config, please fix this issue before loading the world.", e);
+            return Optional.empty();
+        }
         // Create the world instance
-        final LanternWorld world = new LanternWorld(this.game, this.getOrCreateWorldConfig(
-                worldEntry.properties), worldEntry.folder, worldEntry.properties);
+        final LanternWorld world = new LanternWorld(this.game, config, worldEntry.folder, worldEntry.properties);
         // Share the world instance
         worldEntry.world = world;
         worldEntry.properties.setWorld(world);
         // Initialize the world if not done before
         world.initialize();
         // Generate the spawn if needed
-        if (worldEntry.properties.keepSpawnLoaded) {
+        if (worldEntry.properties.doesKeepSpawnLoaded()) {
             world.enableSpawnArea(true);
         }
         // The world is ready for ticks
@@ -571,13 +593,15 @@ public final class LanternWorldManager {
     /**
      * Gets or creates a new world config for the specified world.
      * 
-     * @param worldProperties the world properties
+     * @param worldName the world name
      * @return the world config
+     * @throws IOException 
      */
-    LanternConfig<WorldConfig> getOrCreateWorldConfig(WorldProperties worldProperties) {
-        return new LanternConfig<>(new LanternConfig.WorldConfig(this.globalConfig.getBase()),
-                this.globalConfig.getPath().getParent().resolve("worlds/" + worldProperties.getWorldName()
-                        + "/" + WORLD_CONFIG));
+    WorldConfig getOrCreateWorldConfig(String worldName) throws IOException {
+        final WorldConfig config = new WorldConfig(this.globalConfig, this.globalConfig.getPath().getParent()
+                .resolve("worlds").resolve(worldName).resolve(WORLD_CONFIG));
+        config.load();
+        return config;
     }
 
     /**
@@ -745,13 +769,21 @@ public final class LanternWorldManager {
     /**
      * Initializes the root world and the dimension id map.
      */
-    public void init() {
+    public void init() throws IOException {
         // The properties of the root world
         WorldProperties rootWorldProperties = null;
 
         if (this.rootWorldFolder.exists()) {
             try {
                 final LevelData data = LanternWorldPropertiesIO.read(this.rootWorldFolder, null);
+                // Create a config
+                try {
+                    final WorldConfig worldConfig = this.getOrCreateWorldConfig(this.rootWorldFolder.getName());
+                    data.properties.setConfig(worldConfig, false);
+                } catch (IOException e) {
+                    this.game.getLogger().error("Unable to read/write the root world config, please fix this issue before loading the world.", e);
+                    throw e;
+                }
                 // The world exists, continue
                 rootWorldProperties = data.properties;
                 // Already store the data
@@ -810,10 +842,19 @@ public final class LanternWorldManager {
                             }
                             data = new LevelData(data.properties, i, null);
                         }
+                        // Create a config
+                        try {
+                            final WorldConfig worldConfig = this.getOrCreateWorldConfig(this.rootWorldFolder.getName());
+                            data.properties.setConfig(worldConfig, false);
+                        } catch (IOException e) {
+                            this.game.getLogger().error("Unable to read/write the world config, please fix this issue before loading the world, "
+                                    + "this will be skipped for now.", e);
+                            continue;
+                        }
                         // Store the data
                         this.addWorld(folder, data);
                         // Check if it should be loaded on startup
-                        if (data.properties.loadOnStartup) {
+                        if (data.properties.loadOnStartup()) {
                             loadQueue.add(this.worldByProperties.get(data.properties));
                         }
                     } catch (FileNotFoundException e) {

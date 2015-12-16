@@ -40,7 +40,7 @@ public final class DebugGeneratorType extends LanternGeneratorType {
 
     @Override
     public WorldGenerator createGenerator(World world) {
-        return new LanternWorldGenerator(new DebugGeneratorPopulator(LanternGame.get().getRegistry()),
+        return new LanternWorldGenerator(new DebugGenerationPopulator(LanternGame.get().getRegistry()),
                 new SingleBiomeGenerator(BiomeTypes.PLAINS));
     }
 }

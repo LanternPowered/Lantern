@@ -72,6 +72,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.Chunk;
@@ -79,6 +80,13 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.extent.ImmutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBlockVolume;
+import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBlockVolume;
+import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
+import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
@@ -1061,5 +1069,23 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public int getInhabittedTime() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public double getRegionalDifficultyFactor() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public double getRegionalDifficultyPercentage() {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

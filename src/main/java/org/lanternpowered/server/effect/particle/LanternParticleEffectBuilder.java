@@ -27,7 +27,9 @@ package org.lanternpowered.server.effect.particle;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.NotePitch;
+import org.spongepowered.api.effect.particle.BlockParticle;
 import org.spongepowered.api.effect.particle.ColoredParticle;
 import org.spongepowered.api.effect.particle.ItemParticle;
 import org.spongepowered.api.effect.particle.NoteParticle;
@@ -221,48 +223,93 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         }
     }
 
-    public static class Material extends LanternParticleEffectBuilder implements ItemParticle.Builder {
+    public static class Item extends LanternParticleEffectBuilder implements ItemParticle.Builder {
 
         private ItemStackSnapshot itemSnapshot;
 
         @Override
-        public LanternParticleEffectBuilder.Material type(ParticleType particleType) {
+        public LanternParticleEffectBuilder.Item type(ParticleType particleType) {
             checkArgument(particleType instanceof ParticleType.Material);
-            return (LanternParticleEffectBuilder.Material) super.type(particleType);
+            return (LanternParticleEffectBuilder.Item) super.type(particleType);
         }
 
         @Override
-        public LanternParticleEffectBuilder.Material item(ItemStackSnapshot itemSnapshot) {
+        public LanternParticleEffectBuilder.Item item(ItemStackSnapshot itemSnapshot) {
             this.itemSnapshot = checkNotNull(itemSnapshot, "itemSnapshot").copy();
             return this;
         }
 
         @Override
-        public LanternParticleEffectBuilder.Material reset() {
+        public LanternParticleEffectBuilder.Item reset() {
             this.itemSnapshot = null;
-            return (LanternParticleEffectBuilder.Material) super.reset();
+            return (LanternParticleEffectBuilder.Item) super.reset();
         }
 
         @Override
-        public LanternParticleEffectBuilder.Material motion(Vector3d motion) {
-            return (LanternParticleEffectBuilder.Material) super.motion(motion);
+        public LanternParticleEffectBuilder.Item motion(Vector3d motion) {
+            return (LanternParticleEffectBuilder.Item) super.motion(motion);
         }
 
         @Override
-        public LanternParticleEffectBuilder.Material offset(Vector3d offset) {
-            return (LanternParticleEffectBuilder.Material) super.offset(offset);
+        public LanternParticleEffectBuilder.Item offset(Vector3d offset) {
+            return (LanternParticleEffectBuilder.Item) super.offset(offset);
         }
 
         @Override
-        public LanternParticleEffectBuilder.Material count(int count) {
-            return (LanternParticleEffectBuilder.Material) super.count(count);
+        public LanternParticleEffectBuilder.Item count(int count) {
+            return (LanternParticleEffectBuilder.Item) super.count(count);
         }
 
         @Override
-        public LanternParticleEffect.Material build() {
-            return new LanternParticleEffect.Material(this.type, this.motion, this.offset, this.count,
+        public LanternParticleEffect.Item build() {
+            return new LanternParticleEffect.Item(this.type, this.motion, this.offset, this.count,
                     this.itemSnapshot == null ? ((ParticleType.Material) this.type).getDefaultItem().createSnapshot() :
                         this.itemSnapshot);
+        }
+    }
+
+    public static class Block extends LanternParticleEffectBuilder implements BlockParticle.Builder {
+
+        private BlockState blockState;
+
+        @Override
+        public LanternParticleEffectBuilder.Block type(ParticleType particleType) {
+            checkArgument(particleType instanceof ParticleType.Material);
+            return (LanternParticleEffectBuilder.Block) super.type(particleType);
+        }
+
+        @Override
+        public LanternParticleEffectBuilder.Block block(BlockState blockState) {
+            this.blockState = checkNotNull(blockState, "blockState");
+            return this;
+        }
+
+        @Override
+        public LanternParticleEffectBuilder.Block reset() {
+            this.blockState = null;
+            return (LanternParticleEffectBuilder.Block) super.reset();
+        }
+
+        @Override
+        public LanternParticleEffectBuilder.Block motion(Vector3d motion) {
+            return (LanternParticleEffectBuilder.Block) super.motion(motion);
+        }
+
+        @Override
+        public LanternParticleEffectBuilder.Block offset(Vector3d offset) {
+            return (LanternParticleEffectBuilder.Block) super.offset(offset);
+        }
+
+        @Override
+        public LanternParticleEffectBuilder.Block count(int count) {
+            return (LanternParticleEffectBuilder.Block) super.count(count);
+        }
+
+        @Override
+        public LanternParticleEffect.Block build() {
+            return new LanternParticleEffect.Block(this.type, this.motion, this.offset, this.count,
+                    this.blockState == null ? ((ParticleType.Material) this.type).getDefaultItem()
+                            .getItem().getBlock().get().getDefaultState() : this.blockState);
         }
     }
 }

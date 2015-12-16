@@ -36,8 +36,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.configuration.LanternConfig;
-import org.lanternpowered.server.configuration.LanternConfig.WorldConfig;
+import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
@@ -58,6 +57,7 @@ import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
@@ -65,7 +65,7 @@ import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.gen.BiomeGenerator;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
+import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
 import com.flowpowered.math.vector.Vector2i;
@@ -117,7 +117,7 @@ public final class LanternChunkManager {
     private final LanternWorld world;
 
     // The world configuration
-    private final LanternConfig<WorldConfig> worldConfig;
+    private final WorldConfig worldConfig;
 
     // The chunk I/O service
     private final ChunkIOService chunkIOService;
@@ -153,7 +153,7 @@ public final class LanternChunkManager {
      * @param worldGenerator the world generator
      * @param worldFolder the world data folder
      */
-    public LanternChunkManager(LanternGame game, LanternWorld world, LanternConfig<WorldConfig> worldConfig,
+    public LanternChunkManager(LanternGame game, LanternWorld world, WorldConfig worldConfig,
             LanternChunkTicketManager chunkLoadService, ChunkIOService chunkIOService,
             WorldGenerator worldGenerator, File worldFolder) {
         this.chunkLoadService = chunkLoadService;
@@ -274,7 +274,7 @@ public final class LanternChunkManager {
      * @return the maximum amount of tickets
      */
     public int getMaxTicketsForPlugin(String plugin) {
-        return this.worldConfig.getBase().getChunkLoadingTickets(plugin).getMaximumTicketCount();
+        return this.worldConfig.getChunkLoadingTickets(plugin).getMaximumTicketCount();
     }
 
     /**
@@ -294,7 +294,7 @@ public final class LanternChunkManager {
      * @return the maximum amount of forced chunks
      */
     public int getMaxChunksForPluginTicket(String plugin) {
-        return this.worldConfig.getBase().getChunkLoadingTickets(plugin).getMaximumChunksPerTicket();
+        return this.worldConfig.getChunkLoadingTickets(plugin).getMaximumChunksPerTicket();
     }
 
     /**
@@ -542,19 +542,20 @@ public final class LanternChunkManager {
         blockBuffer.reuse(new Vector3i(chunk.getX() << 4, 0, chunk.getZ() << 4));
 
         // Apply the main world generator
-        final GeneratorPopulator baseGenerator = this.worldGenerator.getBaseGeneratorPopulator();
+        final GenerationPopulator baseGenerator = this.worldGenerator.getBaseGenerationPopulator();
         baseGenerator.populate(this.world, blockBuffer, immutableBiomeArea);
 
         // Get all the used biome types
         final Set<BiomeType> biomeTypes = ImmutableSet.copyOf(biomeBuffer.biomeTypes);
         for (BiomeType biomeType : biomeTypes) {
-            for (GeneratorPopulator generator : biomeType.getGeneratorPopulators()) {
+            final BiomeGenerationSettings settings = this.worldGenerator.getBiomeSettings(biomeType);
+            for (GenerationPopulator generator : settings.getGenerationPopulators()) {
                 generator.populate(this.world, blockBuffer, immutableBiomeArea);
             }
         }
 
         // Apply the generator populators to complete the block buffer
-        for (GeneratorPopulator generator : this.worldGenerator.getGeneratorPopulators()) {
+        for (GenerationPopulator generator : this.worldGenerator.getGenerationPopulators()) {
             generator.populate(this.world, blockBuffer, immutableBiomeArea);
         }
 

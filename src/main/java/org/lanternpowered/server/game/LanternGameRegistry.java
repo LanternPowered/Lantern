@@ -69,6 +69,7 @@ import org.lanternpowered.server.data.type.LanternShrubType;
 import org.lanternpowered.server.data.type.LanternShrubTypes;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternStoneTypes;
+import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
@@ -76,6 +77,7 @@ import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.LanternItemRegistry;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
+import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.LanternTextFactory;
 import org.lanternpowered.server.text.format.LanternTextColor;
@@ -120,6 +122,12 @@ import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.value.ValueFactory;
+import org.spongepowered.api.effect.particle.NoteParticle;
+import org.spongepowered.api.effect.particle.ItemParticle;
+import org.spongepowered.api.effect.particle.BlockParticle;
+import org.spongepowered.api.effect.particle.ResizableParticle;
+import org.spongepowered.api.effect.particle.ColoredParticle;
+import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -175,11 +183,11 @@ import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
-import org.spongepowered.api.world.gen.PopulatorFactory;
 import org.spongepowered.api.world.gen.PopulatorType;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
+import org.spongepowered.api.scheduler.Task;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -253,6 +261,13 @@ public class LanternGameRegistry implements GameRegistry {
             .put(LanternAttributeBuilder.class, () -> new LanternAttributeBuilder(this.attributeRegistry))
             .put(BlockState.Builder.class, LanternBlockStateBuilder::new)
             .put(WorldBuilder.class, () -> createWorldBuilder())
+            .put(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
+            .put(NoteParticle.Builder.class, LanternParticleEffectBuilder.Note::new)
+            .put(ResizableParticle.Builder.class, LanternParticleEffectBuilder.Resizable::new)
+            .put(ColoredParticle.Builder.class, LanternParticleEffectBuilder.Colorable::new)
+            .put(ItemParticle.Builder.class, LanternParticleEffectBuilder.Item::new)
+            .put(BlockParticle.Builder.class, LanternParticleEffectBuilder.Block::new)
+            .put(Task.Builder.class, () -> new LanternTaskBuilder(this.game.getScheduler()))
             .build();
 
     // We cannot add this method directly in builderFactories map,
@@ -432,8 +447,8 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private void registerDimensionTypes() {
-        this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "end", -1,
-                LanternDimensionEnd.class, GeneratorTypes.END, true, false, false, false,
+        this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "the_end", -1,
+                LanternDimensionEnd.class, GeneratorTypes.THE_END, true, false, false, false,
                 (world, type) -> new LanternDimensionEnd(world, type.getName(), type)));
         this.dimensionTypeRegistry.register(new LanternDimensionType<>("minecraft", "overworld", 0,
                 LanternDimensionOverworld.class, GeneratorTypes.OVERWORLD, true, false, false, true,
@@ -1112,12 +1127,6 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public void registerWorldGeneratorModifier(WorldGeneratorModifier modifier) {
         this.worldGeneratorModifierRegistry.register(modifier);
-    }
-
-    @Override
-    public PopulatorFactory getPopulatorFactory() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

@@ -22,38 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.biome;
+package org.lanternpowered.server.config.world.chunk;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.spongepowered.api.world.biome.BiomeType;
-
-public class LanternBiomeType extends LanternPluginCatalogType implements BiomeType {
-
-    private final LanternBiomeGenerationSettings defaultSettings = new LanternBiomeGenerationSettings();
-
-    private double temperature;
-    private double humidity;
-
-    public LanternBiomeType(String pluginId, String identifier) {
-        super(pluginId, identifier);
-    }
-
-    @Override
-    public double getTemperature() {
-        return this.temperature;
-    }
-
-    @Override
-    public double getHumidity() {
-        return this.humidity;
-    }
+public interface ChunkLoadingConfig {
 
     /**
-     * Gets the default biome generation settings.
+     * Gets the chunk loading tickets configuration for the specified plugin.
      * 
-     * @return the default biome generation settings
+     * @return the chunk loading tickets configuration
      */
-    public LanternBiomeGenerationSettings getDefaultGenerationSettings() {
-        return this.defaultSettings;
-    }
+    ChunkLoadingTickets getChunkLoadingTickets(String plugin);
 }

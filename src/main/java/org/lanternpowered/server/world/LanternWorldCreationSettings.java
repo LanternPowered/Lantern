@@ -53,6 +53,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     private final boolean commandsAllowed;
     private final boolean waterEvaporates;
     private final boolean allowPlayerRespawns;
+    private final boolean pvpEnabled;
 
     private final int buildHeight;
     private final long seed;
@@ -60,7 +61,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
             boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
-            boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns,
+            boolean pvpEnabled, boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns,
             long seed, int buildHeight) {
         this.allowPlayerRespawns = allowPlayerRespawns;
         this.generatorModifiers = generatorModifiers;
@@ -75,6 +76,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
         this.dimensionType = dimensionType;
         this.generatorType = generatorType;
         this.buildHeight = buildHeight;
+        this.pvpEnabled = pvpEnabled;
         this.hardcore = hardcore;
         this.gameMode = gameMode;
         this.enabled = enabled;
@@ -166,5 +168,10 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
 
     public boolean allowPlayerRespawns() {
         return this.allowPlayerRespawns;
+    }
+
+    @Override
+    public boolean isPVPEnabled() {
+        return this.pvpEnabled;
     }
 }

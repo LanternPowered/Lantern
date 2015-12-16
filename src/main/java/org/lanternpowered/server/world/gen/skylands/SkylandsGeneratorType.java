@@ -33,7 +33,7 @@ import org.spongepowered.api.extra.skylands.SkylandsGrassPopulator;
 import org.spongepowered.api.extra.skylands.SkylandsGroundCoverPopulator;
 import org.spongepowered.api.extra.skylands.SkylandsTerrainGenerator;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
+import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
 public final class SkylandsGeneratorType extends LanternGeneratorType {
@@ -46,7 +46,7 @@ public final class SkylandsGeneratorType extends LanternGeneratorType {
     public WorldGenerator createGenerator(World world) {
         final LanternWorldGenerator generator = new LanternWorldGenerator(new SkylandsTerrainGenerator(),
                 new SkylandsBiomeGenerator());
-        final List<GeneratorPopulator> generatorPopulators = generator.getGeneratorPopulators();
+        final List<GenerationPopulator> generatorPopulators = generator.getGenerationPopulators();
         generatorPopulators.add(new SkylandsGroundCoverPopulator());
         generatorPopulators.add(new SkylandsGrassPopulator());
         return generator;

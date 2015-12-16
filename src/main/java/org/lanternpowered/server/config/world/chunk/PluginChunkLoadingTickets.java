@@ -22,36 +22,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.mutable;
+package org.lanternpowered.server.config.world.chunk;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableWeightedCollectionValue;
-import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
-import org.spongepowered.api.util.weighted.WeightedCollection;
-import org.spongepowered.api.util.weighted.WeightedObject;
+@ConfigSerializable
+public class PluginChunkLoadingTickets implements ChunkLoadingTickets {
 
-import java.util.Random;
+    @Setting(value = ChunkLoading.MAXIMUM_CHUNKS_PER_TICKET, comment =
+            "Maximum chunks per ticket for the plugin.")
+    private int maximumChunksPerTicket = 25;
 
-import javax.annotation.Nullable;
+    @Setting(value = ChunkLoading.MAXIMUM_TICKET_COUNT, comment =
+            "Maximum ticket count for the mod. Zero disables chunkloading capabilities.")
+    private int maximumTicketCount = 200;
 
-public abstract class LanternWeightedCollectionValue<E extends WeightedObject<?>, V extends WeightedCollectionValue<E, V, I>,
-    I extends ImmutableWeightedCollectionValue<E, I, V>> extends LanternCollectionValue<E, WeightedCollection<E>, V, I>
-    implements WeightedCollectionValue<E, V, I> {
-
-    public LanternWeightedCollectionValue(Key<? extends BaseValue<WeightedCollection<E>>> key) {
-        super(key, new WeightedCollection<E>());
-    }
-
-    public LanternWeightedCollectionValue(Key<? extends BaseValue<WeightedCollection<E>>> key, WeightedCollection<E> actualValue) {
-        super(key, new WeightedCollection<E>(), actualValue);
-    }
-
-    @Nullable
     @Override
-    public E get(Random random) {
-        return this.actualValue.get(checkNotNull(random));
+    public int getMaximumChunksPerTicket() {
+        return this.maximumChunksPerTicket;
+    }
+
+    @Override
+    public int getMaximumTicketCount() {
+        return this.maximumTicketCount;
     }
 }

@@ -82,13 +82,15 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final DataQuery LAST_UPDATE = DataQuery.of("LastUpdate"); // long
 
     private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
+    private final WorldProperties properties;
     private final RegionFileCache cache;
     private final File dir;
 
     // TODO: Consider the session.lock file
 
-    public AnvilChunkIOService(File dir) {
+    public AnvilChunkIOService(File dir, WorldProperties properties) {
         this.cache = new RegionFileCache(dir, ".mca");
+        this.properties = properties;
         this.dir = dir;
     }
 
@@ -466,8 +468,6 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public WorldProperties getWorldProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.properties;
     }
-
 }

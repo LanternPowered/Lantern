@@ -36,12 +36,12 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
-import org.spongepowered.api.world.gen.GeneratorPopulator;
+import org.spongepowered.api.world.gen.GenerationPopulator;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 
-public final class DebugGeneratorPopulator implements GeneratorPopulator {
+public final class DebugGenerationPopulator implements GenerationPopulator {
 
     // The height of the plane where all the blocks are set
     private static final int BLOCKS_PLANE = 70;
@@ -55,7 +55,7 @@ public final class DebugGeneratorPopulator implements GeneratorPopulator {
     // The x/z size of the plane
     private final int size;
 
-    public DebugGeneratorPopulator(GameRegistry registry) {
+    public DebugGenerationPopulator(GameRegistry registry) {
         checkNotNull(registry, "registry");
         Set<BlockState> blockStates = Sets.newLinkedHashSet();
         for (BlockType blockType : registry.getAllOf(BlockType.class)) {
@@ -65,7 +65,7 @@ public final class DebugGeneratorPopulator implements GeneratorPopulator {
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));
     }
 
-    public DebugGeneratorPopulator(Iterable<BlockState> blockStates) {
+    public DebugGenerationPopulator(Iterable<BlockState> blockStates) {
         this.blockStateCache = Sets.newLinkedHashSet(checkNotNull(blockStates, "blockStates"))
                 .toArray(new BlockState[0]);
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));

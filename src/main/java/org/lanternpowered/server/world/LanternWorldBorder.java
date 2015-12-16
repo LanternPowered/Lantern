@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.world;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -124,5 +127,11 @@ public class LanternWorldBorder implements WorldBorder {
     @Override
     public void setDamageAmount(double damage) {
         this.world.getProperties().setWorldBorderDamageAmount(damage);
+    }
+
+    @Override
+    public ChunkPreGenerate newChunkPreGenerate(World world) {
+        return new LanternChunkPreGenerate(checkNotNull(world, "world"),
+                this.getCenter(), this.getDiameter());
     }
 }

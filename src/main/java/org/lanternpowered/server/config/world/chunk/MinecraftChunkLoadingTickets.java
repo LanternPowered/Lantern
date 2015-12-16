@@ -22,38 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.biome;
+package org.lanternpowered.server.config.world.chunk;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.spongepowered.api.world.biome.BiomeType;
+/**
+ * The internal Minecraft plugin has no chunk loading limits.
+ */
+public final class MinecraftChunkLoadingTickets implements ChunkLoadingTickets {
 
-public class LanternBiomeType extends LanternPluginCatalogType implements BiomeType {
-
-    private final LanternBiomeGenerationSettings defaultSettings = new LanternBiomeGenerationSettings();
-
-    private double temperature;
-    private double humidity;
-
-    public LanternBiomeType(String pluginId, String identifier) {
-        super(pluginId, identifier);
+    @Override
+    public int getMaximumChunksPerTicket() {
+        return Integer.MAX_VALUE;
     }
 
     @Override
-    public double getTemperature() {
-        return this.temperature;
-    }
-
-    @Override
-    public double getHumidity() {
-        return this.humidity;
-    }
-
-    /**
-     * Gets the default biome generation settings.
-     * 
-     * @return the default biome generation settings
-     */
-    public LanternBiomeGenerationSettings getDefaultGenerationSettings() {
-        return this.defaultSettings;
+    public int getMaximumTicketCount() {
+        return Integer.MAX_VALUE;
     }
 }

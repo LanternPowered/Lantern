@@ -103,6 +103,11 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return null;
         }
         String name = this.dis.readUTF();
+        // Reflect the sponge NbtTranslator boolean suffix in our input stream
+        if (name.endsWith(BOOLEAN_IDENTIFER)) {
+            name = name.substring(0, name.lastIndexOf(BOOLEAN_IDENTIFER));
+            type = BOOLEAN;
+        }
         return new Entry(name, type);
     }
 
@@ -159,6 +164,9 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return this.dis.readShort();
         } else if (type == STRING) {
             return this.dis.readUTF();
+        // Reflect the sponge NbtTranslator boolean suffix in our input stream
+        } else if (type == BOOLEAN) {
+            return this.dis.readByte() != 0;
         }
         return null;
     }

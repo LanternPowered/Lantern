@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.effect.potion;
 
+import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -137,15 +138,34 @@ public final class PotionColorTableGenerator {
     }
 
     private static void put(int id, int rgb) {
-        int r = ((rgb >> 16) & 0xff) / 4;
-        int g = ((rgb >> 8) & 0xff) / 4;
-        int b = (rgb & 0xff) / 4;
+        int r = ((rgb >> 16) & 0xff) / DIVISION;
+        int g = ((rgb >> 8) & 0xff) / DIVISION;
+        int b = (rgb & 0xff) / DIVISION;
         int rgb0 = r << DOUBLE_COMPOUND_BITS | g << COMPOUND_BITS | b;
         knownColorsById.put(id, new int[] { rgb0, r, g, b });
     }
 
-    private final TIntObjectMap<int[]> colorTable = new TIntObjectHashMap<>();
+    private final TIntObjectMap<Entry> colorTable = new TIntObjectHashMap<>();
     private int mixedColors;
+    
+    private class Entry {
+
+        private final int[] potionIds;
+        private final float hue;
+        private final float sat;
+        private final float bright;
+        
+        public Entry(int[] potionIds, int red, int green, int blue) {
+            red *= DIVISION;
+            green *= DIVISION;
+            blue *= DIVISION;
+            final float[] hsb = Color.RGBtoHSB(red, green, blue, null);
+            this.hue = hsb[0];
+            this.sat = hsb[1];
+            this.bright = hsb[2];
+            this.potionIds = potionIds;
+        }
+    }
 
     private PotionColorTableGenerator(String path, int maxColorDepth) throws IOException {
         final File file = new File(path);
@@ -153,7 +173,7 @@ public final class PotionColorTableGenerator {
         // Process all color combinations
         for (int key : knownColorsById.keys()) {
             int[] t = knownColorsById.get(key);
-            this.colorTable.put(t[0], new int[] { key });
+            this.colorTable.put(t[0], new Entry(new int[] { key }, t[1], t[2], t[3]));
             if (maxColorDepth > 1) {
                 this.process(Lists.newArrayList(key), t, maxColorDepth - 2);
             }
@@ -229,21 +249,21 @@ public final class PotionColorTableGenerator {
                         int rgb = r << DOUBLE_COMPOUND_BITS | g << COMPOUND_BITS | b;
                         int[] types;
                         if (!colorTable.containsKey(rgb)) {
+                            final float[] hsb = Color.RGBtoHSB(r * DIVISION, g * DIVISION, b * DIVISION, null);
                             float closestDistance = Float.MAX_VALUE;
-                            int closest = 0;
-                            for (int color : colorTable.keys()) {
-                                float distance = colorDistance(r * 4, g * 4, b * 4,
-                                        ((color >> DOUBLE_COMPOUND_BITS) & COMPOUND_MASK) * 4,
-                                        ((color >> COMPOUND_BITS) & COMPOUND_MASK) * 4,
-                                        (color & COMPOUND_MASK) * 4);
+                            Entry closest = null;
+                            for (Object color : colorTable.values()) {
+                                final Entry entry1 = (Entry) color;
+                                float distance = colorDistance(hsb[0], hsb[1], hsb[2],
+                                        entry1.hue, entry1.sat, entry1.bright);
                                 if (distance < closestDistance) {
                                     closestDistance = distance;
-                                    closest = color;
+                                    closest = entry1;
                                 }
                             }
-                            types = colorTable.get(closest);
+                            types = closest.potionIds;
                         } else {
-                            types = colorTable.get(rgb);
+                            types = colorTable.get(rgb).potionIds;
                         }
                         try {
                             this.dos.writeByte(types.length);
@@ -258,13 +278,12 @@ public final class PotionColorTableGenerator {
             }
         }
     }
-    
-    private float colorDistance(int r0, int g0, int b0, int r1, int g1, int b1) {
-        int rm = (r0 + r1) >> 1;
-        r0 -= r1;
-        g0 -= g1;
-        b0 -= b1;
-        return (((512 + rm) * r0 * r0) >> 8) + 4 * g0 * g0 + (((767 - rm) * b0 * b0) >> 8);
+
+    private float colorDistance(float hue0, float sat0, float bright0, float hue1, float sat1, float bright1) {
+        hue0 -= hue1;
+        sat0 -= sat1;
+        bright0 -= bright1;
+        return 4.75f * hue0 * hue0 + 2.875f * sat0 * sat0 + 2.375f * bright0 * bright0;
     }
 
     private void process(List<Integer> entries, int[] t, int depth) {
@@ -277,9 +296,12 @@ public final class PotionColorTableGenerator {
             entries0.add(key);
             int rgb0 = r0 << DOUBLE_COMPOUND_BITS | g0 << COMPOUND_BITS | b0;
             int[] t1 = new int[] { rgb0, r0, g0, b0 };
-            if (!this.colorTable.containsKey(rgb0) || entries0.size() < this.colorTable.get(rgb0).length) {
-                this.colorTable.put(rgb0, entries0.stream().mapToInt(i -> i).toArray());
-                this.mixedColors++;
+            boolean flag = false;
+            if (!this.colorTable.containsKey(rgb0) || (flag = (entries0.size() < this.colorTable.get(rgb0).potionIds.length))) {
+                this.colorTable.put(rgb0, new Entry(entries0.stream().mapToInt(i -> i).toArray(), r0, g0, b0));
+                if (flag) {
+                    this.mixedColors++;
+                }
             }
             if (depth > 0) {
                 this.process(entries0, t1, depth - 1);

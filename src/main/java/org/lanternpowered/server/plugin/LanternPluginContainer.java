@@ -28,6 +28,8 @@ import java.util.Optional;
 
 import org.spongepowered.api.plugin.PluginContainer;
 
+import com.google.inject.Injector;
+
 public final class LanternPluginContainer implements PluginContainer {
 
     private final String id;
@@ -36,6 +38,7 @@ public final class LanternPluginContainer implements PluginContainer {
 
     // The instance of the plugin
     private Object instance;
+    private Injector injector;
 
     LanternPluginContainer(String id, String name, String version) {
         this.version = version;
@@ -61,6 +64,17 @@ public final class LanternPluginContainer implements PluginContainer {
     @Override
     public Optional<Object> getInstance() {
         return Optional.ofNullable(this.instance);
+    }
+
+    public Injector getInjector() {
+        return this.injector;
+    }
+
+    void setInjector(Injector injector) {
+        if (this.injector != null) {
+            throw new IllegalStateException("Injector for (" + this.getId() + ") can only be set once!");
+        }
+        this.injector = injector;
     }
 
     void setInstance(Object instance) {

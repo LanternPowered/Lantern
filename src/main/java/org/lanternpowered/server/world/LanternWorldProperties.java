@@ -121,7 +121,6 @@ public class LanternWorldProperties implements WorldProperties {
     boolean hardcore;
     boolean thundering;
     boolean raining;
-    boolean pvpEnabled;
 
     int rainTime;
     int thunderTime;
@@ -186,7 +185,6 @@ public class LanternWorldProperties implements WorldProperties {
         this.name = creationSettings.getWorldName();
         this.seed = creationSettings.getSeed();
         this.allowPlayerRespawns = creationSettings.allowPlayerRespawns();
-        this.pvpEnabled = creationSettings.isPVPEnabled();
         this.uniqueId = UUID.randomUUID();
     }
 
@@ -196,6 +194,7 @@ public class LanternWorldProperties implements WorldProperties {
             this.setKeepSpawnLoaded(this.creationSettings.doesKeepSpawnLoaded());
             this.setGeneratorModifiers(this.creationSettings.getGeneratorModifiers());
             this.setEnabled(this.creationSettings.isEnabled());
+            this.setPVPEnabled(this.creationSettings.isPVPEnabled());
             worldConfig.save();
         } else {
             worldConfig.load();
@@ -719,11 +718,11 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public boolean isPVPEnabled() {
-        return this.pvpEnabled;
+        return this.worldConfig.getPVPEnabled();
     }
 
     @Override
     public void setPVPEnabled(boolean enabled) {
-        this.pvpEnabled = enabled;
+        this.worldConfig.setPVPEnabled(enabled);
     }
 }

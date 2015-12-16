@@ -24,13 +24,17 @@
  */
 package org.lanternpowered.server.config;
 
+import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
 
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.config.ConfigRoot;
 
-import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -38,32 +42,39 @@ import java.nio.file.Path;
  */
 public class LanternConfigRoot implements ConfigRoot {
 
+    private final ObjectMapperFactory mapperFactory;
     private final String pluginName;
-    private final File baseDir;
+    private final Path baseDir;
 
-    public LanternConfigRoot(String pluginName, File baseDir) {
+    public LanternConfigRoot(ObjectMapperFactory mapperFactory, String pluginName, Path baseDir) {
+        this.mapperFactory = mapperFactory;
         this.pluginName = pluginName;
         this.baseDir = baseDir;
     }
 
     @Override
     public Path getConfigPath() {
-        File configFile = new File(this.baseDir, this.pluginName + ".conf");
-        if (configFile.getParentFile().isDirectory()) {
-            configFile.getParentFile().mkdirs();
+        final Path configFile = this.baseDir.resolve(this.pluginName + ".conf");
+        if (!Files.exists(this.baseDir)) {
+            try {
+                Files.createDirectories(this.baseDir);
+            } catch (IOException e) {
+                LanternGame.log().error("Failed to create plugin dir for {} at {}", this.pluginName, this.baseDir, e);
+            }
         }
-        return configFile.toPath();
+        return configFile;
     }
 
     @Override
     public ConfigurationLoader<CommentedConfigurationNode> getConfig() {
         return HoconConfigurationLoader.builder()
                 .setPath(this.getConfigPath())
+                .setDefaultOptions(ConfigurationOptions.defaults().setObjectMapperFactory(this.mapperFactory))
                 .build();
     }
 
     @Override
     public Path getDirectory() {
-        return this.baseDir.toPath();
+        return this.baseDir;
     }
 }

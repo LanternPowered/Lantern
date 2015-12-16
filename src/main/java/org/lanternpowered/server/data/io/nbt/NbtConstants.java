@@ -30,20 +30,21 @@ package org.lanternpowered.server.data.io.nbt;
  */
 class NbtConstants {
 
-    public static final int END = 0;
-    public static final int BYTE = 1;
-    public static final int SHORT = 2;
-    public static final int INT = 3;
-    public static final int LONG = 4;
-    public static final int FLOAT = 5;
-    public static final int DOUBLE = 6;
-    public static final int BYTE_ARRAY = 7;
-    public static final int STRING = 8;
-    public static final int LIST = 9;
-    public static final int COMPOUND = 10;
-    public static final int INT_ARRAY = 11;
+    public static final byte END = 0;
+    public static final byte BYTE = 1;
+    public static final byte SHORT = 2;
+    public static final byte INT = 3;
+    public static final byte LONG = 4;
+    public static final byte FLOAT = 5;
+    public static final byte DOUBLE = 6;
+    public static final byte BYTE_ARRAY = 7;
+    public static final byte STRING = 8;
+    public static final byte LIST = 9;
+    public static final byte COMPOUND = 10;
+    public static final byte INT_ARRAY = 11;
 
     // Boolean suffix introduced in sponge common NbtTranslator
-    public static final int BOOLEAN = 99;
+    public static final byte BOOLEAN = 99;
+    public static final byte BOOLEAN_LIST = 98;
     public static final String BOOLEAN_IDENTIFER = "$Boolean";
 }

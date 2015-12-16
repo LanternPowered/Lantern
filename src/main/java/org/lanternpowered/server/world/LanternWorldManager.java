@@ -26,7 +26,6 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -92,7 +91,7 @@ public final class LanternWorldManager {
         public final LanternWorldProperties properties;
 
         // The folder where all the world files are stored
-        public final File folder;
+        public final Path folder;
 
         // The dimension id of the world
         public final int dimensionId;
@@ -100,7 +99,7 @@ public final class LanternWorldManager {
         // The reference to the world instance
         @Nullable public volatile LanternWorld world;
 
-        public WorldLookupEntry(LanternWorldProperties properties, File folder,
+        public WorldLookupEntry(LanternWorldProperties properties, Path folder,
                 int dimensionId) {
             this.dimensionId = dimensionId;
             this.properties = properties;
@@ -127,7 +126,7 @@ public final class LanternWorldManager {
     private BitSet dimensionMap;
 
     // The folder of the root world
-    private final File rootWorldFolder;
+    private final Path rootWorldFolder;
 
     // The global configuration file
     private final GlobalConfig globalConfig;
@@ -145,7 +144,7 @@ public final class LanternWorldManager {
      * @param game the game instance
      * @param globalConfig the global configuration
      */
-    public LanternWorldManager(LanternGame game, File rootWorldFolder) {
+    public LanternWorldManager(LanternGame game, Path rootWorldFolder) {
         this.rootWorldFolder = rootWorldFolder;
         this.globalConfig = game.getGlobalConfig();
         this.game = game;
@@ -318,22 +317,22 @@ public final class LanternWorldManager {
             final WorldLookupEntry entry = this.worldByProperties.get(worldProperties);
 
             // The folder of the new world
-            final File targetFolder = this.getWorldFolder(dimensionId);
+            final Path targetFolder = this.getWorldFolder(dimensionId);
             // The folder of the original world
-            final File folder = entry.folder;
+            final Path folder = entry.folder;
 
             // Save the changes once more to make sure that they will be saved
             this.saveWorldProperties(worldProperties);
 
             // Copy the world folder
-            final String folderPath = folder.getAbsolutePath();
+            final String folderPath = folder.toFile().getAbsolutePath();
             try {
-                Files.walkFileTree(folder.toPath(), new SimpleFileVisitor<Path>() {
+                Files.walkFileTree(folder, new SimpleFileVisitor<Path>() {
                     @Override
                     public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
-                        final File dstFile = new File(targetFolder, path.toFile()
+                        final Path dstPath = targetFolder.resolve(path.toFile()
                                 .getAbsolutePath().substring(folderPath.length()));
-                        Files.copy(path, dstFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                        Files.copy(path, dstPath, StandardCopyOption.REPLACE_EXISTING);
                         return FileVisitResult.CONTINUE;
                     }
                 });
@@ -401,6 +400,10 @@ public final class LanternWorldManager {
         return Optional.of(worldProperties0);
     }
 
+    private static class Ref {
+        public boolean flag;
+    }
+
     /**
      * Deletes the provided world's files asynchronously from the disk.
      *
@@ -414,7 +417,8 @@ public final class LanternWorldManager {
             if (entry.world != null) {
                 return false;
             }
-            Files.walkFileTree(entry.folder.toPath(), new SimpleFileVisitor<Path>() {
+            final Ref ref = new Ref();
+            Files.walkFileTree(entry.folder, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
                     try {
@@ -422,6 +426,7 @@ public final class LanternWorldManager {
                     } catch (IOException e) {
                         LanternGame.log().error("Unable to delete the file {} of world {}",
                                 path.toFile().getAbsolutePath(), worldProperties.getWorldName(), e);
+                        ref.flag = true;
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -431,7 +436,8 @@ public final class LanternWorldManager {
             this.worldByProperties.remove(worldProperties);
             this.worldByUUID.remove(worldProperties.getUniqueId());
             this.dimensionMap.clear(entry.dimensionId);
-            return entry.folder.delete();
+            Files.delete(entry.folder);
+            return ref.flag;
         });
     }
 
@@ -507,8 +513,13 @@ public final class LanternWorldManager {
             return Optional.empty();
         }
         // Get the world folder
-        final File worldFolder = this.getWorldFolder(dimensionId);
-        worldFolder.mkdirs();
+        final Path worldFolder = this.getWorldFolder(dimensionId);
+        try {
+            Files.createDirectories(worldFolder);
+        } catch (IOException e) {
+            this.game.getLogger().error("Unable to create the world folders for {}.", settings0.getWorldName(), e);
+            return Optional.empty();
+        }
         // Store the new properties
         this.addWorldProperties(worldProperties, worldFolder, dimensionId);
         // Save the world properties to reserve the world folder
@@ -706,9 +717,8 @@ public final class LanternWorldManager {
      * @param dimensionId the dimension id
      * @return the world folder
      */
-    File getWorldFolder(int dimensionId) {
-        return dimensionId == 0 ? this.rootWorldFolder : new File(
-                this.rootWorldFolder, DIMENSION_PREFIX + dimensionId);
+    Path getWorldFolder(int dimensionId) {
+        return dimensionId == 0 ? this.rootWorldFolder : this.rootWorldFolder.resolve(DIMENSION_PREFIX + dimensionId);
     }
 
     /**
@@ -734,7 +744,7 @@ public final class LanternWorldManager {
      * @param worldFolder the folder of the world
      * @param levelData the level data
      */
-    void addWorld(File worldFolder, LevelData levelData) {
+    void addWorld(Path worldFolder, LevelData levelData) {
         final UUID uniqueId = levelData.properties.getUniqueId();
         // The world is already added
         if (this.worldByUUID.containsKey(uniqueId)) {
@@ -758,7 +768,7 @@ public final class LanternWorldManager {
      * @param worldFolder the folder of the world
      * @param dimensionId the id of the world (dimension)
      */
-    void addWorldProperties(LanternWorldProperties properties, File worldFolder, int dimensionId) {
+    void addWorldProperties(LanternWorldProperties properties, Path worldFolder, int dimensionId) {
         final WorldLookupEntry entry = new WorldLookupEntry(properties, worldFolder, dimensionId);
         this.worldByUUID.put(properties.getUniqueId(), entry);
         this.worldByName.put(properties.getWorldName(), entry);
@@ -773,12 +783,12 @@ public final class LanternWorldManager {
         // The properties of the root world
         WorldProperties rootWorldProperties = null;
 
-        if (this.rootWorldFolder.exists()) {
+        if (Files.exists(this.rootWorldFolder)) {
             try {
                 final LevelData data = LanternWorldPropertiesIO.read(this.rootWorldFolder, null);
                 // Create a config
                 try {
-                    final WorldConfig worldConfig = this.getOrCreateWorldConfig(this.rootWorldFolder.getName());
+                    final WorldConfig worldConfig = this.getOrCreateWorldConfig(this.rootWorldFolder.toFile().getName());
                     data.properties.setConfig(worldConfig, false);
                 } catch (IOException e) {
                     this.game.getLogger().error("Unable to read/write the root world config, please fix this issue before loading the world.", e);
@@ -809,7 +819,7 @@ public final class LanternWorldManager {
         // Generate the root (default) world if missing
         if (rootWorldProperties == null) {
             final LanternWorldCreationSettings settings = new LanternWorldBuilder(this.game)
-                    .name(this.rootWorldFolder.getName())
+                    .name(this.rootWorldFolder.toFile().getName())
                     .dimensionType(DimensionTypes.OVERWORLD)
                     .generator(GeneratorTypes.FLAT) // TODO: Use the default generator type once implemented
                     .gameMode(GameModes.SURVIVAL)
@@ -829,7 +839,7 @@ public final class LanternWorldManager {
         if (loadDimensionWorlds) {
             for (int i = 0; i < DIMENSION_MAP_SIZE; i++) {
                 if (this.dimensionMap.get(i)) {
-                    final File folder = this.getWorldFolder(i);
+                    final Path folder = this.getWorldFolder(i);
                     try {
                         LevelData data = LanternWorldPropertiesIO.read(folder, null);
                         // Modify the dimension to make sure that the ids will
@@ -844,7 +854,8 @@ public final class LanternWorldManager {
                         }
                         // Create a config
                         try {
-                            final WorldConfig worldConfig = this.getOrCreateWorldConfig(this.rootWorldFolder.getName());
+                            final WorldConfig worldConfig = this.getOrCreateWorldConfig(this.rootWorldFolder
+                                    .toFile().getName());
                             data.properties.setConfig(worldConfig, false);
                         } catch (IOException e) {
                             this.game.getLogger().error("Unable to read/write the world config, please fix this issue before loading the world, "
@@ -862,7 +873,7 @@ public final class LanternWorldManager {
                         // The world (dimension) is missing, so remove it
                         this.dimensionMap.clear(i);
                     } catch (IOException e) {
-                        LanternGame.log().error("Unable to load world (dimension) folder: {}", folder.getName(), e);
+                        LanternGame.log().error("Unable to load world (dimension) folder: {}", folder.toFile().getName(), e);
                     }
                 }
             }

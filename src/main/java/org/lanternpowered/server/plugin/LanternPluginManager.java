@@ -26,14 +26,14 @@ package org.lanternpowered.server.plugin;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -41,6 +41,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -69,7 +71,8 @@ public final class LanternPluginManager implements PluginManager {
     private static final String PLUGIN_DESCRIPTOR = Type.getDescriptor(Plugin.class);
     private static final String CLASS_EXTENSION = ".class";
 
-    private static final FilenameFilter ARCHIVE = (dir, name) -> name.endsWith(".jar") || name.endsWith(".zip");
+    private static final Predicate<Path> ARCHIVE = path -> path.toFile().getName().endsWith(".jar") ||
+            path.toFile().getName().endsWith(".zip");
     private static final Comparator<PluginEntry> ENTRY_COMPARATOR = (x, y) -> {
         if (x.loadAfter != null && x.loadAfter.contains(y.id)) {
             return 1;
@@ -90,9 +93,9 @@ public final class LanternPluginManager implements PluginManager {
     private final Map<Object, PluginContainer> pluginInstances = Maps.newIdentityHashMap();
 
     private final LanternGame game;
-    private final File pluginsFolder;
+    private final Path pluginsFolder;
 
-    public LanternPluginManager(LanternGame game, File pluginsFolder,
+    public LanternPluginManager(LanternGame game, Path pluginsFolder,
             PluginContainer... preInstalledPlugins) {
         this.pluginsFolder = checkNotNull(pluginsFolder, "pluginsFolder");
         this.game = checkNotNull(game, "game");
@@ -119,23 +122,23 @@ public final class LanternPluginManager implements PluginManager {
         }
     }
 
-    public void loadPlugins() {
+    public void loadPlugins() throws IOException {
         // Make the plugins folder is needed
-        if (!this.pluginsFolder.exists()) {
-            this.pluginsFolder.mkdirs();
+        if (!Files.exists(this.pluginsFolder)) {
+            Files.createDirectories(this.pluginsFolder);
         }
 
         List<PluginEntry> plugins = Lists.newArrayList();
 
         // Search for all the plugin jar/zip files
-        for (File jar : this.pluginsFolder.listFiles(ARCHIVE)) {
+        for (Path jar : Files.list(this.pluginsFolder).filter(ARCHIVE).collect(Collectors.toList())) {
             // Search the jar for plugins
             if (scanZip(jar, plugins)) {
                 // Add the jar/zip to the class loader, even if the
                 // jar doesn't contain a plugin, it may be used as
                 // a library
                 try {
-                    this.addLibrary(jar.toURI().toURL());
+                    this.addLibrary(jar.toFile().toURI().toURL());
                 } catch (MalformedURLException e) {
                     LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
                     continue;
@@ -185,7 +188,7 @@ public final class LanternPluginManager implements PluginManager {
             }
 
             try {
-                LanternPluginContainer container = new LanternPluginContainer(entry.id, entry.name, entry.version);
+                final LanternPluginContainer container = new LanternPluginContainer(entry.id, entry.name, entry.version);
                 Class<?> pluginClass;
                 try {
                     pluginClass = Class.forName(entry.classPath);
@@ -193,7 +196,8 @@ public final class LanternPluginManager implements PluginManager {
                     LanternGame.log().error("Unable to load the plugin {} (from {})", entry.id, entry.classPath, e);
                     continue;
                 }
-                Injector injector = Guice.createInjector(new PluginModule(container, pluginClass, this.game));
+                final Injector injector = Guice.createInjector(new PluginModule(container, pluginClass, this.game));
+                container.setInjector(injector);
                 Object instance = injector.getInstance(pluginClass);
                 container.setInstance(instance);
 
@@ -252,9 +256,9 @@ public final class LanternPluginManager implements PluginManager {
         public List<String> required;
     }
 
-    private static boolean scanZip(File file, List<PluginEntry> plugins) {
+    private static boolean scanZip(Path file, List<PluginEntry> plugins) {
         try {
-            ZipFile zip = new ZipFile(file);
+            ZipFile zip = new ZipFile(file.toFile());
             try {
                 Enumeration<? extends ZipEntry> entries = zip.entries();
                 while (entries.hasMoreElements()) {

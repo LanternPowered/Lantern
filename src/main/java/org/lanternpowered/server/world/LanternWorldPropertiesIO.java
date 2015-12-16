@@ -24,11 +24,12 @@
  */
 package org.lanternpowered.server.world;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -38,7 +39,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.util.DataQueries;
@@ -140,17 +140,17 @@ public final class LanternWorldPropertiesIO {
     private LanternWorldPropertiesIO() {
     }
 
-    static LevelData read(File folder, @Nullable String worldName) throws IOException {
-        File levelFile = new File(folder, LEVEL_DATA);
-        if (!levelFile.exists()) {
-            levelFile = new File(folder, LEVEL_DATA_OLD);
+    static LevelData read(Path folder, @Nullable String worldName) throws IOException {
+        Path levelFile = folder.resolve(LEVEL_DATA);
+        if (!Files.exists(levelFile)) {
+            levelFile = folder.resolve(LEVEL_DATA_OLD);
         }
-        if (!levelFile.exists()) {
+        if (!Files.exists(levelFile)) {
             throw new FileNotFoundException("Unable to find " + LEVEL_DATA + " or " + LEVEL_DATA_OLD + "!");
         }
         DataView rootDataView;
         try {
-            rootDataView = NbtStreamUtils.read(new FileInputStream(levelFile), true);
+            rootDataView = NbtStreamUtils.read(Files.newInputStream(levelFile), true);
         } catch (IOException e) {
             throw new IOException("Unable to access " + LEVEL_DATA + "!", e);
         }
@@ -159,13 +159,13 @@ public final class LanternWorldPropertiesIO {
         DataContainer spongeRootContainer = null;
         DataView spongeContainer = null;
 
-        File spongeLevelFile = new File(folder, SPONGE_LEVEL_DATA);
-        if (!spongeLevelFile.exists()) {
-            spongeLevelFile = new File(folder, SPONGE_LEVEL_DATA_OLD);
+        Path spongeLevelFile = folder.resolve(SPONGE_LEVEL_DATA);
+        if (!Files.exists(spongeLevelFile)) {
+            spongeLevelFile = folder.resolve(SPONGE_LEVEL_DATA_OLD);
         }
-        if (spongeLevelFile.exists()) {
+        if (Files.exists(spongeLevelFile)) {
             try {
-                spongeRootContainer = NbtStreamUtils.read(new FileInputStream(spongeLevelFile), true);
+                spongeRootContainer = NbtStreamUtils.read(Files.newInputStream(spongeLevelFile), true);
             } catch (IOException e) {
                 LanternGame.log().error("Unable to access {}, ignoring...", SPONGE_LEVEL_DATA, e);
             }
@@ -404,7 +404,7 @@ public final class LanternWorldPropertiesIO {
         return new LevelData(properties, dimensionId, dimensionMap);
     }
 
-    static void write(File folder, LevelData levelData) throws IOException {
+    static void write(Path folder, LevelData levelData) throws IOException {
         final LanternWorldProperties properties = levelData.properties;
 
         final DataContainer container = new MemoryDataContainer();
@@ -473,20 +473,20 @@ public final class LanternWorldPropertiesIO {
             }
             dimensionData.set(DIMENSION_ARRAY, data);
         }
-        File levelFileNew = new File(folder, LEVEL_DATA_NEW);
-        File levelFileOld = new File(folder, LEVEL_DATA_OLD);
-        File levelFile = new File(folder, LEVEL_DATA);
-        NbtStreamUtils.write(container, new FileOutputStream(levelFileNew), true);
-        if (levelFileOld.exists()) {
-            levelFileOld.delete();
+        Path levelFileNew = folder.resolve(LEVEL_DATA_NEW);
+        Path levelFileOld = folder.resolve(LEVEL_DATA_OLD);
+        Path levelFile = folder.resolve(LEVEL_DATA);
+        NbtStreamUtils.write(container, Files.newOutputStream(levelFileNew), true);
+        if (Files.exists(levelFileOld)) {
+            Files.delete(levelFileOld);
         }
-        levelFile.renameTo(levelFileOld);
-        if (levelFile.exists()) {
-            levelFile.delete();
+        Files.move(levelFile, levelFileOld);
+        if (Files.exists(levelFile)) {
+            Files.delete(levelFile);
         }
-        levelFileNew.renameTo(levelFile);
-        if (levelFileNew.exists()) {
-            levelFileNew.delete();
+        Files.move(levelFileNew, levelFile);
+        if (Files.exists(levelFileNew)) {
+            Files.delete(levelFileNew);
         }
         final DataContainer spongeRootContainer = properties.properties.copy();
         final DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
@@ -506,20 +506,20 @@ public final class LanternWorldPropertiesIO {
                             .set(UUID_MOST, uuid.getMostSignificantBits())
                             .set(UUID_LEAST, uuid.getLeastSignificantBits()))
                 .collect(Collectors.toList()));
-        levelFileNew = new File(folder, SPONGE_LEVEL_DATA_NEW);
-        levelFileOld = new File(folder, SPONGE_LEVEL_DATA_OLD);
-        levelFile = new File(folder, SPONGE_LEVEL_DATA);
-        NbtStreamUtils.write(spongeRootContainer, new FileOutputStream(levelFileNew), true);
-        if (levelFileOld.exists()) {
-            levelFileOld.delete();
+        levelFileNew = folder.resolve(SPONGE_LEVEL_DATA_NEW);
+        levelFileOld = folder.resolve(SPONGE_LEVEL_DATA_OLD);
+        levelFile = folder.resolve(SPONGE_LEVEL_DATA);
+        NbtStreamUtils.write(container, Files.newOutputStream(levelFileNew), true);
+        if (Files.exists(levelFileOld)) {
+            Files.delete(levelFileOld);
         }
-        levelFile.renameTo(levelFileOld);
-        if (levelFile.exists()) {
-            levelFile.delete();
+        Files.move(levelFile, levelFileOld);
+        if (Files.exists(levelFile)) {
+            Files.delete(levelFile);
         }
-        levelFileNew.renameTo(levelFile);
-        if (levelFileNew.exists()) {
-            levelFileNew.delete();
+        Files.move(levelFileNew, levelFile);
+        if (Files.exists(levelFileNew)) {
+            Files.delete(levelFileNew);
         }
     }
 

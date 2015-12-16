@@ -33,6 +33,7 @@ import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.nio.file.Path;
 import java.security.KeyPair;
 import java.util.Collection;
 import java.util.Optional;
@@ -132,7 +133,7 @@ public class LanternServer implements Server {
                     LanternMinecraftVersion.CURRENT.getProtocol()); 
 
             // The root world folder
-            final File worldFolder = new File(game.getGlobalConfig().getRootWorldFolder());
+            final Path worldFolder = new File(game.getGlobalConfig().getRootWorldFolder()).toPath();
 
             // Initialize the game
             game.initialize(server, worldFolder);

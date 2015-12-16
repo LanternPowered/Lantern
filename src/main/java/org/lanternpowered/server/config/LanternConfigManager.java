@@ -26,27 +26,48 @@ package org.lanternpowered.server.config;
 
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
-import java.io.File;
+import java.nio.file.Path;
 
+import ninja.leaping.configurate.objectmapping.DefaultObjectMapperFactory;
+import ninja.leaping.configurate.objectmapping.GuiceObjectMapperFactory;
+import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
+
+import org.lanternpowered.server.plugin.LanternPluginContainer;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.ConfigRoot;
+import org.spongepowered.api.plugin.PluginContainer;
+
+import com.google.inject.Injector;
 
 public class LanternConfigManager implements ConfigManager {
 
-    private final File configRoot;
+    private final Path configRoot;
 
-    public LanternConfigManager(File configRoot) {
+    public LanternConfigManager(Path configRoot) {
         this.configRoot = configRoot;
     }
 
     @Override
     public ConfigRoot getSharedConfig(Object instance) {
-        return new LanternConfigRoot(checkPlugin(instance, "instance").getId().toLowerCase(), this.configRoot);
+        final PluginContainer pluginContainer = checkPlugin(instance, "instance");
+        return new LanternConfigRoot(this.getMapperFactory(pluginContainer), pluginContainer.getId().toLowerCase(),
+                this.configRoot);
     }
 
     @Override
     public ConfigRoot getPluginConfig(Object instance) {
-        String name = checkPlugin(instance, "instance").getId().toLowerCase();
-        return new LanternConfigRoot(name, new File(this.configRoot, name));
+        final PluginContainer pluginContainer = checkPlugin(instance, "instance");
+        final String name = pluginContainer.getId().toLowerCase();
+        return new LanternConfigRoot(this.getMapperFactory(pluginContainer), name, this.configRoot.resolve(name));
+    }
+
+    private ObjectMapperFactory getMapperFactory(PluginContainer container) {
+        if (container instanceof LanternPluginContainer) {
+            Injector injector = ((LanternPluginContainer) container).getInjector();
+            if (injector != null) {
+                return injector.getInstance(GuiceObjectMapperFactory.class);
+            }
+        }
+        return DefaultObjectMapperFactory.getInstance();
     }
 }

@@ -26,6 +26,7 @@ package org.lanternpowered.server.world.chunk;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -126,7 +127,7 @@ public final class LanternChunkManager {
     private final LanternChunkTicketManager chunkLoadService;
 
     // The world folder
-    private final File worldFolder;
+    private final Path worldFolder;
 
     // The biome buffers that will be reused
     private final ThreadLocal<ChunkBiomeBuffer> biomeBuffer = ThreadLocal.withInitial(() -> {
@@ -151,11 +152,11 @@ public final class LanternChunkManager {
      * @param chunkLoadService the chunk load (ticket) service
      * @param chunkIOService the chunk i/o service
      * @param worldGenerator the world generator
-     * @param worldFolder the world data folder
+     * @param worldFolder2 the world data folder
      */
     public LanternChunkManager(LanternGame game, LanternWorld world, WorldConfig worldConfig,
             LanternChunkTicketManager chunkLoadService, ChunkIOService chunkIOService,
-            WorldGenerator worldGenerator, File worldFolder) {
+            WorldGenerator worldGenerator, Path worldFolder) {
         this.chunkLoadService = chunkLoadService;
         this.chunkIOService = chunkIOService;
         this.worldGenerator = worldGenerator;

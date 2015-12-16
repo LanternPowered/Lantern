@@ -24,7 +24,7 @@
  */
 package org.lanternpowered.server.world;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -159,13 +159,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private volatile Context worldContext;
 
-    public LanternWorld(LanternGame game, WorldConfig worldConfig, File worldFolder,
+    public LanternWorld(LanternGame game, WorldConfig worldConfig, Path worldFolder,
             LanternWorldProperties properties) {
         this.worldConfig = worldConfig;
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder, properties);
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder.toFile(), properties);
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type

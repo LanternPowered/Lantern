@@ -151,10 +151,10 @@ public class LanternGame implements Game {
     private LanternPlatform platform;
 
     // The config folder
-    private File configFolder;
+    private Path configFolder;
 
     // The plugins folder
-    private File pluginsFolder;
+    private Path pluginsFolder;
 
     // The channel registrar
     private LanternChannelRegistrar channelRegistrar;
@@ -201,7 +201,7 @@ public class LanternGame implements Game {
     private PluginContainer implContainer;
 
     // The folder where the worlds are saved
-    private File rootWorldFolder;
+    private Path rootWorldFolder;
 
     // The global config
     private GlobalConfig globalConfig;
@@ -217,8 +217,9 @@ public class LanternGame implements Game {
     }
 
     public void preInitialize() throws IOException {
-        this.configFolder = new File(CONFIG_FOLDER);
-        this.pluginsFolder = new File(PLUGINS_FOLDER);
+        final Path root = new File("").toPath();
+        this.configFolder = root.resolve(CONFIG_FOLDER);
+        this.pluginsFolder = root.resolve(PLUGINS_FOLDER);
 
         // Create the inbuilt plugin containers and platform
         this.minecraft = new MinecraftPluginContainer(this);
@@ -231,11 +232,11 @@ public class LanternGame implements Game {
         this.gameRegistry.preRegisterGameObjects();
 
         // Create the global config
-        this.globalConfig = new GlobalConfig(new File(this.configFolder, GLOBAL_CONFIG).toPath());
+        this.globalConfig = new GlobalConfig(this.configFolder.resolve(GLOBAL_CONFIG));
         this.globalConfig.load();
     }
 
-    public void initialize(LanternServer server, File rootWorldFolder) {
+    public void initialize(LanternServer server, Path rootWorldFolder) {
         this.rootWorldFolder = rootWorldFolder;
         this.server = server;
 
@@ -247,7 +248,7 @@ public class LanternGame implements Game {
         this.gameRegistry.registerGameObjects();
 
         // Create the plugin manager instance
-        this.pluginManager = new LanternPluginManager(this, pluginsFolder, this.minecraft,
+        this.pluginManager = new LanternPluginManager(this, this.pluginsFolder, this.minecraft,
                 this.apiContainer, this.implContainer);
 
         // Create the service manager instance
@@ -295,7 +296,11 @@ public class LanternGame implements Game {
                 GameState.CONSTRUCTION));
 
         // Load the plugin instances
-        this.pluginManager.loadPlugins();
+        try {
+            this.pluginManager.loadPlugins();
+        } catch (IOException e) {
+            throw new RuntimeException("An error occurred while loading the plugins.", e);
+        }
 
         // Load-complete phase
         this.setGameState(GameState.LOAD_COMPLETE);
@@ -419,7 +424,7 @@ public class LanternGame implements Game {
 
     @Override
     public Path getSavesDirectory() {
-        return this.rootWorldFolder.toPath();
+        return this.rootWorldFolder;
     }
 
     /**

@@ -103,10 +103,10 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return null;
         }
         String name = this.dis.readUTF();
-        // Reflect the sponge NbtTranslator boolean suffix in our input stream
-        if (name.endsWith(BOOLEAN_IDENTIFER)) {
-            name = name.substring(0, name.lastIndexOf(BOOLEAN_IDENTIFER));
-            type = BOOLEAN;
+        int index = name.lastIndexOf(BOOLEAN_IDENTIFER);
+        if (index != -1) {
+            name = name.substring(0, index);
+            type = type == LIST ? BOOLEAN_LIST : BOOLEAN;
         }
         return new Entry(name, type);
     }
@@ -144,8 +144,11 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 array[i] = this.dis.readInt();
             }
             return array;
-        } else if (type == LIST) {
+        } else if (type == LIST || type == BOOLEAN_LIST) {
             byte type0 = this.dis.readByte();
+            if (type == BOOLEAN_LIST) {
+                type0 = BOOLEAN;
+            }
             int size = this.dis.readInt();
             List list = Lists.newArrayListWithExpectedSize(size);
             if (size == 0 || type0 == END) {
@@ -164,7 +167,6 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return this.dis.readShort();
         } else if (type == STRING) {
             return this.dis.readUTF();
-        // Reflect the sponge NbtTranslator boolean suffix in our input stream
         } else if (type == BOOLEAN) {
             return this.dis.readByte() != 0;
         }

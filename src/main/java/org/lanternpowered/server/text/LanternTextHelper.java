@@ -30,7 +30,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 
+import org.lanternpowered.server.text.action.LanternCallbackHolder;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.ClickAction;
@@ -58,6 +62,20 @@ public class LanternTextHelper {
                 }
             }
         } else if (action.equals("run_command")) {
+            if (value.toLowerCase().contains(LanternCallbackHolder.CALLBACK_COMMAND)) {
+                final String[] parts = value.split(" ");
+                if (parts.length > 1 && parts[0].equalsIgnoreCase(LanternCallbackHolder.CALLBACK_COMMAND)) {
+                    try {
+                        final UUID uuid = UUID.fromString(parts[1]);
+                        Optional<Consumer<CommandSource>> opt = LanternCallbackHolder.getInstance()
+                                .getCallbackForUUID(uuid);
+                        if (opt.isPresent()) {
+                            return TextActions.executeCallback(opt.get());
+                        }
+                    } catch (IllegalArgumentException e) {
+                    }
+                }
+            }
             return TextActions.runCommand(value);
         } else if (action.equals("suggest_command")) {
             return TextActions.suggestCommand(value);
@@ -100,6 +118,10 @@ public class LanternTextHelper {
             } else {
                 return new RawAction("open_url", url.toExternalForm());
             }
+        } else if (clickAction instanceof ClickAction.ExecuteCallback) {
+            final UUID uniqueId = LanternCallbackHolder.getInstance().getOrCreateIdForCallback(
+                    ((ClickAction.ExecuteCallback) clickAction).getResult());
+            return new RawAction("run_command", LanternCallbackHolder.CALLBACK_COMMAND_QUALIFIED + " " + uniqueId.toString());
         } else if (clickAction instanceof ClickAction.RunCommand) {
             return new RawAction("run_command", ((ClickAction.RunCommand) clickAction).getResult());
         } else if (clickAction instanceof ClickAction.SuggestCommand) {

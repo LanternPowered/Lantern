@@ -232,7 +232,7 @@ public class LanternServer implements Server {
     }
 
     public void start() throws IOException {
-        this.worldManager = new LanternWorldManager(this.game, this.game.getSavesDirectory().toFile());
+        this.worldManager = new LanternWorldManager(this.game, this.game.getSavesDirectory());
         this.worldManager.init();
 
         this.game.setGameState(GameState.SERVER_ABOUT_TO_START);

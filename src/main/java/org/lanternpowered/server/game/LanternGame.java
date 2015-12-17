@@ -46,6 +46,7 @@ import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
+import org.lanternpowered.server.text.action.LanternCallbackHolder;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
@@ -281,6 +282,8 @@ public class LanternGame implements Game {
             // TODO: Use a different plugin for this command?
             commandService.register(this.minecraft, new CommandVersion(this).build(), "version");
         }
+        commandService.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
+                LanternCallbackHolder.CALLBACK_COMMAND);
 
         // Create the teleport helper
         this.teleportHelper = new LanternTeleportHelper();

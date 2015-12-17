@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -137,7 +139,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     final LanternGame game;
 
     // The world border
-    final LanternWorldBorder worldBorder = new LanternWorldBorder(this);
+    final LanternWorldBorder worldBorder;
 
     // The weather universe
     @Nullable final LanternWeatherUniverse weatherUniverse;
@@ -176,6 +178,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         } else {
             this.weatherUniverse = null;
         }
+        // Create the world border
+        this.worldBorder = this.addComponent(LanternWorldBorder.class);
         // Create the new dimension instance
         this.dimension = dimensionType.newDimension(this);
         // Create a new world generator
@@ -231,7 +235,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
-                    this.chunkManager.getOrCreateChunk(x, z, Cause.of(), true);
+                    this.chunkManager.getOrCreateChunk(x, z, Cause.of(this.game.getPlugin()), true);
                     this.spawnLoadingTicket.forceChunk(new Vector3i(x, 0, z));
                 }
             }
@@ -912,5 +916,21 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         if (this.weatherUniverse != null) {
             this.weatherUniverse.pulse();
         }
+    }
+
+    public void broadcast(Supplier<Message> message) {
+        this.broadcast(message, null);
+    }
+
+    public void broadcast(Supplier<Message> message, @Nullable Predicate<LanternPlayer> filter) {
+        List<LanternPlayer> players = this.getPlayers();
+        if (filter != null) {
+            players = players.stream().filter(filter).collect(Collectors.toList());
+        }
+        if (players.isEmpty()) {
+            return;
+        }
+        Message message0 = message.get();
+        players.forEach(player -> player.getConnection().send(message0));
     }
 }

@@ -24,43 +24,33 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
-import java.util.Map;
-
-import org.lanternpowered.server.game.LanternGame;
-
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import com.google.common.collect.Maps;
-
-import static org.lanternpowered.server.config.ConfigConstants.*;
-
+/**
+ * Global/default settings of the chunk loading, all these settings are available in
+ * the global config and the world specific configs.
+ */
 @ConfigSerializable
-public abstract class ChunkLoading implements ChunkLoadingConfig {
+public class WorldChunkLoadingTickets implements ChunkLoadingTickets {
 
-    public static final String MAXIMUM_CHUNKS_PER_TICKET = "maximum-chunks-per-ticket";
-    public static final String MAXIMUM_TICKET_COUNT = "maximum-ticket-count";
-    public static final String PLAYER_TICKET_COUNT = "player-ticket-count";
-    public static final String CHUNK_LOADING = "chunk-loading";
+    @Setting(value = ChunkLoading.MAXIMUM_CHUNKS_PER_TICKET, comment =
+            "The default maximum number of chunks a plugin can force, per ticket, for a plugin\n " +
+            "without an override. This is the maximum number of chunks a single ticket can force.")
+    private int maximumChunksPerTicket = 25;
 
-    private static final MinecraftChunkLoadingTickets MINECRAFT = new MinecraftChunkLoadingTickets();
-
-    @Setting(value = OVERRIDES, comment = "Plugin specific configuration for chunk loading control.")
-    private Map<String, PluginChunkLoadingTickets> pluginOverrides = Maps.newHashMap();
-
-    protected abstract ChunkLoadingTickets getDefaults();
+    @Setting(value = ChunkLoading.MAXIMUM_TICKET_COUNT, comment =
+            "The default maximum ticket count for a plugin which does not have an override\n " +
+            "in this file. This is the number of chunk loading requests a plugin is allowed to make.")
+    private int maximumTicketCount = 200;
 
     @Override
-    public ChunkLoadingTickets getChunkLoadingTickets(String plugin) {
-        // Minecraft has no limits
-        if (plugin.equalsIgnoreCase(LanternGame.MINECRAFT_ID)) {
-            return MINECRAFT;
-        }
-        // Check for overridden configuration
-        if (this.pluginOverrides.containsKey(plugin)) {
-            return this.pluginOverrides.get(plugin);
-        }
-        // Fall back to default if not found
-        return this.getDefaults();
+    public int getMaximumChunksPerTicket() {
+        return this.maximumChunksPerTicket;
+    }
+
+    @Override
+    public int getMaximumTicketCount() {
+        return this.maximumTicketCount;
     }
 }

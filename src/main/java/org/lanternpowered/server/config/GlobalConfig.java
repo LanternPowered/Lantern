@@ -33,6 +33,7 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
+import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
@@ -86,10 +87,14 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     private static final class World {
 
         @Setting(value = ChunkLoading.CHUNK_LOADING, comment = "Configuration for the chunk loading control.")
-        private ChunkLoading chunkLoading = new ChunkLoading();
+        private GlobalChunkLoading chunkLoading = new GlobalChunkLoading();
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    public int getPlayerTicketCount() {
+        return this.worlds.chunkLoading.getPlayerTicketCount();
     }
 
     public String getRootWorldFolder() {

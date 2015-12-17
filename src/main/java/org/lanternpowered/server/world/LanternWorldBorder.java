@@ -26,27 +26,22 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.component.Component;
+import org.lanternpowered.server.component.OnAttach;
+import org.lanternpowered.server.inject.Inject;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 import com.flowpowered.math.vector.Vector3d;
 
-public class LanternWorldBorder implements WorldBorder {
+public final class LanternWorldBorder implements WorldBorder, Component {
 
-    private final LanternWorld world;
+    @Inject
+    private LanternWorld world;
 
-    // Whether the first tick has occurred
-    private boolean firstTick;
-
-    public LanternWorldBorder(LanternWorld world) {
-        this.world = world;
-    }
-
-    void pulse() {
-        if (!this.firstTick) {
-            this.world.getProperties().updateCurrentBorderTime();
-            this.firstTick = true;
-        }
+    @OnAttach
+    private void onAttach() {
+        this.world.getProperties().updateCurrentBorderTime();
     }
 
     @Override

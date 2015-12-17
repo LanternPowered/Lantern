@@ -24,43 +24,30 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
-import java.util.Map;
-
-import org.lanternpowered.server.game.LanternGame;
-
+import static org.lanternpowered.server.config.ConfigConstants.*;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import com.google.common.collect.Maps;
-
-import static org.lanternpowered.server.config.ConfigConstants.*;
-
 @ConfigSerializable
-public abstract class ChunkLoading implements ChunkLoadingConfig {
+public class GlobalChunkLoading extends ChunkLoading {
 
-    public static final String MAXIMUM_CHUNKS_PER_TICKET = "maximum-chunks-per-ticket";
-    public static final String MAXIMUM_TICKET_COUNT = "maximum-ticket-count";
-    public static final String PLAYER_TICKET_COUNT = "player-ticket-count";
-    public static final String CHUNK_LOADING = "chunk-loading";
-
-    private static final MinecraftChunkLoadingTickets MINECRAFT = new MinecraftChunkLoadingTickets();
-
-    @Setting(value = OVERRIDES, comment = "Plugin specific configuration for chunk loading control.")
-    private Map<String, PluginChunkLoadingTickets> pluginOverrides = Maps.newHashMap();
-
-    protected abstract ChunkLoadingTickets getDefaults();
+    @Setting(value = DEFAULTS, comment = "Default configuration for chunk loading control.")
+    private GlobalChunkLoadingTickets defaults = new GlobalChunkLoadingTickets();
 
     @Override
-    public ChunkLoadingTickets getChunkLoadingTickets(String plugin) {
-        // Minecraft has no limits
-        if (plugin.equalsIgnoreCase(LanternGame.MINECRAFT_ID)) {
-            return MINECRAFT;
-        }
-        // Check for overridden configuration
-        if (this.pluginOverrides.containsKey(plugin)) {
-            return this.pluginOverrides.get(plugin);
-        }
-        // Fall back to default if not found
-        return this.getDefaults();
+    protected ChunkLoadingTickets getDefaults() {
+        return this.defaults;
+    }
+
+    /**
+     * Gets the maximum amount of tickets that can be requested
+     * per player.
+     * 
+     * TODO: Make this configurable per world?
+     * 
+     * @return the player ticket count
+     */
+    public int getPlayerTicketCount() {
+        return this.defaults.getPlayerTicketCount();
     }
 }

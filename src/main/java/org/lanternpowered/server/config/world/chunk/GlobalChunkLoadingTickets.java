@@ -32,32 +32,12 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
  * the global config and the world specific configs.
  */
 @ConfigSerializable
-public class GlobalChunkLoadingTickets implements ChunkLoadingTickets {
-
-    @Setting(value = ChunkLoading.MAXIMUM_CHUNKS_PER_TICKET, comment =
-            "The default maximum number of chunks a plugin can force, per ticket, for a plugin\n " +
-            "without an override. This is the maximum number of chunks a single ticket can force.")
-    private int maximumChunksPerTicket = 25;
-
-    @Setting(value = ChunkLoading.MAXIMUM_TICKET_COUNT, comment =
-            "The default maximum ticket count for a plugin which does not have an override\n " +
-            "in this file. This is the number of chunk loading requests a plugin is allowed to make.")
-    private int maximumTicketCount = 200;
+public class GlobalChunkLoadingTickets extends WorldChunkLoadingTickets {
 
     @Setting(value = ChunkLoading.PLAYER_TICKET_COUNT, comment =
             "The number of tickets a player can be assigned instead of a plugin. This is shared\n" +
             "across all plugins.")
     private int playerTicketCount = 500;
-
-    @Override
-    public int getMaximumChunksPerTicket() {
-        return this.maximumChunksPerTicket;
-    }
-
-    @Override
-    public int getMaximumTicketCount() {
-        return this.playerTicketCount;
-    }
 
     /**
      * Gets the maximum amount of tickets that can be requested

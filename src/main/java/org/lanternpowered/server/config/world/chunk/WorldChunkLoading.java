@@ -26,7 +26,6 @@ package org.lanternpowered.server.config.world.chunk;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-
 import static org.lanternpowered.server.config.ConfigConstants.*;
 
 @ConfigSerializable
@@ -37,6 +36,9 @@ public class WorldChunkLoading extends ChunkLoading {
             "loading settings, if set false, this sections won't affect anything.")
     private boolean enabled = false;
 
+    @Setting(value = DEFAULTS, comment = "Default configuration for chunk loading control.")
+    private WorldChunkLoadingTickets defaults = new WorldChunkLoadingTickets();
+
     /**
      * Gets whether this section is enabled.
      * 
@@ -44,5 +46,10 @@ public class WorldChunkLoading extends ChunkLoading {
      */
     public boolean isEnabled() {
         return this.enabled;
+    }
+
+    @Override
+    protected WorldChunkLoadingTickets getDefaults() {
+        return this.defaults;
     }
 }

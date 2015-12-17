@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -92,24 +91,20 @@ public final class LanternChunkManager {
     private static final int CHUNK_LOADING_LIMIT = 100;
 
     // All the attached tickets mapped by the forced chunk coordinates
-    private final Map<Vector2i, Set<LanternLoadingTicket>> ticketsByPos =
-            Maps.newConcurrentMap();
+    private final Map<Vector2i, Set<LanternLoadingTicket>> ticketsByPos = Maps.newConcurrentMap();
+
     // All the loading tickets that are still usable
-    private final Set<LanternLoadingTicket> tickets =
-            Sets.newConcurrentHashSet();
+    private final Set<LanternLoadingTicket> tickets = Sets.newConcurrentHashSet();
 
     // All the chunks that are loaded into the server
-    private final Map<Vector2i, LanternChunk> loadedChunks =
-            Maps.newConcurrentMap();
+    private final Map<Vector2i, LanternChunk> loadedChunks = Maps.newConcurrentMap();
 
     // A cache that can be used to get chunks that weren't unloaded
     // so much after all, because of active references to the chunk
-    private final Map<Vector2i, LanternChunk> reusableChunks =
-            new MapMaker().weakValues().makeMap();
+    private final Map<Vector2i, LanternChunk> reusableChunks = new MapMaker().weakValues().makeMap();
 
     // A queue of all the chunks that should be loaded
-    private final ConcurrentLinkedQueue<Vector2i> forcedChunkLoadingQueue =
-            new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<Vector2i> forcedChunkLoadingQueue = new ConcurrentLinkedQueue<>();
 
     // The game instance
     private final LanternGame game;

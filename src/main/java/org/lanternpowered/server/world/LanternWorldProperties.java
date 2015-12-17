@@ -33,12 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
@@ -465,11 +463,8 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setDifficulty(Difficulty difficulty) {
         checkNotNull(difficulty, "difficulty");
-        if (this.difficulty != difficulty) {
-            this.forPlayersIfPresent(players -> {
-                MessagePlayOutSetDifficulty message = new MessagePlayOutSetDifficulty((LanternDifficulty) difficulty);
-                players.forEach(player -> player.getConnection().send(message));
-            });
+        if (this.difficulty != difficulty && this.world != null) {
+            this.world.broadcast(() -> new MessagePlayOutSetDifficulty((LanternDifficulty) difficulty));
         }
         this.difficulty = difficulty;
     }
@@ -537,15 +532,6 @@ public class LanternWorldProperties implements WorldProperties {
                 this.borderWarningTime);
     }
 
-    void forPlayersIfPresent(Consumer<List<LanternPlayer>> consumer) {
-        if (this.world != null) {
-            List<LanternPlayer> players = this.world.getPlayers();
-            if (!players.isEmpty()) {
-                consumer.accept(players);
-            }
-        }
-    }
-
     public void setBorderDiameter(double startDiameter, double endDiameter, long time) {
         checkArgument(startDiameter >= 0, "The start diameter cannot be negative!");
         checkArgument(endDiameter >= 0, "The end diameter cannot be negative!");
@@ -556,19 +542,17 @@ public class LanternWorldProperties implements WorldProperties {
             this.borderDiameterStart = endDiameter;
             this.borderDiameterEnd = endDiameter;
             this.setCurrentBorderTime(0);
-            this.forPlayersIfPresent(players -> {
-                MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.setSize(endDiameter);
-                players.forEach(player -> player.getConnection().send(message));
-            });
+            if (this.world != null) {
+                this.world.broadcast(() -> MessagePlayOutWorldBorder.setSize(endDiameter));
+            }
         } else {
             this.borderDiameterStart = startDiameter;
             this.borderDiameterEnd = endDiameter;
             this.setCurrentBorderTime(time);
-            this.forPlayersIfPresent(players -> {
-                MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.lerpSize(startDiameter,
-                        endDiameter, time);
-                players.forEach(player -> player.getConnection().send(message));
-            });
+            if (this.world != null) {
+                this.world.broadcast(() -> MessagePlayOutWorldBorder.lerpSize(startDiameter,
+                        endDiameter, time));
+            }
         }
     }
 
@@ -577,11 +561,10 @@ public class LanternWorldProperties implements WorldProperties {
         this.borderCenterX = x;
         this.borderCenterZ = z;
 
-        this.forPlayersIfPresent(players -> {
-            MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.setCenter(this.borderCenterX,
-                    this.borderCenterZ);
-            players.forEach(player -> player.getConnection().send(message));
-        });
+        if (this.world != null) {
+            this.world.broadcast(() -> MessagePlayOutWorldBorder.setCenter(this.borderCenterX,
+                    this.borderCenterZ));
+        }
     }
 
     @Override
@@ -632,17 +615,10 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setWorldBorderTimeRemaining(long time) {
         this.setCurrentBorderTime(time);
-        if (time == 0) {
-            this.forPlayersIfPresent(players -> {
-                MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.setSize(this.borderDiameterEnd);
-                players.forEach(player -> player.getConnection().send(message));
-            });
-        } else {
-            this.forPlayersIfPresent(players -> {
-                MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.lerpSize(this.getWorldBorderDiameter(),
-                        this.borderDiameterEnd, this.getWorldBorderTimeRemaining());
-                players.forEach(player -> player.getConnection().send(message));
-            });
+        if (this.world != null) {
+            this.world.broadcast(() -> time == 0 ? MessagePlayOutWorldBorder.setSize(this.borderDiameterEnd) :
+                MessagePlayOutWorldBorder.lerpSize(this.getWorldBorderDiameter(), this.borderDiameterEnd,
+                        this.getWorldBorderTimeRemaining()));
         }
     }
 
@@ -654,17 +630,10 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setWorldBorderTargetDiameter(double diameter) {
         this.borderDiameterEnd = diameter;
-        if (this.getWorldBorderTimeRemaining() == 0) {
-            this.forPlayersIfPresent(players -> {
-                MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.setSize(diameter);
-                players.forEach(player -> player.getConnection().send(message));
-            });
-        } else {
-            this.forPlayersIfPresent(players -> {
-                MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.lerpSize(this.getWorldBorderDiameter(),
-                        diameter, this.getWorldBorderTimeRemaining());
-                players.forEach(player -> player.getConnection().send(message));
-            });
+        if (this.world != null) {
+            this.world.broadcast(() -> this.getWorldBorderTimeRemaining() == 0 ? MessagePlayOutWorldBorder.setSize(
+                    diameter) : MessagePlayOutWorldBorder.lerpSize(this.getWorldBorderDiameter(),
+                            diameter, this.getWorldBorderTimeRemaining()));
         }
     }
 
@@ -696,10 +665,9 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setWorldBorderWarningTime(int time) {
         this.borderWarningTime = time;
-        this.forPlayersIfPresent(players -> {
-            MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.setWarningTime(time);
-            players.forEach(player -> player.getConnection().send(message));
-        });
+        if (this.world != null) {
+            this.world.broadcast(() -> MessagePlayOutWorldBorder.setWarningTime(time));
+        }
     }
 
     @Override
@@ -710,10 +678,9 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setWorldBorderWarningDistance(int distance) {
         this.borderWarningDistance = distance;
-        this.forPlayersIfPresent(players -> {
-            MessagePlayOutWorldBorder message = MessagePlayOutWorldBorder.setWarningBlocks(distance);
-            players.forEach(player -> player.getConnection().send(message));
-        });
+        if (this.world != null) {
+            this.world.broadcast(() -> MessagePlayOutWorldBorder.setWarningBlocks(distance));
+        }
     }
 
     @Override

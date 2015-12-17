@@ -69,7 +69,7 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
      * @return the maximum amount of tickets
      */
     public int getMaxTicketsForPlayer(UUID playerUUID) {
-        return 500;
+        return this.globalConfig.getMaxPlayers();
     }
 
     @Override

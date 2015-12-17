@@ -30,7 +30,7 @@ import java.util.Optional;
 
 import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.permission.SubjectBase;
+import org.lanternpowered.server.permission.AbstractSubjectBase;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -40,7 +40,7 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 
-public final class LanternConsoleSource extends SubjectBase implements AbstractCommandSource, ConsoleSource {
+public final class LanternConsoleSource extends AbstractSubjectBase implements AbstractCommandSource, ConsoleSource {
 
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
 
@@ -71,12 +71,12 @@ public final class LanternConsoleSource extends SubjectBase implements AbstractC
     }
 
     @Override
-    protected String getSubjectCollectionIdentifier() {
+    public String getSubjectCollectionIdentifier() {
         return PermissionService.SUBJECTS_SYSTEM;
     }
 
     @Override
-    protected Tristate getPermissionDefault(String permission) {
+    public Tristate getPermissionDefault(String permission) {
         checkNotNull(permission, "permission");
         return Tristate.TRUE;
     }

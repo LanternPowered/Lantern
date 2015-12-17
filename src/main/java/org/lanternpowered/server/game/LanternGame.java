@@ -35,6 +35,7 @@ import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
+import org.lanternpowered.server.config.OpsConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
@@ -45,7 +46,9 @@ import org.lanternpowered.server.plugin.SpongeApiContainer;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
+import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
+import org.lanternpowered.server.service.user.LanternUserStorageService;
 import org.lanternpowered.server.text.action.LanternCallbackHolder;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
@@ -68,7 +71,11 @@ import org.spongepowered.api.command.SimpleCommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.sql.SqlService;
+import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.world.TeleportHelper;
 
@@ -91,6 +98,9 @@ public class LanternGame implements Game {
 
     // The name of the global config file
     public static final String GLOBAL_CONFIG = "global.conf";
+
+    // The name of the global config file
+    public static final String OPS_CONFIG = "ops.conf";
 
     // The name of the config folder
     public static final String PLUGINS_FOLDER = "plugins";
@@ -206,6 +216,8 @@ public class LanternGame implements Game {
 
     // The global config
     private GlobalConfig globalConfig;
+    // The ops config
+    private OpsConfig opsConfig;
 
     // The current game state
     private GameState gameState = GameState.CONSTRUCTION;
@@ -235,6 +247,10 @@ public class LanternGame implements Game {
         // Create the global config
         this.globalConfig = new GlobalConfig(this.configFolder.resolve(GLOBAL_CONFIG));
         this.globalConfig.load();
+
+        // Create the ops config
+        this.opsConfig = new OpsConfig(this.configFolder.resolve(OPS_CONFIG));
+        this.opsConfig.load();
     }
 
     public void initialize(LanternServer server, Path rootWorldFolder) {
@@ -270,6 +286,7 @@ public class LanternGame implements Game {
         // Register the game profile resolver
         this.gameProfileManager = new LanternGameProfileManager();
 
+        this.registerService(UserStorageService.class, new LanternUserStorageService());
         // Register the pagination service
         this.registerService(PaginationService.class, new LanternPaginationService(this));
 
@@ -314,7 +331,8 @@ public class LanternGame implements Game {
         this.setGameState(GameState.PRE_INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(this, 
                 GameState.PRE_INITIALIZATION));
-        // TODO: Initialize the permission service
+        this.serviceManager.potentiallyProvide(PermissionService.class).executeWhenPresent(
+                input -> this.server.getConsole().getContainingCollection());
 
         // Create the default sql service
         this.registerService(SqlService.class, new LanternSqlService());
@@ -323,6 +341,21 @@ public class LanternGame implements Game {
         this.setGameState(GameState.INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(this, 
                 GameState.INITIALIZATION));
+
+        // Provide the default permission service if no custom one is found
+        if (!this.serviceManager.provide(PermissionService.class).isPresent()) {
+            try {
+                final LanternPermissionService service = new LanternPermissionService(this);
+                service.getGroupForOpLevel(1).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
+                        "minecraft.selector", Tristate.TRUE);
+                service.getGroupForOpLevel(2).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
+                        "minecraft.commandblock", Tristate.TRUE);
+                
+                this.serviceManager.setProvider(this, PermissionService.class, service);
+            } catch (ProviderExistsException e) {
+            }
+        }
+
         // Post-init phase
         this.setGameState(GameState.POST_INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(this, 
@@ -359,6 +392,15 @@ public class LanternGame implements Game {
      */
     public GlobalConfig getGlobalConfig() {
         return this.globalConfig;
+    }
+
+    /**
+     * Gets the ops configuration.
+     * 
+     * @return the ops configuration
+     */
+    public OpsConfig getOpsConfig() {
+        return this.opsConfig;
     }
 
     @Override

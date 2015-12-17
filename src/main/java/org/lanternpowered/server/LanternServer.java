@@ -324,13 +324,13 @@ public class LanternServer implements Server {
     @Override
     public Optional<Player> getPlayer(UUID uniqueId) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Optional<Player> getPlayer(String name) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -514,6 +514,12 @@ public class LanternServer implements Server {
                 ((LanternGameProfileManager) gameProfileResolver).shutdown();
             }
         });
+
+        try {
+            this.game.getOpsConfig().save();
+        } catch (IOException e) {
+            LanternGame.log().error("A error occurred while saving the ops config.", e);
+        }
 
         this.game.setGameState(GameState.SERVER_STOPPED);
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game, 

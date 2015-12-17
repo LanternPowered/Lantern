@@ -34,6 +34,7 @@ import java.net.URLConnection;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
@@ -105,6 +106,10 @@ public final class LanternGameProfileManager implements GameProfileManager {
         return this.get(uniqueId, true);
     }
 
+    public Optional<GameProfile> getCachedProfile(UUID uniqueId) {
+        return Optional.ofNullable(this.profileCache.getIfPresent(uniqueId));
+    }
+
     @Override
     public ListenableFuture<GameProfile> get(UUID uniqueId, boolean useCache) {
         return this.service.submit(useCache ? () -> profileCache.get(uniqueId) : new GetProfile(uniqueId));
@@ -113,6 +118,11 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public ListenableFuture<GameProfile> get(String name) {
         return this.get(name, true);
+    }
+
+    public Optional<GameProfile> getCachedProfile(String name) {
+        UUID uuid = this.uuidByNameCache.getIfPresent(name);
+        return uuid == null ? Optional.empty() : this.getCachedProfile(uuid);
     }
 
     @Override

@@ -30,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -56,6 +57,12 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
 
 public class LanternUser implements User {
+
+    private final LanternGameProfile gameProfile;
+
+    public LanternUser(LanternGameProfile gameProfile) {
+        this.gameProfile = gameProfile;
+    }
 
     @Override
     public boolean validateRawData(DataContainer container) {

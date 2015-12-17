@@ -27,9 +27,12 @@ package org.lanternpowered.server.config;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.UUID;
 
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.TextTypeSerializer;
+import org.lanternpowered.server.config.serializer.UUIDTypeSerializer;
+import org.lanternpowered.server.util.IpSet;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.Text;
 
@@ -48,7 +51,9 @@ public abstract class ConfigBase {
     public static final ConfigurationOptions DEFAULT_OPTIONS = ConfigurationOptions.defaults()
             .setSerializers(ConfigurationOptions.defaults().getSerializers().newChild()
                     .registerType(TypeToken.of(Text.class), new TextTypeSerializer())
-                    .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer()));
+                    .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
+                    .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
+                    .registerType(TypeToken.of(UUID.class), new UUIDTypeSerializer()));
 
     private final ObjectMapper<ConfigBase>.BoundInstance configMapper;
     private final ConfigurationLoader<CommentedConfigurationNode> loader;

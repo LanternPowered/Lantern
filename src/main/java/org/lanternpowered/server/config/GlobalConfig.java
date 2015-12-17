@@ -25,7 +25,10 @@
 package org.lanternpowered.server.config;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Map;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -34,8 +37,15 @@ import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
+import org.lanternpowered.server.util.IpSet;
+
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import static org.lanternpowered.server.config.ConfigConstants.*;
 
@@ -116,6 +126,16 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "network-compression-threshold")
         private int networkCompressionThreshold = 256;
+
+        // Some context related stuff, check this issue for more information
+        // https://github.com/SpongePowered/SpongeCommon/commit/71220742baf4b0317ddefe625b12cc64a7ec9084
+        // TODO: Move this?
+        @Setting(value = "ip-sets")
+        private Map<String, List<IpSet>> ipSets = Maps.newHashMap();
+
+        // TODO: Move this?
+        @Setting(value = "op-permission-level", comment = "The default op level of all the operators.")
+        private int opPermissionLevel = 4;
     }
 
     @ConfigSerializable
@@ -126,6 +146,18 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    public Map<String, Predicate<InetAddress>> getIpSets() {
+        return ImmutableMap.copyOf(Maps.transformValues(this.server.ipSets, input -> Predicates.and(input)));
+    }
+
+    public Predicate<InetAddress> getIpSet(String name) {
+        return this.server.ipSets.containsKey(name) ? Predicates.and(this.server.ipSets.get(name)) : null;
+    }
+
+    public int getDefaultOpPermissionLevel() {
+        return this.server.opPermissionLevel;
     }
 
     public Text getShutdownMessage() {

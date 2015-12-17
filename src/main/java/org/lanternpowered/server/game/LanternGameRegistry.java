@@ -267,7 +267,7 @@ public class LanternGameRegistry implements GameRegistry {
             .put(ColoredParticle.Builder.class, LanternParticleEffectBuilder.Colorable::new)
             .put(ItemParticle.Builder.class, LanternParticleEffectBuilder.Item::new)
             .put(BlockParticle.Builder.class, LanternParticleEffectBuilder.Block::new)
-            .put(Task.Builder.class, () -> new LanternTaskBuilder(this.game.getScheduler()))
+            .put(Task.Builder.class, () -> createTaskBuilder())
             .build();
 
     // We cannot add this method directly in builderFactories map,
@@ -275,6 +275,10 @@ public class LanternGameRegistry implements GameRegistry {
     // not be initialized yet.
     private LanternWorldBuilder createWorldBuilder() {
         return new LanternWorldBuilder(this.game);
+    }
+
+    private LanternTaskBuilder createTaskBuilder() {
+        return new LanternTaskBuilder(this.game.getScheduler());
     }
 
     {

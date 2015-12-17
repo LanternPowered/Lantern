@@ -26,34 +26,34 @@ package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.Set;
 
 import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
-import org.lanternpowered.server.permission.SubjectBase;
+import org.lanternpowered.server.permission.AbstractSubject;
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.title.LanternTitles;
+
 import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
@@ -65,37 +65,15 @@ import org.spongepowered.api.command.CommandSource;
 
 import com.flowpowered.math.vector.Vector3d;
 
-public class LanternPlayer extends LanternEntityHumanoid implements Player, AbstractViewer, AbstractCommandSource {
+public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, AbstractCommandSource {
 
-    // We cannot extend the subject base directly, so we have to forward the methods
-    private final SubjectBase permissionSubject = new SubjectBase() {
+    private final User user;
+    private final LanternGameProfile gameProfile;
 
-        @Override
-        public String getIdentifier() {
-            return LanternPlayer.this.getIdentifier();
-        }
-
-        @Override
-        public Optional<CommandSource> getCommandSource() {
-            return Optional.of(LanternPlayer.this);
-        }
-
-        @Override
-        protected String getSubjectCollectionIdentifier() {
-            return PermissionService.SUBJECTS_USER;
-        }
-
-        @Override
-        protected Tristate getPermissionDefault(String permission) {
-            return Tristate.TRUE;
-        }
-
-    };
+    private volatile Subject subject;
 
     private Session session = null;
     private MessageSink messageSink = MessageSinks.toAll();
-
-    private GameProfile gameProfile;
 
     // The (client) locale of the player
     private Locale locale = Locale.ENGLISH;
@@ -105,6 +83,40 @@ public class LanternPlayer extends LanternEntityHumanoid implements Player, Abst
     private int renderDistance = -1;
 
     private boolean sleepingIgnored;
+
+    public LanternPlayer(LanternGameProfile gameProfile) {
+        this.gameProfile = gameProfile;
+        // Get or create the user object
+        this.user = LanternGame.get().getServiceManager().provideUnchecked(UserStorageService.class)
+                .getOrCreate(gameProfile);
+    }
+
+    public User getUserObject() {
+        return this.user;
+    }
+
+    @Override
+    public void setInternalSubject(Subject subj) {
+        this.subject = subj;
+    }
+
+    @Override
+    public Subject getInternalSubject() {
+        if (this.subject == null) {
+            this.subject = this.findPermissionSubject();
+        }
+        return this.subject;
+    }
+
+    @Override
+    public String getSubjectCollectionIdentifier() {
+        return PermissionService.SUBJECTS_USER;
+    }
+
+    @Override
+    public Tristate getPermissionDefault(String permission) {
+        return Tristate.TRUE;
+    }
 
     /**
      * Gets the render distance of the player.
@@ -137,61 +149,6 @@ public class LanternPlayer extends LanternEntityHumanoid implements Player, Abst
     @Override
     public Optional<CommandSource> getCommandSource() {
         return Optional.of(this);
-    }
-
-    @Override
-    public SubjectCollection getContainingCollection() {
-        return this.permissionSubject.getContainingCollection();
-    }
-
-    @Override
-    public SubjectData getSubjectData() {
-        return this.permissionSubject.getSubjectData();
-    }
-
-    @Override
-    public SubjectData getTransientSubjectData() {
-        return this.permissionSubject.getTransientSubjectData();
-    }
-
-    @Override
-    public boolean hasPermission(Set<Context> contexts, String permission) {
-        return this.permissionSubject.hasPermission(contexts, permission);
-    }
-
-    @Override
-    public boolean hasPermission(String permission) {
-        return this.permissionSubject.hasPermission(permission);
-    }
-
-    @Override
-    public Tristate getPermissionValue(Set<Context> contexts, String permission) {
-        return this.permissionSubject.getPermissionValue(contexts, permission);
-    }
-
-    @Override
-    public boolean isChildOf(Subject parent) {
-        return this.permissionSubject.isChildOf(parent);
-    }
-
-    @Override
-    public boolean isChildOf(Set<Context> contexts, Subject parent) {
-        return this.permissionSubject.isChildOf(contexts, parent);
-    }
-
-    @Override
-    public List<Subject> getParents() {
-        return this.permissionSubject.getParents();
-    }
-
-    @Override
-    public List<Subject> getParents(Set<Context> contexts) {
-        return this.permissionSubject.getParents(contexts);
-    }
-
-    @Override
-    public Set<Context> getActiveContexts() {
-        return this.permissionSubject.getActiveContexts();
     }
 
     @Override

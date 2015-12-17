@@ -34,6 +34,9 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -45,6 +48,7 @@ import org.spongepowered.api.util.persistence.InvalidDataException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
+@ConfigSerializable
 public final class LanternGameProfile implements GameProfile {
 
     private static final DataQuery NAME = DataQuery.of("Name");
@@ -53,9 +57,17 @@ public final class LanternGameProfile implements GameProfile {
     private static final DataQuery VALUE = DataQuery.of("Value");
     private static final DataQuery SIGNATURE = DataQuery.of("Signature");
 
-    private final List<Property> properties;
-    private final UUID uniqueId;
-    private final String name;
+    @Setting("properties")
+    private List<Property> properties;
+
+    @Setting("uniqueId")
+    private UUID uniqueId;
+
+    @Setting("name")
+    private String name;
+
+    LanternGameProfile() {
+    }
 
     public LanternGameProfile(UUID uniqueId, String name) {
         this(uniqueId, name, Lists.newArrayList());
@@ -65,6 +77,18 @@ public final class LanternGameProfile implements GameProfile {
         this.properties = ImmutableList.copyOf(checkNotNull(properties, "properties"));
         this.uniqueId = checkNotNull(uniqueId, "uniqueId");
         this.name = checkNotNullOrEmpty(name, "name");
+    }
+
+    /**
+     * Creates a new game profile without all the properties.
+     * 
+     * @return the new game profile
+     */
+    public LanternGameProfile withoutProperties() {
+        if (this.properties.isEmpty()) {
+            return this;
+        }
+        return new LanternGameProfile(this.uniqueId, this.name);
     }
 
     @Override

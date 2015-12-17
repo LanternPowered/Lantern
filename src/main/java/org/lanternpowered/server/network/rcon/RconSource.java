@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.rcon;
 import java.util.Optional;
 
 import org.lanternpowered.server.command.AbstractCommandSource;
-import org.lanternpowered.server.permission.SubjectBase;
+import org.lanternpowered.server.permission.AbstractSubjectBase;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
@@ -35,7 +35,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.util.Tristate;
 
-public class RconSource extends SubjectBase implements AbstractCommandSource, org.spongepowered.api.command.source.RconSource {
+public class RconSource extends AbstractSubjectBase implements AbstractCommandSource, org.spongepowered.api.command.source.RconSource {
 
     private final StringBuffer buffer = new StringBuffer();
     private final RconConnection connection;

@@ -24,9 +24,7 @@
  */
 package org.lanternpowered.server.world;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,6 +43,7 @@ import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternGameRegistry;
+import org.lanternpowered.server.world.LanternWorldProperties.OverriddenWorldProperties;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
@@ -56,6 +55,7 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
@@ -132,7 +132,6 @@ public final class LanternWorldPropertiesIO {
     private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
 
     // Lantern properties
-    private final static DataQuery BUILD_HEIGHT = DataQuery.of("buildHeight");
     private final static DataQuery BONUS_CHEST_ENABLED = DataQuery.of("bonusChestEnabled");
     // Extra generator options for the flat world generator type
     private final static DataQuery GENERATOR_OPTIONS_EXTRA = DataQuery.of("generatorOptionsExtra");
@@ -223,13 +222,14 @@ public final class LanternWorldPropertiesIO {
         properties.thundering = dataView.getInt(THUNDERING).get() > 0;
         properties.thunderTime = dataView.getInt(THUNDER_TIME).get();
         properties.clearWeatherTime = dataView.getInt(CLEAR_WEATHER_TIME).get();
-        properties.hardcore = dataView.getInt(HARDCORE).get() > 0;
+        boolean hardcore = dataView.getInt(HARDCORE).get() > 0;
         properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
         properties.initialized = dataView.getInt(INITIALIZED).get() > 0;
-        byte difficulty = dataView.getInt(DIFFICULTY).get().byteValue();
+        byte difficultyId = dataView.getInt(DIFFICULTY).get().byteValue();
+        Difficulty difficulty = Difficulties.NORMAL;
         for (Difficulty difficulty0 : LanternGame.get().getRegistry().getAllOf(Difficulty.class)) {
-            if (((LanternDifficulty) difficulty0).getInternalId() == difficulty) {
-                properties.difficulty = difficulty0;
+            if (((LanternDifficulty) difficulty0).getInternalId() == difficultyId) {
+                difficulty = difficulty0;
                 break;
             }
         }
@@ -320,7 +320,6 @@ public final class LanternWorldPropertiesIO {
         }
 
         Integer dimensionId = null;
-        Integer buildHeight = null;
 
         // Get the sponge properties
         if (spongeContainer != null) {
@@ -355,10 +354,6 @@ public final class LanternWorldPropertiesIO {
                 }
             }
 
-            // Lantern properties, store them for now in the sponge data file
-            if (spongeContainer.contains(BUILD_HEIGHT)) {
-                buildHeight = spongeContainer.getInt(BUILD_HEIGHT).get();
-            }
             if (spongeContainer.contains(BONUS_CHEST_ENABLED)) {
                 properties.bonusChestEnabled = spongeContainer.getInt(BONUS_CHEST_ENABLED).get() > 0;
             }
@@ -385,8 +380,6 @@ public final class LanternWorldPropertiesIO {
             properties.properties = new MemoryDataContainer();
         }
 
-        properties.buildHeight = buildHeight == null ? 256 : buildHeight;
-
         BitSet dimensionMap = null;
         if (rootDataView.contains(FORGE)) {
             final DataView forgeView = rootDataView.getView(FORGE).get();
@@ -401,7 +394,8 @@ public final class LanternWorldPropertiesIO {
             }
         }
 
-        return new LevelData(properties, dimensionId, dimensionMap);
+        return new LevelData(properties, dimensionId, dimensionMap, new OverriddenWorldProperties(
+                difficulty, hardcore));
     }
 
     static void write(Path folder, LevelData levelData) throws IOException {
@@ -423,7 +417,7 @@ public final class LanternWorldPropertiesIO {
         dataView.set(RAIN_TIME, properties.rainTime);
         dataView.set(THUNDERING, (byte) (properties.thundering ? 1 : 0));
         dataView.set(THUNDER_TIME, properties.thunderTime);
-        dataView.set(HARDCORE, (byte) (properties.hardcore ? 1 : 0));
+        dataView.set(HARDCORE, (byte) (properties.isHardcore() ? 1 : 0));
         dataView.set(CLEAR_WEATHER_TIME, properties.clearWeatherTime);
         dataView.set(LAST_PLAYED, properties.getLastPlayedTime());
         dataView.set(SIZE_ON_DISK, 0L);
@@ -443,7 +437,7 @@ public final class LanternWorldPropertiesIO {
         } else {
             dataView.set(GENERATOR_OPTIONS, properties.generatorSettings);
         }
-        dataView.set(DIFFICULTY, ((LanternDifficulty) properties.difficulty).getInternalId());
+        dataView.set(DIFFICULTY, ((LanternDifficulty) properties.getDifficulty()).getInternalId());
         dataView.set(DIFFICULTY_LOCKED, (byte) (properties.difficultyLocked ? 1 : 0));
         dataView.set(GAME_MODE, ((LanternGameMode) properties.gameMode).getInternalId());
         dataView.set(MAP_FEATURES, (byte) (properties.mapFeatures ? 1 : 0));
@@ -493,7 +487,6 @@ public final class LanternWorldPropertiesIO {
         spongeContainer.set(NAME, properties.name);
         spongeContainer.set(UUID_MOST, properties.uniqueId.getMostSignificantBits());
         spongeContainer.set(UUID_LEAST, properties.uniqueId.getLeastSignificantBits());
-        spongeContainer.set(BUILD_HEIGHT, properties.buildHeight);
         spongeContainer.set(BONUS_CHEST_ENABLED, (byte) (properties.bonusChestEnabled ? 1 : 0));
         if (levelData.dimensionId != null) {
             spongeContainer.set(DIMENSION_INDEX, levelData.dimensionId);
@@ -530,9 +523,12 @@ public final class LanternWorldPropertiesIO {
         @Nullable public final Integer dimensionId;
         // The map with all the dimension ids, this is only present on the root world (normally)
         @Nullable public final BitSet dimensionMap;
+        // The level data that should be applied to the world config
+        @Nullable public final OverriddenWorldProperties configLevelData;
 
         public LevelData(LanternWorldProperties properties, @Nullable Integer dimensionId,
-                @Nullable BitSet dimensionMap) {
+                @Nullable BitSet dimensionMap, @Nullable OverriddenWorldProperties configLevelData) {
+            this.configLevelData = configLevelData;
             this.dimensionMap = dimensionMap;
             this.dimensionId = dimensionId;
             this.properties = properties;

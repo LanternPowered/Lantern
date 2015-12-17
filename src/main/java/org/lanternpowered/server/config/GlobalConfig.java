@@ -37,6 +37,8 @@ import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
+import static org.lanternpowered.server.config.ConfigConstants.*;
+
 public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public GlobalConfig(Path path) throws IOException {
@@ -48,6 +50,32 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     @Setting(value = "worlds", comment = "Configuration for the worlds.")
     private World worlds = new World();
+
+    @Setting(value = "rcon", comment = "Configuration for the rcon server.")
+    private Rcon rcon = new Rcon();
+
+    @Setting(value = "query", comment = "Configuration for the query server.")
+    private Query query = new Query();
+
+    @ConfigSerializable
+    private static final class Query {
+
+        @Setting(value = ENABLED, comment = "Whether the query server should be enabled.")
+        private boolean enabled = false;
+
+        @Setting(value = "port", comment = "The port that should be bound.")
+        private int port = 25565;
+    }
+
+    @ConfigSerializable
+    private static final class Rcon {
+
+        @Setting(value = ENABLED, comment = "Whether the rcon server should be enabled.")
+        private boolean enabled = false;
+
+        @Setting(value = "port", comment = "The port that should be bound.")
+        private int port = 25565;
+    }
 
     @ConfigSerializable
     private static final class Server {
@@ -81,6 +109,13 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
                 "This is the message that will be displayed in the\n " +
                 "server list.")
         private Text motd = Texts.of("A lantern minecraft server!");
+
+        @Setting(value = "shutdown-message", comment =
+                "This is the default message that will be displayed when the server is shut down.")
+        private Text shutdownMessage = Texts.of("Server shutting down.");
+
+        @Setting(value = "network-compression-threshold")
+        private int networkCompressionThreshold = 256;
     }
 
     @ConfigSerializable
@@ -93,6 +128,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         private String worldFolder = "world";
     }
 
+    public Text getShutdownMessage() {
+        return this.server.shutdownMessage;
+    }
+
     public int getPlayerTicketCount() {
         return this.worlds.chunkLoading.getPlayerTicketCount();
     }
@@ -103,6 +142,26 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public String getServerIp() {
         return this.server.ip;
+    }
+
+    public int getNetworkCompressionThreshold() {
+        return this.server.networkCompressionThreshold;
+    }
+
+    public int getRconPort() {
+        return this.rcon.port;
+    }
+
+    public boolean isRconEnabled() {
+        return this.rcon.enabled;
+    }
+
+    public int getQueryPort() {
+        return this.query.port;
+    }
+
+    public boolean isQueryEnabled() {
+        return this.query.enabled;
     }
 
     public int getServerPort() {

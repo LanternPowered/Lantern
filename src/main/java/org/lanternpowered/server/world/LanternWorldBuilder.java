@@ -47,6 +47,8 @@ import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -60,6 +62,7 @@ public class LanternWorldBuilder implements WorldBuilder {
 
     private String name;
     private GameMode gameMode;
+    private Difficulty difficulty;
     private LanternDimensionType<?> dimensionType;
     // If not specified, fall back to dimension default
     @Nullable private GeneratorType generatorType;
@@ -92,6 +95,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     public LanternWorldBuilder fill(WorldCreationSettings settings) {
         final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings)
                 checkNotNull(settings, "settings");
+        this.difficulty = settings0.getDifficulty();
         this.hardcore = settings0.isHardcore();
         this.enabled = settings0.isEnabled();
         this.gameMode = settings0.getGameMode();
@@ -117,6 +121,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     public LanternWorldBuilder fill(WorldProperties properties) {
         final LanternWorldProperties properties0 = (LanternWorldProperties)
                 checkNotNull(properties, "properties");
+        this.difficulty = properties0.getDifficulty();
         this.hardcore = properties0.isHardcore();
         this.enabled = properties0.isEnabled();
         this.gameMode = properties0.getGameMode();
@@ -129,8 +134,8 @@ public class LanternWorldBuilder implements WorldBuilder {
         this.generatorType = properties0.getGeneratorType();
         this.generatorSettings = properties0.generatorSettings.copy();
         this.bonusChestEnabled = properties0.bonusChestEnabled;
-        this.waterEvaporates = properties0.waterEvaporates;
-        this.buildHeight = properties0.buildHeight;
+        this.waterEvaporates = properties0.doesWaterEvaporate();
+        this.buildHeight = properties0.getBuildHeight();
         this.pvpEnabled = properties0.isPVPEnabled();
         return this;
     }
@@ -238,6 +243,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     public LanternWorldBuilder reset() {
         this.usesMapFeatures = true;
         this.gameMode = GameModes.SURVIVAL;
+        this.difficulty = Difficulties.NORMAL;
         this.hardcore = false;
         this.keepsSpawnLoaded = null;
         this.loadsOnStartup = false;
@@ -285,9 +291,10 @@ public class LanternWorldBuilder implements WorldBuilder {
         final boolean allowPlayerRespawns = this.allowPlayerRespawns == null ?
                 this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
         return new LanternWorldCreationSettings(this.name, this.gameMode, this.dimensionType, generatorType,
-                this.generatorModifiers, generatorSettings, this.teleporterAgent, this.hardcore, this.enabled,
-                this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled, this.bonusChestEnabled,
-                this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.seed, this.buildHeight);
+                this.generatorModifiers, generatorSettings, this.teleporterAgent, this.difficulty, this.hardcore,
+                this.enabled, this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
+                this.bonusChestEnabled, this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.seed,
+                this.buildHeight);
     }
 
     @Override

@@ -52,7 +52,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -79,7 +78,7 @@ public class LanternWorldProperties implements WorldProperties {
     final List<UUID> pendingUniqueIds = Lists.newArrayList();
 
     // The settings that were used to create the properties
-    @Nullable final LanternWorldCreationSettings creationSettings;
+    @Nullable LanternWorldCreationSettings creationSettings;
 
     // The extra properties
     DataContainer properties;
@@ -95,9 +94,6 @@ public class LanternWorldProperties implements WorldProperties {
 
     // The generator settings
     DataContainer generatorSettings;
-
-    // The difficulty
-    Difficulty difficulty = Difficulties.NORMAL;
 
     // Whether the difficulty is locked
     boolean difficultyLocked;
@@ -116,7 +112,6 @@ public class LanternWorldProperties implements WorldProperties {
     boolean bonusChestEnabled;
     boolean commandsAllowed;
     boolean mapFeatures;
-    boolean hardcore;
     boolean thundering;
     boolean raining;
 
@@ -156,43 +151,45 @@ public class LanternWorldProperties implements WorldProperties {
     // The last time the world was played in
     private long lastPlayed;
 
-    // Custom properties (the ones moved from the dimension instances)
-    boolean waterEvaporates;
-    boolean allowPlayerRespawns;
-
-    int buildHeight;
-
     public LanternWorldProperties(UUID uniqueId) {
-        this.creationSettings = null;
         this.uniqueId = uniqueId;
     }
 
-    public LanternWorldProperties(LanternWorldCreationSettings creationSettings) {
-        this.properties = new MemoryDataContainer();
-        this.creationSettings = creationSettings;
-        this.commandsAllowed = creationSettings.commandsAllowed();
-        this.hardcore = creationSettings.isHardcore();
-        this.dimensionType = creationSettings.getDimensionType();
-        this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();
-        this.generatorSettings = creationSettings.getGeneratorSettings();
-        this.waterEvaporates = creationSettings.waterEvaporates();
-        this.bonusChestEnabled = creationSettings.bonusChestEnabled();
-        this.buildHeight = creationSettings.getBuildHeight();
-        this.mapFeatures = creationSettings.usesMapFeatures();
-        this.gameMode = creationSettings.getGameMode();
-        this.name = creationSettings.getWorldName();
-        this.seed = creationSettings.getSeed();
-        this.allowPlayerRespawns = creationSettings.allowPlayerRespawns();
+    public LanternWorldProperties() {
         this.uniqueId = UUID.randomUUID();
     }
 
-    public void setConfig(WorldConfig worldConfig, boolean save) throws IOException {
+    public void update(WorldConfig worldConfig, @Nullable OverriddenWorldProperties overrides,
+            @Nullable LanternWorldCreationSettings creationSettings) throws IOException {
         this.worldConfig = worldConfig;
-        if (save) {
+        if (creationSettings != null) {
+            this.properties = new MemoryDataContainer();
+            this.creationSettings = creationSettings;
+            this.commandsAllowed = creationSettings.commandsAllowed();
+            this.dimensionType = creationSettings.getDimensionType();
+            this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();
+            this.generatorSettings = creationSettings.getGeneratorSettings();
+            this.bonusChestEnabled = creationSettings.bonusChestEnabled();
+            this.mapFeatures = creationSettings.usesMapFeatures();
+            this.gameMode = creationSettings.getGameMode();
+            this.name = creationSettings.getWorldName();
+            this.seed = creationSettings.getSeed();
+            this.setAllowsPlayerRespawns(creationSettings.allowPlayerRespawns());
+            this.setDifficulty(this.creationSettings.getDifficulty());
             this.setKeepSpawnLoaded(this.creationSettings.doesKeepSpawnLoaded());
+            this.setWaterEvaporates(this.creationSettings.waterEvaporates());
             this.setGeneratorModifiers(this.creationSettings.getGeneratorModifiers());
             this.setEnabled(this.creationSettings.isEnabled());
             this.setPVPEnabled(this.creationSettings.isPVPEnabled());
+            this.setBuildHeight(this.creationSettings.getBuildHeight());
+            this.setHardcore(this.creationSettings.isHardcore());
+            worldConfig.save();
+        } else if (overrides != null) {
+            this.setHardcore(overrides.hardcore);
+            this.setDifficulty(overrides.difficulty);
+            this.setKeepSpawnLoaded(this.dimensionType.doesKeepSpawnLoaded());
+            this.setAllowsPlayerRespawns(this.dimensionType.allowsPlayerRespawns());
+            this.setWaterEvaporates(this.dimensionType.doesWaterEvaporate());
             worldConfig.save();
         } else {
             worldConfig.load();
@@ -231,11 +228,11 @@ public class LanternWorldProperties implements WorldProperties {
     }
 
     public int getBuildHeight() {
-        return this.buildHeight;
+        return this.worldConfig.getMaxBuildHeight();
     }
 
     public void setBuildHeight(int buildHeight) {
-        this.buildHeight = buildHeight;
+        this.worldConfig.setMaxBuildHeight(buildHeight);
     }
 
     long getLastPlayedTime() {
@@ -432,12 +429,12 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public boolean isHardcore() {
-        return this.hardcore;
+        return this.worldConfig.isHardcore();
     }
 
     @Override
     public void setHardcore(boolean state) {
-        this.hardcore = state;
+        this.worldConfig.setHardcore(state);
     }
 
     @Override
@@ -457,16 +454,16 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public Difficulty getDifficulty() {
-        return this.difficulty;
+        return this.worldConfig.getDifficulty();
     }
 
     @Override
     public void setDifficulty(Difficulty difficulty) {
         checkNotNull(difficulty, "difficulty");
-        if (this.difficulty != difficulty && this.world != null) {
+        if (this.getDifficulty() != difficulty && this.world != null) {
             this.world.broadcast(() -> new MessagePlayOutSetDifficulty((LanternDifficulty) difficulty));
         }
-        this.difficulty = difficulty;
+        this.worldConfig.setDifficulty(difficulty);
     }
 
     @Override
@@ -691,5 +688,16 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setPVPEnabled(boolean enabled) {
         this.worldConfig.setPVPEnabled(enabled);
+    }
+
+    public static class OverriddenWorldProperties {
+
+        private final Difficulty difficulty;
+        private final boolean hardcore;
+
+        public OverriddenWorldProperties(Difficulty difficulty, boolean hardcore) {
+            this.difficulty = difficulty;
+            this.hardcore = hardcore;
+        }
     }
 }

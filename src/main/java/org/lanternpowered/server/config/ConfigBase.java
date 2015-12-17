@@ -28,7 +28,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.TextTypeSerializer;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.Text;
 
 import com.google.common.reflect.TypeToken;
@@ -45,7 +47,8 @@ public abstract class ConfigBase {
 
     public static final ConfigurationOptions DEFAULT_OPTIONS = ConfigurationOptions.defaults()
             .setSerializers(ConfigurationOptions.defaults().getSerializers().newChild()
-                    .registerType(TypeToken.of(Text.class), new TextTypeSerializer()));
+                    .registerType(TypeToken.of(Text.class), new TextTypeSerializer())
+                    .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer()));
 
     private final ObjectMapper<ConfigBase>.BoundInstance configMapper;
     private final ConfigurationLoader<CommentedConfigurationNode> loader;

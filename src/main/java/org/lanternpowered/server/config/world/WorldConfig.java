@@ -35,6 +35,8 @@ import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.WorldChunkLoading;
+import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
 
@@ -43,6 +45,9 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
 
     @Setting(value = "pvp-enabled", comment = "Enable if this world allows PVP combat.")
     private boolean pvpEnabled = true;
+
+    @Setting(value = "hardcore", comment = "Enable if this world should use the hardcore mode.")
+    private boolean hardcore = true;
 
     @Setting(value = "world-enabled", comment = "Enable if this world should be allowed to load.")
     private boolean worldEnabled = false;
@@ -59,6 +64,12 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "allow-player-respawns", comment = "Enable if the player may respawn in this world.")
     private boolean allowPlayerRespawns = true;
 
+    @Setting(value = "max-build-height", comment = "The maximum buid height of this world.")
+    private int maxBuildHeight = 255;
+
+    @Setting(value = "difficulty", comment = "The difficulty this world.")
+    private Difficulty difficulty = Difficulties.NORMAL;
+
     private final GlobalConfig globalConfig;
 
     public WorldConfig(GlobalConfig globalConfig, Path path) throws IOException {
@@ -72,6 +83,22 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
             return this.chunkLoading.getChunkLoadingTickets(plugin);
         }
         return this.globalConfig.getChunkLoadingTickets(plugin);
+    }
+
+    public Difficulty getDifficulty() {
+        return this.difficulty;
+    }
+
+    public void setDifficulty(Difficulty difficulty) {
+        this.difficulty = difficulty;
+    }
+
+    public int getMaxBuildHeight() {
+        return this.maxBuildHeight;
+    }
+
+    public void setMaxBuildHeight(int maxBuildHeight) {
+        this.maxBuildHeight = maxBuildHeight;
     }
 
     public boolean allowPlayerRespawns() {
@@ -120,5 +147,13 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public void setPVPEnabled(boolean allow) {
         this.pvpEnabled = allow;
+    }
+
+    public boolean isHardcore() {
+        return this.hardcore;
+    }
+
+    public void setHardcore(boolean hardcore) {
+        this.hardcore = hardcore;
     }
 }

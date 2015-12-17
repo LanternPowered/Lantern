@@ -460,7 +460,7 @@ public class LanternServer implements Server {
 
     @Override
     public void shutdown() {
-        this.shutdown(Texts.of(this.game.getRegistry().getTranslationManager().get("disconnect.closed")));
+        this.shutdown(this.game.getGlobalConfig().getShutdownMessage());
     }
 
     @SuppressWarnings("deprecation")

@@ -44,7 +44,7 @@ import org.spongepowered.api.util.persistence.DataBuilder;
  * An implementation of {@link TypeSerializer} so that DataSerializables can be
  * provided in {@link ObjectMapper}-using classes.
  */
-public class DataSerializableTypeSerializer implements TypeSerializer<DataSerializable> {
+public final class DataSerializableTypeSerializer implements TypeSerializer<DataSerializable> {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override

@@ -32,12 +32,14 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 public final class LanternWorldCreationSettings implements WorldCreationSettings {
 
     private final String name;
     private final GameMode gameMode;
+    private final Difficulty difficulty;
     private final LanternDimensionType<?> dimensionType;
     private final GeneratorType generatorType;
     private final Collection<WorldGeneratorModifier> generatorModifiers;
@@ -60,7 +62,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
 
     LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
-            boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
+            Difficulty difficulty, boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
             boolean pvpEnabled, boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns,
             long seed, int buildHeight) {
         this.allowPlayerRespawns = allowPlayerRespawns;
@@ -77,11 +79,16 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
         this.generatorType = generatorType;
         this.buildHeight = buildHeight;
         this.pvpEnabled = pvpEnabled;
+        this.difficulty = difficulty;
         this.hardcore = hardcore;
         this.gameMode = gameMode;
         this.enabled = enabled;
         this.name = name;
         this.seed = seed;
+    }
+
+    public Difficulty getDifficulty() {
+        return this.difficulty;
     }
 
     @Override

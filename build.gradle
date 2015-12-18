@@ -21,6 +21,8 @@ group = 'org.lanterpowered'
 archivesBaseName = 'lanternserver'
 version = '1.0.0-SNAPSHOT'
 
+defaultTasks 'licenseFormat', 'build'
+
 // Repositories
 repositories {
     mavenCentral()
@@ -32,12 +34,17 @@ repositories {
     }
 }
 
+ext.api = project('SpongeAPI')
+
+evaluationDependsOn api.path
+
 // Project dependencies
 dependencies {
+    compile api
+
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.3'
     compile 'org.apache.logging.log4j:log4j-core:2.3'
     compile 'org.apache.logging.log4j:log4j-api:2.3'
-    compile 'org.spongepowered:spongeapi:2.1-SNAPSHOT'
     compile 'org.ow2.asm:asm-all:5.0.3'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'org.mariadb.jdbc:mariadb-java-client:1.3.2'
@@ -88,7 +95,7 @@ shadowJar {
 
     dependencies {
         // SpongeAPI
-        include dependency('org.spongepowered:spongeapi')
+        include project(api.path)
         include dependency('org.spongepowered:event-gen-core')
 
         include dependency('net.sf.trove4j:trove4j')
@@ -131,9 +138,16 @@ shadowJar {
         include dependency('org.mariadb.jdbc:mariadb-java-client')
         include dependency('com.h2database:h2')
         include dependency('org.xerial:sqlite-jdbc')
+
+        mergeServiceFiles()
     }
 
    	exclude 'LICENSE', 'NOTICE'
+}
+
+task sourceJar(type: Jar, dependsOn: classes) {
+    from api.sourceSets.main.allSource
+    from sourceSets.main.allSource
 }
 
 // Run shadowJar on build

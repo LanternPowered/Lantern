@@ -177,5 +177,4 @@ abstract class JsonTextBaseSerializer {
             json.addProperty("insertion", ((ShiftClickAction.InsertText) shiftClickAction).getResult());
         }
     }
-
 }

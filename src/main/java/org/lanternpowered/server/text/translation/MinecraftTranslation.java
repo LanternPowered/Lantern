@@ -22,35 +22,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.object.serializer;
+package org.lanternpowered.server.text.translation;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CodecException;
+import java.util.IllegalFormatException;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.text.gson.JsonTextSerializer;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.translation.Translation;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+public final class MinecraftTranslation implements Translation {
 
-public final class SerializerText implements ObjectSerializer<Text> {
+    private final String id;
+    private final ResourceBundle bundle;
 
-    static final Gson GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
-            LanternGame.get().getRegistry().getTranslationManager(), true).create();
-
-    @Override
-    public void write(ObjectSerializerContext context, ByteBuf buf, Text object) throws CodecException {
-        context.write(buf, String.class, GSON.toJson(object));
+    public MinecraftTranslation(String id, ResourceBundle bundle) {
+        this.bundle = bundle;
+        this.id = id;
     }
 
     @Override
-    public Text read(ObjectSerializerContext context, ByteBuf buf) throws CodecException {
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String get(Locale locale) {
+        return this.bundle.getString(this.id);
+    }
+
+    @Override
+    public String get(Locale locale, Object... args) {
+        final String value = this.get(locale);
         try {
-            return GSON.fromJson(context.read(buf, String.class), Text.class);
-        } catch (JsonSyntaxException e) {
-            throw new CodecException(e);
+            return String.format(value, args);
+        } catch (IllegalFormatException e) {
+            LanternGame.log().error("Illegal format used in the translation: " + this.id, e);
+            return value;
         }
     }
 }

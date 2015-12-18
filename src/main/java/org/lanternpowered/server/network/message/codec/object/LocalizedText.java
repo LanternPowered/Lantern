@@ -22,35 +22,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.object.serializer;
+package org.lanternpowered.server.network.message.codec.object;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CodecException;
+import java.util.Locale;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.spongepowered.api.text.Text;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+public final class LocalizedText {
 
-public final class SerializerText implements ObjectSerializer<Text> {
+    private final Locale locale;
+    private final Text text;
 
-    static final Gson GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
-            LanternGame.get().getRegistry().getTranslationManager(), true).create();
-
-    @Override
-    public void write(ObjectSerializerContext context, ByteBuf buf, Text object) throws CodecException {
-        context.write(buf, String.class, GSON.toJson(object));
+    public LocalizedText(Text text, Locale locale) {
+        this.locale = locale;
+        this.text = text;
     }
 
-    @Override
-    public Text read(ObjectSerializerContext context, ByteBuf buf) throws CodecException {
-        try {
-            return GSON.fromJson(context.read(buf, String.class), Text.class);
-        } catch (JsonSyntaxException e) {
-            throw new CodecException(e);
-        }
+    public Locale getLocale() {
+        return this.locale;
+    }
+
+    public Text getText() {
+        return this.text;
     }
 }

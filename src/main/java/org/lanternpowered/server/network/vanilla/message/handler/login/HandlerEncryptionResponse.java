@@ -107,7 +107,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
         }
 
         // initialize stream encryption
-        session.setExcryption(sharedSecret);
+        session.setEncryption(sharedSecret);
 
         // create hash for auth
         String hash;

@@ -344,7 +344,7 @@ public class Session implements PlayerConnection {
         }
     }
 
-    public void setExcryption(@Nullable SecretKey secretKey) {
+    public void setEncryption(@Nullable SecretKey secretKey) {
         if (secretKey == null) {
             this.channel.pipeline().replace(ENCRYPTION, ENCRYPTION, NoopHandler.INSTANCE);
         } else {

@@ -35,7 +35,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -86,7 +88,9 @@ import org.lanternpowered.server.text.selector.LanternArgumentHolder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.selector.LanternSelectorType;
 import org.lanternpowered.server.text.sink.LanternMessageSinkFactory;
+import org.lanternpowered.server.text.translation.CombinedTranslationManager;
 import org.lanternpowered.server.text.translation.LanternTranslationManager;
+import org.lanternpowered.server.text.translation.MinecraftTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.rotation.LanternRotation;
 import org.lanternpowered.server.world.LanternWeather;
@@ -201,7 +205,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     private final LanternGame game;
     private final Set<String> defaultGameRules;
-    private final LanternTranslationManager translationManager = new LanternTranslationManager();
+    private final TranslationManager translationManager;
     private final LanternResourcePackFactory resourcePackFactory = new LanternResourcePackFactory();
     private final LanternAttributeCalculator attributeCalculator = new LanternAttributeCalculator();
     private final LanternBiomeRegistry biomeRegistry = new LanternBiomeRegistry();
@@ -299,6 +303,16 @@ public class LanternGameRegistry implements GameRegistry {
 
     public LanternGameRegistry(LanternGame game) {
         this.game = game;
+        // Create the translation managers
+        final CombinedTranslationManager translationManager = new CombinedTranslationManager();
+        final MinecraftTranslationManager minecraftTranslationManager = new MinecraftTranslationManager(
+                ResourceBundle.getBundle("assets/minecraft/lang/en_US"));
+        final LanternTranslationManager lanternTranslationManager = new LanternTranslationManager();
+        lanternTranslationManager.addResourceBundle("assets/lantern/lang/en_US", Locale.ENGLISH);
+        translationManager.addManager(minecraftTranslationManager);
+        translationManager.addManager(lanternTranslationManager);
+        translationManager.setDelegateManager(lanternTranslationManager);
+        this.translationManager = translationManager;
     }
 
     /**

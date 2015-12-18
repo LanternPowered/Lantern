@@ -57,6 +57,11 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                 session.disconnect("Outdated client! I'm running " + LanternGame.get().getPlatform().getMinecraftVersion().getName());
             } else if (message.getProtocolVersion() > protocol) {
                 session.disconnect("Outdated server! I'm running " + LanternGame.get().getPlatform().getMinecraftVersion().getName());
+            } else {
+                int compressionThreshold = LanternGame.get().getGlobalConfig().getNetworkCompressionThreshold();
+                if (compressionThreshold != -1) {
+                    session.setCompression(compressionThreshold);
+                }
             }
         }
     }

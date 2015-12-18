@@ -24,31 +24,32 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
+import java.util.Locale;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.text.gson.JsonTextSerializer;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
 import org.spongepowered.api.text.Text;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-public final class SerializerText implements ObjectSerializer<Text> {
-
-    static final Gson GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
-            LanternGame.get().getRegistry().getTranslationManager(), true).create();
+public final class SerializerLocalizedText implements ObjectSerializer<LocalizedText> {
 
     @Override
-    public void write(ObjectSerializerContext context, ByteBuf buf, Text object) throws CodecException {
-        context.write(buf, String.class, GSON.toJson(object));
+    public void write(ObjectSerializerContext context, ByteBuf buf, LocalizedText object) throws CodecException {
+        final Locale oldLocale = JsonTextTranslatableSerializer.getCurrentLocale();
+        JsonTextTranslatableSerializer.setCurrentLocale(object.getLocale());
+        context.write(buf, String.class, SerializerText.GSON.toJson(object.getText()));
+        JsonTextTranslatableSerializer.setCurrentLocale(oldLocale);
     }
 
     @Override
-    public Text read(ObjectSerializerContext context, ByteBuf buf) throws CodecException {
+    public LocalizedText read(ObjectSerializerContext context, ByteBuf buf) throws CodecException {
         try {
-            return GSON.fromJson(context.read(buf, String.class), Text.class);
+            return new LocalizedText(SerializerText.GSON.fromJson(context.read(buf, String.class), Text.class),
+                    JsonTextTranslatableSerializer.getCurrentLocale());
         } catch (JsonSyntaxException e) {
             throw new CodecException(e);
         }

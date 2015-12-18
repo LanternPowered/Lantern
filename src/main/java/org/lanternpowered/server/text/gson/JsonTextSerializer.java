@@ -45,13 +45,15 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
      * @param translationManager the translation manager
      * @return the gson builder for chaining
      */
-    public static GsonBuilder applyTo(GsonBuilder gsonBuilder, TranslationManager translationManager) {
+    public static GsonBuilder applyTo(GsonBuilder gsonBuilder, TranslationManager translationManager,
+            boolean translateNonMinecraft) {
         gsonBuilder.registerTypeAdapter(Text.class, new JsonTextSerializer());
         gsonBuilder.registerTypeAdapter(Text.Literal.class, new JsonTextLiteralSerializer());
         gsonBuilder.registerTypeAdapter(Text.Placeholder.class, new JsonTextPlaceholderSerializer());
         gsonBuilder.registerTypeAdapter(Text.Score.class, new JsonTextScoreSerializer());
         gsonBuilder.registerTypeAdapter(Text.Selector.class, new JsonTextSelectorSerializer());
-        gsonBuilder.registerTypeAdapter(Text.Translatable.class, new JsonTextTranslatableSerializer(translationManager));
+        gsonBuilder.registerTypeAdapter(Text.Translatable.class, new JsonTextTranslatableSerializer(translationManager,
+                translateNonMinecraft));
         return gsonBuilder;
     }
 

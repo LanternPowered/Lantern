@@ -22,35 +22,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.object.serializer;
+package org.lanternpowered.server.util;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CodecException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.text.gson.JsonTextSerializer;
-import org.spongepowered.api.text.Text;
+public final class ReflectionHelper {
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
+    public static void setField(Field field, Object target, Object object) throws Exception {
+        int modifiers = field.getModifiers();
 
-public final class SerializerText implements ObjectSerializer<Text> {
+        if (Modifier.isFinal(modifiers)) {
+            Field mfield = Field.class.getDeclaredField("modifiers");
+            mfield.setAccessible(true);
+            mfield.set(field, modifiers & ~Modifier.FINAL);
+        }
 
-    static final Gson GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
-            LanternGame.get().getRegistry().getTranslationManager(), true).create();
-
-    @Override
-    public void write(ObjectSerializerContext context, ByteBuf buf, Text object) throws CodecException {
-        context.write(buf, String.class, GSON.toJson(object));
+        field.setAccessible(true);
+        field.set(target, object);
     }
 
-    @Override
-    public Text read(ObjectSerializerContext context, ByteBuf buf) throws CodecException {
-        try {
-            return GSON.fromJson(context.read(buf, String.class), Text.class);
-        } catch (JsonSyntaxException e) {
-            throw new CodecException(e);
-        }
+    private ReflectionHelper() {
     }
 }

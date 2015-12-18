@@ -31,6 +31,7 @@ import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
@@ -86,8 +87,7 @@ public class LanternPaginationService implements PaginationService {
             return this.lastUuid;
         }
     }
-    final ConcurrentMap<Class<? extends CommandSource>, PaginationCalculator<?>> calculators = new ConcurrentHashMap<Class<? extends
-            CommandSource>, PaginationCalculator<?>>();
+    final ConcurrentMap<Class<? extends CommandSource>, PaginationCalculator<?>> calculators = Maps.newConcurrentMap();
     final ConcurrentMap<CommandSource, SourcePaginations> activePaginations = new MapMaker().weakKeys().makeMap();
     private final AtomicBoolean commandRegistered = new AtomicBoolean();
     private final LanternGame game;

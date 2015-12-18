@@ -54,7 +54,7 @@ public class PlayerPaginationCalculator implements PaginationCalculator<Player> 
 
     static {
         ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
-                .setURL(PlayerPaginationCalculator.class.getResource("/font-sizes.json"))
+                .setURL(PlayerPaginationCalculator.class.getResource("/assets/lantern/internal/font-sizes.json"))
                 .setPreservesHeader(false).build();
         try {
             ConfigurationNode node = loader.load();

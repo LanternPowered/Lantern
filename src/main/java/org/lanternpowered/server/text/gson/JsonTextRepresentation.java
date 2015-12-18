@@ -43,7 +43,7 @@ public final class JsonTextRepresentation implements TextRepresentation {
     private final Gson gson;
 
     public JsonTextRepresentation(TranslationManager translationManager) {
-        this.gson = JsonTextSerializer.applyTo(new GsonBuilder(), translationManager).create();
+        this.gson = JsonTextSerializer.applyTo(new GsonBuilder(), translationManager, false).create();
     }
 
     /**

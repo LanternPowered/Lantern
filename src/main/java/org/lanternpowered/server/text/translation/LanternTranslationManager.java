@@ -69,9 +69,17 @@ public class LanternTranslationManager implements TranslationManager {
                 @Override
                 public Optional<ResourceBundle> load(ResourceKey key) throws Exception {
                     Locale locale = key.locale == null ? Locale.ENGLISH : key.locale;
+                    Optional<ResourceBundle> optBundle = this.load(key.name, locale);
+                    if (!optBundle.isPresent() && locale != Locale.ENGLISH) {
+                        optBundle = this.load(key.name, Locale.ENGLISH);
+                    }
+                    return optBundle;
+                }
+
+                private Optional<ResourceBundle> load(String name, Locale locale) throws Exception {
                     if (bundles.containsKey(locale)) {
                         for (ResourceBundle resourceBundle : bundles.get(locale)) {
-                            if (resourceBundle.containsKey(key.name)) {
+                            if (resourceBundle.containsKey(name)) {
                                 return Optional.of(resourceBundle);
                             }
                         }

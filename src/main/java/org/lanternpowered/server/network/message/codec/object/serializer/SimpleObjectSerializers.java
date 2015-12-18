@@ -32,6 +32,7 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.network.message.codec.object.VarInt;
 import org.lanternpowered.server.network.message.codec.object.VarLong;
 import org.spongepowered.api.data.DataView;
@@ -53,6 +54,7 @@ public class SimpleObjectSerializers implements ObjectSerializers {
             this.register(DataView.class, new SerializerDataView());
             this.register(String.class, new SerializerString());
             this.register(Text.class, new SerializerText());
+            this.register(LocalizedText.class, new SerializerLocalizedText());
             this.register(UUID.class, new SerializerUUID());
             this.register(VarInt.class, new SerializerVarInt());
             this.register(VarLong.class, new SerializerVarLong());

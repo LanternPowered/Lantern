@@ -25,7 +25,9 @@
 package org.lanternpowered.server.text.gson;
 
 import java.lang.reflect.Type;
+import java.util.Locale;
 
+import org.lanternpowered.server.text.translation.MinecraftTranslation;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
@@ -38,14 +40,36 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
 public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Translatable>, JsonDeserializer<Text.Translatable> {
 
-    private final TranslationManager translationManager;
+    private final static ThreadLocal<Locale> currentLocale = ThreadLocal.withInitial(() -> Locale.ENGLISH);
 
-    public JsonTextTranslatableSerializer(TranslationManager translationManager) {
+    /**
+     * Sets the current locale that should be used to translate all
+     * the text components if {@link translateNonMinecraft} is set to true.
+     * 
+     * <p>This will only be applied to the current thread, so this will
+     * can be used in concurrent environments.</p>
+     * 
+     * @param locale the locale
+     */
+    public static void setCurrentLocale(Locale locale) {
+        currentLocale.set(locale);
+    }
+
+    public static Locale getCurrentLocale() {
+        return currentLocale.get();
+    }
+
+    private final TranslationManager translationManager;
+    private final boolean translateNonMinecraft;
+
+    public JsonTextTranslatableSerializer(TranslationManager translationManager, boolean translateNonMinecraft) {
+        this.translateNonMinecraft = translateNonMinecraft;
         this.translationManager = translationManager;
     }
 
@@ -72,6 +96,10 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
     @Override
     public JsonElement serialize(Text.Translatable src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject json = new JsonObject();
+        Translation translation = src.getTranslation();
+        if (this.translateNonMinecraft && !(translation instanceof MinecraftTranslation)) {
+            return new JsonPrimitive(src.getTranslation().get(currentLocale.get(), src.getArguments().toArray()));
+        }
         json.addProperty("translate", src.getTranslation().getId());
         ImmutableList<Object> arguments = src.getArguments();
         if (!arguments.isEmpty()) {

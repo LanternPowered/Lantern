@@ -25,32 +25,32 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.text.Text;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 
 public abstract class MessagePlayOutTitle implements Message {
 
     public static final class SetTitle extends MessagePlayOutTitle {
 
-        private final Text title;
+        private final LocalizedText title;
 
-        public SetTitle(Text title) {
+        public SetTitle(LocalizedText title) {
             this.title = title;
         }
 
-        public Text getTitle() {
+        public LocalizedText getTitle() {
             return this.title;
         }
     }
 
     public static final class SetSubtitle extends MessagePlayOutTitle {
 
-        private final Text title;
+        private final LocalizedText title;
 
-        public SetSubtitle(Text title) {
+        public SetSubtitle(LocalizedText title) {
             this.title = title;
         }
 
-        public Text getTitle() {
+        public LocalizedText getTitle() {
             return this.title;
         }
     }

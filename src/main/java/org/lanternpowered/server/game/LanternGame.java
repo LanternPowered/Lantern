@@ -27,7 +27,6 @@ package org.lanternpowered.server.game;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Locale;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandHelp;
@@ -50,6 +49,7 @@ import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
 import org.lanternpowered.server.text.action.LanternCallbackHolder;
+import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.slf4j.Logger;
@@ -59,6 +59,7 @@ import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -227,6 +228,11 @@ public class LanternGame implements Game {
             throw new IllegalStateException("The game can only be initialized once!");
         }
         game = this;
+        try {
+            ReflectionHelper.setField(Sponge.class.getDeclaredField("game"), null, this);
+        } catch (Exception e) {
+            throw new RuntimeException("An error occurred while setting the game instance for the Sponge class.", e);
+        }
     }
 
     public void preInitialize() throws IOException {
@@ -307,9 +313,6 @@ public class LanternGame implements Game {
 
         // Create the event manager instance
         this.eventManager = new LanternEventManager();
-
-        // Load the default translations
-        this.gameRegistry.getTranslationManager().addResourceBundle("translations/en_US", Locale.ENGLISH);
 
         // Call the construction events
         this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(this, 

@@ -24,11 +24,15 @@
  */
 package org.lanternpowered.server.text.title;
 
+import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
@@ -37,45 +41,90 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 
 public final class LanternTitles {
 
-    private final static LoadingCache<Title, List<Message>> messagesCache = 
-            CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Title, List<Message>>() {
-
+    private final static LoadingCache<Title, CacheValue> messagesCache = 
+            CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Title, CacheValue>() {
                 @Override
-                public List<Message> load(Title key) throws Exception {
-                    ImmutableList.Builder<Message> builder = ImmutableList.builder();
-                    if (key.isClear()) {
-                        builder.add(new MessagePlayOutTitle.Clear());
-                    }
-                    if (key.isReset()) {
-                        builder.add(new MessagePlayOutTitle.Reset());
-                    }
-                    Optional<Integer> fadeIn = key.getFadeIn();
-                    Optional<Integer> stay = key.getStay();
-                    Optional<Integer> fadeOut = key.getFadeOut();
-                    if (fadeIn.isPresent() || stay.isPresent() || fadeOut.isPresent()) {
-                        builder.add(new MessagePlayOutTitle.SetTimes(fadeIn.orElse(20), stay.orElse(60), fadeOut.orElse(20)));
-                    }
-                    Optional<Text> title = key.getTitle();
-                    if (title.isPresent()) {
-                        builder.add(new MessagePlayOutTitle.SetTitle(title.get()));
-                    }
-                    title = key.getSubtitle();
-                    if (title.isPresent()) {
-                        builder.add(new MessagePlayOutTitle.SetSubtitle(title.get()));
-                    }
-                    return builder.build();
+                public CacheValue load(Title key) throws Exception {
+                    return createValue(key);
                 }
             });
 
-    public static List<Message> getMessages(Title title) {
+    private static CacheValue createValue(Title title) {
+        final ImmutableList.Builder<Message> builder = ImmutableList.builder();
+        if (title.isClear()) {
+            builder.add(new MessagePlayOutTitle.Clear());
+        }
+        if (title.isReset()) {
+            builder.add(new MessagePlayOutTitle.Reset());
+        }
+        Optional<Integer> fadeIn = title.getFadeIn();
+        Optional<Integer> stay = title.getStay();
+        Optional<Integer> fadeOut = title.getFadeOut();
+        if (fadeIn.isPresent() || stay.isPresent() || fadeOut.isPresent()) {
+            builder.add(new MessagePlayOutTitle.SetTimes(fadeIn.orElse(20), stay.orElse(60), fadeOut.orElse(20)));
+        }
+        if (title.getTitle().isPresent() || title.getSubtitle().isPresent()) {
+            return new LocaleCacheValue(builder.build(), title);
+        } else {
+            return new CacheValue(builder.build(), title);
+        }
+    }
+
+    private static class CacheValue {
+
+        final WeakReference<Title> title;
+        final List<Message> messages;
+
+        public CacheValue(List<Message> messages, Title title) {
+            this.title = new WeakReference<>(title);
+            this.messages = messages;
+        }
+
+        public List<Message> getMessages(Locale locale) {
+            return this.messages;
+        }
+    }
+
+    private static class LocaleCacheValue extends CacheValue {
+
+        private final Map<Locale, List<Message>> cache = Maps.newConcurrentMap();
+
+        public LocaleCacheValue(List<Message> baseMessages, Title title) {
+            super(baseMessages, title);
+        }
+
+        @Override
+        public List<Message> getMessages(Locale locale) {
+            return this.cache.computeIfAbsent(locale, locale0 -> {
+                final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder();
+                builder.addAll(this.messages);
+                Optional<Text> title = this.title.get().getTitle();
+                if (title.isPresent()) {
+                    builder.add(new MessagePlayOutTitle.SetTitle(new LocalizedText(title.get(), locale)));
+                }
+                title = this.title.get().getSubtitle();
+                if (title.isPresent()) {
+                    builder.add(new MessagePlayOutTitle.SetSubtitle(new LocalizedText(title.get(), locale)));
+                }
+                return builder.build();
+            });
+        }
+    }
+
+    public static List<Message> getMessages(Title title, Locale locale) {
         try {
-            return messagesCache.get(title);
+            return messagesCache.get(title).getMessages(locale);
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static List<Message> getMessages(Title title) {
+        return getMessages(title, Locale.ENGLISH);
     }
 
     private LanternTitles() {

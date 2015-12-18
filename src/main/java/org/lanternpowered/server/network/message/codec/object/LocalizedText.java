@@ -24,18 +24,27 @@
  */
 package org.lanternpowered.server.network.message.codec.object;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import java.util.Locale;
 
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
 
 public final class LocalizedText {
+
+    public static final LocalizedText EMPTY = new LocalizedText(Texts.of());
 
     private final Locale locale;
     private final Text text;
 
     public LocalizedText(Text text, Locale locale) {
-        this.locale = locale;
-        this.text = text;
+        this.locale = checkNotNull(locale, "locale");
+        this.text = checkNotNull(text, "text");
+    }
+
+    public LocalizedText(Text text) {
+        this(text, Locale.ENGLISH);
     }
 
     public Locale getLocale() {

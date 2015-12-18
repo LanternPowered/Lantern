@@ -33,6 +33,7 @@ import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -41,7 +42,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.title.LanternTitles;
-
 import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -165,7 +165,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void sendMessage(ChatType type, Text message) {
         checkNotNull(message, "message");
         checkNotNull(type, "type");
-        this.session.send(new MessagePlayOutChatMessage(message, type));
+        this.session.send(new MessagePlayOutChatMessage(new LocalizedText(message, this.locale), type));
     }
 
     @Override

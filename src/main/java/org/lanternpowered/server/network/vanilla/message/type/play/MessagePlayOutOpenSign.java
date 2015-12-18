@@ -51,5 +51,4 @@ public final class MessagePlayOutOpenSign implements Message {
     public Vector3i getPosition() {
         return this.position;
     }
-
 }

@@ -28,14 +28,14 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.text.Text;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 
 import com.flowpowered.math.vector.Vector3i;
 
 public final class MessagePlayOutUpdateSign implements Message {
 
     private final Vector3i position;
-    private final Text[] lines;
+    private final LocalizedText[] lines;
 
     /**
      * Creates the update sign message.
@@ -43,7 +43,7 @@ public final class MessagePlayOutUpdateSign implements Message {
      * @param position the position
      * @param lines the lines
      */
-    public MessagePlayOutUpdateSign(Vector3i position, Text[] lines) {
+    public MessagePlayOutUpdateSign(Vector3i position, LocalizedText[] lines) {
         this.position = checkNotNull(position, "position");
         checkNotNull(lines, "lines");
         checkArgument(lines.length == 4, "lines length must be 4");
@@ -64,7 +64,7 @@ public final class MessagePlayOutUpdateSign implements Message {
      * 
      * @return the lines
      */
-    public Text[] getLines() {
+    public LocalizedText[] getLines() {
         return this.lines;
     }
 }

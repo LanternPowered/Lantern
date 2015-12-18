@@ -24,15 +24,17 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import java.util.Locale;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 
 import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
@@ -44,7 +46,7 @@ public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMe
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutChatMessage message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
-        Text text = message.getMessage();
+        LocalizedText text = message.getMessage();
         ChatType type = message.getChatType();
         int value;
         if (type == ChatTypes.CHAT) {
@@ -54,11 +56,11 @@ public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMe
         } else if (type == ChatTypes.ACTION_BAR) {
             value = 2;
             // Fix the message format
-            text = Texts.builder(Texts.legacy().to(text)).build();
+            text = new LocalizedText(Texts.builder(Texts.legacy().to(text.getText())).build(), Locale.ENGLISH);
         } else {
             throw new CodecException("Unknown chat type: " + type.getName());
         }
-        context.write(buf, Text.class, message.getMessage());
+        context.write(buf, LocalizedText.class, text);
         buf.writeByte(value);
         return buf;
     }

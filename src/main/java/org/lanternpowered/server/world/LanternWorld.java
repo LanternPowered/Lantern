@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -46,6 +47,7 @@ import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
@@ -111,6 +113,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
@@ -716,9 +719,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public void sendMessage(ChatType type, Text message) {
         List<LanternPlayer> players = this.getPlayers();
         if (!players.isEmpty()) {
-            Message netwMessage = new MessagePlayOutChatMessage(message, type);
+            final Map<Locale, Message> netwMessages = Maps.newHashMap();
             for (LanternPlayer player : players) {
-                player.getConnection().send(netwMessage);
+                player.getConnection().send(netwMessages.computeIfAbsent(player.getLocale(),
+                        locale -> new MessagePlayOutChatMessage(new LocalizedText(message, locale), type)));
             }
         }
     }

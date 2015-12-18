@@ -25,21 +25,21 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 
 public final class MessagePlayOutChatMessage implements Message {
 
-    private final Text message;
+    private final LocalizedText message;
     private final ChatType chatType;
 
-    public MessagePlayOutChatMessage(Text message, ChatType chatType) {
+    public MessagePlayOutChatMessage(LocalizedText message, ChatType chatType) {
         this.chatType = chatType;
         this.message = message;
     }
 
-    public Text getMessage() {
+    public LocalizedText getMessage() {
         return this.message;
     }
 

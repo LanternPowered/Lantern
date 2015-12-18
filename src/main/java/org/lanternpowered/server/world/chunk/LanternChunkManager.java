@@ -426,7 +426,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrCreateChunk(int x, int z, boolean generate) {
-        return this.getOrCreateChunk(x, z, Cause.of(), generate);
+        return this.getOrCreateChunk(x, z, Cause.of(this.world), generate);
     }
 
     /**
@@ -488,8 +488,7 @@ public final class LanternChunkManager {
         try {
             // Try to load the chunk
             if (this.chunkIOService.read(chunk)) {
-                this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(
-                        this.game, cause, chunk));
+                this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause, chunk));
                 return true;
             }
         } catch (Exception e) {
@@ -512,8 +511,7 @@ public final class LanternChunkManager {
                     chunk.getX(), chunk.getZ(), e);
             return false;
         }
-        this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(
-                this.game, cause, chunk));
+        this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause, chunk));
         return true;
     }
 
@@ -729,8 +727,7 @@ public final class LanternChunkManager {
             return false;
         }
         // Post the chunk unload event
-        this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(
-                this.game, cause, chunk));
+        this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(cause, chunk));
         // Remove from the loaded chunks
         this.loadedChunks.remove(coords);
         // Move the chunk to the graveyard
@@ -767,8 +764,7 @@ public final class LanternChunkManager {
         set.add(ticket);
         if (chunk != null && callEvents) {
             final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
-            final ForcedChunkEvent event = SpongeEventFactory.createForcedChunkEvent(
-                    this.game, coords0, chunk, ticket);
+            final ForcedChunkEvent event = SpongeEventFactory.createForcedChunkEvent(Cause.of(ticket), coords0, chunk, ticket);
             this.game.getEventManager().post(event);
         }
     }
@@ -810,7 +806,7 @@ public final class LanternChunkManager {
             final LanternChunk chunk = entry.getValue();
             // Post the chunk unload event
             this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(
-                    this.game, Cause.of(), chunk));
+                    Cause.of(LanternGame.get().getServer()), chunk));
             // Save the chunk
             this.save(chunk);
         }
@@ -847,7 +843,7 @@ public final class LanternChunkManager {
                 final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
                 for (LanternLoadingTicket ticket : set) {
                     final ForcedChunkEvent event = SpongeEventFactory.createForcedChunkEvent(
-                            this.game, coords0, chunk, ticket);
+                            Cause.of(ticket), coords0, chunk, ticket);
                     this.game.getEventManager().post(event);
                 }
             }

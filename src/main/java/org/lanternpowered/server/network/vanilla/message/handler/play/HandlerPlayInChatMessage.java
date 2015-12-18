@@ -59,8 +59,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             Text rawMessage = Texts.of(message0);
             Text.Translatable text = Texts.builder(translation, displayName, rawMessage).build();
             MessageSink sink = MessageSinks.toAll();
-            MessageSinkEvent.Chat event = SpongeEventFactory.createMessageSinkEventChat(LanternGame.get(),
-                    Cause.of(player), text, text, sink, sink, rawMessage);
+            MessageSinkEvent.Chat event = SpongeEventFactory.createMessageSinkEventChat(Cause.of(player), text, text, sink, sink, rawMessage);
             if (!LanternGame.get().getEventManager().post(event)) {
                 event.getSink().sendMessage(event.getMessage());
             }

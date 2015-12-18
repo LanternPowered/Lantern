@@ -45,6 +45,7 @@ import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -78,7 +79,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(Lists.<GameProfile>newArrayList(), online, max);
         LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
-        ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(client, response);
+        ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.of(client), client, response);
 
         // Cancelled, we are done here
         if (event.isCancelled()) {

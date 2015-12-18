@@ -783,7 +783,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         }
         if (generate) {
             return Optional.of(this.chunkManager.getOrCreateChunk(
-                    new Vector2i(x, z), Cause.of(), generate));
+                    new Vector2i(x, z), Cause.of(this), generate));
         } else {
             return Optional.ofNullable(this.chunkManager.getChunk(x, z));
         }

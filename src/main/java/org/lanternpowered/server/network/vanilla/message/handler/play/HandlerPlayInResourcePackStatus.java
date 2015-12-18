@@ -32,6 +32,7 @@ import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.resourcepack.ResourcePack;
 
 public final class HandlerPlayInResourcePackStatus implements Handler<MessagePlayInResourcePackStatus> {
@@ -49,6 +50,6 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
             return;
         }
         LanternGame.get().getEventManager().post(SpongeEventFactory.createResourcePackStatusEvent(
-                LanternGame.get(), resourcePack.get(), session.getPlayer(), message.getStatus()));
+                Cause.of(session.getPlayer()), resourcePack.get(), session.getPlayer(), message.getStatus()));
     }
 }

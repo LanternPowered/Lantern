@@ -71,6 +71,7 @@ import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.command.SimpleCommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.EventManager;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectData;
@@ -315,7 +316,7 @@ public class LanternGame implements Game {
         this.eventManager = new LanternEventManager();
 
         // Call the construction events
-        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(this, 
+        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(Cause.of(this), 
                 GameState.CONSTRUCTION));
 
         // Load the plugin instances
@@ -327,12 +328,12 @@ public class LanternGame implements Game {
 
         // Load-complete phase
         this.setGameState(GameState.LOAD_COMPLETE);
-        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(this, 
+        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(Cause.of(this), 
                 GameState.LOAD_COMPLETE));
 
         // Pre-init phase
         this.setGameState(GameState.PRE_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(this, 
+        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(Cause.of(this), 
                 GameState.PRE_INITIALIZATION));
         this.serviceManager.potentiallyProvide(PermissionService.class).executeWhenPresent(
                 input -> this.server.getConsole().getContainingCollection());
@@ -342,7 +343,7 @@ public class LanternGame implements Game {
 
         // Init phase
         this.setGameState(GameState.INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(this, 
+        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(Cause.of(this), 
                 GameState.INITIALIZATION));
 
         // Provide the default permission service if no custom one is found
@@ -361,7 +362,7 @@ public class LanternGame implements Game {
 
         // Post-init phase
         this.setGameState(GameState.POST_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(this, 
+        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(Cause.of(this), 
                 GameState.POST_INITIALIZATION));
     }
 

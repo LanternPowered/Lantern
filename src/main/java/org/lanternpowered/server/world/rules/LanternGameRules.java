@@ -107,7 +107,7 @@ public final class LanternGameRules implements GameRules {
 
         @Override
         public <T> void set(T object) {
-            this.set(object, Cause.of());
+            this.set(object, Cause.of(world));
         }
 
         @Override
@@ -123,7 +123,7 @@ public final class LanternGameRules implements GameRules {
                 this.valueNumber = Coerce.asDouble(object).orElse(null);
             }
             if (world != null && !Objects.equals(this.value, oldValue)) {
-                ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(LanternGame.get(),
+                ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(
                         cause, oldValue == null ? "" : oldValue, this.value == null ? "" : this.value, this.name, world);
                 LanternGame.get().getEventManager().post(event);
             }

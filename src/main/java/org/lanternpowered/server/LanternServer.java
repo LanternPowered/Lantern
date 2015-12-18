@@ -62,6 +62,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
@@ -236,10 +237,10 @@ public class LanternServer implements Server {
         this.worldManager.init();
 
         this.game.setGameState(GameState.SERVER_ABOUT_TO_START);
-        this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(this.game,
+        this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(Cause.of(this.game),
                 GameState.SERVER_ABOUT_TO_START));
         this.game.setGameState(GameState.SERVER_STARTING);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(this.game, 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(Cause.of(this.game), 
                 GameState.SERVER_STARTING));
 
         final GlobalConfig config = this.game.getGlobalConfig();
@@ -264,7 +265,7 @@ public class LanternServer implements Server {
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
         this.game.setGameState(GameState.SERVER_STARTED);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(this.game, 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(Cause.of(this.game), 
                 GameState.SERVER_STARTED));
     }
 
@@ -472,7 +473,7 @@ public class LanternServer implements Server {
         this.shuttingDown = true;
 
         this.game.setGameState(GameState.SERVER_STOPPING);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(this.game, 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(Cause.of(this.game), 
                 GameState.SERVER_STOPPING));
 
         // Debug a message
@@ -522,7 +523,7 @@ public class LanternServer implements Server {
         }
 
         this.game.setGameState(GameState.SERVER_STOPPED);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(this.game, 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(Cause.of(this.game), 
                 GameState.SERVER_STOPPED));
 
         // Wait for a while and terminate any rogue threads

@@ -110,7 +110,7 @@ public final class Health implements Component {
     public void heal(double health, Cause cause) {
         if (this.holder instanceof Entity) {
             // TODO: Health modifiers, etc.
-            HealEntityEvent event = SpongeEventFactory.createHealEntityEvent(LanternGame.get(),
+            HealEntityEvent event = SpongeEventFactory.createHealEntityEvent(
                     cause, Lists.newArrayList(), (Entity) this.holder, health);
             if (event.isCancelled()) {
                 return;
@@ -134,7 +134,7 @@ public final class Health implements Component {
     public boolean damage(double damage, DamageSource damageSource, Cause cause) {
         if (this.holder instanceof Entity) {
             // TODO: Damage modifiers, etc.
-            DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(LanternGame.get(),
+            DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(
                     cause, Lists.newArrayList(), (Entity) this.holder, damage);
             // TODO: Not cancellable?
             damage = event.getFinalDamage();

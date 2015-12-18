@@ -33,13 +33,13 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.lanternpowered.server.game.LanternGame;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.plugin.PluginManager;
-import org.spongepowered.api.service.ServiceManager;
+import org.spongepowered.api.scheduler.AsynchronousExecutor;
+import org.spongepowered.api.scheduler.Scheduler;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.event.EventManager;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -68,10 +68,6 @@ public final class PluginModule extends AbstractModule {
         this.bind(this.pluginClass).in(Scopes.SINGLETON);
         this.bind(PluginContainer.class).toInstance(this.container);
         this.bind(Logger.class).toInstance(this.container.getLogger());
-        this.bind(ServiceManager.class).toInstance(this.game.getServiceManager());
-        this.bind(EventManager.class).toInstance(this.game.getEventManager());
-        this.bind(PluginManager.class).toInstance(this.game.getPluginManager());
-        this.bind(GameRegistry.class).toInstance(this.game.getRegistry());
         this.bind(LanternGame.class).toInstance(this.game);
         this.bind(Game.class).toInstance(this.game);
 
@@ -87,6 +83,9 @@ public final class PluginModule extends AbstractModule {
         }).annotatedWith(sharedConfigFile).toProvider(SharedHoconConfigProvider.class); // Loader for shared-directory config file
         this.bind(new TypeLiteral<ConfigurationLoader<CommentedConfigurationNode>>() {
         }).annotatedWith(privateConfigFile).toProvider(PrivateHoconConfigProvider.class); // Loader for plugin-private directory config file
+
+        this.bind(SpongeExecutorService.class).annotatedWith(SynchronousExecutor.class).toProvider(SynchronousExecutorProvider.class);
+        this.bind(SpongeExecutorService.class).annotatedWith(AsynchronousExecutor.class).toProvider(AsynchronousExecutorProvider.class);
     }
 
     private static class PrivateConfigDirProvider implements Provider<Path> {
@@ -216,6 +215,40 @@ public final class PluginModule extends AbstractModule {
         @Override
         public File get() {
             return this.configPath.toFile();
+        }
+    }
+
+    private static class SynchronousExecutorProvider implements Provider<SpongeExecutorService> {
+
+        private final PluginContainer container;
+        private final Scheduler schedulerService;
+
+        @Inject
+        private SynchronousExecutorProvider(PluginContainer container, Game game) {
+            this.container = container;
+            this.schedulerService = game.getScheduler();
+        }
+
+        @Override
+        public SpongeExecutorService get() {
+            return this.schedulerService.createSyncExecutor(this.container);
+        }
+    }
+
+    private static class AsynchronousExecutorProvider implements Provider<SpongeExecutorService> {
+
+        private final PluginContainer container;
+        private final Scheduler schedulerService;
+
+        @Inject
+        private AsynchronousExecutorProvider(PluginContainer container, Game game) {
+            this.container = container;
+            this.schedulerService = game.getScheduler();
+        }
+
+        @Override
+        public SpongeExecutorService get() {
+            return this.schedulerService.createAsyncExecutor(this.container);
         }
     }
 }

@@ -70,17 +70,15 @@ public final class LanternTitles {
         if (title.getTitle().isPresent() || title.getSubtitle().isPresent()) {
             return new LocaleCacheValue(builder.build(), title);
         } else {
-            return new CacheValue(builder.build(), title);
+            return new CacheValue(builder.build());
         }
     }
 
     private static class CacheValue {
 
-        final WeakReference<Title> title;
         final List<Message> messages;
 
-        public CacheValue(List<Message> messages, Title title) {
-            this.title = new WeakReference<>(title);
+        public CacheValue(List<Message> messages) {
             this.messages = messages;
         }
 
@@ -91,10 +89,12 @@ public final class LanternTitles {
 
     private static class LocaleCacheValue extends CacheValue {
 
+        private final WeakReference<Title> title;
         private final Map<Locale, List<Message>> cache = Maps.newConcurrentMap();
 
         public LocaleCacheValue(List<Message> baseMessages, Title title) {
-            super(baseMessages, title);
+            super(baseMessages);
+            this.title = new WeakReference<>(title);
         }
 
         @Override

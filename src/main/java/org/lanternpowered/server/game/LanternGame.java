@@ -27,6 +27,7 @@ package org.lanternpowered.server.game;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandHelp;
@@ -115,6 +116,9 @@ public class LanternGame implements Game {
 
     // The amount of milli seconds in one tick
     public static final int TICK_DURATION = 1000 / TICKS_PER_SECOND;
+
+    // The amount of nano seconds in one tick
+    public static final long TICK_DURATION_NS = TimeUnit.NANOSECONDS.convert(TICK_DURATION, TimeUnit.MILLISECONDS);
 
     // The logger of the game
     private static Logger logger;

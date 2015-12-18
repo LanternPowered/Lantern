@@ -25,6 +25,7 @@
 package org.lanternpowered.server.scheduler;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import org.spongepowered.api.plugin.PluginContainer;
@@ -107,12 +108,20 @@ public class ScheduledTask implements Task {
 
     @Override
     public long getDelay() {
-        return this.offset;
+        if (this.delayIsTicks) {
+            return this.offset;
+        } else {
+            return TimeUnit.NANOSECONDS.toMillis(this.offset);
+        }
     }
 
     @Override
     public long getInterval() {
-        return this.period;
+        if (this.intervalIsTicks) {
+            return this.period;
+        } else {
+            return TimeUnit.NANOSECONDS.toMillis(this.period);
+        }
     }
 
     @Override
@@ -143,6 +152,21 @@ public class ScheduledTask implements Task {
     @Override
     public boolean isAsynchronous() {
         return this.syncType == TaskSynchronicity.ASYNCHRONOUS;
+    }
+
+    /**
+     * Returns a timestamp after which the next execution will take place.
+     * Should only be compared to
+     * {@link SchedulerBase#getTimestamp(ScheduledTask)}.
+     *
+     * @return The next execution timestamp
+    */
+    long nextExecutionTimestamp() {
+        if (this.state.isActive) {
+            return this.timestamp + this.period;
+        } else {
+            return this.timestamp + this.offset;
+        }
     }
 
     long getTimestamp() {

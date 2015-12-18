@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.data.io.anvil;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -200,7 +201,8 @@ public class RegionFile {
 
     public DataOutputStream getChunkDataOutputStream(int x, int z) {
         checkBounds(x, z);
-        return new DataOutputStream(new DeflaterOutputStream(new ChunkBuffer(x, z), new Deflater(Deflater.BEST_SPEED)));
+        return new DataOutputStream(new BufferedOutputStream(new DeflaterOutputStream(new ChunkBuffer(x, z),
+                new Deflater(Deflater.BEST_SPEED))));
     }
 
     /*

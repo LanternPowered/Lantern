@@ -79,7 +79,7 @@ public class LanternTaskBuilder implements Task.Builder {
     @Override
     public LanternTaskBuilder delay(long delay, TimeUnit unit) {
         checkArgument(delay >= 0, "delay cannot be negative");
-        this.delay = checkNotNull(unit, "unit").toMillis(delay);
+        this.delay = checkNotNull(unit, "unit").toNanos(delay);
         this.delayIsTicks = false;
         return this;
     }
@@ -95,7 +95,7 @@ public class LanternTaskBuilder implements Task.Builder {
     @Override
     public LanternTaskBuilder interval(long interval, TimeUnit unit) {
         checkArgument(interval >= 0, "interval cannot be negative");
-        this.interval = checkNotNull(unit, "unit").toMillis(interval);
+        this.interval = checkNotNull(unit, "unit").toNanos(interval);
         this.intervalIsTicks = false;
         return this;
     }
@@ -129,8 +129,8 @@ public class LanternTaskBuilder implements Task.Builder {
         boolean delayIsTicks = this.delayIsTicks;
         boolean intervalIsTicks = this.intervalIsTicks;
         if (this.syncType == ScheduledTask.TaskSynchronicity.ASYNCHRONOUS) {
-            delay = delayIsTicks ? delay * LanternGame.TICK_DURATION : delay;
-            interval = intervalIsTicks ? interval * LanternGame.TICK_DURATION : interval;
+            delay = delayIsTicks ? delay * LanternGame.TICK_DURATION_NS : delay;
+            interval = intervalIsTicks ? interval * LanternGame.TICK_DURATION_NS : interval;
             delayIsTicks = intervalIsTicks = false;
         }
         ScheduledTask task = new ScheduledTask(this.syncType, this.consumer, name, delay,

@@ -179,13 +179,11 @@ public class LanternScheduler implements Scheduler {
 
     @Override
     public SpongeExecutorService createSyncExecutor(Object plugin) {
-        // TODO Auto-generated method stub
-        return null;
+        return new TaskExecutorService(this::createTaskBuilder, this.syncScheduler, checkPlugin(plugin, "plugin"));
     }
 
     @Override
     public SpongeExecutorService createAsyncExecutor(Object plugin) {
-        // TODO Auto-generated method stub
-        return null;
+        return new TaskExecutorService(() -> this.createTaskBuilder().async(), this.asyncScheduler, checkPlugin(plugin, "plugin"));
     }
 }

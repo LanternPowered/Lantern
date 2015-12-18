@@ -27,6 +27,7 @@ package org.lanternpowered.server.game;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.lanternpowered.server.LanternServer;
@@ -35,7 +36,9 @@ import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
-import org.lanternpowered.server.config.OpsConfig;
+import org.lanternpowered.server.config.user.UserConfig;
+import org.lanternpowered.server.config.user.OpsEntry;
+import org.lanternpowered.server.config.user.UserEntry;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
@@ -43,6 +46,7 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.LanternServerContainer;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
 import org.lanternpowered.server.plugin.SpongeApiContainer;
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
@@ -102,8 +106,11 @@ public class LanternGame implements Game {
     // The name of the global config file
     public static final String GLOBAL_CONFIG = "global.conf";
 
-    // The name of the global config file
+    // The name of the ops config file
     public static final String OPS_CONFIG = "ops.conf";
+
+    // The name of the whitelist config file
+    public static final String WHITELIST_CONFIG = "whitelist.conf";
 
     // The name of the config folder
     public static final String PLUGINS_FOLDER = "plugins";
@@ -223,7 +230,9 @@ public class LanternGame implements Game {
     // The global config
     private GlobalConfig globalConfig;
     // The ops config
-    private OpsConfig opsConfig;
+    private UserConfig<OpsEntry> opsConfig;
+    // The whitelist config
+    private UserConfig<UserEntry> whitelistConfig;
 
     // The current game state
     private GameState gameState = GameState.CONSTRUCTION;
@@ -260,8 +269,19 @@ public class LanternGame implements Game {
         this.globalConfig.load();
 
         // Create the ops config
-        this.opsConfig = new OpsConfig(this.configFolder.resolve(OPS_CONFIG));
+        this.opsConfig = new UserConfig<>(this.configFolder.resolve(OPS_CONFIG));
         this.opsConfig.load();
+
+        this.opsConfig.addEntry(new OpsEntry(new LanternGameProfile(UUID.randomUUID(), "TestName1"), 3));
+        this.opsConfig.addEntry(new OpsEntry(new LanternGameProfile(UUID.randomUUID(), "TestName0"), 1));
+        this.opsConfig.save();
+
+        // Create the whitelist config
+        this.whitelistConfig = new UserConfig<>(this.configFolder.resolve(WHITELIST_CONFIG));
+        this.whitelistConfig.load();
+
+        this.whitelistConfig.addEntry(new UserEntry(new LanternGameProfile(UUID.randomUUID(), "TestName0")));
+        this.whitelistConfig.save();
     }
 
     public void initialize(LanternServer server, Path rootWorldFolder) {
@@ -359,7 +379,7 @@ public class LanternGame implements Game {
                 service.getGroupForOpLevel(2).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
                         "minecraft.commandblock", Tristate.TRUE);
                 
-                this.serviceManager.setProvider(this, PermissionService.class, service);
+                this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
             } catch (ProviderExistsException e) {
             }
         }
@@ -407,8 +427,17 @@ public class LanternGame implements Game {
      * 
      * @return the ops configuration
      */
-    public OpsConfig getOpsConfig() {
+    public UserConfig<OpsEntry> getOpsConfig() {
         return this.opsConfig;
+    }
+
+    /**
+     * Gets the whitelist configuration.
+     * 
+     * @return the whitelist configuration
+     */
+    public UserConfig<UserEntry> getWhitelistConfig() {
+        return this.whitelistConfig;
     }
 
     @Override

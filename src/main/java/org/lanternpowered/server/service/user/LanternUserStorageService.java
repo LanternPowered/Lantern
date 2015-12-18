@@ -32,6 +32,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
+import org.lanternpowered.server.config.user.UserEntry;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.LanternUser;
 import org.lanternpowered.server.game.LanternGame;
@@ -114,7 +115,10 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Nullable
     private static User getFromWhitelist(UUID uniqueId) {
-        // TODO
+        final Optional<UserEntry> optEntry = LanternGame.get().getWhitelistConfig().getEntryByUUID(uniqueId);
+        if (optEntry.isPresent()) {
+            return create(optEntry.get().getProfile());
+        }
         return null;
     }
 
@@ -172,8 +176,11 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Override
     public boolean delete(GameProfile profile) {
+        final LanternGame game = LanternGame.get();
+        game.getOpsConfig().removeEntry(profile.getUniqueId());
+        game.getWhitelistConfig().removeEntry(profile.getUniqueId());
         // TODO
-        return false;
+        return true;
     }
 
     @Override

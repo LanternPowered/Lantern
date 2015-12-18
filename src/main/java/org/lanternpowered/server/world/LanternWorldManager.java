@@ -501,9 +501,12 @@ public final class LanternWorldManager {
      * @return the new or existing world properties, if creation was successful
      */
     Optional<WorldProperties> createWorld(WorldCreationSettings settings, int dimensionId) {
-        final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) settings;
+        final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) checkNotNull(settings, "settings");
+        if (this.worldByName.containsKey(settings0.getWorldName())) {
+            return Optional.empty();
+        }
         // Create the world properties
-        final LanternWorldProperties worldProperties = new LanternWorldProperties();
+        final LanternWorldProperties worldProperties = new LanternWorldProperties(settings0.getWorldName());
         // Create a config
         try {
             final WorldConfigResult result = this.getOrCreateWorldConfig(worldProperties);
@@ -621,6 +624,8 @@ public final class LanternWorldManager {
      * @throws IOException 
      */
     WorldConfigResult getOrCreateWorldConfig(WorldProperties worldProperties) throws IOException {
+        checkNotNull(worldProperties, "worldProperties");
+        checkNotNull(worldProperties.getWorldName(), "worldName");
         final Path path = this.globalConfig.getPath().getParent().resolve("worlds")
                 .resolve(worldProperties.getWorldName()).resolve(WORLD_CONFIG);
         boolean newCreated = !Files.exists(path);
@@ -861,7 +866,7 @@ public final class LanternWorldManager {
                         if (data.dimensionId != null) {
                             if (data.dimensionId != i) {
                                 LanternGame.log().warn("Dimension id ({}) stored in the world save ({})"
-                                        + "does not match the one of the world folder ({}), modifying...",
+                                        + " does not match the one of the world folder ({}), modifying...",
                                         data.dimensionId, i, data.properties.getWorldName());
                             }
                             data = new LevelData(data.properties, i, null, data.configLevelData);

@@ -521,6 +521,11 @@ public class LanternServer implements Server {
         } catch (IOException e) {
             LanternGame.log().error("A error occurred while saving the ops config.", e);
         }
+        try {
+            this.game.getWhitelistConfig().save();
+        } catch (IOException e) {
+            LanternGame.log().error("A error occurred while saving the whitelist config.", e);
+        }
 
         this.game.setGameState(GameState.SERVER_STOPPED);
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(Cause.of(this.game), 

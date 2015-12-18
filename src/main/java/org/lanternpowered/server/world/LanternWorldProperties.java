@@ -155,8 +155,9 @@ public class LanternWorldProperties implements WorldProperties {
         this.uniqueId = uniqueId;
     }
 
-    public LanternWorldProperties() {
+    public LanternWorldProperties(String name) {
         this.uniqueId = UUID.randomUUID();
+        this.name = name;
     }
 
     public void update(WorldConfig worldConfig, @Nullable OverriddenWorldProperties overrides,
@@ -172,7 +173,6 @@ public class LanternWorldProperties implements WorldProperties {
             this.bonusChestEnabled = creationSettings.bonusChestEnabled();
             this.mapFeatures = creationSettings.usesMapFeatures();
             this.gameMode = creationSettings.getGameMode();
-            this.name = creationSettings.getWorldName();
             this.seed = creationSettings.getSeed();
             this.setAllowsPlayerRespawns(creationSettings.allowPlayerRespawns());
             this.setDifficulty(this.creationSettings.getDifficulty());

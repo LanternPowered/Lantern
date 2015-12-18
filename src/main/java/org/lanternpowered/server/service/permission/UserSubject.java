@@ -24,7 +24,7 @@
  */
 package org.lanternpowered.server.service.permission;
 
-import org.lanternpowered.server.config.OpsConfig;
+import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
@@ -69,7 +69,7 @@ public class UserSubject extends LanternSubject {
                     opLevel = ((OpLevelCollection.OpLevelSubject) parent).getOpLevel();
                 }
                 if (opLevel > 0) {
-                    LanternGame.get().getOpsConfig().addEntry(new OpsConfig.Entry((LanternGameProfile) player, opLevel));
+                    LanternGame.get().getOpsConfig().addEntry(new OpsEntry(((LanternGameProfile) player).withoutProperties(), opLevel));
                 } else {
                     LanternGame.get().getOpsConfig().removeEntry(player.getUniqueId());
                 }
@@ -91,7 +91,7 @@ public class UserSubject extends LanternSubject {
     }
 
     int getOpLevel() {
-        Optional<OpsConfig.Entry> entry = LanternGame.get().getOpsConfig().getEntryByUUID(this.player.getUniqueId());
+        Optional<OpsEntry> entry = LanternGame.get().getOpsConfig().getEntryByUUID(this.player.getUniqueId());
         if (entry.isPresent()) {
             return entry.get().getOpLevel();
         }
@@ -119,6 +119,5 @@ public class UserSubject extends LanternSubject {
             ret = Tristate.TRUE;
         }
         return ret;
-
     }
 }

@@ -66,7 +66,7 @@ public final class LanternGameProfile implements GameProfile {
     @Setting("name")
     private String name;
 
-    LanternGameProfile() {
+    protected LanternGameProfile() {
     }
 
     public LanternGameProfile(UUID uniqueId, String name) {
@@ -180,12 +180,21 @@ public final class LanternGameProfile implements GameProfile {
         }
     }
 
+    @ConfigSerializable
     public static final class Property {
 
-        private final String name;
-        private final String value;
+        @Setting(value = "name")
+        private String name;
 
-        @Nullable private final String signature;
+        @Setting(value = "value")
+        private String value;
+
+        @Nullable
+        @Setting(value = "signature")
+        private String signature;
+
+        protected Property() {
+        }
 
         public Property(String name, String value, @Nullable String signature) {
             this.signature = signature;

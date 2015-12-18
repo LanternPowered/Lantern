@@ -32,8 +32,10 @@ import java.util.UUID;
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.TextTypeSerializer;
 import org.lanternpowered.server.config.serializer.UUIDTypeSerializer;
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.IpSet;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 
 import com.google.common.reflect.TypeToken;
@@ -45,15 +47,24 @@ import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 
+@SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class ConfigBase {
 
-    public static final ConfigurationOptions DEFAULT_OPTIONS = ConfigurationOptions.defaults()
-            .setSerializers(ConfigurationOptions.defaults().getSerializers().newChild()
-                    .registerType(TypeToken.of(Text.class), new TextTypeSerializer())
-                    .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
-                    .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
-                    .registerType(TypeToken.of(UUID.class), new UUIDTypeSerializer()));
+    public static final ConfigurationOptions DEFAULT_OPTIONS;
+
+    static {
+        final TypeSerializerCollection typeSerializers = ConfigurationOptions.defaults().getSerializers().newChild();
+        typeSerializers.registerType(TypeToken.of(Text.class), new TextTypeSerializer())
+                .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
+                .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
+                .registerType(TypeToken.of(UUID.class), new UUIDTypeSerializer())
+                .registerType(TypeToken.of(GameProfile.class), (TypeSerializer) typeSerializers.get(
+                        TypeToken.of(LanternGameProfile.class)));
+        DEFAULT_OPTIONS = ConfigurationOptions.defaults().setSerializers(typeSerializers);
+    }
 
     private final ObjectMapper<ConfigBase>.BoundInstance configMapper;
     private final ConfigurationLoader<CommentedConfigurationNode> loader;

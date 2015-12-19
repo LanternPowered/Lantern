@@ -61,11 +61,22 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "worlds", comment = "Configuration for the worlds.")
     private World worlds = new World();
 
+    @Setting(value = "commands")
+    private Commands commands = new Commands();
+
     @Setting(value = "rcon", comment = "Configuration for the rcon server.")
     private Rcon rcon = new Rcon();
 
     @Setting(value = "query", comment = "Configuration for the query server.")
     private Query query = new Query();
+
+    @ConfigSerializable
+    public static class Commands {
+
+        @Setting(value = "aliases", comment = "A mapping from unqualified command alias to plugin id"
+                + " of the plugin that should handle a certain command")
+        private Map<String, String> aliases = Maps.newHashMap();
+    }
 
     @ConfigSerializable
     private static final class Query {
@@ -146,6 +157,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    public Map<String, String> getCommandAliases() {
+        return this.commands.aliases;
     }
 
     public Map<String, Predicate<InetAddress>> getIpSets() {

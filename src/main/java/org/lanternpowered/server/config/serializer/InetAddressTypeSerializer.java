@@ -24,7 +24,8 @@
  */
 package org.lanternpowered.server.config.serializer;
 
-import java.util.UUID;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 import com.google.common.reflect.TypeToken;
 
@@ -32,19 +33,19 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-public final class UUIDTypeSerializer implements TypeSerializer<UUID> {
+public final class InetAddressTypeSerializer implements TypeSerializer<InetAddress> {
 
     @Override
-    public UUID deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+    public InetAddress deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         try {
-            return UUID.fromString(value.getString());
-        } catch (IllegalArgumentException e) {
+            return InetAddress.getByName(value.getString());
+        } catch (UnknownHostException e) {
             throw new ObjectMappingException(e);
         }
     }
 
     @Override
-    public void serialize(TypeToken<?> type, UUID obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(obj.toString());
+    public void serialize(TypeToken<?> type, InetAddress obj, ConfigurationNode value) throws ObjectMappingException {
+        value.setValue(obj.getHostAddress());
     }
 }

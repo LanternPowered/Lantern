@@ -25,13 +25,13 @@
 package org.lanternpowered.server.config;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.UUID;
 
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
+import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
 import org.lanternpowered.server.config.serializer.TextTypeSerializer;
-import org.lanternpowered.server.config.serializer.UUIDTypeSerializer;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.IpSet;
 import org.spongepowered.api.CatalogType;
@@ -60,9 +60,9 @@ public abstract class ConfigBase {
         typeSerializers.registerType(TypeToken.of(Text.class), new TextTypeSerializer())
                 .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
                 .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
-                .registerType(TypeToken.of(UUID.class), new UUIDTypeSerializer())
                 .registerType(TypeToken.of(GameProfile.class), (TypeSerializer) typeSerializers.get(
-                        TypeToken.of(LanternGameProfile.class)));
+                        TypeToken.of(LanternGameProfile.class)))
+                .registerType(TypeToken.of(InetAddress.class), new InetAddressTypeSerializer());
         DEFAULT_OPTIONS = ConfigurationOptions.defaults().setSerializers(typeSerializers);
     }
 
@@ -71,7 +71,7 @@ public abstract class ConfigBase {
     private final ConfigurationOptions options;
     private final Path path;
 
-    private CommentedConfigurationNode root;
+    private volatile CommentedConfigurationNode root;
 
     /**
      * Creates a new config object.

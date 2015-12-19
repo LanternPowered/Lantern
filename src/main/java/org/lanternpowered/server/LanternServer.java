@@ -395,11 +395,6 @@ public class LanternServer implements Server {
     }
 
     @Override
-    public Optional<WorldProperties> createWorld(WorldCreationSettings settings) {
-        return this.worldManager.createWorld(settings);
-    }
-
-    @Override
     public ListenableFuture<Optional<WorldProperties>> copyWorld(WorldProperties worldProperties, String copyName) {
         return this.worldManager.copyWorld(worldProperties, copyName);
     }
@@ -526,6 +521,11 @@ public class LanternServer implements Server {
         } catch (IOException e) {
             LanternGame.log().error("A error occurred while saving the whitelist config.", e);
         }
+        try {
+            this.game.getBanConfig().save();
+        } catch (IOException e) {
+            LanternGame.log().error("A error occurred while saving the bans config.", e);
+        }
 
         this.game.setGameState(GameState.SERVER_STOPPED);
         this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(Cause.of(this.game), 
@@ -560,5 +560,10 @@ public class LanternServer implements Server {
     @Override
     public GameProfileManager getGameProfileManager() {
         return this.game.getGameProfileManager();
+    }
+
+    @Override
+    public Optional<WorldProperties> createWorldProperties(WorldCreationSettings settings) {
+        return this.worldManager.createWorld(settings);
     }
 }

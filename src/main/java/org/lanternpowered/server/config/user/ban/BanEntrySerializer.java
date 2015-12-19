@@ -22,51 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.config.user;
+package org.lanternpowered.server.config.user.ban;
 
-import java.util.Optional;
-import java.util.UUID;
+import com.google.common.reflect.TypeToken;
 
-import org.spongepowered.api.profile.GameProfile;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-public interface UserStorage<T> {
+public final class BanEntrySerializer implements TypeSerializer<BanEntry> {
 
-    /**
-     * Gets the user entry for the specified unique id.
-     * 
-     * @param uniqueId the unique id
-     * @return the entry if present, otherwise {@link Optional#empty()}
-     */
-    Optional<T> getEntryByUUID(UUID uniqueId);
+    @Override
+    public BanEntry deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+        if (value.getNode("ip").isVirtual()) {
+            return value.getValue(TypeToken.of(BanEntry.Ip.class));
+        } else {
+            return value.getValue(TypeToken.of(BanEntry.User.class));
+        }
+    }
 
-    /**
-     * Gets the user entry for the specified username.
-     * 
-     * @param username the username
-     * @return the entry if present, otherwise {@link Optional#empty()}
-     */
-    Optional<T> getEntryByName(String username);
-
-    /**
-     * Gets the user entry for the specified game profile.
-     * 
-     * @param gameProfile the game profile
-     * @return the entry if present, otherwise {@link Optional#empty()}
-     */
-    Optional<T> getEntryByProfile(GameProfile gameProfile);
-
-    /**
-     * Adds the op entry and replaces any present ones.
-     * 
-     * @param entry the entry
-     */
-    void addEntry(T entry);
-
-    /**
-     * Removes the op entry for the specified player unique id.
-     * 
-     * @param uniqueId the unique id
-     * @return whether a entry was removed
-     */
-    boolean removeEntry(UUID uniqueId);
+    @Override
+    public void serialize(TypeToken<?> type, BanEntry obj, ConfigurationNode value) throws ObjectMappingException {
+        if (obj instanceof BanEntry.Ip) {
+            value.setValue(TypeToken.of(BanEntry.Ip.class), (BanEntry.Ip) value);
+        } else {
+            value.setValue(TypeToken.of(BanEntry.User.class), (BanEntry.User) value);
+        }
+    }
 }

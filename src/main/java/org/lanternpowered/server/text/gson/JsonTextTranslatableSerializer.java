@@ -50,7 +50,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
 
     /**
      * Sets the current locale that should be used to translate all
-     * the text components if {@link translateNonMinecraft} is set to true.
+     * the text components if {@link #translateNonMinecraft} is set to true.
      * 
      * <p>This will only be applied to the current thread, so this will
      * can be used in concurrent environments.</p>

@@ -625,7 +625,6 @@ public final class LanternWorldManager {
      */
     WorldConfigResult getOrCreateWorldConfig(WorldProperties worldProperties) throws IOException {
         checkNotNull(worldProperties, "worldProperties");
-        checkNotNull(worldProperties.getWorldName(), "worldName");
         final Path path = this.globalConfig.getPath().getParent().resolve("worlds")
                 .resolve(worldProperties.getWorldName()).resolve(WORLD_CONFIG);
         boolean newCreated = !Files.exists(path);
@@ -837,15 +836,15 @@ public final class LanternWorldManager {
 
         // Generate the root (default) world if missing
         if (rootWorldProperties == null) {
-            final LanternWorldCreationSettings settings = new LanternWorldBuilder(this.game)
+            final LanternWorldCreationSettings settings = new LanternWorldCreationSettingsBuilder(this.game)
                     .name(this.rootWorldFolder.toFile().getName())
-                    .dimensionType(DimensionTypes.OVERWORLD)
+                    .dimension(DimensionTypes.OVERWORLD)
                     .generator(GeneratorTypes.FLAT) // TODO: Use the default generator type once implemented
                     .gameMode(GameModes.SURVIVAL)
                     .keepsSpawnLoaded(true)
                     .loadsOnStartup(true)
                     .enabled(true)
-                    .buildSettings();
+                    .build();
             rootWorldProperties = (LanternWorldProperties) this.createWorld(settings, 0).get();
         }
 

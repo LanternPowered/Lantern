@@ -27,18 +27,19 @@ package org.lanternpowered.server.game;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
+import org.lanternpowered.server.command.LanternCommandDisambiguator;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserEntry;
+import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
@@ -46,7 +47,6 @@ import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.LanternServerContainer;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
 import org.lanternpowered.server.plugin.SpongeApiContainer;
-import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
@@ -83,7 +83,6 @@ import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.world.TeleportHelper;
 
 public class LanternGame implements Game {
@@ -111,6 +110,9 @@ public class LanternGame implements Game {
 
     // The name of the whitelist config file
     public static final String WHITELIST_CONFIG = "whitelist.conf";
+
+    // The name of the ban config file
+    public static final String BANS_CONFIG = "bans.conf";
 
     // The name of the config folder
     public static final String PLUGINS_FOLDER = "plugins";
@@ -233,6 +235,8 @@ public class LanternGame implements Game {
     private UserConfig<OpsEntry> opsConfig;
     // The whitelist config
     private UserConfig<UserEntry> whitelistConfig;
+    // The ban config
+    private BanConfig banConfig;
 
     // The current game state
     private GameState gameState = GameState.CONSTRUCTION;
@@ -272,16 +276,13 @@ public class LanternGame implements Game {
         this.opsConfig = new UserConfig<>(this.configFolder.resolve(OPS_CONFIG));
         this.opsConfig.load();
 
-        this.opsConfig.addEntry(new OpsEntry(new LanternGameProfile(UUID.randomUUID(), "TestName1"), 3));
-        this.opsConfig.addEntry(new OpsEntry(new LanternGameProfile(UUID.randomUUID(), "TestName0"), 1));
-        this.opsConfig.save();
-
         // Create the whitelist config
         this.whitelistConfig = new UserConfig<>(this.configFolder.resolve(WHITELIST_CONFIG));
         this.whitelistConfig.load();
 
-        this.whitelistConfig.addEntry(new UserEntry(new LanternGameProfile(UUID.randomUUID(), "TestName0")));
-        this.whitelistConfig.save();
+        // Create the whitelist config
+        this.banConfig = new BanConfig(this.configFolder.resolve(BANS_CONFIG));
+        this.banConfig.load();
     }
 
     public void initialize(LanternServer server, Path rootWorldFolder) {
@@ -322,8 +323,7 @@ public class LanternGame implements Game {
         this.registerService(PaginationService.class, new LanternPaginationService(this));
 
         // Register the command service
-        SimpleCommandManager commandService = new SimpleCommandManager(this, log(),
-                SimpleDispatcher.FIRST_DISAMBIGUATOR); // TODO: Use custom disambiguator like in sponge
+        SimpleCommandManager commandService = new SimpleCommandManager(log(), new LanternCommandDisambiguator(this));
         if (this.registerService(CommandManager.class, commandService)) {
             commandService.register(this.minecraft, new CommandStop(this).build(), "stop", "shutdown");
             commandService.register(this.minecraft, new CommandHelp(this).build(), "help", "?");
@@ -438,6 +438,15 @@ public class LanternGame implements Game {
      */
     public UserConfig<UserEntry> getWhitelistConfig() {
         return this.whitelistConfig;
+    }
+
+    /**
+     * Gets the ban configuration.
+     * 
+     * @return the ban configuration
+     */
+    public BanConfig getBanConfig() {
+        return this.banConfig;
     }
 
     @Override

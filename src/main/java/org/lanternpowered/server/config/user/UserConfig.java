@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.lanternpowered.server.config.ConfigBase;
 import org.spongepowered.api.profile.GameProfile;
@@ -43,13 +42,11 @@ import com.google.common.collect.Maps;
 
 public class UserConfig<T extends UserEntry> extends ConfigBase implements UserStorage<T> {
 
-    public static final ConfigurationOptions DEFAULT_OPTIONS = ConfigurationOptions.defaults();
-
     @Setting(value = "entries")
-    private volatile List<T> entries = Lists.newArrayList();
+    private List<T> entries = Lists.newArrayList();
 
-    private volatile Map<UUID, T> byUUID;
-    private volatile Map<String, T> byName;
+    private final Map<UUID, T> byUUID = Maps.newConcurrentMap();
+    private final Map<String, T> byName = Maps.newConcurrentMap();
 
     public UserConfig(Path path) throws IOException {
         super(path);
@@ -59,76 +56,58 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
         super(path, options);
     }
 
-    protected List<T> getEntriesList() {
-        return this.entries;
-    }
-
-    protected void setEntriesList(List<T> entries) {
-        this.entries = entries;
-    }
-
-    private List<T> getEntries() {
-        List<T> entries = this.getEntriesList();
-        if (entries instanceof CopyOnWriteArrayList) {
-            return entries;
+    @Override
+    public void save() throws IOException {
+        synchronized (this.entries) {
+            this.entries.clear();
+            for (T entry : this.byUUID.values()) {
+                this.entries.add(entry);
+            }
+            super.save();
         }
-        entries = Lists.newCopyOnWriteArrayList(entries);
-        this.setEntriesList(entries);
-        return entries;
     }
 
-    private Map<String, T> getByName() {
-        if (this.byName == null) {
-            this.byName = Maps.newConcurrentMap();
-            for (T entry : this.getEntries()) {
+    @Override
+    public void load() throws IOException {
+        synchronized (this.entries) {
+            super.load();
+            this.byUUID.clear();
+            this.byName.clear();
+            for (T entry : this.entries) {
+                this.byUUID.put(entry.getProfile().getUniqueId(), entry);
                 this.byName.put(entry.getProfile().getName().toLowerCase(), entry);
             }
         }
-        return this.byName;
-    }
-
-    private Map<UUID, T> getByUUID() {
-        if (this.byUUID == null) {
-            this.byUUID = Maps.newConcurrentMap();
-            for (T entry : this.getEntries()) {
-                this.byUUID.put(entry.getProfile().getUniqueId(), entry);
-            }
-        }
-        return this.byUUID;
     }
 
     @Override
     public Optional<T> getEntryByUUID(UUID uniqueId) {
-        return Optional.ofNullable(this.getByUUID().get(uniqueId));
+        return Optional.ofNullable(this.byUUID.get(uniqueId));
     }
 
     @Override
     public Optional<T> getEntryByName(String username) {
-        return Optional.ofNullable(this.getByName().get(username.toLowerCase()));
+        return Optional.ofNullable(this.byName.get(username.toLowerCase()));
     }
 
     @Override
-    public Optional<T> getEntry(GameProfile gameProfile) {
-        return Optional.ofNullable(this.getByUUID().get(gameProfile.getUniqueId()));
+    public Optional<T> getEntryByProfile(GameProfile gameProfile) {
+        return this.getEntryByUUID(gameProfile.getUniqueId());
     }
 
     @Override
     public void addEntry(T entry) {
         final GameProfile gameProfile = entry.getProfile();
-        T entry0 = this.getByUUID().remove(gameProfile.getUniqueId());
-        if (entry0 != null) {
-            this.getEntries().remove(entry0);
-        }
-        this.getEntries().add(entry);
-        this.getByUUID().put(gameProfile.getUniqueId(), entry);
-        this.getByName().put(gameProfile.getName().toLowerCase(), entry);
+        this.byUUID.put(gameProfile.getUniqueId(), entry);
+        this.byName.put(gameProfile.getName().toLowerCase(), entry);
     }
 
     @Override
     public boolean removeEntry(UUID uniqueId) {
-        T entry = this.getByUUID().remove(uniqueId);
+        T entry = this.byUUID.remove(uniqueId);
         if (entry != null) {
-            return this.getEntries().remove(entry);
+            this.byName.remove(entry.getProfile().getName().toLowerCase());
+            return true;
         }
         return false;
     }

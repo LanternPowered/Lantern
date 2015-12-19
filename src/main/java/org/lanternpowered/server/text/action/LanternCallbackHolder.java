@@ -53,7 +53,7 @@ import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableList;
 
-import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 public class LanternCallbackHolder {
 

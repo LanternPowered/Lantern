@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 
@@ -44,8 +43,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.TeleporterAgent;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -54,7 +51,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.google.common.collect.Sets;
 
-public class LanternWorldBuilder implements WorldBuilder {
+public class LanternWorldCreationSettingsBuilder implements WorldCreationSettings.Builder {
 
     private static final Random RANDOM = new Random();
 
@@ -86,13 +83,13 @@ public class LanternWorldBuilder implements WorldBuilder {
 
     private long seed;
 
-    public LanternWorldBuilder(LanternGame game) {
+    public LanternWorldCreationSettingsBuilder(LanternGame game) {
         this.game = game;
         this.reset();
     }
 
     @Override
-    public LanternWorldBuilder fill(WorldCreationSettings settings) {
+    public LanternWorldCreationSettingsBuilder fill(WorldCreationSettings settings) {
         final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings)
                 checkNotNull(settings, "settings");
         this.difficulty = settings0.getDifficulty();
@@ -118,7 +115,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public LanternWorldBuilder fill(WorldProperties properties) {
+    public LanternWorldCreationSettingsBuilder fill(WorldProperties properties) {
         final LanternWorldProperties properties0 = (LanternWorldProperties)
                 checkNotNull(properties, "properties");
         this.difficulty = properties0.getDifficulty();
@@ -141,49 +138,49 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public LanternWorldBuilder name(String name) {
+    public LanternWorldCreationSettingsBuilder name(String name) {
         this.name = checkNotNull(name, "name");
         return this;
     }
 
     @Override
-    public LanternWorldBuilder enabled(boolean state) {
+    public LanternWorldCreationSettingsBuilder enabled(boolean state) {
         this.enabled = state;
         return this;
     }
 
     @Override
-    public LanternWorldBuilder loadsOnStartup(boolean state) {
+    public LanternWorldCreationSettingsBuilder loadsOnStartup(boolean state) {
         this.loadsOnStartup = state;
         return this;
     }
 
     @Override
-    public LanternWorldBuilder keepsSpawnLoaded(boolean state) {
+    public LanternWorldCreationSettingsBuilder keepsSpawnLoaded(boolean state) {
         this.keepsSpawnLoaded = state;
         return this;
     }
 
     @Override
-    public LanternWorldBuilder seed(long seed) {
+    public LanternWorldCreationSettingsBuilder seed(long seed) {
         this.seed = seed;
         return this;
     }
 
     @Override
-    public LanternWorldBuilder gameMode(GameMode gameMode) {
+    public LanternWorldCreationSettingsBuilder gameMode(GameMode gameMode) {
         this.gameMode = checkNotNull(gameMode, "gameMode");
         return this;
     }
 
     @Override
-    public LanternWorldBuilder generator(GeneratorType type) {
+    public LanternWorldCreationSettingsBuilder generator(GeneratorType type) {
         this.generatorType = checkNotNull(type, "type");
         return this;
     }
 
     @Override
-    public LanternWorldBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
+    public LanternWorldCreationSettingsBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
         Set<WorldGeneratorModifier> entries = Sets.newHashSet();
         CatalogTypeRegistry<WorldGeneratorModifier> registry = this.game.getRegistry()
@@ -199,48 +196,48 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public LanternWorldBuilder dimensionType(DimensionType type) {
+    public LanternWorldCreationSettingsBuilder dimension(DimensionType type) {
         this.dimensionType = (LanternDimensionType<?>) checkNotNull(type, "type");
         return this;
     }
 
     @Override
-    public LanternWorldBuilder usesMapFeatures(boolean enabled) {
+    public LanternWorldCreationSettingsBuilder usesMapFeatures(boolean enabled) {
         this.usesMapFeatures = enabled;
         return this;
     }
 
     @Override
-    public LanternWorldBuilder hardcore(boolean enabled) {
+    public LanternWorldCreationSettingsBuilder hardcore(boolean enabled) {
         this.hardcore = enabled;
         return this;
     }
 
     @Override
-    public LanternWorldBuilder generatorSettings(DataContainer settings) {
+    public LanternWorldCreationSettingsBuilder generatorSettings(DataContainer settings) {
         this.generatorSettings = checkNotNull(settings, "settings");
         return this;
     }
 
     @Override
-    public LanternWorldBuilder teleporterAgent(TeleporterAgent agent) {
+    public LanternWorldCreationSettingsBuilder teleporterAgent(TeleporterAgent agent) {
         this.teleporterAgent = checkNotNull(agent, "agent");
         return this;
     }
 
-    public LanternWorldBuilder waterEvaporates(boolean evaporates) {
+    public LanternWorldCreationSettingsBuilder waterEvaporates(boolean evaporates) {
         this.waterEvaporates = evaporates;
         return this;
     }
 
-    public LanternWorldBuilder buildHeight(int buildHeight) {
+    public LanternWorldCreationSettingsBuilder buildHeight(int buildHeight) {
         checkState(buildHeight <= 256, "the build height cannot be greater then 256");
         this.buildHeight = buildHeight;
         return this;
     }
 
     @Override
-    public LanternWorldBuilder reset() {
+    public LanternWorldCreationSettingsBuilder reset() {
         this.usesMapFeatures = true;
         this.gameMode = GameModes.SURVIVAL;
         this.difficulty = Difficulties.NORMAL;
@@ -264,16 +261,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public Optional<World> build() throws IllegalStateException {
-        Optional<WorldProperties> worldProperties = this.game.getServer().createWorld(this.buildSettings());
-        if (worldProperties.isPresent()) {
-            return this.game.getServer().loadWorld(worldProperties.get());
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public LanternWorldCreationSettings buildSettings() throws IllegalStateException {
+    public LanternWorldCreationSettings build() throws IllegalStateException {
         checkState(this.name != null, "name is not set");
         checkState(this.dimensionType != null, "dimensionType is not set");
         DataContainer generatorSettings = this.generatorSettings;
@@ -298,7 +286,7 @@ public class LanternWorldBuilder implements WorldBuilder {
     }
 
     @Override
-    public LanternWorldBuilder pvp(boolean enabled) {
+    public LanternWorldCreationSettingsBuilder pvp(boolean enabled) {
         this.pvpEnabled = enabled;
         return this;
     }

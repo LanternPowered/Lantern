@@ -60,6 +60,7 @@ import org.lanternpowered.server.block.type.BlockGrass;
 import org.lanternpowered.server.block.type.BlockStone;
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
+import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDirtTypes;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
@@ -94,7 +95,7 @@ import org.lanternpowered.server.text.translation.MinecraftTranslationManager;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.rotation.LanternRotation;
 import org.lanternpowered.server.world.LanternWeather;
-import org.lanternpowered.server.world.LanternWorldBuilder;
+import org.lanternpowered.server.world.LanternWorldCreationSettingsBuilder;
 import org.lanternpowered.server.world.biome.LanternBiomeRegistry;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
@@ -174,13 +175,13 @@ import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.util.rotation.Rotations;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
-import org.spongepowered.api.world.WorldBuilder;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.difficulty.Difficulties;
@@ -189,6 +190,7 @@ import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
 import org.spongepowered.api.world.gen.PopulatorType;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
+import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 import org.spongepowered.api.scheduler.Task;
@@ -264,7 +266,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final Map<Class<?>, Supplier<Object>> builderFactories = ImmutableMap.<Class<?>, Supplier<Object>>builder()
             .put(LanternAttributeBuilder.class, () -> new LanternAttributeBuilder(this.attributeRegistry))
             .put(BlockState.Builder.class, LanternBlockStateBuilder::new)
-            .put(WorldBuilder.class, () -> createWorldBuilder())
+            .put(WorldCreationSettings.Builder.class, () -> createWorldBuilder())
             .put(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
             .put(NoteParticle.Builder.class, LanternParticleEffectBuilder.Note::new)
             .put(ResizableParticle.Builder.class, LanternParticleEffectBuilder.Resizable::new)
@@ -272,13 +274,14 @@ public class LanternGameRegistry implements GameRegistry {
             .put(ItemParticle.Builder.class, LanternParticleEffectBuilder.Item::new)
             .put(BlockParticle.Builder.class, LanternParticleEffectBuilder.Block::new)
             .put(Task.Builder.class, () -> createTaskBuilder())
+            .put(Ban.Builder.class, BanBuilder::new)
             .build();
 
     // We cannot add this method directly in builderFactories map,
     // the compiler will throw a error that the game parameter may
     // not be initialized yet.
-    private LanternWorldBuilder createWorldBuilder() {
-        return new LanternWorldBuilder(this.game);
+    private LanternWorldCreationSettingsBuilder createWorldBuilder() {
+        return new LanternWorldCreationSettingsBuilder(this.game);
     }
 
     private LanternTaskBuilder createTaskBuilder() {

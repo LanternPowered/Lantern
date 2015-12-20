@@ -22,22 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.lanternpowered.server.event.filter;
 
 import org.spongepowered.api.event.Event;
 
-public abstract class AnnotatedEventHandler implements LanternEventListener<Event> {
+public interface EventFilter {
 
-    protected final Object handle;
+    Object[] filter(Event event);
 
-    protected AnnotatedEventHandler(Object handle) {
-        this.handle = checkNotNull(handle, "handle");
-    }
-
-    @Override
-    public Object getHandle() {
-        return this.handle;
-    }
 }

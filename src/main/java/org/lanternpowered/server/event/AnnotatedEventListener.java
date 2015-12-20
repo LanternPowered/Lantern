@@ -24,42 +24,27 @@
  */
 package org.lanternpowered.server.event;
 
-import java.util.EnumMap;
-import java.util.List;
-
-import org.spongepowered.api.event.Order;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
-public class RegisteredHandlerCache {
+import java.lang.reflect.Method;
 
-    private final List<RegisteredHandler<?>> handlers;
-    private final EnumMap<Order, List<RegisteredHandler<?>>> handlersByOrder;
+import org.spongepowered.api.event.Event;
 
-    RegisteredHandlerCache(List<RegisteredHandler<?>> handlers) {
-        this.handlers = handlers;
+public abstract class AnnotatedEventListener implements LanternEventListener<Event> {
 
-        this.handlersByOrder = Maps.newEnumMap(Order.class);
-        for (Order order : Order.values()) {
-            this.handlersByOrder.put(order, Lists.<RegisteredHandler<?>>newArrayList());
-        }
-        for (RegisteredHandler<?> handler : handlers) {
-            this.handlersByOrder.get(handler.getOrder()).add(handler);
-        }
+    protected final Object handle;
+
+    protected AnnotatedEventListener(Object handle) {
+        this.handle = checkNotNull(handle, "handle");
     }
 
-    public List<RegisteredHandler<?>> getHandlers() {
-        return this.handlers;
+    @Override
+    public Object getHandle() {
+        return this.handle;
     }
 
-    /**
-     * TODO: Do we need this method?
-     */
-    public List<RegisteredHandler<?>> getHandlersByOrder(Order order) {
-        return this.handlersByOrder.get(checkNotNull(order, "order"));
-    }
+    public interface Factory {
 
+        AnnotatedEventListener create(Object handle, Method method) throws Exception;
+    }
 }

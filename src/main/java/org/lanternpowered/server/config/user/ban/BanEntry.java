@@ -33,13 +33,12 @@ import javax.annotation.Nullable;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
+import org.spongepowered.api.util.ban.BanTypes;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
@@ -55,35 +54,37 @@ public abstract class BanEntry implements Ban {
     private Date expirationDate;
 
     @Setting(value = "reason")
-    private String reason;
+    private Text reason;
 
-    private volatile Text.Literal textReason;
+    @Nullable
+    @Setting(value = "source")
+    private Text source;
+
+    private volatile WeakReference<CommandSource> commandSource;
 
     protected BanEntry() {
     }
 
-    protected BanEntry(Text.Literal reason, Date startDate, @Nullable Date expirationDate) {
-        this.reason = Texts.toPlain(reason);
-        this.textReason = reason;
+    protected BanEntry(Text reason, Date startDate, @Nullable Date expirationDate,
+            @Nullable Text source) {
         this.expirationDate = expirationDate;
         this.startDate = startDate;
+        this.source = source;
+        this.reason = reason;
     }
 
     @Override
     public BanType getType() {
-        return this instanceof Ban.Ip ? BanType.IP_BAN : BanType.USER_BAN;
+        return this instanceof Ban.Ip ? BanTypes.IP : BanTypes.PROFILE;
     }
 
     @Override
-    public Text.Literal getReason() {
-        if (this.textReason == null) {
-            this.textReason = Texts.of(this.reason);
-        }
-        return this.textReason;
+    public Text getReason() {
+        return this.reason;
     }
 
     @Override
-    public Date getStartDate() {
+    public Date getCreationDate() {
         return this.startDate;
     }
 
@@ -97,29 +98,47 @@ public abstract class BanEntry implements Ban {
         return this.expirationDate == null;
     }
 
+    @Override
+    public Optional<Text> getBanSource() {
+        return Optional.ofNullable(this.source);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public Optional<CommandSource> getBanCommandSource() {
+        if (this.source == null) {
+            return Optional.empty();
+        }
+        CommandSource source;
+        if (this.commandSource != null && (source = this.commandSource.get()) != null) {
+            return Optional.of(source);
+        }
+        String plainSource = Texts.legacy().to(this.source);
+        if (plainSource.equals("Server")) {
+            source = LanternGame.get().getServer().getConsole();
+        } else {
+            source = LanternGame.get().getServer().getPlayer(plainSource).orElse(null);
+        }
+        if (source != null) {
+            this.commandSource = new WeakReference<>(source);
+        }
+        return Optional.ofNullable(source);
+    }
+
     @ConfigSerializable
     public static class Ip extends BanEntry implements Ban.Ip {
 
         @Setting(value = "ip")
         private InetAddress ip;
 
-        private final WeakReference<CommandSource> commandSource;
-
         // It is actually used...
         @SuppressWarnings("unused")
         private Ip() {
-            this.commandSource = null;
         }
 
-        public Ip(InetAddress ipAddress, Text.Literal reason, Date startDate, @Nullable Date expirationDate,
-                @Nullable CommandSource commandSource) {
-            super(reason, startDate, expirationDate);
-            this.commandSource = new WeakReference<>(commandSource);
-        }
-
-        @Override
-        public Optional<CommandSource> getSource() {
-            return Optional.ofNullable(this.commandSource == null ? null : this.commandSource.get());
+        public Ip(InetAddress ipAddress, Text reason, Date startDate, @Nullable Date expirationDate,
+                @Nullable Text source) {
+            super(reason, startDate, expirationDate, source);
         }
 
         @Override
@@ -129,35 +148,24 @@ public abstract class BanEntry implements Ban {
     }
 
     @ConfigSerializable
-    public static class User extends BanEntry implements Ban.User {
+    public static class Profile extends BanEntry implements Ban.Profile {
 
         @Setting(value = "profile")
         private LanternGameProfile profile;
 
         // It is actually used...
         @SuppressWarnings("unused")
-        private User() {
+        private Profile() {
         }
 
-        public User(org.spongepowered.api.entity.living.player.User user, Text.Literal reason, Date startDate,
-                @Nullable Date expirationDate, @Nullable CommandSource commandSource) {
-            super(reason, startDate, expirationDate);
-            this.profile = (LanternGameProfile) user.getProfile();
+        public Profile(LanternGameProfile profile, Text reason, Date startDate, @Nullable Date expirationDate,
+                @Nullable Text source) {
+            super(reason, startDate, expirationDate, source);
+            this.profile = profile;
         }
 
         public LanternGameProfile getProfile() {
             return this.profile;
-        }
-
-        @SuppressWarnings({"unchecked", "rawtypes"})
-        @Override
-        public Optional<CommandSource> getSource() {
-            return (Optional) LanternGame.get().getServer().getPlayer(this.profile.getUniqueId());
-        }
-
-        @Override
-        public org.spongepowered.api.entity.living.player.User getUser() {
-            return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getOrCreate(this.profile);
         }
     }
 }

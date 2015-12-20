@@ -30,6 +30,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.lanternpowered.server.entity.AbstractArmorEquipable;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.data.DataContainer;
@@ -38,7 +40,6 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
@@ -56,7 +57,7 @@ import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
 
-public class LanternUser implements User {
+public class LanternUser implements AbstractArmorEquipable, User {
 
     private final LanternGameProfile gameProfile;
 
@@ -192,68 +193,7 @@ public class LanternUser implements User {
 
     @Override
     public UUID getUniqueId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Optional<ItemStack> getHelmet() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setHelmet(ItemStack helmet) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getChestplate() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setChestplate(ItemStack chestplate) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getLeggings() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setLeggings(ItemStack leggings) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getBoots() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setBoots(ItemStack boots) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public Optional<ItemStack> getItemInHand() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setItemInHand(ItemStack itemInHand) {
-        // TODO Auto-generated method stub
-        
+        return this.gameProfile.getUniqueId();
     }
 
     @Override
@@ -366,31 +306,21 @@ public class LanternUser implements User {
 
     @Override
     public GameProfile getProfile() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.gameProfile;
     }
 
     @Override
     public String getName() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.gameProfile.getName();
     }
 
     @Override
     public boolean isOnline() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.getPlayer().isPresent();
     }
 
     @Override
     public Optional<Player> getPlayer() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public BanData getBanData() {
-        // TODO Auto-generated method stub
-        return null;
+        return LanternGame.get().getServer().getPlayer(this.gameProfile.getUniqueId());
     }
 }

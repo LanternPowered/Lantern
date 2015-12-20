@@ -32,21 +32,24 @@ import java.util.Date;
 
 import javax.annotation.Nullable;
 
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text.Literal;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
+import org.spongepowered.api.util.ban.BanTypes;
 
 public final class BanBuilder implements Ban.Builder {
 
     private BanType banType;
-    private User user;
+    private GameProfile gameProfile;
     private InetAddress address;
-    private Literal reason;
+    private Text reason;
+    @Nullable private Text source;
     private Date startDate;
     @Nullable private Date expirationDate;
-    @Nullable private CommandSource commandSource;
 
     public BanBuilder() {
         this.reset();
@@ -55,27 +58,27 @@ public final class BanBuilder implements Ban.Builder {
     @Override
     public BanBuilder reset() {
         this.banType = null;
-        this.user = null;
+        this.gameProfile = null;
         this.address = null;
-        this.startDate = null;
+        this.startDate = new Date();
         this.expirationDate = null;
-        this.commandSource = null;
+        this.source = null;
         this.reason = null;
         return this;
     }
 
     @Override
-    public BanBuilder user(User user) {
-        checkNotNull(user, "user");
-        checkState(this.banType == BanType.USER_BAN, "The ban type must first be set to USER_BAN before you can use this method.");
-        this.user = user;
+    public BanBuilder profile(GameProfile gameProfile) {
+        checkNotNull(gameProfile, "gameProfile");
+        checkState(this.banType == BanTypes.PROFILE, "Cannot set a GameProfile if the BanType is not BanTypes.PROFILE!");
+        this.gameProfile = gameProfile;
         return this;
     }
 
     @Override
     public BanBuilder address(InetAddress address) {
         checkNotNull(address, "address");
-        checkState(this.banType == BanType.IP_BAN, "The ban type must first be set to IP_BAN before you can use this method.");
+        checkState(this.banType == BanTypes.IP, "Cannot set an InetAddress if the BanType is not BanTypes.IP!");
         this.address = address;
         return this;
     }
@@ -87,7 +90,7 @@ public final class BanBuilder implements Ban.Builder {
     }
 
     @Override
-    public BanBuilder reason(Literal reason) {
+    public BanBuilder reason(Text reason) {
         this.reason = checkNotNull(reason, "reason");
         return this;
     }
@@ -106,7 +109,13 @@ public final class BanBuilder implements Ban.Builder {
 
     @Override
     public BanBuilder source(@Nullable CommandSource source) {
-        this.commandSource = source;
+        this.source = source == null ? null : Texts.of(source.getName());
+        return this;
+    }
+
+    @Override
+    public BanBuilder source(@Nullable Text source) {
+        this.source = source;
         return this;
     }
 
@@ -115,12 +124,12 @@ public final class BanBuilder implements Ban.Builder {
         checkState(this.banType != null, "banType is not set");
         checkState(this.startDate != null, "startDate is not set");
         checkState(this.reason != null, "reason is not set");
-        if (this.banType == BanType.IP_BAN) {
+        if (this.banType == BanTypes.IP) {
             checkState(this.address != null, "address is not set");
-            return new BanEntry.Ip(this.address, this.reason, this.startDate, this.expirationDate, this.commandSource);
+            return new BanEntry.Ip(this.address, this.reason, this.startDate, this.expirationDate, this.source);
         } else {
-            checkState(this.user != null, "user is not set");
-            return new BanEntry.User(this.user, this.reason, this.startDate, this.expirationDate, this.commandSource);
+            checkState(this.gameProfile != null, "gameProfile is not set");
+            return new BanEntry.Profile((LanternGameProfile) this.gameProfile, this.reason, this.startDate, this.expirationDate, this.source);
         }
     }
 }

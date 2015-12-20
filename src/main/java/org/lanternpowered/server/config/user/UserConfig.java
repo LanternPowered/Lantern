@@ -26,6 +26,7 @@ package org.lanternpowered.server.config.user;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -37,6 +38,7 @@ import org.spongepowered.api.profile.GameProfile;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.objectmapping.Setting;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -110,5 +112,10 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Collection<T> getEntries() {
+        return ImmutableList.copyOf(this.byUUID.values());
     }
 }

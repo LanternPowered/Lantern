@@ -38,7 +38,7 @@ import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.OpsEntry;
-import org.lanternpowered.server.config.user.UserEntry;
+import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.event.LanternEventManager;
@@ -77,11 +77,13 @@ import org.spongepowered.api.command.SimpleCommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.TeleportHelper;
 
@@ -234,7 +236,7 @@ public class LanternGame implements Game {
     // The ops config
     private UserConfig<OpsEntry> opsConfig;
     // The whitelist config
-    private UserConfig<UserEntry> whitelistConfig;
+    private WhitelistConfig whitelistConfig;
     // The ban config
     private BanConfig banConfig;
 
@@ -277,7 +279,7 @@ public class LanternGame implements Game {
         this.opsConfig.load();
 
         // Create the whitelist config
-        this.whitelistConfig = new UserConfig<>(this.configFolder.resolve(WHITELIST_CONFIG));
+        this.whitelistConfig = new WhitelistConfig(this.configFolder.resolve(WHITELIST_CONFIG));
         this.whitelistConfig.load();
 
         // Create the whitelist config
@@ -317,6 +319,9 @@ public class LanternGame implements Game {
 
         // Register the game profile resolver
         this.gameProfileManager = new LanternGameProfileManager();
+
+        this.registerService(WhitelistService.class, this.whitelistConfig);
+        this.registerService(BanService.class, this.banConfig);
 
         this.registerService(UserStorageService.class, new LanternUserStorageService());
         // Register the pagination service
@@ -436,7 +441,7 @@ public class LanternGame implements Game {
      * 
      * @return the whitelist configuration
      */
-    public UserConfig<UserEntry> getWhitelistConfig() {
+    public WhitelistConfig getWhitelistConfig() {
         return this.whitelistConfig;
     }
 

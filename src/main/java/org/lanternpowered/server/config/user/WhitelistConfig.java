@@ -24,57 +24,42 @@
  */
 package org.lanternpowered.server.config.user;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
 
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.whitelist.WhitelistService;
+import org.spongepowered.api.util.GuavaCollectors;
 
-public interface UserStorage<T> {
+public final class WhitelistConfig extends UserConfig<UserEntry> implements WhitelistService {
 
-    /**
-     * Gets a collection with all the entries.
-     * 
-     * @return the entries
-     */
-    Collection<T> getEntries();
+    public WhitelistConfig(Path path) throws IOException {
+        super(path);
+    }
 
-    /**
-     * Gets the user entry for the specified unique id.
-     * 
-     * @param uniqueId the unique id
-     * @return the entry if present, otherwise {@link Optional#empty()}
-     */
-    Optional<T> getEntryByUUID(UUID uniqueId);
+    @Override
+    public Collection<GameProfile> getWhitelistedProfiles() {
+        return this.getEntries().stream().map(e -> e.getProfile()).collect(GuavaCollectors.toImmutableList());
+    }
 
-    /**
-     * Gets the user entry for the specified username.
-     * 
-     * @param username the username
-     * @return the entry if present, otherwise {@link Optional#empty()}
-     */
-    Optional<T> getEntryByName(String username);
+    @Override
+    public boolean isWhitelisted(GameProfile profile) {
+        return this.getEntryByProfile(profile) != null;
+    }
 
-    /**
-     * Gets the user entry for the specified game profile.
-     * 
-     * @param gameProfile the game profile
-     * @return the entry if present, otherwise {@link Optional#empty()}
-     */
-    Optional<T> getEntryByProfile(GameProfile gameProfile);
+    @Override
+    public boolean addProfile(GameProfile profile) {
+        if (this.isWhitelisted(profile)) {
+            return true;
+        }
+        this.addEntry(new UserEntry((LanternGameProfile) profile));
+        return false;
+    }
 
-    /**
-     * Adds the op entry and replaces any present ones.
-     * 
-     * @param entry the entry
-     */
-    void addEntry(T entry);
-
-    /**
-     * Removes the op entry for the specified player unique id.
-     * 
-     * @param uniqueId the unique id
-     * @return whether a entry was removed
-     */
-    boolean removeEntry(UUID uniqueId);
+    @Override
+    public boolean removeProfile(GameProfile profile) {
+        return this.removeProfile(profile);
+    }
 }

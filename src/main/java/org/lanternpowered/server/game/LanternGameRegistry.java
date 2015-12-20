@@ -61,6 +61,7 @@ import org.lanternpowered.server.block.type.BlockStone;
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
+import org.lanternpowered.server.config.user.ban.LanternBanType;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDirtTypes;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
@@ -176,6 +177,8 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.util.ban.BanType;
+import org.spongepowered.api.util.ban.BanTypes;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.util.rotation.Rotations;
 import org.spongepowered.api.world.DimensionType;
@@ -190,6 +193,7 @@ import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
 import org.spongepowered.api.world.gen.PopulatorType;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
+import org.spongepowered.api.world.gen.WorldGeneratorModifiers;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
@@ -235,6 +239,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final CatalogTypeRegistry<ParticleType> particleTypeRegistry = new LanternCatalogTypeRegistry<ParticleType>();
     private final CatalogTypeRegistry<PopulatorType> populatorTypeRegistry = new LanternCatalogTypeRegistry<PopulatorType>();
     private final CatalogTypeRegistry<LanternWeather> weatherRegistry = new LanternCatalogTypeRegistry<LanternWeather>();
+    private final CatalogTypeRegistry<BanType> banTypeRegistry = new LanternCatalogTypeRegistry<BanType>();
     private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
             .put(LanternAttribute.class, this.attributeRegistry)
             .put(LanternOperation.class, this.attributeOperationRegistry)
@@ -302,8 +307,6 @@ public class LanternGameRegistry implements GameRegistry {
         this.defaultGameRules = builder.build();
     }
 
-    private boolean registered;
-
     public LanternGameRegistry(LanternGame game) {
         this.game = game;
         // Create the translation managers
@@ -326,13 +329,10 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerTextFactory();
         this.registerTextStyles();
         this.registerTextColors();
+        this.registerBanTypes();
     }
 
     public void registerGameObjects() {
-        if (this.registered) {
-            throw new IllegalStateException("You can only register the game objects once!");
-        }
-        this.registered = true;
         this.registerWeathers();
         this.registerNotePitches();
         // The particle types, requires NotePitches
@@ -354,6 +354,12 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerAttributes();
         this.registerSelectors();
         this.registerBlockTypes();
+    }
+
+    private void registerBanTypes() {
+        this.banTypeRegistry.register(new LanternBanType("profile", Ban.Profile.class));
+        this.banTypeRegistry.register(new LanternBanType("ip", Ban.Ip.class));
+        RegistryHelper.mapFields(BanTypes.class, this.banTypeRegistry.getDelegateMap());
     }
 
     private void registerWeathers() {
@@ -450,6 +456,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     private void registerGeneratorModifiers() {
         this.worldGeneratorModifierRegistry.register(new SkylandsWorldGeneratorModifier());
+        RegistryHelper.mapFields(WorldGeneratorModifiers.class, this.worldGeneratorModifierRegistry.getDelegateMap());
     }
 
     private void registerBiomeTypes() {

@@ -24,29 +24,21 @@
  */
 package org.lanternpowered.server.config.user.ban;
 
-import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.util.ban.BanType;
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+public class LanternBanType extends SimpleLanternCatalogType implements BanType {
 
-public final class BanEntrySerializer implements TypeSerializer<BanEntry> {
+    private final Class<? extends Ban> banClass;
 
-    @Override
-    public BanEntry deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        if (value.getNode("ip").isVirtual()) {
-            return value.getValue(TypeToken.of(BanEntry.Ip.class));
-        } else {
-            return value.getValue(TypeToken.of(BanEntry.Profile.class));
-        }
+    public LanternBanType(String identifier, Class<? extends Ban> banClass) {
+        super(identifier);
+        this.banClass = banClass;
     }
 
     @Override
-    public void serialize(TypeToken<?> type, BanEntry obj, ConfigurationNode value) throws ObjectMappingException {
-        if (obj instanceof BanEntry.Ip) {
-            value.setValue(TypeToken.of(BanEntry.Ip.class), (BanEntry.Ip) value);
-        } else {
-            value.setValue(TypeToken.of(BanEntry.Profile.class), (BanEntry.Profile) value);
-        }
+    public Class<? extends Ban> getBanClass() {
+        return this.banClass;
     }
 }

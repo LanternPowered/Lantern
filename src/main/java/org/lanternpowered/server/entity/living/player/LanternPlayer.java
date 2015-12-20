@@ -42,7 +42,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.title.LanternTitles;
-import org.spongepowered.api.data.manipulator.mutable.entity.BanData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -269,10 +268,5 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Override
     public void setSleepingIgnored(boolean sleepingIgnored) {
         this.sleepingIgnored = sleepingIgnored;
-    }
-
-    @Override
-    public BanData getBanData() {
-        return this.get(BanData.class).get();
     }
 }

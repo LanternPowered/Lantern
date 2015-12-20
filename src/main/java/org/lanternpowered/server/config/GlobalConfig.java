@@ -85,7 +85,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         private boolean enabled = false;
 
         @Setting(value = "port", comment = "The port that should be bound.")
-        private int port = 25565;
+        private int port = 25563;
     }
 
     @ConfigSerializable
@@ -95,7 +95,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         private boolean enabled = false;
 
         @Setting(value = "port", comment = "The port that should be bound.")
-        private int port = 25565;
+        private int port = 25564;
     }
 
     @ConfigSerializable

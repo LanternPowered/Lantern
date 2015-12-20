@@ -27,8 +27,8 @@ package org.lanternpowered.server.config.user.ban;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,16 +39,19 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
 
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.user.UserStorage;
-import org.lanternpowered.server.config.user.ban.BanEntry.User;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.util.ban.Ban;
 
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.ban.BanService;
+import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.util.ban.Ban.Ip;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class BanConfig extends ConfigBase implements UserStorage<BanEntry> {
+public class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService {
 
     public static final ConfigurationOptions OPTIONS;
 
@@ -56,22 +59,21 @@ public class BanConfig extends ConfigBase implements UserStorage<BanEntry> {
         final TypeSerializerCollection typeSerializers = DEFAULT_OPTIONS.getSerializers();
         final TypeSerializer banSerializer = new BanEntrySerializer();
         final TypeSerializer ipTypeSerializer = typeSerializers.get(TypeToken.of(BanEntry.Ip.class));
-        final TypeSerializer userTypeSerializer = typeSerializers.get(TypeToken.of(BanEntry.User.class));
+        final TypeSerializer userTypeSerializer = typeSerializers.get(TypeToken.of(BanEntry.Profile.class));
         typeSerializers.registerType(TypeToken.of(Ban.class), banSerializer)
                 .registerType(TypeToken.of(BanEntry.class), banSerializer)
                 .registerType(TypeToken.of(BanEntry.Ip.class), ipTypeSerializer)
                 .registerType(TypeToken.of(Ban.Ip.class), ipTypeSerializer)
-                .registerType(TypeToken.of(BanEntry.User.class), userTypeSerializer)
-                .registerType(TypeToken.of(Ban.User.class), userTypeSerializer);
+                .registerType(TypeToken.of(BanEntry.Profile.class), userTypeSerializer)
+                .registerType(TypeToken.of(Ban.Profile.class), userTypeSerializer);
         OPTIONS = ConfigurationOptions.defaults().setSerializers(typeSerializers);
     }
 
     @Setting(value = "entries")
     private List<BanEntry> entries = Lists.newArrayList();
 
-    private final Map<String, BanEntry> byIp = Maps.newConcurrentMap();
-    private final Map<UUID, BanEntry> byUUID = Maps.newConcurrentMap();
-    private final Map<String, BanEntry> byName = Maps.newConcurrentMap();
+    // A version of the entries list that allows concurrent operations
+    private final List<BanEntry> entries0 = Lists.newCopyOnWriteArrayList();
 
     public BanConfig(Path path) throws IOException {
         super(path, OPTIONS);
@@ -81,12 +83,7 @@ public class BanConfig extends ConfigBase implements UserStorage<BanEntry> {
     public void save() throws IOException {
         synchronized (this.entries) {
             this.entries.clear();
-            for (BanEntry entry : this.byUUID.values()) {
-                this.entries.add(entry);
-            }
-            for (BanEntry entry : this.byIp.values()) {
-                this.entries.add(entry);
-            }
+            this.entries.addAll(this.entries0);
             super.save();
         }
     }
@@ -95,29 +92,21 @@ public class BanConfig extends ConfigBase implements UserStorage<BanEntry> {
     public void load() throws IOException {
         synchronized (this.entries) {
             super.load();
-            this.byIp.clear();
-            this.byUUID.clear();
-            this.byName.clear();
-            for (BanEntry entry : this.entries) {
-                if (entry instanceof BanEntry.User) {
-                    final GameProfile gameProfile = ((BanEntry.User) entry).getProfile();
-                    this.byUUID.put(gameProfile.getUniqueId(), entry);
-                    this.byName.put(gameProfile.getName().toLowerCase(), entry);
-                } else {
-                    this.byIp.put(((BanEntry.Ip) entry).getAddress().getHostAddress(), entry);
-                }
-            }
+            this.entries0.clear();
+            this.entries0.addAll(this.entries);
         }
     }
 
     @Override
     public Optional<BanEntry> getEntryByUUID(UUID uniqueId) {
-        return Optional.ofNullable(this.byUUID.get(uniqueId));
+        return this.entries0.stream().filter(e -> e instanceof BanEntry.Profile &&
+                ((BanEntry.Profile) e).getProfile().getUniqueId().equals(uniqueId)).findFirst();
     }
 
     @Override
     public Optional<BanEntry> getEntryByName(String username) {
-        return Optional.ofNullable(this.byName.get(username.toLowerCase()));
+        return this.entries0.stream().filter(e -> e instanceof BanEntry.Profile &&
+                ((BanEntry.Profile) e).getProfile().getName().equalsIgnoreCase(username)).findFirst();
     }
 
     @Override
@@ -125,45 +114,102 @@ public class BanConfig extends ConfigBase implements UserStorage<BanEntry> {
         return this.getEntryByUUID(gameProfile.getUniqueId());
     }
 
-    /**
-     * Gets the ban entry for the specified inet address.
-     * 
-     * @param address the inet address
-     * @return the entry if present, otherwise {@link Optional#empty()}
-     */
-    public Optional<BanEntry> getEntryByAddress(InetAddress address) {
-        return Optional.ofNullable(this.byIp.get(address.getHostAddress()));
-    }
-
     @Override
     public void addEntry(BanEntry entry) {
-        if (entry instanceof BanEntry.User) {
-            final GameProfile gameProfile = ((BanEntry.User) entry).getProfile();
-            this.byUUID.put(gameProfile.getUniqueId(), entry);
-            this.byName.put(gameProfile.getName().toLowerCase(), entry);
-        } else {
-            this.byIp.put(((BanEntry.Ip) entry).getAddress().getHostAddress(), entry);
-        }
+        this.addBan(entry);
     }
 
     @Override
     public boolean removeEntry(UUID uniqueId) {
-        BanEntry.User entry = (User) this.byUUID.remove(uniqueId);
-        if (entry != null) {
-            this.byName.remove(entry.getProfile().getName().toLowerCase());
+        Optional<BanEntry> ban = this.getEntryByUUID(uniqueId);
+        if (ban.isPresent()) {
+            return this.removeBan(ban.get());
+        }
+        return false;
+    }
+
+    @Override
+    public Collection<? extends Ban> getBans() {
+        return ImmutableList.copyOf(this.entries0);
+    }
+
+    @Override
+    public Collection<Ban.Profile> getProfileBans() {
+        return (Collection) this.entries0.stream().filter(e -> e instanceof Ban.Profile).collect(GuavaCollectors.toImmutableList());
+    }
+
+    @Override
+    public Collection<Ban.Ip> getIpBans() {
+        return (Collection) this.entries0.stream().filter(e -> e instanceof Ban.Ip).collect(GuavaCollectors.toImmutableList());
+    }
+
+    @Override
+    public Optional<Ban.Profile> getBanFor(GameProfile profile) {
+        return (Optional) this.getEntryByProfile(profile);
+    }
+
+    @Override
+    public Optional<Ip> getBanFor(InetAddress address) {
+        final String address0 = address.getHostAddress();
+        return (Optional) this.entries0.stream().filter(e -> e instanceof BanEntry.Ip &&
+                ((BanEntry.Ip) e).getAddress().getHostAddress().equalsIgnoreCase(address0)).findFirst();
+    }
+
+    @Override
+    public boolean isBanned(GameProfile profile) {
+        return this.getBanFor(profile).isPresent();
+    }
+
+    @Override
+    public boolean isBanned(InetAddress address) {
+        return this.getBanFor(address).isPresent();
+    }
+
+    @Override
+    public boolean pardon(GameProfile profile) {
+        Optional<Ban.Profile> ban = this.getBanFor(profile);
+        if (ban.isPresent()) {
+            this.entries0.remove(ban.get());
             return true;
         }
         return false;
     }
 
-    /**
-     * Removes a entry for the specified inet address.
-     * 
-     * @param address the inet address
-     * @return whether a entry was removed
-     */
-    public boolean removeEntry(InetAddress address) {
-        final String key = address.getHostAddress();
-        return this.byIp.remove(key) != null;
+    @Override
+    public boolean pardon(InetAddress address) {
+        Optional<Ban.Ip> ban = this.getBanFor(address);
+        if (ban.isPresent()) {
+            this.entries0.remove(ban.get());
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeBan(Ban ban) {
+        return this.entries0.remove(ban);
+    }
+
+    @Override
+    public Optional<? extends Ban> addBan(Ban ban) {
+        Optional<Ban> oldBan;
+        if (ban instanceof Ban.Ip) {
+            oldBan = (Optional) this.getBanFor(((Ban.Ip) ban).getAddress());
+        } else {
+            oldBan = (Optional) this.getBanFor(((Ban.Profile) ban).getProfile());
+        }
+        this.entries0.remove(oldBan.get());
+        this.entries0.add((BanEntry) ban);
+        return oldBan;
+    }
+
+    @Override
+    public boolean hasBan(Ban ban) {
+        return this.entries0.contains(ban);
+    }
+
+    @Override
+    public Collection<BanEntry> getEntries() {
+        return ImmutableList.copyOf(this.entries0);
     }
 }

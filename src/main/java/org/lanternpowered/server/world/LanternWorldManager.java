@@ -383,16 +383,19 @@ public final class LanternWorldManager {
     public Optional<WorldProperties> renameWorld(WorldProperties worldProperties, String newName) {
         checkNotNull(worldProperties, "worldProperties");
         checkNotNull(newName, "newName");
+        // There already exists a world with that name
+        if (this.worldByName.containsKey(newName)) {
+            return Optional.empty();
+        }
         final WorldLookupEntry entry = this.worldByProperties.get(worldProperties);
-        // You cannot rename a active world or if there is
-        // already a world present with that name
-        if (entry.world != null || this.getWorld(newName).isPresent()) {
+        // You cannot rename a loaded world
+        if (entry.world != null || this.getWorld(worldProperties.getWorldName()).isPresent()) {
             return Optional.empty();
         }
         final LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
         this.worldByName.put(newName, entry);
-        this.worldByName.remove(worldProperties0.name);
-        worldProperties0.name = newName;
+        this.worldByName.remove(worldProperties0.getWorldName());
+        worldProperties0.setName(newName);
 
         // Save the changes once more to make sure that they will be saved
         this.saveWorldProperties(worldProperties0);

@@ -42,7 +42,6 @@ import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternGameRegistry;
 import org.lanternpowered.server.world.LanternWorldProperties.OverriddenWorldProperties;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -57,10 +56,7 @@ import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
-
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -130,11 +126,19 @@ public final class LanternWorldPropertiesIO {
     private final static DataQuery DIMENSION_INDEX = DataQuery.of("dimensionId");
     private final static DataQuery GENERATOR_MODIFIERS = DataQuery.of("generatorModifiers");
     private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
+    private final static DataQuery ENABLED = DataQuery.of("enabled");
+    private final static DataQuery KEEP_SPAWN_LOADED = DataQuery.of("keepSpawnLoaded");
+    private final static DataQuery LOAD_ON_STARTUP = DataQuery.of("loadOnStartup");
 
     // Lantern properties
     private final static DataQuery BONUS_CHEST_ENABLED = DataQuery.of("bonusChestEnabled");
     // Extra generator options for the flat world generator type
     private final static DataQuery GENERATOR_OPTIONS_EXTRA = DataQuery.of("generatorOptionsExtra");
+
+    // Provider class names in vanilla
+    private final static String OVERWORLD = "net.minecraft.world.WorldProviderSurface";
+    private final static String NETHER = "net.minecraft.world.WorldProviderHell";
+    private final static String END = "net.minecraft.world.WorldProviderEnd";
 
     private LanternWorldPropertiesIO() {
     }
@@ -211,9 +215,8 @@ public final class LanternWorldPropertiesIO {
             worldName = dataView.getString(NAME).get();
         }
 
-        final LanternWorldProperties properties = new LanternWorldProperties(uuid);
-        properties.name = worldName;
-        properties.seed = dataView.getLong(SEED).get();
+        final LanternWorldProperties properties = new LanternWorldProperties(uuid, worldName);
+        long seed = dataView.getLong(SEED).get();
         properties.age = dataView.getLong(AGE).get();
         properties.time = dataView.getLong(TIME).orElse(properties.age % 24000);
         properties.setLastPlayedTime(dataView.getLong(LAST_PLAYED).get());
@@ -319,31 +322,41 @@ public final class LanternWorldPropertiesIO {
             }
         }
 
+        Boolean enabled = null;
+        Boolean keepSpawnLoaded = null;
+        Boolean loadOnStartup = null;
+        List<String> generatorModifiers = null;
+
         Integer dimensionId = null;
 
         // Get the sponge properties
         if (spongeContainer != null) {
             properties.properties = spongeRootContainer.copy().remove(DataQueries.SPONGE_DATA);
-
+            if (spongeContainer.contains(ENABLED)) {
+                enabled = spongeContainer.getInt(ENABLED).get() > 0;
+            }
+            if (spongeContainer.contains(KEEP_SPAWN_LOADED)) {
+                keepSpawnLoaded = spongeContainer.getInt(KEEP_SPAWN_LOADED).get() > 0;
+            }
+            if (spongeContainer.contains(KEEP_SPAWN_LOADED)) {
+                loadOnStartup = spongeContainer.getInt(LOAD_ON_STARTUP).get() > 0;
+            }
+            if (spongeContainer.contains(GENERATOR_MODIFIERS)) {
+                generatorModifiers = spongeContainer.getStringList(GENERATOR_MODIFIERS).get();
+            }
             dimensionId = spongeContainer.getInt(DIMENSION_INDEX).orElse(null);
             // This can be null, this is provided in the lantern-server
             String dimensionType = spongeContainer.getString(DIMENSION_TYPE).get();
-            properties.dimensionType = (LanternDimensionType<?>) LanternGame.get().getRegistry()
-                    .getType(DimensionType.class, dimensionType).orElse(null);
-
-            List<String> modifiers = spongeContainer.getStringList(GENERATOR_MODIFIERS).get();
-            ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
-            LanternGameRegistry registry = LanternGame.get().getRegistry();
-            for (String modifier : modifiers) {
-                Optional<WorldGeneratorModifier> genModifier = registry.getType(WorldGeneratorModifier.class, modifier);
-                if (genModifier.isPresent()) {
-                    genModifiers.add(genModifier.get());
-                } else {
-                    LanternGame.log().error("World generator modifier with id " + modifier +
-                            " not found. Missing plugin?");
-                }
+            if (dimensionType.equalsIgnoreCase(OVERWORLD)) {
+                properties.dimensionType = (LanternDimensionType<?>) DimensionTypes.OVERWORLD;
+            } else if (dimensionType.equalsIgnoreCase(NETHER)) {
+                properties.dimensionType = (LanternDimensionType<?>) DimensionTypes.NETHER;
+            } else if (dimensionType.equalsIgnoreCase(END)) {
+                properties.dimensionType = (LanternDimensionType<?>) DimensionTypes.THE_END;
+            } else {
+                properties.dimensionType = (LanternDimensionType<?>) LanternGame.get().getRegistry()
+                        .getType(DimensionType.class, dimensionType).orElse(null);
             }
-            properties.generatorModifiers = genModifiers.build();
 
             if (spongeContainer.contains(PLAYER_UUID_TABLE)) {
                 List<DataView> views = spongeContainer.getViewList(PLAYER_UUID_TABLE).get();
@@ -395,7 +408,7 @@ public final class LanternWorldPropertiesIO {
         }
 
         return new LevelData(properties, dimensionId, dimensionMap, new OverriddenWorldProperties(
-                difficulty, hardcore));
+                difficulty, hardcore, seed, enabled, keepSpawnLoaded, loadOnStartup, generatorModifiers));
     }
 
     static void write(Path folder, LevelData levelData) throws IOException {
@@ -404,9 +417,9 @@ public final class LanternWorldPropertiesIO {
         final DataContainer container = new MemoryDataContainer();
         final DataView dataView = container.createView(DATA);
 
-        dataView.set(SEED, properties.seed);
+        dataView.set(SEED, properties.getSeed());
         dataView.set(VERSION, CURRENT_VERSION);
-        dataView.set(NAME, properties.name);
+        dataView.set(NAME, properties.getWorldName());
         final DataView rulesView = dataView.createView(GAME_RULES);
         for (Entry<String, String> en : properties.rules.getValues().entrySet()) {
             rulesView.set(DataQuery.of(en.getKey()), en.getValue());
@@ -484,7 +497,7 @@ public final class LanternWorldPropertiesIO {
         }
         final DataContainer spongeRootContainer = properties.properties.copy();
         final DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
-        spongeContainer.set(NAME, properties.name);
+        spongeContainer.set(NAME, properties.getWorldName());
         spongeContainer.set(UUID_MOST, properties.uniqueId.getMostSignificantBits());
         spongeContainer.set(UUID_LEAST, properties.uniqueId.getLeastSignificantBits());
         spongeContainer.set(BONUS_CHEST_ENABLED, (byte) (properties.bonusChestEnabled ? 1 : 0));

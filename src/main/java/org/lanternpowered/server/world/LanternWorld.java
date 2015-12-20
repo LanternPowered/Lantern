@@ -762,7 +762,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public String getName() {
-        return this.properties.name;
+        return this.properties.getWorldName();
     }
 
     @Override

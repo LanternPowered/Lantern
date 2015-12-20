@@ -33,10 +33,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.config.world.WorldConfig;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
@@ -44,6 +46,7 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.rules.GameRule;
 import org.lanternpowered.server.world.rules.LanternGameRules;
+import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -102,7 +105,7 @@ public class LanternWorldProperties implements WorldProperties {
     GameMode gameMode = GameModes.NOT_SET;
 
     // The name of the world
-    String name;
+    private String name;
 
     // The spawn position
     Vector3i spawnPosition = Vector3i.ZERO;
@@ -120,7 +123,6 @@ public class LanternWorldProperties implements WorldProperties {
     int clearWeatherTime;
 
     long sizeOnDisk;
-    long seed;
     long time;
     long age;
 
@@ -151,12 +153,17 @@ public class LanternWorldProperties implements WorldProperties {
     // The last time the world was played in
     private long lastPlayed;
 
-    public LanternWorldProperties(UUID uniqueId) {
+    public LanternWorldProperties(UUID uniqueId, String name) {
         this.uniqueId = uniqueId;
+        this.name = name;
     }
 
     public LanternWorldProperties(String name) {
         this.uniqueId = UUID.randomUUID();
+        this.name = name;
+    }
+
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -173,7 +180,7 @@ public class LanternWorldProperties implements WorldProperties {
             this.bonusChestEnabled = creationSettings.bonusChestEnabled();
             this.mapFeatures = creationSettings.usesMapFeatures();
             this.gameMode = creationSettings.getGameMode();
-            this.seed = creationSettings.getSeed();
+            this.worldConfig.getGeneration().setSeed(creationSettings.getSeed());
             this.setAllowsPlayerRespawns(creationSettings.allowPlayerRespawns());
             this.setDifficulty(this.creationSettings.getDifficulty());
             this.setKeepSpawnLoaded(this.creationSettings.doesKeepSpawnLoaded());
@@ -190,6 +197,34 @@ public class LanternWorldProperties implements WorldProperties {
             this.setKeepSpawnLoaded(this.dimensionType.doesKeepSpawnLoaded());
             this.setAllowsPlayerRespawns(this.dimensionType.allowsPlayerRespawns());
             this.setWaterEvaporates(this.dimensionType.doesWaterEvaporate());
+            if (overrides.generatorModifiers != null) {
+                final List<String> modifiers = this.worldConfig.getGeneration().getGenerationModifiers();
+                modifiers.clear();
+                modifiers.addAll(overrides.generatorModifiers);
+                final ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
+                final GameRegistry registry = LanternGame.get().getRegistry();
+                for (String modifier : modifiers) {
+                    Optional<WorldGeneratorModifier> genModifier = registry.getType(WorldGeneratorModifier.class, modifier);
+                    if (genModifier.isPresent()) {
+                        genModifiers.add(genModifier.get());
+                    } else {
+                        LanternGame.log().error("World generator modifier with id " + modifier +
+                                " not found. Missing plugin?");
+                    }
+                }
+                this.generatorModifiers = genModifiers.build();
+            }
+            if (overrides.keepSpawnLoaded != null) {
+                this.setKeepSpawnLoaded(overrides.keepSpawnLoaded);
+            } else {
+                this.setKeepSpawnLoaded(this.dimensionType.doesKeepSpawnLoaded());
+            }
+            if (overrides.loadOnStartup != null) {
+                this.setLoadOnStartup(overrides.loadOnStartup);
+            }
+            if (overrides.enabled != null) {
+                this.setEnabled(overrides.enabled);
+            }
             worldConfig.save();
         } else {
             worldConfig.load();
@@ -332,7 +367,7 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public long getSeed() {
-        return this.seed;
+        return this.worldConfig.getGeneration().getSeed();
     }
 
     @Override
@@ -508,6 +543,9 @@ public class LanternWorldProperties implements WorldProperties {
     @Override
     public void setGeneratorModifiers(Collection<WorldGeneratorModifier> modifiers) {
         this.generatorModifiers = ImmutableSet.copyOf(this.generatorModifiers);
+        final List<String> genModifiers = this.worldConfig.getGeneration().getGenerationModifiers();
+        genModifiers.clear();
+        genModifiers.addAll(modifiers.stream().map(m -> m.getId()).collect(Collectors.toList()));
     }
 
     @Override
@@ -694,10 +732,21 @@ public class LanternWorldProperties implements WorldProperties {
 
         private final Difficulty difficulty;
         private final boolean hardcore;
+        private final long seed;
+        @Nullable private final Boolean enabled;
+        @Nullable private final Boolean keepSpawnLoaded;
+        @Nullable private final Boolean loadOnStartup;
+        @Nullable private final List<String> generatorModifiers;
 
-        public OverriddenWorldProperties(Difficulty difficulty, boolean hardcore) {
+        public OverriddenWorldProperties(Difficulty difficulty, boolean hardcore, long seed, @Nullable Boolean enabled,
+                @Nullable Boolean keepSpawnLoaded, @Nullable Boolean loadOnStartup, @Nullable List<String> generatorModifiers) {
+            this.generatorModifiers = generatorModifiers;
+            this.keepSpawnLoaded = keepSpawnLoaded;
+            this.loadOnStartup = loadOnStartup;
             this.difficulty = difficulty;
             this.hardcore = hardcore;
+            this.enabled = enabled;
+            this.seed = seed;
         }
     }
 }

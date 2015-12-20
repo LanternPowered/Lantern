@@ -70,6 +70,9 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "difficulty", comment = "The difficulty this world.")
     private Difficulty difficulty = Difficulties.NORMAL;
 
+    @Setting(value = "generation")
+    private WorldGeneration generation = new WorldGeneration();
+
     private final GlobalConfig globalConfig;
 
     public WorldConfig(GlobalConfig globalConfig, Path path) throws IOException {
@@ -83,6 +86,10 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
             return this.chunkLoading.getChunkLoadingTickets(plugin);
         }
         return this.globalConfig.getChunkLoadingTickets(plugin);
+    }
+
+    public WorldGeneration getGeneration() {
+        return this.generation;
     }
 
     public Difficulty getDifficulty() {

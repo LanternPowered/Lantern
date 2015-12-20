@@ -198,7 +198,9 @@ public class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanS
         } else {
             oldBan = (Optional) this.getBanFor(((Ban.Profile) ban).getProfile());
         }
-        this.entries0.remove(oldBan.get());
+        if (oldBan.isPresent()) {
+            this.entries0.remove(oldBan.get());
+        }
         this.entries0.add((BanEntry) ban);
         return oldBan;
     }

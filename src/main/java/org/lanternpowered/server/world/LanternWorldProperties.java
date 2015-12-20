@@ -170,6 +170,7 @@ public class LanternWorldProperties implements WorldProperties {
     public void update(WorldConfig worldConfig, @Nullable OverriddenWorldProperties overrides,
             @Nullable LanternWorldCreationSettings creationSettings) throws IOException {
         this.worldConfig = worldConfig;
+        List<String> worldGenModifiers = null;
         if (creationSettings != null) {
             this.properties = new MemoryDataContainer();
             this.creationSettings = creationSettings;
@@ -197,22 +198,12 @@ public class LanternWorldProperties implements WorldProperties {
             this.setKeepSpawnLoaded(this.dimensionType.doesKeepSpawnLoaded());
             this.setAllowsPlayerRespawns(this.dimensionType.allowsPlayerRespawns());
             this.setWaterEvaporates(this.dimensionType.doesWaterEvaporate());
+            this.worldConfig.getGeneration().setSeed(overrides.seed);
             if (overrides.generatorModifiers != null) {
                 final List<String> modifiers = this.worldConfig.getGeneration().getGenerationModifiers();
                 modifiers.clear();
                 modifiers.addAll(overrides.generatorModifiers);
-                final ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
-                final GameRegistry registry = LanternGame.get().getRegistry();
-                for (String modifier : modifiers) {
-                    Optional<WorldGeneratorModifier> genModifier = registry.getType(WorldGeneratorModifier.class, modifier);
-                    if (genModifier.isPresent()) {
-                        genModifiers.add(genModifier.get());
-                    } else {
-                        LanternGame.log().error("World generator modifier with id " + modifier +
-                                " not found. Missing plugin?");
-                    }
-                }
-                this.generatorModifiers = genModifiers.build();
+                worldGenModifiers = modifiers;
             }
             if (overrides.keepSpawnLoaded != null) {
                 this.setKeepSpawnLoaded(overrides.keepSpawnLoaded);
@@ -228,6 +219,21 @@ public class LanternWorldProperties implements WorldProperties {
             worldConfig.save();
         } else {
             worldConfig.load();
+            worldGenModifiers = worldConfig.getGeneration().getGenerationModifiers();
+        }
+        if (worldGenModifiers != null) {
+            final ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
+            final GameRegistry registry = LanternGame.get().getRegistry();
+            for (String modifier : worldGenModifiers) {
+                Optional<WorldGeneratorModifier> genModifier = registry.getType(WorldGeneratorModifier.class, modifier);
+                if (genModifier.isPresent()) {
+                    genModifiers.add(genModifier.get());
+                } else {
+                    LanternGame.log().error("World generator modifier with id " + modifier +
+                            " not found. Missing plugin?");
+                }
+            }
+            this.generatorModifiers = genModifiers.build();
         }
     }
 

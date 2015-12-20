@@ -73,8 +73,10 @@ public final class JsonTextPlaceholderSerializer extends JsonTextBaseSerializer 
             // We copy all the objects first to avoid modifying the elements
             // used by the serializer, somebody may still need them
             JsonArray array0 = new JsonArray();
-            array0.addAll(array);
-            fallback = context.deserialize(array0.remove(0), Text.class);
+            for (int i = 1 ; i < array.size(); i++) {
+                array0.add(array.get(i));
+            }
+            fallback = context.deserialize(array.get(0), Text.class);
             array = array0;
         }
         TextBuilder.Placeholder builder = Texts.placeholderBuilder(key).fallback(fallback);

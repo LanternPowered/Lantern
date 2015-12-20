@@ -37,6 +37,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 
+import org.lanternpowered.server.event.filter.FilterFactory;
+import org.lanternpowered.server.event.gen.DefineableClassLoader;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
@@ -55,30 +57,29 @@ import java.util.Set;
 
 import javax.inject.Singleton;
 
-/**
- * TODO: Update all the event manager classes for the added filter api.
- */
 @Singleton
 public class LanternEventManager implements EventManager {
 
     private final Object lock = new Object();
-    private final AnnotatedEventHandlerFactory handlerFactory = new ClassEventHandlerFactory("org.lanternpowered.server.event.handler");
-    private final Multimap<Class<?>, RegisteredHandler<?>> handlersByEvent = HashMultimap.create();
+    private final DefineableClassLoader classLoader = new DefineableClassLoader(getClass().getClassLoader());
+    private final AnnotatedEventListener.Factory handlerFactory = new ClassEventListenerFactory("org.slanternpowered.server.event.listener",
+            new FilterFactory("org.spongepowered.common.event.filters", this.classLoader), this.classLoader);
+    private final Multimap<Class<?>, RegisteredListener<?>> handlersByEvent = HashMultimap.create();
 
     /**
      * A cache of all the handlers for an event type for quick event posting.
      */
-    private final LoadingCache<Class<? extends Event>, RegisteredHandlerCache> handlersCache =
-            CacheBuilder.newBuilder().build(new CacheLoader<Class<? extends Event>, RegisteredHandlerCache>() {
+    private final LoadingCache<Class<? extends Event>, List<RegisteredListener<?>>> handlersCache =
+            CacheBuilder.newBuilder().build(new CacheLoader<Class<? extends Event>, List<RegisteredListener<?>>>() {
                 @Override
-                public RegisteredHandlerCache load(Class<? extends Event> eventClass) throws Exception {
+                public List<RegisteredListener<?>> load(Class<? extends Event> eventClass) throws Exception {
                     return bakeHandlers(eventClass);
                 }
             });
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private RegisteredHandlerCache bakeHandlers(Class<?> rootEvent) {
-        List<RegisteredHandler<?>> handlers = Lists.newArrayList();
+    private List<RegisteredListener<?>> bakeHandlers(Class<?> rootEvent) {
+        List<RegisteredListener<?>> handlers = Lists.newArrayList();
         Set<Class<?>> types = (Set) TypeToken.of(rootEvent).getTypes().rawTypes();
 
         synchronized (this.lock) {
@@ -90,7 +91,7 @@ public class LanternEventManager implements EventManager {
         }
 
         Collections.sort(handlers);
-        return new RegisteredHandlerCache(handlers);
+        return handlers;
     }
 
     private static boolean isValidHandler(Method method) {
@@ -104,19 +105,19 @@ public class LanternEventManager implements EventManager {
         }
 
         Class<?>[] parameters = method.getParameterTypes();
-        return parameters.length == 1 && Event.class.isAssignableFrom(parameters[0]);
+        return parameters.length >= 1 && Event.class.isAssignableFrom(parameters[0]);
     }
 
-    private void register(RegisteredHandler<?> handler) {
-        register(Collections.<RegisteredHandler<?>>singletonList(handler));
+    private void register(RegisteredListener<?> handler) {
+        register(Collections.<RegisteredListener<?>>singletonList(handler));
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void register(List<RegisteredHandler<?>> handlers) {
+    private void register(List<RegisteredListener<?>> handlers) {
         synchronized (this.lock) {
             Set<Class<?>> types = Sets.newHashSet();
 
-            for (RegisteredHandler handler : handlers) {
+            for (RegisteredListener handler : handlers) {
                 if (this.handlersByEvent.put(handler.getEventClass(), handler)) {
                     types.addAll(TypeToken.of(handler.getEventClass()).getTypes().rawTypes());
                 }
@@ -133,7 +134,7 @@ public class LanternEventManager implements EventManager {
         checkNotNull(plugin, "plugin");
         checkNotNull(listener, "listener");
 
-        List<RegisteredHandler<?>> handlers = Lists.newArrayList();
+        List<RegisteredListener<?>> handlers = Lists.newArrayList();
 
         Class<?> handle = listener.getClass();
         for (Method method : handle.getMethods()) {
@@ -141,7 +142,7 @@ public class LanternEventManager implements EventManager {
             if (subscribe != null) {
                 if (isValidHandler(method)) {
                     Class<? extends Event> eventClass = (Class<? extends Event>) method.getParameterTypes()[0];
-                    AnnotatedEventHandler handler;
+                    AnnotatedEventListener handler;
 
                     try {
                         handler = this.handlerFactory.create(listener, method);
@@ -161,14 +162,14 @@ public class LanternEventManager implements EventManager {
         this.register(handlers);
     }
 
-    private static <T extends Event> RegisteredHandler<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
+    private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
             Listener subscribe, EventListener<? super T> handler) {
-        return createRegistration(plugin, eventClass, subscribe.order(), false, handler);
+        return createRegistration(plugin, eventClass, subscribe.order(), handler);
     }
 
-    private static <T extends Event> RegisteredHandler<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
-            Order order, boolean ignoreCancelled, EventListener<? super T> handler) {
-        return new RegisteredHandler<T>(plugin, eventClass, order, handler, ignoreCancelled);
+    private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
+            Order order, EventListener<? super T> handler) {
+        return new RegisteredListener<T>(plugin, eventClass, order, handler);
     }
 
     @Override
@@ -194,16 +195,16 @@ public class LanternEventManager implements EventManager {
         checkNotNull(eventClass, "eventClass");
         checkNotNull(order, "order");
         checkNotNull(listener, "listener");
-        this.register(createRegistration(checkPlugin(plugin, "plugin"), eventClass, order, false, listener));
+        this.register(createRegistration(checkPlugin(plugin, "plugin"), eventClass, order, listener));
     }
 
-    private void unregister(Predicate<RegisteredHandler<?>> unregister) {
+    private void unregister(Predicate<RegisteredListener<?>> unregister) {
         synchronized (this.lock) {
             Set<Class<?>> types = Sets.newHashSet();
-            Iterator<RegisteredHandler<?>> it = this.handlersByEvent.values().iterator();
+            Iterator<RegisteredListener<?>> it = this.handlersByEvent.values().iterator();
 
             while (it.hasNext()) {
-                RegisteredHandler<?> handler = it.next();
+                RegisteredListener<?> handler = it.next();
                 if (unregister.apply(handler)) {
                     types.addAll(TypeToken.of(handler.getEventClass()).getTypes().rawTypes());
                     it.remove();
@@ -219,10 +220,10 @@ public class LanternEventManager implements EventManager {
     @Override
     public void unregisterListeners(final Object listener) {
         checkNotNull(listener, "listener");
-        this.unregister(new Predicate<RegisteredHandler<?>>() {
+        this.unregister(new Predicate<RegisteredListener<?>>() {
 
             @Override
-            public boolean apply(RegisteredHandler<?> handler) {
+            public boolean apply(RegisteredListener<?> handler) {
                 return listener.equals(handler.getHandle());
             }
 
@@ -232,23 +233,23 @@ public class LanternEventManager implements EventManager {
     @Override
     public void unregisterPluginListeners(Object pluginObj) {
         final PluginContainer plugin = checkPlugin(pluginObj, "plugin");
-        this.unregister(new Predicate<RegisteredHandler<?>>() {
+        this.unregister(new Predicate<RegisteredListener<?>>() {
 
             @Override
-            public boolean apply(RegisteredHandler<?> handler) {
+            public boolean apply(RegisteredListener<?> handler) {
                 return plugin.equals(handler.getPlugin());
             }
 
         });
     }
 
-    protected RegisteredHandlerCache getHandlerCache(Event event) {
+    protected List<RegisteredListener<?>> getHandlerCache(Event event) {
         return this.handlersCache.getUnchecked(checkNotNull(event, "event").getClass());
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected boolean post(Event event, List<RegisteredHandler<?>> handlers) {
-        for (RegisteredHandler handler : handlers) {
+    protected boolean post(Event event, List<RegisteredListener<?>> handlers) {
+        for (RegisteredListener handler : handlers) {
             try {
                 handler.handle(event);
             } catch (Throwable e) {
@@ -260,14 +261,6 @@ public class LanternEventManager implements EventManager {
 
     @Override
     public boolean post(Event event) {
-        return this.post(event, this.getHandlerCache(event).getHandlers());
+        return this.post(event, this.getHandlerCache(event));
     }
-
-    /**
-     * TODO: Do we need this method?
-     */
-    public boolean post(Event event, Order order) {
-        return this.post(event, this.getHandlerCache(event).getHandlersByOrder(order));
-    }
-
 }

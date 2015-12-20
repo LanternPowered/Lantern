@@ -22,11 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.event.filter;
 
-import java.lang.reflect.Method;
+import org.spongepowered.api.event.Event;
 
-public interface AnnotatedEventHandlerFactory {
+public interface EventFilter {
 
-    AnnotatedEventHandler create(Object handle, Method method) throws Exception;
+    Object[] filter(Event event);
+
 }

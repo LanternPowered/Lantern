@@ -22,44 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.spongepowered.api.event.filter.cause;
 
-import java.util.EnumMap;
-import java.util.List;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import org.spongepowered.api.event.Order;
+/**
+ * TODO: Remove this class once it's added in the api.
+ */
+@Target(ElementType.PARAMETER)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface Before {
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-public class RegisteredHandlerCache {
-
-    private final List<RegisteredHandler<?>> handlers;
-    private final EnumMap<Order, List<RegisteredHandler<?>>> handlersByOrder;
-
-    RegisteredHandlerCache(List<RegisteredHandler<?>> handlers) {
-        this.handlers = handlers;
-
-        this.handlersByOrder = Maps.newEnumMap(Order.class);
-        for (Order order : Order.values()) {
-            this.handlersByOrder.put(order, Lists.<RegisteredHandler<?>>newArrayList());
-        }
-        for (RegisteredHandler<?> handler : handlers) {
-            this.handlersByOrder.get(handler.getOrder()).add(handler);
-        }
-    }
-
-    public List<RegisteredHandler<?>> getHandlers() {
-        return this.handlers;
-    }
-
-    /**
-     * TODO: Do we need this method?
-     */
-    public List<RegisteredHandler<?>> getHandlersByOrder(Order order) {
-        return this.handlersByOrder.get(checkNotNull(order, "order"));
-    }
+    Class<?> value();
 
 }

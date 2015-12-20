@@ -22,22 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.event.filter.delegate;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.MethodVisitor;
+import org.spongepowered.api.util.Tuple;
 
-import org.spongepowered.api.event.Event;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 
-public abstract class AnnotatedEventHandler implements LanternEventListener<Event> {
+public interface ParameterFilterSourceDelegate {
 
-    protected final Object handle;
-
-    protected AnnotatedEventHandler(Object handle) {
-        this.handle = checkNotNull(handle, "handle");
-    }
-
-    @Override
-    public Object getHandle() {
-        return this.handle;
-    }
+    Tuple<Integer, Integer> write(ClassWriter cw, MethodVisitor mv, Method method, Parameter param, int local);
 }

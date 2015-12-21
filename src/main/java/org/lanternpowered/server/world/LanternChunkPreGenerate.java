@@ -47,9 +47,9 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
 
     private static final int TICK_INTERVAL = 10;
     private static final float DEFAULT_TICK_PERCENT = 0.15f;
-    private final World world;
-    private final Vector3d center;
-    private final double diameter;
+    private World world;
+    private Vector3d center;
+    private double diameter;
     @Nullable private Object plugin = null;
     @Nullable private Logger logger = null;
     private int tickInterval = TICK_INTERVAL;
@@ -114,13 +114,21 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
         return this;
     }
 
-    /**
-     * Uhm? What is this?
-     */
     @Override
     public ChunkPreGenerate from(Task value) {
-        // TODO Auto-generated method stub
-        return null;
+        final Consumer<Task> c0 = value.getConsumer();
+        if (c0 instanceof ChunkPreGenerator) {
+            final ChunkPreGenerator c1 = (ChunkPreGenerator) c0;
+            this.center = c1.center;
+            this.diameter = c1.diameter;
+            this.chunkCount = c1.chunkCount;
+            this.tickPercent = c1.tickPercent;
+            this.world = c1.world;
+            this.tickInterval = (int) value.getInterval();
+            this.plugin = value.getOwner();
+            this.logger = c1.logger;
+        }
+        return this;
     }
 
     @Override
@@ -150,8 +158,10 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
         private final int chunkCount;
         private final float tickPercent;
         private final long tickTimeLimit;
+        private final double diameter;
         @Nullable private final Logger logger;
         private Vector3i currentPosition;
+        private final Vector3d center;
         private int currentLayerIndex;
         private int currentLayerSize;
         private int currentIndexInLayer;
@@ -160,6 +170,7 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
 
         public ChunkPreGenerator(World world, Vector3d center, double diameter, int chunkCount, float tickPercent, @Nullable Logger logger) {
             this.world = world;
+            this.diameter = diameter;
             this.chunkRadius = GenericMath.floor(diameter / 32);
             this.chunkCount = chunkCount;
             this.tickPercent = tickPercent;
@@ -167,6 +178,7 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
             this.tickTimeLimit = Math.round(LanternGame.get().getScheduler().getPreferredTickInterval() * tickPercent);
             this.currentPosition = LanternGame.get().getServer().getChunkLayout().toChunk(center.toInt()).get();
             this.currentLayerIndex = 0;
+            this.center = center;
             this.currentLayerSize = 0;
             this.currentIndexInLayer = 0;
             this.totalCount = 0;

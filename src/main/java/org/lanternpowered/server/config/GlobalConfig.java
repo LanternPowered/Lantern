@@ -84,6 +84,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = ENABLED, comment = "Whether the query server should be enabled.")
         private boolean enabled = false;
 
+        @Setting(value = "show-plugins", comment = "Whether all the plugins should be added to the query.")
+        private boolean showPlugins = true;
+
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25563;
     }
@@ -93,6 +96,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = ENABLED, comment = "Whether the rcon server should be enabled.")
         private boolean enabled = false;
+
+        @Setting(value = "password", comment = "The password that is required to login.")
+        private String password = "";
 
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25564;
@@ -199,6 +205,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         return this.rcon.port;
     }
 
+    public String getRconPassword() {
+        return this.rcon.password;
+    }
+
     public boolean isRconEnabled() {
         return this.rcon.enabled;
     }
@@ -209,6 +219,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public boolean isQueryEnabled() {
         return this.query.enabled;
+    }
+
+    public boolean getShowPluginsToQuery() {
+        return this.query.showPlugins;
     }
 
     public int getServerPort() {

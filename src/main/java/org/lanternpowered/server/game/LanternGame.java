@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.game;
 
+import org.spongepowered.api.service.rcon.RconService;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -63,7 +65,6 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
-import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -287,7 +288,7 @@ public class LanternGame implements Game {
         this.banConfig.load();
     }
 
-    public void initialize(LanternServer server, Path rootWorldFolder) {
+    public void initialize(LanternServer server, RconService rconService, Path rootWorldFolder) {
         this.rootWorldFolder = rootWorldFolder;
         this.server = server;
 
@@ -322,6 +323,7 @@ public class LanternGame implements Game {
 
         this.registerService(WhitelistService.class, this.whitelistConfig);
         this.registerService(BanService.class, this.banConfig);
+        this.registerService(RconService.class, rconService);
 
         this.registerService(UserStorageService.class, new LanternUserStorageService());
         // Register the pagination service
@@ -469,7 +471,7 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public Server getServer() {
+    public LanternServer getServer() {
         return this.server;
     }
 

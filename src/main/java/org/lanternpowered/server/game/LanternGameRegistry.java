@@ -1047,7 +1047,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends ResettableBuilder<? super T>> T createBuilder(Class<T> builderClass) throws IllegalArgumentException {
+    public <T extends ResettableBuilder<?, ? super T>> T createBuilder(Class<T> builderClass) throws IllegalArgumentException {
         if (this.builderFactories.containsKey(builderClass)) {
             return (T) this.builderFactories.get(builderClass).get();
         }

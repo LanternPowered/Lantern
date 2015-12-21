@@ -38,6 +38,7 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.util.ban.Ban.Builder;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
 
@@ -131,5 +132,21 @@ public final class BanBuilder implements Ban.Builder {
             checkState(this.gameProfile != null, "gameProfile is not set");
             return new BanEntry.Profile((LanternGameProfile) this.gameProfile, this.reason, this.startDate, this.expirationDate, this.source);
         }
+    }
+
+    @Override
+    public Builder from(Ban value) {
+        this.reset();
+        this.source = value.getBanSource().orElse(null);
+        this.banType = value.getType();
+        this.reason = value.getReason();
+        this.startDate = value.getCreationDate();
+        this.expirationDate = value.getExpirationDate().orElse(null);
+        if (this.banType == BanTypes.IP) {
+            this.address = ((Ban.Ip) value).getAddress();
+        } else {
+            this.gameProfile = ((Ban.Profile) value).getProfile();
+        }
+        return this;
     }
 }

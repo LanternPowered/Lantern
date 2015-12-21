@@ -138,4 +138,18 @@ public class LanternTaskBuilder implements Task.Builder {
         this.scheduler.submit(task);
         return task;
     }
+
+    @Override
+    public LanternTaskBuilder from(Task value) {
+        this.reset();
+        final ScheduledTask task = (ScheduledTask) value;
+        this.delayIsTicks = true;
+        this.delay = task.offset;
+        this.intervalIsTicks = task.intervalIsTicks;
+        this.interval = task.period;
+        this.consumer = task.getConsumer();
+        this.syncType = task.syncType;
+        this.name = task.getName();
+        return this;
+    }
 }

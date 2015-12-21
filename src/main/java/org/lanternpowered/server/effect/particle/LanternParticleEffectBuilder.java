@@ -39,93 +39,21 @@ import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 
-import com.flowpowered.math.vector.Vector3d;
-
-public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
-
-    protected ParticleType type;
-
-    protected Vector3d motion;
-    protected Vector3d offset;
-    protected int count;
-
-    public LanternParticleEffectBuilder() {
-        this.reset();
-    }
-
-    public LanternParticleEffectBuilder reset() {
-        this.motion = Vector3d.ZERO;
-        this.offset = Vector3d.ZERO;
-        this.type = null;
-        this.count = 1;
-        return this;
-    }
-
-    @Override
-    public LanternParticleEffectBuilder motion(Vector3d motion) {
-        this.motion = checkNotNull(motion, "motion");
-        return this;
-    }
-
-    @Override
-    public LanternParticleEffectBuilder offset(Vector3d offset) {
-        this.offset = checkNotNull(offset, "offset");
-        return this;
-    }
-
-    @Override
-    public LanternParticleEffectBuilder count(int count) throws IllegalArgumentException {
-        checkArgument(count > 0, "Count must be greater then zero!");
-        this.count = count;
-        return null;
-    }
-
-    @Override
-    public LanternParticleEffectBuilder type(ParticleType particleType) {
-        this.type = checkNotNull(particleType, "particleType");
-        return this;
-    }
+public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<ParticleEffect, ParticleEffect.Builder> {
 
     @Override
     public LanternParticleEffect build() {
         return new LanternParticleEffect(this.type, this.motion, this.offset, this.count);
     }
 
-    public static class Colorable extends LanternParticleEffectBuilder implements ColoredParticle.Builder {
+    public static class Colorable extends AbstractParticleEffectBuilder<ColoredParticle, ColoredParticle.Builder> implements ColoredParticle.Builder {
 
         private Color color;
-
-        @Override
-        public LanternParticleEffectBuilder.Colorable type(ParticleType particleType) {
-            checkArgument(particleType instanceof ParticleType.Colorable);
-            return (LanternParticleEffectBuilder.Colorable) super.type(particleType);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Colorable reset() {
-            this.color = null;
-            return (LanternParticleEffectBuilder.Colorable) super.reset();
-        }
 
         @Override
         public LanternParticleEffectBuilder.Colorable color(Color color) {
             this.color = checkNotNull(color, "color");
             return this;
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Colorable motion(Vector3d motion) {
-            return (LanternParticleEffectBuilder.Colorable) super.motion(motion);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Colorable offset(Vector3d offset) {
-            return (LanternParticleEffectBuilder.Colorable) super.offset(offset);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Colorable count(int count) {
-            return (LanternParticleEffectBuilder.Colorable) super.count(count);
         }
 
         @Override
@@ -135,20 +63,22 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         }
     }
 
-    public static class Resizable extends LanternParticleEffectBuilder implements ResizableParticle.Builder {
+    public static class Resizable extends AbstractParticleEffectBuilder<ResizableParticle, ResizableParticle.Builder> implements ResizableParticle.Builder {
 
         private Float size;
 
         @Override
         public LanternParticleEffectBuilder.Resizable type(ParticleType particleType) {
             checkArgument(particleType instanceof ParticleType.Resizable);
-            return (LanternParticleEffectBuilder.Resizable) super.type(particleType);
+            super.type(particleType);
+            return this;
         }
 
         @Override
         public LanternParticleEffectBuilder.Resizable reset() {
             this.size = null;
-            return (LanternParticleEffectBuilder.Resizable) super.reset();
+            super.reset();
+            return this;
         }
 
         @Override
@@ -158,28 +88,13 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         }
 
         @Override
-        public LanternParticleEffectBuilder.Resizable motion(Vector3d motion) {
-            return (LanternParticleEffectBuilder.Resizable) super.motion(motion);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Resizable offset(Vector3d offset) {
-            return (LanternParticleEffectBuilder.Resizable) super.offset(offset);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Resizable count(int count) {
-            return (LanternParticleEffectBuilder.Resizable) super.count(count);
-        }
-
-        @Override
         public LanternParticleEffect.Resizable build() {
             return new LanternParticleEffect.Resizable(this.type, this.motion, this.offset, this.count,
                     this.size == null ? ((ParticleType.Resizable) this.type).getDefaultSize() : this.size);
         }
     }
 
-    public static class Note extends LanternParticleEffectBuilder implements NoteParticle.Builder {
+    public static class Note extends AbstractParticleEffectBuilder<NoteParticle, NoteParticle.Builder> implements NoteParticle.Builder {
 
         private NotePitch note;
 
@@ -192,28 +107,15 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         @Override
         public LanternParticleEffectBuilder.Note type(ParticleType particleType) {
             checkArgument(particleType instanceof ParticleType.Note);
-            return (LanternParticleEffectBuilder.Note) super.type(particleType);
+            super.type(particleType);
+            return this;
         }
 
         @Override
         public LanternParticleEffectBuilder.Note reset() {
             this.note = null;
-            return (LanternParticleEffectBuilder.Note) super.reset();
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Note motion(Vector3d motion) {
-            return (LanternParticleEffectBuilder.Note) super.motion(motion);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Note offset(Vector3d offset) {
-            return (LanternParticleEffectBuilder.Note) super.offset(offset);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Note count(int count) {
-            return (LanternParticleEffectBuilder.Note) super.count(count);
+            super.reset();
+            return this;
         }
 
         @Override
@@ -223,14 +125,15 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         }
     }
 
-    public static class Item extends LanternParticleEffectBuilder implements ItemParticle.Builder {
+    public static class Item extends AbstractParticleEffectBuilder<ItemParticle, ItemParticle.Builder> implements ItemParticle.Builder {
 
         private ItemStackSnapshot itemSnapshot;
 
         @Override
         public LanternParticleEffectBuilder.Item type(ParticleType particleType) {
             checkArgument(particleType instanceof ParticleType.Material);
-            return (LanternParticleEffectBuilder.Item) super.type(particleType);
+            super.type(particleType);
+            return this;
         }
 
         @Override
@@ -242,22 +145,8 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         @Override
         public LanternParticleEffectBuilder.Item reset() {
             this.itemSnapshot = null;
-            return (LanternParticleEffectBuilder.Item) super.reset();
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Item motion(Vector3d motion) {
-            return (LanternParticleEffectBuilder.Item) super.motion(motion);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Item offset(Vector3d offset) {
-            return (LanternParticleEffectBuilder.Item) super.offset(offset);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Item count(int count) {
-            return (LanternParticleEffectBuilder.Item) super.count(count);
+            super.reset();
+            return this;
         }
 
         @Override
@@ -268,14 +157,15 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         }
     }
 
-    public static class Block extends LanternParticleEffectBuilder implements BlockParticle.Builder {
+    public static class Block extends AbstractParticleEffectBuilder<BlockParticle, BlockParticle.Builder> implements BlockParticle.Builder {
 
         private BlockState blockState;
 
         @Override
         public LanternParticleEffectBuilder.Block type(ParticleType particleType) {
             checkArgument(particleType instanceof ParticleType.Material);
-            return (LanternParticleEffectBuilder.Block) super.type(particleType);
+            super.type(particleType);
+            return this;
         }
 
         @Override
@@ -287,22 +177,8 @@ public class LanternParticleEffectBuilder implements ParticleEffect.Builder {
         @Override
         public LanternParticleEffectBuilder.Block reset() {
             this.blockState = null;
-            return (LanternParticleEffectBuilder.Block) super.reset();
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Block motion(Vector3d motion) {
-            return (LanternParticleEffectBuilder.Block) super.motion(motion);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Block offset(Vector3d offset) {
-            return (LanternParticleEffectBuilder.Block) super.offset(offset);
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Block count(int count) {
-            return (LanternParticleEffectBuilder.Block) super.count(count);
+            super.reset();
+            return this;
         }
 
         @Override

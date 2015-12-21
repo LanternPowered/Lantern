@@ -89,7 +89,7 @@ public class LanternWorldCreationSettingsBuilder implements WorldCreationSetting
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder fill(WorldCreationSettings settings) {
+    public LanternWorldCreationSettingsBuilder from(WorldCreationSettings settings) {
         final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings)
                 checkNotNull(settings, "settings");
         this.difficulty = settings0.getDifficulty();
@@ -112,6 +112,11 @@ public class LanternWorldCreationSettingsBuilder implements WorldCreationSetting
         this.allowPlayerRespawns = settings0.allowPlayerRespawns();
         this.pvpEnabled = settings0.isPVPEnabled();
         return this;
+    }
+
+    @Override
+    public LanternWorldCreationSettingsBuilder fill(WorldCreationSettings settings) {
+        return this.from(settings);
     }
 
     @Override

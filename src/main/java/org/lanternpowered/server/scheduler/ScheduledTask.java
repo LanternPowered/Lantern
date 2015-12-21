@@ -48,7 +48,7 @@ public class ScheduledTask implements Task {
     private ScheduledTaskState state;
     private final UUID id;
     private final String name;
-    private final TaskSynchronicity syncType;
+    final TaskSynchronicity syncType;
     private final String stringRepresentation;
 
     // Internal Task state. Not for user-service use.

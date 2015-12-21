@@ -70,7 +70,7 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
     }
 
     @Override
-    public LanternChunkPreGenerate logger(Logger logger) {
+    public LanternChunkPreGenerate logger(@Nullable Logger logger) {
         this.logger = logger;
         return this;
     }
@@ -114,7 +114,17 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
         return this;
     }
 
-    @Override public String toString() {
+    /**
+     * Uhm? What is this?
+     */
+    @Override
+    public ChunkPreGenerate from(Task value) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String toString() {
         return "SpongeChunkPreGen{" +
                 "center=" + this.center +
                 ", diameter=" + this.diameter +

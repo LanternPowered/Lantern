@@ -27,8 +27,6 @@ package org.lanternpowered.server.network.rcon;
 import java.net.InetSocketAddress;
 import java.util.Set;
 
-import org.spongepowered.api.service.rcon.RconService;
-
 import com.google.common.collect.Sets;
 
 import io.netty.bootstrap.ServerBootstrap;
@@ -40,7 +38,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
-public class RconServer implements RconService {
+public class RconServer extends BaseRconService {
 
     private final Set<RconSource> sources = Sets.newConcurrentHashSet();
 
@@ -48,8 +46,11 @@ public class RconServer implements RconService {
     private EventLoopGroup bossGroup;
     private EventLoopGroup workerGroup;
 
-    private String password = "";
     private InetSocketAddress address;
+
+    public RconServer(String password) {
+        super(password);
+    }
 
     /**
      * Initializes the rcon server.
@@ -58,14 +59,12 @@ public class RconServer implements RconService {
      * @param password the password
      * @return the channel future
      */
-    public ChannelFuture init(final InetSocketAddress address, final String password) {
+    public ChannelFuture bind(final InetSocketAddress address) {
         if (this.bootstrap != null) {
             throw new IllegalStateException("The rcon server is already active.");
         }
 
-        this.password = password;
         this.address = address;
-
         this.bootstrap = new ServerBootstrap();
         this.bossGroup = new NioEventLoopGroup();
         this.workerGroup = new NioEventLoopGroup();
@@ -133,10 +132,5 @@ public class RconServer implements RconService {
     @Override
     public boolean isRconEnabled() {
         return this.bootstrap != null;
-    }
-
-    @Override
-    public String getRconPassword() {
-        return this.password;
     }
 }

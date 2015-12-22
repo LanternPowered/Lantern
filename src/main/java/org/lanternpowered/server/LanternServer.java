@@ -24,6 +24,10 @@
  */
 package org.lanternpowered.server;
 
+import org.lanternpowered.server.network.rcon.BaseRconService;
+
+import org.lanternpowered.server.network.status.QueryServer;
+import org.lanternpowered.server.network.rcon.RconServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 
@@ -32,7 +36,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 import java.nio.file.Path;
 import java.security.KeyPair;
 import java.util.Collection;
@@ -42,6 +45,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
@@ -76,7 +81,6 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.storage.ChunkLayout;
 import org.spongepowered.api.world.storage.WorldProperties;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -125,8 +129,20 @@ public class LanternServer implements Server {
             // Start the console (command input/completer)
             consoleManager.start(game);
 
+            final GlobalConfig globalConfig = game.getGlobalConfig();
+            RconServer rconServer = null;
+            QueryServer queryServer = null;
+            // Enable the query server if needed
+            if (globalConfig.isQueryEnabled()) {
+                queryServer = new QueryServer(game, globalConfig.getShowPluginsToQuery());
+            }
+            // Enable the rcon server if needed
+            if (globalConfig.isRconEnabled()) {
+                rconServer = new RconServer(globalConfig.getRconPassword());
+            }
+
             // Create the server instance
-            final LanternServer server = new LanternServer(game, consoleManager);
+            final LanternServer server = new LanternServer(game, consoleManager, rconServer, queryServer);
 
             // Send some startup info
             LanternGame.log().info("Starting Lantern Server (Minecraft: {} (Protocol: {}))",
@@ -137,15 +153,17 @@ public class LanternServer implements Server {
             final Path worldFolder = new File(game.getGlobalConfig().getRootWorldFolder()).toPath();
 
             // Initialize the game
-            game.initialize(server, worldFolder);
+            game.initialize(server, rconServer == null ? new BaseRconService(globalConfig.getRconPassword()) :
+                    rconServer, worldFolder);
 
             // Bind the network channel
             server.bind();
+            // Bind the query server
+            server.bindQuery();
+            // Bind the rcon server
+            server.bindRcon();
             // Start the server
             server.start();
-            
-            // server.bindQuery();
-            // server.bindRcon();
             LanternGame.log().info("Ready for connections.");
         } catch (BindException e) {
             // descriptive bind error messages
@@ -180,6 +198,12 @@ public class LanternServer implements Server {
     // The network manager
     private final NetworkManager networkManager = new NetworkManager(this);
 
+    // The rcon server/service
+    private final RconServer rconServer;
+
+    // The query server
+    private final QueryServer queryServer;
+
     // The key pair used for authentication
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
 
@@ -201,26 +225,34 @@ public class LanternServer implements Server {
 
     private volatile boolean shuttingDown;
 
-    public LanternServer(LanternGame game, ConsoleManager consoleManager) {
+    public LanternServer(LanternGame game, ConsoleManager consoleManager, @Nullable RconServer rconServer,
+            @Nullable QueryServer queryServer) {
         this.consoleManager = consoleManager;
+        this.queryServer = queryServer;
+        this.rconServer = rconServer;
         this.game = game;
     }
 
-    public void bind() throws BindException {
-        final SocketAddress address;
-
-        final GlobalConfig config = this.game.getGlobalConfig();
-        final String ip = config.getServerIp();
-        final int port = config.getServerPort();
-
-        if (ip.isEmpty()) {
-            address = new InetSocketAddress(port);
+    /**
+     * Get the socket address to bind to for a specified service.
+     * 
+     * @param port the port to use
+     * @return the socket address
+     */
+    private InetSocketAddress getBindAddress(int port) {
+        final String ip = this.game.getGlobalConfig().getServerIp();
+        if (ip.length() == 0) {
+            return new InetSocketAddress(port);
         } else {
-            address = new InetSocketAddress(ip, port);
+            return new InetSocketAddress(ip, port);
         }
+    }
 
-        final ChannelFuture future = this.networkManager.init(address);
-        final Channel channel = future.awaitUninterruptibly().channel();
+    public void bind() throws BindException {
+        InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getServerPort());
+
+        ChannelFuture future = this.networkManager.init(address);
+        Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             final Throwable cause = future.cause();
             if (cause instanceof BindException) {
@@ -230,6 +262,36 @@ public class LanternServer implements Server {
         }
 
         LanternGame.log().info("Successfully bound to: " + channel.localAddress());
+    }
+
+    private void bindQuery() {
+        if (this.queryServer == null) {
+            return;
+        }
+
+        InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getQueryPort());
+        this.game.getLogger().info("Binding query to address: " + address + "...");
+
+        ChannelFuture future = this.queryServer.bind(address);
+        Channel channel = future.awaitUninterruptibly().channel();
+        if (!channel.isActive()) {
+            this.game.getLogger().warn("Failed to bind query. Address already in use?");
+        }
+    }
+
+    private void bindRcon() {
+        if (this.rconServer == null) {
+            return;
+        }
+
+        InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getRconPort());
+        this.game.getLogger().info("Binding rcon to address: " + address + "...");
+
+        ChannelFuture future = this.rconServer.bind(address);
+        Channel channel = future.awaitUninterruptibly().channel();
+        if (!channel.isActive()) {
+            this.game.getLogger().warn("Failed to bind rcon. Address already in use?");
+        }
     }
 
     public void start() throws IOException {
@@ -483,6 +545,13 @@ public class LanternServer implements Server {
         // Stop the network servers - starts the shutdown process
         // It may take a second or two for Netty to totally clean up
         this.networkManager.shutdown();
+
+        if (this.queryServer != null) {
+            this.queryServer.shutdown();
+        }
+        if (this.rconServer != null) {
+            this.rconServer.shutdown();
+        }
 
         // Stop the world manager
         this.worldManager.shutdown();

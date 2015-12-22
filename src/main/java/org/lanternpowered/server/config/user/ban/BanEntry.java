@@ -26,7 +26,7 @@ package org.lanternpowered.server.config.user.ban;
 
 import java.lang.ref.WeakReference;
 import java.net.InetAddress;
-import java.util.Date;
+import java.time.Instant;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -47,11 +47,11 @@ import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 public abstract class BanEntry implements Ban {
 
     @Setting(value = "start-date")
-    private Date startDate;
+    private Instant startDate;
 
     @Nullable
     @Setting(value = "expiration-date")
-    private Date expirationDate;
+    private Instant expirationDate;
 
     @Setting(value = "reason")
     private Text reason;
@@ -65,7 +65,7 @@ public abstract class BanEntry implements Ban {
     protected BanEntry() {
     }
 
-    protected BanEntry(Text reason, Date startDate, @Nullable Date expirationDate,
+    protected BanEntry(Text reason, Instant startDate, @Nullable Instant expirationDate,
             @Nullable Text source) {
         this.expirationDate = expirationDate;
         this.startDate = startDate;
@@ -84,12 +84,12 @@ public abstract class BanEntry implements Ban {
     }
 
     @Override
-    public Date getCreationDate() {
+    public Instant getCreationDate() {
         return this.startDate;
     }
 
     @Override
-    public Optional<Date> getExpirationDate() {
+    public Optional<Instant> getExpirationDate() {
         return Optional.ofNullable(this.expirationDate);
     }
 
@@ -136,7 +136,7 @@ public abstract class BanEntry implements Ban {
         private Ip() {
         }
 
-        public Ip(InetAddress ipAddress, Text reason, Date startDate, @Nullable Date expirationDate,
+        public Ip(InetAddress ipAddress, Text reason, Instant startDate, @Nullable Instant expirationDate,
                 @Nullable Text source) {
             super(reason, startDate, expirationDate, source);
         }
@@ -158,7 +158,7 @@ public abstract class BanEntry implements Ban {
         private Profile() {
         }
 
-        public Profile(LanternGameProfile profile, Text reason, Date startDate, @Nullable Date expirationDate,
+        public Profile(LanternGameProfile profile, Text reason, Instant startDate, @Nullable Instant expirationDate,
                 @Nullable Text source) {
             super(reason, startDate, expirationDate, source);
             this.profile = profile;

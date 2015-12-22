@@ -28,8 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.net.InetAddress;
-import java.util.Date;
-
+import java.time.Instant;
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -49,8 +48,8 @@ public final class BanBuilder implements Ban.Builder {
     private InetAddress address;
     private Text reason;
     @Nullable private Text source;
-    private Date startDate;
-    @Nullable private Date expirationDate;
+    private Instant startDate;
+    @Nullable private Instant expirationDate;
 
     public BanBuilder() {
         this.reset();
@@ -61,7 +60,7 @@ public final class BanBuilder implements Ban.Builder {
         this.banType = null;
         this.gameProfile = null;
         this.address = null;
-        this.startDate = new Date();
+        this.startDate = Instant.now();
         this.expirationDate = null;
         this.source = null;
         this.reason = null;
@@ -97,13 +96,13 @@ public final class BanBuilder implements Ban.Builder {
     }
 
     @Override
-    public BanBuilder startDate(Date date) {
+    public BanBuilder startDate(Instant date) {
         this.startDate = checkNotNull(date, "date");
         return this;
     }
 
     @Override
-    public BanBuilder expirationDate(@Nullable Date date) {
+    public BanBuilder expirationDate(@Nullable Instant date) {
         this.expirationDate = date;
         return this;
     }

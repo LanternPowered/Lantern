@@ -28,9 +28,11 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
+import org.lanternpowered.server.config.serializer.InstantTypeSerializer;
 import org.lanternpowered.server.config.serializer.TextTypeSerializer;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.IpSet;
@@ -62,7 +64,8 @@ public abstract class ConfigBase {
                 .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
                 .registerType(TypeToken.of(GameProfile.class), (TypeSerializer) typeSerializers.get(
                         TypeToken.of(LanternGameProfile.class)))
-                .registerType(TypeToken.of(InetAddress.class), new InetAddressTypeSerializer());
+                .registerType(TypeToken.of(InetAddress.class), new InetAddressTypeSerializer())
+                .registerType(TypeToken.of(Instant.class), new InstantTypeSerializer());
         DEFAULT_OPTIONS = ConfigurationOptions.defaults().setSerializers(typeSerializers);
     }
 

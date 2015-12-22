@@ -34,6 +34,17 @@ repositories {
     }
 }
 
+sourceSets {
+    java6 {
+        compileClasspath += main.compileClasspath + main.output
+    }
+}
+
+compileJava6Java {
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
+}
+
 ext.api = project('SpongeAPI')
 
 // Disable some tasks to make the building go faster
@@ -75,10 +86,11 @@ dependencies {
 }
 
 jar {
-	classifier = 'release'
+    classifier = 'release'
+    from sourceSets.java6.output
     manifest {
         attributes(
-                'Main-Class': 'org.lanternpowered.launch.Launch',
+                'Main-Class': 'org.lanternpowered.launch.VersionCheckingMain',
                 'Implementation-Title': project.name,
                 'Implementation-Version': project.version,
                 'Implementation-Vendor': project.url,
@@ -98,7 +110,7 @@ test {
 
 shadowJar {
     classifier = ''
-
+    from sourceSets.java6.output
     dependencies {
         // SpongeAPI
         include project(api.path)
@@ -152,7 +164,7 @@ shadowJar {
 }
 
 task sourceJar(type: Jar) {
-	classifier = 'sources'
+    classifier = 'sources'
     from api.sourceSets.main.allSource
     from sourceSets.main.allSource
 }
@@ -169,13 +181,13 @@ license {
     strictCheck true
     ignoreFailures = false
 
-	ext {
+    ext {
         name = project.name
         url = project.url
         organization = project.organization
     }
 
-	mapping {
+    mapping {
         java = 'SLASHSTAR_STYLE'
     }
 }

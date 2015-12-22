@@ -1,7 +1,7 @@
 /*
  * This file is part of LanternServer, licensed under the MIT License (MIT).
  *
- * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -515,7 +515,7 @@ public final class LanternWorldPropertiesIO {
         levelFileNew = folder.resolve(SPONGE_LEVEL_DATA_NEW);
         levelFileOld = folder.resolve(SPONGE_LEVEL_DATA_OLD);
         levelFile = folder.resolve(SPONGE_LEVEL_DATA);
-        NbtStreamUtils.write(container, Files.newOutputStream(levelFileNew), true);
+        NbtStreamUtils.write(spongeRootContainer, Files.newOutputStream(levelFileNew), true);
         if (Files.exists(levelFileOld)) {
             Files.delete(levelFileOld);
         }

@@ -1,7 +1,7 @@
 /*
  * This file is part of LanternServer, licensed under the MIT License (MIT).
  *
- * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -49,80 +49,85 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf buf0, List<Object> output) throws Exception {
-        ByteBuf buf1 = ctx.alloc().buffer();
+    protected void encode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+        ByteBuf prefixBuf = ctx.alloc().buffer(5);
+        ByteBuf contentsBuf;
 
-        if (buf0.readableBytes() >= this.compressionThreshold) {
-            int length = buf0.readableBytes();
+        if (msg.readableBytes() >= this.compressionThreshold) {
+            // Message should be compressed
+            int index = msg.readerIndex();
+            int length = msg.readableBytes();
 
-            byte[] source = new byte[length];
-            buf0.readBytes(source);
+            byte[] sourceData = new byte[length];
+            msg.readBytes(sourceData);
+            deflater.setInput(sourceData);
+            deflater.finish();
 
-            this.deflater.setInput(source);
-            this.deflater.finish();
-
-            byte[] compressed = new byte[length];
-            int compressedLength = this.deflater.deflate(compressed);
-
-            this.deflater.reset();
+            byte[] compressedData = new byte[length];
+            int compressedLength = deflater.deflate(compressedData);
+            deflater.reset();
 
             if (compressedLength == 0) {
-                throw new EncoderException("Failed to compress message of size " + length + "!");
+                // Compression failed in some weird way
+                throw new EncoderException("Failed to compress message of size " + length);
             } else if (compressedLength >= length) {
-                // Compression increased the size, threshold is probably too low
+                // Compression increased the size. threshold is probably too low
                 // Send as an uncompressed packet
-                CONTEXT.writeVarInt(buf1, 0);
-                buf1.writeBytes(source);
+                CONTEXT.writeVarInt(prefixBuf, 0);
+                msg.readerIndex(index);
+                msg.retain();
+                contentsBuf = msg;
             } else {
-                CONTEXT.writeVarInt(buf1, length);
-                buf1.writeBytes(compressed, 0, compressedLength);
+                // All is well
+                CONTEXT.writeVarInt(prefixBuf, length);
+                contentsBuf = Unpooled.wrappedBuffer(compressedData, 0, compressedLength);
             }
         } else {
-            CONTEXT.writeVarInt(buf1, 0);
-            buf1.writeBytes(buf0);
+            // Message should be sent through
+            CONTEXT.writeVarInt(prefixBuf, 0);
+            msg.retain();
+            contentsBuf = msg;
         }
 
-        output.add(buf1);
+        out.add(Unpooled.wrappedBuffer(prefixBuf, contentsBuf));
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf buf0, List<Object> output) throws Exception {
-        int index = buf0.readerIndex();
-        int uncompressedSize = CONTEXT.readVarInt(buf0);
-
+    protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
+        int index = msg.readerIndex();
+        int uncompressedSize = CONTEXT.readVarInt(msg);
         if (uncompressedSize == 0) {
-            int length = buf0.readableBytes();
-
+            // Message is uncompressed
+            int length = msg.readableBytes();
             if (length >= this.compressionThreshold) {
-                throw new DecoderException("Received uncompressed message of size " + length +
-                        " greater than threshold " + this.compressionThreshold);
+                // Invalid
+                throw new DecoderException("Received uncompressed message of size " + length + " greater than threshold "
+                        + this.compressionThreshold);
             }
 
-            ByteBuf buf1 = ctx.alloc().buffer(length);
-            buf0.readBytes(buf1, length);
-
-            output.add(buf1);
+            ByteBuf buf = ctx.alloc().buffer(length);
+            msg.readBytes(buf, length);
+            out.add(buf);
         } else {
-            byte[] source = new byte[buf0.readableBytes()];
-            buf0.readBytes(source);
+            // Message is compressed
+            byte[] sourceData = new byte[msg.readableBytes()];
+            msg.readBytes(sourceData);
+            this.inflater.setInput(sourceData);
 
-            this.inflater.setInput(source);
-
-            byte[] result = new byte[uncompressedSize];
-            int resultLength = this.inflater.inflate(result);
-
+            byte[] destData = new byte[uncompressedSize];
+            int resultLength = this.inflater.inflate(destData);
             this.inflater.reset();
 
             if (resultLength == 0) {
-                buf0.readerIndex(index);
-                buf0.retain();
-
-                output.add(buf0);
+                // Might be a leftover from before compression was enabled (no compression header)
+                // UncompressedSize is likely to be < threshold
+                msg.readerIndex(index);
+                msg.retain();
+                out.add(msg);
             } else if (resultLength != uncompressedSize) {
-                throw new DecoderException("Received compressed message claiming to be of size " + uncompressedSize + " but actually "
-                        + resultLength);
+                throw new DecoderException("Received compressed message claiming to be of size " + uncompressedSize + " but actually " + resultLength);
             } else {
-                output.add(Unpooled.wrappedBuffer(result));
+                out.add(Unpooled.wrappedBuffer(destData));
             }
         }
     }

@@ -460,8 +460,8 @@ public final class LanternWorldManager {
                     entry.dimensionId, dimensionMap, null));
             worldProperties0.getConfig().save();
         } catch (IOException e) {
-            LanternGame.log().warn("Unable to save the world properties of {}: {}",
-                    worldProperties.getWorldName(), e.getMessage());
+            LanternGame.log().error("Unable to save the world properties of {}: {}",
+                    worldProperties.getWorldName(), e.getMessage(), e);
             return false;
         }
         return true;

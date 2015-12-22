@@ -487,8 +487,8 @@ public final class LanternWorldPropertiesIO {
         if (Files.exists(levelFileOld)) {
             Files.delete(levelFileOld);
         }
-        Files.move(levelFile, levelFileOld);
         if (Files.exists(levelFile)) {
+            Files.move(levelFile, levelFileOld);
             Files.delete(levelFile);
         }
         Files.move(levelFileNew, levelFile);
@@ -519,8 +519,8 @@ public final class LanternWorldPropertiesIO {
         if (Files.exists(levelFileOld)) {
             Files.delete(levelFileOld);
         }
-        Files.move(levelFile, levelFileOld);
         if (Files.exists(levelFile)) {
+            Files.move(levelFile, levelFileOld);
             Files.delete(levelFile);
         }
         Files.move(levelFileNew, levelFile);

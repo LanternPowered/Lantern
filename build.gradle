@@ -36,6 +36,12 @@ repositories {
 
 ext.api = project('SpongeAPI')
 
+// Disable some tasks to make the building go faster
+tasks.getByPath(':SpongeAPI:javadoc').enabled = false
+tasks.getByPath(':SpongeAPI:javadocJar').enabled = false
+tasks.getByPath(':SpongeAPI:checkstyleMain').enabled = false
+tasks.getByPath(':SpongeAPI:checkstyleTest').enabled = false
+
 evaluationDependsOn api.path
 
 // Project dependencies
@@ -72,13 +78,13 @@ jar {
 	classifier = 'release'
     manifest {
         attributes(
-                'Main-Class': 'org.lanternpowered.server.LanternServer',
-                'Implementation-Title': 'LanternServer',
-                'Implementation-Version': version,
-       	        'Implementation-Vendor': 'LanternPowered',
-                'Specification-Title': 'SpongeAPI',
-                'Specification-Version': '2.1-SNAPSHOT',
-                'Specification-Vendor': 'SpongePowered',
+                'Main-Class': 'org.lanternpowered.launch.Launch',
+                'Implementation-Title': project.name,
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': project.url,
+                'Specification-Name': api.name,
+                'Specification-Version': api.version,
+                'Specification-Vendor': api.url,
                 'Sealed': true
         )
     }
@@ -145,13 +151,15 @@ shadowJar {
    	exclude 'LICENSE', 'NOTICE'
 }
 
-task sourceJar(type: Jar, dependsOn: classes) {
+task sourceJar(type: Jar) {
+	classifier = 'sources'
     from api.sourceSets.main.allSource
     from sourceSets.main.allSource
 }
 
-// Run shadowJar on build
+// Run shadowJar and sourceJar on build
 assemble.dependsOn shadowJar
+assemble.dependsOn sourceJar
 
 license {
     header project.file('HEADER.txt')
@@ -170,4 +178,9 @@ license {
 	mapping {
         java = 'SLASHSTAR_STYLE'
     }
+}
+
+// Gradle version used for generating the Gradle wrapper
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.8'
 }

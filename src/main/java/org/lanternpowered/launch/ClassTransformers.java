@@ -33,10 +33,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public final class ClassTransformers {
 
     final static List<ClassTransformer> transformers = new CopyOnWriteArrayList<>();
-    final static Set<Exclusion> loaderExclusions = Collections.newSetFromMap(
-            new ConcurrentHashMap<Exclusion, Boolean>());
-    final static Set<Exclusion> transformerExclusions = Collections.newSetFromMap(
-            new ConcurrentHashMap<Exclusion, Boolean>());
+    final static Set<Exclusion> loaderExclusions = Collections.newSetFromMap(new ConcurrentHashMap<>());
+    final static Set<Exclusion> transformerExclusions = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     /**
      * Initializes the transformers.
@@ -80,7 +78,7 @@ public final class ClassTransformers {
      * @param exclusion the exclusion
      */
     public static void addLoaderExclusion(Exclusion exclusion) {
-        transformerExclusions.add(exclusion);
+        loaderExclusions.add(exclusion);
     }
 
     /**

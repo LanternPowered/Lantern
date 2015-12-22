@@ -59,10 +59,8 @@ final class Launch {
 
     private static class LaunchClassLoader extends URLClassLoader {
 
-        private final Map<String, Class<?>> cachedClasses =
-                new ConcurrentHashMap<>();
-        private final Set<String> invalidClasses = Collections.newSetFromMap(
-                new ConcurrentHashMap<String, Boolean>());
+        private final Map<String, Class<?>> cachedClasses = new ConcurrentHashMap<>();
+        private final Set<String> invalidClasses = Collections.newSetFromMap(new ConcurrentHashMap<>());
         private final ClassLoader parent = this.getClass().getClassLoader();
 
         public LaunchClassLoader(URL[] urls) {

@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 
 import org.lanternpowered.server.config.user.UserEntry;
+import org.lanternpowered.server.config.user.ban.BanEntry;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.LanternUser;
 import org.lanternpowered.server.game.LanternGame;
@@ -124,7 +125,10 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Nullable
     private static User getFromBanlist(UUID uniqueId) {
-        // TODO
+        final Optional<BanEntry> optEntry = LanternGame.get().getBanConfig().getEntryByUUID(uniqueId);
+        if (optEntry.isPresent()) {
+            return create(((BanEntry.Profile) optEntry.get()).getProfile());
+        }
         return null;
     }
 
@@ -179,7 +183,7 @@ public class LanternUserStorageService implements UserStorageService {
         final LanternGame game = LanternGame.get();
         game.getOpsConfig().removeEntry(profile.getUniqueId());
         game.getWhitelistConfig().removeEntry(profile.getUniqueId());
-        // TODO
+        game.getBanConfig().removeEntry(profile.getUniqueId());
         return true;
     }
 

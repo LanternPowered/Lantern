@@ -25,6 +25,7 @@
 package org.lanternpowered.server.network.pipeline.legacy;
 
 import java.net.InetSocketAddress;
+import java.util.stream.Collectors;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
@@ -33,7 +34,7 @@ import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusResponse;
 import org.lanternpowered.server.status.LanternStatusResponsePlayers;
-import org.spongepowered.api.profile.GameProfile;
+
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -42,7 +43,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
 import com.google.common.base.Charsets;
-import com.google.common.collect.Lists;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFutureListener;
@@ -129,8 +129,8 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
 
             InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
             LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
-            // TODO: Replace the list with the actual profiles, but not used anyway
-            LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(Lists.<GameProfile>newArrayList(), online, max);
+            LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(server.getOnlinePlayers()
+            		.stream().map(p -> p.getProfile()).collect(Collectors.toList()), online, max);
             LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
             ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.of(client), client, response);

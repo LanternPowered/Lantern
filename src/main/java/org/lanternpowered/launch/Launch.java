@@ -24,19 +24,7 @@
  */
 package org.lanternpowered.launch;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-
-import com.google.common.io.ByteStreams;
-
-import static org.lanternpowered.launch.ClassTransformers.loaderExclusions;
-import static org.lanternpowered.launch.ClassTransformers.transformerExclusions;
-import static org.lanternpowered.launch.ClassTransformers.transformers;
 
 final class Launch {
 
@@ -54,95 +42,6 @@ final class Launch {
                     .getMethod("main", String[].class).invoke(null, new Object[] { args });
         } catch (Throwable e) {
             throw new RuntimeException(e);
-        }
-    }
-
-    private static class LaunchClassLoader extends URLClassLoader {
-
-        private final Map<String, Class<?>> cachedClasses = new ConcurrentHashMap<>();
-        private final Set<String> invalidClasses = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        private final ClassLoader parent = this.getClass().getClassLoader();
-
-        public LaunchClassLoader(URL[] urls) {
-            super(urls, null);
-        }
-
-        @Override
-        public Class<?> findClass(final String name) throws ClassNotFoundException {
-            if (this.invalidClasses.contains(name)) {
-                throw new ClassNotFoundException(name);
-            }
-
-            // Skip the classes that are excluded
-            for (Exclusion exclusion : loaderExclusions) {
-                if (exclusion.isApplicableFor(name)) {
-                    return this.parent.loadClass(name);
-                }
-            }
-
-            // Use the cached class if possible, avoid transforming the
-            // classes multiple times
-            if (this.cachedClasses.containsKey(name)) {
-                return this.cachedClasses.get(name);
-            }
-
-            // Skip the classes that are excluded
-            for (Exclusion exclusion : transformerExclusions) {
-                if (exclusion.isApplicableFor(name)) {
-                    try {
-                        Class<?> clazz = super.findClass(name);
-                        this.cachedClasses.put(name, clazz);
-                        return clazz;
-                    } catch (ClassNotFoundException e) {
-                        this.invalidClasses.add(name);
-                        throw e;
-                    }
-                }
-            }
-
-            // Search for the class file
-            String fileName = name.replace('.', '/').concat(".class");
-            URL resource = this.findResource(fileName);
-
-            // The class file could not be found
-            if (resource == null) {
-                this.invalidClasses.add(name);
-                throw new ClassNotFoundException(name);
-            }
-
-            try {
-                // Get the package name
-                int lastDot = name.lastIndexOf('.');
-                String packageName = lastDot == -1 ? "" : name.substring(0, lastDot);
-
-                // Make sure that there is a package defined
-                Package pkg = this.getPackage(packageName);
-                if (pkg == null) {
-                    this.definePackage(packageName, null, null, null, null, null, null, null);
-                }
-
-                InputStream is = resource.openStream();
-                byte[] bytes = new byte[is.available()];
-                ByteStreams.readFully(is, bytes);
-                is.close();
-
-                for (ClassTransformer transformer : transformers) {
-                    try {
-                        bytes = transformer.transform(this, name, bytes);
-                    } catch (Exception e) {
-                        System.err.println("An error occurred while transforming " + name + ": " + e);
-                    }
-                }
-
-                // Define the new class and cache it
-                Class<?> clazz = this.defineClass(name, bytes, 0, bytes.length);
-                this.cachedClasses.put(name, clazz);
-                return clazz;
-            } catch (Throwable e) {
-                // An error occurred while reading the class
-                this.invalidClasses.add(name);
-                throw new ClassNotFoundException(name, e);
-            }
         }
     }
 }

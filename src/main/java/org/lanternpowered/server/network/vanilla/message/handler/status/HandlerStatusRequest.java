@@ -27,13 +27,13 @@ package org.lanternpowered.server.network.vanilla.message.handler.status;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
-import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
 import org.lanternpowered.server.status.LanternFavicon;
@@ -50,7 +50,6 @@ import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -75,8 +74,8 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
 
         LanternMinecraftVersion version = new LanternMinecraftVersion(String.valueOf(protocol), protocol, false);
         LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
-        // TODO: Replace the list with the actual profiles
-        LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(Lists.<GameProfile>newArrayList(), online, max);
+        LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(server.getOnlinePlayers()
+        		.stream().map(p -> p.getProfile()).collect(Collectors.toList()), online, max);
         LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
         ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.of(client), client, response);
@@ -90,25 +89,18 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         online = players.getOnline();
         max = players.getMax();
 
-        // The players should be hidden, this will replace the player count with
-        // ???
-        if (!response.getPlayers().isPresent()) {
-            online = -1;
-        }
-
         JsonObject rootObject = new JsonObject();
         JsonObject versionObject = new JsonObject();
-        JsonObject playersObject = new JsonObject();
 
         versionObject.addProperty("name", LanternGame.get().getPlatform().getImplementation().getName());
         versionObject.addProperty("protocol", ((LanternMinecraftVersion) version0).getProtocol());
 
-        playersObject.addProperty("max", max);
-        playersObject.addProperty("online", online);
+        if (response.getPlayers().isPresent()) {
+            JsonObject playersObject = new JsonObject();
+            playersObject.addProperty("max", max);
+            playersObject.addProperty("online", online);
 
-        if (online != -1) {
             List<GameProfile> profiles = players.getProfiles();
-
             if (!profiles.isEmpty()) {
                 JsonArray array = new JsonArray();
                 for (GameProfile profile : profiles) {
@@ -119,10 +111,10 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
                 }
                 playersObject.add("sample", array);
             }
+            rootObject.add("players", playersObject);
         }
 
         rootObject.add("version", versionObject);
-        rootObject.add("players", playersObject);
         rootObject.add("description", ((JsonTextRepresentation) Texts.json()).getGson().toJsonTree(motd));
 
         Optional<Favicon> icon = response.getFavicon();
@@ -140,7 +132,5 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         rootObject.add("modinfo", fmlObject);
 
         session.send(new MessageStatusOutResponse(gson.toJson(rootObject)));
-        // TODO: Is this good?
-        session.send(new MessageStatusInOutPing(System.currentTimeMillis()));
     }
 }

@@ -166,6 +166,7 @@ shadowJar {
 task sourceJar(type: Jar) {
     classifier = 'sources'
     from api.sourceSets.main.allSource
+    from sourceSets.java6.allSource
     from sourceSets.main.allSource
 }
 

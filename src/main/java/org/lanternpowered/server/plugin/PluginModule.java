@@ -24,12 +24,16 @@
  */
 package org.lanternpowered.server.plugin;
 
+import org.spongepowered.api.Platform;
+
+import org.spongepowered.api.plugin.PluginManager;
+import org.spongepowered.api.service.ServiceManager;
+
 import java.io.File;
 import java.nio.file.Path;
 
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
@@ -40,7 +44,6 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.SynchronousExecutor;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
-
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -70,6 +73,9 @@ public final class PluginModule extends AbstractModule {
         this.bind(Logger.class).toInstance(this.container.getLogger());
         this.bind(LanternGame.class).toInstance(this.game);
         this.bind(Game.class).toInstance(this.game);
+        this.bind(ServiceManager.class).toInstance(this.game.getServiceManager());
+        this.bind(PluginManager.class).toInstance(this.game.getPluginManager());
+        this.bind(Platform.class).toInstance(this.game.getPlatform());
 
         // Plugin-private config directory (shared dir is in the global guice module)
         this.bind(Path.class).annotatedWith(privateConfigDir).toProvider(PrivateConfigDirProvider.class);

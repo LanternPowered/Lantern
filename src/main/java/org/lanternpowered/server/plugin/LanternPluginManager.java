@@ -24,14 +24,13 @@
  */
 package org.lanternpowered.server.plugin;
 
+import org.lanternpowered.launch.LaunchClassLoader;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -58,7 +57,6 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
-
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -108,18 +106,8 @@ public final class LanternPluginManager implements PluginManager {
 
     private void registerPlugin(PluginContainer plugin) {
         this.plugins.put(plugin.getId(), plugin);
-        this.pluginInstances.put(plugin.getInstance(), plugin);
-    }
-
-    private void addLibrary(URL url) {
-        URLClassLoader sysLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-        try {
-            Method method = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
-            method.setAccessible(true);
-            method.invoke(sysLoader, url);
-        } catch (ReflectiveOperationException e) {
-            LanternGame.log().error("Failed to add to classpath: " + url, e);
-        }
+        // Plugin instances shouldn't be null
+        this.pluginInstances.put(plugin.getInstance().get(), plugin);
     }
 
     public void loadPlugins() throws IOException {
@@ -138,7 +126,7 @@ public final class LanternPluginManager implements PluginManager {
                 // jar doesn't contain a plugin, it may be used as
                 // a library
                 try {
-                    this.addLibrary(jar.toFile().toURI().toURL());
+                    ((LaunchClassLoader) this.getClass().getClassLoader()).addURL(jar.toFile().toURI().toURL());
                 } catch (MalformedURLException e) {
                     LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
                     continue;

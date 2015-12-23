@@ -24,6 +24,10 @@
  */
 package org.lanternpowered.server.world;
 
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -228,6 +232,14 @@ public final class LanternWorldPropertiesIO {
         boolean hardcore = dataView.getInt(HARDCORE).get() > 0;
         properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
         properties.initialized = dataView.getInt(INITIALIZED).get() > 0;
+        byte gameModeId = dataView.getInt(GAME_MODE).get().byteValue();
+        GameMode gameMode = GameModes.SURVIVAL;
+        for (GameMode gameMode0 : LanternGame.get().getRegistry().getAllOf(GameMode.class)) {
+            if (((LanternGameMode) gameMode0).getInternalId() == gameModeId) {
+                gameMode = gameMode0;
+                break;
+            }
+        }
         byte difficultyId = dataView.getInt(DIFFICULTY).get().byteValue();
         Difficulty difficulty = Difficulties.NORMAL;
         for (Difficulty difficulty0 : LanternGame.get().getRegistry().getAllOf(Difficulty.class)) {
@@ -408,7 +420,7 @@ public final class LanternWorldPropertiesIO {
         }
 
         return new LevelData(properties, dimensionId, dimensionMap, new OverriddenWorldProperties(
-                difficulty, hardcore, seed, enabled, keepSpawnLoaded, loadOnStartup, generatorModifiers));
+                difficulty, gameMode, hardcore, seed, enabled, keepSpawnLoaded, loadOnStartup, generatorModifiers));
     }
 
     static void write(Path folder, LevelData levelData) throws IOException {
@@ -452,7 +464,7 @@ public final class LanternWorldPropertiesIO {
         }
         dataView.set(DIFFICULTY, ((LanternDifficulty) properties.getDifficulty()).getInternalId());
         dataView.set(DIFFICULTY_LOCKED, (byte) (properties.difficultyLocked ? 1 : 0));
-        dataView.set(GAME_MODE, ((LanternGameMode) properties.gameMode).getInternalId());
+        dataView.set(GAME_MODE, ((LanternGameMode) properties.getGameMode()).getInternalId());
         dataView.set(MAP_FEATURES, (byte) (properties.mapFeatures ? 1 : 0));
         dataView.set(BORDER_CENTER_X, properties.borderCenterX);
         dataView.set(BORDER_CENTER_Z, properties.borderCenterZ);

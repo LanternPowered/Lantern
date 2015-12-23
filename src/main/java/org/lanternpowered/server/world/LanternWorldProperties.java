@@ -52,7 +52,6 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -100,9 +99,6 @@ public class LanternWorldProperties implements WorldProperties {
 
     // Whether the difficulty is locked
     boolean difficultyLocked;
-
-    // The game mode
-    GameMode gameMode = GameModes.NOT_SET;
 
     // The name of the world
     private String name;
@@ -180,8 +176,8 @@ public class LanternWorldProperties implements WorldProperties {
             this.generatorSettings = creationSettings.getGeneratorSettings();
             this.bonusChestEnabled = creationSettings.bonusChestEnabled();
             this.mapFeatures = creationSettings.usesMapFeatures();
-            this.gameMode = creationSettings.getGameMode();
             this.worldConfig.getGeneration().setSeed(creationSettings.getSeed());
+            this.setGameMode(creationSettings.getGameMode());
             this.setAllowsPlayerRespawns(creationSettings.allowPlayerRespawns());
             this.setDifficulty(this.creationSettings.getDifficulty());
             this.setKeepSpawnLoaded(this.creationSettings.doesKeepSpawnLoaded());
@@ -450,12 +446,12 @@ public class LanternWorldProperties implements WorldProperties {
 
     @Override
     public GameMode getGameMode() {
-        return this.gameMode;
+        return this.worldConfig.getGameMode();
     }
 
     @Override
     public void setGameMode(GameMode gameMode) {
-        this.gameMode = checkNotNull(gameMode, "gameMode");
+        this.worldConfig.setGameMode(gameMode);
     }
 
     @Override
@@ -737,6 +733,7 @@ public class LanternWorldProperties implements WorldProperties {
     public static class OverriddenWorldProperties {
 
         private final Difficulty difficulty;
+        private final GameMode gameMode;
         private final boolean hardcore;
         private final long seed;
         @Nullable private final Boolean enabled;
@@ -744,12 +741,14 @@ public class LanternWorldProperties implements WorldProperties {
         @Nullable private final Boolean loadOnStartup;
         @Nullable private final List<String> generatorModifiers;
 
-        public OverriddenWorldProperties(Difficulty difficulty, boolean hardcore, long seed, @Nullable Boolean enabled,
-                @Nullable Boolean keepSpawnLoaded, @Nullable Boolean loadOnStartup, @Nullable List<String> generatorModifiers) {
+        public OverriddenWorldProperties(Difficulty difficulty, GameMode gameMode, boolean hardcore, long seed,
+                @Nullable Boolean enabled, @Nullable Boolean keepSpawnLoaded, @Nullable Boolean loadOnStartup,
+                @Nullable List<String> generatorModifiers) {
             this.generatorModifiers = generatorModifiers;
             this.keepSpawnLoaded = keepSpawnLoaded;
             this.loadOnStartup = loadOnStartup;
             this.difficulty = difficulty;
+            this.gameMode = gameMode;
             this.hardcore = hardcore;
             this.enabled = enabled;
             this.seed = seed;

@@ -24,9 +24,9 @@
  */
 package org.lanternpowered.server;
 
-import org.lanternpowered.server.network.rcon.BaseRconService;
+import org.lanternpowered.server.network.query.QueryServer;
 
-import org.lanternpowered.server.network.status.QueryServer;
+import org.lanternpowered.server.network.rcon.BaseRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;

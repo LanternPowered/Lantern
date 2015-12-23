@@ -1,7 +1,7 @@
 /*
  * This file is part of LanternServer, licensed under the MIT License (MIT).
  *
- * Copyright (c) LanternPowered <https://github.com/LanternPowered/LanternServer>
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.status;
+package org.lanternpowered.server.network.query;
 
 import org.spongepowered.api.entity.living.player.Player;
 

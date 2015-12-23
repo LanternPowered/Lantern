@@ -24,11 +24,16 @@
  */
 package org.lanternpowered.server.config.world;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+
 import java.io.IOException;
 import java.nio.file.Path;
 
 import ninja.leaping.configurate.objectmapping.Setting;
-
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoading;
@@ -70,8 +75,21 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "difficulty", comment = "The difficulty this world.")
     private Difficulty difficulty = Difficulties.NORMAL;
 
-    @Setting(value = "generation")
+    @Setting(value = "generation", comment = "The generation settings of this world.")
     private WorldGeneration generation = new WorldGeneration();
+
+    @Setting(value = "game-mode", comment = "The game mode settings of this world.")
+    private WorldGameMode gameMode = new WorldGameMode();
+
+    @ConfigSerializable
+    private static class WorldGameMode {
+
+        @Setting(value = "mode", comment = "The default game mode of this world.")
+        private GameMode mode = GameModes.SURVIVAL;
+
+        @Setting(value = "force", comment = "Whether the default game mode should be forced for the players in this world")
+        private boolean force = false;
+    }
 
     private final GlobalConfig globalConfig;
 
@@ -86,6 +104,22 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
             return this.chunkLoading.getChunkLoadingTickets(plugin);
         }
         return this.globalConfig.getChunkLoadingTickets(plugin);
+    }
+
+    public GameMode getGameMode() {
+        return this.gameMode.mode;
+    }
+
+    public void setGameMode(GameMode gameMode) {
+        this.gameMode.mode = checkNotNull(gameMode, "gameMode");
+    }
+
+    public boolean isGameModeForced() {
+        return this.gameMode.force;
+    }
+
+    public void setGameModeForced(boolean forced) {
+        this.gameMode.force = forced;
     }
 
     public WorldGeneration getGeneration() {

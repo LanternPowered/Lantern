@@ -32,8 +32,8 @@ import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractParticleEffectBuilder<T extends ParticleEffect, B extends ParticleEffect.ParticleBuilder<T, B>>
-    implements ParticleEffect.ParticleBuilder<T, B> {
+public abstract class AbstractParticleEffectBuilder<T extends ParticleEffect, P extends ParticleType, B extends ParticleEffect.ParticleBuilder<T, P, B>>
+        implements ParticleEffect.ParticleBuilder<T, P, B> {
 
     protected LanternParticleType type;
 
@@ -47,7 +47,7 @@ public abstract class AbstractParticleEffectBuilder<T extends ParticleEffect, B 
     }
 
     @Override
-    public B type(ParticleType particleType) {
+    public B type(P particleType) {
         checkNotNull(particleType, "ParticleType");
         checkArgument(particleType instanceof LanternParticleType, "Must use a supported implementation of ParticleType!");
         this.type = (LanternParticleType) particleType;
@@ -77,7 +77,11 @@ public abstract class AbstractParticleEffectBuilder<T extends ParticleEffect, B 
 
     @Override
     public B from(T value) {
-        type(value.getType());
+        try {
+            this.type((P) value.getType());
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException("Invalid ParticleType!");
+        }
         this.motion = value.getMotion();
         this.offset = value.getOffset();
         this.count = value.getCount();

@@ -81,7 +81,7 @@ public class LanternTabList implements TabList {
                 } else if (entry.gameProfileOrName) {
                     entries0.add(new Entry.Add(info.uniqueId, info.name,
                             info.gameProfile.getProperties(), info.gameMode,
-                            info.displayName, info.connectionTime));
+                            info.displayName, info.latency));
                 } else {
                     if (entry.gameMode) {
                         entries0.add(new Entry.UpdateGameMode(info.uniqueId, info.gameMode));
@@ -89,8 +89,8 @@ public class LanternTabList implements TabList {
                     if (entry.displayName) {
                         entries0.add(new Entry.UpdateDisplayName(info.uniqueId, info.displayName));
                     }
-                    if (entry.connectionTime) {
-                        entries0.add(new Entry.UpdateLatency(info.uniqueId, info.connectionTime));
+                    if (entry.latency) {
+                        entries0.add(new Entry.UpdateLatency(info.uniqueId, info.latency));
                     }
                 }
                 entry.entryCache = entries0;

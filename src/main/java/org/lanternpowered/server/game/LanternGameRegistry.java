@@ -409,9 +409,9 @@ public class LanternGameRegistry implements GameRegistry {
         mappings.put("slime", new LanternParticleType(33, "slime", false));
         mappings.put("heart", new LanternParticleType(34, "heart", false));
         mappings.put("barrier", new LanternParticleType(35, "barrier", false));
-        mappings.put("item_crack", new LanternParticleType.Material(36, "iconcrack", true, new LanternItemStack(BlockTypes.STONE)));
-        mappings.put("block_crack", new LanternParticleType.Material(37, "blockcrack", true, new LanternItemStack(BlockTypes.STONE)));
-        mappings.put("block_dust", new LanternParticleType.Material(38, "blockdust", true, new LanternItemStack(BlockTypes.STONE)));
+        mappings.put("item_crack", new LanternParticleType.Item(36, "iconcrack", true, new LanternItemStack(BlockTypes.STONE)));
+        mappings.put("block_crack", new LanternParticleType.Block(37, "blockcrack", true, BlockTypes.STONE.getDefaultState()));
+        mappings.put("block_dust", new LanternParticleType.Block(38, "blockdust", true, BlockTypes.STONE.getDefaultState()));
         mappings.put("water_drop", new LanternParticleType(39, "droplet", false));
         mappings.put("item_take", new LanternParticleType(40, "take", false));
         mappings.put("mob_appearance", new LanternParticleType(41, "mobappearance", false));

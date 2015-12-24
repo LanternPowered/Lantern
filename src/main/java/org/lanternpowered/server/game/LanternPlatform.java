@@ -24,15 +24,15 @@
  */
 package org.lanternpowered.server.game;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.plugin.PluginContainer;
-
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.Maps;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Preconditions.checkArgument;
 
 public class LanternPlatform implements Platform {
 
@@ -42,16 +42,34 @@ public class LanternPlatform implements Platform {
             .getSpecificationVersion(), LanternGame.API_VERSION);
 
     public static final String IMPL_NAME = firstNonNull(LanternPlatform.class.getPackage()
-            .getSpecificationTitle(), LanternGame.IMPL_NAME);
+            .getImplementationTitle(), LanternGame.IMPL_NAME);
     public static final String IMPL_VERSION = firstNonNull(LanternPlatform.class.getPackage()
-            .getSpecificationVersion(), LanternGame.IMPL_VERSION);
+            .getImplementationVersion(), LanternGame.IMPL_VERSION);
 
     private final PluginContainer apiContainer;
     private final PluginContainer implContainer;
 
+    private final Map<String, Object> platformMap = new HashMap<String, Object>() {
+
+        private static final long serialVersionUID = -4950319352163911882L;
+
+        @Override
+        public Object put(String key, Object value) {
+            checkArgument(!this.containsKey(key), "Cannot set the value of the existing key %s", key);
+            return super.put(key, value);
+        }
+    };
+
     public LanternPlatform(PluginContainer apiContainer, PluginContainer implContainer) {
         this.implContainer = implContainer;
         this.apiContainer = apiContainer;
+
+        this.platformMap.put("Type", this.getType());
+        this.platformMap.put("ApiName", apiContainer.getName());
+        this.platformMap.put("ApiVersion", apiContainer.getVersion());
+        this.platformMap.put("ImplementationName", implContainer.getName());
+        this.platformMap.put("ImplementationVersion", implContainer.getVersion());
+        this.platformMap.put("MinecraftVersion", this.getMinecraftVersion());
     }
 
     @Override
@@ -76,13 +94,7 @@ public class LanternPlatform implements Platform {
 
     @Override
     public Map<String, Object> asMap() {
-        final Map<String, Object> map = Maps.newHashMap();
-        map.put("Name", this.implContainer.getName());
-        map.put("Type", this.getType());
-        map.put("ApiVersion", this.apiContainer.getVersion());
-        map.put("ImplementationVersion", this.implContainer.getVersion());
-        map.put("MinecraftVersion", this.getMinecraftVersion());
-        return map;
+        return this.platformMap;
     }
 
     @Override

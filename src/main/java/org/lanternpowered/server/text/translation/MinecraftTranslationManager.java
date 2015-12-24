@@ -49,11 +49,8 @@ public final class MinecraftTranslationManager implements TranslationManager {
 
     @Override
     public Translation get(String key) {
-        return this.getIfPresent(key).orElseGet(() -> this.translations.computeIfAbsent(key, key0 -> {
-            final FixedTranslation translation = new FixedTranslation(key);
-            this.translations.put(key, translation);
-            return translation;
-        }));
+        return this.getIfPresent(key).orElseGet(() -> this.translations.computeIfAbsent(key,
+                key0 -> new FixedTranslation(key)));
     }
 
     @Override

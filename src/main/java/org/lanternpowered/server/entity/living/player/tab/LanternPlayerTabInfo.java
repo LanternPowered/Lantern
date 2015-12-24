@@ -54,7 +54,7 @@ public final class LanternPlayerTabInfo implements PlayerTabInfo {
         boolean gameProfileOrName;
         boolean gameMode;
         boolean displayName;
-        boolean connectionTime;
+        boolean latency;
         boolean remove;
 
         List<Entry> entryCache;
@@ -74,7 +74,7 @@ public final class LanternPlayerTabInfo implements PlayerTabInfo {
     GameMode gameMode;
     String name;
 
-    int connectionTime;
+    int latency;
 
     public LanternPlayerTabInfo(UUID uniqueId) {
         this.uniqueId = uniqueId;
@@ -91,14 +91,14 @@ public final class LanternPlayerTabInfo implements PlayerTabInfo {
     }
 
     @Override
-    public int getConnectionTime() {
-        return this.connectionTime;
+    public int getLatency() {
+        return this.latency;
     }
 
     @Override
-    public void setConnectionTime(int milliseconds) {
-        this.connectionTime = milliseconds;
-        this.updateEntry().gameProfileOrName = true;
+    public void setLatency(int latency) {
+        this.latency = latency;
+        this.updateEntry().latency = true;
     }
 
     @Override

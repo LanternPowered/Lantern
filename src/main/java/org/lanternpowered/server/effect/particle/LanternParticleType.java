@@ -24,8 +24,10 @@
  */
 package org.lanternpowered.server.effect.particle;
 
+import org.spongepowered.api.block.BlockState;
+
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.data.type.LanternNotePitch;
+
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -51,11 +53,11 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         return this.internalId;
     }
 
-    public static class Material extends LanternParticleType implements ParticleType.Material {
+    public static class Item extends LanternParticleType implements ParticleType.Item {
 
         private final ItemStack defaultItem;
 
-        public Material(int internalId, String name, boolean hasMotion, ItemStack defaultItem) {
+        public Item(int internalId, String name, boolean hasMotion, ItemStack defaultItem) {
             super(internalId, name, hasMotion);
             this.defaultItem = defaultItem;
         }
@@ -63,6 +65,21 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         @Override
         public ItemStack getDefaultItem() {
             return this.defaultItem.copy();
+        }
+    }
+
+    public static class Block extends LanternParticleType implements ParticleType.Block {
+
+        private final BlockState defaultBlockState;
+
+        public Block(int internalId, String name, boolean hasMotion, BlockState defaultBlockState) {
+            super(internalId, name, hasMotion);
+            this.defaultBlockState = defaultBlockState;
+        }
+
+        @Override
+        public BlockState getDefaultBlockState() {
+            return this.defaultBlockState;
         }
     }
 
@@ -106,8 +123,8 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         }
 
         @Override
-        public float getDefaultNote() {
-            return ((LanternNotePitch) this.defaultNote).getInternalId();
+        public NotePitch getDefaultNote() {
+            return this.defaultNote;
         }
 
         public NotePitch getDefaultNotePitch() {

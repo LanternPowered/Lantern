@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.launch;
 
+import javax.annotation.Nullable;
+
 public interface Exclusion {
 
     /**
@@ -62,7 +64,7 @@ public interface Exclusion {
     public final class Class implements Exclusion {
 
         private final String name;
-        private final String excludeInnerPref;
+        @Nullable private final String excludeInnerPref;
 
         /**
          * Creates a new class exclusion.

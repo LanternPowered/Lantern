@@ -24,10 +24,10 @@
  */
 package org.lanternpowered.server.command;
 
-import java.util.Iterator;
-
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
+
+import java.util.Iterator;
 
 public interface AbstractCommandSource extends CommandSource {
 

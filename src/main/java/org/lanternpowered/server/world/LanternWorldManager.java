@@ -402,10 +402,6 @@ public final class LanternWorldManager {
         return Optional.of(worldProperties0);
     }
 
-    private static class Ref {
-        public boolean flag;
-    }
-
     /**
      * Deletes the provided world's files asynchronously from the disk.
      *
@@ -419,7 +415,7 @@ public final class LanternWorldManager {
             if (entry.world != null) {
                 return false;
             }
-            final Ref ref = new Ref();
+            final boolean[] flag = { true };
             Files.walkFileTree(entry.folder, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
@@ -428,7 +424,7 @@ public final class LanternWorldManager {
                     } catch (IOException e) {
                         LanternGame.log().error("Unable to delete the file {} of world {}",
                                 path.toFile().getAbsolutePath(), worldProperties.getWorldName(), e);
-                        ref.flag = true;
+                        flag[0] = false;
                     }
                     return FileVisitResult.CONTINUE;
                 }
@@ -439,7 +435,7 @@ public final class LanternWorldManager {
             this.worldByUUID.remove(worldProperties.getUniqueId());
             this.dimensionMap.clear(entry.dimensionId);
             Files.delete(entry.folder);
-            return ref.flag;
+            return flag[0];
         });
     }
 

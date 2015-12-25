@@ -24,35 +24,40 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.spongepowered.api.command.args.GenericArguments.optional;
-
+import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.command.element.RemainingTextElement;
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.command.CommandResult;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.spec.CommandSpec;
 
-public final class CommandStop implements Command {
+/**
+ * The shutdown command of the server. This has the same behavior as the
+ * original minecraft stop command but also allows a kick message to be provided
+ * that will be displayed to all the active players.
+ */
+public final class CommandStop {
 
-    private final LanternGame game;
-
-    public CommandStop(LanternGame game) {
-        this.game = game;
-    }
-
-    @Override
-    public CommandSpec build() {
+    public static CommandSpec create() {
         return CommandSpec.builder()
-                .arguments(optional(ArgumentRemainingText.of(Texts.of("kickMessage"))))
+                .arguments(
+                        GenericArguments.optional(RemainingTextElement.of(Texts.of("kick-message"))))
                 .permission("minecraft.command.stop")
-                .description(Texts.of(this.game.getRegistry().getTranslationManager().get("commands.stop.description")))
+                .description(Texts.of(LanternGame.get().getRegistry().getTranslationManager().get(
+                        "commands.stop.description")))
                 .executor((src, args) -> {
-                    if (args.hasAny("kickMessage")) {
-                        game.getServer().shutdown(args.<Text>getOne("kickMessage").get());
+                    final LanternServer server = LanternGame.get().getServer();
+                    if (args.hasAny("kick-message")) {
+                        server.shutdown(args.<Text>getOne("kick-message").get());
                     } else {
-                        game.getServer().shutdown();
+                        server.shutdown();
                     }
                     return CommandResult.success();
                 }).build();
+    }
+
+    private CommandStop() {
     }
 }

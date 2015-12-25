@@ -32,6 +32,8 @@ import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.command.CommandSeed;
+import org.lanternpowered.server.command.CommandBan;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
@@ -332,10 +334,11 @@ public class LanternGame implements Game {
         // Register the command service
         SimpleCommandManager commandService = new SimpleCommandManager(log(), new LanternCommandDisambiguator(this));
         if (this.registerService(CommandManager.class, commandService)) {
-            commandService.register(this.minecraft, new CommandStop(this).build(), "stop", "shutdown");
+            commandService.register(this.minecraft, CommandBan.create(false), "ban-ip");
+            commandService.register(this.minecraft, CommandSeed.create(), "seed");
+            commandService.register(this.minecraft, CommandStop.create(), "stop", "shutdown");
             commandService.register(this.minecraft, new CommandHelp(this).build(), "help", "?");
-            // TODO: Use a different plugin for this command?
-            commandService.register(this.minecraft, new CommandVersion(this).build(), "version");
+            commandService.register(this.implContainer, new CommandVersion(this).build(), "version");
         }
         commandService.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
                 LanternCallbackHolder.CALLBACK_COMMAND);

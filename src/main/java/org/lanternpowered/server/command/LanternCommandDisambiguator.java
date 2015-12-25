@@ -29,14 +29,13 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
-
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.dispatcher.Disambiguator;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.Optional;

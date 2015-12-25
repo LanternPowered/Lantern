@@ -28,10 +28,10 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.translation.Translation;
 
 public final class CommandVersion implements Command {
 

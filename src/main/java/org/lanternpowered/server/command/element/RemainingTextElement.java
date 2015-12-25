@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command;
+package org.lanternpowered.server.command.element;
 
 import java.util.List;
 
@@ -41,9 +41,9 @@ import com.google.common.collect.Lists;
  * turn into a message. An example can be the kick command that
  * can kick a player with a specific reason.
  */
-public final class ArgumentRemainingText extends CommandElement {
+public final class RemainingTextElement extends CommandElement {
 
-    private ArgumentRemainingText(Text key) {
+    private RemainingTextElement(Text key) {
         super(key);
     }
 
@@ -62,7 +62,7 @@ public final class ArgumentRemainingText extends CommandElement {
         return Lists.newArrayList();
     }
 
-    public static final ArgumentRemainingText of(Text key) {
-        return new ArgumentRemainingText(key);
+    public static final RemainingTextElement of(Text key) {
+        return new RemainingTextElement(key);
     }
 }

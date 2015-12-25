@@ -334,9 +334,6 @@ public class LanternGameRegistry implements GameRegistry {
 
     public void registerGameObjects() {
         this.registerWeathers();
-        this.registerNotePitches();
-        // The particle types, requires NotePitches
-        this.registerParticleTypes();
         this.registerMessageSinkFactory();
         this.registerSoundTypes();
         this.registerShrubTypes();
@@ -354,6 +351,9 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerAttributes();
         this.registerSelectors();
         this.registerBlockTypes();
+        this.registerNotePitches();
+        // The particle types, requires NotePitches and BlockTypes
+        this.registerParticleTypes();
     }
 
     private void registerBanTypes() {

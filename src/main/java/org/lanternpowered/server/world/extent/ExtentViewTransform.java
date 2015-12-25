@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.world.extent;
 
+import org.spongepowered.api.item.inventory.ItemStack;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
@@ -60,7 +62,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
-
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -175,6 +176,42 @@ public class ExtentViewTransform implements AbstractExtent {
     @Override
     public Vector2i getBiomeSize() {
         return this.biomeSize;
+    }
+
+    @Override
+    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
+        return this.extent.hitBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), side, cause);
+    }
+
+    @Override
+    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
+        return this.extent.interactBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), side, cause);
+    }
+
+    @Override
+    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
+        return this.extent.interactBlockWith(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), itemStack, side, cause);
+    }
+
+    @Override
+    public boolean digBlock(int x, int y, int z, Cause cause) {
+        return this.extent.digBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), cause);
+    }
+
+    @Override
+    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        return this.extent.digBlockWith(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), itemStack, cause);
+    }
+
+    @Override
+    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        return this.extent.getBlockDigTimeWith(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), itemStack, cause);
     }
 
     @Override

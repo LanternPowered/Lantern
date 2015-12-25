@@ -819,7 +819,7 @@ public final class LanternChunkManager {
      * Pulses the chunk manager.
      */
     public void pulse() {
-        final PluginContainer minecraft = this.game.getPlugin();
+        final PluginContainer minecraft = this.game.getMinecraftPlugin();
         final Cause unloadCause = Cause.of(minecraft);
         for (Entry<Vector2i, LanternChunk> en : this.loadedChunks.entrySet()) {
             // The chunk is no longer locked, try to unload

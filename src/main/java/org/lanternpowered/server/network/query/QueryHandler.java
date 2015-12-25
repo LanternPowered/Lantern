@@ -149,7 +149,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         List<PluginContainer> containers = Lists.newArrayList(game.getPluginManager().getPlugins());
         containers.remove(platform.getApi());
         containers.remove(platform.getImplementation());
-        containers.remove(game.getPlugin());
+        containers.remove(game.getMinecraftPlugin());
 
         if (this.showPlugins) {
             char delim = ':';
@@ -163,7 +163,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         data.put("hostname", Texts.toPlain(game.getServer().getMotd()));
         data.put("gametype", "SMP");
         data.put("game_id", "MINECRAFT");
-        data.put("version", game.getPlugin().getVersion());
+        data.put("version", game.getMinecraftPlugin().getVersion());
         data.put("plugins", plugins);
         data.put("map", this.getWorldName());
         data.put("numplayers", game.getServer().getOnlinePlayers().size());

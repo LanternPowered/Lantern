@@ -82,7 +82,7 @@ public class QueryServer {
         if (this.flushTask == null) {
             this.flushTask = this.game.getScheduler().createTaskBuilder().async()
                     .delay(30, TimeUnit.SECONDS).interval(30, TimeUnit.SECONDS)
-                    .execute(this::flushChallengeTokens).submit(this.game.getPlugin());
+                    .execute(this::flushChallengeTokens).submit(this.game.getMinecraftPlugin());
         }
         return this.bootstrap.bind(address);
     }

@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.world.chunk;
 
+import org.spongepowered.api.item.inventory.ItemStack;
+
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Optional;
@@ -79,14 +81,11 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
-
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_MASK;
@@ -1077,6 +1076,42 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public double getRegionalDifficultyPercentage() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean digBlock(int x, int y, int z, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
         // TODO Auto-generated method stub
         return 0;
     }

@@ -681,8 +681,7 @@ public final class LanternWorldManager {
     // The current tick that is executing
     private volatile int currentTick = -1;
 
-    // Task used to finish the current tick
-    private final Runnable tickEndTask = () -> {
+    private void tickEnd() {
         // Mark ourselves as arrived so world threads automatically trigger advance once done
         int endPhase = this.tickEnd.arriveAndAwaitAdvance();
         int nextTick = this.currentTick + 1;
@@ -690,7 +689,7 @@ public final class LanternWorldManager {
             LanternGame.log().warn("Tick end barrier {} has advanced differently from tick begin barrier: {}",
                     endPhase, nextTick);
         }
-    };
+    }
 
     /**
      * Pulses the world for the next tick.
@@ -701,7 +700,7 @@ public final class LanternWorldManager {
             this.currentTick = this.tickBegin.arrive();
 
             try {
-                this.executor.submit(this.tickEndTask);
+                this.executor.submit(this::tickEnd);
             } catch (RejectedExecutionException ex) {
                 this.shutdown();
                 return;

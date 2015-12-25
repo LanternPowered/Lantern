@@ -68,9 +68,7 @@ public class ConsoleCommandCompleter implements Completer {
                 candidates.addAll(completions);
             } else {
                 for (String completion : completions) {
-                    if (!completion.isEmpty()) {
-                        candidates.add(completion.charAt(0) == '/' ? completion.substring(1) : completion);
-                    }
+                    candidates.add(completion.charAt(0) == '/' ? completion.substring(1) : completion);
                 }
             }
 
@@ -78,7 +76,7 @@ public class ConsoleCommandCompleter implements Completer {
             if (pos == -1) {
                 return cursor - len;
             } else {
-                return cursor - (len - pos);
+                return cursor - len + pos;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

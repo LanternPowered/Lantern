@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.world.extent;
 
+import org.spongepowered.api.item.inventory.ItemStack;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
@@ -35,7 +37,6 @@ import java.util.function.Predicate;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -120,6 +121,42 @@ public class ExtentViewDownsize implements AbstractExtent {
         if (!VecHelper.inBounds(x, z, this.biomeMin, this.biomeMax)) {
             throw new PositionOutOfBoundsException(new Vector2i(x, z), this.biomeMin, this.biomeMax);
         }
+    }
+
+    @Override
+    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.hitBlock(x, y, z, side, cause);
+    }
+
+    @Override
+    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.interactBlock(x, y, z, side, cause);
+    }
+
+    @Override
+    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.interactBlockWith(x, y, z, itemStack, side, cause);
+    }
+
+    @Override
+    public boolean digBlock(int x, int y, int z, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.digBlock(x, y, z, cause);
+    }
+
+    @Override
+    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.digBlockWith(x, y, z, itemStack, cause);
+    }
+
+    @Override
+    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.getBlockDigTimeWith(x, y, z, itemStack, cause);
     }
 
     @Override

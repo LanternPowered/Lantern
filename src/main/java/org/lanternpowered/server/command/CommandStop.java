@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.command;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.element.RemainingTextElement;
 import org.lanternpowered.server.game.LanternGame;
@@ -45,8 +47,7 @@ public final class CommandStop {
                 .arguments(
                         GenericArguments.optional(RemainingTextElement.of(Texts.of("kick-message"))))
                 .permission("minecraft.command.stop")
-                .description(Texts.of(LanternGame.get().getRegistry().getTranslationManager().get(
-                        "commands.stop.description")))
+                .description(t("commands.stop.description"))
                 .executor((src, args) -> {
                     final LanternServer server = LanternGame.get().getServer();
                     if (args.hasAny("kick-message")) {

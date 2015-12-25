@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.world;
 
+import org.spongepowered.api.item.inventory.ItemStack;
+
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
@@ -94,7 +96,6 @@ import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.PlayerSimulator;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
@@ -107,14 +108,12 @@ import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
-
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
@@ -134,9 +133,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     // The loading ticket to keep the spawn chunks loaded
     private volatile ChunkLoadingTicket spawnLoadingTicket;
-
-    // The shared player simulator, without an actual player attached to it
-    private final LanternPlayerSimulator sharedPlayerSimulator = new LanternPlayerSimulator(this, null);
 
     // The game instance
     final LanternGame game;
@@ -226,7 +222,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
             if (this.spawnLoadingTicket == null) {
                 this.spawnLoadingTicket = (ChunkLoadingTicket) this.chunkManager.createTicket(
-                        this.game.getPlugin()).get();
+                        this.game.getMinecraftPlugin()).get();
             } else {
                 this.spawnLoadingTicket.unforceChunks();
             }
@@ -238,7 +234,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
-                    this.chunkManager.getOrCreateChunk(x, z, Cause.of(this.game.getPlugin()), true);
+                    this.chunkManager.getOrCreateChunk(x, z, Cause.of(this.game.getMinecraftPlugin()), true);
                     this.spawnLoadingTicket.forceChunk(new Vector3i(x, 0, z));
                 }
             }
@@ -902,11 +898,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public PlayerSimulator getPlayerSimulator() {
-        return this.sharedPlayerSimulator;
-    }
-
-    @Override
     public ChunkPreGenerate newChunkPreGenerate(Vector3d center, double diameter) {
         return new LanternChunkPreGenerate(this, checkNotNull(center, "center"), diameter);
     }
@@ -936,5 +927,41 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         }
         Message message0 = message.get();
         players.forEach(player -> player.getConnection().send(message0));
+    }
+
+    @Override
+    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean digBlock(int x, int y, int z, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        // TODO Auto-generated method stub
+        return 0;
     }
 }

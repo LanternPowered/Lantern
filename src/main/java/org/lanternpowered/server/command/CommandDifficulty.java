@@ -24,42 +24,57 @@
  */
 package org.lanternpowered.server.command;
 
-import org.lanternpowered.server.command.element.WorldPropertiesChoicesElement;
-
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-import org.lanternpowered.server.game.LanternGame;
+
+import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.server.command.element.ChoicesElement;
+import org.lanternpowered.server.command.element.WorldPropertiesChoicesElement;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-public final class CommandSeed {
+public final class CommandDifficulty {
 
     public static CommandSpec create() {
+        final ImmutableMap.Builder<String, Object> baseBuilder = ImmutableMap.builder();
+        final ImmutableMap.Builder<String, Object> aliasesBuilder = ImmutableMap.builder();
+
+        for (Difficulty difficulty : Sponge.getRegistry().getAllOf(Difficulty.class)) {
+            baseBuilder.put(difficulty.getName(), difficulty);
+            aliasesBuilder.put(difficulty.getName().substring(0, 1), difficulty);
+            aliasesBuilder.put(((LanternDifficulty) difficulty).getInternalId() + "", difficulty);
+        }
+
         return CommandSpec.builder()
                 .arguments(
+                        ChoicesElement.of(Texts.of("difficulty"), baseBuilder.build(),
+                                aliasesBuilder.build(), false, true),
                         GenericArguments.optional(WorldPropertiesChoicesElement.of(Texts.of("world"))))
-                .permission("minecraft.command.seed")
+                .permission("minecraft.command.difficulty")
                 .executor(new CommandExecutor() {
-
                     @Override
                     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
                         WorldProperties world;
                         if (args.hasAny("world")) {
                             world = args.<WorldProperties>getOne("world").get();
+                        } else if (src instanceof LocatedSource) {
+                            world = ((LocatedSource) src).getWorld().getProperties();
                         } else {
-                            world = LanternGame.get().getServer().getDefaultWorld().orElse(null);
-                            if (world == null) {
-                                // Shouldn't happen
-                                throw new CommandException(t("Unable to find the default world."));
-                            }
+                            throw new CommandException(Texts.of("Non-located sources must specify a world."));
                         }
-                        src.sendMessage(t("commands.seed.success", world.getSeed()));
+                        Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
+                        world.setDifficulty(difficulty);
+                        src.sendMessage(t("commands.difficulty.success", difficulty.getName()));
                         return CommandResult.success();
                     }
                 })

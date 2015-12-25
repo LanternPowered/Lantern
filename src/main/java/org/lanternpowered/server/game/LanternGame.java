@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.game;
 
+import org.lanternpowered.server.command.CommandDifficulty;
+
 import org.spongepowered.api.service.rcon.RconService;
 
 import java.io.File;
@@ -337,8 +339,9 @@ public class LanternGame implements Game {
             commandService.register(this.minecraft, CommandBan.create(false), "ban-ip");
             commandService.register(this.minecraft, CommandSeed.create(), "seed");
             commandService.register(this.minecraft, CommandStop.create(), "stop", "shutdown");
+            commandService.register(this.minecraft, CommandDifficulty.create(), "difficulty");
             commandService.register(this.minecraft, new CommandHelp(this).build(), "help", "?");
-            commandService.register(this.implContainer, new CommandVersion(this).build(), "version");
+            commandService.register(this.implContainer, CommandVersion.create(), "version");
         }
         commandService.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
                 LanternCallbackHolder.CALLBACK_COMMAND);
@@ -419,7 +422,7 @@ public class LanternGame implements Game {
      * 
      * @return the plugin container
      */
-    public PluginContainer getPlugin() {
+    public PluginContainer getMinecraftPlugin() {
         return this.minecraft;
     }
 

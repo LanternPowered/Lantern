@@ -107,8 +107,8 @@ public final class CommandHelp implements Command {
                 }).build();
     }
 
+    @SuppressWarnings("unchecked")
     private Text getDescription(CommandSource source, CommandMapping mapping) {
-        @SuppressWarnings("unchecked")
         final Optional<Text> description = (Optional<Text>) mapping.getCallable().getShortDescription(source);
         TextBuilder text = Texts.builder("/" + mapping.getPrimaryAlias());
         text.color(TextColors.GREEN);

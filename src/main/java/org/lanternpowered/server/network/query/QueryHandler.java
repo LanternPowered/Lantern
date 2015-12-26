@@ -24,8 +24,11 @@
  */
 package org.lanternpowered.server.network.query;
 
+import com.google.common.collect.Maps;
+import org.spongepowered.api.event.server.query.QueryServerEvent;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.entity.living.player.Player;
-
 import org.spongepowered.api.plugin.PluginContainer;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.Platform;
@@ -38,6 +41,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 
+import java.net.InetSocketAddress;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -45,6 +49,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 /**
  * Class for handling UDP packets according to the minecraft server query protocol.
@@ -121,16 +126,25 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     private void handleBasicStats(ChannelHandlerContext ctx, DatagramPacket packet, int sessionId) {
         LanternServer server = this.queryServer.getGame().getServer();
 
+        // TODO: Find out how to support the size and max size properties
+        final QueryServerEvent.Basic event = SpongeEventFactory.createQueryServerEventBasic(
+                Cause.of(ctx.channel().remoteAddress()), (InetSocketAddress) ctx.channel().localAddress(),
+                "SMP", this.getWorldName(), Texts.toPlain(server.getMotd()), server.getMaxPlayers(),
+                Integer.MAX_VALUE, server.getOnlinePlayers().size(), 0);
+        LanternGame.get().getEventManager().post(event);
+
+        final InetSocketAddress address = event.getAddress();
+
         ByteBuf buf = ctx.alloc().buffer();
         buf.writeByte(ACTION_STATS);
         buf.writeInt(sessionId);
-        writeString(buf, Texts.toPlain(server.getMotd()));
-        writeString(buf, "SMP");
-        writeString(buf, this.getWorldName());
-        writeString(buf, String.valueOf(server.getOnlinePlayers().size()));
-        writeString(buf, String.valueOf(server.getMaxPlayers()));
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeShort(this.getPort());
-        writeString(buf, this.getIp());
+        writeString(buf, event.getMotd());
+        writeString(buf, event.getGameType());
+        writeString(buf, event.getMap());
+        writeString(buf, String.valueOf(event.getPlayerCount()));
+        writeString(buf, String.valueOf(event.getMaxPlayerCount()));
+        buf.order(ByteOrder.LITTLE_ENDIAN).writeShort(address.getPort());
+        writeString(buf, address.getHostString());
         ctx.write(new DatagramPacket(buf, packet.sender()));
     }
 
@@ -138,7 +152,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         LanternGame game = this.queryServer.getGame();
         Platform platform = game.getPlatform();
 
-        StringBuilder plugins = new StringBuilder()
+        final StringBuilder plugins = new StringBuilder()
                 .append(platform.getImplementation().getName())
                 .append(" ")
                 .append(platform.getImplementation().getVersion())
@@ -146,12 +160,13 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
                 .append(platform.getApi().getName())
                 .append(" ")
                 .append(platform.getApi().getVersion());
-        List<PluginContainer> containers = Lists.newArrayList(game.getPluginManager().getPlugins());
-        containers.remove(platform.getApi());
-        containers.remove(platform.getImplementation());
-        containers.remove(game.getMinecraftPlugin());
 
         if (this.showPlugins) {
+            final List<PluginContainer> containers = Lists.newArrayList(game.getPluginManager().getPlugins());
+            containers.remove(platform.getApi());
+            containers.remove(platform.getImplementation());
+            containers.remove(game.getMinecraftPlugin());
+
             char delim = ':';
             for (PluginContainer plugin : containers) {
                 plugins.append(delim).append(' ').append(plugin.getName());
@@ -159,17 +174,29 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
             }
         }
 
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("hostname", Texts.toPlain(game.getServer().getMotd()));
-        data.put("gametype", "SMP");
-        data.put("game_id", "MINECRAFT");
-        data.put("version", game.getMinecraftPlugin().getVersion());
-        data.put("plugins", plugins);
-        data.put("map", this.getWorldName());
-        data.put("numplayers", game.getServer().getOnlinePlayers().size());
-        data.put("maxplayers", game.getServer().getMaxPlayers());
-        data.put("hostport", this.getPort());
-        data.put("hostip", this.getIp());
+        final QueryServerEvent.Full event = SpongeEventFactory.createQueryServerEventFull(
+                Cause.of(ctx.channel().remoteAddress()), (InetSocketAddress) ctx.channel().localAddress(), Maps.newHashMap(), "MINECRAFT",
+                "SMP", this.getWorldName(), Texts.toPlain(game.getServer().getMotd()), game.getServer().getOnlinePlayers()
+                .stream().map(p -> p.getName()).collect(Collectors.toList()), plugins.toString(), game.getMinecraftPlugin().getVersion(),
+                game.getServer().getMaxPlayers(), Integer.MAX_VALUE, game.getServer().getOnlinePlayers().size(), 0);
+        final InetSocketAddress address = event.getAddress();
+
+        final Map<String, Object> data = new LinkedHashMap<>();
+        data.put("hostname", event.getMotd());
+        data.put("gametype", event.getGameType());
+        data.put("game_id", event.getGameId());
+        data.put("version", event.getVersion());
+        data.put("plugins", event.getPlugins());
+        data.put("map", event.getMap());
+        data.put("numplayers", event.getPlayerCount());
+        data.put("maxplayers", event.getMaxPlayerCount());
+        data.put("hostport", address.getPort());
+        data.put("hostip", address.getHostString());
+        for (Entry<String, String> entry : event.getCustomValuesMap().entrySet()) {
+            if (!data.containsKey(entry.getKey())) {
+                data.put(entry.getKey(), entry.getValue());
+            }
+        }
 
         ByteBuf buf = ctx.alloc().buffer();
         buf.writeByte(ACTION_STATS);
@@ -196,15 +223,6 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
             return worlds.iterator().next().getName();
         }
         return "none";
-    }
-
-    private int getPort() {
-        return this.queryServer.getGame().getGlobalConfig().getServerPort();
-    }
-
-    private String getIp() {
-        final String ip = this.queryServer.getGame().getGlobalConfig().getServerIp();
-        return ip.isEmpty() ? "127.0.0.1" : ip;
     }
 
     private static void writeString(ByteBuf out, String str) {

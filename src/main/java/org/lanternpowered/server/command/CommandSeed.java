@@ -46,7 +46,6 @@ public final class CommandSeed {
                         GenericArguments.optional(WorldPropertiesChoicesElement.of(Texts.of("world"))))
                 .permission("minecraft.command.seed")
                 .executor(new CommandExecutor() {
-
                     @Override
                     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
                         WorldProperties world;

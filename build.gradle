@@ -53,6 +53,9 @@ tasks.getByPath(':SpongeAPI:javadoc').enabled = false
 tasks.getByPath(':SpongeAPI:javadocJar').enabled = false
 tasks.getByPath(':SpongeAPI:checkstyleMain').enabled = false
 tasks.getByPath(':SpongeAPI:checkstyleTest').enabled = false
+// Disable this task to avoid that we turn the dependency
+// dirty when we call this on our project
+tasks.getByPath(':SpongeAPI:wrapper').enabled = false
 
 evaluationDependsOn api.path
 

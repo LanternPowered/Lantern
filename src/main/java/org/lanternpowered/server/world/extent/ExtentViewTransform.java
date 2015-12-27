@@ -191,6 +191,12 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
+    public boolean placeBlock(int x, int y, int z, BlockState block, Cause cause) {
+        return this.extent.placeBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), block, cause);
+    }
+
+    @Override
     public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
         return this.extent.interactBlockWith(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
                 this.inverseTransform.transformZ(x, y, z), itemStack, side, cause);

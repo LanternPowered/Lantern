@@ -942,6 +942,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public boolean placeBlock(int x, int y, int z, BlockState block, Cause cause) {
+        return false;
+    }
+
+    @Override
     public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
         // TODO Auto-generated method stub
         return false;

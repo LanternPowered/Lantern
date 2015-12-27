@@ -1115,4 +1115,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
         // TODO Auto-generated method stub
         return 0;
     }
+
+    @Override
+    public boolean placeBlock(int x, int y, int z, BlockState block, Cause cause) {
+        return false;
+    }
 }

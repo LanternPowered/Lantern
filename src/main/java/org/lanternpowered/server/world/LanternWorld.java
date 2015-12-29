@@ -743,12 +743,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Location<World> getLocation(int x, int y, int z) {
-        return new Location<World>(this, x, y, z);
+        return new Location<>(this, x, y, z);
     }
 
     @Override
     public Location<World> getLocation(double x, double y, double z) {
-        return new Location<World>(this, x, y, z);
+        return new Location<>(this, x, y, z);
     }
 
     @Override
@@ -847,18 +847,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public Scoreboard getScoreboard() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setScoreboard(Scoreboard scoreboard) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
     public WorldCreationSettings getCreationSettings() {
         // TODO Auto-generated method stub
         return null;
@@ -942,7 +930,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Cause cause) {
+    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, Cause cause) {
         return false;
     }
 

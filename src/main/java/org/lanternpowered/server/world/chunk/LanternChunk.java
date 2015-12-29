@@ -1117,7 +1117,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Cause cause) {
+    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, Cause cause) {
         return false;
     }
 }

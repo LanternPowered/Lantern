@@ -71,6 +71,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
+import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
@@ -474,6 +475,11 @@ public class LanternServer implements Server {
     @Override
     public boolean saveWorldProperties(WorldProperties properties) {
         return this.worldManager.saveWorldProperties(properties);
+    }
+
+    @Override
+    public Optional<Scoreboard> getServerScoreboard() {
+        return Optional.empty();
     }
 
     @Override

@@ -62,17 +62,7 @@ import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.config.user.ban.LanternBanType;
-import org.lanternpowered.server.data.type.LanternDirtType;
-import org.lanternpowered.server.data.type.LanternDirtTypes;
-import org.lanternpowered.server.data.type.LanternDoublePlantType;
-import org.lanternpowered.server.data.type.LanternDoublePlantTypes;
-import org.lanternpowered.server.data.type.LanternNotePitch;
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.lanternpowered.server.data.type.LanternPlantTypes;
-import org.lanternpowered.server.data.type.LanternShrubType;
-import org.lanternpowered.server.data.type.LanternShrubTypes;
-import org.lanternpowered.server.data.type.LanternStoneType;
-import org.lanternpowered.server.data.type.LanternStoneTypes;
+import org.lanternpowered.server.data.type.*;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
@@ -84,6 +74,8 @@ import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.LanternTextFactory;
+import org.lanternpowered.server.text.chat.LanternChatType;
+import org.lanternpowered.server.text.chat.LanternChatVisibility;
 import org.lanternpowered.server.text.format.LanternTextColor;
 import org.lanternpowered.server.text.format.LanternTextStyle;
 import org.lanternpowered.server.text.selector.LanternArgumentHolder;
@@ -115,18 +107,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.type.DirtType;
-import org.spongepowered.api.data.type.DirtTypes;
-import org.spongepowered.api.data.type.DoublePlantType;
-import org.spongepowered.api.data.type.DoublePlantTypes;
-import org.spongepowered.api.data.type.NotePitch;
-import org.spongepowered.api.data.type.NotePitches;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
-import org.spongepowered.api.data.type.ShrubType;
-import org.spongepowered.api.data.type.ShrubTypes;
-import org.spongepowered.api.data.type.StoneType;
-import org.spongepowered.api.data.type.StoneTypes;
+import org.spongepowered.api.data.type.*;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ItemParticle;
@@ -162,6 +143,10 @@ import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.statistic.TeamStatistic;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.chat.ChatVisibilities;
+import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
@@ -217,29 +202,32 @@ public class LanternGameRegistry implements GameRegistry {
     private final LanternBiomeRegistry biomeRegistry = new LanternBiomeRegistry();
     private final LanternBlockRegistry blockRegistry = new LanternBlockRegistry();
     private final LanternItemRegistry itemRegistry = new LanternItemRegistry();
-    private final CatalogTypeRegistry<Difficulty> difficultyRegistry = new LanternCatalogTypeRegistry<Difficulty>();
-    private final CatalogTypeRegistry<GameMode> gameModeRegistry = new LanternCatalogTypeRegistry<GameMode>();
-    private final CatalogTypeRegistry<LanternAttribute> attributeRegistry = new LanternCatalogTypeRegistry<LanternAttribute>();
-    private final CatalogTypeRegistry<LanternOperation> attributeOperationRegistry = new LanternCatalogTypeRegistry<LanternOperation>();
-    private final CatalogTypeRegistry<TextColor> textColorRegistry = new LanternCatalogTypeRegistry<TextColor>();
-    private final CatalogTypeRegistry<TextStyle.Base> textStyleRegistry = new LanternCatalogTypeRegistry<TextStyle.Base>();
+    private final CatalogTypeRegistry<Difficulty> difficultyRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<GameMode> gameModeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<LanternAttribute> attributeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<LanternOperation> attributeOperationRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<TextColor> textColorRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<TextStyle.Base> textStyleRegistry = new LanternCatalogTypeRegistry<>();
     private final CatalogTypeRegistry<WorldGeneratorModifier> worldGeneratorModifierRegistry =
-            new LanternCatalogTypeRegistry<WorldGeneratorModifier>();
-    private final CatalogTypeRegistry<Rotation> rotationRegistry = new LanternCatalogTypeRegistry<Rotation>();
-    private final CatalogTypeRegistry<DimensionType> dimensionTypeRegistry = new LanternCatalogTypeRegistry<DimensionType>();
-    private final CatalogTypeRegistry<GeneratorType> generatorTypeRegistry = new LanternCatalogTypeRegistry<GeneratorType>();
-    private final CatalogTypeRegistry<SoundType> soundTypeRegistry = new LanternCatalogTypeRegistry<SoundType>();
-    private final CatalogTypeRegistry<NotePitch> notePitchRegistry = new LanternCatalogTypeRegistry<NotePitch>();
-    private final CatalogTypeRegistry<ShrubType> shrubTypeRegistry = new LanternCatalogTypeRegistry<ShrubType>();
-    private final CatalogTypeRegistry<DoublePlantType> doublePlantTypeRegistry = new LanternCatalogTypeRegistry<DoublePlantType>();
-    private final CatalogTypeRegistry<PlantType> plantTypeRegistry = new LanternCatalogTypeRegistry<PlantType>();
-    private final CatalogTypeRegistry<SelectorType> selectorTypeRegistry = new LanternCatalogTypeRegistry<SelectorType>();
-    private final CatalogTypeRegistry<DirtType> dirtTypeRegistry = new LanternCatalogTypeRegistry<DirtType>();
-    private final CatalogTypeRegistry<StoneType> stoneTypeRegistry = new LanternCatalogTypeRegistry<StoneType>();
-    private final CatalogTypeRegistry<ParticleType> particleTypeRegistry = new LanternCatalogTypeRegistry<ParticleType>();
-    private final CatalogTypeRegistry<PopulatorType> populatorTypeRegistry = new LanternCatalogTypeRegistry<PopulatorType>();
-    private final CatalogTypeRegistry<LanternWeather> weatherRegistry = new LanternCatalogTypeRegistry<LanternWeather>();
-    private final CatalogTypeRegistry<BanType> banTypeRegistry = new LanternCatalogTypeRegistry<BanType>();
+            new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<Rotation> rotationRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<DimensionType> dimensionTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<GeneratorType> generatorTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<SoundType> soundTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<NotePitch> notePitchRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<ShrubType> shrubTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<DoublePlantType> doublePlantTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<PlantType> plantTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<SelectorType> selectorTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<DirtType> dirtTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<StoneType> stoneTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<ParticleType> particleTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<PopulatorType> populatorTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<LanternWeather> weatherRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<BanType> banTypeRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<SkinPart> skinPartRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<ChatVisibility> chatVisibilityRegistry = new LanternCatalogTypeRegistry<>();
+    private final CatalogTypeRegistry<ChatType> chatTypeRegistry = new LanternCatalogTypeRegistry<>();
     private final Map<Class<?>, CatalogTypeRegistry<?>> catalogTypeRegistries = ImmutableMap.<Class<?>, CatalogTypeRegistry<?>>builder()
             .put(LanternAttribute.class, this.attributeRegistry)
             .put(LanternOperation.class, this.attributeOperationRegistry)
@@ -267,6 +255,8 @@ public class LanternGameRegistry implements GameRegistry {
             .put(ParticleType.class, this.particleTypeRegistry)
             .put(PopulatorType.class, this.populatorTypeRegistry)
             .put(Weather.class, this.weatherRegistry)
+            .put(SkinPart.class, this.skinPartRegistry)
+            .put(ChatVisibility.class, this.chatVisibilityRegistry)
             .build();
     private final Map<Class<?>, Supplier<Object>> builderFactories = ImmutableMap.<Class<?>, Supplier<Object>>builder()
             .put(LanternAttributeBuilder.class, () -> new LanternAttributeBuilder(this.attributeRegistry))
@@ -333,6 +323,9 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     public void registerGameObjects() {
+        this.registerSkinTypes();
+        this.registerChatVisibilities();
+        this.registerChatTypes();
         this.registerWeathers();
         this.registerMessageSinkFactory();
         this.registerSoundTypes();
@@ -354,6 +347,30 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerNotePitches();
         // The particle types, requires NotePitches and BlockTypes
         this.registerParticleTypes();
+    }
+
+    private void registerChatVisibilities() {
+        this.chatVisibilityRegistry.register(new LanternChatVisibility(0, "full", type -> true));
+        this.chatVisibilityRegistry.register(new LanternChatVisibility(1, "system", type -> type == ChatTypes.SYSTEM));
+        this.chatVisibilityRegistry.register(new LanternChatVisibility(2, "hidden", type -> false));
+        RegistryHelper.mapFields(ChatVisibilities.class, this.chatVisibilityRegistry.getDelegateMap());
+    }
+
+    private void registerChatTypes() {
+        this.chatTypeRegistry.register(new LanternChatType("chat"));
+        this.chatTypeRegistry.register(new LanternChatType("action_bar"));
+        this.chatTypeRegistry.register(new LanternChatType("system"));
+    }
+
+    private void registerSkinTypes() {
+        this.skinPartRegistry.register(new LanternSkinPart("cape", 0));
+        this.skinPartRegistry.register(new LanternSkinPart("jacket", 1));
+        this.skinPartRegistry.register(new LanternSkinPart("left_sleeve", 2));
+        this.skinPartRegistry.register(new LanternSkinPart("right_sleeve", 3));
+        this.skinPartRegistry.register(new LanternSkinPart("left_pants_leg", 4));
+        this.skinPartRegistry.register(new LanternSkinPart("right_pants_leg", 5));
+        this.skinPartRegistry.register(new LanternSkinPart("hat", 6));
+        RegistryHelper.mapFields(SkinParts.class, this.skinPartRegistry.getDelegateMap());
     }
 
     private void registerBanTypes() {
@@ -974,7 +991,7 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     /**
-     * Gets the {@link CatalogTypeRegistry<Attribute>}.
+     * Gets the {@link CatalogTypeRegistry<LanternAttribute>}.
      * 
      * @return the attribute registry
      */

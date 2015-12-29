@@ -27,27 +27,9 @@ package org.lanternpowered.server.network.protocol;
 import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutPing;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInChangeSign;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInChatMessage;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCustomPayload;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutHeldItemChange;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInResourcePackStatus;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutChatMessage;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerHealthUpdate;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerJoinGame;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerRespawn;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerSpawnPosition;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSoundEffect;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnParticle;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTitle;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
+import org.lanternpowered.server.network.vanilla.message.codec.play.*;
 import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
-import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
+import org.lanternpowered.server.network.vanilla.message.handler.play.*;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInPlayerAction;
@@ -129,6 +111,8 @@ public final class ProtocolPlay extends ProtocolBase {
         // ...
         inbound.register(0x12, MessagePlayInChangeSign.class, CodecPlayInChangeSign.class, new HandlerPlayInChangeSign());
         // ...
+        inbound.register(0x15, MessagePlayInClientSettings.class, CodecPlayInClientSettings.class, new HandlerPlayInClientSettings());
+        // 0x16
         inbound.register(0x17, MessagePlayInOutChannelPayload.class, CodecPlayInOutCustomPayload.class,
                 new HandlerPlayInChannelPayload());
         // 0x18
@@ -145,6 +129,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.register(0x07, MessagePlayOutPlayerRespawn.class, CodecPlayOutPlayerRespawn.class);
         // 0x08
         outbound.register(0x09, MessagePlayInOutHeldItemChange.class, CodecPlayInOutHeldItemChange.class);
+        // ...
         outbound.register(0x29, MessagePlayOutSoundEffect.class, CodecPlayOutSoundEffect.class);
         outbound.register(0x2a, MessagePlayOutSpawnParticle.class, CodecPlayOutSpawnParticle.class);
         // ...

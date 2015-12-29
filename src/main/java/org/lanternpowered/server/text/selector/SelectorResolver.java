@@ -27,13 +27,13 @@ package org.lanternpowered.server.text.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExperienceHolderData;
 import org.spongepowered.api.data.manipulator.mutable.entity.GameModeData;
@@ -57,6 +57,7 @@ import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.selector.SelectorTypes;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.LocatedSource;
+import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -69,6 +70,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * A resolver that acts like Vanilla Minecraft in many regards.
@@ -170,7 +172,7 @@ public class SelectorResolver {
             // insert at the start so it applies first
             filters.add(0, requireTypePredicate(Entity.class, Player.class));
         }
-        return Predicates.and(filters);
+        return Functional.predicateAnd(filters);
     }
 
     private void addDimensionFilters(final Vector3d position, List<Predicate<Entity>> filters) {
@@ -181,36 +183,21 @@ public class SelectorResolver {
         final Vector3d boxMin = det1.min(det2);
         final Vector3d boxMax = det1.max(det2);
         if (sel.has(ArgumentTypes.DIMENSION.x())) {
-            filters.add(new Predicate<Entity>() {
-
-                @Override
-                public boolean apply(Entity input) {
-                    Vector3d pos = input.getLocation().getPosition();
-                    return pos.getX() >= boxMin.getX() && pos.getX() <= boxMax.getX();
-                }
-
+            filters.add(input -> {
+                Vector3d pos = input.getLocation().getPosition();
+                return pos.getX() >= boxMin.getX() && pos.getX() <= boxMax.getX();
             });
         }
         if (sel.has(ArgumentTypes.DIMENSION.y())) {
-            filters.add(new Predicate<Entity>() {
-
-                @Override
-                public boolean apply(Entity input) {
-                    Vector3d pos = input.getLocation().getPosition();
-                    return pos.getY() >= boxMin.getY() && pos.getY() <= boxMax.getY();
-                }
-
+            filters.add(input -> {
+                Vector3d pos = input.getLocation().getPosition();
+                return pos.getY() >= boxMin.getY() && pos.getY() <= boxMax.getY();
             });
         }
         if (sel.has(ArgumentTypes.DIMENSION.z())) {
-            filters.add(new Predicate<Entity>() {
-
-                @Override
-                public boolean apply(Entity input) {
-                    Vector3d pos = input.getLocation().getPosition();
-                    return pos.getZ() >= boxMin.getZ() && pos.getZ() <= boxMax.getZ();
-                }
-
+            filters.add(input -> {
+                Vector3d pos = input.getLocation().getPosition();
+                return pos.getZ() >= boxMin.getZ() && pos.getZ() <= boxMax.getZ();
             });
         }
     }
@@ -221,14 +208,9 @@ public class SelectorResolver {
         // If the game mode is NOT_SET, that means accept any
         if (gamemode.isPresent() && gamemode.get() != GameModes.NOT_SET) {
             final GameMode actualMode = gamemode.get();
-            filters.add(new Predicate<Entity>() {
-
-                @Override
-                public boolean apply(Entity input) {
-                    Optional<GameModeData> mode = input.get(GameModeData.class);
-                    return mode.isPresent() && mode.get() == actualMode;
-                }
-
+            filters.add(input -> {
+                Optional<GameModeData> mode = input.get(GameModeData.class);
+                return mode.isPresent() && mode.get() == actualMode;
             });
         }
     }
@@ -239,26 +221,16 @@ public class SelectorResolver {
         Optional<Integer> levelMax = sel.get(ArgumentTypes.LEVEL.maximum());
         if (levelMin.isPresent()) {
             final int actualMin = levelMin.get();
-            filters.add(new Predicate<Entity>() {
-
-                @Override
-                public boolean apply(Entity input) {
-                    Optional<ExperienceHolderData> xp = input.get(ExperienceHolderData.class);
-                    return xp.isPresent() && xp.get().level().get() >= actualMin;
-                }
-
+            filters.add(input -> {
+                Optional<ExperienceHolderData> xp = input.get(ExperienceHolderData.class);
+                return xp.isPresent() && xp.get().level().get() >= actualMin;
             });
         }
         if (levelMax.isPresent()) {
             final int actualMax = levelMax.get();
-            filters.add(new Predicate<Entity>() {
-
-                @Override
-                public boolean apply(Entity input) {
-                    Optional<ExperienceHolderData> xp = input.get(ExperienceHolderData.class);
-                    return xp.isPresent() && xp.get().level().get() <= actualMax;
-                }
-
+            filters.add(input -> {
+                Optional<ExperienceHolderData> xp = input.get(ExperienceHolderData.class);
+                return xp.isPresent() && xp.get().level().get() <= actualMax;
             });
         }
     }
@@ -269,14 +241,9 @@ public class SelectorResolver {
         if (nameOpt.isPresent()) {
             final String name = nameOpt.get().getValue();
             final boolean inverted = nameOpt.get().isInverted();
-            filters.add(new Predicate<Entity>() {
-
-                @Override
-                public boolean apply(Entity input) {
-                    Optional<DisplayNameData> dispName = input.get(DisplayNameData.class);
-                    return inverted ^ (dispName.isPresent() && name.equals(Texts.toPlain(dispName.get().displayName().get())));
-                }
-
+            filters.add(input -> {
+                Optional<DisplayNameData> dispName = input.get(DisplayNameData.class);
+                return inverted ^ (dispName.isPresent() && name.equals(Texts.toPlain(dispName.get().displayName().get())));
             });
         }
     }
@@ -332,26 +299,14 @@ public class SelectorResolver {
     private void addTeamFilters(List<Predicate<Entity>> filters) {
         Selector sel = this.selector;
         Optional<Invertible<String>> teamOpt = sel.getArgument(ArgumentTypes.TEAM);
-        Collection<World> worlds = Lists.newArrayList();
-        for (Extent e : this.extents) {
-            if (e instanceof World) {
-                worlds.add((World) e);
-            } else if (e instanceof Chunk) {
-                worlds.add(((Chunk) e).getWorld());
-            }
-        }
-        if (teamOpt.isPresent() && !worlds.isEmpty()) {
+        if (teamOpt.isPresent()) {
             Invertible<String> teamArg = teamOpt.get();
             final boolean inverted = teamArg.isInverted();
-            ImmutableSet.Builder<Team> teamBuilder = ImmutableSet.builder();
-            for (World w : worlds) {
-                teamBuilder.addAll(asSet(w.getScoreboard().getTeam(teamArg.getValue())));
-            }
-            final Collection<Team> teams = teamBuilder.build();
+            final Collection<Team> teams = Sponge.getGame().getServer().getServerScoreboard().get().getTeams();
             filters.add(new Predicate<Entity>() {
 
                 @Override
-                public boolean apply(Entity input) {
+                public boolean test(Entity input) {
                     if (input instanceof TeamMember) {
                         return inverted ^ collectMembers(teams).contains(((TeamMember) input).getTeamRepresentation());
                     }
@@ -412,7 +367,7 @@ public class SelectorResolver {
             }
 
             for (Entity e : allEntities) {
-                if (!this.selectorFilter.apply(e)) {
+                if (!this.selectorFilter.test(e)) {
                     continue;
                 }
                 entities.add(e);

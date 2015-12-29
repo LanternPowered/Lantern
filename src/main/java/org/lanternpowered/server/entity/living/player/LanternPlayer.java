@@ -28,7 +28,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.Set;
 
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
@@ -42,6 +44,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.title.LanternTitles;
+import org.spongepowered.api.data.type.SkinPart;
+import org.spongepowered.api.data.type.SkinParts;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -56,6 +60,8 @@ import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.chat.ChatVisibilities;
+import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.title.Title;
@@ -79,8 +85,19 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     // The (client) render distance of the player
     // When specified -1, the render distance will match the server one
-    private int renderDistance = -1;
+    private int viewDistance = -1;
 
+    // The char visibility
+    private ChatVisibility chatVisibility = ChatVisibilities.FULL;
+
+    // Whether the chat colors are enabled
+    private boolean chatColorsEnabled;
+
+    // The visible skin parts
+    private Set<SkinPart> skinParts = Sets.newHashSet(SkinParts.CAPE, SkinParts.HAT, SkinParts.JACKET, SkinParts.LEFT_SLEEVE,
+            SkinParts.LEFT_PANTS_LEG, SkinParts.RIGHT_SLEEVE, SkinParts.RIGHT_PANTS_LEG);
+
+    // Whether you should ignore this player when checking for sleeping players to reset the time
     private boolean sleepingIgnored;
 
     public LanternPlayer(LanternGameProfile gameProfile) {
@@ -115,24 +132,6 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Override
     public Tristate getPermissionDefault(String permission) {
         return Tristate.TRUE;
-    }
-
-    /**
-     * Gets the render distance of the player.
-     * 
-     * @return the render distance
-     */
-    public int getRenderDistance() {
-        return this.renderDistance;
-    }
-
-    /**
-     * Sets the render distance of the player.
-     * 
-     * @param renderDistance the render distance
-     */
-    public void setRenderDistance(int renderDistance) {
-        this.renderDistance = renderDistance;
     }
 
     @Override
@@ -217,6 +216,42 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     public void setLocale(Locale locale) {
         this.locale = checkNotNull(locale, "locale");
+    }
+
+    @Override
+    public int getViewDistance() {
+        return this.viewDistance;
+    }
+
+    public void setViewDistance(int viewDistance) {
+        this.viewDistance = viewDistance;
+    }
+
+    @Override
+    public ChatVisibility getChatVisibility() {
+        return this.chatVisibility;
+    }
+
+    public void setChatVisibility(ChatVisibility chatVisibility) {
+        this.chatVisibility = chatVisibility;
+    }
+
+    @Override
+    public boolean isChatColorsEnabled() {
+        return this.chatColorsEnabled;
+    }
+
+    public void setChatColorsEnabled(boolean enabled) {
+        this.chatColorsEnabled = enabled;
+    }
+
+    @Override
+    public Set<SkinPart> getDisplayedSkinParts() {
+        return this.skinParts;
+    }
+
+    public void setSkinParts(Set<SkinPart> skinParts) {
+        this.skinParts = skinParts;
     }
 
     @Override

@@ -22,47 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
+import org.lanternpowered.server.text.chat.LanternChatVisibility;
 
 import java.util.Locale;
 
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.text.chat.ChatVisibility;
+public final class CodecPlayInClientSettings implements Codec<MessagePlayInClientSettings> {
 
-public final class MessagePlayInClientSettings implements Message {
-
-    private final Locale locale;
-    private final ChatVisibility chatVisibility;
-    private final int viewDistance;
-    private final int skinPartsBitPattern;
-    private final boolean enableColors;
-
-    public MessagePlayInClientSettings(Locale locale, int viewDistance, ChatVisibility chatVisibility,
-            boolean enableColors, int skinPartsBitPattern) {
-        this.skinPartsBitPattern = skinPartsBitPattern;
-        this.chatVisibility = chatVisibility;
-        this.viewDistance = viewDistance;
-        this.enableColors = enableColors;
-        this.locale = locale;
+    @Override
+    public ByteBuf encode(CodecContext context, MessagePlayInClientSettings message) throws CodecException {
+        throw new UnsupportedOperationException();
     }
 
-    public Locale getLocale() {
-        return this.locale;
+    @Override
+    public MessagePlayInClientSettings decode(CodecContext context, ByteBuf buf) throws CodecException {
+        Locale locale = Locale.forLanguageTag(context.read(buf, String.class));
+        int viewDistance = buf.readByte();
+        LanternChatVisibility visibility = LanternChatVisibility.fromInternalId(buf.readByte());
+        boolean enableColors = buf.readBoolean();
+        int skinPartsBitPattern = buf.readByte() & 0xff;
+        return new MessagePlayInClientSettings(locale, viewDistance, visibility, enableColors, skinPartsBitPattern);
     }
 
-    public int getViewDistance() {
-        return this.viewDistance;
-    }
-
-    public int getSkinPartsBitPattern() {
-        return this.skinPartsBitPattern;
-    }
-
-    public ChatVisibility getChatVisibility() {
-        return this.chatVisibility;
-    }
-
-    public boolean getEnableColors() {
-        return this.enableColors;
-    }
 }

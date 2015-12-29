@@ -142,9 +142,9 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Cause cause) {
+    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, Cause cause) {
         this.checkRange(x, y, z);
-        return this.extent.placeBlock(x, y, z, block, cause);
+        return this.extent.placeBlock(x, y, z, block, direction, cause);
     }
 
     @Override

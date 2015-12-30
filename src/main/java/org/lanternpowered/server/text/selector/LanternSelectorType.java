@@ -34,4 +34,5 @@ public class LanternSelectorType extends SimpleLanternCatalogType implements Sel
     public LanternSelectorType(String identifier) {
         super(identifier);
     }
+
 }

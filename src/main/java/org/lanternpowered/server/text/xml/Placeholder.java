@@ -26,11 +26,13 @@ package org.lanternpowered.server.text.xml;
 
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@NonnullByDefault
 public class Placeholder extends Span {
 
     @XmlAttribute(required = true)
@@ -45,7 +47,6 @@ public class Placeholder extends Span {
 
     @Override
     protected void modifyBuilder(TextBuilder builder) {
-        // TODO: get rid of this
     }
 
     @Override
@@ -54,7 +55,8 @@ public class Placeholder extends Span {
         if (!this.mixedContent.isEmpty()) {
             builder.fallback(super.toText().build());
         }
-        //applyTextActions(builder);
+        this.applyTextActions(builder);
         return builder;
     }
+
 }

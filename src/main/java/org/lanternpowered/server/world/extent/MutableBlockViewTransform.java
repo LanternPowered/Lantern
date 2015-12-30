@@ -28,9 +28,11 @@ import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.DiscreteTransform3;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 
+@NonnullByDefault
 public class MutableBlockViewTransform extends AbstractBlockViewTransform<MutableBlockVolume> implements MutableBlockVolume {
 
     public MutableBlockViewTransform(MutableBlockVolume volume, DiscreteTransform3 transform) {
@@ -78,4 +80,5 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
     public UnmodifiableBlockVolume getUnmodifiableBlockView() {
         return new UnmodifiableBlockVolumeWrapper(this);
     }
+
 }

@@ -340,7 +340,7 @@ public class LanternGame implements Game {
             commandService.register(this.minecraft, CommandSeed.create(), "seed");
             commandService.register(this.minecraft, CommandStop.create(), "stop", "shutdown");
             commandService.register(this.minecraft, CommandDifficulty.create(), "difficulty");
-            commandService.register(this.minecraft, new CommandHelp(this).build(), "help", "?");
+            commandService.register(this.minecraft, CommandHelp.create(), "help", "?");
             commandService.register(this.implContainer, CommandVersion.create(), "version");
         }
         commandService.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),

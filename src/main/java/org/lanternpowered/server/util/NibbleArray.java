@@ -26,8 +26,13 @@ package org.lanternpowered.server.util;
 
 import static org.lanternpowered.server.util.Conditions.checkArrayRange;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.Arrays;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class NibbleArray {
 
     private final int length;
@@ -159,7 +164,7 @@ public class NibbleArray {
      * @param array the provided array
      * @return an array containing the values in the array
      */
-    public byte[] getArray(byte[] array) {
+    public byte[] getArray(@Nullable byte[] array) {
         if (array == null || array.length != this.length) {
             array = new byte[this.length];
         }
@@ -195,7 +200,7 @@ public class NibbleArray {
      * @param array the provided array
      * @return an array containing the values in the array
      */
-    public byte[] getPackedArray(byte[] array) {
+    public byte[] getPackedArray(@Nullable byte[] array) {
         if (array == null || array.length != this.backingArraySize) {
             array = new byte[this.backingArraySize];
         }
@@ -215,8 +220,13 @@ public class NibbleArray {
         return this.getPackedArray(null);
     }
 
-    @Override
-    public NibbleArray clone() {
+    /**
+     * Creates a copy of this nibble array.
+     *
+     * @return the copy
+     */
+    public NibbleArray copy() {
         return new NibbleArray(this.backingArray.clone(), this.length);
     }
+
 }

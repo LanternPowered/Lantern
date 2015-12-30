@@ -29,10 +29,12 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 
 import com.flowpowered.math.vector.Vector2i;
 
+@NonnullByDefault
 class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityLoadingTicket {
 
     // The reference of the entity while it's not loaded yet,
@@ -55,6 +57,8 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityL
         this.entity = entity;
     }
 
+    // This method may not return null, but we can not ensure that
+    // until the ticket entity is loaded
     @Nullable
     @Override
     public Entity getBoundEntity() {
@@ -75,4 +79,5 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityL
             this.uniqueId = uniqueId;
         }
     }
+
 }

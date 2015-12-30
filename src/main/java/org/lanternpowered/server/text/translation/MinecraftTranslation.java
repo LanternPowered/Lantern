@@ -30,7 +30,9 @@ import java.util.ResourceBundle;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class MinecraftTranslation implements Translation {
 
     private final String id;
@@ -61,4 +63,5 @@ public final class MinecraftTranslation implements Translation {
             return value;
         }
     }
+
 }

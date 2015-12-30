@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.text.xml;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.xml.sax.Attributes;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.Locator;
@@ -37,6 +38,7 @@ import javax.xml.bind.UnmarshallerHandler;
  * Courtesy of http://jazzjuice.blogspot.de/2009/06/jaxb-xmlmixed-and-white-space-anomalies.html
  * Improves the XML parser's handling of whitespace.
  */
+@NonnullByDefault
 class WhitespaceAwareUnmarshallerHandler implements ContentHandler {
 
     private final UnmarshallerHandler uh;
@@ -115,4 +117,5 @@ class WhitespaceAwareUnmarshallerHandler implements ContentHandler {
     public void startPrefixMapping(String prefix, String uri) throws SAXException {
         this.uh.startPrefixMapping(prefix, uri);
     }
+
 }

@@ -30,11 +30,13 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@NonnullByDefault
 public class Tr extends Element {
 
     @XmlAttribute(required = true)
@@ -48,7 +50,6 @@ public class Tr extends Element {
 
     @Override
     protected void modifyBuilder(TextBuilder builder) {
-        // TODO: get rid of this
     }
 
     @Override
@@ -59,7 +60,8 @@ public class Tr extends Element {
         }
         Translation translation = LanternGame.get().getRegistry().getTranslationManager().get(this.key);
         TextBuilder builder = Texts.builder(translation, build.build().toArray());
-        //applyTextActions(builder);
+        this.applyTextActions(builder);
         return builder;
     }
+
 }

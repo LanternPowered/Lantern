@@ -86,6 +86,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
@@ -118,6 +119,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
+@NonnullByDefault
 public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, AbstractViewer {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
@@ -132,7 +134,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     private final static int SPAWN_SIZE = 12;
 
     // The loading ticket to keep the spawn chunks loaded
-    private volatile ChunkLoadingTicket spawnLoadingTicket;
+    @Nullable private volatile ChunkLoadingTicket spawnLoadingTicket;
 
     // The game instance
     final LanternGame game;

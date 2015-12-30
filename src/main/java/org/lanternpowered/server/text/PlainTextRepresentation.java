@@ -32,7 +32,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentation;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.TextMessageException;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class PlainTextRepresentation implements TextRepresentation {
 
     @Override

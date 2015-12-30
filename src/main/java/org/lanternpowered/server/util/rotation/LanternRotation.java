@@ -25,14 +25,17 @@
 package org.lanternpowered.server.util.rotation;
 
 import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.rotation.Rotation;
 
-public class LanternRotation extends LanternCatalogType implements Rotation {
+@NonnullByDefault
+public final class LanternRotation extends SimpleLanternCatalogType implements Rotation {
 
     private final int angle;
 
-    public LanternRotation(String name, int angle) {
-        super(name, name);
+    public LanternRotation(String identifier, int angle) {
+        super(identifier);
         this.angle = angle;
     }
 
@@ -40,4 +43,5 @@ public class LanternRotation extends LanternCatalogType implements Rotation {
     public int getAngle() {
         return this.angle;
     }
+
 }

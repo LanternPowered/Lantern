@@ -32,10 +32,12 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 
 import com.google.common.base.MoreObjects;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * An internal representation of a {@link Task} created by a plugin.
  */
+@NonnullByDefault
 public class ScheduledTask implements Task {
 
     final long offset;
@@ -72,7 +74,7 @@ public class ScheduledTask implements Task {
 
         public final boolean isActive;
 
-        private ScheduledTaskState(boolean active) {
+        ScheduledTaskState(boolean active) {
             this.isActive = active;
         }
     }

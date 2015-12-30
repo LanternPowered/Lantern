@@ -31,7 +31,9 @@ import javax.annotation.Nullable;
 
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.network.status.StatusClient;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternStatusClient implements StatusClient {
 
     private final InetSocketAddress address;
@@ -58,4 +60,5 @@ public class LanternStatusClient implements StatusClient {
     public Optional<InetSocketAddress> getVirtualHost() {
         return this.virtualHost;
     }
+
 }

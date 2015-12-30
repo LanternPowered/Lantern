@@ -27,8 +27,11 @@ package org.lanternpowered.server.util;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.UUID;
 
+@NonnullByDefault
 public final class UUIDHelper {
 
     private UUIDHelper() {
@@ -56,4 +59,5 @@ public final class UUIDHelper {
     public static String toFlatString(UUID uuid) {
         return checkNotNull(uuid, "uuid").toString().replace("-", "");
     }
+
 }

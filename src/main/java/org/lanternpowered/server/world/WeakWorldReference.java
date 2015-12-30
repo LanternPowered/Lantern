@@ -31,8 +31,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 
+@NonnullByDefault
 public final class WeakWorldReference {
 
     private WeakReference<World> world;
@@ -44,7 +46,7 @@ public final class WeakWorldReference {
      * @param world the world
      */
     public WeakWorldReference(World world) {
-        this.world = new WeakReference<World>(checkNotNull(world, "world"));
+        this.world = new WeakReference<>(checkNotNull(world, "world"));
         this.uniqueId = world.getUniqueId();
     }
 
@@ -79,7 +81,7 @@ public final class WeakWorldReference {
         }
         world = LanternGame.get().getServer().getWorld(this.uniqueId).orElse(null);
         if (world != null) {
-            this.world = new WeakReference<World>(world);
+            this.world = new WeakReference<>(world);
             return Optional.of(world);
         }
         return Optional.empty();
@@ -91,7 +93,8 @@ public final class WeakWorldReference {
      * @return the copy
      */
     public WeakWorldReference copy() {
-        return !this.world.isEnqueued() ? new WeakWorldReference(this.world.get()) :
-            new WeakWorldReference(this.uniqueId);
+        final World world = this.world.get();
+        return world != null ? new WeakWorldReference(world) : new WeakWorldReference(this.uniqueId);
     }
+
 }

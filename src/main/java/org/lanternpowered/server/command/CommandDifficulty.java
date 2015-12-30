@@ -61,22 +61,19 @@ public final class CommandDifficulty {
                                 aliasesBuilder.build(), false, true),
                         GenericArguments.optional(WorldPropertiesChoicesElement.of(Texts.of("world"))))
                 .permission("minecraft.command.difficulty")
-                .executor(new CommandExecutor() {
-                    @Override
-                    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                        WorldProperties world;
-                        if (args.hasAny("world")) {
-                            world = args.<WorldProperties>getOne("world").get();
-                        } else if (src instanceof LocatedSource) {
-                            world = ((LocatedSource) src).getWorld().getProperties();
-                        } else {
-                            throw new CommandException(Texts.of("Non-located sources must specify a world."));
-                        }
-                        Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
-                        world.setDifficulty(difficulty);
-                        src.sendMessage(t("commands.difficulty.success", difficulty.getName()));
-                        return CommandResult.success();
+                .executor((src, args) -> {
+                    WorldProperties world;
+                    if (args.hasAny("world")) {
+                        world = args.<WorldProperties>getOne("world").get();
+                    } else if (src instanceof LocatedSource) {
+                        world = ((LocatedSource) src).getWorld().getProperties();
+                    } else {
+                        throw new CommandException(Texts.of("Non-located sources must specify a world."));
                     }
+                    Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
+                    world.setDifficulty(difficulty);
+                    src.sendMessage(t("commands.difficulty.success", difficulty.getName()));
+                    return CommandResult.success();
                 })
                 .build();
     }

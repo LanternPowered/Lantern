@@ -34,7 +34,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class AsyncScheduler extends SchedulerBase {
 
     // Adjustable timeout for pending Tasks
@@ -144,4 +146,5 @@ public class AsyncScheduler extends SchedulerBase {
             this.lock.unlock();
         }
     }
+
 }

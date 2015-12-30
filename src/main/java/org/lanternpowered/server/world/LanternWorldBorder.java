@@ -29,11 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.component.Component;
 import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.inject.Inject;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 import com.flowpowered.math.vector.Vector3d;
 
+@NonnullByDefault
 public final class LanternWorldBorder implements WorldBorder, Component {
 
     @Inject
@@ -126,7 +128,7 @@ public final class LanternWorldBorder implements WorldBorder, Component {
 
     @Override
     public ChunkPreGenerate newChunkPreGenerate(World world) {
-        return new LanternChunkPreGenerate(checkNotNull(world, "world"),
-                this.getCenter(), this.getDiameter());
+        return new LanternChunkPreGenerate(checkNotNull(world, "world"), this.getCenter(), this.getDiameter());
     }
+
 }

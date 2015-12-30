@@ -31,13 +31,18 @@ import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class IpSet implements Predicate<InetAddress> {
+
     private final InetAddress addr;
     private final int prefixLen;
 
@@ -47,7 +52,11 @@ public class IpSet implements Predicate<InetAddress> {
     }
 
     @Override
-    public boolean apply(InetAddress input) {
+    public boolean apply(@Nullable InetAddress input) {
+        if (input == null) {
+            return false;
+        }
+
         byte[] address = input.getAddress();
         byte[] checkAddr = this.addr.getAddress();
         if (address.length != checkAddr.length) {
@@ -137,4 +146,5 @@ public class IpSet implements Predicate<InetAddress> {
             value.setValue(obj.toString());
         }
     }
+
 }

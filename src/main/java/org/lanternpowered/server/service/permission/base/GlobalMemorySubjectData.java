@@ -30,11 +30,13 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@NonnullByDefault
 public class GlobalMemorySubjectData extends MemorySubjectData {
 
     /**

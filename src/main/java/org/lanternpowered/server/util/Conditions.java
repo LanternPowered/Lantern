@@ -34,7 +34,9 @@ import javax.annotation.Nullable;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class Conditions {
 
     private static final String NOT_AVAILABLE = "This function is not available yet.";
@@ -45,7 +47,7 @@ public final class Conditions {
      * 
      * @param object an object reference
      * @param message the exception message to use if the check fails; will be
-     *        converted to a string using {@link String.valueOf(Object)}.
+     *        converted to a string using {@link String#valueOf(Object)}.
      * @return the resulted plugin container
      * @throws NullPointerException - if reference is null
      * @throws IllegalArgumentException - if reference is invalid
@@ -72,7 +74,7 @@ public final class Conditions {
      * 
      * @param object an object reference
      * @param message the exception message to use if the check fails; will be
-     *        converted to a string using {@link String.valueOf(Object)}.
+     *        converted to a string using {@link String#valueOf(Object)}.
      * @return the reference that was validated
      * @throws NullPointerException - if reference is null
      * @throws IllegalArgumentException - if reference is empty
@@ -114,4 +116,5 @@ public final class Conditions {
 
     private Conditions() {
     }
+
 }

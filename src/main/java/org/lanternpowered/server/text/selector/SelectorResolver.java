@@ -58,6 +58,7 @@ import org.spongepowered.api.text.selector.SelectorTypes;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.util.Functional;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -71,16 +72,20 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 /**
  * A resolver that acts like Vanilla Minecraft in many regards.
  */
+@NonnullByDefault
 public class SelectorResolver {
 
-    private static final Function<CommandSource, String> GET_NAME = input -> input.getName();
+    private static final Function<CommandSource, String> GET_NAME = CommandSource::getName;
     private static final Vector3d ORIGIN = new Vector3d(0, 0, 0);
     private static final Set<ArgumentType<?>> LOCATION_BASED_ARGUMENTS;
-    private static final Function<Number, Double> TO_DOUBLE = input -> input.doubleValue();
+    private static final Function<Number, Double> TO_DOUBLE = Number::doubleValue;
     private static final Collection<SelectorType> INFINITE_TYPES = ImmutableSet.of(SelectorTypes.ALL_ENTITIES, SelectorTypes.ALL_PLAYERS);
 
     static {
@@ -108,7 +113,7 @@ public class SelectorResolver {
     }
 
     private static <I, R> Predicate<I> requireTypePredicate(Class<I> inputType, final Class<R> requiredType) {
-        return input -> requiredType.isInstance(input);
+        return requiredType::isInstance;
     }
 
     private static <E> Collection<E> asSet(Optional<E> opt) {
@@ -137,8 +142,8 @@ public class SelectorResolver {
         this(asSet(Optional.ofNullable(extentFromSource(origin))), positionFromSource(origin), origin, selector, force);
     }
 
-    private SelectorResolver(Collection<? extends Extent> extents, Vector3d position,
-        CommandSource original, Selector selector, boolean force) {
+    private SelectorResolver(Collection<? extends Extent> extents, @Nullable Vector3d position, @Nullable CommandSource original, Selector selector,
+            boolean force) {
         this.extents = ImmutableSet.copyOf(extents);
         this.position = position == null ? ORIGIN : position;
         this.original = Optional.ofNullable(original);
@@ -178,10 +183,9 @@ public class SelectorResolver {
     private void addDimensionFilters(final Vector3d position, List<Predicate<Entity>> filters) {
         Selector sel = this.selector;
         Vector3d boxDimensions = getPositionOrDefault(ORIGIN, ArgumentTypes.DIMENSION);
-        Vector3d det1 = position;
         Vector3d det2 = position.add(boxDimensions);
-        final Vector3d boxMin = det1.min(det2);
-        final Vector3d boxMax = det1.max(det2);
+        final Vector3d boxMin = position.min(det2);
+        final Vector3d boxMax = position.max(det2);
         if (sel.has(ArgumentTypes.DIMENSION.x())) {
             filters.add(input -> {
                 Vector3d pos = input.getLocation().getPosition();
@@ -340,8 +344,7 @@ public class SelectorResolver {
         Optional<Double> x = this.selector.get(vecTypes.x()).map(TO_DOUBLE);
         Optional<Double> y = this.selector.get(vecTypes.y()).map(TO_DOUBLE);
         Optional<Double> z = this.selector.get(vecTypes.z()).map(TO_DOUBLE);
-        return new Vector3d(x.orElse(Double.valueOf(pos.getX())), y.orElse(Double.valueOf(pos.getY())),
-                z.orElse(Double.valueOf(pos.getZ())));
+        return new Vector3d(x.orElse(pos.getX()), y.orElse(pos.getY()), z.orElse(pos.getZ()));
     }
 
     public String getName() {
@@ -388,11 +391,7 @@ public class SelectorResolver {
     }
 
     private Collection<ArgumentType<?>> getArgumentTypes(Collection<Argument<?>> arguments) {
-        Collection<ArgumentType<?>> types = Sets.newHashSet();
-        for (Argument<?> argument : arguments) {
-            types.add(argument.getType());
-        }
-        return types;
+        return arguments.stream().map(Argument::getType).collect(Collectors.toSet());
     }
 
 }

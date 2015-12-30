@@ -32,12 +32,16 @@ import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class LanternStatusResponse implements ClientPingServerEvent.Response {
 
     private final MinecraftVersion version;
 
-    private Favicon favicon;
+    @Nullable private Favicon favicon;
     private Text description;
     private Players players;
 
@@ -76,7 +80,7 @@ public class LanternStatusResponse implements ClientPingServerEvent.Response {
     }
 
     @Override
-    public void setFavicon(Favicon favicon) {
+    public void setFavicon(@Nullable Favicon favicon) {
         this.favicon = favicon;
     }
 

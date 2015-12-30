@@ -56,6 +56,7 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -73,6 +74,7 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 
+@NonnullByDefault
 public interface AbstractExtent extends Extent {
 
     @Override

@@ -40,11 +40,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * Serializes/deserializes the {@link Text.Placeholder} object type introduced by sponge.
  */
-public final class JsonTextPlaceholderSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text.Placeholder>, JsonSerializer<Text.Placeholder> {
+@NonnullByDefault
+public final class JsonTextPlaceholderSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text.Placeholder>,
+        JsonSerializer<Text.Placeholder> {
 
     @Override
     public JsonElement serialize(Text.Placeholder src, Type typeOfSrc, JsonSerializationContext context) {

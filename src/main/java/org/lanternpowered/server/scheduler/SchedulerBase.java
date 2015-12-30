@@ -35,7 +35,9 @@ import org.spongepowered.api.scheduler.Task;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 abstract class SchedulerBase {
 
     // The simple queue of all pending (and running) ScheduledTasks
@@ -103,7 +105,7 @@ abstract class SchedulerBase {
     protected final void runTick() {
         this.preTick();
         try {
-            this.taskMap.values().forEach(task -> this.processTask(task));
+            this.taskMap.values().forEach(this::processTask);
             this.postTick();
         } finally {
             this.finallyPostTick();

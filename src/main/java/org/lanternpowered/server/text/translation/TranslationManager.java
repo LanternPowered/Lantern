@@ -29,7 +29,9 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface TranslationManager {
 
     /**
@@ -55,4 +57,5 @@ public interface TranslationManager {
      * @return the translation
      */
     Optional<Translation> getIfPresent(String key);
+
 }

@@ -26,11 +26,13 @@ package org.lanternpowered.server.world.gen;
 
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.PopulatorType;
 
 import com.google.common.base.MoreObjects;
 
+@NonnullByDefault
 public final class LanternPopulatorType extends LanternPluginCatalogType implements PopulatorType {
 
     public final Class<? extends Populator> populatorClass;
@@ -82,4 +84,5 @@ public final class LanternPopulatorType extends LanternPluginCatalogType impleme
     public Translation getTranslation() {
         return null;
     }
+
 }

@@ -29,19 +29,24 @@ import java.util.Optional;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 @XmlSeeAlso(Color.C.class)
 @XmlRootElement
+@NonnullByDefault
 public class Color extends Element {
 
     @XmlAttribute
+    @Nullable
     private String name;
 
     @XmlAttribute
+    @Nullable
     protected String n;
 
     public Color() {
@@ -73,5 +78,7 @@ public class Color extends Element {
         public C(TextColor color) {
             this.n = color.getName();
         }
+
     }
+
 }

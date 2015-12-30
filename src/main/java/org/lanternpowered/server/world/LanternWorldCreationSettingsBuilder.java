@@ -40,6 +40,7 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.TeleporterAgent;
@@ -51,20 +52,19 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import com.google.common.collect.Sets;
 
-public class LanternWorldCreationSettingsBuilder implements WorldCreationSettings.Builder {
-
-    private static final Random RANDOM = new Random();
+@NonnullByDefault
+public final class LanternWorldCreationSettingsBuilder implements WorldCreationSettings.Builder {
 
     private final LanternGame game;
 
-    private String name;
+    @Nullable private String name;
     private GameMode gameMode;
     private Difficulty difficulty;
-    private LanternDimensionType<?> dimensionType;
+    @Nullable private LanternDimensionType<?> dimensionType;
     // If not specified, fall back to dimension default
     @Nullable private GeneratorType generatorType;
     private Collection<WorldGeneratorModifier> generatorModifiers;
-    private DataContainer generatorSettings;
+    @Nullable private DataContainer generatorSettings;
     private TeleporterAgent teleporterAgent;
 
     @Nullable private Boolean keepsSpawnLoaded;
@@ -254,7 +254,7 @@ public class LanternWorldCreationSettingsBuilder implements WorldCreationSetting
         this.commandsAllowed = true;
         this.name = null;
         this.generatorModifiers = Collections.emptySet();
-        this.seed = RANDOM.nextLong();
+        this.seed = new Random().nextLong();
         this.dimensionType = null;
         this.generatorType = null;
         this.generatorSettings = null;
@@ -262,20 +262,20 @@ public class LanternWorldCreationSettingsBuilder implements WorldCreationSetting
         this.buildHeight = 256;
         // This teleporter agent won't return anything useful
         this.teleporterAgent = new LanternTeleporterAgent();
-        return null;
+        return this;
     }
 
     @Override
     public LanternWorldCreationSettings build() throws IllegalStateException {
         checkState(this.name != null, "name is not set");
         checkState(this.dimensionType != null, "dimensionType is not set");
-        DataContainer generatorSettings = this.generatorSettings;
-        if (generatorSettings == null) {
-            generatorSettings = this.generatorType.getGeneratorSettings();
-        }
         GeneratorType generatorType = this.generatorType;
         if (generatorType == null) {
             generatorType = this.dimensionType.getDefaultGeneratorType();
+        }
+        DataContainer generatorSettings = this.generatorSettings;
+        if (generatorSettings == null) {
+            generatorSettings = generatorType.getGeneratorSettings();
         }
         final boolean keepsSpawnLoaded = this.keepsSpawnLoaded == null ?
                 this.dimensionType.doesKeepSpawnLoaded() : this.keepsSpawnLoaded;

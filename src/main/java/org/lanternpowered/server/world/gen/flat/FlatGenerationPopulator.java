@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -38,6 +39,7 @@ import org.spongepowered.api.world.gen.GenerationPopulator;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 
+@NonnullByDefault
 public final class FlatGenerationPopulator implements GenerationPopulator {
 
     // Using a cache to increase generation performance
@@ -62,7 +64,7 @@ public final class FlatGenerationPopulator implements GenerationPopulator {
             blockStates = blockStates.subList(0, generatorHeight);
         }
 
-        this.blockStateCache = blockStates.toArray(new BlockState[] {});
+        this.blockStateCache = blockStates.toArray(new BlockState[blockStates.size()]);
     }
 
     @Override
@@ -82,4 +84,5 @@ public final class FlatGenerationPopulator implements GenerationPopulator {
             }
         }
     }
+
 }

@@ -25,12 +25,16 @@
 package org.lanternpowered.server.text.xml;
 
 import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@NonnullByDefault
 public class Span extends Element {
+
     @Override
     protected void modifyBuilder(TextBuilder builder) {
     }
+
 }

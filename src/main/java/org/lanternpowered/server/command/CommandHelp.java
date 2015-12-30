@@ -29,6 +29,7 @@ import static org.spongepowered.api.command.args.GenericArguments.string;
 
 import com.google.common.collect.Collections2;
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandMapping;
@@ -50,17 +51,11 @@ import java.util.Comparator;
 import java.util.Optional;
 import java.util.TreeSet;
 
-public final class CommandHelp implements Command {
+public final class CommandHelp {
 
-    private final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
-    private final LanternGame game;
+    private static final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
 
-    public CommandHelp(LanternGame game) {
-        this.game = game;
-    }
-
-    @Override
-    public CommandSpec build() {
+    public static CommandSpec create() {
         return CommandSpec
                 .builder()
                 .arguments(optional(string(Texts.of("command"))))
@@ -70,7 +65,7 @@ public final class CommandHelp implements Command {
                 .executor((src, args) -> {
                     Optional<String> command = args.getOne("command");
                     if (command.isPresent()) {
-                        Optional<? extends CommandMapping> mapping = game.getCommandManager().get(command.get());
+                        Optional<? extends CommandMapping> mapping = Sponge.getCommandManager().get(command.get());
                         if (mapping.isPresent()) {
                             CommandCallable callable = mapping.get().getCallable();
                             Optional<? extends Text> desc = callable.getHelp(src);
@@ -85,7 +80,7 @@ public final class CommandHelp implements Command {
                     }
 
                     TreeSet<CommandMapping> commands = new TreeSet<CommandMapping>(comparator);
-                    commands.addAll(Collections2.filter(game.getCommandManager().getAll().values(),
+                    commands.addAll(Collections2.filter(Sponge.getCommandManager().getAll().values(),
                             input -> input.getCallable().testPermission(src)));
 
                     // Console sources cannot see/use the pagination
@@ -95,7 +90,7 @@ public final class CommandHelp implements Command {
                     Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
 
                     if (paginate) {
-                        PaginationBuilder builder = game.getServiceManager().provide(PaginationService.class).get().builder();
+                        PaginationBuilder builder = Sponge.getServiceManager().provide(PaginationService.class).get().builder();
                         builder.title(title);
                         builder.contents(lines);
                         builder.sendTo(src);
@@ -108,7 +103,7 @@ public final class CommandHelp implements Command {
     }
 
     @SuppressWarnings("unchecked")
-    private Text getDescription(CommandSource source, CommandMapping mapping) {
+    private static Text getDescription(CommandSource source, CommandMapping mapping) {
         final Optional<Text> description = (Optional<Text>) mapping.getCallable().getShortDescription(source);
         TextBuilder text = Texts.builder("/" + mapping.getPrimaryAlias());
         text.color(TextColors.GREEN);

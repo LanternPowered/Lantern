@@ -37,7 +37,9 @@ import org.spongepowered.api.text.TextRepresentation;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternTextFactory implements TextFactory {
 
     private final LoadingCache<Character, LegacyTextRepresentation> legacyCache = CacheBuilder.newBuilder()
@@ -105,4 +107,5 @@ public final class LanternTextFactory implements TextFactory {
     public String replaceLegacyCodes(String text, char from, char to) {
         return LegacyTextRepresentation.replace(text, from, to);
     }
+
 }

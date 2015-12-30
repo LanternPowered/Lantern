@@ -26,16 +26,20 @@ package org.lanternpowered.server.text.xml;
 
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.net.URL;
 
+import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
+@NonnullByDefault
 public class A extends Element {
 
     @XmlAttribute(required = true)
+    @Nullable
     private URL href;
 
     public A() {
@@ -56,4 +60,5 @@ public class A extends Element {
     public void setUrl(URL href) {
         this.href = href;
     }
+
 }

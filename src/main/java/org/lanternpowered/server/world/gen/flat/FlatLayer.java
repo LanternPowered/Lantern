@@ -28,7 +28,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class FlatLayer {
 
     private final BlockState blockState;
@@ -74,4 +76,5 @@ public final class FlatLayer {
     public int getDepth() {
         return this.depth;
     }
+
 }

@@ -31,11 +31,13 @@ import java.util.Optional;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.ChunkLayout;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 
+@NonnullByDefault
 public class LanternChunkLayout implements ChunkLayout {
 
     /**

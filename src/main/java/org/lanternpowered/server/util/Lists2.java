@@ -26,12 +26,15 @@ package org.lanternpowered.server.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 
+@NonnullByDefault
 public final class Lists2 {
 
     /**
@@ -42,7 +45,7 @@ public final class Lists2 {
      * @return the non null list
      */
     public static <T> List<T> nonNullOf(List<T> list) {
-        return checkedOf(list, e -> checkNotNull(e, "Element cannot be null"));
+        return checkedOf(list, e -> checkNotNull(e, "element"));
     }
 
     /**
@@ -54,7 +57,7 @@ public final class Lists2 {
      * @return the checked list
      */
     public static <T> List<T> checkedOf(List<T> list, Consumer<T> checker) {
-        return new CheckedList<>(checkNotNull(list, "List cannot be null"), checker);
+        return new CheckedList<>(checkNotNull(list, "list"), checkNotNull(checker, "checker"));
     }
 
     private static class CheckedListIterator<T> implements ListIterator<T> {
@@ -142,7 +145,7 @@ public final class Lists2 {
 
         @Override
         public Iterator<T> iterator() {
-            return new CheckedListIterator<T>(this.backing.listIterator(), this.checker);
+            return new CheckedListIterator<>(this.backing.listIterator(), this.checker);
         }
 
         @Override
@@ -168,18 +171,18 @@ public final class Lists2 {
 
         @Override
         public boolean containsAll(Collection<?> c) {
-            return this.backing.contains(c);
+            return this.backing.containsAll(c);
         }
 
         @Override
         public boolean addAll(Collection<? extends T> c) {
-            c.forEach(e -> this.checker.accept(e));
+            c.forEach(this.checker::accept);
             return this.backing.addAll(c);
         }
 
         @Override
         public boolean addAll(int index, Collection<? extends T> c) {
-            c.forEach(e -> this.checker.accept(e));
+            c.forEach(this.checker::accept);
             return this.backing.addAll(index, c);
         }
 

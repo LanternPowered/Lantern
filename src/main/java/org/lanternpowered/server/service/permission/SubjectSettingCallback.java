@@ -29,15 +29,13 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-/**
- * {@link MixinSubject} helper class to apply the appropriate subject to the
- * mixin.
- */
+@NonnullByDefault
 public class SubjectSettingCallback implements Consumer<PermissionService> {
 
     private final AbstractSubject ref;
@@ -58,11 +56,10 @@ public class SubjectSettingCallback implements Consumer<PermissionService> {
                 // GameProfile is already resolved, use it directly
                 subject = ((UserCollection) userSubjects).get(((User) this.ref).getProfile());
             } else {
-                subject = userSubjects.get(((Subject) this.ref).getIdentifier());
+                subject = userSubjects.get(this.ref.getIdentifier());
             }
             this.ref.setInternalSubject(subject);
         }
-        return;
     }
 
 }

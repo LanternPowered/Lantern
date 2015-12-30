@@ -27,8 +27,10 @@ package org.lanternpowered.server.text.translation;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public class TranslationHelper {
+@NonnullByDefault
+public final class TranslationHelper {
 
     /**
      * Get the translated text for a given string.
@@ -40,4 +42,8 @@ public class TranslationHelper {
     public static Text t(String key, Object... args) {
         return Texts.of(LanternGame.get().getRegistry().getTranslationManager().get(key), args);
     }
+
+    private TranslationHelper() {
+    }
+
 }

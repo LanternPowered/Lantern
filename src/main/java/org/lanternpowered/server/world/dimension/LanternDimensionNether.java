@@ -25,11 +25,14 @@
 package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternDimensionNether extends LanternDimension {
 
     public LanternDimensionNether(LanternWorld world, String name,
             LanternDimensionType<LanternDimensionNether> dimensionType) {
         super(world, name, dimensionType);
     }
+
 }

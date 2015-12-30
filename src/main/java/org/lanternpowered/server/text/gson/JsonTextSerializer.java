@@ -35,7 +35,9 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text> {
 
     /**

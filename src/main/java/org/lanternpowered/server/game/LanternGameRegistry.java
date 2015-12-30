@@ -257,6 +257,7 @@ public class LanternGameRegistry implements GameRegistry {
             .put(Weather.class, this.weatherRegistry)
             .put(SkinPart.class, this.skinPartRegistry)
             .put(ChatVisibility.class, this.chatVisibilityRegistry)
+            .put(ChatType.class, this.chatTypeRegistry)
             .build();
     private final Map<Class<?>, Supplier<Object>> builderFactories = ImmutableMap.<Class<?>, Supplier<Object>>builder()
             .put(LanternAttributeBuilder.class, () -> new LanternAttributeBuilder(this.attributeRegistry))
@@ -360,6 +361,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.chatTypeRegistry.register(new LanternChatType("chat"));
         this.chatTypeRegistry.register(new LanternChatType("action_bar"));
         this.chatTypeRegistry.register(new LanternChatType("system"));
+        RegistryHelper.mapFields(ChatTypes.class, this.chatTypeRegistry.getDelegateMap());
     }
 
     private void registerSkinTypes() {
@@ -608,9 +610,7 @@ public class LanternGameRegistry implements GameRegistry {
         selectorMappings.put("all_entities", new LanternSelectorType("e"));
         selectorMappings.put("nearest_player", new LanternSelectorType("p"));
         selectorMappings.put("random", new LanternSelectorType("r"));
-        for (SelectorType type : selectorMappings.values()) {
-            this.selectorTypeRegistry.register(type);
-        }
+        selectorMappings.values().forEach(this.selectorTypeRegistry::register);
         RegistryHelper.mapFields(SelectorTypes.class, selectorMappings);
 
         LanternSelectorFactory factory = new LanternSelectorFactory(this.selectorTypeRegistry);
@@ -619,13 +619,13 @@ public class LanternGameRegistry implements GameRegistry {
         ArgumentType<Integer> x = factory.createArgumentType("x", Integer.class);
         ArgumentType<Integer> y = factory.createArgumentType("y", Integer.class);
         ArgumentType<Integer> z = factory.createArgumentType("z", Integer.class);
-        ArgumentHolder.Vector3<Vector3i, Integer> position = new LanternArgumentHolder.LanternVector3<Vector3i, Integer>(x, y, z, Vector3i.class);
+        ArgumentHolder.Vector3<Vector3i, Integer> position = new LanternArgumentHolder.LanternVector3<>(x, y, z, Vector3i.class);
         argMappings.put("position", position);
 
         // RADIUS
         ArgumentType<Integer> rmin = factory.createArgumentType("rm", Integer.class);
         ArgumentType<Integer> rmax = factory.createArgumentType("r", Integer.class);
-        ArgumentHolder.Limit<ArgumentType<Integer>> radius = new LanternArgumentHolder.LanternLimit<ArgumentType<Integer>>(rmin, rmax);
+        ArgumentHolder.Limit<ArgumentType<Integer>> radius = new LanternArgumentHolder.LanternLimit<>(rmin, rmax);
         argMappings.put("radius", radius);
 
         // GAME_MODE
@@ -637,7 +637,7 @@ public class LanternGameRegistry implements GameRegistry {
         // LEVEL
         ArgumentType<Integer> lmin = factory.createArgumentType("lm", Integer.class);
         ArgumentType<Integer> lmax = factory.createArgumentType("l", Integer.class);
-        ArgumentHolder.Limit<ArgumentType<Integer>> level = new LanternArgumentHolder.LanternLimit<ArgumentType<Integer>>(lmin, lmax);
+        ArgumentHolder.Limit<ArgumentType<Integer>> level = new LanternArgumentHolder.LanternLimit<>(lmin, lmax);
         argMappings.put("level", level);
 
         // TEAM
@@ -652,7 +652,7 @@ public class LanternGameRegistry implements GameRegistry {
         ArgumentType<Integer> dy = factory.createArgumentType("dy", Integer.class);
         ArgumentType<Integer> dz = factory.createArgumentType("dz", Integer.class);
         ArgumentHolder.Vector3<Vector3i, Integer> dimension =
-                new LanternArgumentHolder.LanternVector3<Vector3i, Integer>(dx, dy, dz, Vector3i.class);
+                new LanternArgumentHolder.LanternVector3<>(dx, dy, dz, Vector3i.class);
         argMappings.put("dimension", dimension);
 
         // ROTATION
@@ -660,14 +660,14 @@ public class LanternGameRegistry implements GameRegistry {
         ArgumentType<Double> rotymin = factory.createArgumentType("rym", Double.class);
         ArgumentType<Double> rotzmin = factory.createArgumentType("rzm", Double.class);
         ArgumentHolder.Vector3<Vector3d, Double> rotmin =
-                new LanternArgumentHolder.LanternVector3<Vector3d, Double>(rotxmin, rotymin, rotzmin, Vector3d.class);
+                new LanternArgumentHolder.LanternVector3<>(rotxmin, rotymin, rotzmin, Vector3d.class);
         ArgumentType<Double> rotxmax = factory.createArgumentType("rx", Double.class);
         ArgumentType<Double> rotymax = factory.createArgumentType("ry", Double.class);
         ArgumentType<Double> rotzmax = factory.createArgumentType("rz", Double.class);
         ArgumentHolder.Vector3<Vector3d, Double> rotmax =
-                new LanternArgumentHolder.LanternVector3<Vector3d, Double>(rotxmax, rotymax, rotzmax, Vector3d.class);
+                new LanternArgumentHolder.LanternVector3<>(rotxmax, rotymax, rotzmax, Vector3d.class);
         ArgumentHolder.Limit<ArgumentHolder.Vector3<Vector3d, Double>> rot =
-                new LanternArgumentHolder.LanternLimit<ArgumentHolder.Vector3<Vector3d, Double>>(rotmin, rotmax);
+                new LanternArgumentHolder.LanternLimit<>(rotmin, rotmax);
         argMappings.put("rotation", rot);
 
         // ENTITY_TYPE

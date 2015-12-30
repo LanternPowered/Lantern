@@ -36,6 +36,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.WeatherUniverse;
 import org.spongepowered.api.world.weather.Weathers;
@@ -44,6 +45,7 @@ import com.google.common.collect.Lists;
 
 @Locked
 @AttachableTo(LanternWorld.class)
+@NonnullByDefault
 public final class LanternWeatherUniverse implements Component, WeatherUniverse {
 
     private static final float FADE_SPEED = 0.01f;
@@ -207,4 +209,5 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         this.darknessTarget = weather0.getDarkness();
         this.rainStrengthTarget = weather0.getRainStrength();
     }
+
 }

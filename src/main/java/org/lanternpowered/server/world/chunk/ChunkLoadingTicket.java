@@ -24,8 +24,10 @@
  */
 package org.lanternpowered.server.world.chunk;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
 
+@NonnullByDefault
 public interface ChunkLoadingTicket extends LoadingTicket {
 
     /**
@@ -33,4 +35,5 @@ public interface ChunkLoadingTicket extends LoadingTicket {
      * to this loading ticket.
      */
     void unforceChunks();
+
 }

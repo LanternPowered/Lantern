@@ -28,13 +28,16 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+@NonnullByDefault
 public abstract class LanternSubjectCollection implements SubjectCollection {
+
     private final String identifier;
 
     protected LanternSubjectCollection(String identifier) {
@@ -69,4 +72,5 @@ public abstract class LanternSubjectCollection implements SubjectCollection {
         }
         return Collections.unmodifiableMap(ret);
     }
+
 }

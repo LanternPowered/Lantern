@@ -29,6 +29,7 @@ import org.spongepowered.api.text.TextRepresentation;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.TextMessageException;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
@@ -46,6 +47,7 @@ import javax.xml.bind.UnmarshallerHandler;
 /**
  * Xml format serializer for Text instances.
  */
+@NonnullByDefault
 public class XmlTextRepresentation implements TextRepresentation {
 
     private static final JAXBContext CONTEXT;
@@ -113,4 +115,5 @@ public class XmlTextRepresentation implements TextRepresentation {
             return Texts.of(input);
         }
     }
+
 }

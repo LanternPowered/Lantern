@@ -26,10 +26,12 @@ package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 
+@NonnullByDefault
 public final class LanternDimensionType<T extends LanternDimension> extends LanternPluginCatalogType implements DimensionType {
 
     private final GeneratorType defaultGeneratorType;
@@ -100,4 +102,5 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
     public int getInternalId() {
         return this.internalId;
     }
+
 }

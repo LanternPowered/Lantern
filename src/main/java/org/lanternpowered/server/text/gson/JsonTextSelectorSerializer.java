@@ -39,8 +39,11 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Selector>, JsonDeserializer<Text.Selector> {
+@NonnullByDefault
+public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Selector>,
+        JsonDeserializer<Text.Selector> {
 
     @Override
     public Text.Selector deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

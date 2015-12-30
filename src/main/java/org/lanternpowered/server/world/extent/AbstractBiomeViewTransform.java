@@ -30,12 +30,14 @@ import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuf
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
 import org.spongepowered.api.util.DiscreteTransform2;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
 
+@NonnullByDefault
 public abstract class AbstractBiomeViewTransform<A extends BiomeArea> implements BiomeArea {
 
     protected final A area;

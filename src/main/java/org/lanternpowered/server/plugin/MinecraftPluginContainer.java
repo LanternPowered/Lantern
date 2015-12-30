@@ -29,7 +29,9 @@ import java.util.Optional;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class MinecraftPluginContainer implements PluginContainer {
 
     private final Game game;
@@ -57,4 +59,5 @@ public final class MinecraftPluginContainer implements PluginContainer {
     public Optional<Object> getInstance() {
         return Optional.of(this.game.getServer());
     }
+
 }

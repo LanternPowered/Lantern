@@ -26,10 +26,12 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.util.DiscreteTransform2;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 
+@NonnullByDefault
 public class MutableBiomeViewTransform extends AbstractBiomeViewTransform<MutableBiomeArea> implements MutableBiomeArea {
 
     public MutableBiomeViewTransform(MutableBiomeArea area, DiscreteTransform2 transform) {
@@ -65,4 +67,5 @@ public class MutableBiomeViewTransform extends AbstractBiomeViewTransform<Mutabl
     public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
         return new UnmodifiableBiomeAreaWrapper(this);
     }
+
 }

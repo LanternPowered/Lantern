@@ -24,10 +24,12 @@
  */
 package org.lanternpowered.server.world.gen;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
+@NonnullByDefault
 public class LanternGeneratorTypeNether extends LanternGeneratorType {
 
     public LanternGeneratorTypeNether(String pluginId, String name) {

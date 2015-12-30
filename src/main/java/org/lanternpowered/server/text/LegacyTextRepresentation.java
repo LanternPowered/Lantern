@@ -49,12 +49,9 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-/**
- * TODO: PermissionsEx (PEX) is translating the translations
- * with the toString (or other) method, which gives unreadable results.
- * Strangely this is working in sponge.
- */
+@NonnullByDefault
 public class LegacyTextRepresentation implements TextRepresentation {
 
     public static final char DEFAULT_CHAR = '\u00A7';
@@ -303,8 +300,7 @@ public class LegacyTextRepresentation implements TextRepresentation {
 
     private static class ResolvedChatStyle {
 
-        @Nullable
-        public final TextColor color;
+        @Nullable public final TextColor color;
         public final boolean bold;
         public final boolean italic;
         public final boolean underlined;

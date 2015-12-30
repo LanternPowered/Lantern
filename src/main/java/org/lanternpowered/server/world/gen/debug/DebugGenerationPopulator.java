@@ -33,6 +33,7 @@ import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -41,6 +42,7 @@ import org.spongepowered.api.world.gen.GenerationPopulator;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 
+@NonnullByDefault
 public final class DebugGenerationPopulator implements GenerationPopulator {
 
     // The height of the plane where all the blocks are set
@@ -61,7 +63,7 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
         for (BlockType blockType : registry.getAllOf(BlockType.class)) {
             blockStates.addAll(((LanternBlockType) blockType).getAllStates());
         }
-        this.blockStateCache = blockStates.toArray(new BlockState[0]);
+        this.blockStateCache = blockStates.toArray(new BlockState[blockStates.size()]);
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));
     }
 
@@ -96,4 +98,5 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
             }
         }
     }
+
 }

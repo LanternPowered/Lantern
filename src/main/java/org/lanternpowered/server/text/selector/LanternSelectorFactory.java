@@ -57,6 +57,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.annotation.Nullable;
+
 @NonnullByDefault
 public class LanternSelectorFactory implements SelectorFactory {
 
@@ -66,44 +68,32 @@ public class LanternSelectorFactory implements SelectorFactory {
 
     public static <K, V> Function<K, V> methodAsFunction(final Method m, boolean isStatic) {
         if (isStatic) {
-            return new Function<K, V>() {
-
-                @SuppressWarnings("unchecked")
-                @Override
-                public V apply(K input) {
-                    try {
-                        return (V) m.invoke(null, input);
-                    } catch (IllegalAccessException e) {
-                        LanternGame.log().debug(m + " wasn't public", e);
-                        return null;
-                    } catch (IllegalArgumentException e) {
-                        LanternGame.log().debug(m + " failed with paramter " + input, e);
-                        return null;
-                    } catch (InvocationTargetException e) {
-                        throw Throwables.propagate(e.getCause());
-                    }
+            return input -> {
+                try {
+                    return (V) m.invoke(null, input);
+                } catch (IllegalAccessException e) {
+                    LanternGame.log().debug(m + " wasn't public", e);
+                    return null;
+                } catch (IllegalArgumentException e) {
+                    LanternGame.log().debug(m + " failed with paramter " + input, e);
+                    return null;
+                } catch (InvocationTargetException e) {
+                    throw Throwables.propagate(e.getCause());
                 }
-
             };
         } else {
-            return new Function<K, V>() {
-
-                @SuppressWarnings("unchecked")
-                @Override
-                public V apply(K input) {
-                    try {
-                        return (V) m.invoke(input);
-                    } catch (IllegalAccessException e) {
-                        LanternGame.log().debug(m + " wasn't public", e);
-                        return null;
-                    } catch (IllegalArgumentException e) {
-                        LanternGame.log().debug(m + " failed with paramter " + input, e);
-                        return null;
-                    } catch (InvocationTargetException e) {
-                        throw Throwables.propagate(e.getCause());
-                    }
+            return input -> {
+                try {
+                    return (V) m.invoke(input);
+                } catch (IllegalAccessException e) {
+                    LanternGame.log().debug(m + " wasn't public", e);
+                    return null;
+                } catch (IllegalArgumentException e) {
+                    LanternGame.log().debug(m + " failed with paramter " + input, e);
+                    return null;
+                } catch (InvocationTargetException e) {
+                    throw Throwables.propagate(e.getCause());
                 }
-
             };
         }
     }
@@ -162,7 +152,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     Score.class.getName());
             LanternArgumentType<Integer> max = this.createArgumentType("score_" + name, Integer.class,
                     Score.class.getName());
-            this.scoreToTypeMap.put(name, new LanternArgumentHolder.LanternLimit<ArgumentType<Integer>>(min, max));
+            this.scoreToTypeMap.put(name, new LanternArgumentHolder.LanternLimit<>(min, max));
         }
         return this.scoreToTypeMap.get(name);
     }
@@ -190,7 +180,7 @@ public class LanternSelectorFactory implements SelectorFactory {
     @SuppressWarnings("unchecked")
     public <T> LanternArgumentType<T> createArgumentType(String key, Class<T> type, String converterKey) {
         if (!this.argumentLookupMap.containsKey(key)) {
-            this.argumentLookupMap.put(key, new LanternArgumentType<T>(key, type, converterKey));
+            this.argumentLookupMap.put(key, new LanternArgumentType<>(key, type, converterKey));
         }
         return (LanternArgumentType<T>) this.argumentLookupMap.get(key);
     }
@@ -207,7 +197,7 @@ public class LanternSelectorFactory implements SelectorFactory {
     public <T> LanternArgumentType.Invertible<T> createInvertibleArgumentType(String key, Class<T> type,
             String converterKey) {
         if (!this.argumentLookupMap.containsKey(key)) {
-            this.argumentLookupMap.put(key, new LanternArgumentType.Invertible<T>(key, type, converterKey));
+            this.argumentLookupMap.put(key, new LanternArgumentType.Invertible<>(key, type, converterKey));
         }
         return (LanternArgumentType.Invertible<T>) this.argumentLookupMap.get(key);
     }
@@ -217,12 +207,12 @@ public class LanternSelectorFactory implements SelectorFactory {
         if (type instanceof ArgumentType.Invertible) {
             return this.createArgument((ArgumentType.Invertible<T>) type, value, false);
         }
-        return new LanternArgument<T>(type, value);
+        return new LanternArgument<>(type, value);
     }
 
     @Override
     public <T> Argument.Invertible<T> createArgument(ArgumentType.Invertible<T> type, T value, boolean inverted) {
-        return new LanternArgument.Invertible<T>(type, value, inverted);
+        return new LanternArgument.Invertible<>(type, value, inverted);
     }
 
     @SuppressWarnings("unchecked")
@@ -231,7 +221,7 @@ public class LanternSelectorFactory implements SelectorFactory {
             ArgumentHolder<? extends ArgumentType<T>> type, V value) {
         Set<Argument<T>> set = Sets.newLinkedHashSet();
         if (type instanceof LanternArgumentHolder.LanternVector3) {
-            Set<Function<V, T>> extractors = ((LanternArgumentHolder.LanternVector3<V, T>) (Object) type).extractFunctions();
+            Set<Function<V, T>> extractors = ((LanternArgumentHolder.LanternVector3<V, T>) type).extractFunctions();
             Set<? extends ArgumentType<T>> types = type.getTypes();
             Iterator<Function<V, T>> extIter = extractors.iterator();
             Iterator<? extends ArgumentType<T>> typeIter = types.iterator();
@@ -262,7 +252,7 @@ public class LanternSelectorFactory implements SelectorFactory {
         return generated;
     }
 
-    public Map<String, String> parseArgumentsMap(String input) {
+    public Map<String, String> parseArgumentsMap(@Nullable String input) {
         Map<String, String> map = Maps.newHashMap();
         if (input == null) {
             return map;
@@ -313,4 +303,5 @@ public class LanternSelectorFactory implements SelectorFactory {
         }
         return created;
     }
+
 }

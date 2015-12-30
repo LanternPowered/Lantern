@@ -26,9 +26,11 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.util.DiscreteTransform2;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 
+@NonnullByDefault
 public class ImmutableBiomeViewDownsize extends AbstractBiomeViewDownsize<ImmutableBiomeArea> implements ImmutableBiomeArea {
 
     public ImmutableBiomeViewDownsize(ImmutableBiomeArea area, Vector2i min, Vector2i max) {

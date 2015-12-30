@@ -43,6 +43,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
+@NonnullByDefault
 public class LanternCommandDisambiguator implements Disambiguator {
 
     private final LanternGame game;
@@ -58,7 +59,6 @@ public class LanternCommandDisambiguator implements Disambiguator {
     }
 
     @Override
-    @NonnullByDefault
     public Optional<CommandMapping> disambiguate(@Nullable CommandSource source, String aliasUsed, List<CommandMapping> availableOptions) {
         if (availableOptions.size() > 1) {
             final String chosenPlugin = this.game.getGlobalConfig().getCommandAliases().get(aliasUsed.toLowerCase());

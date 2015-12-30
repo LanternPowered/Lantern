@@ -25,16 +25,21 @@
 package org.lanternpowered.server.permission;
 
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public abstract class AbstractSubjectBase implements AbstractSubject {
 
-    private volatile Subject subject;
+    @Nullable private volatile Subject subject;
 
     @Override
-    public void setInternalSubject(Subject subj) {
+    public void setInternalSubject(@Nullable Subject subj) {
         this.subject = subj;
     }
 
+    @Nullable
     @Override
     public Subject getInternalSubject() {
         if (this.subject == null) {
@@ -42,4 +47,5 @@ public abstract class AbstractSubjectBase implements AbstractSubject {
         }
         return this.subject;
     }
+
 }

@@ -29,12 +29,14 @@ import java.util.Collection;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
+@NonnullByDefault
 public final class LanternWorldCreationSettings implements WorldCreationSettings {
 
     private final String name;
@@ -181,4 +183,5 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     public boolean isPVPEnabled() {
         return this.pvpEnabled;
     }
+
 }

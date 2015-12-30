@@ -39,7 +39,9 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Literal>, JsonDeserializer<Text.Literal> {
 
     @Override

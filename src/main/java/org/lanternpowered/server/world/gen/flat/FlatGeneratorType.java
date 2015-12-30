@@ -32,12 +32,14 @@ import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
 import com.google.common.collect.Lists;
 
+@NonnullByDefault
 public final class FlatGeneratorType extends LanternGeneratorType {
 
     public final static DataQuery SETTINGS = DataQuery.of("customSettings");
@@ -79,4 +81,5 @@ public final class FlatGeneratorType extends LanternGeneratorType {
                 (LanternGeneratorType) world.getProperties().getGeneratorType());
         return new LanternWorldGenerator(populatorGenerator, biomeGenerator);
     }
+
 }

@@ -25,6 +25,7 @@
 package org.lanternpowered.server.text.title;
 
 import java.lang.ref.WeakReference;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -42,7 +43,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternTitles {
 
     private final static LoadingCache<Title, CacheValue> messagesCache = 
@@ -100,15 +103,19 @@ public final class LanternTitles {
         @Override
         public List<Message> getMessages(Locale locale) {
             return this.cache.computeIfAbsent(locale, locale0 -> {
+                Title title = this.title.get();
+                if (title == null) {
+                    return Collections.emptyList();
+                }
                 final ImmutableList.Builder<Message> builder = ImmutableList.<Message>builder();
                 builder.addAll(this.messages);
-                Optional<Text> title = this.title.get().getTitle();
-                if (title.isPresent()) {
-                    builder.add(new MessagePlayOutTitle.SetTitle(new LocalizedText(title.get(), locale)));
+                Optional<Text> text = title.getTitle();
+                if (text.isPresent()) {
+                    builder.add(new MessagePlayOutTitle.SetTitle(new LocalizedText(text.get(), locale)));
                 }
-                title = this.title.get().getSubtitle();
-                if (title.isPresent()) {
-                    builder.add(new MessagePlayOutTitle.SetSubtitle(new LocalizedText(title.get(), locale)));
+                text = title.getSubtitle();
+                if (text.isPresent()) {
+                    builder.add(new MessagePlayOutTitle.SetSubtitle(new LocalizedText(text.get(), locale)));
                 }
                 return builder.build();
             });

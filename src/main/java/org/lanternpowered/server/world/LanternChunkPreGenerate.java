@@ -35,6 +35,7 @@ import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.lanternpowered.server.game.LanternGame;
 import org.slf4j.Logger;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
@@ -43,6 +44,7 @@ import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 
+@NonnullByDefault
 public final class LanternChunkPreGenerate implements ChunkPreGenerate {
 
     private static final int TICK_INTERVAL = 10;
@@ -232,5 +234,7 @@ public final class LanternChunkPreGenerate implements ChunkPreGenerate {
         private boolean checkTickTime(long tickTime) {
             return this.tickPercent <= 0 || tickTime < this.tickTimeLimit;
         }
+
     }
+
 }

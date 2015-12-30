@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.lanternpowered.server.util.Lists2;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.GroundCoverLayer;
 import org.spongepowered.api.world.gen.GenerationPopulator;
@@ -35,6 +36,7 @@ import org.spongepowered.api.world.gen.Populator;
 
 import com.google.common.collect.Lists;
 
+@NonnullByDefault
 public final class LanternBiomeGenerationSettings implements BiomeGenerationSettings {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...
@@ -108,4 +110,5 @@ public final class LanternBiomeGenerationSettings implements BiomeGenerationSett
     public <T extends Populator> List<T> getPopulators(Class<T> type) {
         return (List<T>) this.populators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
     }
+
 }

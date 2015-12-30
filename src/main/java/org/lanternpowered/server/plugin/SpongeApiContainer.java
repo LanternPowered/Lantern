@@ -29,7 +29,9 @@ import java.util.Optional;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternPlatform;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class SpongeApiContainer implements PluginContainer {
 
     @Override
@@ -51,4 +53,5 @@ public final class SpongeApiContainer implements PluginContainer {
     public Optional<Object> getInstance() {
         return Optional.of(LanternGame.get());
     }
+
 }

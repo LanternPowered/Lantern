@@ -31,9 +31,11 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.function.Predicate;
 
+@NonnullByDefault
 public final class LanternChatVisibility extends SimpleLanternCatalogType implements ChatVisibility {
 
     private final static TIntObjectMap<LanternChatVisibility> lookup = new TIntObjectHashMap<>();

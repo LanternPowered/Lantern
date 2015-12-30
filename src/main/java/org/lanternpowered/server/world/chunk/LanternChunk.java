@@ -72,6 +72,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
@@ -92,6 +93,7 @@ import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_MAS
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTION_MASK;
 import static com.google.common.base.Preconditions.checkArgument;
 
+@NonnullByDefault
 public class LanternChunk implements AbstractExtent, Chunk {
 
     // The size of a chunk section in the x, y and z directions
@@ -208,9 +210,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
     private volatile boolean loaded;
     private volatile boolean populated;
 
-    private AtomicByteArray heightMap;
-    private AtomicReferenceArray<ChunkSection> sections = new AtomicReferenceArray<>(CHUNK_SECTIONS);
-    private AtomicShortArray biomes;
+    @Nullable private AtomicByteArray heightMap;
+    @Nullable private AtomicReferenceArray<ChunkSection> sections = new AtomicReferenceArray<>(CHUNK_SECTIONS);
+    @Nullable private AtomicShortArray biomes;
 
     public LanternChunk(LanternWorld world, int x, int z) {
         this.world = world;

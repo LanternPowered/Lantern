@@ -39,6 +39,7 @@ import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.source.RemoteSource;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 
 import java.net.InetAddress;
@@ -49,7 +50,9 @@ import java.util.function.Function;
 /**
  * A context calculator handling world contexts.
  */
+@NonnullByDefault
 public class LanternContextCalculator implements ContextCalculator {
+
     private final LoadingCache<RemoteSource, Set<Context>> remoteIpCache = buildAddressCache(Context.REMOTE_IP_KEY,
             input -> input.getConnection().getAddress().getAddress());
 
@@ -94,7 +97,6 @@ public class LanternContextCalculator implements ContextCalculator {
                 accumulator.add(new Context(Context.LOCAL_HOST_KEY, rem.getConnection().getVirtualHost().getHostName()));
             }
         }
-
     }
 
     @Override
@@ -125,4 +127,5 @@ public class LanternContextCalculator implements ContextCalculator {
         }
         return false;
     }
+
 }

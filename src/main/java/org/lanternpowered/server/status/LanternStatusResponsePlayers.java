@@ -30,7 +30,9 @@ import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.profile.GameProfile;
 
 import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternStatusResponsePlayers implements ClientPingServerEvent.Response.Players {
 
     private final List<GameProfile> profiles;
@@ -68,4 +70,5 @@ public class LanternStatusResponsePlayers implements ClientPingServerEvent.Respo
     public void setOnline(int online) {
         this.online = online;
     }
+
 }

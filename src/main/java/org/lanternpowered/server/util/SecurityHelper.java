@@ -33,7 +33,11 @@ import java.security.SecureRandom;
 import java.security.spec.X509EncodedKeySpec;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public final class SecurityHelper {
 
     private static SecureRandom random = new SecureRandom();
@@ -44,6 +48,7 @@ public final class SecurityHelper {
     /**
      * Generate a RSA key pair
      */
+    @Nullable
     public static KeyPair generateKeyPair() {
         KeyPair keyPair = null;
         try {
@@ -69,6 +74,7 @@ public final class SecurityHelper {
     /**
      * Generates an X509 formatted key used in authentication
      */
+    @Nullable
     public static Key generateX509Key(Key base) {
         Key key = null;
         try {
@@ -80,4 +86,5 @@ public final class SecurityHelper {
         }
         return key;
     }
+
 }

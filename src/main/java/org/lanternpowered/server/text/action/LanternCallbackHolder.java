@@ -52,9 +52,11 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+@NonnullByDefault
 public class LanternCallbackHolder {
 
     public static final String CALLBACK_COMMAND = "callback";
@@ -130,4 +132,5 @@ public class LanternCallbackHolder {
             return ImmutableList.of();
         }
     }
+
 }

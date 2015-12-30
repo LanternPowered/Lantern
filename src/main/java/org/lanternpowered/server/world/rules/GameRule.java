@@ -27,7 +27,9 @@ package org.lanternpowered.server.world.rules;
 import java.util.Optional;
 
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface GameRule {
 
     /**
@@ -86,4 +88,5 @@ public interface GameRule {
      * @return the value
      */
     Optional<Integer> asInt();
+
 }

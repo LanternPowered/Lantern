@@ -44,13 +44,15 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public class LanternTranslationManager implements TranslationManager {
+@NonnullByDefault
+public final class LanternTranslationManager implements TranslationManager {
 
     private static class ResourceKey {
 
         private final String name;
-        private final Locale locale;
+        @Nullable private final Locale locale;
 
         public ResourceKey(String name, @Nullable Locale locale) {
             this.name = name;
@@ -110,7 +112,8 @@ public class LanternTranslationManager implements TranslationManager {
 
         Set<ResourceKey> refresh = Sets.newHashSet();
         for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
-            if (key.locale.equals(locale) && bundle.containsKey(key.name)) {
+            Locale locale1 = key.locale == null ? Locale.ENGLISH : key.locale;
+            if (locale1.equals(locale) && bundle.containsKey(key.name)) {
                 refresh.add(key);
             }
         }

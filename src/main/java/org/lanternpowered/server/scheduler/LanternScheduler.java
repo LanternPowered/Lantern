@@ -44,7 +44,9 @@ import org.spongepowered.api.scheduler.Task;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFutureTask;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternScheduler implements Scheduler {
 
     private static final LanternScheduler INSTANCE = new LanternScheduler();
@@ -186,4 +188,5 @@ public class LanternScheduler implements Scheduler {
     public SpongeExecutorService createAsyncExecutor(Object plugin) {
         return new TaskExecutorService(() -> this.createTaskBuilder().async(), this.asyncScheduler, checkPlugin(plugin, "plugin"));
     }
+
 }

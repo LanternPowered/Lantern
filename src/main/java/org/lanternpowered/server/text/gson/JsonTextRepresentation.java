@@ -37,7 +37,9 @@ import org.spongepowered.api.util.TextMessageException;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class JsonTextRepresentation implements TextRepresentation {
 
     private final Gson gson;
@@ -83,4 +85,5 @@ public final class JsonTextRepresentation implements TextRepresentation {
             return Texts.of(input);
         }
     }
+
 }

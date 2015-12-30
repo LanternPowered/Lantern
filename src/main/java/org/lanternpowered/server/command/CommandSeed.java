@@ -45,22 +45,19 @@ public final class CommandSeed {
                 .arguments(
                         GenericArguments.optional(WorldPropertiesChoicesElement.of(Texts.of("world"))))
                 .permission("minecraft.command.seed")
-                .executor(new CommandExecutor() {
-                    @Override
-                    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                        WorldProperties world;
-                        if (args.hasAny("world")) {
-                            world = args.<WorldProperties>getOne("world").get();
-                        } else {
-                            world = LanternGame.get().getServer().getDefaultWorld().orElse(null);
-                            if (world == null) {
-                                // Shouldn't happen
-                                throw new CommandException(t("Unable to find the default world."));
-                            }
+                .executor((src, args) -> {
+                    WorldProperties world;
+                    if (args.hasAny("world")) {
+                        world = args.<WorldProperties>getOne("world").get();
+                    } else {
+                        world = LanternGame.get().getServer().getDefaultWorld().orElse(null);
+                        if (world == null) {
+                            // Shouldn't happen
+                            throw new CommandException(t("Unable to find the default world."));
                         }
-                        src.sendMessage(t("commands.seed.success", world.getSeed()));
-                        return CommandResult.success();
                     }
+                    src.sendMessage(t("commands.seed.success", world.getSeed()));
+                    return CommandResult.success();
                 })
                 .build();
     }

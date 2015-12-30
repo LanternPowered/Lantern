@@ -48,14 +48,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 abstract class JsonTextBaseSerializer {
 
     public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context) throws JsonParseException {
         this.deserialize(json, builder, context, json.has("extra") ? json.getAsJsonArray("extra") : null);
     }
 
-    public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context, @Nullable JsonArray children) throws JsonParseException {
+    public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context, @Nullable JsonArray children)
+            throws JsonParseException {
         if (json.has("color")) {
             TextColor color = LanternGame.get().getRegistry().getType(TextColor.class, json.get("color").getAsString()).orElse(null);
             if (color != null) {
@@ -150,7 +153,7 @@ abstract class JsonTextBaseSerializer {
             json.addProperty("obfuscated", obfuscated.get());
         }
         if (!children.isEmpty()) {
-            json.add("extra", context.serialize(children.toArray(new Text[] {}), Text[].class));
+            json.add("extra", context.serialize(children.toArray(new Text[children.size()]), Text[].class));
         }
         ClickAction<?> clickAction = text.getClickAction().orElse(null);
         if (clickAction != null) {
@@ -177,4 +180,5 @@ abstract class JsonTextBaseSerializer {
             json.addProperty("insertion", ((ShiftClickAction.InsertText) shiftClickAction).getResult());
         }
     }
+
 }

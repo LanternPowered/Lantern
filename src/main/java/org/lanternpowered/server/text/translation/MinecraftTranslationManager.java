@@ -33,7 +33,9 @@ import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
 import com.google.common.collect.Maps;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class MinecraftTranslationManager implements TranslationManager {
 
     private final Map<String, Translation> translations = Maps.newConcurrentMap();
@@ -49,16 +51,15 @@ public final class MinecraftTranslationManager implements TranslationManager {
 
     @Override
     public Translation get(String key) {
-        return this.getIfPresent(key).orElseGet(() -> this.translations.computeIfAbsent(key,
-                key0 -> new FixedTranslation(key)));
+        return this.getIfPresent(key).orElseGet(() -> this.translations.computeIfAbsent(key, FixedTranslation::new));
     }
 
     @Override
     public Optional<Translation> getIfPresent(String key) {
         if (this.resourceBundle.containsKey(key)) {
-            return Optional.of(this.translations.computeIfAbsent(key, key0 ->
-                    new MinecraftTranslation(key, this.resourceBundle)));
+            return Optional.of(this.translations.computeIfAbsent(key, key0 -> new MinecraftTranslation(key, this.resourceBundle)));
         }
         return Optional.empty();
     }
+
 }

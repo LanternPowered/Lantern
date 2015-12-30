@@ -33,11 +33,13 @@ import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
 
+@NonnullByDefault
 public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implements BlockVolume {
 
     protected final V volume;

@@ -27,16 +27,20 @@ package org.lanternpowered.server.world.dimension;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public abstract class LanternDimension implements Dimension {
 
     private final String name;
     private final LanternDimensionType<?> dimensionType;
     private final LanternWorld world;
 
-    private volatile Context dimContext;
+    @Nullable private volatile Context dimContext;
 
     public LanternDimension(LanternWorld world, String name, LanternDimensionType<?> dimensionType) {
         this.dimensionType = dimensionType;
@@ -106,4 +110,5 @@ public abstract class LanternDimension implements Dimension {
     public LanternGeneratorType getGeneratorType() {
         return this.world.getProperties().getGeneratorType();
     }
+
 }

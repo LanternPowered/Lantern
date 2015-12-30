@@ -42,6 +42,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.DataBuilder;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 
@@ -49,6 +50,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
 @ConfigSerializable
+@NonnullByDefault
 public final class LanternGameProfile implements GameProfile {
 
     private static final DataQuery NAME = DataQuery.of("Name");
@@ -127,7 +129,7 @@ public final class LanternGameProfile implements GameProfile {
     }
 
     @Override
-    public boolean equals(Object other) {
+    public boolean equals(@Nullable Object other) {
         if (this == other) {
             return true;
         }
@@ -216,7 +218,7 @@ public final class LanternGameProfile implements GameProfile {
         }
 
         @Override
-        public boolean equals(Object other) {
+        public boolean equals(@Nullable Object other) {
             if (this == other) {
                 return true;
             }

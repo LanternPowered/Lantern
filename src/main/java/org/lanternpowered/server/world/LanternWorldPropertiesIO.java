@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.world;
 
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -55,6 +56,7 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
@@ -64,6 +66,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
+@NonnullByDefault
 public final class LanternWorldPropertiesIO {
 
     private final static Gson GSON = new Gson();
@@ -393,8 +396,7 @@ public final class LanternWorldPropertiesIO {
 
         // Fall back to the default generator type
         if (properties.generatorType == null) {
-            properties.generatorType = (LanternGeneratorType) ((LanternDimensionType<?>)
-                    properties.dimensionType).getDefaultGeneratorType();
+            properties.generatorType = (LanternGeneratorType) properties.dimensionType.getDefaultGeneratorType();
         }
         // Fall back to the default generator settings
         if (properties.generatorSettings == null) {
@@ -518,7 +520,7 @@ public final class LanternWorldPropertiesIO {
         }
         spongeContainer.set(DIMENSION_TYPE, properties.dimensionType.getId());
         spongeContainer.set(GENERATOR_MODIFIERS, properties.generatorModifiers.stream().map(
-                modifier -> modifier.getId()).collect(Collectors.toList()));
+                CatalogType::getId).collect(Collectors.toList()));
         spongeContainer.set(PLAYER_UUID_TABLE, properties.pendingUniqueIds.stream().map(
                 uuid -> new MemoryDataContainer()
                             .set(UUID_MOST, uuid.getMostSignificantBits())
@@ -559,4 +561,5 @@ public final class LanternWorldPropertiesIO {
             this.properties = properties;
         }
     }
+
 }

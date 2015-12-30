@@ -36,14 +36,19 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
 /**
  * An implementation of vanilla minecraft's 4 op groups.
  */
+@NonnullByDefault
 public class UserSubject extends LanternSubject {
+
     private final GameProfile player;
     private final MemorySubjectData data;
     private final UserCollection collection;
@@ -58,7 +63,7 @@ public class UserSubject extends LanternSubject {
             }
 
             @Override
-            public boolean setParent(Subject parent) {
+            public boolean setParent(@Nullable Subject parent) {
                 int opLevel;
                 if (parent == null) {
                     opLevel = 0;
@@ -120,4 +125,5 @@ public class UserSubject extends LanternSubject {
         }
         return ret;
     }
+
 }

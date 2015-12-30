@@ -43,11 +43,13 @@ import org.spongepowered.api.network.status.Favicon;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+@NonnullByDefault
 public class LanternFavicon implements Favicon {
 
     private final BufferedImage decoded;
@@ -117,9 +119,9 @@ public class LanternFavicon implements Favicon {
     }
 
     /**
-     * Loads the favicon from the image file.
+     * Loads the favicon from the image path.
      * 
-     * @param file the file
+     * @param path the path
      * @return the favicon
      */
     public static Favicon load(Path path) throws IOException {

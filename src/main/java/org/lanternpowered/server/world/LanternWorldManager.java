@@ -55,6 +55,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
@@ -67,6 +68,9 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
+import com.flowpowered.math.vector.Vector3d;
+
+@NonnullByDefault
 public final class LanternWorldManager {
 
     // The counter for the executor threads
@@ -142,7 +146,7 @@ public final class LanternWorldManager {
      * Creates a new world manager.
      * 
      * @param game the game instance
-     * @param globalConfig the global configuration
+     * @param rootWorldFolder the root world folder
      */
     public LanternWorldManager(LanternGame game, Path rootWorldFolder) {
         this.rootWorldFolder = rootWorldFolder;
@@ -254,7 +258,7 @@ public final class LanternWorldManager {
      * is still enabled according to {@link WorldProperties#isEnabled()} then it
      * will be loaded again if the server is restarted or an attempt is made by
      * a plugin to transfer an entity to the world using
-     * {@link Entity#transferToWorld(String, Vector3d)}.</p>
+     * {@link org.spongepowered.api.entity.Entity#transferToWorld(String, Vector3d)}.</p>
      *
      * @param world the world to unload
      * @return whether the operation was successful
@@ -466,7 +470,7 @@ public final class LanternWorldManager {
     /**
      * Creates a new world from the given {@link WorldCreationSettings}. For the
      * creation of the WorldCreationSettings please see
-     * {@link WorldBuilder}.
+     * {@link org.spongepowered.api.world.WorldCreationSettings.Builder}.
      *
      * <p>If the world already exists then the existing {@link WorldProperties}
      * are returned else a new world is created and the new WorldProperties
@@ -618,7 +622,7 @@ public final class LanternWorldManager {
     /**
      * Gets or creates a new world config for the specified world.
      * 
-     * @param worldName the world name
+     * @param worldProperties the properties of the world
      * @return the world config
      * @throws IOException 
      */
@@ -703,7 +707,6 @@ public final class LanternWorldManager {
                 this.executor.submit(this::tickEnd);
             } catch (RejectedExecutionException ex) {
                 this.shutdown();
-                return;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
@@ -716,11 +719,9 @@ public final class LanternWorldManager {
      */
     public void shutdown() {
         // Unload all the active worlds
-        for (WorldLookupEntry entry : this.worldByProperties.values()) {
-            if (entry.world != null) {
-                this.unloadWorld(entry.world);
-            }
-        }
+        this.worldByProperties.values().stream().filter(entry -> entry.world != null).forEach(entry -> {
+            this.unloadWorld(entry.world);
+        });
         this.tickBegin.forceTermination();
         this.tickEnd.forceTermination();
         this.worldThreads.clear();

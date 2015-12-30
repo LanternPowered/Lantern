@@ -32,6 +32,7 @@ import java.util.Map;
 import org.lanternpowered.server.util.Lists2;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.BiomeGenerator;
@@ -42,6 +43,7 @@ import org.spongepowered.api.world.gen.WorldGenerator;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+@NonnullByDefault
 public final class LanternWorldGenerator implements WorldGenerator {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...
@@ -105,4 +107,5 @@ public final class LanternWorldGenerator implements WorldGenerator {
         final LanternBiomeType biomeType = (LanternBiomeType) checkNotNull(type, "type");
         return this.biomeGenSettings.computeIfAbsent(biomeType, t -> t.getDefaultGenerationSettings().copy());
     }
+
 }

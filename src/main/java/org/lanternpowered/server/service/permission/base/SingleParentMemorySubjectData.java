@@ -29,13 +29,18 @@ import org.lanternpowered.server.service.permission.OpLevelCollection;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class SingleParentMemorySubjectData extends GlobalMemorySubjectData {
-    private Subject parent;
+
+    @Nullable private Subject parent;
 
     /**
      * Creates a new subject data instance, using the provided service to request instances of permission subjects.
@@ -57,7 +62,6 @@ public class SingleParentMemorySubjectData extends GlobalMemorySubjectData {
         if (!(parent instanceof OpLevelCollection.OpLevelSubject)) {
             return false;
         }
-
         if (!GLOBAL_CONTEXT.equals(contexts)) {
             return false;
         }
@@ -65,7 +69,7 @@ public class SingleParentMemorySubjectData extends GlobalMemorySubjectData {
     }
 
     @Override
-    public boolean removeParent(Set<Context> contexts, Subject parent) {
+    public boolean removeParent(Set<Context> contexts, @Nullable Subject parent) {
         if (parent == this.parent) {
             return setParent(null);
         }
@@ -82,12 +86,14 @@ public class SingleParentMemorySubjectData extends GlobalMemorySubjectData {
         return GLOBAL_CONTEXT.equals(contexts) && clearParents();
     }
 
-    public boolean setParent(Subject parent) {
+    public boolean setParent(@Nullable Subject parent) {
         this.parent = parent;
         return true;
     }
 
+    @Nullable
     public Subject getParent() {
         return this.parent;
     }
+
 }

@@ -62,39 +62,35 @@ public final class CommandBan {
                         GenericArguments.string(Texts.of(targetArg)),
                         GenericArguments.optional(RemainingTextElement.of(Texts.of("reason"))))
                 .permission(alwaysSuccess ? "minecraft.command.ban" : "minecraft.command.ban-ip")
-                .executor(new CommandExecutor() {
-
-                    @Override
-                    public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                        final String target = args.<String>getOne(targetArg).get();
-                        final String reason = args.<String>getOne("reason").orElse(null);
-                        BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
-                        if (alwaysSuccess) {
-                            // TODO
-                        } else {
-                            // Try as ip address first
-                            try {
-                                InetAddress address = InetAddress.getByName(target);
-                                banService.addBan(LanternGame.get().getRegistry().createBuilder(Ban.Builder.class)
-                                        .type(BanTypes.IP)
-                                        .address(address)
-                                        .reason(reason == null ? null : Texts.of(reason))
-                                        .build());
-                            } catch (UnknownHostException e) {
-                                // Ip address failed, try to find a player
-                                Optional<Player> player = Sponge.getGame().getServer().getPlayer(target);
-                                if (!player.isPresent()) {
-                                    throw new CommandException(t("commands.banip.invalid"));
-                                }
-                                banService.addBan(Sponge.getRegistry().createBuilder(Ban.Builder.class)
-                                        .type(BanTypes.PROFILE)
-                                        .profile(player.get().getProfile())
-                                        .reason(reason == null ? null : Texts.of(reason))
-                                        .build());
+                .executor((src, args) -> {
+                    final String target = args.<String>getOne(targetArg).get();
+                    final String reason = args.<String>getOne("reason").orElse(null);
+                    BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+                    if (alwaysSuccess) {
+                        // TODO
+                    } else {
+                        // Try as ip address first
+                        try {
+                            InetAddress address = InetAddress.getByName(target);
+                            banService.addBan(LanternGame.get().getRegistry().createBuilder(Ban.Builder.class)
+                                    .type(BanTypes.IP)
+                                    .address(address)
+                                    .reason(reason == null ? null : Texts.of(reason))
+                                    .build());
+                        } catch (UnknownHostException e) {
+                            // Ip address failed, try to find a player
+                            Optional<Player> player = Sponge.getGame().getServer().getPlayer(target);
+                            if (!player.isPresent()) {
+                                throw new CommandException(t("commands.banip.invalid"));
                             }
+                            banService.addBan(Sponge.getRegistry().createBuilder(Ban.Builder.class)
+                                    .type(BanTypes.PROFILE)
+                                    .profile(player.get().getProfile())
+                                    .reason(reason == null ? null : Texts.of(reason))
+                                    .build());
                         }
-                        return CommandResult.success();
                     }
+                    return CommandResult.success();
                 })
                 .build();
     }

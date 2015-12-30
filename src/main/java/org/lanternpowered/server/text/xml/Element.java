@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.text.xml;
 
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.text.LanternTextHelper;
 import org.lanternpowered.server.text.LanternTextHelper.RawAction;
 import org.spongepowered.api.text.Text;
@@ -36,6 +37,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,22 +64,26 @@ import javax.xml.bind.annotation.XmlSeeAlso;
         Tr.class,
         U.class
     })
+@NonnullByDefault
 public abstract class Element {
 
     private static final Pattern FUNCTION_PATTERN = Pattern.compile("^([^(]+)\\('(.*)'\\)$");
 
     @XmlAttribute
+    @Nullable
     private String onClick = null;
 
     @XmlAttribute
+    @Nullable
     private String onShiftClick = null;
 
     @XmlAttribute
+    @Nullable
     private String onHover = null;
 
     @XmlElementRef(type = Element.class)
     @XmlMixed
-    protected List<Object> mixedContent = new ArrayList<Object>();
+    protected List<Object> mixedContent = Lists.newArrayList();
 
     protected abstract void modifyBuilder(TextBuilder builder);
 
@@ -164,7 +170,7 @@ public abstract class Element {
     }
 
     public static Element fromText(Text text, Locale locale) {
-        final AtomicReference<Element> fixedRoot = new AtomicReference<Element>();
+        final AtomicReference<Element> fixedRoot = new AtomicReference<>();
         Element currentElement = null;
         if (text.getColor() != TextColors.NONE) {
             currentElement = update(fixedRoot, currentElement, new Color.C(text.getColor()));

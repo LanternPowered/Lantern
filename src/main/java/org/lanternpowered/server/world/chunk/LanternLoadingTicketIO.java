@@ -47,6 +47,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 
@@ -61,6 +62,7 @@ import com.google.common.collect.Multimap;
  * they are saved in the same format as forge to allow maximum
  * compatibility.
  */
+@NonnullByDefault
 public class LanternLoadingTicketIO {
 
     private static final String TICKETS_FILE = "forcedchunks.dat";

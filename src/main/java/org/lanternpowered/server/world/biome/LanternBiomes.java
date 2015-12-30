@@ -27,11 +27,13 @@ package org.lanternpowered.server.world.biome;
 import javax.annotation.Nullable;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 
+@NonnullByDefault
 public class LanternBiomes {
 
-    private static LanternBiomeRegistry registry;
+    @Nullable private static LanternBiomeRegistry registry;
 
     /**
      * Gets the {@link LanternBiomeRegistry}.

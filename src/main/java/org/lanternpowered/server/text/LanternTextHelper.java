@@ -41,51 +41,59 @@ import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.Coerce;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class LanternTextHelper {
 
     public static ClickAction<?> parseClickAction(String action, String value) {
-        if (action.equals("open_url") || action.equals("open_file")) {
-            URI uri = null;
-            if (action.equals("open_url")) {
-                try {
-                    uri = new URI(value);
-                } catch (URISyntaxException e) {
-                }
-            } else {
-                uri = new File(value).toURI();
-            }
-            if (uri != null) {
-                try {
-                    return TextActions.openUrl(uri.toURL());
-                } catch (MalformedURLException e) {
-                }
-            }
-        } else if (action.equals("run_command")) {
-            if (value.toLowerCase().contains(LanternCallbackHolder.CALLBACK_COMMAND)) {
-                final String[] parts = value.split(" ");
-                if (parts.length > 1 && parts[0].equalsIgnoreCase(LanternCallbackHolder.CALLBACK_COMMAND)) {
+        switch (action) {
+            case "open_url":
+            case "open_file":
+                URI uri = null;
+                if (action.equals("open_url")) {
                     try {
-                        final UUID uuid = UUID.fromString(parts[1]);
-                        Optional<Consumer<CommandSource>> opt = LanternCallbackHolder.getInstance()
-                                .getCallbackForUUID(uuid);
-                        if (opt.isPresent()) {
-                            return TextActions.executeCallback(opt.get());
-                        }
-                    } catch (IllegalArgumentException e) {
+                        uri = new URI(value);
+                    } catch (URISyntaxException ignored) {
+                    }
+                } else {
+                    uri = new File(value).toURI();
+                }
+                if (uri != null) {
+                    try {
+                        return TextActions.openUrl(uri.toURL());
+                    } catch (MalformedURLException ignored) {
                     }
                 }
-            }
-            return TextActions.runCommand(value);
-        } else if (action.equals("suggest_command")) {
-            return TextActions.suggestCommand(value);
-        } else if (action.equals("change_page")) {
-            Optional<Integer> page = Coerce.asInteger(value);
-            if (page.isPresent()) {
-                return TextActions.changePage(page.get());
-            }
-        } else {
-            throw new IllegalArgumentException("Unknown click action type: " + action);
+                break;
+            case "run_command":
+                if (value.toLowerCase().contains(LanternCallbackHolder.CALLBACK_COMMAND)) {
+                    final String[] parts = value.split(" ");
+                    if (parts.length > 1 && parts[0].equalsIgnoreCase(LanternCallbackHolder.CALLBACK_COMMAND)) {
+                        try {
+                            final UUID uuid = UUID.fromString(parts[1]);
+                            Optional<Consumer<CommandSource>> opt = LanternCallbackHolder.getInstance()
+                                    .getCallbackForUUID(uuid);
+                            if (opt.isPresent()) {
+                                return TextActions.executeCallback(opt.get());
+                            }
+                        } catch (IllegalArgumentException ignored) {
+                        }
+                    }
+                }
+                return TextActions.runCommand(value);
+            case "suggest_command":
+                return TextActions.suggestCommand(value);
+            case "change_page":
+                Optional<Integer> page = Coerce.asInteger(value);
+                if (page.isPresent()) {
+                    return TextActions.changePage(page.get());
+                }
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown click action type: " + action);
         }
 
         return null;
@@ -93,16 +101,17 @@ public class LanternTextHelper {
 
     @SuppressWarnings("deprecation")
     public static HoverAction<?> parseHoverAction(String action, String value) {
-        if (action.equals("show_text")) {
-           return TextActions.showText(Texts.legacy().fromUnchecked(value));
-        } else if (action.equals("show_achievement")) {
-            return null; // TODO
-        } else if (action.equals("show_item")) {
-            return null; // TODO
-        } else if (action.equals("show_entity")) {
-            return null; // TODO
-        } else {
-            throw new IllegalArgumentException("Unknown hover action type: " + action);
+        switch (action) {
+            case "show_text":
+                return TextActions.showText(Texts.legacy().fromUnchecked(value));
+            case "show_achievement":
+                return null; // TODO
+            case "show_item":
+                return null; // TODO
+            case "show_entity":
+                return null; // TODO
+            default:
+                throw new IllegalArgumentException("Unknown hover action type: " + action);
         }
     }
 
@@ -149,8 +158,8 @@ public class LanternTextHelper {
 
         private final String action;
 
-        private String value;
-        private Text text;
+        @Nullable private String value;
+        @Nullable private Text text;
 
         public RawAction(String action, String value) {
             this.action = action;

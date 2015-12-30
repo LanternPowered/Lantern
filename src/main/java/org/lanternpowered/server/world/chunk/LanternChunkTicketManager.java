@@ -30,6 +30,7 @@ import java.util.UUID;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.World;
 
@@ -42,6 +43,7 @@ import com.google.common.collect.Multimap;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
+@NonnullByDefault
 public class LanternChunkTicketManager implements ChunkTicketManager {
 
     private final Multimap<String, Callback> callbacks = HashMultimap.create();
@@ -124,4 +126,5 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
     public ImmutableSetMultimap<Vector3i, LoadingTicket> getForcedChunks(World world) {
         return ((LanternWorld) checkNotNull(world, "world")).getChunkManager().getForced();
     }
+
 }

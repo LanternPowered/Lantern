@@ -26,6 +26,7 @@ package org.lanternpowered.server.world.extent;
 
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.world.biome.LanternBiomes;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
 import org.spongepowered.api.world.extent.BlockVolume;
@@ -33,6 +34,7 @@ import org.spongepowered.api.world.extent.BlockVolume;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 
+@NonnullByDefault
 public final class ExtentBufferHelper {
 
     public static short[] copyToArray(BiomeArea area, Vector2i min, Vector2i max, Vector2i size) {

@@ -26,10 +26,12 @@ package org.lanternpowered.server.world;
 
 import java.util.Optional;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 
+@NonnullByDefault
 public class LanternTeleporterAgent implements TeleporterAgent {
 
     protected boolean canCreateTeleporter;
@@ -56,7 +58,7 @@ public class LanternTeleporterAgent implements TeleporterAgent {
     @Override
     public TeleporterAgent setTeleporterCreationRadius(int radius) {
         this.creationRadius = radius;
-        return null;
+        return this;
     }
 
     @Override
@@ -99,4 +101,5 @@ public class LanternTeleporterAgent implements TeleporterAgent {
     protected Optional<Location<World>> createTeleporter0(Location<World> targetLocation) {
         return Optional.empty();
     }
+
 }

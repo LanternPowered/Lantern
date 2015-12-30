@@ -26,12 +26,14 @@ package org.lanternpowered.server.text.xml;
 
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 @XmlSeeAlso(Obfuscated.O.class)
 @XmlRootElement
+@NonnullByDefault
 public class Obfuscated extends Element {
 
     @Override
@@ -42,4 +44,5 @@ public class Obfuscated extends Element {
     @XmlRootElement
     public static class O extends Obfuscated {
     }
+
 }

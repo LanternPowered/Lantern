@@ -29,12 +29,16 @@ import org.lanternpowered.server.service.permission.base.LanternSubjectCollectio
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 /**
  * User collection keeping track of opped users.
  */
+@NonnullByDefault
 public class UserCollection extends LanternSubjectCollection {
 
     private final LanternPermissionService service;
@@ -64,12 +68,10 @@ public class UserCollection extends LanternSubjectCollection {
     @Override
     public boolean hasRegistered(String identifier) {
         UUID uuid = identifierToUUID(identifier);
-        if (uuid == null) {
-            return false;
-        }
-        return LanternGame.get().getOpsConfig().getEntryByUUID(uuid) != null;
+        return uuid != null && LanternGame.get().getOpsConfig().getEntryByUUID(uuid) != null;
     }
 
+    @Nullable
     private UUID identifierToUUID(String identifier) {
         try {
             return UUID.fromString(identifier);

@@ -24,6 +24,18 @@
  */
 package org.lanternpowered.server.world.rules;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.LanternWorldProperties;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.world.ChangeWorldGameRuleEvent;
+import org.spongepowered.api.util.Coerce;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.World;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,30 +44,16 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.world.ChangeWorldGameRuleEvent;
-import org.spongepowered.api.util.Coerce;
-import org.spongepowered.api.world.World;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
+@NonnullByDefault
 public final class LanternGameRules implements GameRules {
 
     private final Map<String, LanternGameRule> rules = Maps.newHashMap();
-    @Nullable private World world;
+    private final LanternWorldProperties worldProperties;
 
-    /**
-     * Sets the world of the game rules.
-     * 
-     * @param world the world
-     */
-    public void setWorld(@Nullable World world) {
-        this.world = world;
+    public LanternGameRules(LanternWorldProperties worldProperties) {
+        this.worldProperties = worldProperties;
     }
 
     @Override
@@ -90,11 +88,11 @@ public final class LanternGameRules implements GameRules {
         private final String name;
 
         // The value of the game rule
-        protected String value;
+        @Nullable protected String value;
 
         // Optional possible types
-        protected Boolean valueBoolean = false;
-        protected Number valueNumber = 0;
+        @Nullable protected Boolean valueBoolean = false;
+        @Nullable protected Number valueNumber = 0;
 
         public LanternGameRule(String name) {
             this.name = name;
@@ -106,12 +104,19 @@ public final class LanternGameRules implements GameRules {
         }
 
         @Override
-        public <T> void set(T object) {
-            this.set(object, Cause.of(world));
+        public <T> void set(@Nullable T object) {
+            Cause cause;
+            World world = worldProperties.getWorld();
+            if (world != null) {
+                cause = Cause.of(world);
+            } else {
+                cause = Cause.of(worldProperties);
+            }
+            this.set(object, cause);
         }
 
         @Override
-        public <T> void set(T object, Cause cause) {
+        public <T> void set(@Nullable T object, Cause cause) {
             String oldValue = this.value;
             if (object == null) {
                 this.value = null;
@@ -122,6 +127,7 @@ public final class LanternGameRules implements GameRules {
                 this.valueBoolean = Coerce.asBoolean(object).orElse(null);
                 this.valueNumber = Coerce.asDouble(object).orElse(null);
             }
+            World world = worldProperties.getWorld();
             if (world != null && !Objects.equals(this.value, oldValue)) {
                 ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(
                         cause, oldValue == null ? "" : oldValue, this.value == null ? "" : this.value, this.name, world);

@@ -43,8 +43,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Translatable>, JsonDeserializer<Text.Translatable> {
+@NonnullByDefault
+public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Translatable>,
+        JsonDeserializer<Text.Translatable> {
 
     private final static ThreadLocal<Locale> currentLocale = ThreadLocal.withInitial(() -> Locale.ENGLISH);
 
@@ -82,9 +85,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
         if (json0.has("with")) {
             Text[] with = context.deserialize(json0.get("with"), Text[].class);
             arguments = new Object[with.length];
-            for (int i = 0; i < with.length; i++) {
-                arguments[i] = with[i];
-            }
+            System.arraycopy(with, 0, arguments, 0, with.length);
         } else {
             arguments = new Object[0];
         }

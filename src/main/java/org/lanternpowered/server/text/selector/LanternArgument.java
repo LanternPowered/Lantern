@@ -90,4 +90,5 @@ public class LanternArgument<T> implements Argument<T> {
     public String toPlain() {
         return this.type.getKey() + getEqualitySymbols() + toSelectorArgument(getValue());
     }
+
 }

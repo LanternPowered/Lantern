@@ -34,6 +34,7 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 import java.util.Set;
@@ -41,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+@NonnullByDefault
 public class DataFactoryCollection extends LanternSubjectCollection {
 
     private final LanternPermissionService service;
@@ -77,6 +79,7 @@ public class DataFactoryCollection extends LanternSubjectCollection {
     }
 
     private class DataFactorySubject extends LanternSubject {
+
         private final String identifier;
         private final MemorySubjectData data;
 
@@ -112,7 +115,8 @@ public class DataFactoryCollection extends LanternSubjectCollection {
                 ret = getDataPermissionValue(DataFactoryCollection.this.service.getDefaultData(), permission);
             }
             return ret;
-
         }
+
     }
+
 }

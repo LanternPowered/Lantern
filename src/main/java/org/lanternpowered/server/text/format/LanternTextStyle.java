@@ -30,13 +30,14 @@ import javax.annotation.Nullable;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.text.format.TextStyle;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternTextStyle extends TextStyle.Base implements SimpleCatalogType {
 
     private final String identifier;
 
-    public LanternTextStyle(String identifier,
-            @Nullable Boolean bold, @Nullable Boolean italic, @Nullable Boolean underline,
+    public LanternTextStyle(String identifier, @Nullable Boolean bold, @Nullable Boolean italic, @Nullable Boolean underline,
             @Nullable Boolean strikethrough, @Nullable Boolean obfuscated) {
         super(bold, italic, underline, strikethrough, obfuscated);
         this.identifier = checkNotNullOrEmpty(identifier, "identifier");
@@ -46,4 +47,5 @@ public final class LanternTextStyle extends TextStyle.Base implements SimpleCata
     public String getId() {
         return this.identifier;
     }
+
 }

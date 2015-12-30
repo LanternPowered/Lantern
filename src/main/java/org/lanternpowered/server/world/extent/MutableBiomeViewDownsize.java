@@ -26,10 +26,12 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.util.DiscreteTransform2;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 
+@NonnullByDefault
 public class MutableBiomeViewDownsize extends AbstractBiomeViewDownsize<MutableBiomeArea> implements MutableBiomeArea {
 
     public MutableBiomeViewDownsize(MutableBiomeArea area, Vector2i min, Vector2i max) {
@@ -68,4 +70,5 @@ public class MutableBiomeViewDownsize extends AbstractBiomeViewDownsize<MutableB
     public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
         return new UnmodifiableBiomeAreaWrapper(this);
     }
+
 }

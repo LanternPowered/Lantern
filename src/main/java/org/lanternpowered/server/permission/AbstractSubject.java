@@ -38,7 +38,9 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface AbstractSubject extends Subject {
 
     void setInternalSubject(@Nullable Subject subj);
@@ -50,6 +52,7 @@ public interface AbstractSubject extends Subject {
 
     Tristate getPermissionDefault(String permission);
 
+    @Nullable
     default Subject findPermissionSubject() {
         Optional<PermissionService> service = LanternGame.get().getServiceManager().provide(PermissionService.class);
         if (service.isPresent()) {
@@ -144,4 +147,5 @@ public interface AbstractSubject extends Subject {
         final Subject subject = this.getInternalSubject();
         return subject == null ? Collections.emptySet() : subject.getActiveContexts();
     }
+
 }

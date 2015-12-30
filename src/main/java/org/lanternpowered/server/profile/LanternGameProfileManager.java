@@ -61,7 +61,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternGameProfileManager implements GameProfileManager {
 
     private final AtomicInteger counter = new AtomicInteger();
@@ -112,7 +114,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     @Override
     public ListenableFuture<GameProfile> get(UUID uniqueId, boolean useCache) {
-        return this.service.submit(useCache ? () -> profileCache.get(uniqueId) : new GetProfile(uniqueId));
+        return this.service.submit(useCache ? () -> profileCache.get(uniqueId) : (Callable<GameProfile>) new GetProfile(uniqueId));
     }
 
     @Override
@@ -127,69 +129,57 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     @Override
     public ListenableFuture<GameProfile> get(String name, boolean useCache) {
-        return this.service.submit(new Callable<GameProfile>() {
-
-            @Override
-            public GameProfile call() throws Exception {
-                UUID uniqueId = useCache ? uuidByNameCache.get(name) :
-                    new GetUUID(Sets.newHashSet(name)).call().get(name);
-                if (uniqueId == null) {
-                    return null;
-                }
-                return useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call();
+        return this.service.submit(() -> {
+            UUID uniqueId = useCache ? uuidByNameCache.get(name) :
+                new GetUUID(Sets.newHashSet(name)).call().get(name);
+            if (uniqueId == null) {
+                return null;
             }
+            return useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call();
         });
     }
 
     @Override
     public ListenableFuture<Collection<GameProfile>> getAllByName(Iterable<String> names, boolean useCache) {
-        return this.service.submit(new Callable<Collection<GameProfile>>() {
-
-            @Override
-            public Collection<GameProfile> call() throws Exception {
-                List<GameProfile> profiles = Lists.newArrayList();
-                List<UUID> uniqueIds = Lists.newArrayList();
-                List<String> rest = Lists.newArrayList();
-                if (useCache) {
-                    rest = Lists.newArrayList();
-                    for (String name : names) {
-                        UUID uniqueId = uuidByNameCache.getIfPresent(name);
-                        if (uniqueId == null) {
-                            rest.add(name);
-                        } else {
-                            uniqueIds.add(uniqueId);
-                        }
+        return this.service.submit(() -> {
+            List<GameProfile> profiles = Lists.newArrayList();
+            List<UUID> uniqueIds = Lists.newArrayList();
+            List<String> rest;
+            if (useCache) {
+                rest = Lists.newArrayList();
+                for (String name : names) {
+                    UUID uniqueId = uuidByNameCache.getIfPresent(name);
+                    if (uniqueId == null) {
+                        rest.add(name);
+                    } else {
+                        uniqueIds.add(uniqueId);
                     }
-                } else {
-                    rest = Lists.newArrayList(names);
                 }
-                if (!rest.isEmpty()) {
-                    Map<String, UUID> results = new GetUUID(rest).call();
-                    if (useCache) {
-                        uuidByNameCache.putAll(results);
-                    }
-                    uniqueIds.addAll(results.values());
-                }
-                for (UUID uniqueId : uniqueIds) {
-                    profiles.add(useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call());
-                }
-                return ImmutableList.copyOf(profiles);
+            } else {
+                rest = Lists.newArrayList(names);
             }
+            if (!rest.isEmpty()) {
+                Map<String, UUID> results = new GetUUID(rest).call();
+                if (useCache) {
+                    uuidByNameCache.putAll(results);
+                }
+                uniqueIds.addAll(results.values());
+            }
+            for (UUID uniqueId : uniqueIds) {
+                profiles.add(useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call());
+            }
+            return ImmutableList.copyOf(profiles);
         });
     }
 
     @Override
     public ListenableFuture<Collection<GameProfile>> getAllById(final Iterable<UUID> uniqueIds, final boolean useCache) {
-        return this.service.submit(new Callable<Collection<GameProfile>>() {
-
-            @Override
-            public Collection<GameProfile> call() throws Exception {
-                List<GameProfile> profiles = Lists.newArrayList();
-                for (UUID uniqueId : uniqueIds) {
-                    profiles.add(useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call());
-                }
-                return ImmutableList.copyOf(profiles);
+        return this.service.submit(() -> {
+            List<GameProfile> profiles = Lists.newArrayList();
+            for (UUID uniqueId : uniqueIds) {
+                profiles.add(useCache ? profileCache.get(uniqueId) : new GetProfile(uniqueId).call());
             }
+            return ImmutableList.copyOf(profiles);
         });
     }
 

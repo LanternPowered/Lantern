@@ -38,15 +38,19 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.annotation.Nullable;
+
 /**
  * Basic implementation of {@link PermissionDescription}. Can only be used in
  * conjunction with {@link LanternPermissionService}.
  */
+@NonnullByDefault
 class LanternPermissionDescription implements PermissionDescription {
 
     private final PermissionService permissionService;
@@ -89,14 +93,11 @@ class LanternPermissionDescription implements PermissionDescription {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (this == obj) {
             return true;
         }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
+        if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         }
         LanternPermissionDescription other = (LanternPermissionDescription) obj;
@@ -115,8 +116,8 @@ class LanternPermissionDescription implements PermissionDescription {
 
         private final LanternPermissionService permissionService;
         private final PluginContainer owner;
-        private String id;
-        private Text description;
+        @Nullable private String id;
+        @Nullable private Text description;
         private final Map<String, Tristate> roleAssignments = new LinkedHashMap<>();
 
         Builder(LanternPermissionService permissionService, PluginContainer owner) {

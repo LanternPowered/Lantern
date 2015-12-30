@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.scheduler;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+@NonnullByDefault
 public class SyncScheduler extends SchedulerBase {
 
     // The number of ticks elapsed since this scheduler began.

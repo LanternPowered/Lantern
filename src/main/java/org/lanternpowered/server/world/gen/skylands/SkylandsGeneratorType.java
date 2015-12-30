@@ -32,10 +32,12 @@ import org.spongepowered.api.extra.skylands.SkylandsBiomeGenerator;
 import org.spongepowered.api.extra.skylands.SkylandsGrassPopulator;
 import org.spongepowered.api.extra.skylands.SkylandsGroundCoverPopulator;
 import org.spongepowered.api.extra.skylands.SkylandsTerrainGenerator;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
+@NonnullByDefault
 public final class SkylandsGeneratorType extends LanternGeneratorType {
 
     public SkylandsGeneratorType(String pluginId, String name) {
@@ -51,4 +53,5 @@ public final class SkylandsGeneratorType extends LanternGeneratorType {
         generatorPopulators.add(new SkylandsGrassPopulator());
         return generator;
     }
+
 }

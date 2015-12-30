@@ -52,6 +52,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.chunk.ForcedChunkEvent;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
@@ -84,6 +85,7 @@ import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_V
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTIONS;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_HEIGHT;
 
+@NonnullByDefault
 public final class LanternChunkManager {
 
     // The maximum amount of chunks that may be loaded during
@@ -147,7 +149,7 @@ public final class LanternChunkManager {
      * @param chunkLoadService the chunk load (ticket) service
      * @param chunkIOService the chunk i/o service
      * @param worldGenerator the world generator
-     * @param worldFolder2 the world data folder
+     * @param worldFolder the world data folder
      */
     public LanternChunkManager(LanternGame game, LanternWorld world, WorldConfig worldConfig,
             LanternChunkTicketManager chunkLoadService, ChunkIOService chunkIOService,

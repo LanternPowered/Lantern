@@ -42,6 +42,7 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -51,17 +52,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import javax.annotation.Nullable;
+
 /**
  * Permission service representing the vanilla operator permission structure.
  *
  * <p>Really doesn't do much else. Don't use this guys.
  */
+@NonnullByDefault
 public class LanternPermissionService implements PermissionService {
     private static final Function<String, CommandSource> NO_COMMAND_SOURCE = s -> null;
 
     private final Game game;
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<>();
-    private Collection<PermissionDescription> descriptions;
+    @Nullable private Collection<PermissionDescription> descriptions;
     private final ConcurrentMap<String, SubjectCollection> subjects = new ConcurrentHashMap<>();
     private final MemorySubjectData defaultData;
 

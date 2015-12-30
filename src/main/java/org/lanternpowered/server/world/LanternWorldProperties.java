@@ -52,6 +52,7 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -63,7 +64,8 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 
-public class LanternWorldProperties implements WorldProperties {
+@NonnullByDefault
+public final class LanternWorldProperties implements WorldProperties {
 
     private static final int BOUNDARY = 29999984;
 
@@ -74,7 +76,7 @@ public class LanternWorldProperties implements WorldProperties {
     @Nullable WorldConfig worldConfig;
 
     // The rules of the world
-    final LanternGameRules rules = new LanternGameRules();
+    final LanternGameRules rules = new LanternGameRules(this);
 
     // This is a map added by sponge, not sure what it is supposed to do yet
     final List<UUID> pendingUniqueIds = Lists.newArrayList();
@@ -284,7 +286,7 @@ public class LanternWorldProperties implements WorldProperties {
     }
 
     @Nullable
-    LanternWorld getWorld() {
+    public LanternWorld getWorld() {
         return this.world;
     }
 

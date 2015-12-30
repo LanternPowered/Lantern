@@ -26,9 +26,11 @@ package org.lanternpowered.server.command;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Iterator;
 
+@NonnullByDefault
 public interface AbstractCommandSource extends CommandSource {
 
     @Override
@@ -42,12 +44,11 @@ public interface AbstractCommandSource extends CommandSource {
 
     @Override
     default void sendMessages(Iterable<Text> messages) {
-        Iterator<Text> it = messages.iterator();
-        while (it.hasNext()) {
-            Text message = it.next();
+        for (Text message : messages) {
             if (message != null) {
                 this.sendMessage(message);
             }
         }
     }
+
 }

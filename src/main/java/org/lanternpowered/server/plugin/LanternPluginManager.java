@@ -63,7 +63,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternPluginManager implements PluginManager {
 
     private static final String PLUGIN_DESCRIPTOR = Type.getDescriptor(Plugin.class);
@@ -129,7 +131,6 @@ public final class LanternPluginManager implements PluginManager {
                     ((LaunchClassLoader) this.getClass().getClassLoader()).addURL(jar.toFile().toURI().toURL());
                 } catch (MalformedURLException e) {
                     LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
-                    continue;
                 }
             }
         }
@@ -229,43 +230,44 @@ public final class LanternPluginManager implements PluginManager {
 
     private static class PluginEntry {
 
-        public String id;
-        public String name;
-        public String version;
-        public String classPath;
+        public final String id;
+        public final String name;
+        public final String version;
+        public final String classPath;
+
+        public PluginEntry(String id, String name, String version, String classPath) {
+            this.classPath = classPath;
+            this.version = version;
+            this.name = name;
+            this.id = id;
+        }
 
         // The plugins that will be loaded after this one.
-        public List<String> loadAfter;
+        @Nullable public List<String> loadAfter;
 
         // The plugins that will be loaded before this one.
-        public List<String> loadBefore;
+        @Nullable public List<String> loadBefore;
 
         // The plugins that are required for this one to work.
-        public List<String> required;
+        @Nullable public List<String> required;
     }
 
     private static boolean scanZip(Path file, List<PluginEntry> plugins) {
         try {
-            ZipFile zip = new ZipFile(file.toFile());
-            try {
+            try (ZipFile zip = new ZipFile(file.toFile())) {
                 Enumeration<? extends ZipEntry> entries = zip.entries();
                 while (entries.hasMoreElements()) {
                     ZipEntry entry = entries.nextElement();
                     if (entry.isDirectory() || !entry.getName().endsWith(CLASS_EXTENSION)) {
                         continue;
                     }
-                    InputStream in = zip.getInputStream(entry);
-                    try {
+                    try (InputStream in = zip.getInputStream(entry)) {
                         PluginEntry plugin = findPlugin(in);
                         if (plugin != null) {
                             plugins.add(plugin);
                         }
-                    } finally {
-                        in.close();
                     }
                 }
-            } finally {
-                zip.close();
             }
         } catch (IOException e) {
             LanternGame.log().error("Failed to load plugin/library JAR: {}", file, e);
@@ -292,11 +294,11 @@ public final class LanternPluginManager implements PluginManager {
                         settings.put((String) objects.get(i), objects.get(++i));
                     }
 
-                    PluginEntry entry = new PluginEntry();
-                    entry.id = (String) settings.get("id");
-                    entry.name = (String) settings.get("name");
-                    entry.version = settings.containsKey("version") ? (String) settings.get("version") : "unknown";
-                    entry.classPath = classNode.name.replace('/', '.');
+                    final String id = (String) settings.get("id");
+                    final String name = (String) settings.get("name");
+                    final String version = settings.containsKey("version") ? (String) settings.get("version") : "unknown";
+                    final String classPath = classNode.name.replace('/', '.');
+                    PluginEntry entry = new PluginEntry(id, name, version, classPath);
 
                     String dependencies = (String) settings.get("dependencies");
                     if (dependencies != null && !dependencies.isEmpty()) {

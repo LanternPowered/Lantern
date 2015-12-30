@@ -24,9 +24,12 @@
  */
 package org.lanternpowered.server.util;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+@NonnullByDefault
 public final class ReflectionHelper {
 
     public static void setField(Field field, Object target, Object object) throws Exception {
@@ -44,4 +47,5 @@ public final class ReflectionHelper {
 
     private ReflectionHelper() {
     }
+
 }

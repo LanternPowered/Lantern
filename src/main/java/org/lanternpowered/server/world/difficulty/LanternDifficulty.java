@@ -25,8 +25,10 @@
 package org.lanternpowered.server.world.difficulty;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
+@NonnullByDefault
 public final class LanternDifficulty extends SimpleLanternCatalogType implements Difficulty {
 
     private final byte internalId;
@@ -39,4 +41,5 @@ public final class LanternDifficulty extends SimpleLanternCatalogType implements
     public byte getInternalId() {
         return this.internalId;
     }
+
 }

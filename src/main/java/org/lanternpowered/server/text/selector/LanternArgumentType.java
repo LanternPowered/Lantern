@@ -130,4 +130,5 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
             super(key, converter);
         }
     }
+
 }

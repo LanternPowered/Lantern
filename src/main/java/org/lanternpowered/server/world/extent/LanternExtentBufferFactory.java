@@ -33,12 +33,14 @@ import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuf
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
+@NonnullByDefault
 public final class LanternExtentBufferFactory implements ExtentBufferFactory {
 
     public static final LanternExtentBufferFactory INSTANCE = new LanternExtentBufferFactory();

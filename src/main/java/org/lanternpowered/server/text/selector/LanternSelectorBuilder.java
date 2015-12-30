@@ -114,4 +114,5 @@ public class LanternSelectorBuilder implements SelectorBuilder {
     public Selector build() {
         return new LanternSelector(this.type, ImmutableMap.copyOf(this.arguments));
     }
+
 }

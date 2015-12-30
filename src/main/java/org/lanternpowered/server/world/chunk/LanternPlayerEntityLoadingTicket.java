@@ -27,8 +27,10 @@ package org.lanternpowered.server.world.chunk;
 import java.util.UUID;
 
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
 
+@NonnullByDefault
 class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implements PlayerEntityLoadingTicket {
 
     private final UUID uniqueId;
@@ -55,4 +57,5 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
     public UUID getPlayerUniqueId() {
         return this.uniqueId;
     }
+
 }

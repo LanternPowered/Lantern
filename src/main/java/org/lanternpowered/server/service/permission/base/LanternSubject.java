@@ -29,10 +29,12 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.Set;
 
+@NonnullByDefault
 public abstract class LanternSubject implements Subject {
 
     @Override
@@ -97,4 +99,5 @@ public abstract class LanternSubject implements Subject {
     public Set<Context> getActiveContexts() {
         return SubjectData.GLOBAL_CONTEXT;
     }
+    
 }

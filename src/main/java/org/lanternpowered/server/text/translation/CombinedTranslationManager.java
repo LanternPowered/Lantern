@@ -35,14 +35,18 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.text.translation.FixedTranslation;
 
 import com.google.common.collect.Lists;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class CombinedTranslationManager implements TranslationManager {
 
     // The primary translation manager that will be used
     private final List<TranslationManager> translationManagers = Lists.newCopyOnWriteArrayList();
 
     // The delegate translation manager
-    private volatile TranslationManager delegateTranslationManager;
+    @Nullable private volatile TranslationManager delegateTranslationManager;
 
     /**
      * Adds a translation manager.
@@ -118,4 +122,5 @@ public class CombinedTranslationManager implements TranslationManager {
         }
         return Optional.empty();
     }
+
 }

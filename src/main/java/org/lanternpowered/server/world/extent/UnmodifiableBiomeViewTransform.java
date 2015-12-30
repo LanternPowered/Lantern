@@ -26,8 +26,10 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.util.DiscreteTransform2;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 
+@NonnullByDefault
 public class UnmodifiableBiomeViewTransform extends AbstractBiomeViewTransform<UnmodifiableBiomeArea> implements UnmodifiableBiomeArea {
 
     public UnmodifiableBiomeViewTransform(UnmodifiableBiomeArea area, DiscreteTransform2 transform) {
@@ -36,7 +38,8 @@ public class UnmodifiableBiomeViewTransform extends AbstractBiomeViewTransform<U
 
     @Override
     public UnmodifiableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
-        return new UnmodifiableBiomeViewDownsize(this.area, this.inverseTransform.transform(newMin), this.inverseTransform.transform(newMax)).getBiomeView(this.transform);
+        return new UnmodifiableBiomeViewDownsize(this.area, this.inverseTransform.transform(newMin), this.inverseTransform.transform(newMax))
+                .getBiomeView(this.transform);
     }
 
     @Override

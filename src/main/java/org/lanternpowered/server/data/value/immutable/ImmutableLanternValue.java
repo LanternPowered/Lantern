@@ -26,14 +26,14 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.function.Function;
-
 import org.lanternpowered.server.data.value.AbstractBaseValue;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
+
+import java.util.function.Function;
 
 public class ImmutableLanternValue<E> extends AbstractBaseValue<E> implements ImmutableValue<E> {
 

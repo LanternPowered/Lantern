@@ -25,7 +25,6 @@
 package org.lanternpowered.server.config.user.ban;
 
 import com.google.common.reflect.TypeToken;
-
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
@@ -49,4 +48,5 @@ public final class BanEntrySerializer implements TypeSerializer<BanEntry> {
             value.setValue(TypeToken.of(BanEntry.Profile.class), (BanEntry.Profile) value);
         }
     }
+
 }

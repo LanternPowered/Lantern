@@ -24,15 +24,11 @@
  */
 package org.lanternpowered.server.entity.living.player.tab;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.LanternPlayerTabInfo.UpdateEntry;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
@@ -42,10 +38,13 @@ import org.spongepowered.api.entity.living.player.tab.PlayerTabInfo;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 @NonnullByDefault
 public class LanternTabList implements TabList {

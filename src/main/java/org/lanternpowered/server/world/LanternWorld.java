@@ -24,23 +24,16 @@
  */
 package org.lanternpowered.server.world;
 
-import org.spongepowered.api.item.inventory.ItemStack;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
-import java.nio.file.Path;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
@@ -57,8 +50,8 @@ import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.chunk.LanternChunk;
-import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.lanternpowered.server.world.chunk.LanternChunkManager;
+import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
@@ -84,16 +77,15 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
@@ -109,17 +101,22 @@ import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
 
-@NonnullByDefault
+import java.nio.file.Path;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
+
 public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, AbstractViewer {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);

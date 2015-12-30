@@ -24,22 +24,22 @@
  */
 package org.lanternpowered.server.network.query;
 
-import com.google.common.collect.Maps;
-import org.spongepowered.api.event.server.query.QueryServerEvent;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.plugin.PluginContainer;
 import com.google.common.collect.Lists;
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.text.Texts;
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.LanternGame;
+import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
+import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.server.query.QueryServerEvent;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.world.World;
 
 import java.net.InetSocketAddress;
 import java.nio.ByteOrder;

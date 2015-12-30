@@ -26,10 +26,10 @@ package org.lanternpowered.server.network.message.codec.object;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Locale;
-
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+
+import java.util.Locale;
 
 public final class LocalizedText {
 

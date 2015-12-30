@@ -24,11 +24,6 @@
  */
 package org.lanternpowered.server.inventory;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -42,9 +37,14 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.persistence.InvalidDataException;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 public class LanternItemStack implements ItemStack {
 

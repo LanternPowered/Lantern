@@ -35,7 +35,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.dispatcher.Disambiguator;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,8 +42,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
-public class LanternCommandDisambiguator implements Disambiguator {
+public final class LanternCommandDisambiguator implements Disambiguator {
 
     private final LanternGame game;
 

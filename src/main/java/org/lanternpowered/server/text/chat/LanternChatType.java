@@ -26,9 +26,7 @@ package org.lanternpowered.server.text.chat;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.text.chat.ChatType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public final class LanternChatType extends SimpleLanternCatalogType implements ChatType {
 
     public LanternChatType(String identifier) {

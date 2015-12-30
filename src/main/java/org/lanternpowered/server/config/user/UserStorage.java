@@ -24,14 +24,12 @@
  */
 package org.lanternpowered.server.config.user;
 
+import org.spongepowered.api.profile.GameProfile;
+
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public interface UserStorage<T> {
 
     /**

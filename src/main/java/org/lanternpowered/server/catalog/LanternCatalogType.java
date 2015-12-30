@@ -24,9 +24,9 @@
  */
 package org.lanternpowered.server.catalog;
 
-import org.spongepowered.api.CatalogType;
-
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+
+import org.spongepowered.api.CatalogType;
 
 public class LanternCatalogType implements CatalogType {
 

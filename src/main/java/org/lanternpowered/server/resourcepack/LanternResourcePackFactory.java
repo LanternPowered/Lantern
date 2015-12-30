@@ -24,6 +24,13 @@
  */
 package org.lanternpowered.server.resourcepack;
 
+import com.google.common.collect.Maps;
+import com.google.common.hash.Hashing;
+import com.google.common.io.ByteStreams;
+import org.spongepowered.api.resourcepack.ResourcePack;
+import org.spongepowered.api.resourcepack.ResourcePackFactory;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -31,14 +38,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Map;
 import java.util.Optional;
-
-import org.spongepowered.api.resourcepack.ResourcePack;
-import org.spongepowered.api.resourcepack.ResourcePackFactory;
-
-import com.google.common.collect.Maps;
-import com.google.common.hash.Hashing;
-import com.google.common.io.ByteStreams;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public final class LanternResourcePackFactory implements ResourcePackFactory {

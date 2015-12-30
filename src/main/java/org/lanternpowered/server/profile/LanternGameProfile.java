@@ -27,6 +27,18 @@ package org.lanternpowered.server.profile;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.util.persistence.DataBuilder;
+import org.spongepowered.api.util.persistence.InvalidDataException;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -34,23 +46,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.util.persistence.DataBuilder;
-import org.spongepowered.api.util.persistence.InvalidDataException;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 @ConfigSerializable
-@NonnullByDefault
 public final class LanternGameProfile implements GameProfile {
 
     private static final DataQuery NAME = DataQuery.of("Name");

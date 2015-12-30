@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.block;
 
-import java.util.function.Function;
-
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public interface BlockRegistry extends CatalogTypeRegistry<BlockType> {
 

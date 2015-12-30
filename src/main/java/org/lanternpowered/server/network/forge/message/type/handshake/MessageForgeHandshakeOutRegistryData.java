@@ -24,12 +24,11 @@
  */
 package org.lanternpowered.server.network.forge.message.type.handshake;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.message.Message;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
+import java.util.Map;
 
 public final class MessageForgeHandshakeOutRegistryData implements Message {
 

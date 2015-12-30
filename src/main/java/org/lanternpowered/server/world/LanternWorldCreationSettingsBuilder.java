@@ -27,20 +27,13 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Random;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.TeleporterAgent;
@@ -50,9 +43,13 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import com.google.common.collect.Sets;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Random;
+import java.util.Set;
 
-@NonnullByDefault
+import javax.annotation.Nullable;
+
 public final class LanternWorldCreationSettingsBuilder implements WorldCreationSettings.Builder {
 
     private final LanternGame game;

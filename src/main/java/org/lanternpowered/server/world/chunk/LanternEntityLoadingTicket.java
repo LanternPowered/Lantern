@@ -24,17 +24,14 @@
  */
 package org.lanternpowered.server.world.chunk;
 
+import com.flowpowered.math.vector.Vector2i;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
+
 import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
-
-import com.flowpowered.math.vector.Vector2i;
-
-@NonnullByDefault
 class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityLoadingTicket {
 
     // The reference of the entity while it's not loaded yet,

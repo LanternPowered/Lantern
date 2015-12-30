@@ -26,13 +26,11 @@ package org.lanternpowered.server.world.gen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.lanternpowered.server.util.Lists2;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.BiomeGenerator;
@@ -40,10 +38,9 @@ import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
 
-@NonnullByDefault
 public final class LanternWorldGenerator implements WorldGenerator {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...

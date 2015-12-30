@@ -24,11 +24,10 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
-import org.lanternpowered.server.network.message.codec.object.VarInt;
-import org.lanternpowered.server.network.message.codec.object.VarLong;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.message.codec.object.VarInt;
+import org.lanternpowered.server.network.message.codec.object.VarLong;
 
 public abstract class AbstractObjectSerializerContext implements ObjectSerializerContext {
 

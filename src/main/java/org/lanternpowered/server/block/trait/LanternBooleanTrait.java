@@ -26,9 +26,8 @@ package org.lanternpowered.server.block.trait;
 
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.spongepowered.api.block.trait.BooleanTrait;
-
 import com.google.common.collect.ImmutableSet;
+import org.spongepowered.api.block.trait.BooleanTrait;
 
 public final class LanternBooleanTrait extends LanternBlockTrait<Boolean> implements BooleanTrait {
 

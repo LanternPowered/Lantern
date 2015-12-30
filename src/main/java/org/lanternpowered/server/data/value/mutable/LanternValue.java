@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.data.value.mutable;
 
-import java.util.function.Function;
-
 import org.lanternpowered.server.data.value.AbstractBaseValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
+
+import java.util.function.Function;
 
 public class LanternValue<E> extends AbstractBaseValue<E> implements Value<E> {
 

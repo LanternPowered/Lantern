@@ -24,9 +24,9 @@
  */
 package org.lanternpowered.server.service.pagination;
 
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.command.CommandSource;
 
 /**
  * A pagination calculator that has a fixed length per page.
@@ -52,4 +52,5 @@ class FixedLengthPaginationCalculator implements PaginationCalculator<CommandSou
     public Text center(CommandSource source, Text text, String padding) {
         return text;
     }
+
 }

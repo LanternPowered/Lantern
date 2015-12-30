@@ -24,16 +24,16 @@
  */
 package org.lanternpowered.server.world.rules;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.ChangeWorldGameRuleEvent;
 import org.spongepowered.api.util.Coerce;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 
 import java.util.Collections;
@@ -44,9 +44,6 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@NonnullByDefault
 public final class LanternGameRules implements GameRules {
 
     private final Map<String, LanternGameRule> rules = Maps.newHashMap();

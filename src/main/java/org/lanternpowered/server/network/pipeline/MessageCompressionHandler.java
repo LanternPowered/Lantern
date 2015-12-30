@@ -24,9 +24,7 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import java.util.List;
-import java.util.zip.Deflater;
-import java.util.zip.Inflater;
+import static org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializerContext.CONTEXT;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -35,7 +33,9 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageCodec;
 
-import static org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializerContext.CONTEXT;
+import java.util.List;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 public final class MessageCompressionHandler extends MessageToMessageCodec<ByteBuf, ByteBuf> {
 

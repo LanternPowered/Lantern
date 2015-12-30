@@ -31,13 +31,12 @@ import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
-
-import org.spongepowered.api.service.pagination.PaginationBuilder;
-import org.spongepowered.api.service.pagination.PaginationCalculator;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ProxySource;
+import org.spongepowered.api.service.pagination.PaginationBuilder;
+import org.spongepowered.api.service.pagination.PaginationCalculator;
+import org.spongepowered.api.text.Text;
 
 import java.util.List;
 import java.util.Map;
@@ -45,11 +44,12 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 class LanternPaginationBuilder implements PaginationBuilder {
+
     private final LanternPaginationService service;
     private Iterable<Text> contents;
-    private Text title;
-    private Text header;
-    private Text footer;
+    @Nullable private Text title;
+    @Nullable private Text header;
+    @Nullable private Text footer;
     private String paginationSpacer = "=";
 
     public LanternPaginationBuilder(LanternPaginationService service) {
@@ -69,19 +69,19 @@ class LanternPaginationBuilder implements PaginationBuilder {
     }
 
     @Override
-    public PaginationBuilder title(Text title) {
+    public PaginationBuilder title(@Nullable Text title) {
         this.title = title;
         return this;
     }
 
     @Override
-    public PaginationBuilder header(Text header) {
+    public PaginationBuilder header(@Nullable Text header) {
         this.header = header;
         return this;
     }
 
     @Override
-    public PaginationBuilder footer(Text footer) {
+    public PaginationBuilder footer(@Nullable Text footer) {
         this.footer = footer;
         return this;
     }
@@ -101,7 +101,7 @@ class LanternPaginationBuilder implements PaginationBuilder {
 
         CommandSource realSource = source;
         while (realSource instanceof ProxySource) {
-            realSource = ((ProxySource)realSource).getOriginalSource();
+            realSource = ((ProxySource) realSource).getOriginalSource();
         }
         @SuppressWarnings("unchecked")
         PaginationCalculator<CommandSource> calculator = (PaginationCalculator) this.service.calculators.get(realSource.getClass());

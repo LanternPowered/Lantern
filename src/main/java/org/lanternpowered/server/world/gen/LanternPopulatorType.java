@@ -24,15 +24,14 @@
  */
 package org.lanternpowered.server.world.gen;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.PopulatorType;
 
-import com.google.common.base.MoreObjects;
+import javax.annotation.Nullable;
 
-@NonnullByDefault
 public final class LanternPopulatorType extends LanternPluginCatalogType implements PopulatorType {
 
     public final Class<? extends Populator> populatorClass;
@@ -52,7 +51,7 @@ public final class LanternPopulatorType extends LanternPluginCatalogType impleme
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj == null || this.getClass() != obj.getClass()) {
             return false;
         }

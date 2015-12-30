@@ -25,11 +25,9 @@
 package org.lanternpowered.server.permission;
 
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public abstract class AbstractSubjectBase implements AbstractSubject {
 
     @Nullable private volatile Subject subject;

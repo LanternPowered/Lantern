@@ -25,18 +25,15 @@
 package org.lanternpowered.server.text.xml;
 
 import com.google.common.collect.ImmutableList;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@NonnullByDefault
 public class Tr extends Element {
 
     @XmlAttribute(required = true)

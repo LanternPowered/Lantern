@@ -28,9 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.spongepowered.api.block.trait.IntegerTrait;
-
 import com.google.common.collect.ImmutableSet;
+import org.spongepowered.api.block.trait.IntegerTrait;
 
 public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implements IntegerTrait {
 

@@ -26,13 +26,10 @@ package org.lanternpowered.server.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
+import com.google.common.collect.BiMap;
+import com.google.common.collect.ImmutableBiMap;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.TextRepresentation;
@@ -45,13 +42,13 @@ import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.TextMessageException;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 
-@NonnullByDefault
+import javax.annotation.Nullable;
+
 public class LegacyTextRepresentation implements TextRepresentation {
 
     public static final char DEFAULT_CHAR = '\u00A7';

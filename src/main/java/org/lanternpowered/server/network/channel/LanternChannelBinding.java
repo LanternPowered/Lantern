@@ -25,7 +25,6 @@
 package org.lanternpowered.server.network.channel;
 
 import io.netty.buffer.ByteBuf;
-
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.network.RemoteConnection;

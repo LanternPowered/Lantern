@@ -26,17 +26,16 @@ package org.lanternpowered.server.network.forge.message.processor.handshake;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData.Entry;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public final class ProcessorForgeHandshakeOutRegistryData implements Processor<MessageForgeHandshakeOutRegistryData> {
 

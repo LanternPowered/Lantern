@@ -24,11 +24,11 @@
  */
 package org.lanternpowered.server.catalog;
 
+import org.spongepowered.api.CatalogType;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.spongepowered.api.CatalogType;
 
 public interface CatalogTypeRegistry<T extends CatalogType> {
 

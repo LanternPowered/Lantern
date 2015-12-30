@@ -24,20 +24,17 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import java.lang.reflect.Type;
-
-import org.lanternpowered.server.text.translation.TranslationManager;
-import org.spongepowered.api.text.Text;
-
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.lanternpowered.server.text.translation.TranslationManager;
+import org.spongepowered.api.text.Text;
 
-@NonnullByDefault
+import java.lang.reflect.Type;
+
 public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text> {
 
     /**

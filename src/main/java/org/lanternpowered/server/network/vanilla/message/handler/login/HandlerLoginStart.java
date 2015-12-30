@@ -24,9 +24,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
-import java.nio.charset.StandardCharsets;
-import java.util.UUID;
-
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -38,6 +35,9 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.SecurityHelper;
+
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Async
 public final class HandlerLoginStart implements Handler<MessageLoginInStart> {

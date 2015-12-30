@@ -26,15 +26,15 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-import java.util.function.Function;
-
 import org.lanternpowered.server.data.value.mutable.LanternOptionalValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableOptionalValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.OptionalValue;
+
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 

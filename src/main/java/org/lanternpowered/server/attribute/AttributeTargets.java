@@ -24,9 +24,9 @@
  */
 package org.lanternpowered.server.attribute;
 
-import java.util.function.Predicate;
-
 import org.spongepowered.api.data.DataHolder;
+
+import java.util.function.Predicate;
 
 public class AttributeTargets {
 

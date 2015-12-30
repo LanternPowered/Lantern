@@ -24,6 +24,21 @@
  */
 package org.lanternpowered.server.config.user.ban;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
+import ninja.leaping.configurate.ConfigurationOptions;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
+import org.lanternpowered.server.config.ConfigBase;
+import org.lanternpowered.server.config.user.UserStorage;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.ban.BanService;
+import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.util.ban.Ban.Ip;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
@@ -32,26 +47,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
-
-import org.lanternpowered.server.config.ConfigBase;
-import org.lanternpowered.server.config.user.UserStorage;
-
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.ban.Ban;
-import org.spongepowered.api.util.ban.Ban.Ip;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.reflect.TypeToken;
-
 @SuppressWarnings({"unchecked", "rawtypes"})
-public class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService {
+public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService {
 
     public static final ConfigurationOptions OPTIONS;
 
@@ -214,4 +211,5 @@ public class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanS
     public Collection<BanEntry> getEntries() {
         return ImmutableList.copyOf(this.entries0);
     }
+
 }

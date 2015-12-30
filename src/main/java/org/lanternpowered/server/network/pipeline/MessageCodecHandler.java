@@ -24,8 +24,14 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import java.util.List;
-
+import com.google.common.base.Optional;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.codec.EncoderException;
+import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.util.AttributeKey;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
@@ -35,15 +41,7 @@ import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.session.Session;
 
-import com.google.common.base.Optional;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.DecoderException;
-import io.netty.handler.codec.EncoderException;
-import io.netty.handler.codec.MessageToMessageCodec;
-import io.netty.util.AttributeKey;
+import java.util.List;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Message> {

@@ -24,15 +24,9 @@
  */
 package org.lanternpowered.server.block;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import javax.annotation.Nullable;
-
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.world.WeakWorldReference;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -49,9 +43,14 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.flowpowered.math.vector.Vector3i;
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import javax.annotation.Nullable;
 
 public class LanternBlockSnapshot implements BlockSnapshot {
 

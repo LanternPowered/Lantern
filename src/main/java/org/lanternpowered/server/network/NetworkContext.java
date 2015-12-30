@@ -25,7 +25,6 @@
 package org.lanternpowered.server.network;
 
 import io.netty.channel.Channel;
-
 import org.lanternpowered.server.network.session.Session;
 
 public interface NetworkContext {

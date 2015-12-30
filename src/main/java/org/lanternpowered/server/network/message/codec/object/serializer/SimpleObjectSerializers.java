@@ -26,18 +26,6 @@ package org.lanternpowered.server.network.message.codec.object.serializer;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
-import javax.annotation.Nullable;
-
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
-import org.lanternpowered.server.network.message.codec.object.VarInt;
-import org.lanternpowered.server.network.message.codec.object.VarLong;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.text.Text;
-
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
@@ -45,6 +33,17 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.message.codec.object.VarInt;
+import org.lanternpowered.server.network.message.codec.object.VarLong;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.text.Text;
+
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
+
+import javax.annotation.Nullable;
 
 public class SimpleObjectSerializers implements ObjectSerializers {
 

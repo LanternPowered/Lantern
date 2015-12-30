@@ -29,13 +29,11 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class SubjectSettingCallback implements Consumer<PermissionService> {
 
     private final AbstractSubject ref;

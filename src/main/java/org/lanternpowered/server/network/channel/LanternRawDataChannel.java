@@ -26,20 +26,19 @@ package org.lanternpowered.server.network.channel;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+
+import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
-
-import java.util.List;
-import java.util.function.Consumer;
-
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.RawDataListener;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.network.ChannelBinding;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * A simple raw data channel, the client side handlers will be ignored since

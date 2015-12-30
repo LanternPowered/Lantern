@@ -24,16 +24,14 @@
  */
 package org.lanternpowered.server.status;
 
+import org.spongepowered.api.MinecraftVersion;
+import org.spongepowered.api.network.status.StatusClient;
+
 import java.net.InetSocketAddress;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-import org.spongepowered.api.MinecraftVersion;
-import org.spongepowered.api.network.status.StatusClient;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class LanternStatusClient implements StatusClient {
 
     private final InetSocketAddress address;

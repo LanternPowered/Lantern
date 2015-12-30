@@ -34,14 +34,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-/**
- * The shutdown command of the server. This has the same behavior as the
- * original minecraft stop command but also allows a kick message to be provided
- * that will be displayed to all the active players.
- */
-@NonnullByDefault
 public final class CommandStop {
 
     public static CommandSpec create() {

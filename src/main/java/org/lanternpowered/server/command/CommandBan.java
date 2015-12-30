@@ -31,15 +31,11 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanTypes;
 
@@ -47,7 +43,6 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
-@NonnullByDefault
 public final class CommandBan {
 
     /**

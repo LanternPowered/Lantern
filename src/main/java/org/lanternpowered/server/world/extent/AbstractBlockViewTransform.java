@@ -25,20 +25,17 @@
 package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
-
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.DiscreteTransform3;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
 
-@NonnullByDefault
 public abstract class AbstractBlockViewTransform<V extends BlockVolume> implements BlockVolume {
 
     protected final V volume;

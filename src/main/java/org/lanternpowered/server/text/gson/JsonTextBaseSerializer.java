@@ -24,11 +24,12 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import java.util.List;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
+import com.google.gson.JsonArray;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.text.LanternTextHelper;
 import org.lanternpowered.server.text.LanternTextHelper.RawAction;
@@ -42,15 +43,11 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonPrimitive;
-import com.google.gson.JsonSerializationContext;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.List;
+import java.util.Optional;
 
-@NonnullByDefault
+import javax.annotation.Nullable;
+
 abstract class JsonTextBaseSerializer {
 
     public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context) throws JsonParseException {

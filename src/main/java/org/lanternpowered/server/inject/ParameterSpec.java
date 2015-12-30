@@ -26,14 +26,13 @@ package org.lanternpowered.server.inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.List;
-
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 
 public final class ParameterSpec<T> {
 

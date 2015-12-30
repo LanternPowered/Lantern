@@ -24,15 +24,12 @@
  */
 package org.lanternpowered.server.status;
 
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.profile.GameProfile;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.List;
 
-@NonnullByDefault
 public class LanternStatusResponsePlayers implements ClientPingServerEvent.Response.Players {
 
     private final List<GameProfile> profiles;

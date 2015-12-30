@@ -24,14 +24,9 @@
  */
 package org.lanternpowered.server.block.state;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableTable;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.trait.BlockTraitKey;
 import org.lanternpowered.server.block.trait.MutableBlockTraitValue;
@@ -51,9 +46,13 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableTable;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Predicate;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public final class LanternBlockState implements BlockState {

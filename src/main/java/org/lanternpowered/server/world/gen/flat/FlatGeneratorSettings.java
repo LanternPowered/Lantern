@@ -24,14 +24,11 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
-import java.util.List;
-
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.world.biome.BiomeType;
 
-import com.google.common.collect.ImmutableList;
+import java.util.List;
 
-@NonnullByDefault
 public final class FlatGeneratorSettings {
 
     private final List<FlatLayer> layers;

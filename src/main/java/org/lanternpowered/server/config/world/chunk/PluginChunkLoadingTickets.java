@@ -26,10 +26,8 @@ package org.lanternpowered.server.config.world.chunk;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @ConfigSerializable
-@NonnullByDefault
 public class PluginChunkLoadingTickets implements ChunkLoadingTickets {
 
     @Setting(value = ChunkLoading.MAXIMUM_CHUNKS_PER_TICKET, comment =

@@ -24,14 +24,13 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import java.util.Set;
-
-import org.lanternpowered.server.network.message.Message;
-
-import com.google.common.collect.ImmutableSet;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+
+import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.network.message.Message;
+
+import java.util.Set;
 
 public final class MessagePlayOutStatistics implements Message {
     private final ImmutableSet<Entry> entries;

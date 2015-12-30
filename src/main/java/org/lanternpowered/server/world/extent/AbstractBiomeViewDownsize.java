@@ -25,20 +25,17 @@
 package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
-
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
 
-@NonnullByDefault
 public abstract class AbstractBiomeViewDownsize<A extends BiomeArea> implements BiomeArea {
 
     protected final A area;

@@ -26,10 +26,8 @@ package org.lanternpowered.server.inject.impl;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.lanternpowered.server.inject.Binding;
 import org.lanternpowered.server.inject.MethodSpec;
 import org.lanternpowered.server.inject.Module;
@@ -37,8 +35,9 @@ import org.lanternpowered.server.inject.ModuleBuilder;
 import org.lanternpowered.server.inject.ParameterSpec;
 import org.lanternpowered.server.inject.Provider;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
 public final class SimpleModuleBuilder implements ModuleBuilder {
 

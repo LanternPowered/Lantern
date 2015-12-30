@@ -24,6 +24,15 @@
  */
 package org.lanternpowered.server.text;
 
+import org.lanternpowered.server.text.action.LanternCallbackHolder;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.action.ClickAction;
+import org.spongepowered.api.text.action.HoverAction;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.util.Coerce;
+
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -33,20 +42,9 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-import org.lanternpowered.server.text.action.LanternCallbackHolder;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.action.ClickAction;
-import org.spongepowered.api.text.action.HoverAction;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.util.Coerce;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import javax.annotation.Nullable;
 
-@NonnullByDefault
-public class LanternTextHelper {
+public final class LanternTextHelper {
 
     public static ClickAction<?> parseClickAction(String action, String value) {
         switch (action) {
@@ -191,4 +189,8 @@ public class LanternTextHelper {
             return this.text = Texts.legacy().fromUnchecked(this.value);
         }
     }
+
+    private LanternTextHelper() {
+    }
+
 }

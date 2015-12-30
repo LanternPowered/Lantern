@@ -24,14 +24,14 @@
  */
 package org.lanternpowered.server.game;
 
+import org.lanternpowered.server.util.ReflectionHelper;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
-
-import org.lanternpowered.server.util.ReflectionHelper;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public final class RegistryHelper {

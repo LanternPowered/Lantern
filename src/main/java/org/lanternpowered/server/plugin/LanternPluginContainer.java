@@ -24,16 +24,13 @@
  */
 package org.lanternpowered.server.plugin;
 
-import java.util.Optional;
-
+import com.google.inject.Injector;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import com.google.inject.Injector;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public final class LanternPluginContainer implements PluginContainer {
 
     private final String id;

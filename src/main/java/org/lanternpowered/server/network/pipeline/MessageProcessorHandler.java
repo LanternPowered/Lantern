@@ -24,8 +24,12 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import java.util.List;
+import static org.lanternpowered.server.network.pipeline.MessageCodecHandler.CONTEXT;
 
+import com.google.common.base.Optional;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.EncoderException;
+import io.netty.handler.codec.MessageToMessageEncoder;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
@@ -34,13 +38,7 @@ import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.session.Session;
 
-import com.google.common.base.Optional;
-
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.EncoderException;
-import io.netty.handler.codec.MessageToMessageEncoder;
-
-import static org.lanternpowered.server.network.pipeline.MessageCodecHandler.CONTEXT;
+import java.util.List;
 
 /**
  * Decoding is handled in {@link MessageCodecHandler}, to avoid multiple times

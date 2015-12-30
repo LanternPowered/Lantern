@@ -24,13 +24,11 @@
  */
 package org.lanternpowered.server.world.biome;
 
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 
-@NonnullByDefault
+import javax.annotation.Nullable;
+
 public class LanternBiomes {
 
     @Nullable private static LanternBiomeRegistry registry;
@@ -56,4 +54,5 @@ public class LanternBiomes {
     public static Short getId(BiomeType biomeType) {
         return getRegistry().getId(biomeType);
     }
+
 }

@@ -24,14 +24,12 @@
  */
 package org.lanternpowered.server.plugin;
 
-import java.util.Optional;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternPlatform;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
+import java.util.Optional;
+
 public final class SpongeApiContainer implements PluginContainer {
 
     @Override

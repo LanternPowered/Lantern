@@ -27,6 +27,14 @@ package org.lanternpowered.server.text.translation;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.spongepowered.api.text.translation.ResourceBundleTranslation;
+import org.spongepowered.api.text.translation.Translation;
+
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -36,17 +44,6 @@ import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
-import org.spongepowered.api.text.translation.ResourceBundleTranslation;
-import org.spongepowered.api.text.translation.Translation;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public final class LanternTranslationManager implements TranslationManager {
 
     private static class ResourceKey {

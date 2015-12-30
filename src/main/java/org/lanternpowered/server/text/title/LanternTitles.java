@@ -24,6 +24,17 @@
  */
 package org.lanternpowered.server.text.title;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.title.Title;
+
 import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
@@ -32,20 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.title.Title;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public final class LanternTitles {
 
     private final static LoadingCache<Title, CacheValue> messagesCache = 
@@ -88,6 +85,7 @@ public final class LanternTitles {
         public List<Message> getMessages(Locale locale) {
             return this.messages;
         }
+
     }
 
     private static class LocaleCacheValue extends CacheValue {
@@ -136,4 +134,5 @@ public final class LanternTitles {
 
     private LanternTitles() {
     }
+
 }

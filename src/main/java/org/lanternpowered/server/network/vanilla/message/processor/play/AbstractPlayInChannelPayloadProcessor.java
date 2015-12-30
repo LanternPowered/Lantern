@@ -24,17 +24,14 @@
  */
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
@@ -42,9 +39,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 
-import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
-import com.google.common.collect.Sets;
+import java.nio.charset.StandardCharsets;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
 public abstract class AbstractPlayInChannelPayloadProcessor implements Processor<MessagePlayInOutChannelPayload> {
 

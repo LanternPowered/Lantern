@@ -24,6 +24,26 @@
  */
 package org.lanternpowered.server.profile;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.lanternpowered.server.profile.LanternGameProfile.Property;
+import org.lanternpowered.server.util.UUIDHelper;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.GameProfileManager;
+import org.spongepowered.api.profile.ProfileNotFoundException;
+
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,29 +61,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.lanternpowered.server.profile.LanternGameProfile.Property;
-import org.lanternpowered.server.util.UUIDHelper;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.profile.GameProfileManager;
-import org.spongepowered.api.profile.ProfileNotFoundException;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public final class LanternGameProfileManager implements GameProfileManager {
 
     private final AtomicInteger counter = new AtomicInteger();

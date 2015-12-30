@@ -24,12 +24,9 @@
  */
 package org.lanternpowered.server.network.forge.message.processor.handshake;
 
+import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
-import java.util.List;
-import java.util.Map;
-
 import org.lanternpowered.server.network.forge.handshake.ForgeClientHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutAck;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
@@ -39,7 +36,8 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.processor.play.AbstractPlayInChannelPayloadProcessor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
-import com.google.common.collect.Maps;
+import java.util.List;
+import java.util.Map;
 
 public final class ProcessorPlayInChannelPayload extends AbstractPlayInChannelPayloadProcessor {
 

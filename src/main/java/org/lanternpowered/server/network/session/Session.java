@@ -24,12 +24,7 @@
  */
 package org.lanternpowered.server.network.session;
 
-import java.net.InetSocketAddress;
-import java.util.ArrayDeque;
-import java.util.Queue;
-import java.util.Random;
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -38,10 +33,6 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.util.AttributeKey;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-
-import javax.annotation.Nullable;
-import javax.crypto.SecretKey;
-
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
@@ -63,7 +54,14 @@ import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-import com.google.common.collect.Sets;
+import java.net.InetSocketAddress;
+import java.util.ArrayDeque;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+import javax.crypto.SecretKey;
 
 @SuppressWarnings({"rawtypes","unchecked"})
 public class Session implements PlayerConnection {

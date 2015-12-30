@@ -26,13 +26,12 @@ package org.lanternpowered.server.data.value;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Objects;
-
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
+
+import java.util.Optional;
 
 public abstract class AbstractBaseValue<E> implements BaseValue<E> {
 

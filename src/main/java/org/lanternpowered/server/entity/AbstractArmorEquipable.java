@@ -24,12 +24,12 @@
  */
 package org.lanternpowered.server.entity;
 
-import java.util.Optional;
-
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 

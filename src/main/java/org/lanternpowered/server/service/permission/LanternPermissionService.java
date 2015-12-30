@@ -28,11 +28,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.service.permission.base.FixedParentMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -41,8 +41,6 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.ContextCalculator;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -59,8 +57,8 @@ import javax.annotation.Nullable;
  *
  * <p>Really doesn't do much else. Don't use this guys.
  */
-@NonnullByDefault
 public class LanternPermissionService implements PermissionService {
+
     private static final Function<String, CommandSource> NO_COMMAND_SOURCE = s -> null;
 
     private final Game game;
@@ -143,7 +141,6 @@ public class LanternPermissionService implements PermissionService {
             throw new IllegalArgumentException("The provided plugin object does not have an associated plugin container "
                     + "(in other words, is 'plugin' actually your plugin object?)");
         }
-
         return Optional.<Builder>of(new LanternPermissionDescription.Builder(this, container.get()));
     }
 

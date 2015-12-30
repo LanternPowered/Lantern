@@ -24,10 +24,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.item.inventory.ItemStack;
+
+import javax.annotation.Nullable;
 
 public final class MessagePlayOutSetWindowSlot implements Message {
 

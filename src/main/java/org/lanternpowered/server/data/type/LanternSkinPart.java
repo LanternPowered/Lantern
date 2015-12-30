@@ -33,8 +33,8 @@ import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.Set;
 import java.util.Collection;
+import java.util.Set;
 
 @NonnullByDefault
 public final class LanternSkinPart extends SimpleLanternCatalogType implements SkinPart {

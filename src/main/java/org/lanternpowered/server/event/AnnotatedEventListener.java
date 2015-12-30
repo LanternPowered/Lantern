@@ -26,10 +26,10 @@ package org.lanternpowered.server.event;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.lang.reflect.Method;
-
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.lang.reflect.Method;
 
 @NonnullByDefault
 public abstract class AnnotatedEventListener implements LanternEventListener<Event> {

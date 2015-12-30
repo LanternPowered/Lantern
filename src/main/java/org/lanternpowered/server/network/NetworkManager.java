@@ -24,16 +24,6 @@
  */
 package org.lanternpowered.server.network;
 
-import java.net.SocketAddress;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.Nullable;
-
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.network.pipeline.MessageChannelInitializer;
-import org.lanternpowered.server.network.session.Session;
-import org.lanternpowered.server.network.session.SessionRegistry;
-
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -41,6 +31,15 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.network.pipeline.MessageChannelInitializer;
+import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.session.SessionRegistry;
+
+import java.net.SocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 public final class NetworkManager {
 

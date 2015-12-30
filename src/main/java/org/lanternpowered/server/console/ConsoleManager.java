@@ -27,32 +27,27 @@ package org.lanternpowered.server.console;
 import static jline.TerminalFactory.JLINE_TERMINAL;
 import static jline.TerminalFactory.OFF;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-
 import jline.console.ConsoleReader;
 import jline.console.CursorBuffer;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.fusesource.jansi.AnsiConsole;
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
 
-@NonnullByDefault
 public class ConsoleManager {
 
     // The formatter, by default used to format colored messages
     private Formatter formatter = new ConsoleFormatter();
 
     // The console reader
-    @Nullable private ConsoleReader reader;
+    private ConsoleReader reader;
 
     // A temp cursor buffer, internal use only
-    @Nullable private volatile CursorBuffer stashed;
+    private volatile CursorBuffer stashed;
 
     // Whether the command threads are running
     private volatile boolean active;

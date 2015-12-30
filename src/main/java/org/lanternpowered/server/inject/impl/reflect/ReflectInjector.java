@@ -24,6 +24,22 @@
  */
 package org.lanternpowered.server.inject.impl.reflect;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.lanternpowered.server.inject.Inject;
+import org.lanternpowered.server.inject.Injector;
+import org.lanternpowered.server.inject.MethodSpec;
+import org.lanternpowered.server.inject.Module;
+import org.lanternpowered.server.inject.ParameterInfo;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -40,23 +56,6 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.lanternpowered.server.inject.Inject;
-import org.lanternpowered.server.inject.Injector;
-import org.lanternpowered.server.inject.MethodSpec;
-import org.lanternpowered.server.inject.Module;
-import org.lanternpowered.server.inject.ParameterInfo;
-
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 final class ReflectInjector implements Injector {
 

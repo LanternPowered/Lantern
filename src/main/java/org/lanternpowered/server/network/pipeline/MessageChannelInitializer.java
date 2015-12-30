@@ -24,15 +24,13 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import org.lanternpowered.server.network.NetworkManager;
-import org.lanternpowered.server.network.pipeline.MessageCodecHandler;
-import org.lanternpowered.server.network.pipeline.legacy.LegacyPingHandler;
-import org.lanternpowered.server.network.session.Session;
-
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import org.lanternpowered.server.network.NetworkManager;
+import org.lanternpowered.server.network.pipeline.legacy.LegacyPingHandler;
+import org.lanternpowered.server.network.session.Session;
 
 public final class MessageChannelInitializer extends ChannelInitializer<SocketChannel> {
 

@@ -27,13 +27,12 @@ package org.lanternpowered.server.text.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExperienceHolderData;
 import org.spongepowered.api.data.manipulator.mutable.entity.GameModeData;
@@ -55,11 +54,7 @@ import org.spongepowered.api.text.selector.ArgumentTypes;
 import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.selector.SelectorTypes;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.util.Functional;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
@@ -79,7 +74,6 @@ import javax.annotation.Nullable;
 /**
  * A resolver that acts like Vanilla Minecraft in many regards.
  */
-@NonnullByDefault
 public class SelectorResolver {
 
     private static final Function<CommandSource, String> GET_NAME = CommandSource::getName;

@@ -25,7 +25,6 @@
 package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
-
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
 import org.spongepowered.api.block.BlockState;

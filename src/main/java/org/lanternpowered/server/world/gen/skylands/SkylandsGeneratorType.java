@@ -24,20 +24,18 @@
  */
 package org.lanternpowered.server.world.gen.skylands;
 
-import java.util.List;
-
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.gen.LanternWorldGenerator;
 import org.spongepowered.api.extra.skylands.SkylandsBiomeGenerator;
 import org.spongepowered.api.extra.skylands.SkylandsGrassPopulator;
 import org.spongepowered.api.extra.skylands.SkylandsGroundCoverPopulator;
 import org.spongepowered.api.extra.skylands.SkylandsTerrainGenerator;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
-@NonnullByDefault
+import java.util.List;
+
 public final class SkylandsGeneratorType extends LanternGeneratorType {
 
     public SkylandsGeneratorType(String pluginId, String name) {

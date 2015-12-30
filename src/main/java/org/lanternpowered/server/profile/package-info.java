@@ -22,31 +22,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command.element;
-
-import com.google.common.collect.ImmutableMap;
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.storage.WorldProperties;
-
-import java.util.Map;
-import java.util.function.Supplier;
-
-public final class WorldPropertiesChoicesElement {
-
-    private static final Supplier<Map<String, Object>> supplier = () -> {
-        ImmutableMap.Builder<String, Object> builder = ImmutableMap.builder();
-        for (WorldProperties world : LanternGame.get().getServer().getAllWorldProperties()) {
-            builder.put(world.getWorldName(), world);
-        }
-        return builder.build();
-    };
-
-    public static CommandElement of(Text key) {
-        return ChoicesElement.ofSupplier(key, supplier, false, false);
-    }
-
-    private WorldPropertiesChoicesElement() {
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.profile;

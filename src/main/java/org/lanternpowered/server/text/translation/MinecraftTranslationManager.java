@@ -24,18 +24,15 @@
  */
 package org.lanternpowered.server.text.translation;
 
+import com.google.common.collect.Maps;
+import org.spongepowered.api.text.translation.FixedTranslation;
+import org.spongepowered.api.text.translation.Translation;
+
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import org.spongepowered.api.text.translation.FixedTranslation;
-import org.spongepowered.api.text.translation.Translation;
-
-import com.google.common.collect.Maps;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public final class MinecraftTranslationManager implements TranslationManager {
 
     private final Map<String, Translation> translations = Maps.newConcurrentMap();

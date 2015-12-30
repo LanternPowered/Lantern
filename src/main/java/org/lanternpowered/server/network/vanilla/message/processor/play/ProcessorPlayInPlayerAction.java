@@ -26,17 +26,16 @@ package org.lanternpowered.server.network.vanilla.message.processor.play;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;
-
-import java.util.List;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInLeaveBed;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSprint;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayInPlayerAction;
+
+import java.util.List;
 
 public final class ProcessorPlayInPlayerAction implements Processor<MessagePlayInPlayerAction> {
 

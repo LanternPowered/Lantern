@@ -24,11 +24,11 @@
  */
 package org.lanternpowered.server.data.io;
 
-import java.io.IOException;
-
-import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.io.IOException;
 
 /**
  * A output that can be used to write data views.

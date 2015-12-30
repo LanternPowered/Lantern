@@ -26,17 +26,15 @@ package org.lanternpowered.server.service.permission;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -45,7 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-@NonnullByDefault
 public class OpLevelCollection extends LanternSubjectCollection {
 
     private final Map<String, OpLevelSubject> levels;

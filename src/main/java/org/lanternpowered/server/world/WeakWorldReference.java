@@ -26,15 +26,13 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.world.World;
+
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.World;
-
-@NonnullByDefault
 public final class WeakWorldReference {
 
     private WeakReference<World> world;

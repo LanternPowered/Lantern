@@ -24,18 +24,17 @@
  */
 package org.lanternpowered.server.scheduler;
 
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
-
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 abstract class SchedulerBase {

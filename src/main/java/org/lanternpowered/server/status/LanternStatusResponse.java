@@ -26,17 +26,15 @@ package org.lanternpowered.server.status;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternStatusResponse implements ClientPingServerEvent.Response {
 
     private final MinecraftVersion version;

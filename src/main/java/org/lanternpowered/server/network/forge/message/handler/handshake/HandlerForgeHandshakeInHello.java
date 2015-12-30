@@ -25,7 +25,6 @@
 package org.lanternpowered.server.network.forge.message.handler.handshake;
 
 import io.netty.util.Attribute;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;

@@ -24,20 +24,16 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
-import java.util.Map;
-
-import org.lanternpowered.server.game.LanternGame;
-
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import static org.lanternpowered.server.config.ConfigConstants.OVERRIDES;
 
 import com.google.common.collect.Maps;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.lanternpowered.server.game.LanternGame;
 
-import static org.lanternpowered.server.config.ConfigConstants.*;
+import java.util.Map;
 
 @ConfigSerializable
-@NonnullByDefault
 public abstract class ChunkLoading implements ChunkLoadingConfig {
 
     public static final String MAXIMUM_CHUNKS_PER_TICKET = "maximum-chunks-per-ticket";

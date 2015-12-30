@@ -24,9 +24,25 @@
  */
 package org.lanternpowered.server.plugin;
 
-import org.lanternpowered.launch.LaunchClassLoader;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import org.lanternpowered.launch.LaunchClassLoader;
+import org.lanternpowered.server.game.LanternGame;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AnnotationNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.plugin.PluginManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -47,25 +63,6 @@ import java.util.zip.ZipFile;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AnnotationNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.plugin.PluginManager;
-import com.google.common.base.Splitter;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public final class LanternPluginManager implements PluginManager {
 
     private static final String PLUGIN_DESCRIPTOR = Type.getDescriptor(Plugin.class);

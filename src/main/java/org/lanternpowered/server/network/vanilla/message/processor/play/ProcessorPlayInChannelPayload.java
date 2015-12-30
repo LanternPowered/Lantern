@@ -24,10 +24,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
+import com.flowpowered.math.vector.Vector3i;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-import java.util.List;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeCommand;
@@ -35,7 +34,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
-import com.flowpowered.math.vector.Vector3i;
+
+import java.util.List;
 
 public final class ProcessorPlayInChannelPayload extends AbstractPlayInChannelPayloadProcessor {
 

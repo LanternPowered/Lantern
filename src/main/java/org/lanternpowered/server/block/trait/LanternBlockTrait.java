@@ -24,13 +24,12 @@
  */
 package org.lanternpowered.server.block.trait;
 
-import java.util.Collection;
-import java.util.function.Predicate;
-
+import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.value.mutable.Value;
 
-import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
+import java.util.function.Predicate;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T> {

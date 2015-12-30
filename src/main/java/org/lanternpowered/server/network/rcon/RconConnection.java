@@ -24,9 +24,9 @@
  */
 package org.lanternpowered.server.network.rcon;
 
-import java.net.InetSocketAddress;
-
 import org.spongepowered.api.network.RemoteConnection;
+
+import java.net.InetSocketAddress;
 
 public class RconConnection implements RemoteConnection {
 

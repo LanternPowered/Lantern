@@ -24,20 +24,17 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import org.spongepowered.api.item.inventory.ItemStack;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_MASK;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTION_MASK;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SIZE;
 
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReferenceArray;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
-
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
@@ -72,28 +69,29 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.util.persistence.InvalidDataException;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SIZE;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_MASK;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SECTION_MASK;
-import static com.google.common.base.Preconditions.checkArgument;
 
-@NonnullByDefault
+import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
+
 public class LanternChunk implements AbstractExtent, Chunk {
 
     // The size of a chunk section in the x, y and z directions
@@ -801,12 +799,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        return this.getProperty(x, y, z, direction, propertyClass);
+        return this.getProperty0(x, y, z, direction, propertyClass);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
+        return this.getProperty0(x, y, z, null, propertyClass);
+    }
+
+    public <T extends Property<?, ?>> Optional<T> getProperty0(int x, int y, int z, @Nullable Direction direction, Class<T> propertyClass) {
         BlockState blockState = this.getBlock(x, y, z);
         if (propertyClass.equals(GroundLuminanceProperty.class)) {
             return (Optional<T>) Optional.of(new GroundLuminanceProperty(this.getBlockLight(x, y, z) / 15f));
@@ -1023,12 +1025,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Location<Chunk> getLocation(int x, int y, int z) {
-        return new Location<Chunk>(this, x, y, z);
+        return new Location<>(this, x, y, z);
     }
 
     @Override
     public Location<Chunk> getLocation(double x, double y, double z) {
-        return new Location<Chunk>(this, x, y, z);
+        return new Location<>(this, x, y, z);
     }
 
     @Override

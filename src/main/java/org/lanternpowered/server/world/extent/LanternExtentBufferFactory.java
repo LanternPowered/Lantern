@@ -24,23 +24,20 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import java.util.Arrays;
-
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
-@NonnullByDefault
+import java.util.Arrays;
+
 public final class LanternExtentBufferFactory implements ExtentBufferFactory {
 
     public static final LanternExtentBufferFactory INSTANCE = new LanternExtentBufferFactory();

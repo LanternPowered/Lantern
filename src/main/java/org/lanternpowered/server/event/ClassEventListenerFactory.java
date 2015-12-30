@@ -55,7 +55,6 @@ import static org.objectweb.asm.Opcodes.V1_6;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-
 import org.apache.logging.log4j.Logger;
 import org.lanternpowered.server.event.filter.EventFilter;
 import org.lanternpowered.server.event.filter.FilterFactory;

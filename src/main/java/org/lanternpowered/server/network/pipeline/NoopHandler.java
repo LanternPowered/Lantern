@@ -24,8 +24,8 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerAdapter;
 
 @ChannelHandler.Sharable
 public final class NoopHandler extends ChannelHandlerAdapter {

@@ -24,32 +24,30 @@
  */
 package org.lanternpowered.server.plugin;
 
-import org.spongepowered.api.Platform;
-
-import org.spongepowered.api.plugin.PluginManager;
-import org.spongepowered.api.service.ServiceManager;
-
-import java.io.File;
-import java.nio.file.Path;
-
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import org.lanternpowered.server.game.LanternGame;
-import org.slf4j.Logger;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.AsynchronousExecutor;
-import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
-import org.spongepowered.api.scheduler.SynchronousExecutor;
-import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.config.DefaultConfig;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.lanternpowered.server.game.LanternGame;
+import org.slf4j.Logger;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.config.ConfigDir;
+import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.plugin.PluginManager;
+import org.spongepowered.api.scheduler.AsynchronousExecutor;
+import org.spongepowered.api.scheduler.Scheduler;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.SynchronousExecutor;
+import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.io.File;
+import java.nio.file.Path;
 
 @NonnullByDefault
 public final class PluginModule extends AbstractModule {
@@ -111,6 +109,7 @@ public final class PluginModule extends AbstractModule {
         public Path get() {
             return this.game.getConfigManager().getPluginConfig(this.container).getDirectory();
         }
+
     }
 
     private static class PrivateConfigFileProvider implements Provider<Path> {
@@ -128,6 +127,7 @@ public final class PluginModule extends AbstractModule {
         public Path get() {
             return this.game.getConfigManager().getPluginConfig(this.container).getConfigPath();
         }
+
     }
 
     private static class SharedConfigFileProvider implements Provider<Path> {
@@ -145,6 +145,7 @@ public final class PluginModule extends AbstractModule {
         public Path get() {
             return this.game.getConfigManager().getSharedConfig(this.container).getConfigPath();
         }
+
     }
 
     private static class SharedHoconConfigProvider implements Provider<ConfigurationLoader<CommentedConfigurationNode>> {
@@ -162,6 +163,7 @@ public final class PluginModule extends AbstractModule {
         public ConfigurationLoader<CommentedConfigurationNode> get() {
             return this.game.getConfigManager().getSharedConfig(this.container).getConfig();
         }
+
     }
 
     private static class PrivateHoconConfigProvider implements Provider<ConfigurationLoader<CommentedConfigurationNode>> {
@@ -179,6 +181,7 @@ public final class PluginModule extends AbstractModule {
         public ConfigurationLoader<CommentedConfigurationNode> get() {
             return this.game.getConfigManager().getPluginConfig(this.container).getConfig();
         }
+
     }
 
     private static class FilePrivateConfigDirProvider implements Provider<File> {
@@ -209,6 +212,7 @@ public final class PluginModule extends AbstractModule {
         public File get() {
             return this.configPath.toFile();
         }
+
     }
 
     private static class FileSharedConfigFileProvider implements Provider<File> {
@@ -224,6 +228,7 @@ public final class PluginModule extends AbstractModule {
         public File get() {
             return this.configPath.toFile();
         }
+
     }
 
     private static class SynchronousExecutorProvider implements Provider<SpongeExecutorService> {
@@ -241,6 +246,7 @@ public final class PluginModule extends AbstractModule {
         public SpongeExecutorService get() {
             return this.schedulerService.createSyncExecutor(this.container);
         }
+
     }
 
     private static class AsynchronousExecutorProvider implements Provider<SpongeExecutorService> {
@@ -258,5 +264,7 @@ public final class PluginModule extends AbstractModule {
         public SpongeExecutorService get() {
             return this.schedulerService.createAsyncExecutor(this.container);
         }
+
     }
+
 }

@@ -24,11 +24,11 @@
  */
 package org.lanternpowered.server.resourcepack;
 
-import java.net.URI;
-import java.util.Optional;
-
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.net.URI;
+import java.util.Optional;
 
 @NonnullByDefault
 public final class LanternResourcePack implements ResourcePack {

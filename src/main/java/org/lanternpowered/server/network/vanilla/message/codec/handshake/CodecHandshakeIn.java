@@ -24,14 +24,12 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.handshake;
 
-import java.net.InetSocketAddress;
-import java.net.SocketAddress;
-import java.util.List;
-import java.util.UUID;
-
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.object.VarInt;
@@ -40,10 +38,10 @@ import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageH
 import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.lanternpowered.server.util.UUIDHelper;
 
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.List;
+import java.util.UUID;
 
 public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
 

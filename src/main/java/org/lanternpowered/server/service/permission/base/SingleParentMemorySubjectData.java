@@ -25,11 +25,9 @@
 package org.lanternpowered.server.service.permission.base;
 
 import org.lanternpowered.server.service.permission.OpLevelCollection;
-
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +35,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class SingleParentMemorySubjectData extends GlobalMemorySubjectData {
 
     @Nullable private Subject parent;

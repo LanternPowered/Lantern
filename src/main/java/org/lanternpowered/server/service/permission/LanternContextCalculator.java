@@ -31,15 +31,13 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.source.RemoteSource;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.world.World;
 
 import java.net.InetAddress;
@@ -50,7 +48,6 @@ import java.util.function.Function;
 /**
  * A context calculator handling world contexts.
  */
-@NonnullByDefault
 public class LanternContextCalculator implements ContextCalculator {
 
     private final LoadingCache<RemoteSource, Set<Context>> remoteIpCache = buildAddressCache(Context.REMOTE_IP_KEY,

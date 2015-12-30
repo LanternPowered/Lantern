@@ -24,12 +24,8 @@
  */
 package org.lanternpowered.server.network.forge.message.handler.handshake;
 
-import java.util.Set;
-
+import com.google.common.collect.Sets;
 import io.netty.util.Attribute;
-
-import org.spongepowered.api.Platform;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
@@ -39,8 +35,9 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
+import org.spongepowered.api.Platform;
 
-import com.google.common.collect.Sets;
+import java.util.Set;
 
 public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeHandshakeInStart> {
 

@@ -30,7 +30,6 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.scoreboard.Score;
@@ -43,7 +42,6 @@ import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorBuilder;
 import org.spongepowered.api.text.selector.SelectorFactory;
 import org.spongepowered.api.text.selector.SelectorType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -59,7 +57,6 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternSelectorFactory implements SelectorFactory {
 
     private static final Pattern intListPattern = Pattern.compile("\\G([-!]?[\\w-]*)(?:$|,)");

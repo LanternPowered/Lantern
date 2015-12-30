@@ -24,10 +24,31 @@
  */
 package org.lanternpowered.server.world;
 
+import com.flowpowered.math.vector.Vector3i;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
+import org.lanternpowered.server.data.translator.JsonTranslator;
+import org.lanternpowered.server.data.util.DataQueries;
+import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.LanternWorldProperties.OverriddenWorldProperties;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
+import org.lanternpowered.server.world.gen.LanternGeneratorType;
+import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -42,31 +63,6 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
-import org.lanternpowered.server.data.translator.JsonTranslator;
-import org.lanternpowered.server.data.util.DataQueries;
-import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.world.LanternWorldProperties.OverriddenWorldProperties;
-import org.lanternpowered.server.world.difficulty.LanternDifficulty;
-import org.lanternpowered.server.world.dimension.LanternDimensionType;
-import org.lanternpowered.server.world.gen.LanternGeneratorType;
-import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.difficulty.Difficulties;
-import org.spongepowered.api.world.difficulty.Difficulty;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-
-@NonnullByDefault
 public final class LanternWorldPropertiesIO {
 
     private final static Gson GSON = new Gson();

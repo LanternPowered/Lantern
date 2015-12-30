@@ -24,9 +24,11 @@
  */
 package org.lanternpowered.server.network.pipeline.legacy;
 
-import java.net.InetSocketAddress;
-import java.util.stream.Collectors;
-
+import com.google.common.base.Charsets;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
@@ -34,7 +36,6 @@ import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusResponse;
 import org.lanternpowered.server.status.LanternStatusResponsePlayers;
-
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -42,12 +43,8 @@ import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-import com.google.common.base.Charsets;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import java.net.InetSocketAddress;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
 public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {

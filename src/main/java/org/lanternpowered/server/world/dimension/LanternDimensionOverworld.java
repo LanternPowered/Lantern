@@ -25,9 +25,7 @@
 package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public final class LanternDimensionOverworld extends LanternDimension {
 
     public LanternDimensionOverworld(LanternWorld world, String name,

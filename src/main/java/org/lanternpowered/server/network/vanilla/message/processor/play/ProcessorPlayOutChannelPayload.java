@@ -27,9 +27,6 @@ package org.lanternpowered.server.network.vanilla.message.processor.play;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CodecException;
-
-import java.util.List;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
@@ -37,6 +34,8 @@ import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+
+import java.util.List;
 
 @Caching(ProcessorPlayOutChannelPayload.CachingHash.class)
 public final class ProcessorPlayOutChannelPayload implements Processor<MessagePlayInOutChannelPayload> {

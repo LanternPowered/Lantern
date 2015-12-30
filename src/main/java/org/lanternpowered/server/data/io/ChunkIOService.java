@@ -24,11 +24,11 @@
  */
 package org.lanternpowered.server.data.io;
 
-import java.io.IOException;
-
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.WorldStorage;
+
+import java.io.IOException;
 
 @NonnullByDefault
 public interface ChunkIOService extends WorldStorage {

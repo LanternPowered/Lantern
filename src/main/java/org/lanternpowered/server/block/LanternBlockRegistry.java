@@ -27,19 +27,18 @@ package org.lanternpowered.server.block;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
-
 import gnu.trove.TCollections;
 import gnu.trove.map.TObjectShortMap;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
-
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
 public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> implements BlockRegistry {
 

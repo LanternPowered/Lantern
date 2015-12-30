@@ -24,11 +24,11 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import java.util.Set;
-
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
+
+import java.util.Set;
 
 public final class HandlerPlayInRegisterChannels implements Handler<MessagePlayInOutRegisterChannels> {
 

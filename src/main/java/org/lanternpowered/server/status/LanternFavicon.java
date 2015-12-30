@@ -24,11 +24,18 @@
  */
 package org.lanternpowered.server.status;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Objects;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.base64.Base64;
+import org.spongepowered.api.network.status.Favicon;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -39,17 +46,6 @@ import java.nio.file.Path;
 
 import javax.imageio.ImageIO;
 
-import org.spongepowered.api.network.status.Favicon;
-
-import com.google.common.base.MoreObjects;
-import com.google.common.base.Objects;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-
-@NonnullByDefault
 public class LanternFavicon implements Favicon {
 
     private final BufferedImage decoded;

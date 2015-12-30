@@ -27,7 +27,6 @@ package org.lanternpowered.server.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;

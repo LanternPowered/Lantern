@@ -24,16 +24,6 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import java.lang.reflect.Type;
-import java.util.Locale;
-
-import org.lanternpowered.server.text.translation.MinecraftTranslation;
-import org.lanternpowered.server.text.translation.TranslationManager;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.translation.Translation;
-
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -43,9 +33,16 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.lanternpowered.server.text.translation.MinecraftTranslation;
+import org.lanternpowered.server.text.translation.TranslationManager;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.translation.Translation;
 
-@NonnullByDefault
+import java.lang.reflect.Type;
+import java.util.Locale;
+
 public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Translatable>,
         JsonDeserializer<Text.Translatable> {
 

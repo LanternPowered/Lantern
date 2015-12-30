@@ -27,10 +27,6 @@ package org.lanternpowered.server.config.user.ban;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.net.InetAddress;
-import java.time.Instant;
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.profile.GameProfile;
@@ -41,12 +37,17 @@ import org.spongepowered.api.util.ban.Ban.Builder;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
 
+import java.net.InetAddress;
+import java.time.Instant;
+
+import javax.annotation.Nullable;
+
 public final class BanBuilder implements Ban.Builder {
 
-    private BanType banType;
-    private GameProfile gameProfile;
-    private InetAddress address;
-    private Text reason;
+    @Nullable private BanType banType;
+    @Nullable private GameProfile gameProfile;
+    @Nullable private InetAddress address;
+    @Nullable private Text reason;
     @Nullable private Text source;
     private Instant startDate;
     @Nullable private Instant expirationDate;
@@ -122,7 +123,6 @@ public final class BanBuilder implements Ban.Builder {
     @Override
     public BanEntry build() {
         checkState(this.banType != null, "banType is not set");
-        checkState(this.startDate != null, "startDate is not set");
         checkState(this.reason != null, "reason is not set");
         if (this.banType == BanTypes.IP) {
             checkState(this.address != null, "address is not set");

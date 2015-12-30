@@ -25,10 +25,8 @@
 package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @FunctionalInterface
-@NonnullByDefault
 public interface DimensionSupplier<T extends LanternDimension> {
 
     T get(LanternWorld world, LanternDimensionType<T> dimensionType);

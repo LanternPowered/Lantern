@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-
 import org.lanternpowered.server.data.meta.LanternPatternLayer;
 import org.lanternpowered.server.data.value.mutable.LanternPatternListValue;
 import org.spongepowered.api.data.key.Key;

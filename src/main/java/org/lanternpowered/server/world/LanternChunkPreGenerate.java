@@ -27,24 +27,21 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
-
+import com.flowpowered.math.GenericMath;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.lanternpowered.server.game.LanternGame;
 import org.slf4j.Logger;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
 
-import com.flowpowered.math.GenericMath;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
+import java.util.function.Consumer;
 
-@NonnullByDefault
+import javax.annotation.Nullable;
+
 public final class LanternChunkPreGenerate implements ChunkPreGenerate {
 
     private static final int TICK_INTERVAL = 10;

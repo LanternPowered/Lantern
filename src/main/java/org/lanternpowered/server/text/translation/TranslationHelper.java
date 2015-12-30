@@ -27,9 +27,7 @@ package org.lanternpowered.server.text.translation;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public final class TranslationHelper {
 
     /**

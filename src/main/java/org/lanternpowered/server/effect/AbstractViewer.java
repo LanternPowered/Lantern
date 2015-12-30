@@ -24,13 +24,12 @@
  */
 package org.lanternpowered.server.effect;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
-
-import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault

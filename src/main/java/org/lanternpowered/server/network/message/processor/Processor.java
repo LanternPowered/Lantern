@@ -25,11 +25,10 @@
 package org.lanternpowered.server.network.message.processor;
 
 import io.netty.handler.codec.CodecException;
-
-import java.util.List;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+
+import java.util.List;
 
 /**
  * A processor for messages that aren't ready to be send to the client, this

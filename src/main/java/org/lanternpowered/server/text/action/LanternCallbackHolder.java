@@ -25,17 +25,15 @@
 package org.lanternpowered.server.text.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -46,17 +44,15 @@ import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternCallbackHolder {
 
     public static final String CALLBACK_COMMAND = "callback";
@@ -68,7 +64,7 @@ public class LanternCallbackHolder {
         return instance;
     }
 
-    private final ConcurrentMap<UUID, Consumer<CommandSource>> reverseMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<UUID, Consumer<CommandSource>> reverseMap = Maps.newConcurrentMap();
     private final LoadingCache<Consumer<CommandSource>, UUID> callbackCache = CacheBuilder.newBuilder()
             .expireAfterAccess(10, TimeUnit.MINUTES)
             .removalListener(new RemovalListener<Consumer<CommandSource>, UUID>() {

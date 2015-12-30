@@ -24,14 +24,6 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import java.lang.reflect.Type;
-
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.selector.Selector;
-import org.spongepowered.api.text.selector.Selectors;
-
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -39,9 +31,14 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.selector.Selector;
+import org.spongepowered.api.text.selector.Selectors;
 
-@NonnullByDefault
+import java.lang.reflect.Type;
+
 public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Selector>,
         JsonDeserializer<Text.Selector> {
 

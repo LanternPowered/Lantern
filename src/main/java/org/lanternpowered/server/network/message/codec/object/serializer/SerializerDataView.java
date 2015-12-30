@@ -24,6 +24,14 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufInputStream;
+import io.netty.buffer.ByteBufOutputStream;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
+import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
+import org.spongepowered.api.data.DataView;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -31,16 +39,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import javax.annotation.Nullable;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufInputStream;
-import io.netty.buffer.ByteBufOutputStream;
-import io.netty.handler.codec.CodecException;
-
-import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
-import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
-
-import org.spongepowered.api.data.DataView;
 
 public class SerializerDataView implements ObjectSerializer<DataView> {
 

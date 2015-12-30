@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Preconditions;
-
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -38,7 +37,6 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -50,7 +48,6 @@ import javax.annotation.Nullable;
  * Basic implementation of {@link PermissionDescription}. Can only be used in
  * conjunction with {@link LanternPermissionService}.
  */
-@NonnullByDefault
 class LanternPermissionDescription implements PermissionDescription {
 
     private final PermissionService permissionService;

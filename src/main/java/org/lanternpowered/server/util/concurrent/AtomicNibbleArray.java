@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.util.concurrent;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicIntegerArray;
+import static org.lanternpowered.server.util.Conditions.checkArrayRange;
 
 import org.lanternpowered.server.util.NibbleArray;
 
-import static org.lanternpowered.server.util.Conditions.checkArrayRange;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class AtomicNibbleArray implements Serializable {
 

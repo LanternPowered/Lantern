@@ -24,6 +24,12 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageCodec;
+import org.lanternpowered.server.game.LanternGame;
+
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
 import java.util.List;
@@ -32,13 +38,6 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.ShortBufferException;
 import javax.crypto.spec.IvParameterSpec;
-
-import org.lanternpowered.server.game.LanternGame;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.MessageToMessageCodec;
 
 public final class MessageEncryptionHandler extends MessageToMessageCodec<ByteBuf, ByteBuf> {
 

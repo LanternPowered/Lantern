@@ -26,27 +26,26 @@ package org.lanternpowered.server.text.sink;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.util.Sets2;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.sink.MessageSink;
-import org.spongepowered.api.text.sink.MessageSinkFactory;
-import org.spongepowered.api.command.CommandSource;
-
 import com.google.common.base.Function;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.util.Sets2;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.sink.MessageSink;
+import org.spongepowered.api.text.sink.MessageSinkFactory;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 public class LanternMessageSinkFactory implements MessageSinkFactory {
 

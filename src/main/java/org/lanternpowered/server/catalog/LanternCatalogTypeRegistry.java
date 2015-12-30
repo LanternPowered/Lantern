@@ -24,19 +24,18 @@
  */
 package org.lanternpowered.server.catalog;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import org.spongepowered.api.CatalogType;
+
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentMap;
-
-import org.spongepowered.api.CatalogType;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 public class LanternCatalogTypeRegistry<T extends CatalogType> implements CatalogTypeRegistry<T> {
 

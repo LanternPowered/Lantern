@@ -28,13 +28,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 import java.util.Set;
@@ -42,7 +41,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
-@NonnullByDefault
 public class DataFactoryCollection extends LanternSubjectCollection {
 
     private final LanternPermissionService service;

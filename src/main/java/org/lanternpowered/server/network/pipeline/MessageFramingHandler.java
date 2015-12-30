@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import java.util.List;
+import static org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializerContext.CONTEXT;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 
-import static org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializerContext.CONTEXT;
+import java.util.List;
 
 public final class MessageFramingHandler extends ByteToMessageCodec<ByteBuf> {
 

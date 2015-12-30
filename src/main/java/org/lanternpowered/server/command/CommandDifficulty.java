@@ -28,16 +28,12 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.command.element.ChoicesElement;
-import org.lanternpowered.server.command.element.WorldPropertiesChoicesElement;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.LocatedSource;
-import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -59,7 +55,7 @@ public final class CommandDifficulty {
                 .arguments(
                         ChoicesElement.of(Texts.of("difficulty"), baseBuilder.build(),
                                 aliasesBuilder.build(), false, true),
-                        GenericArguments.optional(WorldPropertiesChoicesElement.of(Texts.of("world"))))
+                        GenericArguments.optional(GenericArguments.world(Texts.of("world"))))
                 .permission("minecraft.command.difficulty")
                 .executor((src, args) -> {
                     WorldProperties world;

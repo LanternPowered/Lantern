@@ -24,24 +24,7 @@
  */
 package org.lanternpowered.server.config;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.Instant;
-
-import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
-import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
-import org.lanternpowered.server.config.serializer.InstantTypeSerializer;
-import org.lanternpowered.server.config.serializer.TextTypeSerializer;
-import org.lanternpowered.server.profile.LanternGameProfile;
-import org.lanternpowered.server.util.IpSet;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.text.Text;
-
 import com.google.common.reflect.TypeToken;
-
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
@@ -51,7 +34,22 @@ import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
+import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
+import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
+import org.lanternpowered.server.config.serializer.InstantTypeSerializer;
+import org.lanternpowered.server.config.serializer.TextTypeSerializer;
+import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.util.IpSet;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.io.IOException;
+import java.net.InetAddress;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @NonnullByDefault

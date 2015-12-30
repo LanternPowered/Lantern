@@ -24,6 +24,10 @@
  */
 package org.lanternpowered.server.scheduler;
 
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,10 +35,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public class AsyncScheduler extends SchedulerBase {

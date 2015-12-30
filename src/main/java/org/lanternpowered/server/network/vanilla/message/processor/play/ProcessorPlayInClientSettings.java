@@ -27,14 +27,13 @@ package org.lanternpowered.server.network.vanilla.message.processor.play;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
-
-import java.util.List;
-import java.util.Locale;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
+
+import java.util.List;
+import java.util.Locale;
 
 public class ProcessorPlayInClientSettings implements Processor<MessagePlayInClientSettings> {
 

@@ -24,11 +24,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.buffer.ByteBuf;
-
-import org.lanternpowered.server.network.message.Message;
-
 import static com.google.common.base.Preconditions.checkNotNull;
+
+import io.netty.buffer.ByteBuf;
+import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayInOutChannelPayload implements Message {
 

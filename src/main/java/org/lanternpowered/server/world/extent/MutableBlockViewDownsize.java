@@ -28,11 +28,9 @@ import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.DiscreteTransform3;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 
-@NonnullByDefault
 public class MutableBlockViewDownsize extends AbstractBlockViewDownsize<MutableBlockVolume> implements MutableBlockVolume {
 
     public MutableBlockViewDownsize(MutableBlockVolume volume, Vector3i min, Vector3i max) {

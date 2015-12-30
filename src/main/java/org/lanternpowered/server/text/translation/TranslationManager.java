@@ -24,14 +24,12 @@
  */
 package org.lanternpowered.server.text.translation;
 
+import org.spongepowered.api.text.translation.Translation;
+
 import java.util.Locale;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public interface TranslationManager {
 
     /**

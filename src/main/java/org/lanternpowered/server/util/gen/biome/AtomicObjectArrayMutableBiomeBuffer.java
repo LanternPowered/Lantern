@@ -26,15 +26,14 @@ package org.lanternpowered.server.util.gen.biome;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.concurrent.atomic.AtomicReferenceArray;
-
 import com.flowpowered.math.vector.Vector2i;
-
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
+
+import java.util.concurrent.atomic.AtomicReferenceArray;
 
 /**
  * Mutable view of a {@link BiomeType} array.

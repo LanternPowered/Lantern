@@ -24,15 +24,14 @@
  */
 package org.lanternpowered.server.inject.impl.reflect;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.util.List;
-
+import com.google.common.collect.Collections2;
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.inject.ParameterInfo;
 import org.lanternpowered.server.inject.ParameterSpec;
 
-import com.google.common.collect.Collections2;
-import com.google.common.collect.ImmutableList;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.util.List;
 
 final class ReflectParameterInfo<T, O> implements ParameterInfo<T> {
 

@@ -26,14 +26,12 @@ package org.lanternpowered.server.console;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.Logger;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class LoggingOutputStream extends ByteArrayOutputStream {
 
     private static final String SEPARATOR = System.getProperty("line.separator");

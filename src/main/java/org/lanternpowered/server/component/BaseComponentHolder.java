@@ -24,12 +24,9 @@
  */
 package org.lanternpowered.server.component;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.inject.Injector;
 import org.lanternpowered.server.inject.Injectors;
@@ -39,9 +36,11 @@ import org.lanternpowered.server.inject.ParameterSpec;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.util.GuavaCollectors;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
 
 public class BaseComponentHolder implements ComponentHolder {
 

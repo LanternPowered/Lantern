@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.util;
 
+import com.google.common.collect.Maps;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-
-import com.google.common.collect.Maps;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public final class Sets2 {

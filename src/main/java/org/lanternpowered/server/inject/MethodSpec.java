@@ -26,15 +26,14 @@ package org.lanternpowered.server.inject;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.lang.annotation.Annotation;
-import java.util.Collections;
-import java.util.List;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.List;
 
 public final class MethodSpec<T> {
 

@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.data.io.anvil;
 
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -37,9 +40,6 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.annotation.Nullable;
 

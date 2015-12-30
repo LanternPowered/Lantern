@@ -24,6 +24,23 @@
  */
 package org.lanternpowered.server.world.chunk;
 
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
+import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.chunk.LanternEntityLoadingTicket.EntityReference;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
+import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
@@ -38,31 +55,11 @@ import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-import org.lanternpowered.server.data.io.nbt.NbtDataContainerInputStream;
-import org.lanternpowered.server.data.io.nbt.NbtDataContainerOutputStream;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.world.chunk.LanternEntityLoadingTicket.EntityReference;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
-import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
-
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
-
 /**
  * This class can be used to serialize/deserialize loading tickets,
  * they are saved in the same format as forge to allow maximum
  * compatibility.
  */
-@NonnullByDefault
 public class LanternLoadingTicketIO {
 
     private static final String TICKETS_FILE = "forcedchunks.dat";

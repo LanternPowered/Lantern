@@ -26,18 +26,17 @@ package org.lanternpowered.server.world.biome;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.Nullable;
-
-import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
-import org.spongepowered.api.world.biome.BiomeType;
-
 import gnu.trove.TCollections;
 import gnu.trove.map.TObjectShortMap;
 import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
+import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
+import org.spongepowered.api.world.biome.BiomeType;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 public class LanternBiomeRegistry extends LanternCatalogTypeRegistry<BiomeType> {
 

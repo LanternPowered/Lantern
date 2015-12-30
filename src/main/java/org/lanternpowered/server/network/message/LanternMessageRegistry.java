@@ -24,22 +24,20 @@
  */
 package org.lanternpowered.server.network.message;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.message.processor.Processor;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.message.processor.Processor;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class LanternMessageRegistry implements MessageRegistry {

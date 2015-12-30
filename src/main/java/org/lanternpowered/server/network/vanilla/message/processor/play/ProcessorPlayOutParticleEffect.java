@@ -24,11 +24,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
+import com.flowpowered.math.vector.Vector3f;
 import io.netty.handler.codec.CodecException;
-
-import java.util.List;
-import java.util.Random;
-
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
@@ -54,7 +51,8 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 
-import com.flowpowered.math.vector.Vector3f;
+import java.util.List;
+import java.util.Random;
 
 @Caching
 public final class ProcessorPlayOutParticleEffect implements Processor<MessagePlayOutParticleEffect> {

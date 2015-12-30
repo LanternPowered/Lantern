@@ -24,15 +24,15 @@
  */
 package org.lanternpowered.server.attribute;
 
-import java.util.function.Predicate;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+import java.util.function.Predicate;
 
 public final class LanternAttributeBuilder {
 

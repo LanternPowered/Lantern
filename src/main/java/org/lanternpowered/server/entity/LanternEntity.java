@@ -24,13 +24,8 @@
  */
 package org.lanternpowered.server.entity;
 
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
-import java.util.function.Function;
-
+import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
 import org.spongepowered.api.data.DataContainer;
@@ -47,14 +42,18 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
-import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.ImmutableSet;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
+import java.util.function.Function;
 
 @NonnullByDefault
 public class LanternEntity extends BaseComponentHolder implements Entity {

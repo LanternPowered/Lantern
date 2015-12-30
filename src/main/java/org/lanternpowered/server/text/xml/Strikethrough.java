@@ -26,14 +26,12 @@ package org.lanternpowered.server.text.xml;
 
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
 @XmlSeeAlso(Strikethrough.S.class)
 @XmlRootElement
-@NonnullByDefault
 public class Strikethrough extends Element {
 
     @Override

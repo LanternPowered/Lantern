@@ -24,13 +24,10 @@
  */
 package org.lanternpowered.server.world.rules;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@NonnullByDefault
 public interface GameRules {
 
     /**

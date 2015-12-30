@@ -26,6 +26,8 @@ package org.lanternpowered.server.service.pagination;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
@@ -33,13 +35,13 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 /**
  * Holds logic for an active pagination that is occurring.
@@ -52,17 +54,17 @@ abstract class ActivePagination {
     private final UUID id = UUID.randomUUID();
     private final Text nextPageText;
     private final Text prevPageText;
-    private final Text title;
-    private final Text header;
-    private final Text footer;
+    @Nullable private final Text title;
+    @Nullable private final Text header;
+    @Nullable private final Text footer;
     private int currentPage;
     private final int maxContentLinesPerPage;
     protected final PaginationCalculator<CommandSource> calc;
     private final String padding;
 
-    public ActivePagination(CommandSource src, PaginationCalculator<CommandSource> calc, Text title,
-            Text header, Text footer, String padding) {
-        this.src = new WeakReference<CommandSource>(src);
+    public ActivePagination(CommandSource src, PaginationCalculator<CommandSource> calc, @Nullable Text title,
+            @Nullable Text header, @Nullable Text footer, String padding) {
+        this.src = new WeakReference<>(src);
         this.calc = calc;
         this.title = title;
         this.header = header;
@@ -144,9 +146,8 @@ abstract class ActivePagination {
         }
 
         Text footer = calculateFooter(page);
-        if (footer != null) {
-            toSend.add(this.calc.center(src, footer, this.padding));
-        }
+        toSend.add(this.calc.center(src, footer, this.padding));
+
         if (this.footer != null) {
             toSend.add(this.footer);
         }
@@ -186,4 +187,5 @@ abstract class ActivePagination {
         }
         return ret.build();
     }
+
 }

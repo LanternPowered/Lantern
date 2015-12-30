@@ -24,30 +24,11 @@
  */
 package org.lanternpowered.server;
 
-import org.lanternpowered.server.network.query.QueryServer;
-
-import org.lanternpowered.server.network.rcon.BaseRconService;
-import org.lanternpowered.server.network.rcon.RconServer;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
-
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.net.BindException;
-import java.net.InetSocketAddress;
-import java.nio.file.Path;
-import java.security.KeyPair;
-import java.util.Collection;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
@@ -55,6 +36,9 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
+import org.lanternpowered.server.network.query.QueryServer;
+import org.lanternpowered.server.network.rcon.BaseRconService;
+import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
@@ -82,9 +66,23 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.storage.ChunkLayout;
 import org.spongepowered.api.world.storage.WorldProperties;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.ListenableFuture;
+
+import java.io.Closeable;
+import java.io.File;
+import java.io.IOException;
+import java.net.BindException;
+import java.net.InetSocketAddress;
+import java.nio.file.Path;
+import java.security.KeyPair;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import javax.annotation.Nullable;
 
 public class LanternServer implements Server {
 

@@ -24,9 +24,9 @@
  */
 package org.lanternpowered.server.text;
 
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.lanternpowered.server.text.gson.JsonTextRepresentation;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.text.xml.XmlTextRepresentation;
@@ -34,12 +34,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextFactory;
 import org.spongepowered.api.text.TextRepresentation;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.Locale;
+import java.util.concurrent.ExecutionException;
 
-@NonnullByDefault
 public final class LanternTextFactory implements TextFactory {
 
     private final LoadingCache<Character, LegacyTextRepresentation> legacyCache = CacheBuilder.newBuilder()

@@ -24,23 +24,20 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.collect.Lists;
+import org.spongepowered.api.text.translation.FixedTranslation;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.text.translation.FixedTranslation;
-
-import com.google.common.collect.Lists;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import javax.annotation.Nullable;
 
-@NonnullByDefault
-public class CombinedTranslationManager implements TranslationManager {
+public final class CombinedTranslationManager implements TranslationManager {
 
     // The primary translation manager that will be used
     private final List<TranslationManager> translationManagers = Lists.newCopyOnWriteArrayList();

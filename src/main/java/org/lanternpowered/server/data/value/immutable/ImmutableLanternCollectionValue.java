@@ -25,7 +25,6 @@
 package org.lanternpowered.server.data.value.immutable;
 
 import com.google.common.collect.Iterables;
-
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableCollectionValue;

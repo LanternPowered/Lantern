@@ -24,14 +24,12 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
@@ -56,7 +54,6 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -70,11 +67,11 @@ import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
-@NonnullByDefault
 public interface AbstractExtent extends Extent {
 
     @Override

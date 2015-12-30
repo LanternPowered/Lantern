@@ -26,10 +26,7 @@ package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.Set;
-
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
@@ -44,6 +41,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.title.LanternTitles;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -66,10 +64,11 @@ import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.command.CommandSource;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 

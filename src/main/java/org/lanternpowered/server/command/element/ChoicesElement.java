@@ -24,13 +24,7 @@
  */
 package org.lanternpowered.server.command.element;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
-import javax.annotation.Nullable;
+import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
 
 import org.spongepowered.api.command.CommandMessageFormatting;
 import org.spongepowered.api.command.CommandSource;
@@ -43,7 +37,14 @@ import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
-import static org.spongepowered.api.util.SpongeApiTranslationHelper.t;
+
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
 
 public final class ChoicesElement extends CommandElement {
 
@@ -220,4 +221,5 @@ public final class ChoicesElement extends CommandElement {
             return super.getUsage(src);
         }
     }
+
 }

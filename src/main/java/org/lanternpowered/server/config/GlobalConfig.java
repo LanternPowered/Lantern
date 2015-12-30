@@ -24,35 +24,30 @@
  */
 package org.lanternpowered.server.config;
 
+import static org.lanternpowered.server.config.ConfigConstants.ENABLED;
+
+import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.lanternpowered.server.config.world.chunk.ChunkLoading;
+import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
+import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
+import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
+import org.lanternpowered.server.util.IpSet;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-
-import org.lanternpowered.server.config.world.chunk.ChunkLoading;
-import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
-import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
-import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
-import org.lanternpowered.server.util.IpSet;
-
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import static org.lanternpowered.server.config.ConfigConstants.*;
-
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public GlobalConfig(Path path) throws IOException {

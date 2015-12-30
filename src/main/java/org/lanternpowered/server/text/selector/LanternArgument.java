@@ -27,9 +27,7 @@ package org.lanternpowered.server.text.selector;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.selector.Argument;
 import org.spongepowered.api.text.selector.ArgumentType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public class LanternArgument<T> implements Argument<T> {
 
     public static class Invertible<T> extends LanternArgument<T> implements Argument.Invertible<T> {
@@ -55,6 +53,7 @@ public class LanternArgument<T> implements Argument<T> {
         public Argument.Invertible<T> invert() {
             return new LanternArgument.Invertible<T>((ArgumentType.Invertible<T>) this.getType(), this.getValue(), !this.isInverted());
         }
+
     }
 
     private static String toSelectorArgument(Object val) {

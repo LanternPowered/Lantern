@@ -24,19 +24,18 @@
  */
 package org.lanternpowered.server.network.rcon;
 
-import java.nio.ByteOrder;
-import java.nio.charset.StandardCharsets;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
+
+import java.nio.ByteOrder;
+import java.nio.charset.StandardCharsets;
 
 public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 

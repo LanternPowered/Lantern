@@ -26,7 +26,6 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;

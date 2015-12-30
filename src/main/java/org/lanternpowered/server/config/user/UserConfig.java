@@ -24,6 +24,14 @@
  */
 package org.lanternpowered.server.config.user;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import ninja.leaping.configurate.ConfigurationOptions;
+import ninja.leaping.configurate.objectmapping.Setting;
+import org.lanternpowered.server.config.ConfigBase;
+import org.spongepowered.api.profile.GameProfile;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -32,18 +40,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.lanternpowered.server.config.ConfigBase;
-import org.spongepowered.api.profile.GameProfile;
-
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.objectmapping.Setting;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class UserConfig<T extends UserEntry> extends ConfigBase implements UserStorage<T> {
 
     @Setting(value = "entries")

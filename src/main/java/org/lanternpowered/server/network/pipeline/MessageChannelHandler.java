@@ -24,17 +24,16 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.timeout.IdleStateEvent;
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.SimpleCodecContext;
 import org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializers;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
-
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.timeout.IdleStateEvent;
 
 public final class MessageChannelHandler extends SimpleChannelInboundHandler<Message> {
 

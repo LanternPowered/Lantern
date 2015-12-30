@@ -24,8 +24,8 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.UnpooledByteBufAllocator;
 
 public class SimpleObjectSerializerContext extends AbstractObjectSerializerContext {

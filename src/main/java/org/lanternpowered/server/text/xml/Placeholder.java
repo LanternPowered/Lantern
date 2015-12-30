@@ -26,13 +26,11 @@ package org.lanternpowered.server.text.xml;
 
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-@NonnullByDefault
 public class Placeholder extends Span {
 
     @XmlAttribute(required = true)

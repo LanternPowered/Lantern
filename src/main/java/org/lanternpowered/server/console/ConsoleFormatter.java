@@ -26,22 +26,20 @@ package org.lanternpowered.server.console;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-import java.util.Map.Entry;
-import java.util.regex.Pattern;
-
+import com.google.common.collect.ImmutableMap;
 import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.Ansi.Color;
 import org.lanternpowered.server.text.LegacyTextRepresentation;
-
-import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Map.Entry;
+import java.util.regex.Pattern;
 
 @NonnullByDefault
 public class ConsoleFormatter implements Formatter {
 
     private static Pattern c(char code) {
-        return Pattern.compile(new StringBuilder().append(LegacyTextRepresentation.DEFAULT_CHAR)
-                .append(code).toString(), Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+        return Pattern.compile(String.valueOf(LegacyTextRepresentation.DEFAULT_CHAR) + code, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
     }
 
     private static final String RESET = ansi().reset().toString();

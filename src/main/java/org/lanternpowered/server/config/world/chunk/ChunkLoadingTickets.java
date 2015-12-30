@@ -24,9 +24,6 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public interface ChunkLoadingTickets {
 
     /**

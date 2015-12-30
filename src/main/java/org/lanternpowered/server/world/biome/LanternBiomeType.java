@@ -25,10 +25,8 @@
 package org.lanternpowered.server.world.biome;
 
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 
-@NonnullByDefault
 public class LanternBiomeType extends LanternPluginCatalogType implements BiomeType {
 
     private final LanternBiomeGenerationSettings defaultSettings = new LanternBiomeGenerationSettings();
@@ -59,4 +57,11 @@ public class LanternBiomeType extends LanternPluginCatalogType implements BiomeT
         return this.defaultSettings;
     }
 
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
+    }
+
+    public void setHumidity(double humidity) {
+        this.humidity = humidity;
+    }
 }

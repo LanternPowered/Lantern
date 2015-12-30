@@ -24,14 +24,13 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
+import static org.lanternpowered.server.config.ConfigConstants.DEFAULTS;
+import static org.lanternpowered.server.config.ConfigConstants.ENABLED;
+
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import static org.lanternpowered.server.config.ConfigConstants.*;
 
 @ConfigSerializable
-@NonnullByDefault
 public class WorldChunkLoading extends ChunkLoading {
 
     @Setting(value = ENABLED, comment =

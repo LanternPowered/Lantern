@@ -24,12 +24,11 @@
  */
 package org.lanternpowered.server.text.xml;
 
-import java.util.Optional;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -38,7 +37,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
 
 @XmlSeeAlso(Color.C.class)
 @XmlRootElement
-@NonnullByDefault
 public class Color extends Element {
 
     @XmlAttribute

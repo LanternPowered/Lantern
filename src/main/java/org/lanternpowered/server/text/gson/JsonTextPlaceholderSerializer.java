@@ -24,14 +24,6 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import java.lang.reflect.Type;
-import java.util.List;
-import java.util.Optional;
-
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -40,12 +32,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.text.Texts;
+
+import java.lang.reflect.Type;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Serializes/deserializes the {@link Text.Placeholder} object type introduced by sponge.
  */
-@NonnullByDefault
 public final class JsonTextPlaceholderSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text.Placeholder>,
         JsonSerializer<Text.Placeholder> {
 

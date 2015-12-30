@@ -29,10 +29,8 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.config.ConfigRoot;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -41,7 +39,6 @@ import java.nio.file.Path;
 /**
  * Root for lantern configurations.
  */
-@NonnullByDefault
 public final class LanternConfigRoot implements ConfigRoot {
 
     private final ObjectMapperFactory mapperFactory;

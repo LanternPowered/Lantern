@@ -26,7 +26,6 @@ package org.lanternpowered.server.network.message.codec.object.serializer;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.codec.object.VarLong;
 
 public class SerializerVarLong implements ObjectSerializer<VarLong> {

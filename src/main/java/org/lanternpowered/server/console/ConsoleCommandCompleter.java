@@ -26,16 +26,13 @@ package org.lanternpowered.server.console;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import jline.console.completer.Completer;
+import org.lanternpowered.server.game.LanternGame;
+
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import jline.console.completer.Completer;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public class ConsoleCommandCompleter implements Completer {
 
     private final LanternGame game;

@@ -25,7 +25,6 @@
 package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
-
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;

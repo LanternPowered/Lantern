@@ -24,18 +24,21 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.util.Conditions.checkPlugin;
+import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_HEIGHT;
+import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTIONS;
+import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_SIZE;
+import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_VOLUME;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
 
-import javax.annotation.Nullable;
-
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
@@ -52,12 +55,11 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.chunk.ForcedChunkEvent;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
-import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -69,23 +71,18 @@ import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSetMultimap;
-import com.google.common.collect.Maps;
-import com.google.common.collect.MapMaker;
-import com.google.common.collect.Sets;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
-import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_SIZE;
-import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_VOLUME;
-import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTIONS;
-import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_HEIGHT;
+import javax.annotation.Nullable;
 
-@NonnullByDefault
 public final class LanternChunkManager {
 
     // The maximum amount of chunks that may be loaded during

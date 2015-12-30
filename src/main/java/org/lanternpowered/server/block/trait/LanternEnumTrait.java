@@ -28,9 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.spongepowered.api.block.trait.EnumTrait;
-
 import com.google.common.collect.ImmutableSet;
+import org.spongepowered.api.block.trait.EnumTrait;
 
 @SuppressWarnings("unchecked")
 public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E> implements EnumTrait<E> {

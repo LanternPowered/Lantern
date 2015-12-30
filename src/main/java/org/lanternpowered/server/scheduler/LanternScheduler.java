@@ -27,6 +27,15 @@ package org.lanternpowered.server.scheduler;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.util.concurrent.ListenableFutureTask;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.Scheduler;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
+import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -35,16 +44,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Scheduler;
-import org.spongepowered.api.scheduler.SpongeExecutorService;
-import org.spongepowered.api.scheduler.Task;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.util.concurrent.ListenableFutureTask;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public class LanternScheduler implements Scheduler {

@@ -32,17 +32,14 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.SetMultimap;
 import com.google.common.collect.Sets;
-
 import org.spongepowered.api.text.selector.ArgumentHolder;
 import org.spongepowered.api.text.selector.ArgumentType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
 
-@NonnullByDefault
 public class LanternArgumentHolder<T extends ArgumentHolder<?>> implements ArgumentHolder<T> {
 
     private final Set<T> subtypes;

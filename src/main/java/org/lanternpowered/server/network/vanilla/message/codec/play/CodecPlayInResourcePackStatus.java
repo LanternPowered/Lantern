@@ -24,17 +24,15 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.spongepowered.api.event.entity.living.humanoid.player.ResourcePackStatusEvent.ResourcePackStatus;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 public final class CodecPlayInResourcePackStatus implements Codec<MessagePlayInResourcePackStatus> {
 

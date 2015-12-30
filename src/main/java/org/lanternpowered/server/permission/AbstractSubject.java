@@ -24,13 +24,6 @@
  */
 package org.lanternpowered.server.permission;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -38,9 +31,14 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
 public interface AbstractSubject extends Subject {
 
     void setInternalSubject(@Nullable Subject subj);

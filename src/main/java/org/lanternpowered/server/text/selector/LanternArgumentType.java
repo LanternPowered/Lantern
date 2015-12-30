@@ -27,18 +27,15 @@ package org.lanternpowered.server.text.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.selector.ArgumentType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.function.Function;
 
-@NonnullByDefault
 public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T>> implements ArgumentType<T> {
 
     private static final Map<String, Function<String, ?>> converters = Maps.newHashMap();

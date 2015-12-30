@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.util.gen.block;
 
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.MutableBlockViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBlockVolumeWrapper;
@@ -32,8 +33,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
-
-import com.flowpowered.math.vector.Vector3i;
 
 public abstract class AbstractMutableBlockBuffer extends AbstractBlockBuffer implements MutableBlockVolume {
 

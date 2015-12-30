@@ -24,16 +24,10 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-
 import org.lanternpowered.server.entity.AbstractArmorEquipable;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
-import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -49,14 +43,20 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
-import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.command.CommandSource;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 @NonnullByDefault
 public class LanternUser implements AbstractArmorEquipable, User {

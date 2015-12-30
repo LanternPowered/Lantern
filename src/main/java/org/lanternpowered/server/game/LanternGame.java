@@ -24,26 +24,18 @@
  */
 package org.lanternpowered.server.game;
 
-import org.lanternpowered.server.command.CommandDifficulty;
-
-import org.spongepowered.api.service.rcon.RconService;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.concurrent.TimeUnit;
-
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.command.CommandSeed;
 import org.lanternpowered.server.command.CommandBan;
+import org.lanternpowered.server.command.CommandDifficulty;
 import org.lanternpowered.server.command.CommandHelp;
+import org.lanternpowered.server.command.CommandSeed;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.command.LanternCommandDisambiguator;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
-import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.OpsEntry;
+import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
@@ -70,28 +62,34 @@ import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandManager;
+import org.spongepowered.api.command.SimpleCommandManager;
+import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.data.property.PropertyRegistry;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.SimpleServiceManager;
-import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.command.SimpleCommandManager;
-import org.spongepowered.api.config.ConfigManager;
-import org.spongepowered.api.event.EventManager;
-import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.rcon.RconService;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.TeleportHelper;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 

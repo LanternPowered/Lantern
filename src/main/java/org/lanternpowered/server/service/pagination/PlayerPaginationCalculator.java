@@ -26,19 +26,17 @@ package org.lanternpowered.server.service.pagination;
 
 import com.flowpowered.math.GenericMath;
 import com.google.common.base.Strings;
-
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-
+import org.spongepowered.api.command.CommandMessageFormatting;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.command.CommandMessageFormatting;
 
 import java.io.IOException;
 import java.util.List;
@@ -47,6 +45,7 @@ import java.util.List;
  * Pagination calculator for players.
  */
 public class PlayerPaginationCalculator implements PaginationCalculator<Player> {
+
     private static final String NON_UNICODE_CHARS;
     private static final int[] NON_UNICODE_CHAR_WIDTHS;
     private static final byte[] UNICODE_CHAR_WIDTHS;
@@ -168,4 +167,5 @@ public class PlayerPaginationCalculator implements PaginationCalculator<Player> 
             .style(text.getStyle());
         return build.build();
     }
+
 }

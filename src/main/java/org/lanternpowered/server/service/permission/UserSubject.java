@@ -29,14 +29,13 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.SingleParentMemorySubjectData;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 import java.util.Set;
@@ -46,7 +45,6 @@ import javax.annotation.Nullable;
 /**
  * An implementation of vanilla minecraft's 4 op groups.
  */
-@NonnullByDefault
 public class UserSubject extends LanternSubject {
 
     private final GameProfile player;
@@ -56,6 +54,7 @@ public class UserSubject extends LanternSubject {
     public UserSubject(final GameProfile player, final UserCollection users) {
         this.player = player;
         this.data = new SingleParentMemorySubjectData(users.getService()) {
+
             @Override
             public Subject getParent() {
                 int opLevel = getOpLevel();
@@ -80,6 +79,7 @@ public class UserSubject extends LanternSubject {
                 }
                 return true;
             }
+
         };
         this.collection = users;
     }

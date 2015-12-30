@@ -29,9 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.util.Color;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public final class LanternTextColor extends LanternCatalogType implements TextColor {
 
     private final Color color;

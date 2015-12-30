@@ -26,20 +26,17 @@ package org.lanternpowered.server.world.gen.flat;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.List;
-
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Lists;
+import java.util.List;
 
-@NonnullByDefault
 public final class FlatGenerationPopulator implements GenerationPopulator {
 
     // Using a cache to increase generation performance

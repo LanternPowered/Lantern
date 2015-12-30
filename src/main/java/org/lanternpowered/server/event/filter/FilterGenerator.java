@@ -40,7 +40,6 @@ import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V1_6;
 
 import com.google.common.collect.Lists;
-
 import org.lanternpowered.server.event.filter.delegate.AfterCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.AllCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.BeforeCauseFilterSourceDelegate;

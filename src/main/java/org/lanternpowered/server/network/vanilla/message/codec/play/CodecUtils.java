@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import java.util.Locale;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInClientSettings;
+
+import java.util.Locale;
 
 public class CodecUtils {
 

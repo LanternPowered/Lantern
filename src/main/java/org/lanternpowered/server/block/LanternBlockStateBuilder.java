@@ -26,8 +26,6 @@ package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -35,6 +33,8 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.util.persistence.InvalidDataException;
+
+import java.util.Optional;
 
 public class LanternBlockStateBuilder implements BlockState.Builder {
 

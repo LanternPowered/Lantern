@@ -24,10 +24,10 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
-import java.nio.charset.StandardCharsets;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+
+import java.nio.charset.StandardCharsets;
 
 public class SerializerString implements ObjectSerializer<String> {
 

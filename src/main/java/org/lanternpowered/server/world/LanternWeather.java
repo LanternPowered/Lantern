@@ -25,10 +25,8 @@
 package org.lanternpowered.server.world;
 
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.weather.Weather;
 
-@NonnullByDefault
 public final class LanternWeather extends LanternPluginCatalogType implements Weather {
 
     private final float darkness;

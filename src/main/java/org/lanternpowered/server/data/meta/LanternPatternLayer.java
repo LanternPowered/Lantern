@@ -24,8 +24,6 @@
  */
 package org.lanternpowered.server.data.meta;
 
-import java.util.Optional;
-
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -37,6 +35,8 @@ import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.DataBuilder;
 import org.spongepowered.api.util.persistence.InvalidDataException;
+
+import java.util.Optional;
 
 @NonnullByDefault
 public final class LanternPatternLayer implements PatternLayer {

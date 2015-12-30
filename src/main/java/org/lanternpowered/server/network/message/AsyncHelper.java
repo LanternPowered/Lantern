@@ -24,11 +24,10 @@
  */
 package org.lanternpowered.server.network.message;
 
-import java.util.Map;
-
+import com.google.common.collect.Maps;
 import org.lanternpowered.server.network.message.handler.Handler;
 
-import com.google.common.collect.Maps;
+import java.util.Map;
 
 public final class AsyncHelper {
 

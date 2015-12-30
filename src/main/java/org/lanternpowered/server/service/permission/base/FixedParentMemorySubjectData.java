@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.Set;
@@ -37,7 +36,6 @@ import java.util.Set;
 /**
  * Implementation that forces a single parent to always be part of the parents.
  */
-@NonnullByDefault
 public class FixedParentMemorySubjectData extends GlobalMemorySubjectData {
     private final Subject forcedParent;
 

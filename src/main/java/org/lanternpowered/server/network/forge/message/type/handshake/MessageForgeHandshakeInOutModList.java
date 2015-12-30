@@ -24,12 +24,11 @@
  */
 package org.lanternpowered.server.network.forge.message.type.handshake;
 
-import java.util.Map;
-
+import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import com.google.common.collect.ImmutableMap;
+import java.util.Map;
 
 public final class MessageForgeHandshakeInOutModList implements Message {
 

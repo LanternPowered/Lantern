@@ -28,7 +28,7 @@ import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 
-public class LanternBanType extends SimpleLanternCatalogType implements BanType {
+public final class LanternBanType extends SimpleLanternCatalogType implements BanType {
 
     private final Class<? extends Ban> banClass;
 
@@ -41,4 +41,5 @@ public class LanternBanType extends SimpleLanternCatalogType implements BanType 
     public Class<? extends Ban> getBanClass() {
         return this.banClass;
     }
+
 }

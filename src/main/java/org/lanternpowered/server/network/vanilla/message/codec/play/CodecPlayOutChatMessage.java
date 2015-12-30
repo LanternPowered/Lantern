@@ -24,20 +24,18 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import java.util.Locale;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
-
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
+
+import java.util.Locale;
 
 @Caching
 public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMessage> {

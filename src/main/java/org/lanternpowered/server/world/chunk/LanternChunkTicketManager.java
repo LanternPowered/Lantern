@@ -24,26 +24,23 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import java.util.Optional;
-import java.util.UUID;
-
-import org.lanternpowered.server.config.GlobalConfig;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.ChunkTicketManager;
-import org.spongepowered.api.world.World;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
+import org.lanternpowered.server.config.GlobalConfig;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.world.ChunkTicketManager;
+import org.spongepowered.api.world.World;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
+import java.util.Optional;
+import java.util.UUID;
 
-@NonnullByDefault
 public class LanternChunkTicketManager implements ChunkTicketManager {
 
     private final Multimap<String, Callback> callbacks = HashMultimap.create();

@@ -24,9 +24,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play.internal;
 
-import org.lanternpowered.server.network.message.Message;
-
 import com.flowpowered.math.vector.Vector3f;
+import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutSpawnParticle implements Message {
 

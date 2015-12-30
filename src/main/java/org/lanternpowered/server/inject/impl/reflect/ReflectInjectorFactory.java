@@ -26,15 +26,14 @@ package org.lanternpowered.server.inject.impl.reflect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.concurrent.ExecutionException;
-
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import org.lanternpowered.server.inject.Injector;
 import org.lanternpowered.server.inject.InjectorFactory;
 import org.lanternpowered.server.inject.Module;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import java.util.concurrent.ExecutionException;
 
 public final class ReflectInjectorFactory implements InjectorFactory {
 

@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-
 import org.lanternpowered.server.event.gen.DefineableClassLoader;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.util.annotation.NonnullByDefault;

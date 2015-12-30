@@ -24,12 +24,10 @@
  */
 package org.lanternpowered.server.world.rules;
 
+import org.spongepowered.api.event.cause.Cause;
+
 import java.util.Optional;
 
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public interface GameRule {
 
     /**

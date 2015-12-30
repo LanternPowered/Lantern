@@ -26,11 +26,7 @@ package org.lanternpowered.server.command;
 
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.Iterator;
-
-@NonnullByDefault
 public interface AbstractCommandSource extends CommandSource {
 
     @Override

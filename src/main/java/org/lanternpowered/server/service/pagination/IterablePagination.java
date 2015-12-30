@@ -28,12 +28,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.PeekingIterator;
-
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,8 +48,8 @@ class IterablePagination extends ActivePagination {
     private final PeekingIterator<Map.Entry<Text, Integer>> countIterator;
     private int lastPage;
 
-    public IterablePagination(CommandSource src, PaginationCalculator<CommandSource> calc, Iterable<Map.Entry<Text, Integer>> counts, Text title,
-            Text header, Text footer, String padding) {
+    public IterablePagination(CommandSource src, PaginationCalculator<CommandSource> calc, Iterable<Map.Entry<Text, Integer>> counts,
+            @Nullable Text title, @Nullable Text header, @Nullable Text footer, String padding) {
         super(src, calc, title, header, footer, padding);
         this.countIterator = Iterators.peekingIterator(counts.iterator());
     }
@@ -70,16 +69,15 @@ class IterablePagination extends ActivePagination {
 
         if (getMaxContentLinesPerPage() <= 0) {
             return Lists.newArrayList(Iterators.transform(this.countIterator, new Function<Map.Entry<Text, Integer>, Text>() {
-
                 @Nullable
                 @Override
-                public Text apply(Map.Entry<Text, Integer> input) {
-                    return input.getKey();
+                public Text apply(@Nullable Map.Entry<Text, Integer> input) {
+                    return input == null ? null : input.getKey();
                 }
             }));
         }
 
-        List<Text> ret = new ArrayList<Text>(getMaxContentLinesPerPage());
+        List<Text> ret = new ArrayList<>(getMaxContentLinesPerPage());
         int addedLines = 0;
         while (addedLines <= getMaxContentLinesPerPage()) {
             if (!this.countIterator.hasNext()) {
@@ -114,4 +112,5 @@ class IterablePagination extends ActivePagination {
     public void previousPage() throws CommandException {
         throw new CommandException(Texts.of("Cannot go backwards in a streaming pagination"));
     }
+
 }

@@ -25,7 +25,25 @@
 package org.lanternpowered.server.data.io.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.*;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.BOOLEAN_IDENTIFER;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.BYTE;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.BYTE_ARRAY;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.COMPOUND;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.DOUBLE;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.END;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.FLOAT;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.INT;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.INT_ARRAY;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.LIST;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.LONG;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.SHORT;
+import static org.lanternpowered.server.data.io.nbt.NbtConstants.STRING;
+
+import org.lanternpowered.server.data.io.DataContainerOutput;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataSerializable;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.Closeable;
 import java.io.DataOutputStream;
@@ -36,12 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.zip.GZIPOutputStream;
-
-import org.lanternpowered.server.data.io.DataContainerOutput;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataSerializable;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * A data output stream that serializes data views into the nbt format.

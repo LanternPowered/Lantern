@@ -36,17 +36,16 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
-
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.event.gen.DefineableClassLoader;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.event.EventManager;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;

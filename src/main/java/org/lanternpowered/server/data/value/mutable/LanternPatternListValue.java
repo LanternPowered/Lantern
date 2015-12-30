@@ -25,7 +25,6 @@
 package org.lanternpowered.server.data.value.mutable;
 
 import com.google.common.collect.ImmutableList;
-
 import org.lanternpowered.server.data.meta.LanternPatternLayer;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternPatternListValue;
 import org.spongepowered.api.data.key.Key;

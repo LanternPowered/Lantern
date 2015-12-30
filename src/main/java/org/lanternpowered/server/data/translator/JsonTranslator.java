@@ -24,14 +24,11 @@
  */
 package org.lanternpowered.server.data.translator;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.regex.Pattern;
-
-import javax.annotation.Nullable;
-
+import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
@@ -39,11 +36,13 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.translator.DataTranslator;
 import org.spongepowered.api.util.Coerce;
 
-import com.google.common.collect.Lists;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.regex.Pattern;
+
+import javax.annotation.Nullable;
 
 public class JsonTranslator implements DataTranslator<JsonObject> {
 

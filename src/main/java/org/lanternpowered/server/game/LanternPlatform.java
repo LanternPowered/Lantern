@@ -24,16 +24,16 @@
  */
 package org.lanternpowered.server.game;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.spongepowered.api.Platform;
-import org.spongepowered.api.plugin.PluginContainer;
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
+
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.Platform;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @NonnullByDefault
 public class LanternPlatform implements Platform {

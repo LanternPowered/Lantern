@@ -26,18 +26,15 @@ package org.lanternpowered.server.world.chunk;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.ChunkLayout;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
+import java.util.Optional;
 
-@NonnullByDefault
 public class LanternChunkLayout implements ChunkLayout {
 
     /**

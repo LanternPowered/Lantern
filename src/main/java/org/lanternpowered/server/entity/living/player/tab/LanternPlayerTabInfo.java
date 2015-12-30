@@ -26,21 +26,21 @@ package org.lanternpowered.server.entity.living.player.tab;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries.Entry;
+import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.util.Sets2;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.tab.PlayerTabInfo;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 import javax.annotation.Nullable;
-
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries.Entry;
-import org.lanternpowered.server.profile.LanternGameProfile;
-import org.lanternpowered.server.util.Sets2;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.entity.living.player.tab.PlayerTabInfo;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public final class LanternPlayerTabInfo implements PlayerTabInfo {

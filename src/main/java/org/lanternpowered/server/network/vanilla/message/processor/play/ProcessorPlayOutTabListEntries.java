@@ -24,19 +24,17 @@
  */
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import io.netty.handler.codec.CodecException;
-
-import java.util.Collection;
-import java.util.List;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries.Entry;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This processor will separate the entries with different types and put them

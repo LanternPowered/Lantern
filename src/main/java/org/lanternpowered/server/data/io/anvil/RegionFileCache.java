@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.data.io.anvil;
 
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.Reference;
@@ -31,9 +34,6 @@ import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * A simple cache and wrapper for efficiently accessing multiple RegionFiles

@@ -24,13 +24,13 @@
  */
 package org.lanternpowered.server.network.query;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.scheduler.Task;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioDatagramChannel;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.scheduler.Task;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;

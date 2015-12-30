@@ -24,12 +24,11 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
-
-import org.lanternpowered.server.network.message.Message;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayInChangeSign implements Message {
 

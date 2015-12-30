@@ -27,8 +27,8 @@ package org.lanternpowered.server.scheduler;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;

@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.util;
 
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -31,9 +34,6 @@ import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.X509EncodedKeySpec;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import javax.annotation.Nullable;
 

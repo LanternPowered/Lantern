@@ -24,16 +24,10 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import org.spongepowered.api.item.inventory.ItemStack;
-
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Function;
-import java.util.function.Predicate;
-
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.base.Preconditions;
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -54,21 +48,24 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.util.persistence.InvalidDataException;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
+import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.base.Preconditions;
 
-@NonnullByDefault
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
 public class ExtentViewTransform implements AbstractExtent {
 
     public static class DiscreteTransform3to2 {

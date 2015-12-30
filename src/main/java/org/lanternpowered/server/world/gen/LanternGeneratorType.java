@@ -27,12 +27,10 @@ package org.lanternpowered.server.world.gen;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.GeneratorType;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public abstract class LanternGeneratorType extends LanternPluginCatalogType implements GeneratorType {
 
     // The maximum height the generator will generate the world,

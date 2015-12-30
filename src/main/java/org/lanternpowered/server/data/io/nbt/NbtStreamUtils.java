@@ -24,12 +24,12 @@
  */
 package org.lanternpowered.server.data.io.nbt;
 
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public final class NbtStreamUtils {

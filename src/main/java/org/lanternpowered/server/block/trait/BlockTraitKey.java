@@ -24,11 +24,10 @@
  */
 package org.lanternpowered.server.block.trait;
 
+import com.google.common.base.Objects;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-
-import com.google.common.base.Objects;
 
 /**
  * This object is a key that is used to modify values

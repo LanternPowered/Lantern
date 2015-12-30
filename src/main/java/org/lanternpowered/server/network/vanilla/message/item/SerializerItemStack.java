@@ -24,12 +24,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.item;
 
-import java.util.List;
-import java.util.Locale;
-
+import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializer;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils;
@@ -45,7 +42,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Locale;
 
 public class SerializerItemStack implements ObjectSerializer<ItemStack> {
 

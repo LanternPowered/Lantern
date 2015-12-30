@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.util.rotation;
 
-import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.rotation.Rotation;

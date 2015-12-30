@@ -32,9 +32,7 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
-
 import org.spongepowered.api.service.sql.SqlService;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.Closeable;
 import java.io.IOException;
@@ -64,7 +62,6 @@ import javax.sql.DataSource;
  *     -- if some plugin makes database connections to a ton of different databases
  *     we may want to implement this, but it is kinda unimportant.
  */
-@NonnullByDefault
 public class LanternSqlService implements SqlService, Closeable {
 
     private static final Map<String, Properties> PROTOCOL_SPECIFIC_PROPS;
@@ -172,7 +169,7 @@ public class LanternSqlService implements SqlService, Closeable {
         }
 
         @Override
-        public boolean equals(Object o) {
+        public boolean equals(@Nullable Object o) {
             if (this == o) {
                 return true;
             }

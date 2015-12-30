@@ -24,14 +24,13 @@
  */
 package org.lanternpowered.server.util.cache;
 
-import java.lang.reflect.Method;
-
-import org.lanternpowered.server.game.LanternGame;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Equivalence;
 import com.google.common.cache.CacheBuilder;
+import org.lanternpowered.server.game.LanternGame;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import java.lang.reflect.Method;
 
 public final class CacheBuilderHelper {
 

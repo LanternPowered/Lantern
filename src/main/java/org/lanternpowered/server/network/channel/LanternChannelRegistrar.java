@@ -28,14 +28,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
+
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.session.Session;
@@ -52,9 +50,10 @@ import org.spongepowered.api.network.ChannelRegistrationException;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class LanternChannelRegistrar implements ChannelRegistrar {
 

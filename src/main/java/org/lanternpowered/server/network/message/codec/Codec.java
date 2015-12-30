@@ -26,7 +26,6 @@ package org.lanternpowered.server.network.message.codec;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.Message;
 
 public interface Codec<T extends Message> {

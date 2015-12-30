@@ -24,11 +24,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.status;
 
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
@@ -41,18 +39,19 @@ import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusResponse;
 import org.lanternpowered.server.status.LanternStatusResponsePlayers;
 import org.lanternpowered.server.text.gson.JsonTextRepresentation;
-import org.spongepowered.api.network.status.Favicon;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
+import org.spongepowered.api.network.status.Favicon;
+import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class HandlerStatusRequest implements Handler<MessageStatusInRequest> {
 

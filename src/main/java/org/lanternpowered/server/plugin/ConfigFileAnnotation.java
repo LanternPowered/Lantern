@@ -24,11 +24,10 @@
  */
 package org.lanternpowered.server.plugin;
 
-import java.lang.annotation.Annotation;
-
 import com.google.common.base.MoreObjects;
-
 import org.spongepowered.api.config.DefaultConfig;
+
+import java.lang.annotation.Annotation;
 
 @SuppressWarnings("all")
 public class ConfigFileAnnotation implements DefaultConfig {

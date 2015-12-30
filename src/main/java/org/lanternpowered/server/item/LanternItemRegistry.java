@@ -24,10 +24,10 @@
  */
 package org.lanternpowered.server.item;
 
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.catalog.LanternCatalogTypeRegistry;
 import org.spongepowered.api.item.ItemType;
+
+import javax.annotation.Nullable;
 
 public class LanternItemRegistry extends LanternCatalogTypeRegistry<ItemType> {
 

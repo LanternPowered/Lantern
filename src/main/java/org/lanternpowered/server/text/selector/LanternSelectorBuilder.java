@@ -33,11 +33,9 @@ import org.spongepowered.api.text.selector.ArgumentType;
 import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorBuilder;
 import org.spongepowered.api.text.selector.SelectorType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Map;
 
-@NonnullByDefault
 public class LanternSelectorBuilder implements SelectorBuilder {
 
     private SelectorType type;

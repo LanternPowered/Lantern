@@ -24,11 +24,6 @@
  */
 package org.lanternpowered.server.block.tile;
 
-import java.util.Collection;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -45,6 +40,11 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 
 public class LanternTileEntity extends BaseComponentHolder implements TileEntity {
 

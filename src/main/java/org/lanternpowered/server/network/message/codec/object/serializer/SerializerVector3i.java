@@ -24,10 +24,9 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
+import com.flowpowered.math.vector.Vector3i;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
-import com.flowpowered.math.vector.Vector3i;
 
 public class SerializerVector3i implements ObjectSerializer<Vector3i> {
 

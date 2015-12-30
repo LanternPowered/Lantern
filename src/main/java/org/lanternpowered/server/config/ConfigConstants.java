@@ -24,9 +24,6 @@
  */
 package org.lanternpowered.server.config;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public final class ConfigConstants {
 
     public static final String DEFAULTS = "defaults";

@@ -24,22 +24,19 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.gen.LanternWorldGenerator;
 import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
-@NonnullByDefault
 public final class FlatGeneratorType extends LanternGeneratorType {
 
     public final static DataQuery SETTINGS = DataQuery.of("customSettings");

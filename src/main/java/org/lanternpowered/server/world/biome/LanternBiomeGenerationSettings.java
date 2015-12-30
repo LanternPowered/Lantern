@@ -24,19 +24,16 @@
  */
 package org.lanternpowered.server.world.biome;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.util.Lists2;
 import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.GroundCoverLayer;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.Populator;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
-@NonnullByDefault
 public final class LanternBiomeGenerationSettings implements BiomeGenerationSettings {
 
     // Using concurrent lists, we have no idea what plugin devs will do with them...

@@ -26,9 +26,9 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Set;
-
 import org.lanternpowered.server.network.message.Message;
+
+import java.util.Set;
 
 public final class MessagePlayInOutRegisterChannels implements Message {
 

@@ -28,13 +28,13 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 @NonnullByDefault
 public final class Conditions {

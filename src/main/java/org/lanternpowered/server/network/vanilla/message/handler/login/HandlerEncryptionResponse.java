@@ -24,6 +24,22 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.protocol.ProtocolState;
+import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
+import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.profile.LanternGameProfile.Property;
+import org.lanternpowered.server.util.UUIDHelper;
+
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -41,23 +57,6 @@ import java.util.UUID;
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.session.Session;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
-import org.lanternpowered.server.profile.LanternGameProfile;
-import org.lanternpowered.server.profile.LanternGameProfile.Property;
-import org.lanternpowered.server.util.UUIDHelper;
-
-import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 public final class HandlerEncryptionResponse implements Handler<MessageLoginInEncryptionResponse> {
 

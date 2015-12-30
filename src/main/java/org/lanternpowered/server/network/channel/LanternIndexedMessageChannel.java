@@ -24,21 +24,15 @@
  */
 package org.lanternpowered.server.network.channel;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import java.lang.reflect.Constructor;
-import java.util.EnumMap;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
+import com.google.common.collect.Maps;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -48,7 +42,11 @@ import org.spongepowered.api.network.MessageHandler;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import com.google.common.collect.Maps;
+import java.lang.reflect.Constructor;
+import java.util.EnumMap;
+import java.util.Map;
+
+import javax.annotation.Nullable;
 
 public class LanternIndexedMessageChannel extends LanternChannelBinding implements ChannelBinding.IndexedMessageChannel {
 

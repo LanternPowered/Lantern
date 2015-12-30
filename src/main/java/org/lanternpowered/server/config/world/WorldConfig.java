@@ -26,25 +26,22 @@ package org.lanternpowered.server.config.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-
-import java.io.IOException;
-import java.nio.file.Path;
-
 import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.WorldChunkLoading;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
-@NonnullByDefault
+import java.io.IOException;
+import java.nio.file.Path;
+
 public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
 
     @Setting(value = ChunkLoading.CHUNK_LOADING, comment = "Configuration for the chunk loading control.")

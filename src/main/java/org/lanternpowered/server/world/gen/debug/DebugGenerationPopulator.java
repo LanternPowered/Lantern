@@ -26,23 +26,21 @@ package org.lanternpowered.server.world.gen.debug;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Set;
-
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Sets;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
-@NonnullByDefault
 public final class DebugGenerationPopulator implements GenerationPopulator {
 
     // The height of the plane where all the blocks are set
@@ -68,8 +66,8 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
     }
 
     public DebugGenerationPopulator(Iterable<BlockState> blockStates) {
-        this.blockStateCache = Sets.newLinkedHashSet(checkNotNull(blockStates, "blockStates"))
-                .toArray(new BlockState[0]);
+        LinkedHashSet<BlockState> states = Sets.newLinkedHashSet(checkNotNull(blockStates, "blockStates"));
+        this.blockStateCache = states.toArray(new BlockState[states.size()]);
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));
     }
 

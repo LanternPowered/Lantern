@@ -24,9 +24,8 @@
  */
 package org.lanternpowered.server.game;
 
-import org.spongepowered.api.MinecraftVersion;
-
 import com.google.common.base.MoreObjects;
+import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault

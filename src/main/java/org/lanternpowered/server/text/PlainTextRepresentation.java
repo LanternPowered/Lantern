@@ -26,16 +26,14 @@ package org.lanternpowered.server.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Locale;
-
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentation;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.TextMessageException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
-public class PlainTextRepresentation implements TextRepresentation {
+import java.util.Locale;
+
+public final class PlainTextRepresentation implements TextRepresentation {
 
     @Override
     public String to(Text text) {

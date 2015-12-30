@@ -26,9 +26,9 @@ package org.lanternpowered.server.network.vanilla.message.type.login;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.UUID;
-
 import org.lanternpowered.server.network.message.Message;
+
+import java.util.UUID;
 
 public final class MessageLoginOutSuccess implements Message {
 

@@ -24,19 +24,6 @@
  */
 package org.lanternpowered.server.inject.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Supplier;
-
-import org.lanternpowered.server.inject.Binding;
-import org.lanternpowered.server.inject.MethodSpec;
-import org.lanternpowered.server.inject.Module;
-import org.lanternpowered.server.inject.ParameterSpec;
-
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -44,6 +31,18 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.lanternpowered.server.inject.Binding;
+import org.lanternpowered.server.inject.MethodSpec;
+import org.lanternpowered.server.inject.Module;
+import org.lanternpowered.server.inject.ParameterSpec;
+
+import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 final class SimpleModule implements Module {
 

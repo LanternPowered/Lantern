@@ -24,10 +24,9 @@
  */
 package org.lanternpowered.server.network.forge.message.handler.handshake;
 
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.netty.util.Attribute;
-
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.forge.handshake.ForgeClientHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
@@ -38,8 +37,7 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import java.util.List;
 
 public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHandshakeInOutAck> {
 

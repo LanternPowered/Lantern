@@ -24,9 +24,9 @@
  */
 package org.lanternpowered.server.util;
 
-import java.util.Map;
-
 import org.lanternpowered.server.game.LanternGame;
+
+import java.util.Map;
 
 /**
  * Thread started on shutdown that monitors for and kills rogue non-daemon threads.

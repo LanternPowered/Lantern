@@ -25,7 +25,6 @@
 package org.lanternpowered.server.block;
 
 import org.lanternpowered.server.game.LanternGame;
-
 import org.spongepowered.api.block.ScheduledBlockUpdate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;

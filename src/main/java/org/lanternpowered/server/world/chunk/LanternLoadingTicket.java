@@ -24,23 +24,20 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableSet;
-
-@NonnullByDefault
 class LanternLoadingTicket implements ChunkLoadingTicket {
 
     private final ConcurrentLinkedQueue<Vector2i> queue = new ConcurrentLinkedQueue<>();

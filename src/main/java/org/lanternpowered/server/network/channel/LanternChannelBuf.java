@@ -25,12 +25,6 @@
 package org.lanternpowered.server.network.channel;
 
 import io.netty.buffer.ByteBuf;
-
-import java.nio.ByteOrder;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
-
 import org.lanternpowered.server.network.message.codec.object.VarInt;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
 import org.lanternpowered.server.network.message.codec.object.serializer.SerializerDataView;
@@ -41,6 +35,11 @@ import org.lanternpowered.server.network.message.codec.object.serializer.SimpleO
 import org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializers;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
+
+import java.nio.ByteOrder;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public class LanternChannelBuf implements ChannelBuf {
 

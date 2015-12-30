@@ -24,15 +24,13 @@
  */
 package org.lanternpowered.server.text.translation;
 
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.text.translation.Translation;
+
 import java.util.IllegalFormatException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
 public final class MinecraftTranslation implements Translation {
 
     private final String id;

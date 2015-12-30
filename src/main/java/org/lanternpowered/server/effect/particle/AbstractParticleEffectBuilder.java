@@ -30,10 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @SuppressWarnings("unchecked")
-@NonnullByDefault
 public abstract class AbstractParticleEffectBuilder<T extends ParticleEffect, P extends ParticleType, B extends ParticleEffect.ParticleBuilder<T, P, B>>
         implements ParticleEffect.ParticleBuilder<T, P, B> {
 

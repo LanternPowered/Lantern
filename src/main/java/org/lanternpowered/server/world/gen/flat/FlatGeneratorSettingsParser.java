@@ -24,24 +24,20 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
-import java.util.List;
-
+import com.flowpowered.math.GenericMath;
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.world.biome.LanternBiomes;
-
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.Coerce;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
-import com.flowpowered.math.GenericMath;
-import com.google.common.collect.Lists;
+import java.util.List;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public final class FlatGeneratorSettingsParser {
 
     public static String toString(FlatGeneratorSettings settings) {

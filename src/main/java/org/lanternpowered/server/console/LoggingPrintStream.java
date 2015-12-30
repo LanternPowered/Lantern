@@ -24,13 +24,11 @@
  */
 package org.lanternpowered.server.console;
 
-import java.io.PrintStream;
-
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
+import java.io.PrintStream;
+
 public class LoggingPrintStream extends PrintStream {
 
     private final LoggingOutputStream out;

@@ -26,7 +26,6 @@ package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.base.MoreObjects;
-
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.util.annotation.NonnullByDefault;

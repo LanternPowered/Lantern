@@ -26,7 +26,6 @@ package org.lanternpowered.server.scheduler;
 
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableList;
-
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;

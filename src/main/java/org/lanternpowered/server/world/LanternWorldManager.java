@@ -26,6 +26,26 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import org.lanternpowered.server.config.GlobalConfig;
+import org.lanternpowered.server.config.world.WorldConfig;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.storage.WorldProperties;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -47,30 +67,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-import org.lanternpowered.server.config.GlobalConfig;
-import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.GeneratorTypes;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldCreationSettings;
-import org.spongepowered.api.world.storage.WorldProperties;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-
-import com.flowpowered.math.vector.Vector3d;
-
-@NonnullByDefault
 public final class LanternWorldManager {
 
     // The counter for the executor threads

@@ -24,16 +24,14 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CodecException;
-
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.text.gson.JsonTextSerializer;
-import org.spongepowered.api.text.Text;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.text.gson.JsonTextSerializer;
+import org.spongepowered.api.text.Text;
 
 public final class SerializerText implements ObjectSerializer<Text> {
 

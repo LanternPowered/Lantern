@@ -26,27 +26,29 @@ package org.lanternpowered.server.console;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
-
 import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.permission.AbstractSubjectBase;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.sink.MessageSink;
 import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 @NonnullByDefault
 public final class LanternConsoleSource extends AbstractSubjectBase implements AbstractCommandSource, ConsoleSource {
 
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
 
-    private MessageSink messageSink;
+    @Nullable private MessageSink messageSink;
 
     private LanternConsoleSource() {
     }

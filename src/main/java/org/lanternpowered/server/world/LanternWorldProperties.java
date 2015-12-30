@@ -24,19 +24,13 @@
  */
 package org.lanternpowered.server.world;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
@@ -52,19 +46,22 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-@NonnullByDefault
+import javax.annotation.Nullable;
+
 public final class LanternWorldProperties implements WorldProperties {
 
     private static final int BOUNDARY = 29999984;

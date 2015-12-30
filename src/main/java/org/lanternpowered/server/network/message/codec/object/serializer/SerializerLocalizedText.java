@@ -24,16 +24,14 @@
  */
 package org.lanternpowered.server.network.message.codec.object.serializer;
 
-import java.util.Locale;
-
+import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-
 import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
 import org.spongepowered.api.text.Text;
 
-import com.google.gson.JsonSyntaxException;
+import java.util.Locale;
 
 public final class SerializerLocalizedText implements ObjectSerializer<LocalizedText> {
 

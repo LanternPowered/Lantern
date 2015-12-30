@@ -26,8 +26,9 @@ package org.lanternpowered.server.network.session;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Set;
 import com.google.common.collect.Sets;
+
+import java.util.Set;
 
 /**
  * A list of all the sessions which provides a convenient {@link #pulse()}

@@ -24,28 +24,24 @@
  */
 package org.lanternpowered.server.config.serializer;
 
-import java.util.Optional;
-
 import com.google.common.reflect.TypeToken;
-
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.data.translator.ConfigurateTranslator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataSerializable;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.data.translator.ConfigurateTranslator;
 import org.spongepowered.api.util.persistence.DataBuilder;
+
+import java.util.Optional;
 
 /**
  * An implementation of {@link TypeSerializer} so that DataSerializables can be
  * provided in {@link ObjectMapper}-using classes.
  */
-@NonnullByDefault
 public final class DataSerializableTypeSerializer implements TypeSerializer<DataSerializable> {
 
     @SuppressWarnings({"rawtypes", "unchecked"})

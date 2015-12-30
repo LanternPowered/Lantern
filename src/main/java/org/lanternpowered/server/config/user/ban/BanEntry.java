@@ -24,13 +24,8 @@
  */
 package org.lanternpowered.server.config.user.ban;
 
-import java.lang.ref.WeakReference;
-import java.net.InetAddress;
-import java.time.Instant;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
+import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
@@ -40,8 +35,12 @@ import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import java.lang.ref.WeakReference;
+import java.net.InetAddress;
+import java.time.Instant;
+import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 @ConfigSerializable
 public abstract class BanEntry implements Ban {
@@ -53,14 +52,13 @@ public abstract class BanEntry implements Ban {
     @Setting(value = "expiration-date")
     private Instant expirationDate;
 
-    @Setting(value = "reason")
-    private Text reason;
+    @Setting(value = "reason") private Text reason;
 
     @Nullable
     @Setting(value = "source")
     private Text source;
 
-    private volatile WeakReference<CommandSource> commandSource;
+    @Nullable private volatile WeakReference<CommandSource> commandSource;
 
     protected BanEntry() {
     }
@@ -167,5 +165,7 @@ public abstract class BanEntry implements Ban {
         public LanternGameProfile getProfile() {
             return this.profile;
         }
+
     }
+
 }

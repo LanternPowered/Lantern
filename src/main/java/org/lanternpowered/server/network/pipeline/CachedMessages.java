@@ -24,18 +24,17 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.caching.Caching;
-import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
-
 import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.caching.Caching;
+import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class CachedMessages {
 

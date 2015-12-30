@@ -24,17 +24,15 @@
  */
 package org.lanternpowered.server.config.user;
 
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.Collection;
-
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Collection;
+
 public final class WhitelistConfig extends UserConfig<UserEntry> implements WhitelistService {
 
     public WhitelistConfig(Path path) throws IOException {

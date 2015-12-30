@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector2i;
-
 import org.lanternpowered.server.world.biome.LanternBiomes;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;

@@ -26,16 +26,13 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.component.Component;
 import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.inject.Inject;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
-import com.flowpowered.math.vector.Vector3d;
-
-@NonnullByDefault
 public final class LanternWorldBorder implements WorldBorder, Component {
 
     @Inject

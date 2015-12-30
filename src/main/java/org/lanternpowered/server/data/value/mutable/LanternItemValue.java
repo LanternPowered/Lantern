@@ -26,14 +26,14 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.function.Function;
-
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternItemValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.item.inventory.ItemStack;
+
+import java.util.function.Function;
 
 public class LanternItemValue extends LanternValue<ItemStack> {
 

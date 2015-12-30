@@ -24,17 +24,16 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import java.util.Collection;
-import java.util.UUID;
-
-import javax.annotation.Nullable;
-
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.Text;
 
-import com.google.common.collect.ImmutableList;
+import java.util.Collection;
+import java.util.UUID;
+
+import javax.annotation.Nullable;
 
 public final class MessagePlayOutTabListEntries implements Message {
 

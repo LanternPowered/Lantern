@@ -24,10 +24,10 @@
  */
 package org.lanternpowered.server.network.message.caching;
 
-import org.lanternpowered.server.network.message.caching.CachingHashGenerator.Equal;
-
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import org.lanternpowered.server.network.message.caching.CachingHashGenerator.Equal;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;

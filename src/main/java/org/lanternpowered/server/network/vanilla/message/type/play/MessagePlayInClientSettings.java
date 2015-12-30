@@ -24,10 +24,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import java.util.Locale;
-
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.text.chat.ChatVisibility;
+
+import java.util.Locale;
 
 public final class MessagePlayInClientSettings implements Message {
 

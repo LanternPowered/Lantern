@@ -26,7 +26,6 @@ package org.lanternpowered.server.network.message.codec;
 
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
-
 import org.lanternpowered.server.network.message.codec.object.serializer.AbstractObjectSerializerContext;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializers;
 import org.lanternpowered.server.network.session.Session;

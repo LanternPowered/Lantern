@@ -32,24 +32,21 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
-
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.service.pagination.PaginationBuilder;
-import org.spongepowered.api.service.pagination.PaginationCalculator;
-import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.StartsWithPredicate;
-import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
-import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.service.pagination.PaginationBuilder;
+import org.spongepowered.api.service.pagination.PaginationCalculator;
+import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.List;
 import java.util.Map;
@@ -65,9 +62,11 @@ import javax.annotation.Nullable;
 public class LanternPaginationService implements PaginationService {
 
     static class SourcePaginations {
-        private final Map<UUID, ActivePagination> paginations = new ConcurrentHashMap<UUID, ActivePagination>();
-        private volatile UUID lastUuid;
 
+        private final Map<UUID, ActivePagination> paginations = new ConcurrentHashMap<UUID, ActivePagination>();
+        @Nullable private volatile UUID lastUuid;
+
+        @Nullable
         public ActivePagination get(UUID uuid) {
             return this.paginations.get(uuid);
         }
@@ -83,9 +82,11 @@ public class LanternPaginationService implements PaginationService {
             return this.paginations.keySet();
         }
 
+        @Nullable
         public UUID getLastUuid() {
             return this.lastUuid;
         }
+
     }
     final ConcurrentMap<Class<? extends CommandSource>, PaginationCalculator<?>> calculators = Maps.newConcurrentMap();
     final ConcurrentMap<CommandSource, SourcePaginations> activePaginations = new MapMaker().weakKeys().makeMap();
@@ -104,31 +105,22 @@ public class LanternPaginationService implements PaginationService {
                     .arguments(new ActivePaginationCommandElement(t("pagination-id")))
                     .child(CommandSpec.builder()
                             .description(t("Go to the next page"))
-                            .executor(new CommandExecutor() {
-                                @Override
-                                public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                                    args.<ActivePagination>getOne("pagination-id").get().nextPage();
-                                    return CommandResult.success();
-                                }
+                            .executor((src, args) -> {
+                                args.<ActivePagination>getOne("pagination-id").get().nextPage();
+                                return CommandResult.success();
                             }).build(), "next", "n")
                     .child(CommandSpec.builder()
                             .description(t("Go to the previous page"))
-                            .executor(new CommandExecutor() {
-                                @Override
-                                public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                                    args.<ActivePagination>getOne("pagination-id").get().previousPage();
-                                    return CommandResult.success();
-                                }
+                            .executor((src, args) -> {
+                                args.<ActivePagination>getOne("pagination-id").get().previousPage();
+                                return CommandResult.success();
                             }).build(), "previous", "prev", "p")
                     .child(CommandSpec.builder()
                             .description(t("Go to a specific page"))
                             .arguments(integer(t("page")))
-                            .executor(new CommandExecutor() {
-                                @Override
-                                public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-                                    args.<ActivePagination>getOne("pagination-id").get().specificPage(args.<Integer>getOne("page").get());
-                                    return CommandResult.success();
-                                }
+                            .executor((src, args) -> {
+                                args.<ActivePagination>getOne("pagination-id").get().specificPage(args.<Integer>getOne("page").get());
+                                return CommandResult.success();
                             }).build(), "page")
                     .build(), "pagination", "page");
         }
@@ -161,14 +153,11 @@ public class LanternPaginationService implements PaginationService {
         return new FixedLengthPaginationCalculator(lines);
     }
 
+    @Nullable
     SourcePaginations getPaginationState(CommandSource source, boolean create) {
         SourcePaginations ret = this.activePaginations.get(source);
         if (ret == null && create) {
-            ret = new SourcePaginations();
-            SourcePaginations existing = this.activePaginations.putIfAbsent(source, ret);
-            if (existing != null) {
-                ret = existing;
-            }
+            ret = this.activePaginations.computeIfAbsent(source, source0 -> new SourcePaginations());
         }
         return ret;
     }
@@ -212,7 +201,6 @@ public class LanternPaginationService implements PaginationService {
             if (paginations == null) {
                 return ImmutableList.of();
             }
-
             final Optional<String> optNext = args.nextIfPresent();
             if (optNext.isPresent()) {
                 return paginations.keys().stream()
@@ -224,4 +212,5 @@ public class LanternPaginationService implements PaginationService {
             }
         }
     }
+
 }

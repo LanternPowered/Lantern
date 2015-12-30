@@ -24,16 +24,14 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
+import com.google.common.collect.Maps;
 import io.netty.buffer.ByteBuf;
+import org.lanternpowered.server.network.message.Message;
 
 import java.util.List;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.Nullable;
-
-import org.lanternpowered.server.network.message.Message;
-
-import com.google.common.collect.Maps;
 
 public class CachedMessage {
 

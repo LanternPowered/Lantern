@@ -25,7 +25,6 @@
 package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector2i;
-
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewTransform;
 import org.spongepowered.api.util.DiscreteTransform2;

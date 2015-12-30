@@ -26,14 +26,11 @@ package org.lanternpowered.server.world.gen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 
-import com.flowpowered.math.vector.Vector2i;
-
-@NonnullByDefault
 public class SingleBiomeGenerator implements BiomeGenerator {
 
     private final BiomeType biomeType;

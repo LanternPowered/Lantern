@@ -26,21 +26,17 @@ package org.lanternpowered.server.config;
 
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
-import java.nio.file.Path;
-
+import com.google.inject.Injector;
 import ninja.leaping.configurate.objectmapping.DefaultObjectMapperFactory;
 import ninja.leaping.configurate.objectmapping.GuiceObjectMapperFactory;
 import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
-
 import org.lanternpowered.server.plugin.LanternPluginContainer;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.config.ConfigRoot;
 import org.spongepowered.api.plugin.PluginContainer;
 
-import com.google.inject.Injector;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.nio.file.Path;
 
-@NonnullByDefault
 public final class LanternConfigManager implements ConfigManager {
 
     private final Path configRoot;

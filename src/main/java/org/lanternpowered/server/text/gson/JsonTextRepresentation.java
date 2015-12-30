@@ -26,20 +26,17 @@ package org.lanternpowered.server.text.gson;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Locale;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentation;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.TextMessageException;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.Locale;
 
-@NonnullByDefault
 public final class JsonTextRepresentation implements TextRepresentation {
 
     private final Gson gson;

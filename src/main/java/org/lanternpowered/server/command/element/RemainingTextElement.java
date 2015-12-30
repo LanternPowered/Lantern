@@ -24,17 +24,16 @@
  */
 package org.lanternpowered.server.command.element;
 
-import java.util.List;
-
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import com.google.common.collect.Lists;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * This argument will take the rest of the arguments buffer and
@@ -62,7 +61,8 @@ public final class RemainingTextElement extends CommandElement {
         return Lists.newArrayList();
     }
 
-    public static final RemainingTextElement of(Text key) {
+    public static RemainingTextElement of(Text key) {
         return new RemainingTextElement(key);
     }
+
 }

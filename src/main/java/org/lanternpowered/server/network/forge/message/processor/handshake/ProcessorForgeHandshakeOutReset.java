@@ -25,14 +25,13 @@
 package org.lanternpowered.server.network.forge.message.processor.handshake;
 
 import io.netty.handler.codec.CodecException;
-
-import java.util.List;
-
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutReset;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+
+import java.util.List;
 
 public final class ProcessorForgeHandshakeOutReset implements Processor<MessageForgeHandshakeOutReset> {
 

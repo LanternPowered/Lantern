@@ -26,13 +26,12 @@ package org.lanternpowered.server.network.vanilla.message.processor.play;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;
-
-import java.util.List;
-
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
+
+import java.util.List;
 
 public final class ProcessorPlayOutPlayerJoinGame implements Processor<MessagePlayOutPlayerJoinGame> {
 

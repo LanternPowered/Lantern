@@ -24,8 +24,7 @@
  */
 package org.lanternpowered.server.entity;
 
-import java.util.Optional;
-
+import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -33,9 +32,9 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 

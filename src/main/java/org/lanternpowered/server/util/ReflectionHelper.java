@@ -29,10 +29,12 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import javax.annotation.Nullable;
+
 @NonnullByDefault
 public final class ReflectionHelper {
 
-    public static void setField(Field field, Object target, Object object) throws Exception {
+    public static void setField(Field field, @Nullable Object target, @Nullable Object object) throws Exception {
         int modifiers = field.getModifiers();
 
         if (Modifier.isFinal(modifiers)) {

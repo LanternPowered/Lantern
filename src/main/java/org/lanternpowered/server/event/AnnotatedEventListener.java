@@ -29,7 +29,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.lang.reflect.Method;
 
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public abstract class AnnotatedEventListener implements LanternEventListener<Event> {
 
     protected final Object handle;
@@ -47,4 +49,5 @@ public abstract class AnnotatedEventListener implements LanternEventListener<Eve
 
         AnnotatedEventListener create(Object handle, Method method) throws Exception;
     }
+
 }

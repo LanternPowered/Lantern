@@ -38,7 +38,9 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternGameDictionary implements GameDictionary {
 
     private final Map<String, Set<ItemType>> map = Maps.newConcurrentMap();
@@ -67,4 +69,5 @@ public final class LanternGameDictionary implements GameDictionary {
         }
         return builder.build();
     }
+
 }

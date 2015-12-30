@@ -42,10 +42,12 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 
 import com.google.common.collect.Lists;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * A data input stream that deserializes data views from the nbt format.
  */
+@NonnullByDefault
 public class NbtDataContainerInputStream implements Closeable, DataContainerInput {
 
     private final DataInputStream dis;
@@ -87,16 +89,18 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
 
     @Override
     public DataContainer read() throws IOException {
-        return (DataContainer) this.readObject(null, this.readEntry());
+        Entry entry = this.readEntry();
+        if (entry == null) {
+            throw new IOException("There is no more data to read.");
+        }
+        return (DataContainer) this.readObject(null, entry);
     }
 
     private Object readObject(@Nullable DataView container, Entry entry) throws IOException {
-        if (entry == null || entry.type == END) {
-            return null;
-        }
         return this.readPayload(container, entry.type);
     }
 
+    @Nullable
     private Entry readEntry() throws IOException {
         byte type = this.dis.readByte();
         if (type == END) {
@@ -117,7 +121,9 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return this.dis.readByte();
         } else if (type == BYTE_ARRAY) {
             byte[] array = new byte[this.dis.readInt()];
-            this.dis.read(array);
+            for (int i = 0; i < array.length; i++) {
+                array[i] = this.dis.readByte();
+            }
             return array;
         } else if (type == COMPOUND) {
             if (container == null) {
@@ -155,10 +161,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 return list;
             }
             for (int i = 0; i < size; i++) {
-                Object payload = this.readPayload(null, type0);
-                if (payload != null) {
-                    list.add(payload);
-                }
+                list.add(this.readPayload(null, type0));
             }
             return list;
         } else if (type == LONG) {
@@ -169,8 +172,9 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return this.dis.readUTF();
         } else if (type == BOOLEAN) {
             return this.dis.readByte() != 0;
+        } else {
+            throw new IOException("Attempt to deserialize unknown type: " + type);
         }
-        return null;
     }
 
     private static class Entry {

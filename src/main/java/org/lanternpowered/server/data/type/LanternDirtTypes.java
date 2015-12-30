@@ -25,7 +25,9 @@
 package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public enum LanternDirtTypes implements LanternDirtType, SimpleCatalogType {
 
     DIRT            ("dirt"),
@@ -48,4 +50,5 @@ public enum LanternDirtTypes implements LanternDirtType, SimpleCatalogType {
     public byte getInternalId() {
         return (byte) this.ordinal();
     }
+
 }

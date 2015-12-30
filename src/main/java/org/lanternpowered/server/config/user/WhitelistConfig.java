@@ -32,7 +32,9 @@ import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class WhitelistConfig extends UserConfig<UserEntry> implements WhitelistService {
 
     public WhitelistConfig(Path path) throws IOException {
@@ -41,12 +43,12 @@ public final class WhitelistConfig extends UserConfig<UserEntry> implements Whit
 
     @Override
     public Collection<GameProfile> getWhitelistedProfiles() {
-        return this.getEntries().stream().map(e -> e.getProfile()).collect(GuavaCollectors.toImmutableList());
+        return this.getEntries().stream().map(UserEntry::getProfile).collect(GuavaCollectors.toImmutableList());
     }
 
     @Override
     public boolean isWhitelisted(GameProfile profile) {
-        return this.getEntryByProfile(profile) != null;
+        return this.getEntryByProfile(profile).isPresent();
     }
 
     @Override
@@ -60,6 +62,7 @@ public final class WhitelistConfig extends UserConfig<UserEntry> implements Whit
 
     @Override
     public boolean removeProfile(GameProfile profile) {
-        return this.removeProfile(profile);
+        return this.removeEntry(profile.getUniqueId());
     }
+
 }

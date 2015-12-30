@@ -24,9 +24,12 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 /**
  * The internal Minecraft plugin has no chunk loading limits.
  */
+@NonnullByDefault
 public final class MinecraftChunkLoadingTickets implements ChunkLoadingTickets {
 
     @Override
@@ -38,4 +41,5 @@ public final class MinecraftChunkLoadingTickets implements ChunkLoadingTickets {
     public int getMaximumTicketCount() {
         return Integer.MAX_VALUE;
     }
+
 }

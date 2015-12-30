@@ -77,4 +77,8 @@ public final class CommandDifficulty {
                 })
                 .build();
     }
+
+    private CommandDifficulty() {
+    }
+
 }

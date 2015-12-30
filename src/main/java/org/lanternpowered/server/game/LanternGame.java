@@ -90,8 +90,12 @@ import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.TeleportHelper;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class LanternGame implements Game {
 
     public static final String API_NAME = "SpongeAPI";
@@ -125,7 +129,7 @@ public class LanternGame implements Game {
     public static final String PLUGINS_FOLDER = "plugins";
 
     // The singleton instance of the game
-    private static LanternGame game;
+    @Nullable private static LanternGame game;
 
     // The server will aim for 20 ticks per second
     public static final int TICKS_PER_SECOND = 20;
@@ -137,7 +141,7 @@ public class LanternGame implements Game {
     public static final long TICK_DURATION_NS = TimeUnit.NANOSECONDS.convert(TICK_DURATION, TimeUnit.MILLISECONDS);
 
     // The logger of the game
-    private static Logger logger;
+    @Nullable private static Logger logger;
 
     /**
      * Gets the current time in ticks. This method is similar to
@@ -393,7 +397,7 @@ public class LanternGame implements Game {
                         "minecraft.commandblock", Tristate.TRUE);
                 
                 this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
-            } catch (ProviderExistsException e) {
+            } catch (ProviderExistsException ignored) {
             }
         }
 
@@ -573,4 +577,5 @@ public class LanternGame implements Game {
     public LanternDataManager getDataManager() {
         return this.dataManager;
     }
+
 }

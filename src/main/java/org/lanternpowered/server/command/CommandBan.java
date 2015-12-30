@@ -39,6 +39,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanTypes;
 
@@ -46,6 +47,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Optional;
 
+@NonnullByDefault
 public final class CommandBan {
 
     /**
@@ -97,4 +99,5 @@ public final class CommandBan {
 
     private CommandBan() {
     }
+
 }

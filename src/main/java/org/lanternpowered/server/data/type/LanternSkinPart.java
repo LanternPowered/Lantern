@@ -31,10 +31,12 @@ import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Set;
 import java.util.Collection;
 
+@NonnullByDefault
 public final class LanternSkinPart extends SimpleLanternCatalogType implements SkinPart {
 
     private static final TIntObjectMap<LanternSkinPart> lookup = new TIntObjectHashMap<>();

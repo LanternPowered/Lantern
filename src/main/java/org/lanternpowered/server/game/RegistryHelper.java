@@ -31,8 +31,10 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.lanternpowered.server.util.ReflectionHelper;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public class RegistryHelper {
+@NonnullByDefault
+public final class RegistryHelper {
 
     public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping, Collection<String> ignoredFields) {
         boolean mappingSuccess = true;
@@ -79,4 +81,8 @@ public class RegistryHelper {
             return false;
         }
     }
+
+    private RegistryHelper() {
+    }
+
 }

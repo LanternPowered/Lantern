@@ -41,7 +41,9 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class UserConfig<T extends UserEntry> extends ConfigBase implements UserStorage<T> {
 
     @Setting(value = "entries")
@@ -118,4 +120,5 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
     public Collection<T> getEntries() {
         return ImmutableList.copyOf(this.byUUID.values());
     }
+
 }

@@ -30,10 +30,12 @@ import java.util.Map;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.plugin.PluginContainer;
 import com.google.common.base.MoreObjects;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkArgument;
 
+@NonnullByDefault
 public class LanternPlatform implements Platform {
 
     public static final String API_NAME = firstNonNull(Platform.class.getPackage()
@@ -112,4 +114,5 @@ public class LanternPlatform implements Platform {
                 .add("minecraftVersion", this.getMinecraftVersion())
                 .toString();
     }
+
 }

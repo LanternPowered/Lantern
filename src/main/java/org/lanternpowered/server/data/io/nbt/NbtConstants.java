@@ -24,10 +24,13 @@
  */
 package org.lanternpowered.server.data.io.nbt;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 /**
  * The nbt constants. These are the ids of all the types that can be used in a
  * nbt tag.
  */
+@NonnullByDefault
 class NbtConstants {
 
     public static final byte END = 0;
@@ -47,4 +50,5 @@ class NbtConstants {
     public static final byte BOOLEAN = 99;
     public static final byte BOOLEAN_LIST = 98;
     public static final String BOOLEAN_IDENTIFER = "$Boolean";
+
 }

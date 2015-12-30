@@ -24,7 +24,11 @@
  */
 package org.lanternpowered.server.console;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+@NonnullByDefault
 public interface Formatter {
 
     String format(String input);
+
 }

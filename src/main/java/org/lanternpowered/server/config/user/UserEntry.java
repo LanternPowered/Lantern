@@ -28,8 +28,10 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @ConfigSerializable
+@NonnullByDefault
 public class UserEntry {
 
     @Setting(value = "profile")
@@ -55,4 +57,5 @@ public class UserEntry {
     public LanternGameProfile getProfile() {
         return this.gameProfile;
     }
+
 }

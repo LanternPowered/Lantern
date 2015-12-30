@@ -41,10 +41,12 @@ import org.lanternpowered.server.data.io.DataContainerOutput;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * A data output stream that serializes data views into the nbt format.
  */
+@NonnullByDefault
 public class NbtDataContainerOutputStream implements Closeable, Flushable, DataContainerOutput {
 
     private final DataOutputStream dos;
@@ -135,14 +137,14 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             if (object instanceof int[]) {
                 int[] array0 = (int[]) object;
                 this.dos.writeInt(array0.length);
-                for (int i = 0; i < array0.length; i++) {
-                    this.dos.writeInt(array0[i]);
+                for (int value : array0) {
+                    this.dos.writeInt(value);
                 }
             } else {
                 Integer[] array0 = (Integer[]) object;
                 this.dos.writeInt(array0.length);
-                for (int i = 0; i < array0.length; i++) {
-                    this.dos.writeInt(array0[i]);
+                for (Integer value : array0) {
+                    this.dos.writeInt(value);
                 }
             }
         } else if (type == LIST) {
@@ -202,4 +204,5 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
         }
         return 0;
     }
+
 }

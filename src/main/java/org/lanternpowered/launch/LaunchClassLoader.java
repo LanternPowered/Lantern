@@ -29,6 +29,7 @@ import static org.lanternpowered.launch.ClassTransformers.transformerExclusions;
 import static org.lanternpowered.launch.ClassTransformers.transformers;
 
 import com.google.common.io.ByteStreams;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+@NonnullByDefault
 public final class LaunchClassLoader extends URLClassLoader {
 
     private final Map<String, Class<?>> cachedClasses = new ConcurrentHashMap<>();
@@ -130,4 +132,5 @@ public final class LaunchClassLoader extends URLClassLoader {
     public void addURL(URL url) {
         super.addURL(url);
     }
+
 }

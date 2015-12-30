@@ -24,8 +24,6 @@
  */
 package org.lanternpowered.server.data.meta;
 
-import static org.spongepowered.api.data.DataQuery.of;
-
 import java.util.Optional;
 
 import org.spongepowered.api.Game;
@@ -36,13 +34,15 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.type.BannerPatternShape;
 import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.DataBuilder;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 
+@NonnullByDefault
 public final class LanternPatternLayer implements PatternLayer {
 
-    private static final DataQuery BANNER_SHAPE = of("BannerShapeId");
-    private static final DataQuery DYE_COLOR = of("DyeColor");
+    private static final DataQuery BANNER_SHAPE = DataQuery.of("BannerShapeId");
+    private static final DataQuery DYE_COLOR = DataQuery.of("DyeColor");
 
     private final BannerPatternShape shape;
     private final DyeColor color;

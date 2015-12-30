@@ -31,16 +31,19 @@ import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class InstantTypeSerializer implements TypeSerializer<Instant> {
 
-	@Override
-	public Instant deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-		return Instant.ofEpochMilli(value.getLong());
-	}
+    @Override
+    public Instant deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+        return Instant.ofEpochMilli(value.getLong());
+    }
 
-	@Override
-	public void serialize(TypeToken<?> type, Instant obj, ConfigurationNode value) throws ObjectMappingException {
-		value.setValue(obj.toEpochMilli());
-	}
+    @Override
+    public void serialize(TypeToken<?> type, Instant obj, ConfigurationNode value) throws ObjectMappingException {
+        value.setValue(obj.toEpochMilli());
+    }
+
 }

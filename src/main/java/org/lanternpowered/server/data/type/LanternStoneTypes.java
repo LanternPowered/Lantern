@@ -25,7 +25,9 @@
 package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public enum LanternStoneTypes implements LanternStoneType, SimpleCatalogType {
 
     STONE               ("stone"),
@@ -51,4 +53,5 @@ public enum LanternStoneTypes implements LanternStoneType, SimpleCatalogType {
     public byte getInternalId() {
         return (byte) this.ordinal();
     }
+
 }

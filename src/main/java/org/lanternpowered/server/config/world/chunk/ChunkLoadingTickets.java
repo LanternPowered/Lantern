@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+@NonnullByDefault
 public interface ChunkLoadingTickets {
 
     /**
@@ -41,4 +44,5 @@ public interface ChunkLoadingTickets {
      * @return the maximum count of tickets
      */
     int getMaximumTicketCount();
+
 }

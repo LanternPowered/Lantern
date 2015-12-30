@@ -32,7 +32,9 @@ import org.spongepowered.api.Platform;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class CommandVersion {
 
     public static CommandSpec create() {
@@ -54,4 +56,5 @@ public final class CommandVersion {
 
     private CommandVersion() {
     }
+
 }

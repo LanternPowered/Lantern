@@ -32,6 +32,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.config.ConfigRoot;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,7 +41,8 @@ import java.nio.file.Path;
 /**
  * Root for lantern configurations.
  */
-public class LanternConfigRoot implements ConfigRoot {
+@NonnullByDefault
+public final class LanternConfigRoot implements ConfigRoot {
 
     private final ObjectMapperFactory mapperFactory;
     private final String pluginName;
@@ -77,4 +79,5 @@ public class LanternConfigRoot implements ConfigRoot {
     public Path getDirectory() {
         return this.baseDir;
     }
+
 }

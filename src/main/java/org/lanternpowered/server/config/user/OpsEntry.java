@@ -28,8 +28,10 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @ConfigSerializable
+@NonnullByDefault
 public final class OpsEntry extends UserEntry {
 
     @Setting(value = "level")
@@ -57,4 +59,5 @@ public final class OpsEntry extends UserEntry {
     public int getOpLevel() {
         return this.opLevel;
     }
+
 }

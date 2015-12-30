@@ -55,4 +55,5 @@ public class VersionCheckingMain {
         ensureJava8();
         Launch.main(args);
     }
+
 }

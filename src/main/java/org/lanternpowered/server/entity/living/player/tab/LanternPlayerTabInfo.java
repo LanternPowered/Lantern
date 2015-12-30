@@ -40,7 +40,9 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.PlayerTabInfo;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternPlayerTabInfo implements PlayerTabInfo {
 
     // All the tab lists this tab info is attached to
@@ -62,6 +64,7 @@ public final class LanternPlayerTabInfo implements PlayerTabInfo {
         public UpdateEntry(LanternPlayerTabInfo tabInfo) {
             this.tabInfo = tabInfo;
         }
+
     }
 
     @Nullable UpdateEntry updateEntry;
@@ -147,4 +150,5 @@ public final class LanternPlayerTabInfo implements PlayerTabInfo {
         this.gameProfile = (LanternGameProfile) checkNotNull(profile, "profile");
         this.updateEntry().gameProfileOrName = true;
     }
+
 }

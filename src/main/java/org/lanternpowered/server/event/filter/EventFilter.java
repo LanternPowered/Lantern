@@ -25,7 +25,9 @@
 package org.lanternpowered.server.event.filter;
 
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface EventFilter {
 
     Object[] filter(Event event);

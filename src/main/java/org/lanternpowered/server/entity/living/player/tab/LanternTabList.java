@@ -45,7 +45,9 @@ import org.spongepowered.api.text.Texts;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternTabList implements TabList {
 
     final Deque<LanternPlayerTabInfo.UpdateEntry> updateEntries = new ArrayDeque<>();

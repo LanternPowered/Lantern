@@ -28,9 +28,11 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 
-public class DataUtil {
+@NonnullByDefault
+public final class DataUtil {
 
     public static DataView checkDataExists(final DataView dataView, final DataQuery query) throws InvalidDataException {
         if (!checkNotNull(dataView).contains(checkNotNull(query))) {
@@ -39,4 +41,8 @@ public class DataUtil {
             return dataView;
         }
     }
+
+    private DataUtil() {
+    }
+
 }

@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.config.world.chunk;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+@NonnullByDefault
 public interface ChunkLoadingConfig {
 
     /**
@@ -32,4 +35,5 @@ public interface ChunkLoadingConfig {
      * @return the chunk loading tickets configuration
      */
     ChunkLoadingTickets getChunkLoadingTickets(String plugin);
+
 }

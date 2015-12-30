@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.launch;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+@NonnullByDefault
 public interface ClassTransformer {
 
     byte[] transform(ClassLoader loader, String className, byte[] byteCode);

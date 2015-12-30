@@ -25,7 +25,9 @@
 package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public enum LanternShrubTypes implements LanternShrubType, SimpleCatalogType {
 
     DEAD_BUSH       ("dead_bush"),
@@ -48,4 +50,5 @@ public enum LanternShrubTypes implements LanternShrubType, SimpleCatalogType {
     public byte getInternalId() {
         return (byte) this.ordinal();
     }
+
 }

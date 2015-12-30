@@ -27,11 +27,12 @@ package org.lanternpowered.server.game;
 import org.spongepowered.api.MinecraftVersion;
 
 import com.google.common.base.MoreObjects;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternMinecraftVersion implements MinecraftVersion {
 
-    public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion(
-            LanternGame.MINECRAFT_VERSION, 47, false);
+    public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion(LanternGame.MINECRAFT_VERSION, 47, false);
 
     public static final LanternMinecraftVersion V1_3 = new LanternMinecraftVersion("<=1.3", 39, true);
     public static final LanternMinecraftVersion V1_5 = new LanternMinecraftVersion("1.4-1.5", 61, true);
@@ -107,4 +108,5 @@ public class LanternMinecraftVersion implements MinecraftVersion {
                 .add("protocol", this.protocol)
                 .toString();
     }
+
 }

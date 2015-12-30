@@ -26,8 +26,11 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.data.type.DoublePlantType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface LanternDoublePlantType extends DoublePlantType, SimpleCatalogType {
 
     byte getInternalId();
+
 }

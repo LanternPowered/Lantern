@@ -33,7 +33,9 @@ import java.util.concurrent.Future;
 import jline.console.completer.Completer;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class ConsoleCommandCompleter implements Completer {
 
     private final LanternGame game;

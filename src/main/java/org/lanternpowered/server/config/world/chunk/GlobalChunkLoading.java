@@ -27,8 +27,10 @@ package org.lanternpowered.server.config.world.chunk;
 import static org.lanternpowered.server.config.ConfigConstants.*;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @ConfigSerializable
+@NonnullByDefault
 public class GlobalChunkLoading extends ChunkLoading {
 
     @Setting(value = DEFAULTS, comment = "Default configuration for chunk loading control.")
@@ -50,4 +52,5 @@ public class GlobalChunkLoading extends ChunkLoading {
     public int getPlayerTicketCount() {
         return this.defaults.getPlayerTicketCount();
     }
+
 }

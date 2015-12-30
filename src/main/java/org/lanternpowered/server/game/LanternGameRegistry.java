@@ -161,6 +161,7 @@ import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
@@ -192,6 +193,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
+@NonnullByDefault
 public class LanternGameRegistry implements GameRegistry {
 
     private final LanternGame game;
@@ -389,7 +391,7 @@ public class LanternGameRegistry implements GameRegistry {
         mappings.forEach((key, value) -> this.weatherRegistry.register(value));
         RegistryHelper.mapFields(Weathers.class, mappings);
     }
- 
+
     private void registerParticleTypes() {
         Map<String, ParticleType> mappings = Maps.newHashMap();
         mappings.put("explosion_normal", new LanternParticleType(0, "explode", true));
@@ -983,7 +985,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     /**
      * Gets the {@link CatalogTypeRegistry<WorldGeneratorModifier>}.
-     * 
+     *
      * @return the world generator modifier registry
      */
     public CatalogTypeRegistry<WorldGeneratorModifier> getWorldGeneratorModifierRegistry() {
@@ -992,7 +994,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     /**
      * Gets the {@link CatalogTypeRegistry<LanternAttribute>}.
-     * 
+     *
      * @return the attribute registry
      */
     public CatalogTypeRegistry<LanternAttribute> getAttributeRegistry() {
@@ -1001,7 +1003,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     /**
      * Gets the {@link LanternBlockRegistry}.
-     * 
+     *
      * @return the block registry
      */
     public LanternBlockRegistry getBlockRegistry() {
@@ -1010,7 +1012,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     /**
      * Gets the {@link LanternItemRegistry}.
-     * 
+     *
      * @return the item registry
      */
     public LanternItemRegistry getItemRegistry() {
@@ -1019,7 +1021,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     /**
      * Gets the {@link LanternBiomeRegistry}.
-     * 
+     *
      * @return the biome registry
      */
     public LanternBiomeRegistry getBiomeRegistry() {
@@ -1028,7 +1030,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     /**
      * Gets the {@link ResourcePackFactory}.
-     * 
+     *
      * @return the resource pack factory
      */
     public LanternResourcePackFactory getResourcePackFactory() {
@@ -1037,7 +1039,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     /**
      * Gets the {@link TranslationManager}.
-     * 
+     *
      * @return the translation manager
      */
     public TranslationManager getTranslationManager() {
@@ -1113,7 +1115,7 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public void registerStatistic(Statistic stat) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
@@ -1203,4 +1205,5 @@ public class LanternGameRegistry implements GameRegistry {
         // TODO Auto-generated method stub
         return null;
     }
+
 }

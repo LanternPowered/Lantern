@@ -53,10 +53,12 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
 
+@NonnullByDefault
 public class LanternUser implements AbstractArmorEquipable, User {
 
     private final LanternGameProfile gameProfile;
@@ -323,4 +325,5 @@ public class LanternUser implements AbstractArmorEquipable, User {
     public Optional<Player> getPlayer() {
         return LanternGame.get().getServer().getPlayer(this.gameProfile.getUniqueId());
     }
+
 }

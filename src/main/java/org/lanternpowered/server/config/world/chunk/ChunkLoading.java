@@ -32,10 +32,12 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import com.google.common.collect.Maps;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import static org.lanternpowered.server.config.ConfigConstants.*;
 
 @ConfigSerializable
+@NonnullByDefault
 public abstract class ChunkLoading implements ChunkLoadingConfig {
 
     public static final String MAXIMUM_CHUNKS_PER_TICKET = "maximum-chunks-per-ticket";
@@ -63,4 +65,5 @@ public abstract class ChunkLoading implements ChunkLoadingConfig {
         // Fall back to default if not found
         return this.getDefaults();
     }
+
 }

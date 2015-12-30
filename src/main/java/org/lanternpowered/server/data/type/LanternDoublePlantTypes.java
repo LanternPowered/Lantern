@@ -25,7 +25,9 @@
 package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public enum LanternDoublePlantTypes implements LanternDoublePlantType, SimpleCatalogType {
 
     SUNFLOWER       ("sunflower"),
@@ -51,4 +53,5 @@ public enum LanternDoublePlantTypes implements LanternDoublePlantType, SimpleCat
     public byte getInternalId() {
         return (byte) this.ordinal();
     }
+
 }

@@ -46,9 +46,13 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import static org.lanternpowered.server.config.ConfigConstants.*;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public GlobalConfig(Path path) throws IOException {
@@ -170,9 +174,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     }
 
     public Map<String, Predicate<InetAddress>> getIpSets() {
-        return ImmutableMap.copyOf(Maps.transformValues(this.server.ipSets, input -> Predicates.and(input)));
+        return ImmutableMap.copyOf(Maps.transformValues(this.server.ipSets, Predicates::and));
     }
 
+    @Nullable
     public Predicate<InetAddress> getIpSet(String name) {
         return this.server.ipSets.containsKey(name) ? Predicates.and(this.server.ipSets.get(name)) : null;
     }
@@ -253,4 +258,5 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     public ChunkLoadingTickets getChunkLoadingTickets(String plugin) {
         return this.worlds.chunkLoading.getChunkLoadingTickets(plugin);
     }
+
 }

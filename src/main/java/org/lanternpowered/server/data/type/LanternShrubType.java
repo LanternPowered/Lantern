@@ -25,8 +25,11 @@
 package org.lanternpowered.server.data.type;
 
 import org.spongepowered.api.data.type.ShrubType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface LanternShrubType extends ShrubType {
 
     byte getInternalId();
+
 }

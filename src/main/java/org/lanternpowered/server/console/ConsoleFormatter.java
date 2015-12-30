@@ -34,7 +34,9 @@ import org.fusesource.jansi.Ansi.Color;
 import org.lanternpowered.server.text.LegacyTextRepresentation;
 
 import com.google.common.collect.ImmutableMap;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class ConsoleFormatter implements Formatter {
 
     private static Pattern c(char code) {
@@ -75,4 +77,5 @@ public class ConsoleFormatter implements Formatter {
         }
         return text + RESET;
     }
+
 }

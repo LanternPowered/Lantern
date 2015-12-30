@@ -69,13 +69,17 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, AbstractCommandSource {
 
     private final User user;
     private final LanternGameProfile gameProfile;
 
-    private volatile Subject subject;
+    @Nullable private volatile Subject subject;
 
     private Session session = null;
     private MessageSink messageSink = MessageSinks.toAll();

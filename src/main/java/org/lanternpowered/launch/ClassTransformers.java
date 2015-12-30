@@ -24,12 +24,15 @@
  */
 package org.lanternpowered.launch;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@NonnullByDefault
 public final class ClassTransformers {
 
     final static List<ClassTransformer> transformers = new CopyOnWriteArrayList<>();
@@ -92,4 +95,5 @@ public final class ClassTransformers {
 
     private ClassTransformers() {
     }
+
 }

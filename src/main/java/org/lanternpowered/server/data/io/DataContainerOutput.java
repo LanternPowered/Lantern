@@ -28,10 +28,12 @@ import java.io.IOException;
 
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * A output that can be used to write data views.
  */
+@NonnullByDefault
 public interface DataContainerOutput {
 
     /**
@@ -41,4 +43,5 @@ public interface DataContainerOutput {
      * @throws IOException when a i/o error occurred
      */
     void write(DataView view) throws IOException;
+
 }

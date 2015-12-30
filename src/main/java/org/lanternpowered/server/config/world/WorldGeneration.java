@@ -31,8 +31,10 @@ import com.google.common.collect.Lists;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @ConfigSerializable
+@NonnullByDefault
 public class WorldGeneration {
 
     @Setting(value = "modifiers", comment = "The generation modifiers to apply to this world.")
@@ -52,4 +54,5 @@ public class WorldGeneration {
     public void setSeed(long seed) {
         this.seed = seed;
     }
+
 }

@@ -33,11 +33,13 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * A simple cache and wrapper for efficiently accessing multiple RegionFiles
  * simultaneously.
  */
+@NonnullByDefault
 public class RegionFileCache {
 
     public static final String REGION_FILE_EXTENSION = "mca";

@@ -33,10 +33,14 @@ import com.google.common.cache.LoadingCache;
 
 import org.lanternpowered.server.event.gen.DefineableClassLoader;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class FilterFactory {
 
     private final AtomicInteger id = new AtomicInteger();
@@ -58,6 +62,7 @@ public class FilterFactory {
         this.classLoader = checkNotNull(classLoader, "classLoader");
     }
 
+    @Nullable
     public Class<? extends EventFilter> createFilter(Method method) throws Exception {
         if (method.getParameterCount() == 1 && method.getDeclaredAnnotations().length == 1
                 && method.getDeclaredAnnotations()[0].annotationType().equals(Listener.class)) {

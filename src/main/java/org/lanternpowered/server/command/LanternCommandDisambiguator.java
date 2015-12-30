@@ -85,4 +85,5 @@ public class LanternCommandDisambiguator implements Disambiguator {
         }
         return SimpleDispatcher.FIRST_DISAMBIGUATOR.disambiguate(source, aliasUsed, availableOptions);
     }
+
 }

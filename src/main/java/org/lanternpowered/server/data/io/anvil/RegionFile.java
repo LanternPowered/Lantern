@@ -39,6 +39,9 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import javax.annotation.Nullable;
 
 /**
  * 2011 January 5
@@ -61,6 +64,7 @@ import org.lanternpowered.server.game.LanternGame;
  * (Minecraft region file) instead of ".data" to differentiate from the
  * original McRegion files.
  */
+@NonnullByDefault
 public class RegionFile {
 
     private static final int VERSION_GZIP = 1;
@@ -164,6 +168,7 @@ public class RegionFile {
      * gets an (uncompressed) stream representing the chunk data returns null if
      * the chunk is not found or an error occurs
      */
+    @Nullable
     public DataInputStream getChunkDataInputStream(int x, int z) throws IOException {
         checkBounds(x, z);
 

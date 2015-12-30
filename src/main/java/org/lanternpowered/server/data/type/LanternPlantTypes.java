@@ -25,7 +25,9 @@
 package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public enum LanternPlantTypes implements LanternPlantType, SimpleCatalogType {
 
     DANDELION           (FlowerColor.YELLOW, 0, "dandelion"),
@@ -65,4 +67,5 @@ public enum LanternPlantTypes implements LanternPlantType, SimpleCatalogType {
     public byte getInternalId() {
         return this.internalId;
     }
+
 }

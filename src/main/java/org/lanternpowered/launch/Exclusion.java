@@ -24,8 +24,11 @@
  */
 package org.lanternpowered.launch;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import javax.annotation.Nullable;
 
+@NonnullByDefault
 public interface Exclusion {
 
     /**
@@ -39,7 +42,7 @@ public interface Exclusion {
     /**
      * A exclusion that will exclude a package.
      */
-    public final class Package implements Exclusion {
+    final class Package implements Exclusion {
 
         private final String name;
 
@@ -61,7 +64,7 @@ public interface Exclusion {
     /**
      * A exclusion that will exclude a class.
      */
-    public final class Class implements Exclusion {
+    final class Class implements Exclusion {
 
         private final String name;
         @Nullable private final String excludeInnerPref;
@@ -83,4 +86,5 @@ public interface Exclusion {
                     className.startsWith(this.excludeInnerPref));
         }
     }
+
 }

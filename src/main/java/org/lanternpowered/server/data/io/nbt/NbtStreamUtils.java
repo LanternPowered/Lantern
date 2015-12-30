@@ -29,7 +29,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class NbtStreamUtils {
 
     /**
@@ -41,8 +43,7 @@ public final class NbtStreamUtils {
      * @return the data container
      * @throws IOException
      */
-    public static DataContainer read(InputStream inputStream, boolean compressed)
-            throws IOException {
+    public static DataContainer read(InputStream inputStream, boolean compressed) throws IOException {
         NbtDataContainerInputStream input = new NbtDataContainerInputStream(inputStream, compressed);
         DataContainer dataContainer = input.read();
         input.close();
@@ -57,8 +58,7 @@ public final class NbtStreamUtils {
      * @param compressed whether the data should be compressed
      * @throws IOException
      */
-    public static void write(DataContainer dataContainer, OutputStream outputStream,
-            boolean compressed) throws IOException {
+    public static void write(DataContainer dataContainer, OutputStream outputStream, boolean compressed) throws IOException {
         NbtDataContainerOutputStream output = new NbtDataContainerOutputStream(outputStream, compressed);
         output.write(dataContainer);
         output.flush();
@@ -67,4 +67,5 @@ public final class NbtStreamUtils {
 
     private NbtStreamUtils() {
     }
+
 }

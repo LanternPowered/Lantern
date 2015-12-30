@@ -29,7 +29,11 @@ import java.util.Optional;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public interface AbstractArmorEquipable extends ArmorEquipable {
 
     @Override
@@ -38,7 +42,7 @@ public interface AbstractArmorEquipable extends ArmorEquipable {
     }
 
     @Override
-    default void setHelmet(ItemStack helmet) {
+    default void setHelmet(@Nullable ItemStack helmet) {
         this.equip(EquipmentTypes.HEADWEAR, helmet);
     }
 
@@ -48,7 +52,7 @@ public interface AbstractArmorEquipable extends ArmorEquipable {
     }
 
     @Override
-    default void setChestplate(ItemStack chestplate) {
+    default void setChestplate(@Nullable ItemStack chestplate) {
         this.equip(EquipmentTypes.CHESTPLATE, chestplate);
     }
 
@@ -58,7 +62,7 @@ public interface AbstractArmorEquipable extends ArmorEquipable {
     }
 
     @Override
-    default void setLeggings(ItemStack leggings) {
+    default void setLeggings(@Nullable ItemStack leggings) {
         this.equip(EquipmentTypes.LEGGINGS, leggings);
     }
 
@@ -68,7 +72,7 @@ public interface AbstractArmorEquipable extends ArmorEquipable {
     }
 
     @Override
-    default void setBoots(ItemStack boots) {
+    default void setBoots(@Nullable ItemStack boots) {
         this.equip(EquipmentTypes.BOOTS, boots);
     }
 
@@ -78,7 +82,8 @@ public interface AbstractArmorEquipable extends ArmorEquipable {
     }
 
     @Override
-    default void setItemInHand(ItemStack itemInHand) {
+    default void setItemInHand(@Nullable ItemStack itemInHand) {
         this.equip(EquipmentTypes.EQUIPPED, itemInHand);
     }
+
 }

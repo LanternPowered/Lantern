@@ -28,7 +28,9 @@ import java.net.URI;
 import java.util.Optional;
 
 import org.spongepowered.api.resourcepack.ResourcePack;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternResourcePack implements ResourcePack {
 
     private final URI uri;
@@ -62,4 +64,5 @@ public final class LanternResourcePack implements ResourcePack {
     public Optional<String> getHash() {
         return this.hash;
     }
+
 }

@@ -39,7 +39,9 @@ import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternConsoleSource extends AbstractSubjectBase implements AbstractCommandSource, ConsoleSource {
 
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
@@ -93,4 +95,5 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements A
     public void setMessageSink(MessageSink sink) {
         this.messageSink = checkNotNull(sink, "sink");
     }
+
 }

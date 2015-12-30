@@ -29,7 +29,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface UserStorage<T> {
 
     /**
@@ -77,4 +79,5 @@ public interface UserStorage<T> {
      * @return whether a entry was removed
      */
     boolean removeEntry(UUID uniqueId);
+
 }

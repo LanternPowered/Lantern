@@ -32,7 +32,9 @@ import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternParticleType extends SimpleLanternCatalogType implements ParticleType {
 
     private final boolean hasMotion;
@@ -66,6 +68,7 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         public ItemStack getDefaultItem() {
             return this.defaultItem.copy();
         }
+
     }
 
     public static class Block extends LanternParticleType implements ParticleType.Block {
@@ -81,6 +84,7 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         public BlockState getDefaultBlockState() {
             return this.defaultBlockState;
         }
+
     }
 
     public static class Colorable extends LanternParticleType implements ParticleType.Colorable {
@@ -96,6 +100,7 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         public Color getDefaultColor() {
             return this.defaultColor;
         }
+
     }
 
     public static class Resizable extends LanternParticleType implements ParticleType.Resizable {
@@ -111,6 +116,7 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         public float getDefaultSize() {
             return this.defaultSize;
         }
+
     }
 
     public static class Note extends LanternParticleType implements ParticleType.Note {
@@ -127,8 +133,6 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
             return this.defaultNote;
         }
 
-        public NotePitch getDefaultNotePitch() {
-            return this.defaultNote;
-        }
     }
+
 }

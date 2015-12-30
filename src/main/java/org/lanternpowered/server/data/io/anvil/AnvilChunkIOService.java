@@ -45,6 +45,7 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -56,6 +57,9 @@ import com.google.common.util.concurrent.MoreExecutors;
 
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_FILE_PATTERN;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class AnvilChunkIOService implements ChunkIOService {
 
     private static final int REGION_SIZE = 32;
@@ -319,7 +323,7 @@ public class AnvilChunkIOService implements ChunkIOService {
             private File[] files;
 
             // The current region file that we opened
-            private RegionFile region;
+            @Nullable private RegionFile region;
 
             // The coordinates of the chunk inside the region
             private int chunkX;
@@ -439,30 +443,26 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public ListenableFuture<Optional<DataContainer>> getChunkData(final Vector3i chunkCoords) {
-        return this.service.submit(new Callable<Optional<DataContainer>>() {
+        return this.service.submit(() -> {
+            int x = chunkCoords.getX();
+            int z = chunkCoords.getZ();
 
-            @Override
-            public Optional<DataContainer> call() throws Exception {
-                int x = chunkCoords.getX();
-                int z = chunkCoords.getZ();
+            RegionFile region = cache.getRegionFile(x, z);
+            int regionX = x & REGION_MASK;
+            int regionZ = z & REGION_MASK;
 
-                RegionFile region = cache.getRegionFile(x, z);
-                int regionX = x & REGION_MASK;
-                int regionZ = z & REGION_MASK;
-
-                if (!region.hasChunk(regionX, regionZ)) {
-                    return Optional.empty();
-                }
-
-                DataInputStream is = region.getChunkDataInputStream(regionX, regionZ);
-                DataContainer data;
-
-                try (NbtDataContainerInputStream nbt = new NbtDataContainerInputStream(is)) {
-                    data = nbt.read();
-                }
-
-                return Optional.of(data);
+            if (!region.hasChunk(regionX, regionZ)) {
+                return Optional.empty();
             }
+
+            DataInputStream is = region.getChunkDataInputStream(regionX, regionZ);
+            DataContainer data;
+
+            try (NbtDataContainerInputStream nbt = new NbtDataContainerInputStream(is)) {
+                data = nbt.read();
+            }
+
+            return Optional.of(data);
         });
     }
 
@@ -470,4 +470,5 @@ public class AnvilChunkIOService implements ChunkIOService {
     public WorldProperties getWorldProperties() {
         return this.properties;
     }
+
 }

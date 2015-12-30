@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.event.gen;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+@NonnullByDefault
 public class DefineableClassLoader extends ClassLoader {
 
     public DefineableClassLoader(ClassLoader parent) {

@@ -67,10 +67,12 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@NonnullByDefault
 public final class ClassEventListenerFactory implements AnnotatedEventListener.Factory {
 
     private final AtomicInteger id = new AtomicInteger();

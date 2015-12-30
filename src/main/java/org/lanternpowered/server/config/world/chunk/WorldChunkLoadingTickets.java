@@ -26,12 +26,14 @@ package org.lanternpowered.server.config.world.chunk;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * Global/default settings of the chunk loading, all these settings are available in
  * the global config and the world specific configs.
  */
 @ConfigSerializable
+@NonnullByDefault
 public class WorldChunkLoadingTickets implements ChunkLoadingTickets {
 
     @Setting(value = ChunkLoading.MAXIMUM_CHUNKS_PER_TICKET, comment =
@@ -53,4 +55,5 @@ public class WorldChunkLoadingTickets implements ChunkLoadingTickets {
     public int getMaximumTicketCount() {
         return this.maximumTicketCount;
     }
+
 }

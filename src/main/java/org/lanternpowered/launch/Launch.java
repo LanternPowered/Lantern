@@ -24,8 +24,11 @@
  */
 package org.lanternpowered.launch;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
 import java.net.URLClassLoader;
 
+@NonnullByDefault
 final class Launch {
 
     public static void main(String[] args) {
@@ -44,4 +47,5 @@ final class Launch {
             throw new RuntimeException(e);
         }
     }
+
 }

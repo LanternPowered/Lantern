@@ -28,7 +28,9 @@ import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
 import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternEntityLiving extends LanternEntity implements Living {
 
     @Override
@@ -46,4 +48,5 @@ public class LanternEntityLiving extends LanternEntity implements Living {
         // TODO Auto-generated method stub
         return null;
     }
+
 }

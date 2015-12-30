@@ -38,7 +38,9 @@ import org.spongepowered.api.resourcepack.ResourcePackFactory;
 import com.google.common.collect.Maps;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternResourcePackFactory implements ResourcePackFactory {
 
     private static class CacheKey {
@@ -128,4 +130,5 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
             throw new RuntimeException(e);
         }
     }
+
 }

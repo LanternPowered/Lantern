@@ -51,8 +51,10 @@ import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
+@NonnullByDefault
 public abstract class ConfigBase {
 
     public static final ConfigurationOptions DEFAULT_OPTIONS;
@@ -89,9 +91,8 @@ public abstract class ConfigBase {
     /**
      * Creates a new config object.
      * 
-     * @param loader the config loader
+     * @param path the config file path
      * @param options the config options
-     * @param configObject the configuration object the settings will be mapped to
      * @throws IOException 
      */
     public ConfigBase(Path path, ConfigurationOptions options) throws IOException {
@@ -118,7 +119,7 @@ public abstract class ConfigBase {
             try {
                 this.configMapper.populate(this.root);
             } catch (ObjectMappingException e) {
-                throw new IOException("An error ocurred while serializing the object.", e);
+                throw new IOException("An error occurred while serializing the object.", e);
             }
         }
     }
@@ -130,8 +131,9 @@ public abstract class ConfigBase {
         try {
             this.configMapper.serialize(this.root);
         } catch (ObjectMappingException e) {
-            throw new IOException("An error ocurred while mapping the object.", e);
+            throw new IOException("An error occurred while mapping the object.", e);
         }
         this.loader.save(this.root);
     }
+
 }

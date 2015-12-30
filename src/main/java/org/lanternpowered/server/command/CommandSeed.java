@@ -61,4 +61,8 @@ public final class CommandSeed {
                 })
                 .build();
     }
+
+    private CommandSeed() {
+    }
+
 }

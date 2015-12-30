@@ -37,7 +37,9 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternParticleEffect implements ParticleEffect {
 
     private final ParticleType type;
@@ -146,4 +148,5 @@ public class LanternParticleEffect implements ParticleEffect {
             return this.blockState;
         }
     }
+
 }

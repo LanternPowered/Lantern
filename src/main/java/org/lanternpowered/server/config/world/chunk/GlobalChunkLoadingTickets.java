@@ -50,4 +50,5 @@ public class GlobalChunkLoadingTickets extends WorldChunkLoadingTickets {
     public int getPlayerTicketCount() {
         return this.playerTicketCount;
     }
+
 }

@@ -25,8 +25,11 @@
 package org.lanternpowered.server.data.type;
 
 import org.spongepowered.api.data.type.DirtType;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface LanternDirtType extends DirtType {
 
     byte getInternalId();
+
 }

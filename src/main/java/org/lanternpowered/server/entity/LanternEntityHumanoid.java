@@ -35,7 +35,11 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
 
     @Override
@@ -57,7 +61,7 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
     }
 
     @Override
-    public boolean canEquip(EquipmentType type, ItemStack equipment) {
+    public boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
         // TODO Auto-generated method stub
         return false;
     }
@@ -69,7 +73,7 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
     }
 
     @Override
-    public boolean equip(EquipmentType type, ItemStack equipment) {
+    public boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
         if (!this.canEquip(type, equipment)) {
             return false;
         }

@@ -28,7 +28,9 @@ import java.io.PrintStream;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LoggingPrintStream extends PrintStream {
 
     private final LoggingOutputStream out;
@@ -48,4 +50,5 @@ public class LoggingPrintStream extends PrintStream {
         super.write(buf, off, len);
         this.out.flush = true;
     }
+
 }

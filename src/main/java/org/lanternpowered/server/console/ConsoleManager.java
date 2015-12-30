@@ -38,17 +38,21 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.fusesource.jansi.AnsiConsole;
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class ConsoleManager {
 
     // The formatter, by default used to format colored messages
     private Formatter formatter = new ConsoleFormatter();
 
     // The console reader
-    private ConsoleReader reader;
+    @Nullable private ConsoleReader reader;
 
     // A temp cursor buffer, internal use only
-    private volatile CursorBuffer stashed;
+    @Nullable private volatile CursorBuffer stashed;
 
     // Whether the command threads are running
     private volatile boolean active;
@@ -208,4 +212,5 @@ public class ConsoleManager {
             }
         }
     }
+
 }

@@ -40,9 +40,11 @@ import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.WorldChunkLoading;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
+@NonnullByDefault
 public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
 
     @Setting(value = ChunkLoading.CHUNK_LOADING, comment = "Configuration for the chunk loading control.")
@@ -197,4 +199,5 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     public void setHardcore(boolean hardcore) {
         this.hardcore = hardcore;
     }
+
 }

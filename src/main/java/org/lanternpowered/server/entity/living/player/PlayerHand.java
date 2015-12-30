@@ -24,6 +24,9 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+@NonnullByDefault
 public enum PlayerHand {
     LEFT,
     RIGHT,

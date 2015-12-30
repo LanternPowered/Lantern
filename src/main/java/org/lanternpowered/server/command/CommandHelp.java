@@ -45,12 +45,14 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Optional;
 import java.util.TreeSet;
 
+@NonnullByDefault
 public final class CommandHelp {
 
     private static final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
@@ -79,7 +81,7 @@ public final class CommandHelp {
                         throw new CommandException(Texts.of("No such command: ", command.get()));
                     }
 
-                    TreeSet<CommandMapping> commands = new TreeSet<CommandMapping>(comparator);
+                    TreeSet<CommandMapping> commands = new TreeSet<>(comparator);
                     commands.addAll(Collections2.filter(Sponge.getCommandManager().getAll().values(),
                             input -> input.getCallable().testPermission(src)));
 
@@ -115,4 +117,8 @@ public final class CommandHelp {
         }
         return Texts.of(text, " ", description.orElse(mapping.getCallable().getUsage(source)));
     }
+
+    private CommandHelp() {
+    }
+
 }

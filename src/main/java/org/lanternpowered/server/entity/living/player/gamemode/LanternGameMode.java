@@ -28,7 +28,9 @@ import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public class LanternGameMode extends SimpleLanternCatalogType implements GameMode {
 
     private final byte internalId;
@@ -46,4 +48,5 @@ public class LanternGameMode extends SimpleLanternCatalogType implements GameMod
     public byte getInternalId() {
         return this.internalId;
     }
+
 }

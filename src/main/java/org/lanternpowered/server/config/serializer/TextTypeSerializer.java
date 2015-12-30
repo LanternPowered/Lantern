@@ -33,7 +33,9 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.TextMessageException;
 
 import com.google.common.reflect.TypeToken;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class TextTypeSerializer implements TypeSerializer<Text> {
 
     @Override
@@ -57,4 +59,5 @@ public final class TextTypeSerializer implements TypeSerializer<Text> {
     public void serialize(TypeToken<?> type, Text obj, ConfigurationNode value) throws ObjectMappingException {
         value.setValue(Texts.xml().to(obj));
     }
+
 }

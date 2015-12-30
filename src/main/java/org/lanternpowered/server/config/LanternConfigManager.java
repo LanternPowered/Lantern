@@ -38,8 +38,10 @@ import org.spongepowered.api.config.ConfigRoot;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import com.google.inject.Injector;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public class LanternConfigManager implements ConfigManager {
+@NonnullByDefault
+public final class LanternConfigManager implements ConfigManager {
 
     private final Path configRoot;
 
@@ -70,4 +72,5 @@ public class LanternConfigManager implements ConfigManager {
         }
         return DefaultObjectMapperFactory.getInstance();
     }
+
 }

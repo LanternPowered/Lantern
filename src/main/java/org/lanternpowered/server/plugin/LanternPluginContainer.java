@@ -31,6 +31,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 import com.google.inject.Injector;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
 @NonnullByDefault
 public final class LanternPluginContainer implements PluginContainer {
 
@@ -39,8 +41,8 @@ public final class LanternPluginContainer implements PluginContainer {
     private final String version;
 
     // The instance of the plugin
-    private Object instance;
-    private Injector injector;
+    @Nullable private Object instance;
+    @Nullable private Injector injector;
 
     LanternPluginContainer(String id, String name, String version) {
         this.version = version;
@@ -68,6 +70,7 @@ public final class LanternPluginContainer implements PluginContainer {
         return Optional.ofNullable(this.instance);
     }
 
+    @Nullable
     public Injector getInjector() {
         return this.injector;
     }

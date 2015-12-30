@@ -27,8 +27,10 @@ package org.lanternpowered.server.data.io;
 import java.io.IOException;
 
 import org.lanternpowered.server.world.chunk.LanternChunk;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.WorldStorage;
 
+@NonnullByDefault
 public interface ChunkIOService extends WorldStorage {
 
     /**
@@ -54,4 +56,5 @@ public interface ChunkIOService extends WorldStorage {
      * @throws IOException if an i/o error occurs
      */
     void unload() throws IOException;
+
 }

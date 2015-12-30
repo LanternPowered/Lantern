@@ -27,10 +27,12 @@ package org.lanternpowered.server.data.io;
 import java.io.IOException;
 
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 /**
  * A input that can be used to read data views.
  */
+@NonnullByDefault
 public interface DataContainerInput {
 
     /**
@@ -40,4 +42,5 @@ public interface DataContainerInput {
      * @throws IOException when a i/o error occurred
      */
     DataContainer read() throws IOException;
+
 }

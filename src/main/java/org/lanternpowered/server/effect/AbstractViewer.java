@@ -31,7 +31,9 @@ import org.spongepowered.api.text.chat.ChatType;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public interface AbstractViewer extends Viewer {
 
     @Override
@@ -55,4 +57,5 @@ public interface AbstractViewer extends Viewer {
     default void playSound(SoundType sound, Vector3d position, double volume, double pitch) {
         this.playSound(sound, position, volume, pitch, 0.0);
     }
+
 }

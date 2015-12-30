@@ -31,14 +31,15 @@ import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+@NonnullByDefault
 public final class LanternEntityType extends SimpleLanternCatalogType implements EntityType {
 
     private final Class<? extends Entity> entityClass;
     private final Translation name;
 
-    public LanternEntityType(String identifier, Class<? extends Entity> entityClass,
-            Translation name) {
+    public LanternEntityType(String identifier, Class<? extends Entity> entityClass, Translation name) {
         super(identifier);
 
         this.entityClass = checkNotNull(entityClass, "entityClass");
@@ -54,4 +55,5 @@ public final class LanternEntityType extends SimpleLanternCatalogType implements
     public Class<? extends Entity> getEntityClass() {
         return this.entityClass;
     }
+
 }

@@ -47,6 +47,7 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.event.EventManager;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -58,6 +59,7 @@ import java.util.Set;
 import javax.inject.Singleton;
 
 @Singleton
+@NonnullByDefault
 public class LanternEventManager implements EventManager {
 
     private final Object lock = new Object();
@@ -83,11 +85,7 @@ public class LanternEventManager implements EventManager {
         Set<Class<?>> types = (Set) TypeToken.of(rootEvent).getTypes().rawTypes();
 
         synchronized (this.lock) {
-            for (Class<?> type : types) {
-                if (Event.class.isAssignableFrom(type)) {
-                    handlers.addAll(this.handlersByEvent.get(type));
-                }
-            }
+            types.stream().filter(Event.class::isAssignableFrom).forEach(type -> handlers.addAll(this.handlersByEvent.get(type)));
         }
 
         Collections.sort(handlers);
@@ -169,7 +167,7 @@ public class LanternEventManager implements EventManager {
 
     private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
             Order order, EventListener<? super T> handler) {
-        return new RegisteredListener<T>(plugin, eventClass, order, handler);
+        return new RegisteredListener<>(plugin, eventClass, order, handler);
     }
 
     @Override
@@ -220,27 +218,13 @@ public class LanternEventManager implements EventManager {
     @Override
     public void unregisterListeners(final Object listener) {
         checkNotNull(listener, "listener");
-        this.unregister(new Predicate<RegisteredListener<?>>() {
-
-            @Override
-            public boolean apply(RegisteredListener<?> handler) {
-                return listener.equals(handler.getHandle());
-            }
-
-        });
+        this.unregister(handler -> listener.equals(handler.getHandle()));
     }
 
     @Override
     public void unregisterPluginListeners(Object pluginObj) {
         final PluginContainer plugin = checkPlugin(pluginObj, "plugin");
-        this.unregister(new Predicate<RegisteredListener<?>>() {
-
-            @Override
-            public boolean apply(RegisteredListener<?> handler) {
-                return plugin.equals(handler.getPlugin());
-            }
-
-        });
+        this.unregister(handler -> plugin.equals(handler.getPlugin()));
     }
 
     protected List<RegisteredListener<?>> getHandlerCache(Event event) {
@@ -263,4 +247,5 @@ public class LanternEventManager implements EventManager {
     public boolean post(Event event) {
         return this.post(event, this.getHandlerCache(event));
     }
+
 }

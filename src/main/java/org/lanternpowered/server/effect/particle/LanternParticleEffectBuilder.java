@@ -37,7 +37,11 @@ import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import javax.annotation.Nullable;
+
+@NonnullByDefault
 public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<ParticleEffect, ParticleType, ParticleEffect.Builder> {
 
     @Override
@@ -47,7 +51,7 @@ public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<
 
     public static class Colorable extends AbstractParticleEffectBuilder<ColoredParticle, ParticleType.Colorable, ColoredParticle.Builder> implements ColoredParticle.Builder {
 
-        private Color color;
+        @Nullable private Color color;
 
         @Override
         public LanternParticleEffectBuilder.Colorable color(Color color) {
@@ -64,7 +68,7 @@ public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<
 
     public static class Resizable extends AbstractParticleEffectBuilder<ResizableParticle, ParticleType.Resizable, ResizableParticle.Builder> implements ResizableParticle.Builder {
 
-        private Float size;
+        @Nullable private Float size;
 
         @Override
         public LanternParticleEffectBuilder.Resizable reset() {
@@ -88,7 +92,7 @@ public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<
 
     public static class Note extends AbstractParticleEffectBuilder<NoteParticle, ParticleType.Note, NoteParticle.Builder> implements NoteParticle.Builder {
 
-        private NotePitch note;
+        @Nullable private NotePitch note;
 
         @Override
         public LanternParticleEffectBuilder.Note note(NotePitch note) {
@@ -106,13 +110,13 @@ public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<
         @Override
         public LanternParticleEffect.Note build() {
             return new LanternParticleEffect.Note(this.type, this.motion, this.offset, this.count,
-                    this.note == null ? ((LanternParticleType.Note) this.type).getDefaultNotePitch() : this.note);
+                    this.note == null ? ((LanternParticleType.Note) this.type).getDefaultNote() : this.note);
         }
     }
 
     public static class Item extends AbstractParticleEffectBuilder<ItemParticle, ParticleType.Item, ItemParticle.Builder> implements ItemParticle.Builder {
 
-        private ItemStackSnapshot itemSnapshot;
+        @Nullable private ItemStackSnapshot itemSnapshot;
 
         @Override
         public LanternParticleEffectBuilder.Item item(ItemStackSnapshot itemSnapshot) {
@@ -137,7 +141,7 @@ public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<
 
     public static class Block extends AbstractParticleEffectBuilder<BlockParticle, ParticleType.Block, BlockParticle.Builder> implements BlockParticle.Builder {
 
-        private BlockState blockState;
+        @Nullable private BlockState blockState;
 
         @Override
         public LanternParticleEffectBuilder.Block block(BlockState blockState) {
@@ -158,4 +162,5 @@ public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<
                     this.blockState == null ? ((ParticleType.Block) this.type).getDefaultBlockState() : this.blockState);
         }
     }
+
 }

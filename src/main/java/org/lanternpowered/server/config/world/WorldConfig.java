@@ -86,7 +86,7 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "mode", comment = "The default game mode of this world.")
         private GameMode mode = GameModes.SURVIVAL;
 
-        @Setting(value = "force", comment = "Whether the default game mode should be forced for the players in this world")
+        @Setting(value = "force", comment = "Whether players are forced to the default gamemode on join.")
         private boolean force = false;
     }
 

@@ -126,7 +126,7 @@ public class LanternServer implements Server {
             game.preInitialize();
 
             // Start the console (command input/completer)
-            consoleManager.start(game);
+            consoleManager.start();
 
             final GlobalConfig globalConfig = game.getGlobalConfig();
             RconServer rconServer = null;

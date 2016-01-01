@@ -33,10 +33,11 @@ import org.lanternpowered.server.text.LegacyTextRepresentation;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 @NonnullByDefault
-public class ConsoleFormatter implements Formatter {
+public class ColoredConsoleFormatter implements Function<String, String> {
 
     private static Pattern c(char code) {
         return Pattern.compile(String.valueOf(LegacyTextRepresentation.DEFAULT_CHAR) + code, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
@@ -69,7 +70,7 @@ public class ConsoleFormatter implements Formatter {
             .build();
 
     @Override
-    public String format(String text) {
+    public String apply(String text) {
         for (Entry<Pattern, String> entry : REPLACEMENTS.entrySet()) {
             text = entry.getKey().matcher(text).replaceAll(entry.getValue());
         }

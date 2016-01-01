@@ -24,22 +24,16 @@
  */
 package org.lanternpowered.server.console;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import jline.console.completer.Completer;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.scheduler.LanternScheduler;
+import org.spongepowered.api.Sponge;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 public class ConsoleCommandCompleter implements Completer {
-
-    private final LanternGame game;
-
-    public ConsoleCommandCompleter(LanternGame game) {
-        this.game = checkNotNull(game, "game");
-    }
 
     @Override
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {
@@ -58,8 +52,8 @@ public class ConsoleCommandCompleter implements Completer {
         }
 
         final String input = buffer;
-        Future<List<String>> tabComplete = this.game.getScheduler().callSync(() ->
-                this.game.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, input));
+        Future<List<String>> tabComplete = ((LanternScheduler) Sponge.getScheduler()).callSync(() ->
+                Sponge.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, input));
 
         try {
             List<String> completions = tabComplete.get();

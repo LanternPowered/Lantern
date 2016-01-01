@@ -42,11 +42,11 @@ import java.util.function.Function;
 
 public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> implements BlockRegistry {
 
-    private final TShortObjectMap<BlockState> blockStatesById = TCollections.synchronizedMap(new TShortObjectHashMap<BlockState>());
-    private final TObjectShortMap<BlockState> idsByBlockState = TCollections.synchronizedMap(new TObjectShortHashMap<BlockState>());
+    private final TShortObjectMap<BlockState> blockStatesById = TCollections.synchronizedMap(new TShortObjectHashMap<>());
+    private final TObjectShortMap<BlockState> idsByBlockState = TCollections.synchronizedMap(new TObjectShortHashMap<>());
  
-    private final TShortObjectMap<BlockType> blocksById = TCollections.synchronizedMap(new TShortObjectHashMap<BlockType>());
-    private final TObjectShortMap<BlockType> idsByBlock = TCollections.synchronizedMap(new TObjectShortHashMap<BlockType>());
+    private final TShortObjectMap<BlockType> blocksById = TCollections.synchronizedMap(new TShortObjectHashMap<>());
+    private final TObjectShortMap<BlockType> idsByBlock = TCollections.synchronizedMap(new TObjectShortHashMap<>());
 
     // The counter for custom block ids. (Non vanilla ones.)
     private final AtomicInteger blockIdCounter = new AtomicInteger(1024);
@@ -62,7 +62,7 @@ public class LanternBlockRegistry extends LanternCatalogTypeRegistry<BlockType> 
         this.idsByBlock.put(blockType, internalId0);
         if (dataValueGenerator != null && blockType.blockStateBase.getBlockStates().size() > 1) {
             for (BlockState state : blockType.blockStateBase.getBlockStates()) {
-                final byte dataValue = dataValueGenerator.apply((LanternBlockState) state);
+                final byte dataValue = dataValueGenerator.apply(state);
                 final short stateValue = (short) ((internalId & 0xfff) << 4 | dataValue & 0xf);
                 this.blockStatesById.put(stateValue, state);
                 this.idsByBlockState.put(state, stateValue);

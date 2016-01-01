@@ -36,4 +36,5 @@ public final class HandlerInPing implements Handler<MessageInOutPing> {
     public void handle(Session session, MessageInOutPing message) {
         session.pong(message.getKeepAliveId());
     }
+
 }

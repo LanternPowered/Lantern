@@ -26,11 +26,13 @@ package org.lanternpowered.server.config.world;
 
 import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 import java.util.List;
 import java.util.Random;
 
-public class WorldGeneration {
+@ConfigSerializable
+public final class WorldGeneration {
 
     @Setting(value = "modifiers", comment = "The generation modifiers to apply to this world.")
     private List<String> generationModifiers = Lists.newArrayList();

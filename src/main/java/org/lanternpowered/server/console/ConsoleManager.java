@@ -33,15 +33,17 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.fusesource.jansi.AnsiConsole;
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Sponge;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.function.Function;
 
 public class ConsoleManager {
 
     // The formatter, by default used to format colored messages
-    private Formatter formatter = new ConsoleFormatter();
+    private Function<String, String> formatter = new ColoredConsoleFormatter();
 
     // The console reader
     private ConsoleReader reader;
@@ -94,7 +96,12 @@ public class ConsoleManager {
         System.setOut(new ConsolePrintStream(System.out));
         System.setErr(new ConsolePrintStream(System.err));
 
-        // Initialize the logging system and setup the logging streams 
+        // Initialize the logging system and setup the logging streams
+        // Before this point may never the any method in LogManager be accessed,
+        // because they will trigger the initialization.
+
+        // This print streams will redirect all the console output through the
+        // loggers, if send through System.out or System.err
         System.setOut(new LoggingPrintStream(LogManager.getLogger("System.OUT"), Level.INFO));
         System.setErr(new LoggingPrintStream(LogManager.getLogger("System.ERR"), Level.ERROR));
 
@@ -143,6 +150,8 @@ public class ConsoleManager {
             String message = this.toString();
             this.reset();
 
+            // The stached field is used to fix the issue that
+            // the reader cursor gets messed up between the other lines
             boolean flag = jline && stashed == null;
 
             if (flag) {
@@ -151,7 +160,7 @@ public class ConsoleManager {
                 reader.flush();
             }
 
-            byte[] bytes = formatter.format(message).getBytes();
+            byte[] bytes = formatter.apply(message).getBytes();
             this.output.write(bytes, 0, bytes.length);
 
             if (flag) {
@@ -161,14 +170,14 @@ public class ConsoleManager {
         }
     }
 
-    public void start(LanternGame game) {
+    public void start() {
         this.active = true;
 
         // Add the command completer
-        this.reader.addCompleter(new ConsoleCommandCompleter(game));
+        this.reader.addCompleter(new ConsoleCommandCompleter());
 
         // Start the command reader thread
-        Thread thread = new Thread(new CommandReaderTask(game));
+        Thread thread = new Thread(this::commandReaderTask);
         thread.setName("ConsoleCommandThread");
         thread.setDaemon(true);
         thread.start();
@@ -178,32 +187,24 @@ public class ConsoleManager {
         this.active = false;
     }
 
-    private class CommandReaderTask implements Runnable {
-
-        private final LanternGame game;
-
-        public CommandReaderTask(LanternGame game) {
-            this.game = game;
-        }
-
-        @Override
-        public void run() {
-            while (active) {
-                try {
-                    String command = reader.readLine();
-                    if (command != null) {
-                        command = command.trim();
-                        if (!command.isEmpty()) {
-                            final String runCommand = command;
-                            this.game.getScheduler().createTaskBuilder().execute(() -> {
-                                LanternGame.get().getCommandManager().process(
-                                        LanternConsoleSource.INSTANCE, runCommand);
-                            }).submit(LanternGame.plugin());
-                        }
+    /**
+     * This task handles the commands that are executed through the console.
+     */
+    private void commandReaderTask() {
+        while (this.active) {
+            try {
+                String command = this.reader.readLine();
+                if (command != null) {
+                    command = command.trim();
+                    if (!command.isEmpty()) {
+                        final String runCommand = command;
+                        Sponge.getScheduler().createTaskBuilder().execute(() -> {
+                            Sponge.getCommandManager().process(LanternConsoleSource.INSTANCE, runCommand);
+                        }).submit(LanternGame.plugin());
                     }
-                } catch (IOException e) {
-                    LanternGame.log().error("Error while reading commands!", e);
                 }
+            } catch (IOException e) {
+                LanternGame.log().error("Error while reading commands!", e);
             }
         }
     }

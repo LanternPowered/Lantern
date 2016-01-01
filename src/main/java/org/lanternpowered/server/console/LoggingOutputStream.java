@@ -55,7 +55,7 @@ public class LoggingOutputStream extends ByteArrayOutputStream {
         String message = this.toString();
         this.reset();
 
-        if (!message.isEmpty() && !message.equals(SEPARATOR)) {
+        if (this.logger.isEnabled(this.level) && !message.isEmpty() && !message.equals(SEPARATOR)) {
             if (message.endsWith(SEPARATOR)) {
                 message = message.substring(0, message.length() - SEPARATOR.length());
             }

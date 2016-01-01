@@ -25,11 +25,13 @@
 package org.lanternpowered.server.config.world.chunk;
 
 import ninja.leaping.configurate.objectmapping.Setting;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
 /**
  * Global/default settings of the chunk loading, all these settings are available in
  * the global config and the world specific configs.
  */
+@ConfigSerializable
 public class GlobalChunkLoadingTickets extends WorldChunkLoadingTickets {
 
     @Setting(value = ChunkLoading.PLAYER_TICKET_COUNT, comment =
@@ -41,7 +43,7 @@ public class GlobalChunkLoadingTickets extends WorldChunkLoadingTickets {
      * Gets the maximum amount of tickets that can be requested
      * per player.
      * 
-     * TODO: Make this configurable per world?
+     * TODO: Make this configurable per world? This is currently not possible using the current api.
      * 
      * @return the player ticket count
      */

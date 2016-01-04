@@ -32,6 +32,7 @@ import org.lanternpowered.server.command.CommandSeed;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.command.LanternCommandDisambiguator;
+import org.lanternpowered.server.command.LanternCommandManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.config.user.OpsEntry;
@@ -47,7 +48,9 @@ import org.lanternpowered.server.plugin.MinecraftPluginContainer;
 import org.lanternpowered.server.plugin.SpongeApiContainer;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
+import org.lanternpowered.server.service.LanternServiceListeners;
 import org.lanternpowered.server.service.pagination.LanternPaginationService;
+import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
@@ -63,7 +66,6 @@ import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandManager;
-import org.spongepowered.api.command.SimpleCommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.EventManager;
@@ -71,7 +73,6 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
-import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.SimpleServiceManager;
 import org.spongepowered.api.service.ban.BanService;
@@ -221,6 +222,9 @@ public class LanternGame implements Game {
     // The chunk load service
     private LanternChunkTicketManager chunkTicketManager;
 
+    // The command manager
+    private LanternCommandManager commandManager;
+
     // The serialization service 
     private LanternDataManager dataManager;
 
@@ -275,7 +279,8 @@ public class LanternGame implements Game {
 
         // Pre register some game objects
         this.gameRegistry = new LanternGameRegistry(this);
-        this.gameRegistry.preRegisterGameObjects();
+        this.gameRegistry.registerDefaults();
+        this.gameRegistry.earlyRegistry();
 
         // Create the global config
         this.globalConfig = new GlobalConfig(this.configFolder.resolve(GLOBAL_CONFIG));
@@ -289,7 +294,7 @@ public class LanternGame implements Game {
         this.whitelistConfig = new WhitelistConfig(this.configFolder.resolve(WHITELIST_CONFIG));
         this.whitelistConfig.load();
 
-        // Create the whitelist config
+        // Create the ban config
         this.banConfig = new BanConfig(this.configFolder.resolve(BANS_CONFIG));
         this.banConfig.load();
     }
@@ -298,16 +303,22 @@ public class LanternGame implements Game {
         this.rootWorldFolder = rootWorldFolder;
         this.server = server;
 
+        // Call pre registry phase.
+        this.gameRegistry.preRegistry();
+
         // Create the channel registrar
         this.channelRegistrar =  new LanternChannelRegistrar(server);
 
         // Register the game objects
         this.gameDictionary = new LanternGameDictionary();
-        this.gameRegistry.registerGameObjects();
 
         // Create the plugin manager instance
         this.pluginManager = new LanternPluginManager(this, this.pluginsFolder, this.minecraft,
                 this.apiContainer, this.implContainer);
+
+        // Create the event manager instance
+        this.eventManager = new LanternEventManager();
+        this.eventManager.registerListeners(this.implContainer, LanternServiceListeners.getInstance());
 
         // Create the service manager instance
         this.serviceManager = new SimpleServiceManager(this.pluginManager);
@@ -336,23 +347,18 @@ public class LanternGame implements Game {
         this.registerService(PaginationService.class, new LanternPaginationService(this));
 
         // Register the command service
-        SimpleCommandManager commandService = new SimpleCommandManager(log(), new LanternCommandDisambiguator(this));
-        if (this.registerService(CommandManager.class, commandService)) {
-            commandService.register(this.minecraft, CommandBan.create(false), "ban-ip");
-            commandService.register(this.minecraft, CommandSeed.create(), "seed");
-            commandService.register(this.minecraft, CommandStop.create(), "stop", "shutdown");
-            commandService.register(this.minecraft, CommandDifficulty.create(), "difficulty");
-            commandService.register(this.minecraft, CommandHelp.create(), "help", "?");
-            commandService.register(this.implContainer, CommandVersion.create(), "version");
-        }
-        commandService.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
+        this.commandManager = new LanternCommandManager(this.getLogger(), new LanternCommandDisambiguator(this));
+        this.commandManager.register(this.minecraft, CommandBan.create(false), "ban-ip");
+        this.commandManager.register(this.minecraft, CommandSeed.create(), "seed");
+        this.commandManager.register(this.minecraft, CommandStop.create(), "stop", "shutdown");
+        this.commandManager.register(this.minecraft, CommandDifficulty.create(), "difficulty");
+        this.commandManager.register(this.minecraft, CommandHelp.create(), "help", "?");
+        this.commandManager.register(this.implContainer, CommandVersion.create(), "version");
+        this.commandManager.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
                 LanternCallbackHolder.CALLBACK_COMMAND);
 
         // Create the teleport helper
         this.teleportHelper = new LanternTeleportHelper();
-
-        // Create the event manager instance
-        this.eventManager = new LanternEventManager();
 
         // Call the construction events
         this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(Cause.of(this), 
@@ -365,54 +371,58 @@ public class LanternGame implements Game {
             throw new RuntimeException("An error occurred while loading the plugins.", e);
         }
 
-        // Load-complete phase
-        this.setGameState(GameState.LOAD_COMPLETE);
-        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(Cause.of(this), 
-                GameState.LOAD_COMPLETE));
+        // Call pre init phase for registry
+        this.gameRegistry.preInit();
+
+        LanternServiceListeners.getInstance().registerServiceCallback(PermissionService.class,
+                input -> {
+                    this.server.getConsole().getContainingCollection();
+                    input.registerContextCalculator(new LanternContextCalculator());
+                });
 
         // Pre-init phase
         this.setGameState(GameState.PRE_INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(Cause.of(this), 
                 GameState.PRE_INITIALIZATION));
-        this.serviceManager.potentiallyProvide(PermissionService.class).executeWhenPresent(
-                input -> this.server.getConsole().getContainingCollection());
 
         // Create the default sql service
         this.registerService(SqlService.class, new LanternSqlService());
+
+        // Call init phase for registry
+        this.gameRegistry.init();
+
+        // Provide the default permission service if no custom one is found
+        if (!this.serviceManager.provide(PermissionService.class).isPresent()) {
+            final LanternPermissionService service = new LanternPermissionService(this);
+            service.getGroupForOpLevel(1).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
+                    "minecraft.selector", Tristate.TRUE);
+            service.getGroupForOpLevel(2).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
+                    "minecraft.commandblock", Tristate.TRUE);
+
+            this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
+        }
 
         // Init phase
         this.setGameState(GameState.INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(Cause.of(this), 
                 GameState.INITIALIZATION));
 
-        // Provide the default permission service if no custom one is found
-        if (!this.serviceManager.provide(PermissionService.class).isPresent()) {
-            try {
-                final LanternPermissionService service = new LanternPermissionService(this);
-                service.getGroupForOpLevel(1).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
-                        "minecraft.selector", Tristate.TRUE);
-                service.getGroupForOpLevel(2).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
-                        "minecraft.commandblock", Tristate.TRUE);
-                
-                this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
-            } catch (ProviderExistsException ignored) {
-            }
-        }
+        // Call post init phase for registry
+        this.gameRegistry.postInit();
 
         // Post-init phase
         this.setGameState(GameState.POST_INITIALIZATION);
         this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(Cause.of(this), 
                 GameState.POST_INITIALIZATION));
+
+        // Load-complete phase
+        this.setGameState(GameState.LOAD_COMPLETE);
+        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(Cause.of(this),
+                GameState.LOAD_COMPLETE));
     }
 
-    private <T> boolean registerService(Class<T> serviceClass, T serviceImpl) {
-        try {
-            this.serviceManager.setProvider(this.minecraft, serviceClass, serviceImpl);
-            return true;
-        } catch (ProviderExistsException e) {
-            log().warn("Non-Lantern {} already registered: {}", serviceClass.getSimpleName(), e.getLocalizedMessage());
-            return false;
-        }
+    private <T> void registerService(Class<T> serviceClass, T serviceImpl) {
+        this.serviceManager.setProvider(this.minecraft, serviceClass, serviceImpl);
     }
 
     public void setGameState(GameState gameState) {
@@ -510,7 +520,7 @@ public class LanternGame implements Game {
 
     @Override
     public CommandManager getCommandManager() {
-        return this.serviceManager.provideUnchecked(CommandManager.class);
+        return this.commandManager;
     }
 
     @Override

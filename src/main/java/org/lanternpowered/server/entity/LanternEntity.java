@@ -42,6 +42,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.persistence.InvalidDataException;
@@ -54,6 +55,8 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 @NonnullByDefault
 public class LanternEntity extends BaseComponentHolder implements Entity {
@@ -93,6 +96,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity {
     public void setRawData(DataContainer container) throws InvalidDataException {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public int getContentVersion() {
+        return 0;
     }
 
     @Override
@@ -153,6 +161,31 @@ public class LanternEntity extends BaseComponentHolder implements Entity {
     public boolean transferToWorld(UUID uuid, Vector3d position) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Override
+    public Optional<Entity> getPassenger() {
+        return null;
+    }
+
+    @Override
+    public DataTransactionResult setPassenger(@Nullable Entity entity) {
+        return null;
+    }
+
+    @Override
+    public Optional<Entity> getVehicle() {
+        return null;
+    }
+
+    @Override
+    public DataTransactionResult setVehicle(@Nullable Entity entity) {
+        return null;
+    }
+
+    @Override
+    public Entity getBaseVehicle() {
+        return null;
     }
 
     @Override
@@ -418,4 +451,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity {
         return false;
     }
 
+    @Override public Translation getTranslation() {
+        return null;
+    }
 }

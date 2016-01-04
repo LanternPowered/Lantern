@@ -24,12 +24,44 @@
  */
 package org.lanternpowered.server.data.type;
 
+import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.type.StoneType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.translation.Translation;
 
-@NonnullByDefault
-public interface LanternStoneType extends StoneType {
+public enum LanternStoneType implements StoneType, SimpleCatalogType, InternalCatalogType {
 
-    byte getInternalId();
+    STONE               ("stone", "stone"),
+    GRANITE             ("granite", "granite"),
+    GRANITE_SMOOTH      ("smooth_granite", "graniteSmooth"),
+    DIORITE             ("diorite", "diorite"),
+    DIORITE_SMOOTH      ("smooth_diorite", "dioriteSmooth"),
+    ANDESITE            ("andesite", "andesite"),
+    ANDESITE_SMOOTH     ("smooth_andesite", "andesiteSmooth");
+
+    private final String identifier;
+    private final Translation translation;
+
+    LanternStoneType(String identifier, String translationPart) {
+        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+                "tile.stone." + translationPart + ".name");
+        this.identifier = identifier;
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
+    }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
+    }
 
 }

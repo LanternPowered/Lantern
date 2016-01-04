@@ -31,7 +31,6 @@ import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.Ban.Builder;
 import org.spongepowered.api.util.ban.BanType;
@@ -110,7 +109,7 @@ public final class BanBuilder implements Ban.Builder {
 
     @Override
     public BanBuilder source(@Nullable CommandSource source) {
-        this.source = source == null ? null : Texts.of(source.getName());
+        this.source = source == null ? null : Text.of(source.getName());
         return this;
     }
 

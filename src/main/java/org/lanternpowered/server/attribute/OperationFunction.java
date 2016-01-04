@@ -42,4 +42,5 @@ public interface OperationFunction {
      *         is applied to it
      */
     double getIncrementation(double base, double modifier, double currentValue);
+
 }

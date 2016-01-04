@@ -52,7 +52,6 @@ import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageH
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
@@ -399,7 +398,7 @@ public class Session implements PlayerConnection {
             LanternGame.log().error("Error in network input!", throwable);
         } else {
             if (this.quitReason == null) {
-                this.quitReason = Texts.of("Message read error: " + throwable);
+                this.quitReason = Text.of("Message read error: " + throwable);
             }
             this.channel.close();
         }
@@ -417,7 +416,7 @@ public class Session implements PlayerConnection {
             // Probably a network-level error - consider the client gone
         } else {
             if (this.quitReason == null) {
-                this.quitReason = Texts.of("Message write error: " + throwable);
+                this.quitReason = Text.of("Message write error: " + throwable);
             }
             this.channel.close();
         }
@@ -527,11 +526,9 @@ public class Session implements PlayerConnection {
     /**
      * Disconnects the session. This causes a KickMessage to be sent. When it
      * has been delivered, the channel is closed.
-     * 
-     * @param reason The reason for disconnection.
      */
     public void disconnect() {
-        this.disconnect(Texts.of("No reason specified."));
+        this.disconnect(Text.of("No reason specified."));
     }
 
     /**
@@ -542,7 +539,7 @@ public class Session implements PlayerConnection {
      * @param objects The reason for disconnection.
      */
     public void disconnect(Object... objects) {
-        this.disconnect(Texts.of(objects), false);
+        this.disconnect(Text.of(objects), false);
     }
 
     /**

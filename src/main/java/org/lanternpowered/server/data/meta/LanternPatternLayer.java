@@ -63,6 +63,11 @@ public final class LanternPatternLayer implements PatternLayer {
     }
 
     @Override
+    public int getContentVersion() {
+        return 0;
+    }
+
+    @Override
     public DataContainer toContainer() {
         return new MemoryDataContainer().set(BANNER_SHAPE, this.shape.getId()).set(DYE_COLOR, this.color.getName());
     }

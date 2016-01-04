@@ -39,8 +39,6 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
@@ -57,9 +55,9 @@ public final class CommandHelp {
     public static CommandSpec create() {
         return CommandSpec
                 .builder()
-                .arguments(optional(string(Texts.of("command"))))
-                .description(Texts.of("View a list of all commands"))
-                .extendedDescription(Texts.of("View a list of all commands. Hover over\n" + " a command to view its description."
+                .arguments(optional(string(Text.of("command"))))
+                .description(Text.of("View a list of all commands"))
+                .extendedDescription(Text.of("View a list of all commands. Hover over\n" + " a command to view its description."
                         + " Click\n a command to insert it into your chat bar."))
                 .executor((src, args) -> {
                     Optional<String> command = args.getOne("command");
@@ -71,11 +69,11 @@ public final class CommandHelp {
                             if (desc.isPresent()) {
                                 src.sendMessage(desc.get());
                             } else {
-                                src.sendMessage(Texts.of("Usage: /", command.get(), callable.getUsage(src)));
+                                src.sendMessage(Text.of("Usage: /", command.get(), callable.getUsage(src)));
                             }
                             return CommandResult.success();
                         }
-                        throw new CommandException(Texts.of("No such command: ", command.get()));
+                        throw new CommandException(Text.of("No such command: ", command.get()));
                     }
 
                     TreeSet<CommandMapping> commands = new TreeSet<>(comparator);
@@ -85,7 +83,7 @@ public final class CommandHelp {
                     // Console sources cannot see/use the pagination
                     boolean paginate = !(src instanceof ConsoleSource);
 
-                    Text title = Texts.builder("Available commands:").color(TextColors.DARK_GREEN).build();
+                    Text title = Text.builder("Available commands:").color(TextColors.DARK_GREEN).build();
                     Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
 
                     if (paginate) {
@@ -104,7 +102,7 @@ public final class CommandHelp {
     @SuppressWarnings("unchecked")
     private static Text getDescription(CommandSource source, CommandMapping mapping) {
         final Optional<Text> description = (Optional<Text>) mapping.getCallable().getShortDescription(source);
-        TextBuilder text = Texts.builder("/" + mapping.getPrimaryAlias());
+        Text.Builder text = Text.builder("/" + mapping.getPrimaryAlias());
         text.color(TextColors.GREEN);
         text.style(TextStyles.UNDERLINE);
         text.onClick(TextActions.suggestCommand("/" + mapping.getPrimaryAlias()));
@@ -112,7 +110,7 @@ public final class CommandHelp {
         if (longDescription.isPresent()) {
             text.onHover(TextActions.showText(longDescription.get()));
         }
-        return Texts.of(text, " ", description.orElse(mapping.getCallable().getUsage(source)));
+        return Text.of(text, " ", description.orElse(mapping.getCallable().getUsage(source)));
     }
 
     private CommandHelp() {

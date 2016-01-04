@@ -29,13 +29,19 @@ import org.lanternpowered.server.permission.AbstractSubjectBase;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.sink.MessageSink;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 
-public class RconSource extends AbstractSubjectBase implements AbstractCommandSource, org.spongepowered.api.command.source.RconSource {
+@NonnullByDefault
+public final class RconSource extends AbstractSubjectBase implements AbstractCommandSource, org.spongepowered.api.command.source.RconSource {
+
+    public static final String NAME_PREFIX = "Rcon";
+    public static final String NAME_FULL_PREFIX = NAME_PREFIX + "{";
+    public static final String NAME_POSTFIX = "}";
 
     private final StringBuffer buffer = new StringBuffer();
     private final RconConnection connection;
@@ -49,12 +55,21 @@ public class RconSource extends AbstractSubjectBase implements AbstractCommandSo
 
     @Override
     public String getName() {
-        return "Rcon{ " + this.connection.getAddress() + "}";
+        return NAME_FULL_PREFIX + this.connection.getAddress().getHostName() + NAME_POSTFIX;
     }
 
     @Override
     public void sendMessage(Text message) {
-        this.buffer.append(Texts.toPlain(message)).append('\n');
+        this.buffer.append(TextSerializers.PLAIN.serialize(message)).append('\n');
+    }
+
+    @Override
+    public MessageChannel getMessageChannel() {
+        return MessageChannel.TO_ALL;
+    }
+
+    @Override
+    public void setMessageChannel(MessageChannel channel) {
     }
 
     @Override
@@ -98,12 +113,4 @@ public class RconSource extends AbstractSubjectBase implements AbstractCommandSo
         return result;
     }
 
-    @Override
-    public MessageSink getMessageSink() {
-        return null;
-    }
-
-    @Override
-    public void setMessageSink(MessageSink sink) {
-    }
 }

@@ -35,9 +35,9 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.source.RemoteSource;
+import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.world.World;
 
 import java.net.InetAddress;
@@ -48,7 +48,7 @@ import java.util.function.Function;
 /**
  * A context calculator handling world contexts.
  */
-public class LanternContextCalculator implements ContextCalculator {
+public class LanternContextCalculator implements ContextCalculator<Subject> {
 
     private final LoadingCache<RemoteSource, Set<Context>> remoteIpCache = buildAddressCache(Context.REMOTE_IP_KEY,
             input -> input.getConnection().getAddress().getAddress());

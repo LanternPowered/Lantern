@@ -24,7 +24,7 @@
  */
 package org.lanternpowered.server.text.xml;
 
-import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.text.Text;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Span extends Element {
 
     @Override
-    protected void modifyBuilder(TextBuilder builder) {
+    protected void modifyBuilder(Text.Builder builder) {
     }
 
 }

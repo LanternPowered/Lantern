@@ -37,7 +37,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.spongepowered.api.entity.living.player.tab.PlayerTabInfo;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.ArrayDeque;
@@ -54,8 +53,8 @@ public class LanternTabList implements TabList {
     private final List<LanternPlayerTabInfo> infoEntries = Lists.newArrayList();
     private final LanternPlayer player;
 
-    private Text header = Texts.of();
-    private Text footer = Texts.of();
+    private Text header = Text.EMPTY;
+    private Text footer = Text.EMPTY;
 
     public LanternTabList(LanternPlayer player) {
         this.player = player;

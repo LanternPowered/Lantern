@@ -24,12 +24,41 @@
  */
 package org.lanternpowered.server.data.type;
 
+import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.type.DirtType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.translation.Translation;
 
-@NonnullByDefault
-public interface LanternDirtType extends DirtType {
+public enum LanternDirtType implements DirtType, SimpleCatalogType, InternalCatalogType {
 
-    byte getInternalId();
+    DIRT            ("dirt", "default"),
+    COARSE_DIRT     ("coarse_dirt", "coarse"),
+    PODZOL          ("podzol", "podzol"),
+    ;
+
+    private final String identifier;
+    private final Translation translation;
+
+    LanternDirtType(String identifier, String translationPart) {
+        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+                "tile.dirt." + translationPart + ".name");
+        this.identifier = identifier;
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
+    }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
+    }
 
 }

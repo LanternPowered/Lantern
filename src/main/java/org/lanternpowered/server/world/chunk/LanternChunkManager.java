@@ -42,6 +42,7 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
@@ -51,6 +52,7 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.extent.ExtentBufferHelper;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.chunk.ForcedChunkEvent;
@@ -624,8 +626,7 @@ public final class LanternChunkManager {
             final int sy = y >> 4;
             final int index = ((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf;
             final short[] types = this.types[sy];
-            final short type = game.getRegistry().getBlockRegistry()
-                    .getInternalStateId(block);
+            final short type = Registries.getBlockRegistry().getStateInternalIdAndData(block);
             if (type == 0 && types[index] != 0) {
                 this.nonAirCount[sy]--;
             } else if (type != 0 && types[index] == 0) {
@@ -637,8 +638,8 @@ public final class LanternChunkManager {
         @Override
         public BlockState getBlock(int x, int y, int z) {
             this.checkRange(x, y, z);
-            return game.getRegistry().getBlockRegistry().getStateByInternalId(
-                    this.types[y >> 4][((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf]);
+            return Registries.getBlockRegistry().getStateByInternalIdAndData(this.types[y >> 4][((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf])
+                    .orElse(BlockTypes.AIR.getDefaultState());
         }
 
         @Override

@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.network.rcon;
 
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -35,11 +36,13 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 
 import java.net.InetSocketAddress;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class RconServer extends BaseRconService {
 
-    private final Set<RconSource> sources = Sets.newConcurrentHashSet();
+    private final Map<String, RconSource> sourcesByHostname = Maps.newConcurrentMap();
 
     private ServerBootstrap bootstrap;
     private EventLoopGroup bossGroup;
@@ -55,7 +58,6 @@ public class RconServer extends BaseRconService {
      * Initializes the rcon server.
      * 
      * @param address the address to bind to
-     * @param password the password
      * @return the channel future
      */
     public ChannelFuture bind(final InetSocketAddress address) {
@@ -115,7 +117,7 @@ public class RconServer extends BaseRconService {
      * @param source the source
      */
     public void onChannelActive(Channel channel, RconSource source) {
-        this.sources.add(source);
+        this.sourcesByHostname.put(source.getConnection().getAddress().getHostName(), source);
     }
 
     /**
@@ -125,11 +127,16 @@ public class RconServer extends BaseRconService {
      * @param source the source
      */
     public void onChannelInactive(Channel channel, RconSource source) {
-        this.sources.remove(source);
+        this.sourcesByHostname.remove(source.getConnection().getAddress().getHostName());
+    }
+
+    public Optional<RconSource> getByHostName(String hostname) {
+        return Optional.ofNullable(this.sourcesByHostname.get(hostname));
     }
 
     @Override
     public boolean isRconEnabled() {
         return this.bootstrap != null;
     }
+
 }

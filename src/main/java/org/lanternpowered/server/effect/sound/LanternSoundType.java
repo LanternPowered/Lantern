@@ -24,15 +24,15 @@
  */
 package org.lanternpowered.server.effect.sound;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
-public final class LanternSoundType extends SimpleLanternCatalogType implements SoundType {
+public final class LanternSoundType extends LanternCatalogType implements SoundType {
 
-    public LanternSoundType(String identifier) {
-        super(identifier);
+    public LanternSoundType(String identifier, String name) {
+        super(identifier, name);
     }
 
 }

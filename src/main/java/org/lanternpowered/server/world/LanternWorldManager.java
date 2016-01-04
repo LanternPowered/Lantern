@@ -831,7 +831,7 @@ public final class LanternWorldManager {
 
         // Generate the root (default) world if missing
         if (rootWorldProperties == null) {
-            final LanternWorldCreationSettings settings = new LanternWorldCreationSettingsBuilder(this.game)
+            final LanternWorldCreationSettings settings = new LanternWorldCreationSettingsBuilder()
                     .name(this.rootWorldFolder.toFile().getName())
                     .dimension(DimensionTypes.OVERWORLD)
                     .generator(GeneratorTypes.FLAT) // TODO: Use the default generator type once implemented
@@ -840,7 +840,7 @@ public final class LanternWorldManager {
                     .loadsOnStartup(true)
                     .enabled(true)
                     .build();
-            rootWorldProperties = (LanternWorldProperties) this.createWorld(settings, 0).get();
+            rootWorldProperties = this.createWorld(settings, 0).get();
         }
 
         // Get all the dimensions (worlds) that should be loaded

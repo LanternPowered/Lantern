@@ -55,7 +55,7 @@ public class UserCollection extends LanternSubjectCollection {
         return get(uuidToGameProfile(uid));
     }
 
-    protected Subject get(GameProfile profile) {
+    public Subject get(GameProfile profile) {
         return new UserSubject(profile, this);
     }
 
@@ -98,4 +98,5 @@ public class UserCollection extends LanternSubjectCollection {
     public LanternPermissionService getService() {
         return this.service;
     }
+
 }

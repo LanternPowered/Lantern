@@ -75,6 +75,11 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     }
 
     @Override
+    public int getContentVersion() {
+        return 0;
+    }
+
+    @Override
     public DataContainer toContainer() {
         return new MemoryDataContainer()
             .set(Queries.WORLD_ID, this.world.getUniqueId().toString())

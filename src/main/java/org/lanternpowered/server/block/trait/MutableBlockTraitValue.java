@@ -39,6 +39,7 @@ public class MutableBlockTraitValue<V extends Comparable<V>> extends LanternValu
     @SuppressWarnings("unchecked")
     @Override
     public ImmutableBlockTraitValue<V> asImmutable() {
-        return new ImmutableBlockTraitValue<V>((BlockTraitKey<V, ? extends MutableBlockTraitValue<V>>) this.getKey(), this.get());
+        return new ImmutableBlockTraitValue<>((BlockTraitKey<V, ? extends MutableBlockTraitValue<V>>) this.getKey(), this.get());
     }
+
 }

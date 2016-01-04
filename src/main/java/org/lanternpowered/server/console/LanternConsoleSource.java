@@ -33,9 +33,8 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.sink.MessageSink;
-import org.spongepowered.api.text.sink.MessageSinks;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -46,22 +45,23 @@ import javax.annotation.Nullable;
 @NonnullByDefault
 public final class LanternConsoleSource extends AbstractSubjectBase implements AbstractCommandSource, ConsoleSource {
 
+    public static final String NAME = "Server";
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
 
-    @Nullable private MessageSink messageSink;
+    @Nullable private MessageChannel messageChannel;
 
     private LanternConsoleSource() {
     }
 
     @Override
     public String getName() {
-        return "Console";
+        return NAME;
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void sendMessage(Text message) {
-        LanternGame.log().info(Texts.legacy().to(message));
+        LanternGame.log().info(TextSerializers.LEGACY_FORMATTING_CODE.serialize(message));
     }
 
     @Override
@@ -86,16 +86,16 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements A
     }
 
     @Override
-    public MessageSink getMessageSink() {
-        if (this.messageSink == null) {
-            this.messageSink = MessageSinks.toAll();
+    public MessageChannel getMessageChannel() {
+        if (this.messageChannel == null) {
+            this.messageChannel = MessageChannel.TO_ALL;
         }
-        return this.messageSink;
+        return this.messageChannel;
     }
 
     @Override
-    public void setMessageSink(MessageSink sink) {
-        this.messageSink = checkNotNull(sink, "sink");
+    public void setMessageChannel(MessageChannel channel) {
+        this.messageChannel = checkNotNull(channel, "channel");
     }
 
 }

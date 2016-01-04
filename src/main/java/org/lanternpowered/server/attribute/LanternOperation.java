@@ -25,7 +25,9 @@
 package org.lanternpowered.server.attribute;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.spongepowered.api.util.annotation.CatalogedBy;
 
+@CatalogedBy(LanternOperations.class)
 public class LanternOperation extends SimpleLanternCatalogType implements Comparable<LanternOperation> {
 
     private final int priority;

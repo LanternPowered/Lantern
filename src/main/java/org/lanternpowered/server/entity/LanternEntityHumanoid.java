@@ -115,4 +115,5 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
         // TODO Auto-generated method stub
         
     }
+
 }

@@ -33,8 +33,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 
@@ -207,10 +205,10 @@ public final class ChoicesElement extends CommandElement {
     @Override
     public Text getUsage(CommandSource src) {
         if (this.choicesInUsage) {
-            final TextBuilder build = Texts.builder();
+            final Text.Builder build = Text.builder();
             build.append(CommandMessageFormatting.LT_TEXT);
             for (Iterator<String> it = this.choicesFunction.apply(src).keySet().iterator(); it.hasNext();) {
-                build.append(Texts.of(it.next()));
+                build.append(Text.of(it.next()));
                 if (it.hasNext()) {
                     build.append(CommandMessageFormatting.PIPE_TEXT);
                 }

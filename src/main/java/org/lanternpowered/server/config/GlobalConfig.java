@@ -38,7 +38,6 @@ import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
 import org.lanternpowered.server.util.IpSet;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -134,11 +133,11 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "message-of-the-day", comment =
                 "This is the message that will be displayed in the\n " +
                 "server list.")
-        private Text motd = Texts.of("A lantern minecraft server!");
+        private Text motd = Text.of("A lantern minecraft server!");
 
         @Setting(value = "shutdown-message", comment =
                 "This is the default message that will be displayed when the server is shut down.")
-        private Text shutdownMessage = Texts.of("Server shutting down.");
+        private Text shutdownMessage = Text.of("Server shutting down.");
 
         @Setting(value = "network-compression-threshold")
         private int networkCompressionThreshold = 256;

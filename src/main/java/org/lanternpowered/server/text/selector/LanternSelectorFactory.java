@@ -30,8 +30,8 @@ import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.registry.type.text.SelectorTypeRegistryModule;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.text.selector.Argument;
 import org.spongepowered.api.text.selector.ArgumentHolder;
@@ -39,7 +39,6 @@ import org.spongepowered.api.text.selector.ArgumentHolder.Limit;
 import org.spongepowered.api.text.selector.ArgumentType;
 import org.spongepowered.api.text.selector.ArgumentTypes;
 import org.spongepowered.api.text.selector.Selector;
-import org.spongepowered.api.text.selector.SelectorBuilder;
 import org.spongepowered.api.text.selector.SelectorFactory;
 import org.spongepowered.api.text.selector.SelectorType;
 
@@ -102,15 +101,15 @@ public class LanternSelectorFactory implements SelectorFactory {
 
     private final Map<String, ArgumentHolder.Limit<ArgumentType<Integer>>> scoreToTypeMap = Maps.newLinkedHashMap();
     private final Map<String, ArgumentType<?>> argumentLookupMap = Maps.newLinkedHashMap();
-    private final CatalogTypeRegistry<SelectorType> selectorTypeRegistry;
+    private final SelectorTypeRegistryModule selectorTypeRegistry;
 
-    public LanternSelectorFactory(CatalogTypeRegistry<SelectorType> selectorTypeRegistry) {
+    public LanternSelectorFactory(SelectorTypeRegistryModule selectorTypeRegistry) {
         this.selectorTypeRegistry = selectorTypeRegistry;
     }
 
     @Override
-    public SelectorBuilder createBuilder(SelectorType type) {
-        return new LanternSelectorBuilder(type);
+    public Selector.Builder createBuilder() {
+        return new LanternSelectorBuilder();
     }
 
     @Override
@@ -126,8 +125,8 @@ public class LanternSelectorFactory implements SelectorFactory {
                     selector);
         }
         String typeStr = selector.substring(1, argListIndex);
-        checkArgument(this.selectorTypeRegistry.has(typeStr), "No type known as '%s'", typeStr);
-        SelectorType type = this.selectorTypeRegistry.get(typeStr).get();
+        Optional<SelectorType> optSelectorType = this.selectorTypeRegistry.getById(typeStr);
+        checkArgument(optSelectorType.isPresent(), "No type known as '%s'", typeStr);
         try {
             Map<String, String> rawMap;
             if (argListIndex == selector.length()) {
@@ -136,7 +135,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                 rawMap = this.parseArgumentsMap(selector.substring(argListIndex + 1, selector.length() - 1));
             }
             Map<ArgumentType<?>, Argument<?>> arguments = parseArguments(rawMap);
-            return new LanternSelector(type, ImmutableMap.copyOf(arguments));
+            return new LanternSelector(optSelectorType.get(), ImmutableMap.copyOf(arguments));
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid selector " + selector, e);
         }

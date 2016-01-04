@@ -295,6 +295,11 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
+    public int getContentVersion() {
+        return 0;
+    }
+
+    @Override
     public DataContainer toContainer() {
         // TODO Auto-generated method stub
         return null;

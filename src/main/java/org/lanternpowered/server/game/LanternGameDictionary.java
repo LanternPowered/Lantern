@@ -27,46 +27,35 @@ package org.lanternpowered.server.game;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.SetMultimap;
 import org.spongepowered.api.GameDictionary;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 @NonnullByDefault
 public final class LanternGameDictionary implements GameDictionary {
 
-    private final Map<String, Set<ItemType>> map = Maps.newConcurrentMap();
+    private final SetMultimap<String, GameDictionary.Entry> map = HashMultimap.create();
 
     @Override
-    public void register(String key, ItemType type) {
+    public void register(String key, Entry entry) {
         checkNotNullOrEmpty(key, "key");
-        checkNotNull(type, "type");
-        this.map.computeIfAbsent(key, key0 -> Sets.newConcurrentHashSet()).add(type);
+        checkNotNull(entry, "entry");
+        this.map.put(key, entry);
     }
 
     @Override
-    public Set<ItemType> get(String key) {
-        Set<ItemType> set = this.map.get(checkNotNull(key, "key"));
-        if (set != null) {
-            return ImmutableSet.copyOf(set);
-        }
-        return ImmutableSet.of();
+    public Set<Entry> get(String key) {
+        return ImmutableSet.copyOf(this.map.get(key));
     }
 
     @Override
-    public Map<String, Set<ItemType>> getAllItems() {
-        ImmutableMap.Builder<String, Set<ItemType>> builder = ImmutableMap.builder();
-        for (Entry<String, Set<ItemType>> en : this.map.entrySet()) {
-            builder.put(en.getKey(), ImmutableSet.copyOf(en.getValue()));
-        }
-        return builder.build();
+    public SetMultimap<String, Entry> getAll() {
+        return ImmutableSetMultimap.copyOf(this.map);
     }
 
 }

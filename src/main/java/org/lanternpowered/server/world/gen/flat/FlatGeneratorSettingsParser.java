@@ -26,10 +26,10 @@ package org.lanternpowered.server.world.gen.flat;
 
 import com.flowpowered.math.GenericMath;
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.block.LanternBlocks;
-import org.lanternpowered.server.world.biome.LanternBiomes;
+import org.lanternpowered.server.game.registry.Registries;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.util.Coerce;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -57,13 +57,13 @@ public final class FlatGeneratorSettingsParser {
             }
             final BlockState block = layer.getBlockState();
             builder.append(block.getType().getId());
-            final int data = LanternBlocks.reg().getStateData(block);
+            final int data = Registries.getBlockRegistry().getStateData(block);
             if (data > 0) {
                 builder.append(':').append(data);
             }
         }
 
-        builder.append(';').append(LanternBiomes.getId(settings.getBiomeType())).append(';');
+        builder.append(';').append(Registries.getBiomeRegistry().getInternalId(settings.getBiomeType())).append(';');
         // TODO: Add structures
         return builder.toString();
     }
@@ -94,13 +94,14 @@ public final class FlatGeneratorSettingsParser {
                     if (parts1.length > 1) {
                         blockData = Coerce.toInteger(parts[1]);
                     }
-                    blockType = LanternBlocks.reg().getTypeByInternalId(Coerce.toInteger(parts[1]));
+                    blockType = Registries.getBlockRegistry().getStateByInternalId(Coerce.toInteger(parts[1]))
+                            .orElse(BlockTypes.AIR.getDefaultState()).getType();
                 } else {
                     parts1 = parts1[index1].split(":", 3);
                     String name = parts1.length > 1 ? parts1[0] + ':' + parts1[1] : parts1[0];
-                    blockType = LanternBlocks.reg().get(name).orElse(null);
+                    blockType = Registries.getBlockRegistry().getById(name).orElse(BlockTypes.AIR);
                     if (blockType == null) {
-                        blockType = LanternBlocks.reg().get(parts1[0]).orElse(null);
+                        blockType = Registries.getBlockRegistry().getById(parts1[0]).orElse(null);
                         if (parts1.length > 1) {
                             blockData = Coerce.toInteger(parts1[1]);
                         }
@@ -111,15 +112,15 @@ public final class FlatGeneratorSettingsParser {
                 if (blockType == null) {
                     return null;
                 }
-                layers.add(new FlatLayer(LanternBlocks.reg().getStateByTypeAndData(blockType,
-                        (byte) GenericMath.clamp(blockData, 0x0, 0xff)), depth));
+                layers.add(new FlatLayer(Registries.getBlockRegistry().getStateByTypeAndData(
+                        blockType, (byte) GenericMath.clamp(blockData, 0x0, 0xff)).orElse(BlockTypes.AIR.getDefaultState()), depth));
             }
         }
         BiomeType biomeType = BiomeTypes.PLAINS;
         if (version > 0 && parts.length > index) {
             Integer biomeId = Coerce.asInteger(parts[index]).orElse(null);
             if (biomeId != null) {
-                BiomeType biomeType0 = LanternBiomes.getById(biomeId);
+                BiomeType biomeType0 = Registries.getBiomeRegistry().getByInternalId(biomeId).orElse(BiomeTypes.OCEAN);
                 if (biomeType0 != null) {
                     biomeType = biomeType0;
                 }

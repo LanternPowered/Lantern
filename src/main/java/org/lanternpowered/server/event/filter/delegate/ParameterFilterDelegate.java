@@ -33,4 +33,5 @@ import java.lang.reflect.Parameter;
 public interface ParameterFilterDelegate {
 
     void write(ClassWriter cw, MethodVisitor mv, Method method, Parameter param, int localParam);
+
 }

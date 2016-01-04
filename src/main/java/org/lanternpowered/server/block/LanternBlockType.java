@@ -41,7 +41,8 @@ import java.util.Optional;
 public class LanternBlockType extends SimpleLanternCatalogType implements BlockType {
 
     // The block state base which contains all the possible block states
-    final LanternBlockStateBase blockStateBase;
+    private final LanternBlockStateBase blockStateBase;
+    private BlockState defaultBlockState;
     private boolean tickRandomly;
 
     public LanternBlockType(String identifier, Matter matter) {
@@ -57,6 +58,24 @@ public class LanternBlockType extends SimpleLanternCatalogType implements BlockT
 
         // Create the block state base
         this.blockStateBase = new LanternBlockStateBase(this, blockTraits);
+        this.defaultBlockState = this.blockStateBase.getBaseState();
+    }
+
+    protected void setDefaultBlockState(BlockState blockState) {
+        this.defaultBlockState = blockState;
+    }
+
+    protected BlockState getBaseBlockState() {
+        return this.blockStateBase.getBaseState();
+    }
+
+    /**
+     * Gets the base of the block state.
+     *
+     * @return the block state base
+     */
+    public LanternBlockStateBase getBlockStateBase() {
+        return this.blockStateBase;
     }
 
     @Override
@@ -78,7 +97,7 @@ public class LanternBlockType extends SimpleLanternCatalogType implements BlockT
 
     @Override
     public BlockState getDefaultState() {
-        return this.blockStateBase.getDefaultBlockState();
+        return this.defaultBlockState;
     }
 
     @Override

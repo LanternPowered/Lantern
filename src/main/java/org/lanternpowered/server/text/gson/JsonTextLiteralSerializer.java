@@ -32,28 +32,27 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.lang.reflect.Type;
 
-public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Literal>, JsonDeserializer<Text.Literal> {
+public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<LiteralText>, JsonDeserializer<LiteralText> {
 
     @Override
-    public Text.Literal deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public LiteralText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         if (json.isJsonPrimitive()) {
-            return Texts.of(json.getAsString());
+            return Text.of(json.getAsString());
         }
         JsonObject json0 = json.getAsJsonObject();
-        TextBuilder.Literal builder = Texts.builder(json0.get("text").getAsString());
+        LiteralText.Builder builder = Text.builder(json0.get("text").getAsString());
         this.deserialize(json0, builder, context);
         return builder.build();
     }
 
     @Override
-    public JsonElement serialize(Text.Literal src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(LiteralText src, Type typeOfSrc, JsonSerializationContext context) {
         if (!src.getHoverAction().isPresent() && !src.getClickAction().isPresent() &&
                 src.getStyle().isEmpty() && src.getColor().equals(TextColors.NONE)) {
             return new JsonPrimitive(src.getContent());

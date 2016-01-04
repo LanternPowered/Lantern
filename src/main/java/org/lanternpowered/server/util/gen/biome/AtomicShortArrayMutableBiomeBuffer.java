@@ -25,8 +25,8 @@
 package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
-import org.lanternpowered.server.world.biome.LanternBiomes;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
@@ -65,7 +65,7 @@ public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffe
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
         this.checkRange(x, z);
-        this.biomes.set(this.index(x, z), LanternBiomes.getId(biome));
+        this.biomes.set(this.index(x, z), Registries.getBiomeRegistry().getInternalId(biome));
     }
 
     @Override
@@ -76,9 +76,7 @@ public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffe
     @Override
     public BiomeType getBiome(int x, int z) {
         this.checkRange(x, z);
-        short biomeId = this.biomes.get(this.index(x, z));
-        BiomeType biomeType = LanternBiomes.getById(biomeId);
-        return biomeType == null ? BiomeTypes.OCEAN : biomeType;
+        return Registries.getBiomeRegistry().getByInternalId(this.biomes.get(this.index(x, z))).orElse(BiomeTypes.OCEAN);
     }
 
     @Override

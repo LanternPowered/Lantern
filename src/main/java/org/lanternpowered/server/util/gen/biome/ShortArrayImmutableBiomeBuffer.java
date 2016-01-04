@@ -25,7 +25,7 @@
 package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector2i;
-import org.lanternpowered.server.world.biome.LanternBiomes;
+import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewTransform;
 import org.spongepowered.api.util.DiscreteTransform2;
@@ -59,9 +59,7 @@ public final class ShortArrayImmutableBiomeBuffer extends AbstractBiomeBuffer im
     @Override
     public BiomeType getBiome(int x, int z) {
         this.checkRange(x, z);
-        short biomeId = this.biomes[this.index(x, z)];
-        BiomeType biomeType = LanternBiomes.getById(biomeId);
-        return biomeType == null ? BiomeTypes.OCEAN : biomeType;
+        return Registries.getBiomeRegistry().getByInternalId(this.biomes[this.index(x, z)]).orElse(BiomeTypes.OCEAN);
     }
 
     @Override

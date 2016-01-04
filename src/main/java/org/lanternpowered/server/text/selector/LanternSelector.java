@@ -31,9 +31,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.text.selector.Argument;
 import org.spongepowered.api.text.selector.ArgumentType;
 import org.spongepowered.api.text.selector.Selector;
-import org.spongepowered.api.text.selector.SelectorBuilder;
 import org.spongepowered.api.text.selector.SelectorType;
-import org.spongepowered.api.text.selector.Selectors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
@@ -145,10 +143,8 @@ public class LanternSelector implements Selector {
     }
 
     @Override
-    public SelectorBuilder builder() {
-        SelectorBuilder builder = Selectors.builder(this.getType());
-        builder.add(this.getArguments());
-        return builder;
+    public Builder toBuilder() {
+        return new LanternSelectorBuilder(this);
     }
 
     private String buildString() {

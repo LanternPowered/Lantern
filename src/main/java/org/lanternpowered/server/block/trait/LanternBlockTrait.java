@@ -77,6 +77,7 @@ public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T>
 
     @Override
     public Predicate<T> getPredicate() {
-        return input -> this.possibleValues.contains(input);
+        return this.possibleValues::contains;
     }
+
 }

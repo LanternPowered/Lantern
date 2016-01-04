@@ -29,8 +29,8 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.util.TextMessageException;
+import org.spongepowered.api.text.serializer.TextParseException;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 public final class TextTypeSerializer implements TypeSerializer<Text> {
 
@@ -39,21 +39,21 @@ public final class TextTypeSerializer implements TypeSerializer<Text> {
         final String value0 = value.getString();
         try {
             // Try to deserialize as xml
-            return Texts.xml().from(value0);
-        } catch (TextMessageException e0) {
+            return TextSerializers.TEXT_XML.deserialize(value0);
+        } catch (TextParseException e0) {
             try {
                 // Try to deserialize as json
-                return Texts.json().from(value0);
-            } catch (TextMessageException e1) {
+                return TextSerializers.JSON.deserialize(value0);
+            } catch (TextParseException e1) {
                 // No format is possible, use plain
-                return Texts.of(value0);
+                return Text.of(value0);
             }
         }
     }
 
     @Override
     public void serialize(TypeToken<?> type, Text obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(Texts.xml().to(obj));
+        value.setValue(TextSerializers.TEXT_XML.serialize(obj));
     }
 
 }

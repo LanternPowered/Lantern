@@ -25,11 +25,12 @@
 package org.lanternpowered.server.permission;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.service.LanternServiceListeners;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Collections;
@@ -50,14 +51,15 @@ public interface AbstractSubject extends Subject {
 
     Tristate getPermissionDefault(String permission);
 
+    default void initSubject() {
+        LanternServiceListeners.getInstance().registerExpirableServiceCallback(PermissionService.class, new SubjectSettingCallback(this));
+    }
+
     @Nullable
     default Subject findPermissionSubject() {
         Optional<PermissionService> service = LanternGame.get().getServiceManager().provide(PermissionService.class);
         if (service.isPresent()) {
-            SubjectCollection userSubjects = service.get().getSubjects(this.getSubjectCollectionIdentifier());
-            if (userSubjects != null) {
-                return userSubjects.get(this.getIdentifier());
-            }
+            new SubjectSettingCallback(this).test(service.get());
         }
         return null;
     }

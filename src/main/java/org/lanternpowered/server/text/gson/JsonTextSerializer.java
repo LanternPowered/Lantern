@@ -31,7 +31,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import org.lanternpowered.server.text.translation.TranslationManager;
+import org.spongepowered.api.text.LiteralText;
+import org.spongepowered.api.text.ScoreText;
+import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TranslatableText;
 
 import java.lang.reflect.Type;
 
@@ -47,11 +51,10 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
     public static GsonBuilder applyTo(GsonBuilder gsonBuilder, TranslationManager translationManager,
             boolean translateNonMinecraft) {
         gsonBuilder.registerTypeAdapter(Text.class, new JsonTextSerializer());
-        gsonBuilder.registerTypeAdapter(Text.Literal.class, new JsonTextLiteralSerializer());
-        gsonBuilder.registerTypeAdapter(Text.Placeholder.class, new JsonTextPlaceholderSerializer());
-        gsonBuilder.registerTypeAdapter(Text.Score.class, new JsonTextScoreSerializer());
-        gsonBuilder.registerTypeAdapter(Text.Selector.class, new JsonTextSelectorSerializer());
-        gsonBuilder.registerTypeAdapter(Text.Translatable.class, new JsonTextTranslatableSerializer(translationManager,
+        gsonBuilder.registerTypeAdapter(LiteralText.class, new JsonTextLiteralSerializer());
+        gsonBuilder.registerTypeAdapter(ScoreText.class, new JsonTextScoreSerializer());
+        gsonBuilder.registerTypeAdapter(SelectorText.class, new JsonTextSelectorSerializer());
+        gsonBuilder.registerTypeAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(translationManager,
                 translateNonMinecraft));
         return gsonBuilder;
     }
@@ -59,19 +62,17 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
     @Override
     public Text deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         if (json.isJsonPrimitive()) {
-            return context.deserialize(json, Text.Literal.class);
+            return context.deserialize(json, LiteralText.class);
         }
         JsonObject json0 = json.getAsJsonObject();
-        if (json0.has("placeholderKey")) {
-            return context.deserialize(json, Text.Placeholder.class);
-        } else if (json0.has("text")) {
-            return context.deserialize(json, Text.Literal.class);
+        if (json0.has("text")) {
+            return context.deserialize(json, LiteralText.class);
         } else if (json0.has("translate")) {
-            return context.deserialize(json, Text.Translatable.class);
+            return context.deserialize(json, TranslatableText.class);
         } else if (json0.has("score")) {
-            return context.deserialize(json, Text.Score.class);
+            return context.deserialize(json, ScoreText.class);
         } else if (json0.has("selector")) {
-            return context.deserialize(json, Text.Selector.class);
+            return context.deserialize(json, SelectorText.class);
         } else {
             throw new JsonParseException("Unknown text format: " + json.toString());
         }

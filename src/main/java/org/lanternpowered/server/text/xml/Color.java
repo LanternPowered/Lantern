@@ -25,7 +25,7 @@
 package org.lanternpowered.server.text.xml;
 
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
 import java.util.Optional;
@@ -55,7 +55,7 @@ public class Color extends Element {
     }
 
     @Override
-    protected void modifyBuilder(TextBuilder builder) {
+    protected void modifyBuilder(Text.Builder builder) {
         if (this.name == null && this.n != null) {
             this.name = this.n;
         }

@@ -26,7 +26,7 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.World;
 
 import java.lang.ref.WeakReference;
@@ -77,7 +77,7 @@ public final class WeakWorldReference {
         if (world != null) {
             return Optional.of(world);
         }
-        world = LanternGame.get().getServer().getWorld(this.uniqueId).orElse(null);
+        world = Sponge.getServer().getWorld(this.uniqueId).orElse(null);
         if (world != null) {
             this.world = new WeakReference<>(world);
             return Optional.of(world);

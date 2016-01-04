@@ -64,4 +64,5 @@ public class LanternBiomeType extends LanternPluginCatalogType implements BiomeT
     public void setHumidity(double humidity) {
         this.humidity = humidity;
     }
+
 }

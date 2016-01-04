@@ -31,12 +31,10 @@ import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Collection;
 import java.util.Set;
 
-@NonnullByDefault
 public final class LanternSkinPart extends SimpleLanternCatalogType implements SkinPart {
 
     private static final TIntObjectMap<LanternSkinPart> lookup = new TIntObjectHashMap<>();
@@ -44,10 +42,14 @@ public final class LanternSkinPart extends SimpleLanternCatalogType implements S
     private final int mask;
     private final int index;
 
+    private final Translation translation;
+
     public LanternSkinPart(String identifier, int index) {
         super(identifier);
         this.mask = index << 1;
         this.index = index;
+        this.translation =  LanternGame.get().getRegistry().getTranslationManager().get(
+                "options.modelPart." + identifier);
         // Add to the lookup
         // TODO: Should this be moved to the registry?
         lookup.put(index, this);
@@ -59,8 +61,7 @@ public final class LanternSkinPart extends SimpleLanternCatalogType implements S
 
     @Override
     public Translation getTranslation() {
-        return LanternGame.get().getRegistry().getTranslationManager().get(
-                "options.modelPart." + this.getId());
+        return this.translation;
     }
 
     /**

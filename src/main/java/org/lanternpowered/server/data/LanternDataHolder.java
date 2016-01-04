@@ -43,6 +43,11 @@ import java.util.function.Function;
 public class LanternDataHolder implements DataHolder {
 
     @Override
+    public int getContentVersion() {
+        return 0;
+    }
+
+    @Override
     public DataContainer toContainer() {
         // TODO Auto-generated method stub
         return null;

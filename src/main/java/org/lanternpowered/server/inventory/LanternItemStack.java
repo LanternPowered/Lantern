@@ -78,6 +78,11 @@ public class LanternItemStack implements ItemStack {
     }
 
     @Override
+    public int getContentVersion() {
+        return 0;
+    }
+
+    @Override
     public DataContainer toContainer() {
         // TODO Auto-generated method stub
         return null;
@@ -229,12 +234,6 @@ public class LanternItemStack implements ItemStack {
 
     @Override
     public Set<ImmutableValue<?>> getValues() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Text toText() {
         // TODO Auto-generated method stub
         return null;
     }

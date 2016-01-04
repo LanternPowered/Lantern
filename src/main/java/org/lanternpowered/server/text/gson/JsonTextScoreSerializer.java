@@ -35,28 +35,28 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.objective.Objective;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.ScoreText;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.lang.reflect.Type;
 import java.util.Iterator;
 import java.util.Optional;
 
-public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Score>, JsonDeserializer<Text.Score> {
+public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<ScoreText>, JsonDeserializer<ScoreText> {
 
     @Override
-    public Text.Score deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public ScoreText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json0 = json.getAsJsonObject();
         // TODO: Wait for sponge to figure out the format and scoreboard implementation
         return null;
     }
 
     @Override
-    public JsonElement serialize(Text.Score src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(ScoreText src, Type typeOfSrc, JsonSerializationContext context) {
         // TODO: Verify and modify once we know how sponge will handle it
         JsonObject json = new JsonObject();
         Score score = src.getScore();
-        json.addProperty("name", Texts.toPlain(score.getName()));
+        json.addProperty("name", TextSerializers.PLAIN.serialize(score.getName()));
         Iterator<Objective> it = score.getObjectives().iterator();
         json.addProperty("objective", it.next().getName());
         if (it.hasNext()) {

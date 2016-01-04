@@ -47,8 +47,7 @@ public final class CacheBuilderHelper {
      * @param equivalence the equivalence strategy to apply
      * @return the builder for chaining
      */
-    public static <K, V> CacheBuilder<K, V> keyEquivalence(CacheBuilder<K, V> builder,
-            Equivalence<K> equivalence) {
+    public static <K, V> CacheBuilder<K, V> keyEquivalence(CacheBuilder<K, V> builder, Equivalence<K> equivalence) {
         checkNotNull(builder, "cacheBuilder");
         try {
             if (keyEquivalenceMethod == null) {
@@ -76,8 +75,7 @@ public final class CacheBuilderHelper {
      * @param equivalence the equivalence strategy to apply
      * @return the builder for chaining
      */
-    public static <K, V> CacheBuilder<K, V> valueEquivalence(CacheBuilder<K, V> builder,
-            Equivalence<V> equivalence) {
+    public static <K, V> CacheBuilder<K, V> valueEquivalence(CacheBuilder<K, V> builder, Equivalence<V> equivalence) {
         checkNotNull(builder, "cacheBuilder");
         try {
             if (valueEquivalenceMethod == null) {

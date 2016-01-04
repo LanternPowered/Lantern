@@ -30,7 +30,7 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeSign;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 public final class CodecPlayInChangeSign implements Codec<MessagePlayInChangeSign> {
 
@@ -46,7 +46,7 @@ public final class CodecPlayInChangeSign implements Codec<MessagePlayInChangeSig
         for (int i = 0; i < lines.length; i++) {
             // In the current protocol version are the lines send in json format,
             // this will change in 1.9
-            lines[i] = Texts.toPlain(Texts.json().fromUnchecked(context.read(buf, String.class)));
+            lines[i] = TextSerializers.PLAIN.serialize(TextSerializers.JSON.deserializeUnchecked(context.read(buf, String.class)));
         }
         return new MessagePlayInChangeSign(position, lines);
     }

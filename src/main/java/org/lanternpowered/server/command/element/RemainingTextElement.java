@@ -31,7 +31,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
 import java.util.List;
 
@@ -48,7 +47,7 @@ public final class RemainingTextElement extends CommandElement {
 
     @Override
     protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        Text text = Texts.of(args.getRaw().substring(args.getRawPosition()));
+        Text text = Text.of(args.getRaw().substring(args.getRawPosition()));
         // Move the position to the end
         while (args.hasNext()) {
             args.next();

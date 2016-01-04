@@ -33,6 +33,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.util.persistence.DataBuilder;
+import org.spongepowered.api.util.persistence.DataContentUpdater;
 
 import java.util.Optional;
 
@@ -50,6 +51,16 @@ public final class LanternDataManager implements DataManager {
     public <T extends DataSerializable> void registerBuilder(Class<T> clazz, DataBuilder<T> builder) {
         // TODO Auto-generated method stub
         
+    }
+
+    @Override
+    public <T extends DataSerializable> void registerContentUpdater(Class<T> clazz, DataContentUpdater updater) {
+
+    }
+
+    @Override
+    public <T extends DataSerializable> Optional<DataContentUpdater> getWrappedContentUpdater(Class<T> clazz, int fromVersion, int toVersion) {
+        return null;
     }
 
     @Override

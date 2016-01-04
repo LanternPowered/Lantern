@@ -26,10 +26,9 @@ package org.lanternpowered.server.network.vanilla.message.processor.play;
 
 import com.flowpowered.math.vector.Vector3f;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
-import org.lanternpowered.server.item.LanternItems;
+import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -86,12 +85,12 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             ItemType itemType = item.getType();
             int extraData = 0;
             if (type == ParticleTypes.ITEM_CRACK) {
-                extraData = LanternItems.getId(itemType);
+                extraData = Registries.getItemRegistry().getInternalId(itemType);
             } else if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
                 BlockType blockType = itemType.getBlock().orElse(null);
                 // Only block types are allowed
                 if (blockType != null) {
-                    int id = LanternBlocks.reg().getInternalTypeId(blockType);
+                    int id = Registries.getBlockRegistry().getStateInternalId(blockType.getDefaultState());
                     int data = 0; // TODO: Retrieve data value from item stack
                     extraData = data << 12 | id;
                 }
@@ -103,8 +102,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         } else if (effect instanceof BlockParticle) {
             if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
                 BlockState blockState = ((BlockParticle) effect).getBlockState();
-                int id = LanternBlocks.reg().getInternalTypeId(blockState.getType());
-                int data = LanternBlocks.reg().getStateData(blockState);
+                int id = Registries.getBlockRegistry().getStateInternalId(blockState);
+                int data = Registries.getBlockRegistry().getStateData(blockState);
                 extra = new int[] { data << 12 | id };
             } else {
                 return;

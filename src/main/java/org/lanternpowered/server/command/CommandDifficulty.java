@@ -35,7 +35,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -53,9 +53,9 @@ public final class CommandDifficulty {
 
         return CommandSpec.builder()
                 .arguments(
-                        ChoicesElement.of(Texts.of("difficulty"), baseBuilder.build(),
+                        ChoicesElement.of(Text.of("difficulty"), baseBuilder.build(),
                                 aliasesBuilder.build(), false, true),
-                        GenericArguments.optional(GenericArguments.world(Texts.of("world"))))
+                        GenericArguments.optional(GenericArguments.world(Text.of("world"))))
                 .permission("minecraft.command.difficulty")
                 .executor((src, args) -> {
                     WorldProperties world;
@@ -64,7 +64,7 @@ public final class CommandDifficulty {
                     } else if (src instanceof LocatedSource) {
                         world = ((LocatedSource) src).getWorld().getProperties();
                     } else {
-                        throw new CommandException(Texts.of("Non-located sources must specify a world."));
+                        throw new CommandException(Text.of("Non-located sources must specify a world."));
                     }
                     Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
                     world.setDifficulty(difficulty);

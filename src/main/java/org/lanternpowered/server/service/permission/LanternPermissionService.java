@@ -28,19 +28,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.rcon.RconServer;
+import org.lanternpowered.server.network.rcon.RconSource;
 import org.lanternpowered.server.service.permission.base.FixedParentMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.context.ContextCalculator;
+import org.spongepowered.api.service.rcon.RconService;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -73,15 +77,19 @@ public class LanternPermissionService implements PermissionService {
         this.subjects.put(SUBJECTS_GROUP, new OpLevelCollection(this));
 
         this.subjects.put(SUBJECTS_COMMAND_BLOCK, new DataFactoryCollection(SUBJECTS_COMMAND_BLOCK, this,
-                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, getGroupForOpLevel(2)), NO_COMMAND_SOURCE));
+                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, this.getGroupForOpLevel(2)), NO_COMMAND_SOURCE));
 
         this.subjects.put(SUBJECTS_SYSTEM, new DataFactoryCollection(SUBJECTS_SYSTEM, this,
-                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, getGroupForOpLevel(4)),
+                s -> new FixedParentMemorySubjectData(LanternPermissionService.this, this.getGroupForOpLevel(4)),
                 s -> {
-                    if (s.equals("Server")) {
+                    if (s.equals(LanternConsoleSource.NAME)) {
                         return LanternGame.get().getServer().getConsole();
-                    } else if (s.equals("RCON")) {
-                        // TODO: Implement RCON API?
+                    } else if (s.startsWith(RconSource.NAME_PREFIX)) {
+                        String hostName = s.substring(RconSource.NAME_FULL_PREFIX.length(), s.length() - RconSource.NAME_POSTFIX.length());
+                        RconService rconService = LanternGame.get().getServiceManager().provideUnchecked(RconService.class);
+                        if (rconService instanceof RconServer) {
+                            return ((RconServer) rconService).getByHostName(hostName).orElse(null);
+                        }
                     }
                     return null;
                 }));
@@ -125,8 +133,7 @@ public class LanternPermissionService implements PermissionService {
     }
 
     private SubjectCollection newCollection(String identifier) {
-        return new DataFactoryCollection(identifier, this,
-                s -> new GlobalMemorySubjectData(LanternPermissionService.this), NO_COMMAND_SOURCE);
+        return new DataFactoryCollection(identifier, this, s -> new GlobalMemorySubjectData(LanternPermissionService.this), NO_COMMAND_SOURCE);
     }
 
     @Override

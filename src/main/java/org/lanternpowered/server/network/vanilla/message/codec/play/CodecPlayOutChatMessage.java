@@ -31,9 +31,11 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.object.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
-import org.spongepowered.api.text.Texts;
+import org.lanternpowered.server.text.LanternTextSerializer;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.Locale;
 
@@ -54,7 +56,8 @@ public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMe
         } else if (type == ChatTypes.ACTION_BAR) {
             value = 2;
             // Fix the message format
-            text = new LocalizedText(Texts.builder(Texts.legacy().to(text.getText())).build(), Locale.ENGLISH);
+            text = new LocalizedText(Text.builder(((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE)
+                    .serialize(text.getText(), text.getLocale())).build(), text.getLocale());
         } else {
             throw new CodecException("Unknown chat type: " + type.getName());
         }

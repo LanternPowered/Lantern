@@ -34,7 +34,7 @@ import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
@@ -119,8 +119,7 @@ public class UserSubject extends LanternSubject {
         if (ret == Tristate.UNDEFINED) {
             ret = getDataPermissionValue(this.collection.getService().getDefaultData(), permission);
         }
-        if (ret == Tristate.UNDEFINED && this.getOpLevel() >= LanternGame.get().getGlobalConfig()
-                .getDefaultOpPermissionLevel()) {
+        if (ret == Tristate.UNDEFINED && this.getOpLevel() >= LanternGame.get().getGlobalConfig().getDefaultOpPermissionLevel()) {
             ret = Tristate.TRUE;
         }
         return ret;

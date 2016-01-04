@@ -31,7 +31,7 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 public final class CommandSeed {
@@ -39,7 +39,7 @@ public final class CommandSeed {
     public static CommandSpec create() {
         return CommandSpec.builder()
                 .arguments(
-                        GenericArguments.optional(GenericArguments.world(Texts.of("world"))))
+                        GenericArguments.optional(GenericArguments.world(Text.of("world"))))
                 .permission("minecraft.command.seed")
                 .executor((src, args) -> {
                     WorldProperties world;

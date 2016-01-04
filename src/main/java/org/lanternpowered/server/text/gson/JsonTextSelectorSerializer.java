@@ -31,28 +31,25 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.selector.Selector;
-import org.spongepowered.api.text.selector.Selectors;
 
 import java.lang.reflect.Type;
 
-public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Selector>,
-        JsonDeserializer<Text.Selector> {
+public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<SelectorText>,
+        JsonDeserializer<SelectorText> {
 
     @Override
-    public Text.Selector deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public SelectorText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json0 = json.getAsJsonObject();
-        Selector selector = Selectors.parse(json0.get("selector").getAsString());
-        TextBuilder.Selector builder = Texts.builder(selector);
+        Selector selector = Selector.parse(json0.get("selector").getAsString());
+        SelectorText.Builder builder = SelectorText.builder(selector);
         this.deserialize(json0, builder, context);
         return builder.build();
     }
 
     @Override
-    public JsonElement serialize(Text.Selector src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(SelectorText src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject json = new JsonObject();
         json.addProperty("selector", src.getSelector().toPlain());
         this.serialize(json, src, context);

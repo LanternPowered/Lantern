@@ -29,7 +29,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 import com.google.common.collect.ImmutableMap;
 import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.Ansi.Color;
-import org.lanternpowered.server.text.LegacyTextRepresentation;
+import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Map.Entry;
@@ -40,7 +40,7 @@ import java.util.regex.Pattern;
 public class ColoredConsoleFormatter implements Function<String, String> {
 
     private static Pattern c(char code) {
-        return Pattern.compile(String.valueOf(LegacyTextRepresentation.DEFAULT_CHAR) + code, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+        return Pattern.compile(String.valueOf(FormattingCodeTextSerializer.DEFAULT_CHAR) + code, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
     }
 
     private static final String RESET = ansi().reset().toString();

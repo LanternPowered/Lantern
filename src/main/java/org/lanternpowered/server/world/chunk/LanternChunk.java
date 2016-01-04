@@ -36,21 +36,21 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
-import org.lanternpowered.server.block.LanternBlocks;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
+import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.concurrent.AtomicByteArray;
 import org.lanternpowered.server.util.concurrent.AtomicNibbleArray;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
 import org.lanternpowered.server.world.LanternWorld;
-import org.lanternpowered.server.world.biome.LanternBiomes;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.ScheduledBlockUpdate;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.DataContainer;
@@ -78,6 +78,7 @@ import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.Extent;
 
 import java.nio.charset.StandardCharsets;
@@ -717,7 +718,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
-        this.setType(x, y, z, LanternBlocks.reg().getInternalStateId(block));
+        this.setType(x, y, z, Registries.getBlockRegistry().getStateInternalIdAndData(block));
     }
 
     private void checkAreaBounds(int x, int z) {
@@ -759,7 +760,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return LanternBlocks.reg().getStateByInternalId(this.getType(x, y, z));
+        return Registries.getBlockRegistry().getStateByInternalIdAndData(this.getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
     }
 
     @Override
@@ -769,7 +770,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
-        this.setBiomeId(x, z, LanternBiomes.getId(biome));
+        this.setBiomeId(x, z, Registries.getBiomeRegistry().getInternalId(biome));
     }
 
     @Override
@@ -794,7 +795,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BiomeType getBiome(int x, int z) {
-        return LanternBiomes.getById(this.getBiomeId(x, z));
+        return Registries.getBiomeRegistry().getByInternalId(this.getBiomeId(x, z)).orElse(BiomeTypes.OCEAN);
     }
 
     @Override

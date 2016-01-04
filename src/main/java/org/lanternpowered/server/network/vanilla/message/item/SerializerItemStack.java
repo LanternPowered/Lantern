@@ -30,6 +30,7 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializer;
 import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils;
+import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -40,7 +41,7 @@ import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
 import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.List;
 import java.util.Locale;
@@ -79,13 +80,14 @@ public class SerializerItemStack implements ObjectSerializer<ItemStack> {
         DisplayNameData name = object.get(DisplayNameData.class).orElse(null);
         if (name != null && name.customNameVisible().get()) {
             display = tag.createView(DataQuery.of("display"));
-            display.set(DataQuery.of("Name"), Texts.legacy().to(name.displayName().get(), locale));
+            display.set(DataQuery.of("Name"), ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE).serialize(
+                    name.displayName().get(), locale));
         }
         LoreData lore = object.get(LoreData.class).orElse(null);
         if (lore != null) {
             List<String> lines = Lists.newArrayList();
             for (Text line : lore.lore()) {
-                lines.add(Texts.legacy().to(line, locale));
+                lines.add(((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE).serialize(line, locale));
             }
             if (display == null) {
                 display = tag.createView(DataQuery.of("display"));

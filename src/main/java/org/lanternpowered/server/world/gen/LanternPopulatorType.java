@@ -26,6 +26,7 @@ package org.lanternpowered.server.world.gen;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.PopulatorType;
@@ -34,20 +35,15 @@ import javax.annotation.Nullable;
 
 public final class LanternPopulatorType extends LanternPluginCatalogType implements PopulatorType {
 
-    public final Class<? extends Populator> populatorClass;
+    private final Translation translation;
 
-    public LanternPopulatorType(String name, Class<? extends Populator> populatorClass) {
-        this("minecraft", name, populatorClass);
+    public LanternPopulatorType(String name) {
+        this("minecraft", name);
     }
 
-    public LanternPopulatorType(String pluginId, String name, Class<? extends Populator> populatorClass) {
+    public LanternPopulatorType(String pluginId, String name) {
         super(pluginId, name);
-        this.populatorClass = populatorClass;
-    }
-
-    @Override
-    public Class<? extends Populator> getPopulatorClass() {
-        return this.populatorClass;
+        this.translation = LanternGame.get().getRegistry().getTranslationManager().get("populator." + name + ".name");
     }
 
     @Override
@@ -56,12 +52,7 @@ public final class LanternPopulatorType extends LanternPluginCatalogType impleme
             return false;
         }
         final LanternPopulatorType other = (LanternPopulatorType) obj;
-        if (!this.getId().equals(other.getId())) {
-            return false;
-        } else if (!this.populatorClass.equals(other.populatorClass)) {
-            return false;
-        }
-        return true;
+        return this.getId().equals(other.getId());
     }
 
     @Override
@@ -75,13 +66,12 @@ public final class LanternPopulatorType extends LanternPluginCatalogType impleme
                 .add("id", this.getId())
                 .add("name", this.getName())
                 .add("pluginId", this.getPluginId())
-                .add("class", this.populatorClass.getName())
                 .toString();
     }
 
     @Override
     public Translation getTranslation() {
-        return null;
+        return this.translation;
     }
 
 }

@@ -26,8 +26,7 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.block.LanternBlocks;
-import org.lanternpowered.server.world.biome.LanternBiomes;
+import org.lanternpowered.server.game.registry.Registries;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
 import org.spongepowered.api.world.extent.BlockVolume;
@@ -45,7 +44,7 @@ public final class ExtentBufferHelper {
         int i = 0;
         for (int y = min.getY(); y <= max.getY(); y++) {
             for (int x = min.getX(); x <= max.getX(); x++) {
-                copy[i++] = LanternBiomes.getId(area.getBiome(y, x));
+                copy[i++] = Registries.getBiomeRegistry().getInternalId(area.getBiome(y, x));
             }
         }
         return copy;
@@ -80,7 +79,7 @@ public final class ExtentBufferHelper {
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
                 for (int y = min.getY(); y <= max.getY(); y++) {
-                    copy[i++] = LanternBlocks.reg().getInternalStateId(volume.getBlock(x, y, z));
+                    copy[i++] = Registries.getBlockRegistry().getStateInternalIdAndData(volume.getBlock(x, y, z));
                 }
             }
         }

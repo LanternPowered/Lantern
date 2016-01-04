@@ -36,15 +36,14 @@ import com.google.gson.JsonSerializer;
 import org.lanternpowered.server.text.translation.MinecraftTranslation;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.reflect.Type;
 import java.util.Locale;
 
-public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<Text.Translatable>,
-        JsonDeserializer<Text.Translatable> {
+public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<TranslatableText>,
+        JsonDeserializer<TranslatableText> {
 
     private final static ThreadLocal<Locale> currentLocale = ThreadLocal.withInitial(() -> Locale.ENGLISH);
 
@@ -74,7 +73,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
     }
 
     @Override
-    public Text.Translatable deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+    public TranslatableText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json0 = json.getAsJsonObject();
         String name = json0.get("translate").getAsString();
         Translation translation = this.translationManager.get(name);
@@ -86,13 +85,13 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
         } else {
             arguments = new Object[0];
         }
-        TextBuilder.Translatable builder = Texts.builder(translation, arguments);
+        TranslatableText.Builder builder = Text.builder(translation, arguments);
         this.deserialize(json0, builder, context);
         return builder.build();
     }
 
     @Override
-    public JsonElement serialize(Text.Translatable src, Type typeOfSrc, JsonSerializationContext context) {
+    public JsonElement serialize(TranslatableText src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject json = new JsonObject();
         Translation translation = src.getTranslation();
         if (this.translateNonMinecraft && !(translation instanceof MinecraftTranslation)) {

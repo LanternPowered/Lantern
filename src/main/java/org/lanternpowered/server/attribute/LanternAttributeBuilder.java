@@ -28,15 +28,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.ResettableBuilder;
 
 import java.util.function.Predicate;
 
-public final class LanternAttributeBuilder {
-
-    private final CatalogTypeRegistry<LanternAttribute> registry;
+public final class LanternAttributeBuilder implements ResettableBuilder<LanternAttribute, LanternAttributeBuilder>{
 
     private String identifier;
     private Text name;
@@ -47,8 +45,7 @@ public final class LanternAttributeBuilder {
 
     private Predicate<DataHolder> targets;
 
-    public LanternAttributeBuilder(CatalogTypeRegistry<LanternAttribute> registry) {
-        this.registry = checkNotNull(registry, "registry");
+    public LanternAttributeBuilder() {
         this.reset();
     }
 
@@ -84,15 +81,17 @@ public final class LanternAttributeBuilder {
 
     public LanternAttribute build() {
         checkState(this.identifier != null, "identifier is not set");
-        checkState(!this.registry.get(this.identifier).isPresent(), "identifier already in use");
         checkState(this.name != null, "name is not set");
         checkState(this.min != null, "minimum is not set");
         checkState(this.max != null, "maximum is not set");
         checkState(this.def != null, "defaultValue is not set");
         checkState(this.def >= this.min && this.def <= this.max, "defaultValue must scale between the minimum and maximum value");
-        LanternAttribute attribute = new LanternAttribute(this.identifier, this.name, this.min, this.max, this.def, this.targets);
-        this.registry.register(attribute);
-        return attribute;
+        return new LanternAttribute(this.identifier, this.name, this.min, this.max, this.def, this.targets);
+    }
+
+    @Override
+    public LanternAttributeBuilder from(LanternAttribute value) {
+        return this;
     }
 
     public LanternAttributeBuilder reset() {

@@ -95,6 +95,11 @@ public final class LanternGameProfile implements GameProfile {
     }
 
     @Override
+    public int getContentVersion() {
+        return 0;
+    }
+
+    @Override
     public DataContainer toContainer() {
         DataContainer container = new MemoryDataContainer()
                 .set(NAME, this.name)

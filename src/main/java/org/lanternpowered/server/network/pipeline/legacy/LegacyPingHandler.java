@@ -41,7 +41,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.InetSocketAddress;
 import java.util.stream.Collectors;
@@ -149,7 +149,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                 online = -1;
             }
 
-            String motd0 = Texts.legacy().to(motd);
+            String motd0 = TextSerializers.LEGACY_FORMATTING_CODE.serialize(motd);
             StringBuilder builder = new StringBuilder();
 
             if (full) {

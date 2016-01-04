@@ -40,7 +40,8 @@ import org.spongepowered.api.util.Color;
 
 import javax.annotation.Nullable;
 
-public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<ParticleEffect, ParticleType, ParticleEffect.Builder> {
+public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<ParticleEffect, ParticleType, ParticleEffect.Builder>
+        implements ParticleEffect.Builder {
 
     @Override
     public LanternParticleEffect build() {

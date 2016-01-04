@@ -27,13 +27,12 @@ package org.lanternpowered.server.network.message.codec.object;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
 import java.util.Locale;
 
 public final class LocalizedText {
 
-    public static final LocalizedText EMPTY = new LocalizedText(Texts.of());
+    public static final LocalizedText EMPTY = new LocalizedText(Text.EMPTY);
 
     private final Locale locale;
     private final Text text;
@@ -54,4 +53,5 @@ public final class LocalizedText {
     public Text getText() {
         return this.text;
     }
+
 }

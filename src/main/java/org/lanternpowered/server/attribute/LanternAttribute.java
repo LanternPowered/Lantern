@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
 import java.util.function.Predicate;
 
@@ -43,7 +42,7 @@ public class LanternAttribute extends LanternCatalogType {
     private final double def;
 
     LanternAttribute(String identifier, Text name, double max, double min, double def, Predicate<DataHolder> targets) {
-        super(identifier, Texts.toPlain(name));
+        super(identifier, name.toPlain());
 
         this.name = checkNotNull(name, "name");
         this.targets = checkNotNull(targets, "targets");

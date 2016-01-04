@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -58,9 +60,9 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.sink.MessageSink;
-import org.spongepowered.api.text.sink.MessageSinks;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
@@ -84,6 +86,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
+@NonnullByDefault
 public class LanternServer implements Server {
 
     public static void main(String[] args) {
@@ -206,11 +209,14 @@ public class LanternServer implements Server {
     // The key pair used for authentication
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
 
+    // The broadcast channel
+    private volatile MessageChannel broadcastChannel = MessageChannel.TO_ALL;
+
     // The game instance
     private final LanternGame game;
 
     // The console manager
-    private ConsoleManager consoleManager;
+    private final ConsoleManager consoleManager;
 
     // The maximum amount of players that can join
     private int maxPlayers;
@@ -491,8 +497,13 @@ public class LanternServer implements Server {
     }
 
     @Override
-    public MessageSink getBroadcastSink() {
-        return MessageSinks.toAll();
+    public MessageChannel getBroadcastChannel() {
+        return this.broadcastChannel;
+    }
+
+    @Override
+    public void setBroadcastChannel(MessageChannel channel) {
+        this.broadcastChannel = checkNotNull(channel, "channel");
     }
 
     @Override
@@ -528,6 +539,7 @@ public class LanternServer implements Server {
     @SuppressWarnings("deprecation")
     @Override
     public void shutdown(Text kickMessage) {
+        checkNotNull(kickMessage, "kickMessage");
         if (this.shuttingDown) {
             return;
         }
@@ -538,7 +550,7 @@ public class LanternServer implements Server {
                 GameState.SERVER_STOPPING));
 
         // Debug a message
-        LanternGame.log().info("Stopping the server... ({})", Texts.legacy().to(kickMessage));
+        LanternGame.log().info("Stopping the server... ({})", TextSerializers.LEGACY_FORMATTING_CODE.serialize(kickMessage));
 
         // Stop the console
         this.consoleManager.shutdown();
@@ -639,4 +651,5 @@ public class LanternServer implements Server {
     public Optional<WorldProperties> createWorldProperties(WorldCreationSettings settings) {
         return this.worldManager.createWorld(settings);
     }
+
 }

@@ -51,8 +51,8 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
         checkNotNull(possibleValues, "possibleValues");
         checkState(possibleValues.length != 0, "possibleValues may not be empty");
         ImmutableSet.Builder<Integer> builder = ImmutableSet.builder();
-        for (int i = 0; i < possibleValues.length; i++) {
-            builder.add(possibleValues[i]);
+        for (int possibleValue : possibleValues) {
+            builder.add(possibleValue);
         }
         return new LanternIntegerTrait(name, builder.build());
     }
@@ -94,4 +94,5 @@ public final class LanternIntegerTrait extends LanternBlockTrait<Integer> implem
         }
         return new LanternIntegerTrait(name, set.build());
     }
+
 }

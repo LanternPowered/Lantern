@@ -38,7 +38,6 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.query.QueryServerEvent;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.World;
 
 import java.net.InetSocketAddress;
@@ -129,7 +128,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         // TODO: Find out how to support the size and max size properties
         final QueryServerEvent.Basic event = SpongeEventFactory.createQueryServerEventBasic(
                 Cause.of(ctx.channel().remoteAddress()), (InetSocketAddress) ctx.channel().localAddress(),
-                "SMP", this.getWorldName(), Texts.toPlain(server.getMotd()), server.getMaxPlayers(),
+                "SMP", this.getWorldName(), server.getMotd().toPlain(), server.getMaxPlayers(),
                 Integer.MAX_VALUE, server.getOnlinePlayers().size(), 0);
         LanternGame.get().getEventManager().post(event);
 
@@ -176,7 +175,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
         final QueryServerEvent.Full event = SpongeEventFactory.createQueryServerEventFull(
                 Cause.of(ctx.channel().remoteAddress()), (InetSocketAddress) ctx.channel().localAddress(), Maps.newHashMap(), "MINECRAFT",
-                "SMP", this.getWorldName(), Texts.toPlain(game.getServer().getMotd()), game.getServer().getOnlinePlayers()
+                "SMP", this.getWorldName(), game.getServer().getMotd().toPlain(), game.getServer().getOnlinePlayers()
                 .stream().map(p -> p.getName()).collect(Collectors.toList()), plugins.toString(), game.getMinecraftPlugin().getVersion(),
                 game.getServer().getMaxPlayers(), Integer.MAX_VALUE, game.getServer().getOnlinePlayers().size(), 0);
         final InetSocketAddress address = event.getAddress();

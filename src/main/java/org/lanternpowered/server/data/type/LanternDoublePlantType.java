@@ -24,13 +24,44 @@
  */
 package org.lanternpowered.server.data.type;
 
+import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.type.DoublePlantType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.translation.Translation;
 
-@NonnullByDefault
-public interface LanternDoublePlantType extends DoublePlantType, SimpleCatalogType {
+public enum LanternDoublePlantType implements DoublePlantType, SimpleCatalogType, InternalCatalogType {
 
-    byte getInternalId();
+    SUNFLOWER       ("sunflower", "sunflower"),
+    SYRINGA         ("syringa", "syringa"),
+    GRASS           ("double_grass", "grass"),
+    FERN            ("double_fern", "fern"),
+    ROSE            ("double_rose", "rose"),
+    PAEONIA         ("paeonia", "paeonia"),
+    ;
+
+    private final String identifier;
+    private final Translation translation;
+
+    LanternDoublePlantType(String identifier, String translationPart) {
+        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+                "tile.doublePlant." + translationPart + ".name");
+        this.identifier = identifier;
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
+    }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
+    }
 
 }

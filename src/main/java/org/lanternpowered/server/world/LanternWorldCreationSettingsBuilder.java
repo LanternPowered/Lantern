@@ -28,8 +28,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.catalog.CatalogTypeRegistry;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -51,8 +51,6 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 public final class LanternWorldCreationSettingsBuilder implements WorldCreationSettings.Builder {
-
-    private final LanternGame game;
 
     @Nullable private String name;
     private GameMode gameMode;
@@ -80,8 +78,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
 
     private long seed;
 
-    public LanternWorldCreationSettingsBuilder(LanternGame game) {
-        this.game = game;
+    public LanternWorldCreationSettingsBuilder() {
         this.reset();
     }
 
@@ -185,11 +182,10 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
     public LanternWorldCreationSettingsBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
         Set<WorldGeneratorModifier> entries = Sets.newHashSet();
-        CatalogTypeRegistry<WorldGeneratorModifier> registry = this.game.getRegistry()
-                .getWorldGeneratorModifierRegistry();
+        GeneratorModifierRegistryModule registry = LanternGame.get().getRegistry().getWorldGeneratorModifierRegistry();
         for (WorldGeneratorModifier modifier : modifiers) {
             checkNotNull(modifier, "modifier");
-            checkState(registry.has(modifier), "Modifier not registered: " + modifier.getId()
+            checkState(registry.getById(modifier.getId()).isPresent(), "Modifier not registered: " + modifier.getId()
                         + " of type " + modifier.getClass().getName());
             entries.add(modifier);
         }

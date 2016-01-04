@@ -56,12 +56,11 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
-import org.spongepowered.api.text.sink.MessageSink;
-import org.spongepowered.api.text.sink.MessageSinks;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -77,11 +76,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     private final User user;
     private final LanternGameProfile gameProfile;
+    private final Session session;
 
     @Nullable private volatile Subject subject;
 
-    private Session session = null;
-    private MessageSink messageSink = MessageSinks.toAll();
+    private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     // The (client) locale of the player
     private Locale locale = Locale.ENGLISH;
@@ -103,11 +102,13 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     // Whether you should ignore this player when checking for sleeping players to reset the time
     private boolean sleepingIgnored;
 
-    public LanternPlayer(LanternGameProfile gameProfile) {
+    public LanternPlayer(LanternGameProfile gameProfile, Session session) {
+        this.session = session;
         this.gameProfile = gameProfile;
         // Get or create the user object
         this.user = LanternGame.get().getServiceManager().provideUnchecked(UserStorageService.class)
                 .getOrCreate(gameProfile);
+        this.initSubject();
     }
 
     public User getUserObject() {
@@ -115,8 +116,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public void setInternalSubject(Subject subj) {
-        this.subject = subj;
+    public void setInternalSubject(Subject subject) {
+        this.subject = subject;
     }
 
     @Override
@@ -175,13 +176,13 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public MessageSink getMessageSink() {
-        return this.messageSink;
+    public MessageChannel getMessageChannel() {
+        return this.messageChannel;
     }
 
     @Override
-    public void setMessageSink(MessageSink sink) {
-        this.messageSink = checkNotNull(sink, "sink");
+    public void setMessageChannel(MessageChannel channel) {
+        this.messageChannel = checkNotNull(channel, "channel");
     }
 
     @Override
@@ -307,4 +308,5 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void setSleepingIgnored(boolean sleepingIgnored) {
         this.sleepingIgnored = sleepingIgnored;
     }
+
 }

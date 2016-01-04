@@ -64,7 +64,7 @@ public final class ObjectArrayImmutableBiomeBuffer extends AbstractBiomeBuffer i
     @Override
     public BiomeType getBiome(int x, int z) {
         this.checkRange(x, z);
-        return (BiomeType) this.biomes[this.index(x, z)];
+        return this.biomes[this.index(x, z)];
     }
 
     @Override
@@ -105,4 +105,5 @@ public final class ObjectArrayImmutableBiomeBuffer extends AbstractBiomeBuffer i
     public ImmutableBiomeArea getImmutableBiomeCopy() {
         return this;
     }
+
 }

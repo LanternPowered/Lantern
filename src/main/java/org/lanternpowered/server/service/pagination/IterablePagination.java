@@ -32,7 +32,6 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,11 +56,11 @@ class IterablePagination extends ActivePagination {
     @Override
     protected Iterable<Text> getLines(int page) throws CommandException {
         if (!this.countIterator.hasNext()) {
-            throw new CommandException(Texts.of("Already at end of iterator"));
+            throw new CommandException(Text.of("Already at end of iterator"));
         }
 
         if (page <= this.lastPage) {
-            throw new CommandException(Texts.of("Cannot go backward in an IterablePagination"));
+            throw new CommandException(Text.of("Cannot go backward in an IterablePagination"));
         } else if (page > this.lastPage + 1) {
             getLines(page - 1);
         }
@@ -110,7 +109,7 @@ class IterablePagination extends ActivePagination {
 
     @Override
     public void previousPage() throws CommandException {
-        throw new CommandException(Texts.of("Cannot go backwards in a streaming pagination"));
+        throw new CommandException(Text.of("Cannot go backwards in a streaming pagination"));
     }
 
 }

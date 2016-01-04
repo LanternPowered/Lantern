@@ -38,7 +38,7 @@ import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusResponse;
 import org.lanternpowered.server.status.LanternStatusResponsePlayers;
-import org.lanternpowered.server.text.gson.JsonTextRepresentation;
+import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -46,7 +46,7 @@ import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -66,8 +66,8 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         int online = server.getOnlinePlayers().size();
         int max = server.getMaxPlayers();
 
-        InetSocketAddress address = (InetSocketAddress) session.getAddress();
-        InetSocketAddress virtualAddress = (InetSocketAddress) session.getVirtualHost();
+        InetSocketAddress address = session.getAddress();
+        InetSocketAddress virtualAddress = session.getVirtualHost();
 
         int protocol = session.getProtocolVersion();
 
@@ -114,7 +114,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         }
 
         rootObject.add("version", versionObject);
-        rootObject.add("description", ((JsonTextRepresentation) Texts.json()).getGson().toJsonTree(motd));
+        rootObject.add("description", ((LanternJsonTextSerializer) TextSerializers.JSON).getGson().toJsonTree(motd));
 
         Optional<Favicon> icon = response.getFavicon();
         if (icon.isPresent()) {

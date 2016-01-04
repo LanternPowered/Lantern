@@ -35,7 +35,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanTypes;
 
@@ -56,8 +56,8 @@ public final class CommandBan {
         final String targetArg = alwaysSuccess ? "name" : "address|name";
         return CommandSpec.builder()
                 .arguments(
-                        GenericArguments.string(Texts.of(targetArg)),
-                        GenericArguments.optional(RemainingTextElement.of(Texts.of("reason"))))
+                        GenericArguments.string(Text.of(targetArg)),
+                        GenericArguments.optional(RemainingTextElement.of(Text.of("reason"))))
                 .permission(alwaysSuccess ? "minecraft.command.ban" : "minecraft.command.ban-ip")
                 .executor((src, args) -> {
                     final String target = args.<String>getOne(targetArg).get();
@@ -72,7 +72,7 @@ public final class CommandBan {
                             banService.addBan(LanternGame.get().getRegistry().createBuilder(Ban.Builder.class)
                                     .type(BanTypes.IP)
                                     .address(address)
-                                    .reason(reason == null ? null : Texts.of(reason))
+                                    .reason(reason == null ? null : Text.of(reason))
                                     .build());
                         } catch (UnknownHostException e) {
                             // Ip address failed, try to find a player
@@ -83,7 +83,7 @@ public final class CommandBan {
                             banService.addBan(Sponge.getRegistry().createBuilder(Ban.Builder.class)
                                     .type(BanTypes.PROFILE)
                                     .profile(player.get().getProfile())
-                                    .reason(reason == null ? null : Texts.of(reason))
+                                    .reason(reason == null ? null : Text.of(reason))
                                     .build());
                         }
                     }

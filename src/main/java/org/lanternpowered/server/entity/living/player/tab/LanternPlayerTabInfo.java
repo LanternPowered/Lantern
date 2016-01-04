@@ -33,7 +33,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.PlayerTabInfo;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
@@ -118,7 +117,7 @@ public final class LanternPlayerTabInfo implements PlayerTabInfo {
     @Override
     public Text getDisplayName() {
         if (this.displayName == null) {
-            return Texts.of(this.name);
+            return Text.of(this.name);
         }
         return this.displayName;
     }

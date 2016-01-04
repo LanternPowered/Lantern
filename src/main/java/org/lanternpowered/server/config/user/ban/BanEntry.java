@@ -30,7 +30,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
@@ -111,8 +111,8 @@ public abstract class BanEntry implements Ban {
         if (this.commandSource != null && (source = this.commandSource.get()) != null) {
             return Optional.of(source);
         }
-        String plainSource = Texts.legacy().to(this.source);
-        if (plainSource.equals("Server")) {
+        String plainSource = TextSerializers.LEGACY_FORMATTING_CODE.serialize(this.source);
+        if (plainSource.equals("Console")) {
             source = LanternGame.get().getServer().getConsole();
         } else {
             source = LanternGame.get().getServer().getPlayer(plainSource).orElse(null);

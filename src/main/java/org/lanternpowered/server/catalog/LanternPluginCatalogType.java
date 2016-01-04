@@ -45,4 +45,5 @@ public abstract class LanternPluginCatalogType implements PluginCatalogType {
     public String getPluginId() {
         return this.pluginId;
     }
+
 }

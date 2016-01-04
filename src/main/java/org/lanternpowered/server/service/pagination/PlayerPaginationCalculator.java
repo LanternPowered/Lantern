@@ -30,13 +30,15 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import org.lanternpowered.server.text.PlainTextSerializer;
 import org.spongepowered.api.command.CommandMessageFormatting;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.pagination.PaginationCalculator;
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.io.IOException;
 import java.util.List;
@@ -116,10 +118,10 @@ public class PlayerPaginationCalculator implements PaginationCalculator<Player> 
         double columnCount = 0d;
         for (Text child : text.withChildren()) {
             final String txt;
-            if (child instanceof Text.Literal) {
-                txt = ((Text.Literal) child).getContent();
-            } else if (child instanceof Text.Translatable) {
-                txt = Texts.toPlain(child, source.getLocale());
+            if (child instanceof LiteralText) {
+                txt = ((LiteralText) child).getContent();
+            } else if (child instanceof TranslatableText) {
+                txt = ((PlainTextSerializer) TextSerializers.PLAIN).serialize(child, source.getLocale());
             } else {
                 continue;
             }
@@ -138,11 +140,11 @@ public class PlayerPaginationCalculator implements PaginationCalculator<Player> 
         if (length >= LINE_WIDTH) {
             return text;
         }
-        int paddingLength = getLength(source, Texts.builder(padding).style(text.getStyle()).build());
+        int paddingLength = getLength(source, Text.builder(padding).style(text.getStyle()).build());
         double paddingNecessary = LINE_WIDTH - length;
-        TextBuilder build =  Texts.builder();
+        Text.Builder build =  Text.builder();
         if (length == 0) {
-            build.append(Texts.of(Strings.repeat(padding, GenericMath.floor((double) LINE_WIDTH / paddingLength))));
+            build.append(Text.of(Strings.repeat(padding, GenericMath.floor((double) LINE_WIDTH / paddingLength))));
         } else {
             paddingNecessary -= getWidth(' ', text.getStyle().contains(TextStyles.BOLD)) * 2;
             int paddingCount = GenericMath.floor(paddingNecessary / paddingLength);
@@ -150,7 +152,7 @@ public class PlayerPaginationCalculator implements PaginationCalculator<Player> 
             int afterPadding = (int) Math.ceil(paddingCount / 2.0);
             if (beforePadding > 0) {
                 if (beforePadding > 1) {
-                    build.append(Texts.of(Strings.repeat(padding, beforePadding)));
+                    build.append(Text.of(Strings.repeat(padding, beforePadding)));
                 }
                 build.append(CommandMessageFormatting.SPACE_TEXT);
             }
@@ -158,7 +160,7 @@ public class PlayerPaginationCalculator implements PaginationCalculator<Player> 
             if (afterPadding > 0) {
                 build.append(CommandMessageFormatting.SPACE_TEXT);
                 if (afterPadding > 1) {
-                    build.append(Texts.of(Strings.repeat(padding, afterPadding)));
+                    build.append(Text.of(Strings.repeat(padding, afterPadding)));
                 }
             }
         }

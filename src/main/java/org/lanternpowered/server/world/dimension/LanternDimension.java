@@ -26,7 +26,7 @@ package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
-import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 

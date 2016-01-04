@@ -73,7 +73,7 @@ public final class LanternBlockStateBase {
         // Convert to a list so it can be sorted
         List<BlockTrait<?>> list = Lists.newArrayList(blockTraits);
 
-        // Sort the traits be name
+        // Sort the traits by the name
         Collections.sort(list, (o1, o2) -> o1.getName().compareTo(o2.getName()));
 
         // The builder for the name to trait lookup
@@ -100,9 +100,8 @@ public final class LanternBlockStateBase {
         ImmutableList.Builder<BlockState> blockStates = ImmutableList.builder();
 
         // Do the cartesian product to get all the possible combinations
-        Iterator<List<Comparable<?>>> cartesianProductIt = Sets.cartesianProduct(allowedValues).iterator();
-        while (cartesianProductIt.hasNext()) {
-            Iterator<Comparable<?>> objectsIt = cartesianProductIt.next().iterator();
+        for (List<Comparable<?>> comparables : Sets.cartesianProduct(allowedValues)) {
+            Iterator<Comparable<?>> objectsIt = comparables.iterator();
 
             ImmutableMap.Builder<BlockTrait<?>, Comparable<?>> traitValuesBuilder = ImmutableMap.builder();
             for (BlockTrait<?> trait : list) {
@@ -117,21 +116,18 @@ public final class LanternBlockStateBase {
 
         this.blockStates = blockStates.build();
 
-        Iterator<BlockState> blockStateIt = this.blockStates.iterator();
-        while (blockStateIt.hasNext()) {
-            LanternBlockState blockState = (LanternBlockState) blockStateIt.next();
+        for (BlockState blockState1 : this.blockStates) {
+            LanternBlockState blockState = (LanternBlockState) blockState1;
             HashBasedTable<BlockTrait<?>, Comparable<?>, BlockState> table = HashBasedTable.create();
 
             for (BlockTrait<?> trait : list) {
-                for (Comparable<?> value : trait.getPossibleValues()) {
-                    if (value != blockState.getTraitValue(trait).get()) {
-                        Map<BlockTrait<?>, Comparable<?>> valueByTrait = Maps.newHashMap();
-                        valueByTrait.putAll(blockState.traitValues);
-                        valueByTrait.put(trait, value);
+                trait.getPossibleValues().stream().filter(value -> value != blockState.getTraitValue(trait).get()).forEach(value -> {
+                    Map<BlockTrait<?>, Comparable<?>> valueByTrait = Maps.newHashMap();
+                    valueByTrait.putAll(blockState.traitValues);
+                    valueByTrait.put(trait, value);
 
-                        table.put(trait, value, stateByValuesMap.get(valueByTrait));
-                    }
-                }
+                    table.put(trait, value, stateByValuesMap.get(valueByTrait));
+                });
             }
 
             blockState.propertyValueTable = ImmutableTable.copyOf(table);
@@ -146,7 +142,7 @@ public final class LanternBlockStateBase {
         return this.blockType;
     }
 
-    public BlockState getDefaultBlockState() {
+    public BlockState getBaseState() {
         return this.blockStates.get(0);
     }
 
@@ -164,4 +160,5 @@ public final class LanternBlockStateBase {
         }
         return Optional.empty();
     }
+
 }

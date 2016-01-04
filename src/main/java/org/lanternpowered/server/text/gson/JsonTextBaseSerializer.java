@@ -34,7 +34,6 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.text.LanternTextHelper;
 import org.lanternpowered.server.text.LanternTextHelper.RawAction;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.ShiftClickAction;
@@ -50,11 +49,11 @@ import javax.annotation.Nullable;
 
 abstract class JsonTextBaseSerializer {
 
-    public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context) throws JsonParseException {
+    public void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
         this.deserialize(json, builder, context, json.has("extra") ? json.getAsJsonArray("extra") : null);
     }
 
-    public void deserialize(JsonObject json, TextBuilder builder, JsonDeserializationContext context, @Nullable JsonArray children)
+    public void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context, @Nullable JsonArray children)
             throws JsonParseException {
         if (json.has("color")) {
             TextColor color = LanternGame.get().getRegistry().getType(TextColor.class, json.get("color").getAsString()).orElse(null);

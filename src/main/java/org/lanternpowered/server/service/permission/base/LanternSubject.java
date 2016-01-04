@@ -24,10 +24,10 @@
  */
 package org.lanternpowered.server.service.permission.base;
 
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.List;
@@ -45,17 +45,17 @@ public abstract class LanternSubject implements Subject {
 
     @Override
     public boolean hasPermission(Set<Context> contexts, String permission) {
-        return getPermissionValue(contexts, permission) == Tristate.TRUE;
+        return this.getPermissionValue(contexts, permission) == Tristate.TRUE;
     }
 
     @Override
     public boolean hasPermission(String permission) {
-        return hasPermission(getActiveContexts(), permission);
+        return this.hasPermission(this.getActiveContexts(), permission);
     }
 
     @Override
     public Tristate getPermissionValue(Set<Context> contexts, String permission) {
-        return getDataPermissionValue(getSubjectData(), permission);
+        return this.getDataPermissionValue(this.getSubjectData(), permission);
     }
 
     protected Tristate getDataPermissionValue(MemorySubjectData subject, String permission) {

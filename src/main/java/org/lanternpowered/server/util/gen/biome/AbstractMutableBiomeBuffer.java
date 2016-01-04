@@ -65,4 +65,5 @@ public abstract class AbstractMutableBiomeBuffer extends AbstractBiomeBuffer imp
     public MutableBiomeArea getRelativeBiomeView() {
         return this.getBiomeView(DiscreteTransform2.fromTranslation(this.start.negate()));
     }
+
 }

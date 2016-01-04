@@ -27,10 +27,10 @@ package org.lanternpowered.server.text;
 import org.lanternpowered.server.text.action.LanternCallbackHolder;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Coerce;
 
 import java.io.File;
@@ -101,7 +101,7 @@ public final class LanternTextHelper {
     public static HoverAction<?> parseHoverAction(String action, String value) {
         switch (action) {
             case "show_text":
-                return TextActions.showText(Texts.legacy().fromUnchecked(value));
+                return TextActions.showText(TextSerializers.LEGACY_FORMATTING_CODE.deserializeUnchecked(value));
             case "show_achievement":
                 return null; // TODO
             case "show_item":
@@ -178,7 +178,7 @@ public final class LanternTextHelper {
             if (this.value != null) {
                 return this.value;
             }
-            return this.value = Texts.legacy().to(this.text);
+            return this.value = TextSerializers.LEGACY_FORMATTING_CODE.serialize(this.text);
         }
 
         @SuppressWarnings("deprecation")
@@ -186,7 +186,7 @@ public final class LanternTextHelper {
             if (this.text != null) {
                 return this.text;
             }
-            return this.text = Texts.legacy().fromUnchecked(this.value);
+            return this.text = TextSerializers.LEGACY_FORMATTING_CODE.deserializeUnchecked(this.value);
         }
     }
 

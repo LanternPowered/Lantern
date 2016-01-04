@@ -170,8 +170,8 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
         } else if (object instanceof List<?>) {
             JsonArray array = new JsonArray();
             List<?> object0 = (List<?>) object;
-            for (int i = 0; i < object0.size(); i++) {
-                array.add(this.toJson(object0.get(i)));
+            for (Object anObject0 : object0) {
+                array.add(this.toJson(anObject0));
             }
             return array;
         } else if (object instanceof Byte) {
@@ -189,15 +189,15 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
         } else if (object instanceof Integer[]) {
             Integer[] object0 = (Integer[]) object;
             JsonArray array = new JsonArray();
-            for (int i = 0; i < object0.length; i++) {
-                array.add(new JsonPrimitive(object0[i].toString()));
+            for (Integer anObject0 : object0) {
+                array.add(new JsonPrimitive(anObject0.toString()));
             }
             return array;
         } else if (object instanceof Byte[]) {
             Byte[] object0 = (Byte[]) object;
             JsonArray array = new JsonArray();
-            for (int i = 0; i < object0.length; i++) {
-                array.add(new JsonPrimitive(object0[i].toString() + "b"));
+            for (Byte anObject0 : object0) {
+                array.add(new JsonPrimitive(anObject0.toString() + "b"));
             }
             return array;
         } else {
@@ -211,4 +211,5 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
         }
         return json;
     }
+
 }

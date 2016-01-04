@@ -27,15 +27,16 @@ package org.lanternpowered.server.text.xml;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.text.LanternTextHelper;
 import org.lanternpowered.server.text.LanternTextHelper.RawAction;
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
 import org.spongepowered.api.text.action.ShiftClickAction;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.List;
@@ -56,7 +57,6 @@ import javax.xml.bind.annotation.XmlSeeAlso;
         Color.class,
         I.class,
         Obfuscated.class,
-        Placeholder.class,
         Strikethrough.class,
         Span.class,
         Tr.class,
@@ -82,12 +82,12 @@ public abstract class Element {
     @XmlMixed
     protected List<Object> mixedContent = Lists.newArrayList();
 
-    protected abstract void modifyBuilder(TextBuilder builder);
+    protected abstract void modifyBuilder(Text.Builder builder);
 
-    public TextBuilder toText() throws Exception {
-        TextBuilder builder;
+    public Text.Builder toText() throws Exception {
+        Text.Builder builder;
         if (this.mixedContent.size() == 0) {
-            builder = Texts.builder();
+            builder = Text.builder();
         } else if (this.mixedContent.size() == 1) { // then we are a thin wrapper around the child
             builder = this.builderFromObject(this.mixedContent.get(0));
         } else {
@@ -95,7 +95,7 @@ public abstract class Element {
                 builder = this.builderFromObject(this.mixedContent.get(0));
                 this.mixedContent.remove(0);
             } else {
-                builder = Texts.builder();
+                builder = Text.builder();
             }
             for (Object child : this.mixedContent) {
                 builder.append(this.builderFromObject(child).build());
@@ -108,9 +108,9 @@ public abstract class Element {
         return builder;
     }
 
-    protected TextBuilder builderFromObject(Object o) throws Exception {
+    protected Text.Builder builderFromObject(Object o) throws Exception {
         if (o instanceof String) {
-            return Texts.builder(String.valueOf(o).replace('\u000B', ' '));
+            return Text.builder(String.valueOf(o).replace('\u000B', ' '));
         } else if (o instanceof Element) {
             return ((Element) o).toText();
         } else {
@@ -118,7 +118,7 @@ public abstract class Element {
         }
     }
 
-    protected void applyTextActions(TextBuilder builder) throws Exception {
+    protected void applyTextActions(Text.Builder builder) throws Exception {
         if (this.onClick != null) {
             Matcher matcher = FUNCTION_PATTERN.matcher(this.onClick);
             if (!matcher.matches()) {
@@ -195,7 +195,8 @@ public abstract class Element {
                     fixedRoot.set(currentElement = new Span());
                 }
                 RawAction raw = LanternTextHelper.raw(text.getClickAction().get());
-                currentElement.onClick = raw.getAction() + "('" + Texts.xml().to(raw.getValueAsText(), locale) + "')";
+                // TODO: Apply the locale again?
+                currentElement.onClick = raw.getAction() + "('" + TextSerializers.TEXT_XML.serialize(raw.getValueAsText()) + "')";
             }
         } else {
             if (currentElement == null) {
@@ -205,7 +206,8 @@ public abstract class Element {
 
         if (text.getHoverAction().isPresent()) {
             RawAction raw = LanternTextHelper.raw(text.getHoverAction().get());
-            currentElement.onHover = raw.getAction() + "('" + Texts.xml().to(raw.getValueAsText(), locale) + "')";
+            // TODO: Apply the locale again?
+            currentElement.onHover = raw.getAction() + "('" + TextSerializers.TEXT_XML.serialize(raw.getValueAsText()) + "')";
         }
 
         if (text.getShiftClickAction().isPresent()) {
@@ -216,19 +218,12 @@ public abstract class Element {
             currentElement.onShiftClick = "insert_text('" + action.getResult() + ')';
         }
 
-        if (text instanceof Text.Placeholder) {
-            Text.Placeholder textPlaceholder = (Text.Placeholder) text;
-            Placeholder placeholder = new Placeholder(textPlaceholder.getKey());
-            if (textPlaceholder.getFallback().isPresent()) {
-                placeholder.mixedContent.add(Element.fromText(textPlaceholder.getFallback().get(), locale));
-            }
-            update(fixedRoot, currentElement, placeholder);
-        } else if (text instanceof Text.Literal) {
-            currentElement.mixedContent.add(((Text.Literal) text).getContent());
-        } else if (text instanceof Text.Translatable) {
-            Translation transl = ((Text.Translatable) text).getTranslation();
+        if (text instanceof LiteralText) {
+            currentElement.mixedContent.add(((LiteralText) text).getContent());
+        } else if (text instanceof TranslatableText) {
+            Translation transl = ((TranslatableText) text).getTranslation();
             currentElement = update(fixedRoot, currentElement, new Tr(transl.getId()));
-            for (Object o : ((Text.Translatable) text).getArguments()) {
+            for (Object o : ((TranslatableText) text).getArguments()) {
                 if (o instanceof Text) {
                     currentElement.mixedContent.add(Element.fromText(((Text) o), locale));
                 } else {

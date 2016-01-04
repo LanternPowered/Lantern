@@ -24,12 +24,41 @@
  */
 package org.lanternpowered.server.data.type;
 
+import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.type.ShrubType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.translation.Translation;
 
-@NonnullByDefault
-public interface LanternShrubType extends ShrubType {
+public enum LanternShrubType implements ShrubType, SimpleCatalogType, InternalCatalogType {
 
-    byte getInternalId();
+    DEAD_BUSH       ("dead_bush", "shrub"),
+    GRASS           ("tall_grass", "grass"),
+    FERN            ("fern", "fern"),
+    ;
+
+    private final String identifier;
+    private final Translation translation;
+
+    LanternShrubType(String identifier, String translationPart) {
+        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+                "tile.tallgrass." + translationPart + ".name");
+        this.identifier = identifier;
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
+    }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
+    }
 
 }

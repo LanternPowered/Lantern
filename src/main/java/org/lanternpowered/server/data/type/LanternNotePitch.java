@@ -26,9 +26,7 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.data.type.NotePitch;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public class LanternNotePitch extends SimpleLanternCatalogType implements NotePitch {
 
     private final byte internalId;

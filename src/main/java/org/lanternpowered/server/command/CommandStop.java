@@ -33,14 +33,13 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
 public final class CommandStop {
 
     public static CommandSpec create() {
         return CommandSpec.builder()
                 .arguments(
-                        GenericArguments.optional(RemainingTextElement.of(Texts.of("kick-message"))))
+                        GenericArguments.optional(RemainingTextElement.of(Text.of("kick-message"))))
                 .permission("minecraft.command.stop")
                 .description(t("commands.stop.description"))
                 .executor((src, args) -> {

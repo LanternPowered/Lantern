@@ -29,10 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
@@ -110,7 +110,7 @@ public class DataFactoryCollection extends LanternSubjectCollection {
         public Tristate getPermissionValue(Set<Context> contexts, String permission) {
             Tristate ret = super.getPermissionValue(contexts, permission);
             if (ret == Tristate.UNDEFINED) {
-                ret = getDataPermissionValue(DataFactoryCollection.this.service.getDefaultData(), permission);
+                ret = this.getDataPermissionValue(DataFactoryCollection.this.service.getDefaultData(), permission);
             }
             return ret;
         }

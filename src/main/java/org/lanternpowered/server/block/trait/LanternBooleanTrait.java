@@ -24,26 +24,31 @@
  */
 package org.lanternpowered.server.block.trait;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.BooleanTrait;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.value.mutable.Value;
 
 public final class LanternBooleanTrait extends LanternBlockTrait<Boolean> implements BooleanTrait {
 
     private final static ImmutableSet<Boolean> STATES = ImmutableSet.of(true, false);
 
-    private LanternBooleanTrait(String name) {
-        super(name, Boolean.class, STATES);
+    private LanternBooleanTrait(String name, Key<? extends Value<Boolean>> key) {
+        super(name, key, Boolean.class, STATES);
     }
 
     /**
      * Creates a new boolean trait with the specified name.
      * 
      * @param name the name
+     * @param key the key that should be attached to the trait
      * @return the boolean trait
      */
-    public static BooleanTrait of(String name) {
-        return new LanternBooleanTrait(checkNotNullOrEmpty(name, "name"));
+    public static BooleanTrait of(String name, Key<? extends Value<Boolean>> key) {
+        return new LanternBooleanTrait(checkNotNullOrEmpty(name, "name"), checkNotNull(key, "key"));
     }
+
 }

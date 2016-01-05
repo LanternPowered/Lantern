@@ -48,8 +48,11 @@ import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DoublePlantTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.HingeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.LogAxisRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.PistonTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PrismarineTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
@@ -101,8 +104,10 @@ import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.DisguisedBlockType;
 import org.spongepowered.api.data.type.DoublePlantType;
+import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
+import org.spongepowered.api.data.type.PistonType;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.data.type.PrismarineType;
 import org.spongepowered.api.data.type.QuartzType;
@@ -223,8 +228,11 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())
                 .registerModule(DisguisedBlockType.class, new DisguisedBlockTypeRegistryModule())
                 .registerModule(DoublePlantType.class, new DoublePlantTypeRegistryModule())
+                .registerModule(Hinge.class, new HingeRegistryModule())
+                .registerModule(new KeyRegistryModule())
                 .registerModule(LogAxis.class, new LogAxisRegistryModule())
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
+                .registerModule(PistonType.class, new PistonTypeRegistryModule())
                 .registerModule(PlantType.class, new PlantTypeRegistryModule())
                 .registerModule(PrismarineType.class, new PrismarineTypeRegistryModule())
                 .registerModule(QuartzType.class, new QuartzTypeRegistryModule())

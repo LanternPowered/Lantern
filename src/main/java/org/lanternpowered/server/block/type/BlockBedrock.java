@@ -29,7 +29,7 @@ import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 
 public class BlockBedrock extends LanternBlockType {
 
-    public BlockBedrock(String identifier) {
-        super(identifier, Matter.SOLID);
+    public BlockBedrock(String pluginId, String identifier) {
+        super(pluginId, identifier, Matter.SOLID);
     }
 }

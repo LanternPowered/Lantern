@@ -30,12 +30,14 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.value.mutable.Value;
 
 @SuppressWarnings("unchecked")
 public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E> implements EnumTrait<E> {
 
-    private LanternEnumTrait(String name, Class<E> valueClass, ImmutableSet<E> possibleValues) {
-        super(name, valueClass, possibleValues);
+    private LanternEnumTrait(String name, Class<E> valueClass, Key<? extends Value<E>> key, ImmutableSet<E> possibleValues) {
+        super(name, key, valueClass, possibleValues);
     }
 
     /**
@@ -44,16 +46,17 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
      * <p>The possible values array may not be empty.</p>
      * 
      * @param name the name
+     * @param key the key that should be attached to the trait
      * @param possibleValues the possible values
      * @return the enum trait
      */
-    public static <E extends Enum<E>> EnumTrait<E> of(String name, Iterable<E> possibleValues) {
+    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key, Iterable<E> possibleValues) {
         checkNotNullOrEmpty(name, "name");
         checkNotNull(possibleValues, "possibleValues");
+        checkNotNull(key, "key");
         checkState(possibleValues.iterator().hasNext(), "possibleValues may not be empty");
-
-        return new LanternEnumTrait<E>(name, (Class<E>) possibleValues.iterator().getClass(),
-                ImmutableSet.copyOf(possibleValues));
+        return new LanternEnumTrait<>(name, (Class<E>) possibleValues.iterator().getClass(),
+                key, ImmutableSet.copyOf(possibleValues));
     }
 
     /**
@@ -62,14 +65,16 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
      * <p>The enum must contain values.</p>
      * 
      * @param name the name
+     * @param key the key that should be attached to the trait
      * @param enumClass the enum class
      * @return the enum trait
      */
-    public static <E extends Enum<E>> EnumTrait<E> of(String name, Class<E> enumClass) {
+    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key, Class<E> enumClass) {
         checkNotNullOrEmpty(name, "name");
         checkNotNull(enumClass, "enumClass");
+        checkNotNull(key, "key");
         checkState(enumClass.getEnumConstants().length != 0, "enumClass must contain values");
-
-        return new LanternEnumTrait<E>(name, enumClass, ImmutableSet.copyOf(enumClass.getEnumConstants()));
+        return new LanternEnumTrait<>(name, enumClass, key, ImmutableSet.copyOf(enumClass.getEnumConstants()));
     }
+
 }

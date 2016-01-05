@@ -29,6 +29,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
 import java.util.Optional;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
@@ -38,16 +39,16 @@ public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
      * 
      * @param internalId the internal id
      * @param blockType the block type
-     * @param dataValueGenerator the data value generator used to transform the block state into a data value
+     * @param dataToStateConverter the data to block state converter
      */
-    void register(int internalId, BlockType blockType, Function<BlockState, Byte> dataValueGenerator);
+    void register(int internalId, BlockType blockType, BiFunction<Byte, BlockState, BlockState> dataToStateConverter);
 
     /**
      * Registers a new catalog type in the registry with a predefined internal id.
      * 
      * <p>This method should only be used for block types that have
      * only one block state. (No attached block traits.) If this is the case,
-     * use the {@link #register(BlockType, Function)} method.</p>
+     * use the {@link #register(BlockType, BiFunction)} method.</p>
      * 
      * @param internalId the internal id
      * @param blockType the block type
@@ -59,7 +60,7 @@ public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
      * 
      * <p>This method should only be used for custom block types that have
      * only one block state. (No attached block traits.) If this is the case,
-     * use the {@link #register(BlockType, Function)} method</p>
+     * use the {@link #register(BlockType, BiFunction)} method</p>
      * 
      * @param blockType the block type
      */
@@ -69,9 +70,9 @@ public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
      * Registers a new catalog type in the registry.
      * 
      * @param blockType the block type
-     * @param dataValueGenerator the data value generator used to transform the block state into a data value
+     * @param dataToStateConverter the data to block state converter
      */
-    void register(BlockType blockType, Function<BlockState, Byte> dataValueGenerator);
+    void register(BlockType blockType, BiFunction<Byte, BlockState, BlockState> dataToStateConverter);
 
     /**
      * Gets the block state by using it's internal id.

@@ -26,6 +26,7 @@ package org.lanternpowered.server.block;
 
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.state.LanternBlockStateBase;
+import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -34,39 +35,39 @@ import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.Optional;
 
-public class LanternBlockType extends SimpleLanternCatalogType implements BlockType {
+public class LanternBlockType extends LanternPluginCatalogType implements BlockType {
 
     // The block state base which contains all the possible block states
     private final LanternBlockStateBase blockStateBase;
+    private final Matter matter;
     private BlockState defaultBlockState;
     private boolean tickRandomly;
 
-    public LanternBlockType(String identifier, Matter matter) {
-        this(identifier, matter, Lists.newArrayList());
+    public LanternBlockType(String pluginId, String identifier, Matter matter) {
+        this(pluginId, identifier, matter, Lists.newArrayList());
     }
 
-    public LanternBlockType(String identifier, Matter matter, BlockTrait<?>... blockTraits) {
-        this(identifier, matter, Lists.newArrayList(blockTraits));
+    public LanternBlockType(String pluginId, String identifier, Matter matter, BlockTrait<?>... blockTraits) {
+        this(pluginId, identifier, matter, Lists.newArrayList(blockTraits));
     }
 
-    public LanternBlockType(String identifier, Matter matter, Iterable<BlockTrait<?>> blockTraits) {
-        super(identifier);
+    public LanternBlockType(String pluginId, String identifier, Matter matter, Iterable<BlockTrait<?>> blockTraits) {
+        super(pluginId, identifier);
 
         // Create the block state base
         this.blockStateBase = new LanternBlockStateBase(this, blockTraits);
         this.defaultBlockState = this.blockStateBase.getBaseState();
+        this.matter = matter;
     }
 
-    protected void setDefaultBlockState(BlockState blockState) {
+    protected void setDefaultState(BlockState blockState) {
         this.defaultBlockState = blockState;
-    }
-
-    protected BlockState getBaseBlockState() {
-        return this.blockStateBase.getBaseState();
     }
 
     /**
@@ -76,6 +77,38 @@ public class LanternBlockType extends SimpleLanternCatalogType implements BlockT
      */
     public LanternBlockStateBase getBlockStateBase() {
         return this.blockStateBase;
+    }
+
+    /**
+     * Gets the {@link Matter} of the specified block state, normally it should be
+     * always the same, which means that the block state is ignored.
+     *
+     * @param blockState the block state
+     * @return the matter
+     */
+    public Matter getMatter(BlockState blockState) {
+        return this.matter;
+    }
+
+    /**
+     * Gets the actual state for the specified block state, extra properties provided by surrounding blocks
+     * may be applied in this method.
+     *
+     * @param blockState the block state
+     * @param location the location
+     * @return the actual state
+     */
+    public BlockState getActualState(BlockState blockState, Location<World> location) {
+        return blockState;
+    }
+
+    /**
+     * Performs a random tick at the specified location for a specific block state.
+     *
+     * @param location the location
+     * @param blockState the block state
+     */
+    public void doRandomTickAt(Location<World> location, BlockState blockState) {
     }
 
     @Override
@@ -139,4 +172,5 @@ public class LanternBlockType extends SimpleLanternCatalogType implements BlockT
     public Collection<BlockState> getAllStates() {
         return this.blockStateBase.getBlockStates();
     }
+
 }

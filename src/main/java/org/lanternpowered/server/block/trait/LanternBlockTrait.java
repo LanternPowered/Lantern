@@ -26,6 +26,8 @@ package org.lanternpowered.server.block.trait;
 
 import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.Collection;
@@ -34,16 +36,16 @@ import java.util.function.Predicate;
 @SuppressWarnings({"unchecked","rawtypes"})
 public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T> {
 
-    private final BlockTraitKey<T, MutableBlockTraitValue<T>> key;
+    private final Key<? extends Value<T>> key;
     private final ImmutableSet<T> possibleValues;
     private final Class<T> valueClass;
     private final String name;
 
-    LanternBlockTrait(String name, Class<T> valueClass, ImmutableSet<T> possibleValues) {
+    LanternBlockTrait(String name, Key<? extends Value<T>> key, Class<T> valueClass, ImmutableSet<T> possibleValues) {
         this.possibleValues = possibleValues;
         this.valueClass = valueClass;
         this.name = name;
-        this.key = new BlockTraitKey(this, valueClass, Value.class);
+        this.key = key;
     }
 
     /**
@@ -51,7 +53,7 @@ public class LanternBlockTrait<T extends Comparable<T>> implements BlockTrait<T>
      * 
      * @return the block trait key
      */
-    public BlockTraitKey<T, MutableBlockTraitValue<T>> getKey() {
+    public Key<? extends Value<T>> getKey() {
         return this.key;
     }
 

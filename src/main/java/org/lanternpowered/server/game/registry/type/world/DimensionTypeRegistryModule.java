@@ -53,7 +53,7 @@ public class DimensionTypeRegistryModule implements AlternateCatalogRegistryModu
     @Override
     public Map<String, DimensionType> provideCatalogMap() {
         Map<String, DimensionType> mappings = Maps.newHashMap();
-        for (DimensionType type : mappings.values()) {
+        for (DimensionType type : this.dimensionTypes.values()) {
             mappings.put(type.getName(), type);
         }
         return mappings;
@@ -61,6 +61,7 @@ public class DimensionTypeRegistryModule implements AlternateCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
+        System.out.println("DEBUG!");
         List<DimensionType> types = Lists.newArrayList();
         types.add(new LanternDimensionType<>("minecraft", "the_end", -1, LanternDimensionEnd.class, GeneratorTypes.THE_END, true, false, false,
                 false, (world, type) -> new LanternDimensionEnd(world, type.getName(), type)));

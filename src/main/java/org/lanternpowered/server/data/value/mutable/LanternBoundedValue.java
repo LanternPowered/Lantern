@@ -84,6 +84,7 @@ public class LanternBoundedValue<E> extends LanternValue<E> implements MutableBo
 
     @Override
     public ImmutableBoundedValue<E> asImmutable() {
-        return new ImmutableLanternBoundedValue<E>(getKey(), this.actualValue, getDefault(), this.comparator, this.minimum, this.maximum);
+        return new ImmutableLanternBoundedValue<>(getKey(), this.actualValue, getDefault(), this.comparator, this.minimum, this.maximum);
     }
+
 }

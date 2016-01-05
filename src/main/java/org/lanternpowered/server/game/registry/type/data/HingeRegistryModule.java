@@ -22,47 +22,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.text;
+package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.text.chat.LanternChatVisibility;
+import org.lanternpowered.server.data.type.LanternBrickType;
+import org.lanternpowered.server.data.type.LanternHinge;
+import org.spongepowered.api.data.type.BrickType;
+import org.spongepowered.api.data.type.BrickTypes;
+import org.spongepowered.api.data.type.Hinge;
+import org.spongepowered.api.data.type.Hinges;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.chat.ChatVisibilities;
-import org.spongepowered.api.text.chat.ChatVisibility;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public final class ChatVisibilityRegistryModule implements CatalogRegistryModule<ChatVisibility> {
+public final class HingeRegistryModule implements CatalogRegistryModule<Hinge> {
 
-    @RegisterCatalog(ChatVisibilities.class)
-    private final Map<String, ChatVisibility> chatVisibilities = Maps.newHashMap();
+    @RegisterCatalog(Hinges.class) private final Map<String, Hinge> hinges = Maps.newHashMap();
 
     @Override
     public void registerDefaults() {
-        List<ChatVisibility> types = Lists.newArrayList();
-        types.add(new LanternChatVisibility(0, "full", type -> true));
-        types.add(new LanternChatVisibility(1, "system", type -> type == ChatTypes.SYSTEM || type == ChatTypes.ACTION_BAR));
-        types.add(new LanternChatVisibility(2, "hidden", type -> false));
-        types.forEach(type -> this.chatVisibilities.put(type.getId(), type));
+        for (LanternHinge type : LanternHinge.values()) {
+            this.hinges.put(type.getId(), type);
+            this.hinges.put(type.name().toLowerCase(), type);
+        }
     }
 
     @Override
-    public Optional<ChatVisibility> getById(String id) {
-        return Optional.ofNullable(this.chatVisibilities.get(checkNotNull(id).toLowerCase()));
+    public Optional<Hinge> getById(String id) {
+        return Optional.ofNullable(this.hinges.get(checkNotNull(id).toLowerCase()));
     }
 
     @Override
-    public Collection<ChatVisibility> getAll() {
-        return ImmutableList.copyOf(this.chatVisibilities.values());
+    public Collection<Hinge> getAll() {
+        return ImmutableList.copyOf(this.hinges.values());
     }
 
 }

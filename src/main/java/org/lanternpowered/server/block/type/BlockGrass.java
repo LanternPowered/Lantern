@@ -25,11 +25,18 @@
 package org.lanternpowered.server.block.type;
 
 import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.trait.LanternBooleanTrait;
+import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 
 public final class BlockGrass extends LanternBlockType {
 
-    public BlockGrass(String identifier) {
-        super(identifier, Matter.SOLID);
+    public static final BlockTrait<Boolean> SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+
+    public BlockGrass(String pluginId, String identifier) {
+        super(pluginId, identifier, Matter.SOLID, SNOWY);
+        this.setDefaultState(this.getDefaultState().withTrait(SNOWY, false).get());
     }
+
 }

@@ -28,15 +28,17 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 
 public final class BlockDirt extends LanternBlockType {
 
-    public static final BlockTrait<LanternDirtType> TYPE = LanternEnumTrait.of("variant", LanternDirtType.class);
+    public static final BlockTrait<LanternDirtType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.DIRT_TYPE, LanternDirtType.class);
 
-    public BlockDirt(String identifier) {
-        super(identifier, Matter.SOLID, TYPE);
-        this.setDefaultBlockState(this.getBaseBlockState().withTrait(TYPE, LanternDirtType.DIRT).get());
+    public BlockDirt(String pluginId, String identifier) {
+        super(pluginId, identifier, Matter.SOLID, TYPE);
+        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternDirtType.DIRT).get());
     }
 
 }

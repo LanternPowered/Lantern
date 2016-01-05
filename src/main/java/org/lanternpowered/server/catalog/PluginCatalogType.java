@@ -43,4 +43,5 @@ public interface PluginCatalogType extends CatalogType {
      * @return the plugin identifier
      */
     String getPluginId();
+
 }

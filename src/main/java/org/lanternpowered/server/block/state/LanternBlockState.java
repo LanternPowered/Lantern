@@ -26,12 +26,14 @@ package org.lanternpowered.server.block.state;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
-import org.lanternpowered.server.block.trait.BlockTraitKey;
-import org.lanternpowered.server.block.trait.MutableBlockTraitValue;
+import org.lanternpowered.server.block.property.LanternMatterProperty;
+import org.lanternpowered.server.block.trait.LanternBlockTrait;
+import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -44,8 +46,10 @@ import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.util.Cycleable;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -59,6 +63,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings({"rawtypes", "unchecked"})
 public final class LanternBlockState implements BlockState {
 
@@ -68,12 +74,21 @@ public final class LanternBlockState implements BlockState {
     // The values for every attached trait
     final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
 
+    // The lookup to convert between key <--> trait
+    final ImmutableMap<Key<Value<?>>, BlockTrait<?>> keyToBlockTrait;
+
     // The base block state
     private final LanternBlockStateBase baseState;
 
     LanternBlockState(LanternBlockStateBase baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
         this.traitValues = traitValues;
         this.baseState = baseState;
+
+        ImmutableBiMap.Builder<Key<Value<?>>, BlockTrait<?>> builder = ImmutableBiMap.builder();
+        for (BlockTrait trait : traitValues.keySet()) {
+            builder.put(((LanternBlockTrait) trait).getKey(), trait);
+        }
+        this.keyToBlockTrait = builder.build();
     }
 
     @Override
@@ -87,7 +102,8 @@ public final class LanternBlockState implements BlockState {
         dataContainer.set(DataQuery.of("BlockType"), this.baseState.getBlockType().getId());
         for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : this.traitValues.entrySet()) {
             Object value = entry.getValue();
-            dataContainer.set(DataQuery.of(entry.getKey().getId()), value instanceof CatalogType ? ((CatalogType) value).getId() : value);
+            dataContainer.set(((LanternBlockTrait) entry.getKey()).getKey().getQuery(),
+                    value instanceof CatalogType ? ((CatalogType) value).getId() : value);
         }
         return dataContainer;
     }
@@ -99,8 +115,7 @@ public final class LanternBlockState implements BlockState {
 
     @Override
     public BlockState withExtendedProperties(Location<World> location) {
-        // TODO Auto-generated method stub
-        return this;
+        return this.baseState.getBlockType().getActualState(this, checkNotNull(location, "location"));
     }
 
     @Override
@@ -123,16 +138,21 @@ public final class LanternBlockState implements BlockState {
 
     @Override
     public <E> Optional<BlockState> transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.supports(key)) {
+            return Optional.empty();
+        } else {
+            E current = this.get(key).get();
+            final E newVal = checkNotNull(function.apply(current));
+            return this.with(key, newVal);
+        }
     }
 
     @Override
     public <E> Optional<BlockState> with(Key<? extends BaseValue<E>> key, E value) {
-        if (!this.supports(key) || !((BlockTraitKey) key).getBlockTrait().getPredicate().test(value)) {
+        BlockTrait trait;
+        if (!this.supports(key) || !(trait = this.keyToBlockTrait.get(key)).getPredicate().test(value)) {
             return Optional.empty();
         }
-        BlockTrait trait = ((BlockTraitKey) key).getBlockTrait();
         if (this.traitValues.get(trait) == value) {
             return Optional.of(this);
         }
@@ -144,7 +164,7 @@ public final class LanternBlockState implements BlockState {
         if (!this.supports(value)) {
             return Optional.empty();
         }
-        BlockTrait trait = ((BlockTraitKey) value.getKey()).getBlockTrait();
+        BlockTrait trait = this.keyToBlockTrait.get(value.getKey());
         if (this.traitValues.get(trait) == value.get()) {
             return Optional.of(this);
         }
@@ -171,14 +191,39 @@ public final class LanternBlockState implements BlockState {
 
     @Override
     public BlockState merge(BlockState that) {
-        // Huh? Not sure what to do here...
-        return this;
+        if (!this.getType().equals(that.getType())) {
+            return this;
+        } else {
+            BlockState temp = this;
+            for (ImmutableDataManipulator<?, ?> manipulator : that.getManipulators()) {
+                Optional<BlockState> optional = temp.with(manipulator);
+                if (optional.isPresent()) {
+                    temp = optional.get();
+                } else {
+                    return temp;
+                }
+            }
+            return temp;
+        }
     }
 
     @Override
     public BlockState merge(BlockState that, MergeFunction function) {
-        // Huh? Not sure what to do here...
-        return this;
+        if (!getType().equals(that.getType())) {
+            return this;
+        } else {
+            BlockState temp = this;
+            for (ImmutableDataManipulator<?, ?> manipulator : that.getManipulators()) {
+                @Nullable ImmutableDataManipulator old = temp.get(manipulator.getClass()).orElse(null);
+                Optional<BlockState> optional = temp.with(checkNotNull(function.merge(old, manipulator)));
+                if (optional.isPresent()) {
+                    temp = optional.get();
+                } else {
+                    return temp;
+                }
+            }
+            return temp;
+        }
     }
 
     @Override
@@ -186,8 +231,7 @@ public final class LanternBlockState implements BlockState {
         if (!this.supports(key)) {
             return Optional.empty();
         }
-        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
-        return Optional.ofNullable((E) this.traitValues.get(blockTrait));
+        return Optional.ofNullable((E) this.traitValues.get(this.keyToBlockTrait.get(key)));
     }
 
     @Override
@@ -195,13 +239,13 @@ public final class LanternBlockState implements BlockState {
         if (!this.supports(key)) {
             return Optional.empty();
         }
-        BlockTrait<?> blockTrait = ((BlockTraitKey) key).getBlockTrait();
-        return Optional.of((V) new MutableBlockTraitValue(((BlockTraitKey) key), this.traitValues.get(blockTrait)));
+        BlockTrait<?> blockTrait = this.keyToBlockTrait.get(key);
+        return Optional.of((V) new LanternValue(key, this.traitValues.get(blockTrait)));
     }
 
     @Override
     public boolean supports(Key<?> key) {
-        return checkNotNull(key, "key") instanceof BlockTraitKey && this.supportsTrait(((BlockTraitKey) key).getBlockTrait());
+        return this.keyToBlockTrait.containsKey(checkNotNull(key, "key"));
     }
 
     @Override
@@ -225,7 +269,7 @@ public final class LanternBlockState implements BlockState {
         if (!this.supports(key)) {
             return this;
         }
-        return (BlockState) this.cycleTraitValue(((BlockTraitKey) key).getBlockTrait()).get();
+        return this.cycleTraitValue(this.keyToBlockTrait.get(key)).get();
     }
 
     @Override
@@ -261,14 +305,25 @@ public final class LanternBlockState implements BlockState {
         }
 
         T value = (T) this.traitValues.get(blockTrait);
-        Iterator<T> it = blockTrait.getPossibleValues().iterator();
-
-        while (it.hasNext()) {
-            if (it.next() == value) {
-                if (it.hasNext()) {
-                    value = it.next();
-                } else {
-                    value = blockTrait.getPossibleValues().iterator().next();
+        if (value instanceof Cycleable) {
+            T last = value;
+            T next;
+            while ((next = (T) ((Cycleable) last).cycleNext()) != value) {
+                if (blockTrait.getPredicate().test(next)) {
+                    value = next;
+                    break;
+                }
+                last = next;
+            }
+        } else {
+            Iterator<T> it = blockTrait.getPossibleValues().iterator();
+            while (it.hasNext()) {
+                if (it.next() == value) {
+                    if (it.hasNext()) {
+                        value = it.next();
+                    } else {
+                        value = blockTrait.getPossibleValues().iterator().next();
+                    }
                 }
             }
         }
@@ -353,8 +408,10 @@ public final class LanternBlockState implements BlockState {
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
+        if (propertyClass == MatterProperty.class) {
+            return (Optional) Optional.of(LanternMatterProperty.of(this.baseState.getBlockType().getMatter(this)));
+        }
+        return Optional.empty();
     }
 
     @Override

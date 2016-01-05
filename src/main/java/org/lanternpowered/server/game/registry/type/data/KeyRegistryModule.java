@@ -22,14 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.block.LanternBlockType;
-import org.spongepowered.api.data.property.block.MatterProperty.Matter;
+import static org.spongepowered.api.data.DataQuery.of;
+import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
 
-public class BlockAir extends LanternBlockType {
+import com.google.common.collect.Maps;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.DirtType;
+import org.spongepowered.api.data.type.StoneType;
+import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.registry.RegistryModule;
+import org.spongepowered.api.registry.util.RegisterCatalog;
 
-    public BlockAir(String pluginId, String identifier) {
-        super(pluginId, identifier, Matter.GAS);
+import java.util.Map;
+
+public final class KeyRegistryModule implements RegistryModule {
+
+    @RegisterCatalog(Keys.class) private final Map<String, Key<?>> mappings = Maps.newHashMap();
+
+    @Override
+    public void registerDefaults() {
+        this.mappings.put("dirt_type", makeSingleKey(DirtType.class, Value.class, of("DirtType")));
+        this.mappings.put("snowed", makeSingleKey(Boolean.class, Value.class, of("Snowed")));
+        this.mappings.put("stone_type", makeSingleKey(StoneType.class, Value.class, of("StoneType")));
     }
+
 }

@@ -22,24 +22,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.data.value.mutable.LanternValue;
+import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.text.translation.Translation;
 
-public class MutableBlockTraitValue<V extends Comparable<V>> extends LanternValue<V> implements BlockTraitValue<V> {
+public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
 
-    public MutableBlockTraitValue(BlockTraitKey<V, ? extends MutableBlockTraitValue<V>> key, V actualValue) {
-        super(key, key.getBlockTrait().getPossibleValues().iterator().next(), actualValue);
+    NORMAL          ("normal", "pistonBase"),
+    STICKY          ("sticky", "pistonStickyBase"),
+    ;
+
+    private final String identifier;
+    private final Translation translation;
+
+    LanternPistonType(String identifier, String translationPart) {
+        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+                "tile." + translationPart + ".name");
+        this.identifier = identifier;
     }
 
-    public MutableBlockTraitValue(BlockTraitKey<V, ? extends MutableBlockTraitValue<V>> key) {
-        super(key, key.getBlockTrait().getPossibleValues().iterator().next());
-    }
-
-    @SuppressWarnings("unchecked")
     @Override
-    public ImmutableBlockTraitValue<V> asImmutable() {
-        return new ImmutableBlockTraitValue<>((BlockTraitKey<V, ? extends MutableBlockTraitValue<V>>) this.getKey(), this.get());
+    public Translation getTranslation() {
+        return this.translation;
+    }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
     }
 
 }

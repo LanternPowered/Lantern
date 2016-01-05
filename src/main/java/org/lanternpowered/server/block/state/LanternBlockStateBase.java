@@ -34,9 +34,9 @@ import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Key;
 
@@ -54,10 +54,10 @@ public final class LanternBlockStateBase {
     private final ImmutableMap<String, BlockTrait<?>> blockTraits;
     private final ImmutableList<BlockState> blockStates;
     private final ImmutableSet<Key<?>> keys;
-    private final BlockType blockType;
+    private final LanternBlockType blockType;
 
     @SuppressWarnings("rawtypes")
-    public LanternBlockStateBase(BlockType blockType, Iterable<BlockTrait<?>> blockTraits) {
+    public LanternBlockStateBase(LanternBlockType blockType, Iterable<BlockTrait<?>> blockTraits) {
         this.blockType = blockType;
 
         // There are no block traits
@@ -138,7 +138,7 @@ public final class LanternBlockStateBase {
         return this.keys;
     }
 
-    public BlockType getBlockType() {
+    public LanternBlockType getBlockType() {
         return this.blockType;
     }
 

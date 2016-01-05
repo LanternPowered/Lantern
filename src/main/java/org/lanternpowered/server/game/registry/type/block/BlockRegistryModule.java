@@ -34,22 +34,24 @@ import gnu.trove.map.TShortObjectMap;
 import gnu.trove.map.hash.TObjectShortHashMap;
 import gnu.trove.map.hash.TShortObjectHashMap;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.state.LanternBlockStateBase;
 import org.lanternpowered.server.block.type.BlockAir;
 import org.lanternpowered.server.block.type.BlockBedrock;
 import org.lanternpowered.server.block.type.BlockDirt;
 import org.lanternpowered.server.block.type.BlockGrass;
 import org.lanternpowered.server.block.type.BlockStone;
+import org.lanternpowered.server.data.type.LanternDirtType;
+import org.lanternpowered.server.data.type.LanternStoneType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import javax.annotation.Nullable;
 
@@ -78,7 +80,7 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
         return mappings;
     }
 
-    private void register0(int internalId, LanternBlockType blockType, @Nullable Function<BlockState, Byte> dataValueGenerator) {
+    private void register0(int internalId, LanternBlockType blockType, @Nullable BiFunction<Byte, BlockState, BlockState> dataToStateConverter) {
         final String id = checkNotNull(blockType, "blockType").getId().toLowerCase();
         checkState(!this.blockTypes.containsValue(checkNotNull(blockType, "blockType")), "The block type (" + id + ") is already registered.");
         checkState(!this.blockTypes.containsKey(id), "The identifier (" + id + ") is already used.");
@@ -89,25 +91,28 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
         this.blockTypes.put(id, blockType);
         this.blockTypeByInternalId.put(internalId0, blockType);
         this.internalIdByBlockType.put(blockType, internalId0);
-        LanternBlockStateBase blockStateBase = blockType.getBlockStateBase();
-        if (dataValueGenerator != null && blockStateBase.getBlockStates().size() > 1) {
-            for (BlockState state : blockStateBase.getBlockStates()) {
-                final byte dataValue = dataValueGenerator.apply(state);
-                final short stateValue = (short) ((internalId & 0xfff) << 4 | dataValue & 0xf);
-                this.blockStateByPackedType.put(stateValue, state);
-                this.packedTypeByBlockState.put(state, stateValue);
+        if (dataToStateConverter != null) {
+            int internalStateIdBase = (internalId & 0xfff) << 4;
+            for (byte b = 0; b <= 0xf; b++) {
+                BlockState blockState = dataToStateConverter.apply(b, blockType.getDefaultState());
+                if (blockState == null) {
+                    blockState = blockType.getDefaultState();
+                }
+                short internalStateId = (short) (internalStateIdBase | b & 0xf);
+                this.blockStateByPackedType.put(internalStateId, blockState);
+                this.packedTypeByBlockState.put(blockState, internalStateId);
             }
         } else {
-            final BlockState state = blockType.getDefaultState();
-            final short stateValue = (short) (internalId << 4);
-            this.blockStateByPackedType.put(stateValue, state);
-            this.packedTypeByBlockState.put(state, stateValue);
+            BlockState state = blockType.getDefaultState();
+            short internalStateId = (short) ((internalId & 0xfff) << 4);
+            this.blockStateByPackedType.put(internalStateId, state);
+            this.packedTypeByBlockState.put(state, internalStateId);
         }
     }
 
     @Override
-    public void register(int internalId, BlockType blockType, Function<BlockState, Byte> dataValueGenerator) {
-        this.register0(internalId, (LanternBlockType) blockType, checkNotNull(dataValueGenerator, "dataValueGenerator"));
+    public void register(int internalId, BlockType blockType, BiFunction<Byte, BlockState, BlockState> dataToStateConverter) {
+        this.register0(internalId, (LanternBlockType) blockType, checkNotNull(dataToStateConverter, "dataToStateConverter"));
     }
 
     @Override
@@ -119,8 +124,8 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
     }
 
     @Override
-    public void register(BlockType blockType, Function<BlockState, Byte> dataValueGenerator) {
-        this.register(this.nextInternalId(), blockType, dataValueGenerator);
+    public void register(BlockType blockType, BiFunction<Byte, BlockState, BlockState> dataToStateConverter) {
+        this.register(this.nextInternalId(), blockType, checkNotNull(dataToStateConverter, "dataToStateConverter"));
     }
 
     @Override
@@ -192,11 +197,13 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
 
     @Override
     public void registerDefaults() {
-        this.register(0, new BlockAir("minecraft:air"));
-        this.register(1, new BlockStone("minecraft:stone"), state -> (byte) state.getTraitValue(BlockStone.TYPE).get().getInternalId());
-        this.register(2, new BlockGrass("minecraft:grass"));
-        this.register(3, new BlockDirt("minecraft:dirt"), state -> (byte) state.getTraitValue(BlockDirt.TYPE).get().getInternalId());
-        this.register(7, new BlockBedrock("minecraft:bedrock"));
+        this.register(0, new BlockAir("minecraft", "air"));
+        this.register(1, new BlockStone("minecraft", "stone"), (data, state) -> state.withTrait(BlockStone.TYPE,
+                Arrays.stream(LanternStoneType.values()).filter(t -> t.getInternalId() == data).findFirst().orElse(LanternStoneType.STONE)).get());
+        this.register(2, new BlockGrass("minecraft", "grass"), (data, state) -> state);
+        this.register(3, new BlockDirt("minecraft", "dirt"), (data, state) -> state.withTrait(BlockDirt.TYPE,
+                Arrays.stream(LanternDirtType.values()).filter(t -> t.getInternalId() == data).findFirst().orElse(LanternDirtType.DIRT)).get());
+        this.register(7, new BlockBedrock("minecraft", "bedrock"));
     }
 
 }

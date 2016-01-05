@@ -22,10 +22,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
-
-import org.spongepowered.api.data.value.BaseValue;
-
-public interface BlockTraitValue<V extends Comparable<V>> extends BaseValue<V> {
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.block;

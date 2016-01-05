@@ -44,4 +44,5 @@ public final class LanternTileEntityType extends SimpleLanternCatalogType implem
     public Class<? extends TileEntity> getTileEntityType() {
         return this.tileClass;
     }
+
 }

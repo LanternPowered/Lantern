@@ -22,14 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.type;
+package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.block.LanternBlockType;
-import org.spongepowered.api.data.property.block.MatterProperty.Matter;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.data.type.Hinge;
 
-public class BlockAir extends LanternBlockType {
+public enum LanternHinge implements Hinge, SimpleCatalogType {
 
-    public BlockAir(String pluginId, String identifier) {
-        super(pluginId, identifier, Matter.GAS);
+    LEFT            ("left"),
+    RIGHT           ("right"),
+    ;
+
+    private final String identifier;
+
+    LanternHinge(String identifier) {
+        this.identifier = identifier;
     }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public Hinge cycleNext() {
+        return this == LEFT ? RIGHT : LEFT;
+    }
+
 }

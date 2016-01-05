@@ -28,13 +28,18 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 
 public final class BlockStone extends LanternBlockType {
 
-    public static final BlockTrait<LanternStoneType> TYPE = LanternEnumTrait.of("variant", LanternStoneType.class);
+    public static final BlockTrait<LanternStoneType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.STONE_TYPE, LanternStoneType.class);
 
-    public BlockStone(String identifier) {
-        super(identifier, Matter.SOLID, TYPE);
+    public BlockStone(String pluginId, String identifier) {
+        super(pluginId, identifier, Matter.SOLID, TYPE);
+        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternStoneType.STONE).get());
     }
+
 }

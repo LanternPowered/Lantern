@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.launch;
 
+import org.lanternpowered.launch.console.ConsoleLaunch;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.net.URLClassLoader;
@@ -32,8 +33,11 @@ import java.net.URLClassLoader;
 final class Launch {
 
     public static void main(String[] args) {
-        ClassLoader classLoader = new LaunchClassLoader(
-                ((URLClassLoader) Launch.class.getClassLoader()).getURLs());
+        // Initialize the console
+        ConsoleLaunch.init();
+
+        // Setup the launch class loader
+        ClassLoader classLoader = new LaunchClassLoader(((URLClassLoader) Launch.class.getClassLoader()).getURLs());
         Thread.currentThread().setContextClassLoader(classLoader);
 
         // Initialize the class transformers

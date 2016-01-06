@@ -53,13 +53,14 @@ public final class ClassTransformers {
         addTransformerExclusion(new Exclusion.Package("org.sqlite"));
         addTransformerExclusion(new Exclusion.Package("org.mariadb.jdbc"));
         addTransformerExclusion(new Exclusion.Package("org.objectweb.asm"));
-        addTransformerExclusion(new Exclusion.Package("org.fusesource"));
         addTransformerExclusion(new Exclusion.Package("org.apache"));
         addTransformerExclusion(new Exclusion.Package("org.aopalliance"));
         addTransformerExclusion(new Exclusion.Package("io.netty"));
         addTransformerExclusion(new Exclusion.Package("gnu.trove"));
         addLoaderExclusion(new Exclusion.Class("com.google.common.io.ByteStreams", true));
+        addLoaderExclusion(new Exclusion.Package("org.fusesource"));
         addLoaderExclusion(new Exclusion.Package("org.lanternpowered.launch"));
+        addLoaderExclusion(new Exclusion.Package("jline"));
         addLoaderExclusion(new Exclusion.Package("java"));
         addLoaderExclusion(new Exclusion.Package("sun"));
     }

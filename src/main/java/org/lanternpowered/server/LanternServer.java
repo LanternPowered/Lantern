@@ -119,15 +119,11 @@ public class LanternServer implements Server {
             }
             */
 
-            // Create the console instance
-            final ConsoleManager consoleManager = new ConsoleManager();
-            // Initialize the console manager (setup basic logging)
-            consoleManager.init();
-
             // Create the game instance
             final LanternGame game = new LanternGame();
             game.preInitialize();
 
+            final ConsoleManager consoleManager = new ConsoleManager();
             // Start the console (command input/completer)
             consoleManager.start();
 

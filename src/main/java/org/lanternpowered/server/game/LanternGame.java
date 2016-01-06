@@ -140,7 +140,7 @@ public class LanternGame implements Game {
     public static final long TICK_DURATION_NS = TimeUnit.NANOSECONDS.convert(TICK_DURATION, TimeUnit.MILLISECONDS);
 
     // The logger of the game
-    @Nullable private static Logger logger;
+    private static Logger logger = LoggerFactory.getLogger("");
 
     /**
      * Gets the current time in ticks. This method is similar to
@@ -168,9 +168,6 @@ public class LanternGame implements Game {
      * @return the logger
      */
     public static Logger log() {
-        if (logger == null) {
-            logger = LoggerFactory.getLogger("");
-        }
         return logger;
     }
 

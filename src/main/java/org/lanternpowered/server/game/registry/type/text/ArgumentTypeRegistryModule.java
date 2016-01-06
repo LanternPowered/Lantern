@@ -41,7 +41,7 @@ import org.spongepowered.api.text.selector.ArgumentTypes;
 import java.util.HashMap;
 import java.util.Map;
 
-@RegistrationDependency(SelectorTypeRegistryModule.class)
+@RegistrationDependency(SelectorFactoryRegistryModule.class)
 public final class ArgumentTypeRegistryModule implements RegistryModule {
 
     @RegisterCatalog(ArgumentTypes.class)

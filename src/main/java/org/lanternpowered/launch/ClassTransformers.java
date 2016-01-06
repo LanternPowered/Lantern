@@ -58,6 +58,7 @@ public final class ClassTransformers {
         addTransformerExclusion(new Exclusion.Package("io.netty"));
         addTransformerExclusion(new Exclusion.Package("gnu.trove"));
         addLoaderExclusion(new Exclusion.Class("com.google.common.io.ByteStreams", true));
+        addLoaderExclusion(new Exclusion.Package("org.apache.logging.log4j"));
         addLoaderExclusion(new Exclusion.Package("org.fusesource"));
         addLoaderExclusion(new Exclusion.Package("org.lanternpowered.launch"));
         addLoaderExclusion(new Exclusion.Package("jline"));

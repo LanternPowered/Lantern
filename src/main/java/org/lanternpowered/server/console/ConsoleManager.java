@@ -44,6 +44,9 @@ public final class ConsoleManager {
 
         // Add the command completer
         final ConsoleReader reader = ConsoleLaunch.getReader();
+        if (reader == null) {
+            return;
+        }
         reader.addCompleter(new ConsoleCommandCompleter());
 
         // Start the command reader thread

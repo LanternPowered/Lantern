@@ -22,31 +22,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.rcon;
-
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import java.net.InetSocketAddress;
-
-@NonnullByDefault
-public class RconConnection implements RemoteConnection {
-
-    private final InetSocketAddress address;
-    private final InetSocketAddress virtualHost;
-
-    public RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
-        this.virtualHost = virtualHost;
-        this.address = address;
-    }
-
-    @Override
-    public InetSocketAddress getAddress() {
-        return this.address;
-    }
-
-    @Override
-    public InetSocketAddress getVirtualHost() {
-        return this.virtualHost;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.network.channel;

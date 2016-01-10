@@ -22,31 +22,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.rcon;
+package org.lanternpowered.server.data.property.common;
 
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.PropertyHolder;
+import org.spongepowered.api.data.property.PropertyStore;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import java.net.InetSocketAddress;
+import java.util.Optional;
 
-@NonnullByDefault
-public class RconConnection implements RemoteConnection {
+public abstract class AbstractLanternPropertyStore<T extends Property<?, ?>> implements PropertyStore<T> {
 
-    private final InetSocketAddress address;
-    private final InetSocketAddress virtualHost;
-
-    public RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
-        this.virtualHost = virtualHost;
-        this.address = address;
+    @Override
+    public Optional<T> getFor(Location<World> location) {
+        return this.getFor((PropertyHolder) location);
     }
 
     @Override
-    public InetSocketAddress getAddress() {
-        return this.address;
+    public Optional<T> getFor(Location<World> location, Direction direction) {
+        return this.getFor(location);
     }
 
     @Override
-    public InetSocketAddress getVirtualHost() {
-        return this.virtualHost;
+    public int getPriority() {
+        return 100;
     }
+
 }

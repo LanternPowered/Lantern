@@ -49,7 +49,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public final class LanternBlockStateBase {
+public final class LanternBlockStateMap {
 
     private final ImmutableMap<String, BlockTrait<?>> blockTraits;
     private final ImmutableList<BlockState> blockStates;
@@ -57,7 +57,7 @@ public final class LanternBlockStateBase {
     private final LanternBlockType blockType;
 
     @SuppressWarnings("rawtypes")
-    public LanternBlockStateBase(LanternBlockType blockType, Iterable<BlockTrait<?>> blockTraits) {
+    public LanternBlockStateMap(LanternBlockType blockType, Iterable<BlockTrait<?>> blockTraits) {
         this.blockType = blockType;
 
         // There are no block traits

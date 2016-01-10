@@ -22,31 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.rcon;
+package org.lanternpowered.server.block.type;
 
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.trait.LanternEnumTrait;
+import org.lanternpowered.server.data.type.LanternSandType;
+import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.block.MatterProperty;
 
-import java.net.InetSocketAddress;
+public class BlockSand extends LanternBlockType {
 
-@NonnullByDefault
-public class RconConnection implements RemoteConnection {
+    public static final BlockTrait<LanternSandType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.SAND_TYPE, LanternSandType.class);
 
-    private final InetSocketAddress address;
-    private final InetSocketAddress virtualHost;
-
-    public RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
-        this.virtualHost = virtualHost;
-        this.address = address;
-    }
-
-    @Override
-    public InetSocketAddress getAddress() {
-        return this.address;
-    }
-
-    @Override
-    public InetSocketAddress getVirtualHost() {
-        return this.virtualHost;
+    public BlockSand(String pluginId, String identifier) {
+        super(pluginId, identifier, MatterProperty.Matter.SOLID, TYPE);
+        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternSandType.NORMAL).get());
     }
 }

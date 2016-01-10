@@ -118,19 +118,16 @@ public final class LanternPluginManager implements PluginManager {
         List<PluginEntry> plugins = Lists.newArrayList();
 
         // Search for all the plugin jar/zip files
-        for (Path jar : Files.list(this.pluginsFolder).filter(ARCHIVE).collect(Collectors.toList())) {
-            // Search the jar for plugins
-            if (scanZip(jar, plugins)) {
-                // Add the jar/zip to the class loader, even if the
-                // jar doesn't contain a plugin, it may be used as
-                // a library
-                try {
-                    ((LaunchClassLoader) this.getClass().getClassLoader()).addURL(jar.toFile().toURI().toURL());
-                } catch (MalformedURLException e) {
-                    LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
-                }
+        // Add the jar/zip to the class loader, even if the
+        // jar doesn't contain a plugin, it may be used as
+        // a library
+        Files.list(this.pluginsFolder).filter(ARCHIVE).collect(Collectors.toList()).stream().filter(jar -> scanZip(jar, plugins)).forEach(jar -> {
+            try {
+                ((LaunchClassLoader) this.getClass().getClassLoader()).addURL(jar.toFile().toURI().toURL());
+            } catch (MalformedURLException e) {
+                LanternGame.log().warn("Unable to add the file {} to the class loader", jar);
             }
-        }
+        });
 
         // Get all the unique identifiers and notify if duplicates are found
         Map<String, PluginEntry> identifiers = Maps.newHashMap();

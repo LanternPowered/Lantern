@@ -37,6 +37,7 @@ import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
+import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
@@ -403,11 +404,13 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     public void init() {
+        DataRegistrar.setupRegistrations(this.game);
         this.phase = RegistrationPhase.INIT;
         this.registerModulePhase();
     }
 
     public void postInit() {
+        DataRegistrar.finalizeRegistrations(this.game);
         this.phase = RegistrationPhase.POST_INIT;
         this.registerModulePhase();
         this.phase = RegistrationPhase.LOADED;

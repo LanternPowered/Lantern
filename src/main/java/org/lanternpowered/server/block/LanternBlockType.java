@@ -25,15 +25,16 @@
 package org.lanternpowered.server.block;
 
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.block.state.LanternBlockStateBase;
+import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -41,10 +42,10 @@ import org.spongepowered.api.world.World;
 import java.util.Collection;
 import java.util.Optional;
 
-public class LanternBlockType extends LanternPluginCatalogType implements BlockType {
+public class LanternBlockType extends LanternPluginCatalogType implements BlockType, AbstractPropertyHolder {
 
     // The block state base which contains all the possible block states
-    private final LanternBlockStateBase blockStateBase;
+    private final LanternBlockStateMap blockStateBase;
     private final Matter matter;
     private BlockState defaultBlockState;
     private boolean tickRandomly;
@@ -61,7 +62,7 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
         super(pluginId, identifier);
 
         // Create the block state base
-        this.blockStateBase = new LanternBlockStateBase(this, blockTraits);
+        this.blockStateBase = new LanternBlockStateMap(this, blockTraits);
         this.defaultBlockState = this.blockStateBase.getBaseState();
         this.matter = matter;
     }
@@ -75,7 +76,7 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
      *
      * @return the block state base
      */
-    public LanternBlockStateBase getBlockStateBase() {
+    public LanternBlockStateMap getBlockStateBase() {
         return this.blockStateBase;
     }
 
@@ -91,15 +92,36 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
     }
 
     /**
-     * Gets the actual state for the specified block state, extra properties provided by surrounding blocks
+     * Gets the extended state for the specified block state, extra properties provided by surrounding blocks
      * may be applied in this method.
      *
      * @param blockState the block state
      * @param location the location
      * @return the actual state
      */
-    public BlockState getActualState(BlockState blockState, Location<World> location) {
+    public BlockState getExtendedState(BlockState blockState, Location<World> location) {
         return blockState;
+    }
+
+    /**
+     * Gets the extended state for the specified location, extra properties provided by surrounding blocks
+     * may be applied in this method.
+     *
+     * @param location the location
+     * @return the actual state
+     */
+    public BlockState getExtendedState(Location<World> location) {
+        return this.getExtendedState(location.getBlock(), location);
+    }
+
+    /**
+     * Gets the block state of this type from the target item stack.
+     *
+     * @param itemStack the item stack
+     * @return the block state
+     */
+    public BlockState getStateFromItemStack(ItemStack itemStack) {
+        return this.getDefaultState();
     }
 
     /**
@@ -151,16 +173,6 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
     @Override
     public Optional<BlockTrait<?>> getTrait(String blockTrait) {
         return this.blockStateBase.getTrait(blockTrait);
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        return this.getDefaultState().getProperty(propertyClass);
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
-        return this.getDefaultState().getApplicableProperties();
     }
 
     /**

@@ -22,24 +22,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.property;
-
-import org.spongepowered.api.data.property.block.MatterProperty;
-
-public final class LanternMatterProperty {
-
-    private static final MatterProperty SOLID = new MatterProperty(MatterProperty.Matter.SOLID);
-    private static final MatterProperty LIQUID = new MatterProperty(MatterProperty.Matter.LIQUID);
-    private static final MatterProperty GAS = new MatterProperty(MatterProperty.Matter.GAS);
-
-    public static MatterProperty of(MatterProperty.Matter matter) {
-        if (matter == MatterProperty.Matter.SOLID) {
-            return SOLID;
-        } else if (matter == MatterProperty.Matter.LIQUID) {
-            return LIQUID;
-        } else {
-            return GAS;
-        }
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.data.property.block;

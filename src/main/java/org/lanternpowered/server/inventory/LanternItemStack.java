@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -46,7 +47,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-public class LanternItemStack implements ItemStack {
+public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
 
     private final ItemType itemType;
 
@@ -57,12 +58,6 @@ public class LanternItemStack implements ItemStack {
 
     public LanternItemStack(ItemType itemType) {
         this.itemType = itemType;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -276,12 +271,6 @@ public class LanternItemStack implements ItemStack {
 
     @Override
     public ItemStack copy() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
         // TODO Auto-generated method stub
         return null;
     }

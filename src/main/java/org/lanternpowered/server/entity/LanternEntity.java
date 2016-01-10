@@ -28,6 +28,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -59,7 +60,7 @@ import java.util.function.Function;
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public class LanternEntity extends BaseComponentHolder implements Entity {
+public class LanternEntity extends BaseComponentHolder implements Entity, AbstractPropertyHolder {
 
     protected final static float EPSILON = 1.0e-004f;
 
@@ -76,12 +77,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity {
 
     @Override
     public UUID getUniqueId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -426,12 +421,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity {
 
     @Override
     public EntitySnapshot createSnapshot() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
         // TODO Auto-generated method stub
         return null;
     }

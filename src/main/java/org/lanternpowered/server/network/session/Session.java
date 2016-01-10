@@ -272,18 +272,16 @@ public class Session implements PlayerConnection {
             return null;
         }
 
-        ChannelFuture future = this.channel.writeAndFlush(message).addListener(new GenericFutureListener<Future<? super Void>>() {
-            @Override
-            public void operationComplete(Future<? super Void> future) throws Exception {
-                if (future.cause() != null) {
-                    onOutboundThrowable(future.cause());
-                }
+        ChannelFuture future = this.channel.writeAndFlush(message).addListener(future1 -> {
+            if (future1.cause() != null) {
+                this.onOutboundThrowable(future1.cause());
             }
         });
 
         // This is a special case, we need to make sure that the message is send
         // before we set the compression on the server side
-        if (message instanceof MessageOutSetCompression) {
+        // MAY ONLY BE SET ONLY AT LOGIN, otherwise you may get some fireworks
+        if (message instanceof MessageOutSetCompression && this.getProtocolState() == ProtocolState.LOGIN) {
             int threshold = ((MessageOutSetCompression) message).getThreshold();
             if (threshold == -1) {
                 this.channel.pipeline().replace(COMPRESSION, COMPRESSION, NoopHandler.INSTANCE);
@@ -330,8 +328,8 @@ public class Session implements PlayerConnection {
      * Handles the inbound message. Also requires the protocol to avoid a lot of
      * calls of the {@link #getProtocol()}.
      * 
-     * @param protocol the protocol to find the handler
-     * @param message the message to be handled
+     * @param handler the handler
+     * @param message the message
      */
     protected void handleMessage(Handler handler, Message message) {
         try {
@@ -355,7 +353,7 @@ public class Session implements PlayerConnection {
      * @param message the message
      */
     public void messageReceived(Message message) {
-        Class<? extends Message> messageClass = (Class<? extends Message>) message.getClass();
+        Class<? extends Message> messageClass = message.getClass();
         MessageRegistration registration = this.getProtocol().inbound().find(messageClass);
 
         if (registration == null) {

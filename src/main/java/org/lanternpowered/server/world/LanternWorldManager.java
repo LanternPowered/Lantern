@@ -158,8 +158,7 @@ public final class LanternWorldManager {
      */
     public Optional<World> getWorld(String worldName) {
         checkNotNull(worldName, "worldName");
-        return this.worldByName.containsKey(worldName) ? Optional.ofNullable(
-                this.worldByName.get(worldName).world) : Optional.empty();
+        return this.worldByName.containsKey(worldName) ? Optional.ofNullable(this.worldByName.get(worldName).world) : Optional.empty();
     }
 
     /**
@@ -168,8 +167,7 @@ public final class LanternWorldManager {
      * @return a collection of loaded worlds
      */
     public Collection<World> getWorlds() {
-        return this.worldByUUID.values().stream().map(e -> e.world)
-                .collect(GuavaCollectors.toImmutableList());
+        return this.worldByUUID.values().stream().map(e -> e.world).collect(GuavaCollectors.toImmutableList());
     }
 
     /**
@@ -181,8 +179,7 @@ public final class LanternWorldManager {
      */
     public Optional<World> getWorld(UUID uniqueId) {
         checkNotNull(uniqueId, "uniqueId");
-        return this.worldByUUID.containsKey(uniqueId) ? Optional.ofNullable(
-                this.worldByUUID.get(uniqueId).world) : Optional.empty();
+        return this.worldByUUID.containsKey(uniqueId) ? Optional.ofNullable(this.worldByUUID.get(uniqueId).world) : Optional.empty();
     }
 
     /**
@@ -191,8 +188,7 @@ public final class LanternWorldManager {
      * @return a collection of world properties
      */
     public Collection<WorldProperties> getAllWorldProperties() {
-        return this.worldByUUID.values().stream().map(e -> e.properties)
-                .collect(GuavaCollectors.toImmutableList());
+        return this.worldByUUID.values().stream().map(e -> e.properties).collect(GuavaCollectors.toImmutableList());
     }
 
     /**
@@ -201,8 +197,7 @@ public final class LanternWorldManager {
      * @return a collection of world properties
      */
     public Collection<WorldProperties> getUnloadedWorlds() {
-        return this.worldByUUID.values().stream().filter(e -> e.world == null)
-                .map(e -> e.properties).collect(GuavaCollectors.toImmutableList());
+        return this.worldByUUID.values().stream().filter(e -> e.world == null).map(e -> e.properties).collect(GuavaCollectors.toImmutableList());
     }
 
     /**
@@ -216,8 +211,7 @@ public final class LanternWorldManager {
      */
     public Optional<WorldProperties> getWorldProperties(String worldName) {
         checkNotNull(worldName, "worldName");
-        return this.worldByName.containsKey(worldName) ? Optional.ofNullable(
-                this.worldByName.get(worldName).properties) : Optional.empty();
+        return this.worldByName.containsKey(worldName) ? Optional.ofNullable(this.worldByName.get(worldName).properties) : Optional.empty();
     }
 
     /**
@@ -231,8 +225,7 @@ public final class LanternWorldManager {
      */
     public Optional<WorldProperties> getWorldProperties(UUID uniqueId) {
         checkNotNull(uniqueId, "uniqueId");
-        return this.worldByUUID.containsKey(uniqueId) ? Optional.ofNullable(
-                this.worldByUUID.get(uniqueId).properties) : Optional.empty();
+        return this.worldByUUID.containsKey(uniqueId) ? Optional.ofNullable(this.worldByUUID.get(uniqueId).properties) : Optional.empty();
     }
 
     /**
@@ -242,8 +235,7 @@ public final class LanternWorldManager {
      */
     public Optional<WorldProperties> getDefaultWorld() {
         // Can be empty if the properties aren't loaded yet
-        return this.worldByDimensionId.containsKey(0) ? Optional.ofNullable(
-                this.worldByDimensionId.get(0).properties) : Optional.empty();
+        return this.worldByDimensionId.containsKey(0) ? Optional.ofNullable(this.worldByDimensionId.get(0).properties) : Optional.empty();
     }
 
     /**
@@ -648,8 +640,7 @@ public final class LanternWorldManager {
                         try {
                             world.pulse();
                         } catch (Exception e) {
-                            LanternGame.log().error("Error occurred while pulsing the world {}",
-                                    world.getName(), e);
+                            LanternGame.log().error("Error occurred while pulsing the world {}", world.getName(), e);
                         } finally {
                             tickEnd.arriveAndAwaitAdvance();
                         }
@@ -673,8 +664,6 @@ public final class LanternWorldManager {
         if (!this.worldThreads.containsKey(world)) {
             return;
         }
-        // this.tickBegin.arriveAndDeregister();
-        // this.tickEnd.arriveAndDeregister();
         this.worldThreads.remove(world).interrupt();
     }
 
@@ -682,12 +671,11 @@ public final class LanternWorldManager {
     private volatile int currentTick = -1;
 
     private void tickEnd() {
+        int nextTick = this.currentTick + 1;
         // Mark ourselves as arrived so world threads automatically trigger advance once done
         int endPhase = this.tickEnd.arriveAndAwaitAdvance();
-        int nextTick = this.currentTick + 1;
         if (endPhase != nextTick) {
-            LanternGame.log().warn("Tick end barrier {} has advanced differently from tick begin barrier: {}",
-                    endPhase, nextTick);
+            LanternGame.log().warn("Tick end barrier {} has advanced differently from tick begin barrier: {}", endPhase, nextTick);
         }
     }
 
@@ -715,9 +703,7 @@ public final class LanternWorldManager {
      */
     public void shutdown() {
         // Unload all the active worlds
-        this.worldByProperties.values().stream().filter(entry -> entry.world != null).forEach(entry -> {
-            this.unloadWorld(entry.world);
-        });
+        this.worldByProperties.values().stream().filter(entry -> entry.world != null).forEach(entry -> this.unloadWorld(entry.world));
         this.tickBegin.forceTermination();
         this.tickEnd.forceTermination();
         this.worldThreads.clear();

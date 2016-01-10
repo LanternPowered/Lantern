@@ -28,7 +28,7 @@ import org.lanternpowered.server.network.message.Message;
 
 /**
  * The set compression message, this can be send in the
- * LOGIN and PLAY protocol state.
+ * LOGIN protocol state.
  */
 public final class MessageOutSetCompression implements Message {
 

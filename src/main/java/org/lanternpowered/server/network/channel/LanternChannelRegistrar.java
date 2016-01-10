@@ -111,11 +111,8 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
 
     @Override
     public boolean isChannelAvailable(String channelName) {
-        if (this.bindings.containsKey(channelName) || channelName.startsWith("MC|") ||
-                channelName.startsWith("\001") || channelName.startsWith("FML")) {
-            return false;
-        }
-        return true;
+        return !(this.bindings.containsKey(channelName) || channelName.startsWith("MC|") || channelName.startsWith("\001") ||
+                channelName.startsWith("FML") || channelName.equals("REGISTER") || channelName.equals("UNREGISTER"));
     }
 
     void sendPayloadChannelBuf(Player player, String channel, Consumer<ChannelBuf> payload) {

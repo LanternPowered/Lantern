@@ -22,31 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.rcon;
+package org.lanternpowered.server.data.property.block;
 
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.util.Direction;
 
-import java.net.InetSocketAddress;
+import java.util.Optional;
 
-@NonnullByDefault
-public class RconConnection implements RemoteConnection {
+import javax.annotation.Nullable;
 
-    private final InetSocketAddress address;
-    private final InetSocketAddress virtualHost;
+public final class MatterPropertyStore extends AbstractBlockPropertyStore<MatterProperty> {
 
-    public RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
-        this.virtualHost = virtualHost;
-        this.address = address;
-    }
-
-    @Override
-    public InetSocketAddress getAddress() {
-        return this.address;
-    }
+    private static final Optional<MatterProperty> SOLID = Optional.of(new MatterProperty(MatterProperty.Matter.SOLID));
+    private static final Optional<MatterProperty> LIQUID = Optional.of(new MatterProperty(MatterProperty.Matter.LIQUID));
+    private static final Optional<MatterProperty> GAS = Optional.of(new MatterProperty(MatterProperty.Matter.GAS));
 
     @Override
-    public InetSocketAddress getVirtualHost() {
-        return this.virtualHost;
+    public Optional<MatterProperty> getFor(BlockState blockState, @Nullable Direction direction) {
+        MatterProperty.Matter matter = ((LanternBlockType) blockState.getType()).getMatter(blockState);
+        if (matter == MatterProperty.Matter.SOLID) {
+            return SOLID;
+        } else if (matter == MatterProperty.Matter.LIQUID) {
+            return LIQUID;
+        } else {
+            return GAS;
+        }
     }
 }

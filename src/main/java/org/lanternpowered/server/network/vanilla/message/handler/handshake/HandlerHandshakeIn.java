@@ -40,15 +40,19 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
         ProtocolState next = ProtocolState.fromId(message.getNextState());
         if (next == null) {
             session.disconnect("Unknown protocol state! (" + message.getNextState() + ")");
+            return;
         }
 
         session.setProtocolState(next);
         if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS)) {
             session.disconnect("Received a unexpected handshake message! (" + next + ")");
+            return;
         }
+
         // session.setVirtualHost(message.getAddress());
         session.setProtocolVersion(message.getProtocolVersion());
         session.getChannel().attr(Session.FML_MARKER).set(message.hasFMLMarker());
+        session.setProxyData(message.getProxyData());
 
         if (next == ProtocolState.LOGIN) {
             int protocol = ((LanternMinecraftVersion) LanternGame.get().getPlatform().getMinecraftVersion()).getProtocol();

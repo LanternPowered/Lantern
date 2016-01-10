@@ -69,7 +69,7 @@ public class LanternPatternListValue extends LanternListValue<PatternLayer> impl
 
     @Override
     public PatternListValue add(int index, BannerPatternShape patternShape, DyeColor color) {
-        return add(index, new LanternPatternLayer(patternShape, color));
+        return this.add(index, new LanternPatternLayer(patternShape, color));
     }
 
     @Override

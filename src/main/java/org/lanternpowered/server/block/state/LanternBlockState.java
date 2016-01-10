@@ -31,8 +31,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
-import org.lanternpowered.server.block.property.LanternMatterProperty;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
+import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -42,16 +42,13 @@ import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.util.Cycleable;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -66,7 +63,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public final class LanternBlockState implements BlockState {
+public final class LanternBlockState implements BlockState, AbstractDirectionRelativePropertyHolder {
 
     // A lookup table to get a specific state when you would change a value
     ImmutableTable<BlockTrait<?>, Comparable<?>, BlockState> propertyValueTable;
@@ -75,12 +72,12 @@ public final class LanternBlockState implements BlockState {
     final ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues;
 
     // The lookup to convert between key <--> trait
-    final ImmutableMap<Key<Value<?>>, BlockTrait<?>> keyToBlockTrait;
+    private final ImmutableMap<Key<Value<?>>, BlockTrait<?>> keyToBlockTrait;
 
     // The base block state
-    private final LanternBlockStateBase baseState;
+    private final LanternBlockStateMap baseState;
 
-    LanternBlockState(LanternBlockStateBase baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
+    LanternBlockState(LanternBlockStateMap baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
         this.traitValues = traitValues;
         this.baseState = baseState;
 
@@ -115,7 +112,7 @@ public final class LanternBlockState implements BlockState {
 
     @Override
     public BlockState withExtendedProperties(Location<World> location) {
-        return this.baseState.getBlockType().getActualState(this, checkNotNull(location, "location"));
+        return this.baseState.getBlockType().getExtendedState(this, checkNotNull(location, "location"));
     }
 
     @Override
@@ -404,25 +401,6 @@ public final class LanternBlockState implements BlockState {
     @Override
     public Map<BlockTrait<?>, ?> getTraitMap() {
         return this.traitValues;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        if (propertyClass == MatterProperty.class) {
-            return (Optional) Optional.of(LanternMatterProperty.of(this.baseState.getBlockType().getMatter(this)));
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Direction direction, Class<T> clazz) {
-        return null;
     }
 
 }

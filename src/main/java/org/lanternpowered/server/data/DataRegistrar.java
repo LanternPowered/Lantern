@@ -22,31 +22,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.rcon;
+package org.lanternpowered.server.data;
 
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.lanternpowered.server.data.property.LanternPropertyRegistry;
+import org.lanternpowered.server.data.property.block.MatterPropertyStore;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.data.property.PropertyRegistry;
+import org.spongepowered.api.data.property.block.MatterProperty;
 
-import java.net.InetSocketAddress;
+public class DataRegistrar {
 
-@NonnullByDefault
-public class RconConnection implements RemoteConnection {
-
-    private final InetSocketAddress address;
-    private final InetSocketAddress virtualHost;
-
-    public RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
-        this.virtualHost = virtualHost;
-        this.address = address;
+    public static void setupRegistrations(Game game) {
+        final PropertyRegistry propertyRegistry = LanternPropertyRegistry.getInstance();
+        propertyRegistry.register(MatterProperty.class, new MatterPropertyStore());
     }
 
-    @Override
-    public InetSocketAddress getAddress() {
-        return this.address;
-    }
-
-    @Override
-    public InetSocketAddress getVirtualHost() {
-        return this.virtualHost;
+    public static void finalizeRegistrations(Game game) {
+        LanternPropertyRegistry.getInstance().completeRegistration();
     }
 }

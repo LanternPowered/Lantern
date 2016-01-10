@@ -25,6 +25,7 @@
 package org.lanternpowered.server.block.tile;
 
 import org.lanternpowered.server.component.BaseComponentHolder;
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
@@ -46,13 +47,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-public class LanternTileEntity extends BaseComponentHolder implements TileEntity {
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
+public class LanternTileEntity extends BaseComponentHolder implements TileEntity, AbstractPropertyHolder {
 
     @Override
     public boolean validateRawData(DataContainer container) {
@@ -235,12 +230,6 @@ public class LanternTileEntity extends BaseComponentHolder implements TileEntity
 
     @Override
     public BlockState getBlock() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
         // TODO Auto-generated method stub
         return null;
     }

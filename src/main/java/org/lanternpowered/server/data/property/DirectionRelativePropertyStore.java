@@ -22,31 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.rcon;
+package org.lanternpowered.server.data.property;
 
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.PropertyHolder;
+import org.spongepowered.api.data.property.PropertyStore;
+import org.spongepowered.api.util.Direction;
 
-import java.net.InetSocketAddress;
+import java.util.Optional;
 
-@NonnullByDefault
-public class RconConnection implements RemoteConnection {
+public interface DirectionRelativePropertyStore<T extends Property<?, ?>> extends PropertyStore<T> {
 
-    private final InetSocketAddress address;
-    private final InetSocketAddress virtualHost;
+    Optional<T> getFor(PropertyHolder propertyHolder, Direction direction);
 
-    public RconConnection(InetSocketAddress address, InetSocketAddress virtualHost) {
-        this.virtualHost = virtualHost;
-        this.address = address;
-    }
-
-    @Override
-    public InetSocketAddress getAddress() {
-        return this.address;
-    }
-
-    @Override
-    public InetSocketAddress getVirtualHost() {
-        return this.virtualHost;
-    }
 }

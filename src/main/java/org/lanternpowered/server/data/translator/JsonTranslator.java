@@ -34,12 +34,10 @@ import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.translator.DataTranslator;
-import org.spongepowered.api.util.Coerce;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
@@ -48,13 +46,13 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
 
     private static final JsonTranslator INSTANCE = new JsonTranslator();
 
-    private static final Pattern DOUBLE = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+[d|D]");
-    private static final Pattern DOUBLE_UNTYPED = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+");
-    private static final Pattern FLOAT = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+[f|F]");
-    private static final Pattern LONG = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+[l|L]");
-    private static final Pattern BYTE = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+[b|B]");
-    private static final Pattern SHORT = Pattern.compile("[-+]?[0-9]*\\.?[0-9]+[s|S]");
-    private static final Pattern INTEGER = Pattern.compile("[-+]?[0-9]+");
+    private static final Pattern DOUBLE = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[dD]$");
+    private static final Pattern DOUBLE_UNTYPED = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+$");
+    private static final Pattern FLOAT = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[fF]$");
+    private static final Pattern LONG = Pattern.compile("^[-+]?[0-9]+[lL]$");
+    private static final Pattern BYTE = Pattern.compile("^[-+]?[0-9]+[bB]$");
+    private static final Pattern SHORT = Pattern.compile("^[-+]?[0-9]+[sS]$");
+    private static final Pattern INTEGER = Pattern.compile("^[-+]?[0-9]+$");
 
     /**
      * Get the instance of this translator.
@@ -145,9 +143,10 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
             } else if (DOUBLE_UNTYPED.matcher(value).matches()) {
                 return Double.parseDouble(value);
             } else {
-                Optional<Boolean> value0 = Coerce.asBoolean(value);
-                if (value0.isPresent()) {
-                    return value0.get();
+                if ("true".equalsIgnoreCase(value)) {
+                    return true;
+                } else if ("false".equalsIgnoreCase(value)) {
+                    return false;
                 }
                 return value;
             }

@@ -62,6 +62,7 @@ import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryMo
 import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.WallTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
@@ -101,6 +102,7 @@ import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.persistence.DataFormat;
 import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.DisguisedBlockType;
@@ -224,8 +226,9 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerModule(LanternOperation.class, new AttributeOperationRegistryModule())
                 .registerModule(LanternAttribute.class, new AttributeRegistryModule())
                 .registerModule(new AttributeTargetRegistryModule())
-                .registerModule(BrickType.class, new BrickTypeRegistryModule())
                 .registerModule(BlockType.class, new BlockRegistryModule())
+                .registerModule(DataFormat.class, new DataFormatRegistryModule())
+                .registerModule(BrickType.class, new BrickTypeRegistryModule())
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())
                 .registerModule(DisguisedBlockType.class, new DisguisedBlockTypeRegistryModule())
                 .registerModule(DoublePlantType.class, new DoublePlantTypeRegistryModule())

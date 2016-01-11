@@ -22,26 +22,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io;
+package org.lanternpowered.server.data.persistence.nbt;
 
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-/**
- * A output that can be used to write data views.
- */
-@NonnullByDefault
-public interface DataContainerOutput {
+public final class NbtStreamUtils {
 
     /**
-     * Writes a {@link DataView} or {@link DataContainer} to the output.
+     * Reads a data container from a input stream that contains
+     * data with the nbt format.
      * 
-     * @param view the data view
-     * @throws IOException when a i/o error occurred
+     * @param inputStream the input stream
+     * @param compressed whether the data is compressed
+     * @return the data container
+     * @throws IOException
      */
-    void write(DataView view) throws IOException;
+    public static DataContainer read(InputStream inputStream, boolean compressed) throws IOException {
+        NbtDataContainerInputStream input = new NbtDataContainerInputStream(inputStream, compressed);
+        DataContainer dataContainer = input.read();
+        input.close();
+        return dataContainer;
+    }
+
+    /**
+     * Writes a data container (view) to the output stream in the nbt format.
+     * 
+     * @param dataView the data view to write
+     * @param outputStream the output stream to write to
+     * @param compressed whether the data should be compressed
+     * @throws IOException
+     */
+    public static void write(DataView dataView, OutputStream outputStream, boolean compressed) throws IOException {
+        NbtDataContainerOutputStream output = new NbtDataContainerOutputStream(outputStream, compressed);
+        output.write(dataView);
+        output.flush();
+        output.close();
+    }
+
+    private NbtStreamUtils() {
+    }
 
 }

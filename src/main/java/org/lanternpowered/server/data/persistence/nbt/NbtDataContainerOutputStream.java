@@ -22,28 +22,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.nbt;
+package org.lanternpowered.server.data.persistence.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BOOLEAN_IDENTIFER;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BYTE;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BYTE_ARRAY;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.COMPOUND;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.DOUBLE;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.END;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.FLOAT;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.INT;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.INT_ARRAY;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.LIST;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.LONG;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.SHORT;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.STRING;
 
-import org.lanternpowered.server.data.io.DataContainerOutput;
+import org.lanternpowered.server.data.persistence.DataContainerOutput;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.Closeable;
 import java.io.DataOutputStream;
@@ -58,7 +44,6 @@ import java.util.zip.GZIPOutputStream;
 /**
  * A data output stream that serializes data views into the nbt format.
  */
-@NonnullByDefault
 public class NbtDataContainerOutputStream implements Closeable, Flushable, DataContainerOutput {
 
     private final DataOutputStream dos;
@@ -110,12 +95,12 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
 
     @SuppressWarnings("unchecked")
     private void writePayload(byte type, Object object) throws IOException {
-        if (type == BYTE) {
+        if (type == NbtConstants.BYTE) {
             if (object instanceof Boolean) {
                 object = (byte) (((Boolean) object) ? 1 : 0);
             }
             this.dos.writeByte((Byte) object);
-        } else if (type == BYTE_ARRAY) {
+        } else if (type == NbtConstants.BYTE_ARRAY) {
             byte[] array0;
             if (object instanceof byte[]) {
                 array0 = (byte[]) object;
@@ -128,7 +113,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             }
             this.dos.writeInt(array0.length);
             this.dos.write(array0);
-        } else if (type == COMPOUND) {
+        } else if (type == NbtConstants.COMPOUND) {
             // Convert the object in something we can serialize
             if (object instanceof DataView) {
                 object = ((DataView) object).getValues(false);
@@ -138,14 +123,14 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             for (Entry<DataQuery, Object> entry : ((Map<DataQuery, Object>) object).entrySet()) {
                 this.writeEntry(entry.getKey().asString('.'), entry.getValue());
             }
-            this.dos.writeByte(END);
-        } else if (type == DOUBLE) {
+            this.dos.writeByte(NbtConstants.END);
+        } else if (type == NbtConstants.DOUBLE) {
             this.dos.writeDouble((Double) object);
-        } else if (type == FLOAT) {
+        } else if (type == NbtConstants.FLOAT) {
             this.dos.writeFloat((Float) object);
-        } else if (type == INT) {
+        } else if (type == NbtConstants.INT) {
             this.dos.writeInt((Integer) object);
-        } else if (type == INT_ARRAY) {
+        } else if (type == NbtConstants.INT_ARRAY) {
             if (object instanceof int[]) {
                 int[] array0 = (int[]) object;
                 this.dos.writeInt(array0.length);
@@ -159,9 +144,9 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                     this.dos.writeInt(value);
                 }
             }
-        } else if (type == LIST) {
+        } else if (type == NbtConstants.LIST) {
             List<Object> list = (List<Object>) object;
-            byte type0 = END;
+            byte type0 = NbtConstants.END;
             if (!list.isEmpty()) {
                 type0 = this.typeFor(list.get(0));
             }
@@ -170,11 +155,11 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             for (Object object0 : list) {
                 this.writePayload(type0, object0);
             }
-        } else if (type == LONG) {
+        } else if (type == NbtConstants.LONG) {
             this.dos.writeLong((Long) object);
-        } else if (type == SHORT) {
+        } else if (type == NbtConstants.SHORT) {
             this.dos.writeShort((Short) object);
-        } else if (type == STRING) {
+        } else if (type == NbtConstants.STRING) {
             this.dos.writeUTF((String) object);
         }
     }
@@ -184,7 +169,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
         this.dos.writeByte(type);
         if (object instanceof Boolean || (object instanceof List && !((List<?>) object).isEmpty()
                 && ((List<?>) object).get(0) instanceof Boolean)) {
-            key += BOOLEAN_IDENTIFER;
+            key += NbtConstants.BOOLEAN_IDENTIFER;
         }
         this.dos.writeUTF(key);
         this.writePayload(type, object);
@@ -192,27 +177,27 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
 
     private byte typeFor(Object object) {
         if (object instanceof Byte || object instanceof Boolean) {
-            return BYTE;
+            return NbtConstants.BYTE;
         } else if (object instanceof Byte[] || object instanceof byte[]) {
-            return BYTE_ARRAY;
+            return NbtConstants.BYTE_ARRAY;
         } else if (object instanceof Map || object instanceof DataView || object instanceof DataSerializable) {
-            return COMPOUND;
+            return NbtConstants.COMPOUND;
         } else if (object instanceof Double) {
-            return DOUBLE;
+            return NbtConstants.DOUBLE;
         } else if (object instanceof Float) {
-            return FLOAT;
+            return NbtConstants.FLOAT;
         } else if (object instanceof Integer) {
-            return INT;
+            return NbtConstants.INT;
         } else if (object instanceof Integer[] || object instanceof int[]) {
-            return INT_ARRAY;
+            return NbtConstants.INT_ARRAY;
         } else if (object instanceof List) {
-            return LIST;
+            return NbtConstants.LIST;
         } else if (object instanceof Long) {
-            return LONG;
+            return NbtConstants.LONG;
         } else if (object instanceof Short) {
-            return SHORT;
+            return NbtConstants.SHORT;
         } else if (object instanceof String) {
-            return STRING;
+            return NbtConstants.STRING;
         }
         return 0;
     }

@@ -22,50 +22,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.nbt;
+package org.lanternpowered.server.data.persistence.nbt;
 
+import org.lanternpowered.server.data.persistence.AbstractDataFormat;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.InvalidDataFormatException;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-@NonnullByDefault
-public final class NbtStreamUtils {
+public final class NbtDataFormat extends AbstractDataFormat {
 
-    /**
-     * Reads a data container from a input stream that contains
-     * data with the nbt format.
-     * 
-     * @param inputStream the input stream
-     * @param compressed whether the data is compressed
-     * @return the data container
-     * @throws IOException
-     */
-    public static DataContainer read(InputStream inputStream, boolean compressed) throws IOException {
-        NbtDataContainerInputStream input = new NbtDataContainerInputStream(inputStream, compressed);
-        DataContainer dataContainer = input.read();
-        input.close();
-        return dataContainer;
+    public NbtDataFormat(String identifier) {
+        super(identifier);
     }
 
-    /**
-     * Writes a data container to the output stream in the nbt format.
-     * 
-     * @param dataContainer the data container to write
-     * @param outputStream the output stream to write to
-     * @param compressed whether the data should be compressed
-     * @throws IOException
-     */
-    public static void write(DataContainer dataContainer, OutputStream outputStream, boolean compressed) throws IOException {
-        NbtDataContainerOutputStream output = new NbtDataContainerOutputStream(outputStream, compressed);
-        output.write(dataContainer);
-        output.flush();
-        output.close();
+    @Override
+    public DataContainer readFrom(InputStream input) throws InvalidDataFormatException, IOException {
+        return NbtStreamUtils.read(input, false);
     }
 
-    private NbtStreamUtils() {
+    @Override
+    public void writeTo(OutputStream output, DataView data) throws IOException {
+        NbtStreamUtils.write(data, output, false);
     }
 
 }

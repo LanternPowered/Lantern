@@ -29,7 +29,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
-import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
+import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.chunk.LanternEntityLoadingTicket.EntityReference;
 import org.spongepowered.api.data.DataContainer;

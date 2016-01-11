@@ -22,32 +22,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.nbt;
+package org.lanternpowered.server.data.persistence.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BOOLEAN;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BOOLEAN_IDENTIFER;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BOOLEAN_LIST;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BYTE;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.BYTE_ARRAY;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.COMPOUND;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.DOUBLE;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.END;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.FLOAT;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.INT;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.INT_ARRAY;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.LIST;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.LONG;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.SHORT;
-import static org.lanternpowered.server.data.io.nbt.NbtConstants.STRING;
 
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.data.io.DataContainerInput;
+import org.lanternpowered.server.data.persistence.DataContainerInput;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.data.persistence.InvalidDataFormatException;
 
 import java.io.Closeable;
 import java.io.DataInputStream;
@@ -61,7 +46,6 @@ import javax.annotation.Nullable;
 /**
  * A data input stream that deserializes data views from the nbt format.
  */
-@NonnullByDefault
 public class NbtDataContainerInputStream implements Closeable, DataContainerInput {
 
     private final DataInputStream dis;
@@ -97,12 +81,12 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() throws IOException, InvalidDataFormatException {
         this.dis.close();
     }
 
     @Override
-    public DataContainer read() throws IOException {
+    public DataContainer read() throws IOException, InvalidDataFormatException {
         Entry entry = this.readEntry();
         if (entry == null) {
             throw new IOException("There is no more data to read.");
@@ -110,84 +94,84 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
         return (DataContainer) this.readObject(null, entry);
     }
 
-    private Object readObject(@Nullable DataView container, Entry entry) throws IOException {
+    private Object readObject(@Nullable DataView container, Entry entry) throws IOException, InvalidDataFormatException {
         return this.readPayload(container, entry.type);
     }
 
     @Nullable
     private Entry readEntry() throws IOException {
         byte type = this.dis.readByte();
-        if (type == END) {
+        if (type == NbtConstants.END) {
             return null;
         }
         String name = this.dis.readUTF();
-        int index = name.lastIndexOf(BOOLEAN_IDENTIFER);
+        int index = name.lastIndexOf(NbtConstants.BOOLEAN_IDENTIFER);
         if (index != -1) {
             name = name.substring(0, index);
-            type = type == LIST ? BOOLEAN_LIST : BOOLEAN;
+            type = type == NbtConstants.LIST ? NbtConstants.BOOLEAN_LIST : NbtConstants.BOOLEAN;
         }
         return new Entry(name, type);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private Object readPayload(@Nullable DataView container, byte type) throws IOException {
-        if (type == BYTE) {
+    private Object readPayload(@Nullable DataView container, byte type) throws IOException, InvalidDataFormatException {
+        if (type == NbtConstants.BYTE) {
             return this.dis.readByte();
-        } else if (type == BYTE_ARRAY) {
+        } else if (type == NbtConstants.BYTE_ARRAY) {
             byte[] array = new byte[this.dis.readInt()];
             for (int i = 0; i < array.length; i++) {
                 array[i] = this.dis.readByte();
             }
             return array;
-        } else if (type == COMPOUND) {
+        } else if (type == NbtConstants.COMPOUND) {
             if (container == null) {
                 container = new MemoryDataContainer();
             }
             Entry entry;
             while ((entry = this.readEntry()) != null) {
-                if (entry.type == COMPOUND) {
+                if (entry.type == NbtConstants.COMPOUND) {
                     this.readObject(container.createView(DataQuery.of(entry.name)), entry);
                 } else {
                     container.set(DataQuery.of('.', entry.name), this.readObject(null, entry));
                 }
             }
             return container;
-        } else if (type == DOUBLE) {
+        } else if (type == NbtConstants.DOUBLE) {
             return this.dis.readDouble();
-        } else if (type == FLOAT) {
+        } else if (type == NbtConstants.FLOAT) {
             return this.dis.readFloat();
-        } else if (type == INT) {
+        } else if (type == NbtConstants.INT) {
             return this.dis.readInt();
-        } else if (type == INT_ARRAY) {
+        } else if (type == NbtConstants.INT_ARRAY) {
             int[] array = new int[this.dis.readInt()];
             for (int i = 0; i < array.length; i++) {
                 array[i] = this.dis.readInt();
             }
             return array;
-        } else if (type == LIST || type == BOOLEAN_LIST) {
+        } else if (type == NbtConstants.LIST || type == NbtConstants.BOOLEAN_LIST) {
             byte type0 = this.dis.readByte();
-            if (type == BOOLEAN_LIST) {
-                type0 = BOOLEAN;
+            if (type == NbtConstants.BOOLEAN_LIST) {
+                type0 = NbtConstants.BOOLEAN;
             }
             int size = this.dis.readInt();
             List list = Lists.newArrayListWithExpectedSize(size);
-            if (size == 0 || type0 == END) {
+            if (size == 0 || type0 == NbtConstants.END) {
                 return list;
             }
             for (int i = 0; i < size; i++) {
                 list.add(this.readPayload(null, type0));
             }
             return list;
-        } else if (type == LONG) {
+        } else if (type == NbtConstants.LONG) {
             return this.dis.readLong();
-        } else if (type == SHORT) {
+        } else if (type == NbtConstants.SHORT) {
             return this.dis.readShort();
-        } else if (type == STRING) {
+        } else if (type == NbtConstants.STRING) {
             return this.dis.readUTF();
-        } else if (type == BOOLEAN) {
+        } else if (type == NbtConstants.BOOLEAN) {
             return this.dis.readByte() != 0;
         } else {
-            throw new IOException("Attempt to deserialize unknown type: " + type);
+            throw new InvalidDataFormatException("Attempt to deserialize unknown type: " + type);
         }
     }
 

@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.nbt;
+package org.lanternpowered.server.data.persistence.nbt;
 
 import static org.junit.Assert.assertEquals;
 

@@ -22,25 +22,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io;
-
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import java.io.IOException;
-
-/**
- * A input that can be used to read data views.
- */
-@NonnullByDefault
-public interface DataContainerInput {
-
-    /**
-     * Reads a {@link DataContainer} from the input.
-     * 
-     * @return the data view
-     * @throws IOException when a i/o error occurred
-     */
-    DataContainer read() throws IOException;
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.data.persistence;

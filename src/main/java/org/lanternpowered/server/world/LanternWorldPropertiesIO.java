@@ -27,7 +27,7 @@ package org.lanternpowered.server.world;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.lanternpowered.server.data.io.nbt.NbtStreamUtils;
+import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;

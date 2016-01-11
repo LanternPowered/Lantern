@@ -37,10 +37,6 @@ import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuff
 import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.spongepowered.api.block.BlockSnapshot;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.ScheduledBlockUpdate;
-import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
@@ -57,7 +53,6 @@ import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
@@ -80,21 +75,6 @@ public interface AbstractExtent extends Extent {
     }
 
     @Override
-    default void setBlock(Vector3i position, BlockState block, boolean notifyNeighbors) {
-        this.setBlock(position.getX(), position.getY(), position.getZ(), block, notifyNeighbors);
-    }
-
-    @Override
-    default void setBlockType(Vector3i position, BlockType type, boolean notifyNeighbors) {
-        this.setBlockType(position.getX(), position.getY(), position.getZ(), type, notifyNeighbors);
-    }
-
-    @Override
-    default void setBlockType(int x, int y, int z, BlockType type, boolean notifyNeighbors) {
-        this.setBlock(x, y, z, type.getDefaultState(), notifyNeighbors);
-    }
-
-    @Override
     default Location<? extends Extent> getLocation(Vector3i position) {
         return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
@@ -105,85 +85,10 @@ public interface AbstractExtent extends Extent {
     }
 
     @Override
-    default BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
-    }
-
-    @Override
-    default void setBiome(Vector2i position, BiomeType biome) {
-        this.setBiome(position.getX(), position.getY(), biome);
-    }
-
-    @Override
-    default BlockState getBlock(Vector3i position) {
-        return this.getBlock(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    default void setBlock(Vector3i position, BlockState block) {
-        this.setBlock(position.getX(), position.getY(), position.getZ(), block);
-    }
-
-    @Override
-    default BlockType getBlockType(Vector3i position) {
-        return this.getBlockType(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    default void setBlockType(Vector3i position, BlockType type) {
-        this.setBlockType(position.getX(), position.getY(), position.getZ(), type);
-    }
-
-    @Override
-    default void setBlockType(int x, int y, int z, BlockType type) {
-        this.setBlock(x, y, z, type.getDefaultState());
-    }
-
-    @Override
-    default BlockSnapshot createSnapshot(Vector3i position) {
-        return this.createSnapshot(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
     default boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
         Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
         checkArgument(location != null, "location is not present in snapshot");
         return this.restoreSnapshot(location.getBlockPosition(), snapshot, force, notifyNeighbors);
-    }
-
-    @Override
-    default boolean restoreSnapshot(Vector3i position, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        return this.restoreSnapshot(position.getX(), position.getY(), position.getZ(), snapshot, force, notifyNeighbors);
-    }
-
-    @Override
-    default Optional<TileEntity> getTileEntity(Vector3i position) {
-        return this.getTileEntity(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    default boolean containsBiome(Vector2i position) {
-        return this.containsBiome(position.getX(), position.getY());
-    }
-
-    @Override
-    default boolean containsBlock(Vector3i position) {
-        return this.containsBlock(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    default Collection<ScheduledBlockUpdate> getScheduledUpdates(Vector3i position) {
-        return this.getScheduledUpdates(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    default ScheduledBlockUpdate addScheduledUpdate(Vector3i position, int priority, int ticks) {
-        return this.addScheduledUpdate(position.getX(), position.getY(), position.getZ(), priority, ticks);
-    }
-
-    @Override
-    default void removeScheduledUpdate(Vector3i position, ScheduledBlockUpdate update) {
-        this.removeScheduledUpdate(position.getX(), position.getY(), position.getZ(), update);
     }
 
     @Override
@@ -203,18 +108,8 @@ public interface AbstractExtent extends Extent {
     }
 
     @Override
-    default MutableBiomeArea getRelativeBiomeView() {
-        return this.getBiomeView(DiscreteTransform2.fromTranslation(this.getBiomeMin().negate()));
-    }
-
-    @Override
     default UnmodifiableBiomeArea getUnmodifiableBiomeView() {
         return new UnmodifiableBiomeAreaWrapper(this);
-    }
-
-    @Override
-    default MutableBiomeArea getBiomeCopy() {
-        return this.getBiomeCopy(StorageType.STANDARD);
     }
 
     @Override
@@ -254,18 +149,8 @@ public interface AbstractExtent extends Extent {
     }
 
     @Override
-    default MutableBlockVolume getRelativeBlockView() {
-        return this.getBlockView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
-    }
-
-    @Override
     default UnmodifiableBlockVolume getUnmodifiableBlockView() {
         return new UnmodifiableBlockVolumeWrapper(this);
-    }
-
-    @Override
-    default MutableBlockVolume getBlockCopy() {
-        return this.getBlockCopy(StorageType.STANDARD);
     }
 
     @Override

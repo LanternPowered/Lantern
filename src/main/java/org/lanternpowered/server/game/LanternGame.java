@@ -40,6 +40,7 @@ import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
+import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.event.LanternEventManager;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.plugin.LanternPluginManager;
@@ -574,8 +575,7 @@ public class LanternGame implements Game {
 
     @Override
     public PropertyRegistry getPropertyRegistry() {
-        // TODO Auto-generated method stub
-        return null;
+        return LanternPropertyRegistry.getInstance();
     }
 
     @Override

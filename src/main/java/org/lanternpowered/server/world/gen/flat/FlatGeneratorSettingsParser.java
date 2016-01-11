@@ -25,6 +25,8 @@
 package org.lanternpowered.server.world.gen.flat;
 
 import com.flowpowered.math.GenericMath;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.game.registry.Registries;
 import org.spongepowered.api.block.BlockState;
@@ -35,37 +37,46 @@ import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 public final class FlatGeneratorSettingsParser {
 
     public static String toString(FlatGeneratorSettings settings) {
-        StringBuilder builder = new StringBuilder();
+        // All the parts
+        List<Object> parts = Lists.newArrayList();
         // The current version
-        builder.append(3).append(";");
+        parts.add(3);
 
-        List<FlatLayer> layers = settings.getLayers();
-        for (int i = 0; i < layers.size(); i++) {
-            if (i > 0) {
-                builder.append(",");
-            }
-            final FlatLayer layer = layers.get(i);
-            final int depth = layer.getDepth();
+        // All the layers
+        List<String> layers = Lists.newArrayList();
+        settings.getLayers().forEach(layer -> {
+            StringBuilder builder = new StringBuilder();
+            int depth = layer.getDepth();
+            // Only append the depth if needed
             if (depth > 1) {
                 builder.append(depth).append('*');
             }
-            final BlockState block = layer.getBlockState();
+            BlockState block = layer.getBlockState();
+            // Append the block id
             builder.append(block.getType().getId());
-            final int data = Registries.getBlockRegistry().getStateData(block);
+            int data = Registries.getBlockRegistry().getStateData(block);
+            // Only append the data if needed
             if (data > 0) {
                 builder.append(':').append(data);
             }
-        }
+            layers.add(builder.toString());
+        });
 
-        builder.append(';').append(Registries.getBiomeRegistry().getInternalId(settings.getBiomeType())).append(';');
+        // Add the layers part
+        parts.add(Joiner.on(',').join(layers));
+        // Add the biome id part
+        parts.add(Registries.getBiomeRegistry().getInternalId(settings.getBiomeType()));
+
         // TODO: Add structures
-        return builder.toString();
+
+        return Joiner.on(';').join(parts);
     }
 
     @Nullable
@@ -73,60 +84,93 @@ public final class FlatGeneratorSettingsParser {
         if (value == null) {
             return null;
         }
-        String[] parts = value.split(";");
-        int index = 0;
-        int version = parts.length == 1 ? 0 : Coerce.asInteger(parts[index++]).orElse(0);
+
+        // Split the value into parts
+        List<String> parts = Splitter.on(';').splitToList(value);
+
+        // Try to extract the version from the parts
+        int version = 0;
+        if (parts.size() > 1) {
+            version = Coerce.toInteger(parts.remove(0));
+        }
+
+        // Smaller then 0 is unknown? and 3 is the latest format version
         if (version < 0 || version > 3) {
             return null;
         }
-        String layersPart = parts[index++];
+
+        // The layers are stored in the first part
+        String layersPart = parts.remove(0);
+
+        // The parsed layers
         List<FlatLayer> layers = Lists.newArrayList();
+
+        // Can be empty if there are no layers
         if (!layersPart.isEmpty()) {
-            String[] layerParts = layersPart.split(",");
-            for (String layerPart : layerParts) {
-                String[] parts1 = version >= 3 ? layerPart.split("\\*", 2) : layerPart.split("x", 2);
-                BlockType blockType = null;
+            // The seperator that can be used to create a layer
+            // of x amount of blocks
+            final String depthSeperator = version >= 3 ? "\\*" : "x";
+            Splitter.on(',').split(layersPart).forEach(s -> {
+                // The block type
+                BlockType blockType;
+                // The data value (optional)
                 int blockData = 0;
-                int index1 = 0;
-                int depth = parts1.length > 1 ? Coerce.asInteger(parts1[index1++]).orElse(1) : 1;
-                if (version < 3) {
-                    parts1 = parts1[index1].split(":", 2);
-                    if (parts1.length > 1) {
-                        blockData = Coerce.toInteger(parts[1]);
+                // The depth of the layer
+                int depth = 1;
+
+                // The depth seperated by the depth seperator followed by the block state
+                List<String> parts1 = Splitter.on(depthSeperator).limit(2).splitToList(value);
+                if (parts1.size() > 1) {
+                    Optional<Integer> optDepth = Coerce.asInteger(parts1.remove(0));
+                    if (optDepth.isPresent()) {
+                        depth = GenericMath.clamp(optDepth.get(), 0, 255);
                     }
-                    blockType = Registries.getBlockRegistry().getStateByInternalId(Coerce.toInteger(parts[1]))
-                            .orElse(BlockTypes.AIR.getDefaultState()).getType();
+                }
+
+                String blockStatePart = parts1.get(0);
+
+                int index = blockStatePart.lastIndexOf(':');
+                if (index > 0) {
+                    Optional<Integer> optData = Coerce.asInteger(blockStatePart.substring(index + 1));
+                    if (optData.isPresent()) {
+                        blockData = GenericMath.clamp(optData.get(), 0, 15);
+                        blockStatePart = blockStatePart.substring(0, index);
+                    }
+                }
+
+                // Try to parse the block id as internal (int) id
+                Optional<Integer> optId = Coerce.asInteger(blockStatePart);
+                if (optId.isPresent()) {
+                    blockType = Registries.getBlockRegistry().getStateByInternalId(optId.get()).orElse(BlockTypes.STONE.getDefaultState()).getType();
+                // Not an integer, try the catalog system
                 } else {
-                    parts1 = parts1[index1].split(":", 3);
-                    String name = parts1.length > 1 ? parts1[0] + ':' + parts1[1] : parts1[0];
-                    blockType = Registries.getBlockRegistry().getById(name).orElse(BlockTypes.AIR);
-                    if (blockType == null) {
-                        blockType = Registries.getBlockRegistry().getById(parts1[0]).orElse(null);
-                        if (parts1.length > 1) {
-                            blockData = Coerce.toInteger(parts1[1]);
-                        }
-                    } else if (parts1.length > 2) {
-                        blockData = Coerce.toInteger(parts1[2]);
-                    }
+                    blockType = Registries.getBlockRegistry().getById(blockStatePart).orElse(BlockTypes.STONE);
                 }
-                if (blockType == null) {
-                    return null;
-                }
-                layers.add(new FlatLayer(Registries.getBlockRegistry().getStateByTypeAndData(
-                        blockType, (byte) GenericMath.clamp(blockData, 0x0, 0xff)).orElse(BlockTypes.AIR.getDefaultState()), depth));
-            }
+
+                layers.add(new FlatLayer(Registries.getBlockRegistry().getStateByTypeAndData(blockType, (byte) blockData).get(), depth));
+            });
         }
+
+        // Try to parse the biome type if present
         BiomeType biomeType = BiomeTypes.PLAINS;
-        if (version > 0 && parts.length > index) {
-            Integer biomeId = Coerce.asInteger(parts[index]).orElse(null);
-            if (biomeId != null) {
-                BiomeType biomeType0 = Registries.getBiomeRegistry().getByInternalId(biomeId).orElse(BiomeTypes.OCEAN);
-                if (biomeType0 != null) {
-                    biomeType = biomeType0;
-                }
+
+        if (!parts.isEmpty()) {
+            String biomePart = parts.remove(0);
+
+            Optional<Integer> optBiomeId = Coerce.asInteger(biomePart);
+            Optional<BiomeType> optBiome;
+            if (optBiomeId.isPresent()) {
+                optBiome = Registries.getBiomeRegistry().getByInternalId(optBiomeId.get());
+            } else {
+                optBiome = Registries.getBiomeRegistry().getById(biomePart);
+            }
+            if (optBiome.isPresent()) {
+                biomeType = optBiome.get();
             }
         }
-        // TODO: Add structures
+
+        // TODO: Parse structures
+
         return new FlatGeneratorSettings(biomeType, layers);
     }
 

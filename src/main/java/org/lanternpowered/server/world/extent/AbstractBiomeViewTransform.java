@@ -73,28 +73,13 @@ public abstract class AbstractBiomeViewTransform<A extends BiomeArea> implements
     }
 
     @Override
-    public boolean containsBiome(Vector2i position) {
-        return this.containsBiome(position.getX(), position.getY());
-    }
-
-    @Override
     public boolean containsBiome(int x, int z) {
         return this.area.containsBiome(this.inverseTransform.transformX(x, z), this.inverseTransform.transformY(x, z));
     }
 
     @Override
-    public BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
-    }
-
-    @Override
     public BiomeType getBiome(int x, int z) {
         return this.area.getBiome(this.inverseTransform.transformX(x, z), this.inverseTransform.transformY(x, z));
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeCopy() {
-        return this.getBiomeCopy(StorageType.STANDARD);
     }
 
     @Override

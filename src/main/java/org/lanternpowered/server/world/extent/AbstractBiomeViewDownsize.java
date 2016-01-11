@@ -66,11 +66,6 @@ public abstract class AbstractBiomeViewDownsize<A extends BiomeArea> implements 
     }
 
     @Override
-    public boolean containsBiome(Vector2i position) {
-        return this.containsBiome(position.getX(), position.getY());
-    }
-
-    @Override
     public boolean containsBiome(int x, int z) {
         return VecHelper.inBounds(x, z, this.min, this.max);
     }
@@ -82,19 +77,9 @@ public abstract class AbstractBiomeViewDownsize<A extends BiomeArea> implements 
     }
 
     @Override
-    public BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
-    }
-
-    @Override
     public BiomeType getBiome(int x, int z) {
         this.checkRange(x, z);
         return this.area.getBiome(x, z);
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeCopy() {
-        return this.getBiomeCopy(StorageType.STANDARD);
     }
 
     @Override

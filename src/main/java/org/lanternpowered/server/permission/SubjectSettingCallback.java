@@ -57,7 +57,7 @@ public class SubjectSettingCallback implements Predicate<PermissionService> {
             Subject subject;
             if (ref instanceof User && userSubjects instanceof UserCollection) {
                 // GameProfile is already resolved, use it directly
-                subject = ((UserCollection) userSubjects).get(((User)ref).getProfile());
+                subject = ((UserCollection) userSubjects).get(((User) ref).getProfile());
             } else {
                 subject = userSubjects.get(ref.getIdentifier());
             }

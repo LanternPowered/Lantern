@@ -25,6 +25,7 @@
 package org.lanternpowered.server.data.persistence.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.*;
 
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.persistence.DataContainerInput;
@@ -101,74 +102,74 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
     @Nullable
     private Entry readEntry() throws IOException {
         byte type = this.dis.readByte();
-        if (type == NbtConstants.END) {
+        if (type == END) {
             return null;
         }
         String name = this.dis.readUTF();
-        int index = name.lastIndexOf(NbtConstants.BOOLEAN_IDENTIFER);
+        int index = name.lastIndexOf(BOOLEAN_IDENTIFER);
         if (index != -1) {
             name = name.substring(0, index);
-            type = type == NbtConstants.LIST ? NbtConstants.BOOLEAN_LIST : NbtConstants.BOOLEAN;
+            type = type == LIST ? BOOLEAN_LIST : BOOLEAN;
         }
         return new Entry(name, type);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private Object readPayload(@Nullable DataView container, byte type) throws IOException, InvalidDataFormatException {
-        if (type == NbtConstants.BYTE) {
+        if (type == BYTE) {
             return this.dis.readByte();
-        } else if (type == NbtConstants.BYTE_ARRAY) {
+        } else if (type == BYTE_ARRAY) {
             byte[] array = new byte[this.dis.readInt()];
             for (int i = 0; i < array.length; i++) {
                 array[i] = this.dis.readByte();
             }
             return array;
-        } else if (type == NbtConstants.COMPOUND) {
+        } else if (type == COMPOUND) {
             if (container == null) {
                 container = new MemoryDataContainer();
             }
             Entry entry;
             while ((entry = this.readEntry()) != null) {
-                if (entry.type == NbtConstants.COMPOUND) {
+                if (entry.type == COMPOUND) {
                     this.readObject(container.createView(DataQuery.of(entry.name)), entry);
                 } else {
                     container.set(DataQuery.of('.', entry.name), this.readObject(null, entry));
                 }
             }
             return container;
-        } else if (type == NbtConstants.DOUBLE) {
+        } else if (type == DOUBLE) {
             return this.dis.readDouble();
-        } else if (type == NbtConstants.FLOAT) {
+        } else if (type == FLOAT) {
             return this.dis.readFloat();
-        } else if (type == NbtConstants.INT) {
+        } else if (type == INT) {
             return this.dis.readInt();
-        } else if (type == NbtConstants.INT_ARRAY) {
+        } else if (type == INT_ARRAY) {
             int[] array = new int[this.dis.readInt()];
             for (int i = 0; i < array.length; i++) {
                 array[i] = this.dis.readInt();
             }
             return array;
-        } else if (type == NbtConstants.LIST || type == NbtConstants.BOOLEAN_LIST) {
+        } else if (type == LIST || type == BOOLEAN_LIST) {
             byte type0 = this.dis.readByte();
-            if (type == NbtConstants.BOOLEAN_LIST) {
-                type0 = NbtConstants.BOOLEAN;
+            if (type == BOOLEAN_LIST) {
+                type0 = BOOLEAN;
             }
             int size = this.dis.readInt();
             List list = Lists.newArrayListWithExpectedSize(size);
-            if (size == 0 || type0 == NbtConstants.END) {
+            if (size == 0 || type0 == END) {
                 return list;
             }
             for (int i = 0; i < size; i++) {
                 list.add(this.readPayload(null, type0));
             }
             return list;
-        } else if (type == NbtConstants.LONG) {
+        } else if (type == LONG) {
             return this.dis.readLong();
-        } else if (type == NbtConstants.SHORT) {
+        } else if (type == SHORT) {
             return this.dis.readShort();
-        } else if (type == NbtConstants.STRING) {
+        } else if (type == STRING) {
             return this.dis.readUTF();
-        } else if (type == NbtConstants.BOOLEAN) {
+        } else if (type == BOOLEAN) {
             return this.dis.readByte() != 0;
         } else {
             throw new InvalidDataFormatException("Attempt to deserialize unknown type: " + type);

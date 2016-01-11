@@ -28,10 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternSandstoneType;
-import org.spongepowered.api.data.type.BrickType;
-import org.spongepowered.api.data.type.BrickTypes;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.SandstoneTypes;
 import org.spongepowered.api.registry.CatalogRegistryModule;

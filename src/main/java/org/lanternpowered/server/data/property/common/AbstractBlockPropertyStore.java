@@ -59,7 +59,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
 
     @Override
     public Optional<T> getFor(Location<World> location, Direction direction) {
-        return this.getFor0(location, direction);
+        return this.getFor0(location, checkNotNull(direction, "direction"));
     }
 
     private Optional<T> getFor0(PropertyHolder propertyHolder, @Nullable Direction direction) {
@@ -86,7 +86,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
 
     private Optional<T> getFor0(Location<?> location, @Nullable Direction direction) {
         try {
-            return this.getFor(location.getBlock(), checkNotNull(direction, "direction"));
+            return this.getFor(location.getBlock(), direction);
         // Can be thrown if the extent is gc
         } catch (IllegalStateException e) {
             return Optional.empty();

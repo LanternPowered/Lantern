@@ -28,7 +28,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.attribute.AttributeTargets;
 import org.lanternpowered.server.attribute.LanternAttribute;
@@ -36,17 +35,12 @@ import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributes;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
-import org.spongepowered.api.world.gen.WorldGeneratorModifiers;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;

@@ -25,9 +25,9 @@
 package org.lanternpowered.server.service.permission.base;
 
 import org.lanternpowered.server.service.permission.OpLevelCollection;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.context.Context;
 
 import java.util.Collections;
 import java.util.List;

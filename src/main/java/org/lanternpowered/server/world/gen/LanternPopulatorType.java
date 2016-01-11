@@ -28,7 +28,6 @@ import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.PopulatorType;
 
 import javax.annotation.Nullable;

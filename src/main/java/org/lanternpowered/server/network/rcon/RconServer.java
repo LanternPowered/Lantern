@@ -25,7 +25,6 @@
 package org.lanternpowered.server.network.rcon;
 
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -38,7 +37,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 public class RconServer extends BaseRconService {
 

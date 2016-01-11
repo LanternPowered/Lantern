@@ -35,7 +35,6 @@ import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.lanternpowered.server.text.xml.XmlTextSerializer;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.serializer.TextSerializers;
 

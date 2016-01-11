@@ -37,8 +37,6 @@ import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.util.Locale;
-
 @Caching
 public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMessage> {
 

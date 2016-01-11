@@ -30,11 +30,11 @@ import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.context.Context;
 
 import java.util.Collection;
 import java.util.Collections;

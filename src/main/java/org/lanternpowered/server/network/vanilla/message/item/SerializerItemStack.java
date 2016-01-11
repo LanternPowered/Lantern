@@ -78,7 +78,7 @@ public class SerializerItemStack implements ObjectSerializer<ItemStack> {
 
         DataView display = null;
         DisplayNameData name = object.get(DisplayNameData.class).orElse(null);
-        if (name != null && name.customNameVisible().get()) {
+        if (name != null) {
             display = tag.createView(DataQuery.of("display"));
             display.set(DataQuery.of("Name"), ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE).serialize(
                     name.displayName().get(), locale));

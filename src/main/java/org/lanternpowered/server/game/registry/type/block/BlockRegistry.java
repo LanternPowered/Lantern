@@ -30,7 +30,6 @@ import org.spongepowered.api.registry.CatalogRegistryModule;
 
 import java.util.Optional;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
 

@@ -31,7 +31,6 @@ import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;

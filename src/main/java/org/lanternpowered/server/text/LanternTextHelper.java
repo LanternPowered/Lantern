@@ -24,8 +24,18 @@
  */
 package org.lanternpowered.server.text;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.lanternpowered.server.data.translator.JsonTranslator;
+import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.text.action.LanternCallbackHolder;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
@@ -45,6 +55,12 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 public final class LanternTextHelper {
+
+    private static final Gson GSON = new Gson();
+
+    private static final DataQuery SHOW_ENTITY_ID = DataQuery.of("id");
+    private static final DataQuery SHOW_ENTITY_TYPE = DataQuery.of("type");
+    private static final DataQuery SHOW_ENTITY_NAME = DataQuery.of("name");
 
     public static ClickAction<?> parseClickAction(String action, String value) {
         switch (action) {
@@ -107,7 +123,16 @@ public final class LanternTextHelper {
             case "show_item":
                 return null; // TODO
             case "show_entity":
-                return null; // TODO
+                DataView dataView = JsonTranslator.instance().translateFrom(GSON.fromJson(value, JsonObject.class));
+
+                UUID uuid = UUID.fromString(dataView.getString(SHOW_ENTITY_ID).get());
+                String name = dataView.getString(SHOW_ENTITY_NAME).get();
+                EntityType entityType = null;
+                if (dataView.contains(SHOW_ENTITY_TYPE)) {
+                    entityType = Sponge.getRegistry().getType(EntityType.class, dataView.getString(SHOW_ENTITY_TYPE).get()).orElse(null);
+                }
+
+                return TextActions.showEntity(uuid, name, entityType);
             default:
                 throw new IllegalArgumentException("Unknown hover action type: " + action);
         }
@@ -144,7 +169,14 @@ public final class LanternTextHelper {
         } else if (hoverAction instanceof HoverAction.ShowAchievement) {
             return new RawAction("show_achievement", ((HoverAction.ShowAchievement) hoverAction).getResult().getId());
         } else if (hoverAction instanceof HoverAction.ShowEntity) {
-            return null; // TODO
+            HoverAction.ShowEntity.Ref ref = ((HoverAction.ShowEntity) hoverAction).getResult();
+
+            DataContainer dataContainer = new MemoryDataContainer();
+            dataContainer.set(SHOW_ENTITY_ID, ref.getUniqueId().toString());
+            dataContainer.set(SHOW_ENTITY_NAME, ref.getName());
+            ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, ((LanternEntityType) type).getMinecraftId()));
+
+            return new RawAction("show_entity", GSON.toJson(JsonTranslator.instance().translateData(dataContainer)));
         } else if (hoverAction instanceof HoverAction.ShowItem) {
             return null; // TODO
         } else {

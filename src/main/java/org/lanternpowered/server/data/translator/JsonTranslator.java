@@ -29,6 +29,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
@@ -77,8 +78,8 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
     }
 
     @Override
-    public DataView translateFrom(JsonObject node) {
-        return (DataView) this.fromJson(null, node);
+    public DataContainer translateFrom(JsonObject node) {
+        return (DataContainer) this.fromJson(null, node);
     }
 
     private Object fromJson(@Nullable DataView container, JsonElement json) {

@@ -27,19 +27,14 @@ package org.lanternpowered.server.game.registry.type.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.world.LanternWeather;
-import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.world.difficulty.Difficulties;
-import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 

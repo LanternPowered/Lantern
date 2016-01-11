@@ -66,7 +66,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
 
     void setRaining(boolean raining) {
         if (raining && this.world.properties.rainTime > 0) {
-            this.forecast(Weathers.RAIN, this.world.properties.rainTime);
+            this.setWeather(Weathers.RAIN, this.world.properties.rainTime);
         } else {
             this.world.properties.raining = false;
         }
@@ -80,14 +80,14 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
             this.duration += time;
             this.remaining += time;
         } else {
-            this.forecast(Weathers.RAIN, time);
+            this.setWeather(Weathers.RAIN, time);
         }
     }
 
     void setThundering(boolean thundering) {
         if (thundering && this.world.properties.raining && this.world.properties.rainTime > 0
                 && this.world.properties.thunderTime > 0) {
-            this.forecast(Weathers.THUNDER_STORM, this.world.properties.thunderTime);
+            this.setWeather(Weathers.THUNDER_STORM, this.world.properties.thunderTime);
         } else {
             this.world.properties.thundering = false;
         }
@@ -101,7 +101,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
             this.duration += time;
             this.remaining += time;
         } else {
-            this.forecast(Weathers.THUNDER_STORM, time);
+            this.setWeather(Weathers.THUNDER_STORM, time);
         }
     }
 
@@ -117,7 +117,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
             this.world.properties.clearWeatherTime--;
         }
         if (--this.remaining <= 0) {
-            this.forecast(this.nextWeather());
+            this.setWeather(this.nextWeather());
         }
         boolean updateSky = false;
         if (this.darkness != this.darknessTarget) {
@@ -180,12 +180,12 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
     }
 
     @Override
-    public void forecast(Weather weather) {
-        this.forecast(weather, (300 + this.random.nextInt(600)) * 20);
+    public void setWeather(Weather weather) {
+        this.setWeather(weather, (300 + this.random.nextInt(600)) * 20);
     }
 
     @Override
-    public void forecast(Weather weather, long duration) {
+    public void setWeather(Weather weather, long duration) {
         LanternWeather weather0 = (LanternWeather) checkNotNull(weather, "weather");
         boolean rain = weather0.getRainStrength() > 0f;
         boolean thunder = weather0.getThunderRate() > 0f;

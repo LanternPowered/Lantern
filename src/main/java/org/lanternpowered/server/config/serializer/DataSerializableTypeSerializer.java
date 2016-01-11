@@ -33,8 +33,8 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataSerializable;
+import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.translator.ConfigurateTranslator;
-import org.spongepowered.api.util.persistence.DataBuilder;
 
 import java.util.Optional;
 

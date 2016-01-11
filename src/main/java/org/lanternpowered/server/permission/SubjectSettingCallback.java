@@ -31,7 +31,6 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 
 import java.lang.ref.WeakReference;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;

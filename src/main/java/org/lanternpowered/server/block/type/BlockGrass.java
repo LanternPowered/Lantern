@@ -29,10 +29,6 @@ import org.lanternpowered.server.block.trait.LanternBooleanTrait;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
-import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
-
-import java.util.Optional;
 
 public final class BlockGrass extends LanternBlockType {
 

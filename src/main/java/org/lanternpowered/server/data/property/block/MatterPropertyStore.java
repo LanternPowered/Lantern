@@ -41,7 +41,7 @@ public final class MatterPropertyStore extends AbstractBlockPropertyStore<Matter
     private static final Optional<MatterProperty> GAS = Optional.of(new MatterProperty(MatterProperty.Matter.GAS));
 
     @Override
-    public Optional<MatterProperty> getFor(BlockState blockState, @Nullable Direction direction) {
+    protected Optional<MatterProperty> getFor(BlockState blockState, @Nullable Direction direction) {
         MatterProperty.Matter matter = ((LanternBlockType) blockState.getType()).getMatter(blockState);
         if (matter == MatterProperty.Matter.SOLID) {
             return SOLID;

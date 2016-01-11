@@ -31,11 +31,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.attribute.LanternOperations;
-import org.lanternpowered.server.text.chat.LanternChatType;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.text.chat.ChatType;
-import org.spongepowered.api.text.chat.ChatTypes;
 
 import java.util.Collection;
 import java.util.List;

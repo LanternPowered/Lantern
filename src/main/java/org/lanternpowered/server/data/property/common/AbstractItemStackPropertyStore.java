@@ -22,27 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.util;
+package org.lanternpowered.server.data.property.common;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.PropertyHolder;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.Optional;
 
-@NonnullByDefault
-public final class DataUtil {
+public abstract class AbstractItemStackPropertyStore<T extends Property<?, ?>> extends AbstractLanternPropertyStore<T> {
 
-    public static DataView checkDataExists(final DataView dataView, final DataQuery query) throws InvalidDataException {
-        if (!checkNotNull(dataView).contains(checkNotNull(query))) {
-            throw new InvalidDataException("Missing data for query: " + query.asString('.'));
-        } else {
-            return dataView;
+    protected abstract Optional<T> getFor(ItemStack itemStack);
+
+    @Override
+    public Optional<T> getFor(PropertyHolder propertyHolder) {
+        if (propertyHolder instanceof ItemStack) {
+            return this.getFor((ItemStack) propertyHolder);
         }
-    }
-
-    private DataUtil() {
+        return Optional.empty();
     }
 
 }

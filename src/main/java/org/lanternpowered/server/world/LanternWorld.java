@@ -69,6 +69,7 @@ import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -85,7 +86,6 @@ import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
-import org.spongepowered.api.util.persistence.InvalidDataException;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
@@ -659,16 +659,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public void forecast(Weather weather) {
+    public void setWeather(Weather weather) {
         if (this.weatherUniverse != null) {
-            this.weatherUniverse.forecast(weather);
+            this.weatherUniverse.setWeather(weather);
         }
     }
 
     @Override
-    public void forecast(Weather weather, long duration) {
+    public void setWeather(Weather weather, long duration) {
         if (this.weatherUniverse != null) {
-            this.weatherUniverse.forecast(weather, duration);
+            this.weatherUniverse.setWeather(weather, duration);
         }
     }
 

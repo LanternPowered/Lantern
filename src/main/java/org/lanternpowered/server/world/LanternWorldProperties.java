@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.config.world.WorldConfig;
@@ -38,8 +39,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
-import org.lanternpowered.server.world.rules.GameRule;
-import org.lanternpowered.server.world.rules.LanternGameRules;
+import org.lanternpowered.server.world.rules.Rule;
+import org.lanternpowered.server.world.rules.RuleDataTypes;
+import org.lanternpowered.server.world.rules.RuleType;
+import org.lanternpowered.server.world.rules.Rules;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -73,7 +76,7 @@ public final class LanternWorldProperties implements WorldProperties {
     @Nullable WorldConfig worldConfig;
 
     // The rules of the world
-    final LanternGameRules rules = new LanternGameRules(this);
+    private final Rules rules = new Rules(this);
 
     // This is a map added by sponge, not sure what it is supposed to do yet
     final List<UUID> pendingUniqueIds = Lists.newArrayList();
@@ -232,6 +235,15 @@ public final class LanternWorldProperties implements WorldProperties {
         }
     }
 
+    /**
+     * Gets the {@link Rules} that is attached to this properties.
+     *
+     * @return the rules
+     */
+    public Rules getRules() {
+        return this.rules;
+    }
+
     public WorldConfig getConfig() {
         return this.worldConfig;
     }
@@ -282,9 +294,8 @@ public final class LanternWorldProperties implements WorldProperties {
         this.lastPlayed = time;
     }
 
-    @Nullable
-    public LanternWorld getWorld() {
-        return this.world;
+    public Optional<LanternWorld> getWorld() {
+        return Optional.ofNullable(this.world);
     }
 
     void setWorld(@Nullable LanternWorld world) {
@@ -509,21 +520,30 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public Optional<String> getGameRule(String gameRule) {
-        Optional<GameRule> rule = this.rules.getRule(gameRule);
+        Optional<RuleType<?>> optRuleType = RuleType.get(gameRule);
+        if (!optRuleType.isPresent()) {
+            return Optional.empty();
+        }
+        Optional<Rule> rule = this.rules.getRule((RuleType) optRuleType.get());
         if (!rule.isPresent()) {
             return Optional.empty();
         }
-        return rule.get().asString();
+        return Optional.of(rule.get().getRawValue());
     }
 
     @Override
     public Map<String, String> getGameRules() {
-        return this.rules.getValues();
+        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        for (Map.Entry<RuleType<?>, Rule<?>> entry : this.rules.getRules().entrySet()) {
+            builder.put(entry.getKey().getName(), entry.getValue().getRawValue());
+        }
+        return builder.build();
     }
 
     @Override
     public void setGameRule(String gameRule, String value) {
-        this.rules.newRule(gameRule).set(value);
+        // We cannot know what type a plugin rule would be, so string
+        this.rules.getOrCreateRule(RuleType.getOrCreate(gameRule, RuleDataTypes.STRING, "")).setRawValue(value);
     }
 
     @Override

@@ -30,11 +30,13 @@ import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 
+import java.util.function.BiFunction;
+
 public final class LanternDimensionType<T extends LanternDimension> extends LanternPluginCatalogType implements DimensionType {
 
+    private final BiFunction<LanternWorld, LanternDimensionType<T>, T> supplier;
     private final GeneratorType defaultGeneratorType;
     private final Class<T> dimensionClass;
-    private final DimensionSupplier<T> supplier;
     private final boolean keepSpawnLoaded;
     private final boolean waterEvaporates;
     private final boolean allowsPlayerRespawns;
@@ -43,7 +45,7 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
 
     public LanternDimensionType(String pluginId, String name, int internalId, Class<T> dimensionClass,
             GeneratorType defaultGeneratorType, boolean keepSpawnLoaded, boolean waterEvaporates,
-            boolean hasSky, boolean allowsPlayerRespawns, DimensionSupplier<T> supplier) {
+            boolean hasSky, boolean allowsPlayerRespawns, BiFunction<LanternWorld, LanternDimensionType<T>, T> supplier) {
         super(pluginId, name);
         this.defaultGeneratorType = defaultGeneratorType;
         this.allowsPlayerRespawns = allowsPlayerRespawns;
@@ -72,7 +74,7 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
      * @return the dimension instance
      */
     public T newDimension(LanternWorld world) {
-        return this.supplier.get(world, this);
+        return this.supplier.apply(world, this);
     }
 
     @Override

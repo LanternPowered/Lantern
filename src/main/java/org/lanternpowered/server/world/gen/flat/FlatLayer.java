@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.world.gen.flat;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.block.BlockState;
@@ -53,6 +54,7 @@ public final class FlatLayer {
      * @param depth the layer depth
      */
     public FlatLayer(BlockState blockState, int depth) {
+        checkArgument(depth > 0, "Depth must be at least 1");
         this.blockState = checkNotNull(blockState, "blockState");
         this.depth = depth;
     }

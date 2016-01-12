@@ -37,6 +37,8 @@ import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
+import org.lanternpowered.server.world.rules.RuleDataTypes;
+import org.lanternpowered.server.world.rules.RuleType;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -329,7 +331,14 @@ public final class LanternWorldPropertiesIO {
         final DataView rulesView = dataView.getView(GAME_RULES).orElse(null);
         if (rulesView != null) {
             for (Entry<DataQuery, Object> en : rulesView.getValues(false).entrySet()) {
-                properties.rules.newRule(en.getKey().toString()).set(en.getValue());
+                try {
+                    properties.getRules()
+                            .getOrCreateRule(RuleType.getOrCreate(en.getKey().toString(), RuleDataTypes.STRING, ""))
+                            .setRawValue((String) en.getValue());
+                } catch (IllegalArgumentException e) {
+                    LanternGame.log().warn("An error occurred while loading a game rule (" + en.getKey().toString() +
+                            ") this one will be skipped", e);
+                }
             }
         }
 
@@ -431,7 +440,7 @@ public final class LanternWorldPropertiesIO {
         dataView.set(VERSION, CURRENT_VERSION);
         dataView.set(NAME, properties.getWorldName());
         final DataView rulesView = dataView.createView(GAME_RULES);
-        for (Entry<String, String> en : properties.rules.getValues().entrySet()) {
+        for (Entry<String, String> en : properties.getGameRules().entrySet()) {
             rulesView.set(DataQuery.of(en.getKey()), en.getValue());
         }
         dataView.set(AGE, properties.age);

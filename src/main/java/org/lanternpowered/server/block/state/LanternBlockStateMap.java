@@ -53,7 +53,7 @@ public final class LanternBlockStateMap {
 
     private final ImmutableMap<String, BlockTrait<?>> blockTraits;
     private final ImmutableList<BlockState> blockStates;
-    private final ImmutableSet<Key<?>> keys;
+    final ImmutableSet<Key<?>> keys;
     private final LanternBlockType blockType;
 
     @SuppressWarnings("rawtypes")
@@ -115,6 +115,16 @@ public final class LanternBlockStateMap {
         }
 
         this.blockStates = blockStates.build();
+        this.blockStates.stream().map(state -> (LanternBlockState) state).forEach(state -> {
+            ImmutableTable.Builder<BlockTrait<?>, Comparable<?>, BlockState> tableBuilder = ImmutableTable.builder();
+            list.forEach(trait -> trait.getPossibleValues().stream().filter(value -> value != state.getTraitValue(trait).get()).forEach(value -> {
+                Map<BlockTrait<?>, Comparable<?>> valueByTrait = Maps.newHashMap();
+                valueByTrait.putAll(state.traitValues);
+                valueByTrait.put(trait, value);
+                tableBuilder.put(trait, value, stateByValuesMap.get(valueByTrait));
+            }));
+            state.propertyValueTable = tableBuilder.build();
+        });
 
         for (BlockState blockState1 : this.blockStates) {
             LanternBlockState blockState = (LanternBlockState) blockState1;
@@ -134,10 +144,6 @@ public final class LanternBlockStateMap {
         }
     }
 
-    public ImmutableSet<Key<?>> getKeys() {
-        return this.keys;
-    }
-
     public LanternBlockType getBlockType() {
         return this.blockType;
     }
@@ -148,10 +154,6 @@ public final class LanternBlockStateMap {
 
     public Collection<BlockState> getBlockStates() {
         return this.blockStates;
-    }
-
-    public Collection<BlockTrait<?>> getTraits() {
-        return this.blockTraits.values();
     }
 
     public Optional<BlockTrait<?>> getTrait(String name) {

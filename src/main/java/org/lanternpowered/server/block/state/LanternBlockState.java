@@ -252,7 +252,7 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
 
     @Override
     public ImmutableSet<Key<?>> getKeys() {
-        return this.baseState.getKeys();
+        return this.baseState.keys;
     }
 
     @Override

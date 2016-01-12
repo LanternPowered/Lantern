@@ -22,43 +22,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.gen.flat;
+package org.lanternpowered.server.world.rules;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.spongepowered.api.util.Coerce;
 
-import com.google.common.collect.ImmutableList;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.world.biome.BiomeType;
+import java.util.function.Function;
 
-import java.util.List;
+public final class RuleDataTypes {
 
-public final class FlatGeneratorSettings {
+    public static final RuleDataType<Integer> INTEGER = new RuleDataType<>(Integer.class,
+            s -> Coerce.asInteger(s).orElseGet(() -> { throw new IllegalArgumentException("Invalid number value. (" + s + ")"); }));
 
-    private final List<FlatLayer> layers;
-    private final BiomeType biomeType;
-    private final DataContainer extraData;
+    public static final RuleDataType<Boolean> BOOLEAN = new RuleDataType<>(Boolean.class,
+            s -> Coerce.asBoolean(s).orElseGet(() -> { throw new IllegalArgumentException("Invalid boolean value. (" + s + ")"); }));
 
-    public FlatGeneratorSettings(BiomeType biomeType, List<FlatLayer> layers) {
-        this(biomeType, layers, new MemoryDataContainer());
-    }
-
-    public FlatGeneratorSettings(BiomeType biomeType, List<FlatLayer> layers, DataContainer extraData) {
-        this.layers = ImmutableList.copyOf(checkNotNull(layers, "layers"));
-        this.extraData = checkNotNull(extraData, "extraData");
-        this.biomeType = checkNotNull(biomeType, "biomeType");
-    }
-
-    public BiomeType getBiomeType() {
-        return this.biomeType;
-    }
-
-    public List<FlatLayer> getLayers() {
-        return this.layers;
-    }
-
-    public DataContainer getExtraData() {
-        return this.extraData;
-    }
+    public static final RuleDataType<String> STRING = new RuleDataType<>(String.class, Function.identity());
 
 }

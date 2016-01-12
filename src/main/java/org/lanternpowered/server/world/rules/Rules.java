@@ -24,67 +24,46 @@
  */
 package org.lanternpowered.server.world.rules;
 
-import org.spongepowered.api.event.cause.Cause;
+import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
+import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldProperties;
+
+import java.util.Map;
 import java.util.Optional;
 
-public interface GameRule {
+public final class Rules implements RuleHolder {
+
+    private final Map<RuleType<?>, Rule<?>> rules = Maps.newHashMap();
+    private final LanternWorldProperties worldProperties;
+
+    public Rules(LanternWorldProperties worldProperties) {
+        this.worldProperties = worldProperties;
+    }
+
+    public Map<RuleType<?>, Rule<?>> getRules() {
+        return ImmutableMap.copyOf(this.rules);
+    }
+
+    @Override
+    public <T> Optional<Rule<T>> getRule(RuleType<T> ruleType) {
+        return Optional.ofNullable((Rule<T>) this.rules.get(checkNotNull(ruleType, "ruleType")));
+    }
+
+    @Override
+    public <T> Rule<T> getOrCreateRule(RuleType<T> ruleType) {
+        return (Rule) this.rules.computeIfAbsent(checkNotNull(ruleType, "ruleType"), key -> new Rule(this, ruleType));
+    }
 
     /**
-     * Gets the name of the game rule.
-     * 
-     * @return the name
+     * Gets the world instance attached to this rules, may be absent.
+     *
+     * @return the world
      */
-    String getName();
-
-    /**
-     * Sets the value of the game rule.
-     * 
-     * @param object the object
-     */
-    <T> void set(T object);
-
-    /**
-     * Sets the value of the game rule with a specific cause.
-     * 
-     * @param object the object
-     * @param cause the cause
-     */
-    <T> void set(T object, Cause cause);
-
-    /**
-     * Gets the value of the game rule as a string.
-     * 
-     * @return the value
-     */
-    Optional<String> asString();
-
-    /**
-     * Gets the value of the game rule as a boolean.
-     * 
-     * @return the value
-     */
-    Optional<Boolean> asBoolean();
-
-    /**
-     * Gets the value of the game rule as a double.
-     * 
-     * @return the value
-     */
-    Optional<Double> asDouble();
-
-    /**
-     * Gets the value of the game rule as a float.
-     * 
-     * @return the value
-     */
-    Optional<Float> asFloat();
-
-    /**
-     * Gets the value of the game rule as a integer.
-     * 
-     * @return the value
-     */
-    Optional<Integer> asInt();
+    public Optional<LanternWorld> getWorld() {
+        return this.worldProperties.getWorld();
+    }
 
 }

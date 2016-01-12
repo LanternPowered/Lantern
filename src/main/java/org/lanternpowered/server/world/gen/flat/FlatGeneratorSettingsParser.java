@@ -32,6 +32,10 @@ import org.lanternpowered.server.game.registry.Registries;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.util.Coerce;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
@@ -74,7 +78,32 @@ public final class FlatGeneratorSettingsParser {
         // Add the biome id part
         parts.add(Registries.getBiomeRegistry().getInternalId(settings.getBiomeType()));
 
-        // TODO: Add structures
+        List<String> extraDataValues = Lists.newArrayList();
+        settings.getExtraData().getValues(false).entrySet().stream().forEach(e -> {
+            Object value = e.getValue();
+            if (value instanceof DataView) {
+                List<String> values = Lists.newArrayList();
+                ((DataView) value).getValues(false).entrySet().stream().forEach(e1 -> {
+                    Object value1 = e1.getValue();
+                    // Only integer numbers are currently supported
+                    if (value instanceof Number) {
+                        values.add(e1.getKey().getParts().get(0) + '=' + ((Number) value1).intValue());
+                    }
+                });
+                StringBuilder builder = new StringBuilder();
+                builder.append(e.getKey().getParts().get(0));
+                if (values.size() > 0) {
+                    builder.append('(');
+                    builder.append(Joiner.on(' ').join(values));
+                    builder.append(')');
+                }
+                extraDataValues.add(builder.toString());
+            }
+        });
+
+        if (!extraDataValues.isEmpty()) {
+            parts.add(Joiner.on(',').join(extraDataValues));
+        }
 
         return Joiner.on(';').join(parts);
     }
@@ -124,6 +153,10 @@ public final class FlatGeneratorSettingsParser {
                     Optional<Integer> optDepth = Coerce.asInteger(parts1.remove(0));
                     if (optDepth.isPresent()) {
                         depth = GenericMath.clamp(optDepth.get(), 0, 255);
+                        if (depth <= 0) {
+                            // Skip to the next layer
+                            return;
+                        }
                     }
                 }
 
@@ -169,9 +202,49 @@ public final class FlatGeneratorSettingsParser {
             }
         }
 
-        // TODO: Parse structures
+        // Extra data (like structures)
+        DataContainer extraData = new MemoryDataContainer();
 
-        return new FlatGeneratorSettings(biomeType, layers);
+        if (!parts.isEmpty()) {
+            String extraPart = parts.remove(0);
+            if (!extraPart.isEmpty()) {
+                Splitter.on(',').split(extraPart).forEach(s -> {
+                    String key = extraPart;
+
+                    // Check if there is extra data attached to the key
+                    int valuesIndex = s.indexOf('(');
+                    if (valuesIndex != -1) {
+                        // Separate the key from the values
+                        key = s.substring(0, valuesIndex);
+
+                        int endIndex = s.lastIndexOf(')');
+                        if (endIndex == -1) {
+                            endIndex = s.length();
+                        }
+
+                        // Get the values section from the string
+                        s = s.substring(valuesIndex + 1, endIndex);
+
+                        // Create the view to store the values
+                        DataView dataView = extraData.createView(DataQuery.of(key));
+                        if (!s.isEmpty()) {
+                            Splitter.on(' ').split(s).forEach(v -> {
+                                List<String> parts1 = Splitter.on('=').limit(2).splitToList(v);
+                                // Must be greater then 1, otherwise it's invalid
+                                if (parts1.size() > 1) {
+                                    // Currently, only integer values seem to be supported
+                                    dataView.set(DataQuery.of(parts1.get(0)), Coerce.toInteger(parts1.get(1)));
+                                }
+                            });
+                        }
+                    } else {
+                        extraData.createView(DataQuery.of(key));
+                    }
+                });
+            }
+        }
+
+        return new FlatGeneratorSettings(biomeType, layers, extraData);
     }
 
     private FlatGeneratorSettingsParser() {

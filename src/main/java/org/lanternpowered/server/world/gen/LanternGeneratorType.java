@@ -48,8 +48,7 @@ public abstract class LanternGeneratorType extends LanternPluginCatalogType impl
         this(pluginId, name, 256, minimalSpawnHeight);
     }
 
-    public LanternGeneratorType(String pluginId, String name, int generatorHeight,
-            int minimalSpawnHeight) {
+    public LanternGeneratorType(String pluginId, String name, int generatorHeight, int minimalSpawnHeight) {
         super(pluginId, name);
         this.minimalSpawnHeight = minimalSpawnHeight;
         this.generatorHeight = generatorHeight;

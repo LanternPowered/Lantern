@@ -24,40 +24,43 @@
  */
 package org.lanternpowered.server.world.rules;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public interface GameRules {
+import java.util.function.Function;
 
-    /**
-     * Adds a new game rule and returns the instance.
-     * 
-     * @param name the name
-     * @return the game rule
-     */
-    GameRule newRule(String name);
+public final class RuleDataType<T>  {
 
-    /**
-     * Get the game rule instance.
-     * 
-     * @param name the name
-     * @return the game rule
-     */
-    Optional<GameRule> getRule(String name);
+    private final Class<T> type;
+    private final Function<String, T> parser;
+    private final Function<T, String> serializer;
 
-    /**
-     * Gets the game rules.
-     * 
-     * @return the rules
-     */
-    List<GameRule> getRules();
+    public RuleDataType(Class<T> type, Function<String, T> parser) {
+        this(type, parser, Object::toString);
+    }
+
+    public RuleDataType(Class<T> type, Function<String, T> parser, Function<T, String> serializer) {
+        this.serializer = serializer;
+        this.parser = parser;
+        this.type = type;
+    }
+
+    public Class<T> getType() {
+        return this.type;
+    }
 
     /**
-     * Gets a map with all the string values.
-     * 
-     * @return the values
+     * Parses the string value for the type.
+     *
+     * @param value the string value
+     * @return the parsed value
+     * @throws IllegalArgumentException if the string value couldn't be parsed
      */
-    Map<String, String> getValues();
+    public T parse(String value) throws IllegalArgumentException {
+        return this.parser.apply(checkNotNull(value, "value"));
+    }
+
+    public String serialize(T value) {
+        return this.serializer.apply(checkNotNull(value, "value"));
+    }
 
 }

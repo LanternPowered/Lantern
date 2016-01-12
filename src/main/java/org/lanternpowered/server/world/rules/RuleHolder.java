@@ -22,13 +22,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.dimension;
+package org.lanternpowered.server.world.rules;
 
-import org.lanternpowered.server.world.LanternWorld;
+import java.util.Optional;
 
-@FunctionalInterface
-public interface DimensionSupplier<T extends LanternDimension> {
+public interface RuleHolder {
 
-    T get(LanternWorld world, LanternDimensionType<T> dimensionType);
+    <T> Optional<Rule<T>> getRule(RuleType<T> ruleType);
 
+    <T> Rule<T> getOrCreateRule(RuleType<T> ruleType);
 }

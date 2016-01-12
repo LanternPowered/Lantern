@@ -166,12 +166,12 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
 
     @Override
     public Collection<BlockTrait<?>> getTraits() {
-        return this.blockStateBase.getTraits();
+        return this.getDefaultState().getTraits();
     }
 
     @Override
     public Optional<BlockTrait<?>> getTrait(String blockTrait) {
-        return this.blockStateBase.getTrait(blockTrait);
+        return this.getDefaultState().getTrait(blockTrait);
     }
 
     /**

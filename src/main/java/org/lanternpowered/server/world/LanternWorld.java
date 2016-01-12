@@ -56,6 +56,9 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.ExtentViewTransform;
+import org.lanternpowered.server.world.rules.Rule;
+import org.lanternpowered.server.world.rules.RuleType;
+import org.lanternpowered.server.world.rules.RuleHolder;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -117,7 +120,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, AbstractViewer {
+public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, AbstractViewer, RuleHolder {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -820,6 +823,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public <T> Optional<Rule<T>> getRule(RuleType<T> ruleType) {
+        return this.properties.getRules().getRule(ruleType);
+    }
+
+    @Override
+    public <T> Rule<T> getOrCreateRule(RuleType<T> ruleType) {
+        return this.properties.getRules().getOrCreateRule(ruleType);
+    }
+
+    @Override
     public Dimension getDimension() {
         return this.dimension;
     }
@@ -956,4 +969,5 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // TODO Auto-generated method stub
         return 0;
     }
+
 }

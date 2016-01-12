@@ -125,23 +125,6 @@ public final class LanternBlockStateMap {
             }));
             state.propertyValueTable = tableBuilder.build();
         });
-
-        for (BlockState blockState1 : this.blockStates) {
-            LanternBlockState blockState = (LanternBlockState) blockState1;
-            HashBasedTable<BlockTrait<?>, Comparable<?>, BlockState> table = HashBasedTable.create();
-
-            for (BlockTrait<?> trait : list) {
-                trait.getPossibleValues().stream().filter(value -> value != blockState.getTraitValue(trait).get()).forEach(value -> {
-                    Map<BlockTrait<?>, Comparable<?>> valueByTrait = Maps.newHashMap();
-                    valueByTrait.putAll(blockState.traitValues);
-                    valueByTrait.put(trait, value);
-
-                    table.put(trait, value, stateByValuesMap.get(valueByTrait));
-                });
-            }
-
-            blockState.propertyValueTable = ImmutableTable.copyOf(table);
-        }
     }
 
     public LanternBlockType getBlockType() {

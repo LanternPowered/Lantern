@@ -44,8 +44,7 @@ import java.util.Optional;
 
 public final class TextColorRegistryModule implements CatalogRegistryModule<TextColor> {
 
-    @RegisterCatalog(TextColors.class)
-    private final Map<String, TextColor> chatColors = Maps.newHashMap();
+    @RegisterCatalog(TextColors.class) private final Map<String, TextColor> chatColors = Maps.newHashMap();
 
     @EarlyRegistration
     @Override

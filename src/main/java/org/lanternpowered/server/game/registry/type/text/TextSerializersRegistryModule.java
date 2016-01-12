@@ -31,6 +31,7 @@ import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.lanternpowered.server.text.LanternTextSerializerFactory;
 import org.lanternpowered.server.text.PlainTextSerializer;
+import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.lanternpowered.server.text.xml.XmlTextSerializer;
 import org.spongepowered.api.registry.RegistryModule;
@@ -50,7 +51,7 @@ public final class TextSerializersRegistryModule implements RegistryModule {
     public void registerDefaults() {
         final Map<String, Object> mappings = Maps.newHashMap();
         mappings.put("plain", new PlainTextSerializer());
-        mappings.put("legacy_formatting_code", new FormattingCodeTextSerializer(FormattingCodeTextSerializer.DEFAULT_CHAR));
+        mappings.put("legacy_formatting_code", new FormattingCodeTextSerializer(TextConstants.LEGACY_CHAR));
         mappings.put("formatting_code", new FormattingCodeTextSerializer('&'));
         mappings.put("json", new LanternJsonTextSerializer(LanternGame.get().getRegistry().getRegistryModule(
                 TranslationManagerRegistryModule.class).get().getTranslationManager()));

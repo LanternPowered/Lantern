@@ -29,7 +29,7 @@ import static org.fusesource.jansi.Ansi.ansi;
 import com.google.common.collect.ImmutableMap;
 import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.Ansi.Color;
-import org.lanternpowered.server.text.FormattingCodeTextSerializer;
+import org.lanternpowered.server.text.TextConstants;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Map.Entry;
@@ -40,33 +40,33 @@ import java.util.regex.Pattern;
 public class ColoredConsoleFormatter implements Function<String, String> {
 
     private static Pattern c(char code) {
-        return Pattern.compile(String.valueOf(FormattingCodeTextSerializer.DEFAULT_CHAR) + code, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+        return Pattern.compile(String.valueOf(TextConstants.LEGACY_CHAR) + code, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
     }
 
     private static final String RESET = ansi().reset().toString();
     private static final ImmutableMap<Pattern, String> REPLACEMENTS = ImmutableMap.<Pattern, String>builder()
-            .put(c('0'), ansi().a(Attribute.RESET).fg(Color.BLACK).boldOff().toString())
-            .put(c('1'), ansi().a(Attribute.RESET).fg(Color.BLUE).boldOff().toString())
-            .put(c('2'), ansi().a(Attribute.RESET).fg(Color.GREEN).boldOff().toString())
-            .put(c('3'), ansi().a(Attribute.RESET).fg(Color.CYAN).boldOff().toString())
-            .put(c('4'), ansi().a(Attribute.RESET).fg(Color.RED).boldOff().toString())
-            .put(c('5'), ansi().a(Attribute.RESET).fg(Color.MAGENTA).boldOff().toString())
-            .put(c('6'), ansi().a(Attribute.RESET).fg(Color.YELLOW).boldOff().toString())
-            .put(c('7'), ansi().a(Attribute.RESET).fg(Color.WHITE).boldOff().toString())
-            .put(c('8'), ansi().a(Attribute.RESET).fg(Color.BLACK).bold().toString())
-            .put(c('9'), ansi().a(Attribute.RESET).fg(Color.BLUE).bold().toString())
-            .put(c('a'), ansi().a(Attribute.RESET).fg(Color.GREEN).bold().toString())
-            .put(c('b'), ansi().a(Attribute.RESET).fg(Color.CYAN).bold().toString())
-            .put(c('c'), ansi().a(Attribute.RESET).fg(Color.RED).bold().toString())
-            .put(c('d'), ansi().a(Attribute.RESET).fg(Color.MAGENTA).bold().toString())
-            .put(c('e'), ansi().a(Attribute.RESET).fg(Color.YELLOW).bold().toString())
-            .put(c('f'), ansi().a(Attribute.RESET).fg(Color.WHITE).bold().toString())
-            .put(c('k'), ansi().a(Attribute.BLINK_SLOW).toString())
-            .put(c('l'), ansi().a(Attribute.INTENSITY_BOLD).toString())
-            .put(c('m'), ansi().a(Attribute.STRIKETHROUGH_ON).toString())
-            .put(c('n'), ansi().a(Attribute.UNDERLINE).toString())
-            .put(c('o'), ansi().a(Attribute.ITALIC).toString())
-            .put(c('r'), ansi().a(Attribute.RESET).toString())
+            .put(c(TextConstants.BLACK), ansi().a(Attribute.RESET).fg(Color.BLACK).boldOff().toString())
+            .put(c(TextConstants.DARK_BLUE), ansi().a(Attribute.RESET).fg(Color.BLUE).boldOff().toString())
+            .put(c(TextConstants.DARK_GREEN), ansi().a(Attribute.RESET).fg(Color.GREEN).boldOff().toString())
+            .put(c(TextConstants.DARK_AQUA), ansi().a(Attribute.RESET).fg(Color.CYAN).boldOff().toString())
+            .put(c(TextConstants.DARK_RED), ansi().a(Attribute.RESET).fg(Color.RED).boldOff().toString())
+            .put(c(TextConstants.DARK_PURPLE), ansi().a(Attribute.RESET).fg(Color.MAGENTA).boldOff().toString())
+            .put(c(TextConstants.GOLD), ansi().a(Attribute.RESET).fg(Color.YELLOW).boldOff().toString())
+            .put(c(TextConstants.GRAY), ansi().a(Attribute.RESET).fg(Color.WHITE).boldOff().toString())
+            .put(c(TextConstants.DARK_GRAY), ansi().a(Attribute.RESET).fg(Color.BLACK).bold().toString())
+            .put(c(TextConstants.BLUE), ansi().a(Attribute.RESET).fg(Color.BLUE).bold().toString())
+            .put(c(TextConstants.GREEN), ansi().a(Attribute.RESET).fg(Color.GREEN).bold().toString())
+            .put(c(TextConstants.AQUA), ansi().a(Attribute.RESET).fg(Color.CYAN).bold().toString())
+            .put(c(TextConstants.RED), ansi().a(Attribute.RESET).fg(Color.RED).bold().toString())
+            .put(c(TextConstants.LIGHT_PURPLE), ansi().a(Attribute.RESET).fg(Color.MAGENTA).bold().toString())
+            .put(c(TextConstants.YELLOW), ansi().a(Attribute.RESET).fg(Color.YELLOW).bold().toString())
+            .put(c(TextConstants.WHITE), ansi().a(Attribute.RESET).fg(Color.WHITE).bold().toString())
+            .put(c(TextConstants.OBFUSCATED), ansi().a(Attribute.BLINK_SLOW).toString())
+            .put(c(TextConstants.BOLD), ansi().a(Attribute.INTENSITY_BOLD).toString())
+            .put(c(TextConstants.STRIKETHROUGH), ansi().a(Attribute.STRIKETHROUGH_ON).toString())
+            .put(c(TextConstants.UNDERLINE), ansi().a(Attribute.UNDERLINE).toString())
+            .put(c(TextConstants.ITALIC), ansi().a(Attribute.ITALIC).toString())
+            .put(c(TextConstants.RESET), ansi().a(Attribute.RESET).toString())
             .build();
 
     @Override

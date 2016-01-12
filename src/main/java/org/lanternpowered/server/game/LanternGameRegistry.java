@@ -533,8 +533,8 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     private boolean isProperPhase(Method method) {
-        if (this.phase == null && method.getAnnotation(EarlyRegistration.class) != null) {
-            return true;
+        if (method.getAnnotation(EarlyRegistration.class) != null) {
+            return this.phase == null;
         }
         DelayedRegistration delay = method.getAnnotation(DelayedRegistration.class);
         if (delay == null) {

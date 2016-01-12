@@ -115,7 +115,7 @@ public final class FlatGeneratorSettingsParser {
         }
 
         // Split the value into parts
-        List<String> parts = Splitter.on(';').splitToList(value);
+        List<String> parts = Lists.newArrayList(Splitter.on(';').split(value));
 
         // Try to extract the version from the parts
         int version = 0;
@@ -148,7 +148,7 @@ public final class FlatGeneratorSettingsParser {
                 int depth = 1;
 
                 // The depth seperated by the depth seperator followed by the block state
-                List<String> parts1 = Splitter.on(depthSeperator).limit(2).splitToList(value);
+                List<String> parts1 = Lists.newArrayList(Splitter.on(depthSeperator).limit(2).split(value));
                 if (parts1.size() > 1) {
                     Optional<Integer> optDepth = Coerce.asInteger(parts1.remove(0));
                     if (optDepth.isPresent()) {

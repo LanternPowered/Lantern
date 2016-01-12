@@ -144,13 +144,10 @@ public class LanternServer implements Server {
             final LanternServer server = new LanternServer(game, consoleManager, rconServer, queryServer);
 
             // Send some startup info
-            LanternGame.log().info("Starting Lantern Server {}\n"
-                    + "\t\t\t\t\tfor Minecraft {} with protocol {}\n"
-                    + "\t\t\t\t\ton  SpongeAPI {}",
-                    LanternPlatform.IMPL_VERSION,
-                    LanternMinecraftVersion.CURRENT.getName(),
-                    LanternMinecraftVersion.CURRENT.getProtocol(),
-                    LanternPlatform.API_VERSION);
+            LanternGame.log().info("Starting Lantern Server {}", LanternPlatform.IMPL_VERSION);
+            LanternGame.log().info("\tfor Minecraft {} with protocol {}",  LanternMinecraftVersion.CURRENT.getName(),
+                    LanternMinecraftVersion.CURRENT.getProtocol());
+            LanternGame.log().info("\ton  SpongeAPI {}", LanternPlatform.API_VERSION);
 
             // The root world folder
             final Path worldFolder = new File(game.getGlobalConfig().getRootWorldFolder()).toPath();

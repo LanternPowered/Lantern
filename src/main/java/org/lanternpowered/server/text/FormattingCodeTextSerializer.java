@@ -30,6 +30,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
@@ -47,36 +48,36 @@ import org.spongepowered.api.text.translation.locale.Locales;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 public class FormattingCodeTextSerializer implements org.spongepowered.api.text.serializer.FormattingCodeTextSerializer, LanternTextSerializer {
 
-    public static final char DEFAULT_CHAR = '\u00A7';
-    public static final BiMap<Object, Character> FORMATS = ImmutableBiMap.<Object, Character>builder()
-            .put(TextColors.BLACK, '0')
-            .put(TextColors.DARK_BLUE, '1')
-            .put(TextColors.DARK_GREEN, '2')
-            .put(TextColors.DARK_AQUA, '3')
-            .put(TextColors.DARK_RED, '4')
-            .put(TextColors.DARK_PURPLE, '5')
-            .put(TextColors.GOLD, '6')
-            .put(TextColors.GRAY, '7')
-            .put(TextColors.DARK_GRAY, '8')
-            .put(TextColors.BLUE, '9')
-            .put(TextColors.GREEN, 'a')
-            .put(TextColors.AQUA, 'b')
-            .put(TextColors.RED, 'c')
-            .put(TextColors.LIGHT_PURPLE, 'd')
-            .put(TextColors.YELLOW, 'e')
-            .put(TextColors.WHITE, 'f')
-            .put(TextColors.RESET, 'r')
-            .put(TextStyles.OBFUSCATED, 'k')
-            .put(TextStyles.BOLD, 'l')
-            .put(TextStyles.STRIKETHROUGH, 'm')
-            .put(TextStyles.UNDERLINE, 'n')
-            .put(TextStyles.ITALIC, 'o')
+    private static final BiMap<Object, Character> FORMATS = ImmutableBiMap.<Object, Character>builder()
+            .put(TextColors.BLACK, TextConstants.BLACK)
+            .put(TextColors.DARK_BLUE, TextConstants.DARK_BLUE)
+            .put(TextColors.DARK_GREEN, TextConstants.DARK_GREEN)
+            .put(TextColors.DARK_AQUA, TextConstants.DARK_AQUA)
+            .put(TextColors.DARK_RED, TextConstants.DARK_RED)
+            .put(TextColors.DARK_PURPLE, TextConstants.DARK_PURPLE)
+            .put(TextColors.GOLD, TextConstants.GOLD)
+            .put(TextColors.GRAY, TextConstants.GRAY)
+            .put(TextColors.DARK_GRAY, TextConstants.DARK_GRAY)
+            .put(TextColors.BLUE, TextConstants.BLUE)
+            .put(TextColors.GREEN, TextConstants.GREEN)
+            .put(TextColors.AQUA, TextConstants.AQUA)
+            .put(TextColors.RED, TextConstants.RED)
+            .put(TextColors.LIGHT_PURPLE, TextConstants.LIGHT_PURPLE)
+            .put(TextColors.YELLOW, TextConstants.YELLOW)
+            .put(TextColors.WHITE, TextConstants.WHITE)
+            .put(TextColors.RESET, TextConstants.RESET)
+            .put(TextStyles.OBFUSCATED, TextConstants.OBFUSCATED)
+            .put(TextStyles.BOLD, TextConstants.BOLD)
+            .put(TextStyles.STRIKETHROUGH, TextConstants.STRIKETHROUGH)
+            .put(TextStyles.UNDERLINE, TextConstants.UNDERLINE)
+            .put(TextStyles.ITALIC, TextConstants.ITALIC)
             .build();
 
     private static boolean isFormat(char format) {

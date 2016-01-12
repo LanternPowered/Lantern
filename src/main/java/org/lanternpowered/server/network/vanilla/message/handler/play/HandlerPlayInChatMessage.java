@@ -29,7 +29,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
-import org.lanternpowered.server.text.FormattingCodeTextSerializer;
+import org.lanternpowered.server.text.TextConstants;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -80,7 +80,6 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
     }
 
     private static boolean isAllowedCharacter(char character) {
-        return character != FormattingCodeTextSerializer.DEFAULT_CHAR &&
-                character >= ' ' && character != '\u007F';
+        return character != TextConstants.LEGACY_CHAR && character >= ' ' && character != '\u007F';
     }
 }

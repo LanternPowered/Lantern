@@ -97,15 +97,7 @@ public final class LanternTranslationManager implements TranslationManager {
         // reasons the "getLocale" always a empty object returns (no name)
         // and doesn't match the one in the constructor
         ResourceBundle bundle = ResourceBundle.getBundle(checkNotNull(resourceBundle, "resourceBundle"));
-        Set<ResourceBundle> bundles;
-
-        if (this.bundles.containsKey(locale)) {
-            bundles = this.bundles.get(locale);
-        } else {
-            this.bundles.put(locale, bundles = Sets.newConcurrentHashSet());
-        }
-
-        bundles.add(bundle);
+        this.bundles.computeIfAbsent(locale, locale0 -> Sets.newConcurrentHashSet()).add(bundle);
 
         Set<ResourceKey> refresh = Sets.newHashSet();
         for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
@@ -123,7 +115,7 @@ public final class LanternTranslationManager implements TranslationManager {
     public Translation get(final String key) {
         return new ResourceBundleTranslation(checkNotNullOrEmpty(key, "key"), locale -> {
             try {
-                return resourceBundlesCache.get(new ResourceKey(key, locale)).orElse(null);
+                return this.resourceBundlesCache.get(new ResourceKey(key, locale)).orElse(null);
             } catch (ExecutionException e) {
                 throw new RuntimeException(e);
             }

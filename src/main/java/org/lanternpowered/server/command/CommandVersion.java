@@ -35,9 +35,11 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 public final class CommandVersion {
 
+    public static final String PERMISSION = "minecraft.command.version";
+
     public static CommandSpec create() {
         return CommandSpec.builder()
-                .permission("minecraft.command.version")
+                .permission(PERMISSION)
                 .description(t("commands.version.description"))
                 .executor((src, args) -> {
                     PluginContainer plugin = LanternGame.get().getMinecraftPlugin();

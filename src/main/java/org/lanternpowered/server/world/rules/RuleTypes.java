@@ -57,4 +57,6 @@ public final class RuleTypes {
     public static final RuleType<Boolean> SHOW_DEATH_MESSAGES =
             RuleType.create(DefaultGameRules.SHOW_DEATH_MESSAGES, RuleDataTypes.BOOLEAN, true);
 
+    private RuleTypes() {
+    }
 }

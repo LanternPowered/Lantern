@@ -25,6 +25,8 @@
 package org.lanternpowered.server.game.registry.type.world;
 
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.world.rules.RuleType;
+import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
 
@@ -50,6 +52,8 @@ public final class DefaultGameRulesRegistryModule implements RegistryModule {
             }
         }
         this.rules = builder.build();
+        // Just access the rule types class to initialize the default rule types
+        RuleType<?> type = RuleTypes.COMMAND_BLOCK_OUTPUT;
     }
 
     public Collection<String> get() {

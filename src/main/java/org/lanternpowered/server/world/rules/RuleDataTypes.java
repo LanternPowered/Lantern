@@ -31,10 +31,18 @@ import java.util.function.Function;
 public final class RuleDataTypes {
 
     public static final RuleDataType<Integer> INTEGER = new RuleDataType<>(Integer.class,
-            s -> Coerce.asInteger(s).orElseGet(() -> { throw new IllegalArgumentException("Invalid number value. (" + s + ")"); }));
+            s -> Coerce.asInteger(s).orElseGet(() -> { throw new IllegalArgumentException("Expected a integer, but input '" + s + "' was not"); }));
 
     public static final RuleDataType<Boolean> BOOLEAN = new RuleDataType<>(Boolean.class,
-            s -> Coerce.asBoolean(s).orElseGet(() -> { throw new IllegalArgumentException("Invalid boolean value. (" + s + ")"); }));
+            s -> {
+                if ("true".equalsIgnoreCase(s)) {
+                    return true;
+                } else if ("false".equalsIgnoreCase(s)) {
+                    return false;
+                } else {
+                    throw new IllegalArgumentException("Expected a boolean, but input '" + s + "' was not");
+                }
+            });
 
     public static final RuleDataType<String> STRING = new RuleDataType<>(String.class, Function.identity());
 

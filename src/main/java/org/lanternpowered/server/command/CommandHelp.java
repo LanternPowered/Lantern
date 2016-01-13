@@ -50,11 +50,13 @@ import java.util.TreeSet;
 
 public final class CommandHelp {
 
-    private static final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
+    public static final String PERMISSION = "minecraft.commands.help";
 
     public static CommandSpec create() {
+        final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
         return CommandSpec
                 .builder()
+                .permission(PERMISSION)
                 .arguments(optional(string(Text.of("command"))))
                 .description(Text.of("View a list of all commands"))
                 .extendedDescription(Text.of("View a list of all commands. Hover over\n" + " a command to view its description."

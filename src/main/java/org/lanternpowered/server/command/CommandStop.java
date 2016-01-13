@@ -36,11 +36,13 @@ import org.spongepowered.api.text.Text;
 
 public final class CommandStop {
 
+    public static final String PERMISSION = "minecraft.command.stop";
+
     public static CommandSpec create() {
         return CommandSpec.builder()
                 .arguments(
                         GenericArguments.optional(RemainingTextElement.of(Text.of("kick-message"))))
-                .permission("minecraft.command.stop")
+                .permission(PERMISSION)
                 .description(t("commands.stop.description"))
                 .executor((src, args) -> {
                     final LanternServer server = LanternGame.get().getServer();

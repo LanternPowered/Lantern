@@ -28,6 +28,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.command.element.ChoicesElement;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
@@ -40,6 +41,8 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 public final class CommandDifficulty {
+
+    public static final String PERMISSION = "minecraft.command.difficulty";
 
     public static CommandSpec create() {
         final ImmutableMap.Builder<String, Object> baseBuilder = ImmutableMap.builder();
@@ -56,7 +59,7 @@ public final class CommandDifficulty {
                         ChoicesElement.of(Text.of("difficulty"), baseBuilder.build(),
                                 aliasesBuilder.build(), false, true),
                         GenericArguments.optional(GenericArguments.world(Text.of("world"))))
-                .permission("minecraft.command.difficulty")
+                .permission(PERMISSION)
                 .executor((src, args) -> {
                     WorldProperties world;
                     if (args.hasAny("world")) {
@@ -64,7 +67,11 @@ public final class CommandDifficulty {
                     } else if (src instanceof LocatedSource) {
                         world = ((LocatedSource) src).getWorld().getProperties();
                     } else {
-                        throw new CommandException(Text.of("Non-located sources must specify a world."));
+                        world = LanternGame.get().getServer().getDefaultWorld().orElse(null);
+                        if (world == null) {
+                            // Shouldn't happen
+                            throw new CommandException(t("Unable to find the default world."));
+                        }
                     }
                     Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
                     world.setDifficulty(difficulty);

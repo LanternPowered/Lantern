@@ -45,25 +45,28 @@ import java.util.Optional;
 
 public final class CommandBan {
 
+    public static final String PERMISSION_BAN = "minecraft.command.ban";
+    public static final String PERMISSION_BAN_IP = "minecraft.command.ban-ip";
+
     /**
      * Creates a new ban command.
      * 
-     * @param alwaysSuccess this is just boolean to create the two behaviors of
-     *        the two ban commands
+     * @param ban whether the created command spec should have "ban-ip" or "ban"
+     *            command behaviour, when set to true it will use "ban"
      * @return the command spec
      */
-    public static CommandSpec create(boolean alwaysSuccess) {
-        final String targetArg = alwaysSuccess ? "name" : "address|name";
+    public static CommandSpec create(boolean ban) {
+        final String targetArg = ban ? "name" : "address|name";
         return CommandSpec.builder()
                 .arguments(
                         GenericArguments.string(Text.of(targetArg)),
                         GenericArguments.optional(RemainingTextElement.of(Text.of("reason"))))
-                .permission(alwaysSuccess ? "minecraft.command.ban" : "minecraft.command.ban-ip")
+                .permission(ban ? PERMISSION_BAN : PERMISSION_BAN_IP)
                 .executor((src, args) -> {
                     final String target = args.<String>getOne(targetArg).get();
                     final String reason = args.<String>getOne("reason").orElse(null);
                     BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
-                    if (alwaysSuccess) {
+                    if (ban) {
                         // TODO
                     } else {
                         // Try as ip address first

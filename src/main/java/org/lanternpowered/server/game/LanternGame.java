@@ -27,6 +27,7 @@ package org.lanternpowered.server.game;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandBan;
 import org.lanternpowered.server.command.CommandDifficulty;
+import org.lanternpowered.server.command.CommandGameRule;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandSeed;
 import org.lanternpowered.server.command.CommandStop;
@@ -350,6 +351,7 @@ public class LanternGame implements Game {
         this.commandManager.register(this.minecraft, CommandSeed.create(), "seed");
         this.commandManager.register(this.minecraft, CommandStop.create(), "stop", "shutdown");
         this.commandManager.register(this.minecraft, CommandDifficulty.create(), "difficulty");
+        this.commandManager.register(this.minecraft, CommandGameRule.create(), "gamerule", "rule");
         this.commandManager.register(this.minecraft, CommandHelp.create(), "help", "?");
         this.commandManager.register(this.implContainer, CommandVersion.create(), "version");
         this.commandManager.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
@@ -359,7 +361,7 @@ public class LanternGame implements Game {
         this.teleportHelper = new LanternTeleportHelper();
 
         // Call the construction events
-        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(Cause.of(this), 
+        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(Cause.of(this),
                 GameState.CONSTRUCTION));
 
         // Load the plugin instances
@@ -380,7 +382,7 @@ public class LanternGame implements Game {
 
         // Pre-init phase
         this.setGameState(GameState.PRE_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(Cause.of(this), 
+        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(Cause.of(this),
                 GameState.PRE_INITIALIZATION));
 
         // Create the default sql service
@@ -392,17 +394,33 @@ public class LanternGame implements Game {
         // Provide the default permission service if no custom one is found
         if (!this.serviceManager.provide(PermissionService.class).isPresent()) {
             final LanternPermissionService service = new LanternPermissionService(this);
-            service.getGroupForOpLevel(1).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
-                    "minecraft.selector", Tristate.TRUE);
-            service.getGroupForOpLevel(2).getSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT,
-                    "minecraft.commandblock", Tristate.TRUE);
+            // Group level 0 permissions
+            SubjectData subjectData = service.getGroupForOpLevel(0).getSubjectData();
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandHelp.PERMISSION, Tristate.TRUE);
+            // Group level 1 permissions
+            subjectData = service.getGroupForOpLevel(1).getSubjectData();
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, "minecraft.selector", Tristate.TRUE);
+            // Group level 2 permissions
+            subjectData = service.getGroupForOpLevel(2).getSubjectData();
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, "minecraft.commandblock", Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandSeed.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandGameRule.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandDifficulty.PERMISSION, Tristate.TRUE);
+            // Group level 3 permissions
+            subjectData = service.getGroupForOpLevel(3).getSubjectData();
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN_IP, Tristate.TRUE);
+            // Group level 4 permissions
+            subjectData = service.getGroupForOpLevel(4).getSubjectData();
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandStop.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandVersion.PERMISSION, Tristate.TRUE);
 
             this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
         }
 
         // Init phase
         this.setGameState(GameState.INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(Cause.of(this), 
+        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(Cause.of(this),
                 GameState.INITIALIZATION));
 
         // Call post init phase for registry
@@ -410,7 +428,7 @@ public class LanternGame implements Game {
 
         // Post-init phase
         this.setGameState(GameState.POST_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(Cause.of(this), 
+        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(Cause.of(this),
                 GameState.POST_INITIALIZATION));
 
         // Load-complete phase

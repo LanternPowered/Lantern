@@ -92,13 +92,13 @@ dependencies {
 
 // Generate application setups, currently only for intellij
 idea.workspace.iws.withXml { provider ->
-    def node = provider.asNode().get("component")
+    def node = provider.asNode().get('component')
     def appName = 'Lantern Server'
 
     // Get the run manager node, this will contain the configuration
     def runManagerNode = null
     node.each { entry ->
-        if ("RunManager".equals(entry.attributes().get("name"))) {
+        if ('RunManager'.equals(entry.attributes().get('name'))) {
             runManagerNode = entry
         }
     }
@@ -106,13 +106,13 @@ idea.workspace.iws.withXml { provider ->
     def defaultNode = null;
     def customNode = null;
 	
-    // Loop though all the nodes to find the default application configuration
-    // or the generated configuration if done before
+    // Loop though all the nodes to find the default application
+    // configuration and the our configuration
     runManagerNode.each { entry ->
-        if ("Application".equals(entry.attributes().get("type"))) {
-            if ("true".equals(entry.attributes().get("default"))) {
+        if ('Application'.equals(entry.attributes().get('type'))) {
+            if ('true'.equals(entry.attributes().get('default'))) {
                 defaultNode = entry
-            } else if ("false".equals(entry.attributes().get("default")) && appName.equals(entry.attributes().get("name"))) {
+            } else if (appName.equals(entry.attributes().get('name'))) {
                 customNode = entry
             }
         }
@@ -120,7 +120,8 @@ idea.workspace.iws.withXml { provider ->
 
     // It should always be present
     if (defaultNode == null) {
-        throw new IllegalStateException("Unable to find the default application config node, try to regenerate the file to resolve this issue.")
+        throw new IllegalStateException('Unable to find the default application config node,' +
+                ' please try to regenerate the intellij project files to resolve this issue.')
     }
 
     // Only create a new configuration if the old one is missing
@@ -128,7 +129,6 @@ idea.workspace.iws.withXml { provider ->
         customNode = defaultNode.clone()
         customNode.attributes().put('default', 'false')
         customNode.attributes().put('name', appName)
-        runManagerNode.append(customNode)
         customNode.each { entry ->
             def type = entry.name()
             def name = entry.attributes().get("name")
@@ -137,16 +137,16 @@ idea.workspace.iws.withXml { provider ->
                 switch (name) {
                     case 'MAIN_CLASS_NAME':    value = 'org.lanternpowered.launch.Launch'; break;
                     case 'VM_PARAMETERS':      value = '-Dlog4j.full-location=true';       break;
-                    case 'PROGRAM_PARAMETERS': value = '';                                 break;
                     case 'WORKING_DIRECTORY':  value = 'file://$PROJECT_DIR$/run';         break;
                 }
-				if (value != null) {
-					entry.attributes().put('value', value)
-				}
+                if (value != null) {
+                    entry.attributes().put('value', value)
+                }
             } else if ('module'.equals(type)) {
                 entry.attributes().put('name', project.name)
             }
         }
+        runManagerNode.append(customNode)
     }
 }
 
@@ -156,13 +156,12 @@ jar {
     manifest {
         attributes(
                 'Main-Class': 'org.lanternpowered.launch.VersionCheckingMain',
-                'Implementation-Title': project.name,
+                'Implementation-Name': project.name,
                 'Implementation-Version': project.version,
                 'Implementation-Vendor': project.url,
                 'Specification-Name': api.name,
                 'Specification-Version': api.version,
-                'Specification-Vendor': api.url,
-                'Sealed': true
+                'Specification-Vendor': api.url
         )
     }
 }

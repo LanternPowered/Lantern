@@ -36,7 +36,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
 
     // Whether the full location should be appended, if false it will be ignored
     // event if it's specified in the configuration
-    private static final boolean enabled = PropertiesUtil.getProperties().getBooleanProperty("log4j.full-location", true);
+    private static final boolean enabled = PropertiesUtil.getProperties().getBooleanProperty("log4j.full-location", false);
 
     // Packages that will be ignored
     private static final String[] ignoredPackages = { "java.", "kotlin.io." };

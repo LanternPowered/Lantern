@@ -90,6 +90,67 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.9.0'
 }
 
+// Generate application setups, currently only for intellij
+idea.workspace.iws.withXml { provider ->
+    def node = provider.asNode().get("component")
+    def appName = 'Lantern Server'
+
+    // Get the run manager node, this will contain the configuration
+    def runManagerNode = null
+    node.each { entry ->
+        if ("RunManager".equals(entry.attributes().get("name"))) {
+            runManagerNode = entry
+        }
+    }
+
+    def defaultNode = null;
+    def customNode = null;
+	
+    // Loop though all the nodes to find the default application configuration
+    // or the generated configuration if done before
+    runManagerNode.each { entry ->
+        println entry.getClass().toString()
+        if ("Application".equals(entry.attributes().get("type"))) {
+            if ("true".equals(entry.attributes().get("default"))) {
+                defaultNode = entry
+            } else if ("false".equals(entry.attributes().get("default")) && appName.equals(entry.attributes().get("name"))) {
+                customNode = entry
+            }
+        }
+    }
+
+    // It should always be present
+    if (defaultNode == null) {
+        throw new IllegalStateException("Unable to find the default application config node, try to regenerate the file to resolve this issue.")
+    }
+
+    // Only create a new configuration if the old one is missing
+    if (customNode == null) {
+        customNode = defaultNode.clone()
+        customNode.attributes().put('default', 'false')
+        customNode.attributes().put('name', appName)
+        runManagerNode.append(customNode)
+        customNode.each { entry ->
+            def type = entry.name()
+            def name = entry.attributes().get("name")
+            if ('option'.equals(type) && name != null) {
+                def value = null;
+                switch (name) {
+                    case 'MAIN_CLASS_NAME':    value = 'org.lanternpowered.launch.Launch'; break;
+                    case 'VM_PARAMETERS':      value = '-Dlog4j.full-location=true';       break;
+                    case 'PROGRAM_PARAMETERS': value = '';                                 break;
+                    case 'WORKING_DIRECTORY':  value = 'file://$PROJECT_DIR$/run';         break;
+                }
+				if (value != null) {
+					entry.attributes().put('value', value)
+				}
+            } else if ('module'.equals(type)) {
+                entry.attributes().put('name', project.name)
+            }
+        }
+    }
+}
+
 jar {
     classifier = 'release'
     from sourceSets.java6.output

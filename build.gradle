@@ -109,7 +109,6 @@ idea.workspace.iws.withXml { provider ->
     // Loop though all the nodes to find the default application configuration
     // or the generated configuration if done before
     runManagerNode.each { entry ->
-        println entry.getClass().toString()
         if ("Application".equals(entry.attributes().get("type"))) {
             if ("true".equals(entry.attributes().get("default"))) {
                 defaultNode = entry
@@ -232,7 +231,7 @@ shadowJar {
         transform(Log4jCacheFileTransformer)
     }
 
-   	exclude 'LICENSE', 'NOTICE'
+    exclude 'LICENSE', 'NOTICE'
 }
 
 task sourceJar(type: Jar) {

@@ -92,31 +92,15 @@ dependencies {
 
 // Generate application setups, currently only for intellij
 idea.workspace.iws.withXml { provider ->
-    def node = provider.asNode().get('component')
+    // The app name
     def appName = 'Lantern Server'
 
     // Get the run manager node, this will contain the configuration
-    def runManagerNode = null
-    node.each { entry ->
-        if ('RunManager'.equals(entry.attributes().get('name'))) {
-            runManagerNode = entry
-        }
-    }
+    def node = provider.asNode().component.find { it.@name == 'RunManager' }
 
-    def defaultNode = null;
-    def customNode = null;
-	
-    // Loop though all the nodes to find the default application
-    // configuration and the our configuration
-    runManagerNode.each { entry ->
-        if ('Application'.equals(entry.attributes().get('type'))) {
-            if ('true'.equals(entry.attributes().get('default'))) {
-                defaultNode = entry
-            } else if (appName.equals(entry.attributes().get('name'))) {
-                customNode = entry
-            }
-        }
-    }
+    // Find the default and custom app node
+    def defaultNode = node.find { it.@type == 'Application' && it.@default == 'true' }
+    def customNode = node.find { it.@type == 'Application' && it.@name == appName }
 
     // It should always be present
     if (defaultNode == null) {
@@ -127,26 +111,20 @@ idea.workspace.iws.withXml { provider ->
     // Only create a new configuration if the old one is missing
     if (customNode == null) {
         customNode = defaultNode.clone()
-        customNode.attributes().put('default', 'false')
-        customNode.attributes().put('name', appName)
-        customNode.each { entry ->
-            def type = entry.name()
-            def name = entry.attributes().get("name")
-            if ('option'.equals(type) && name != null) {
-                def value = null;
-                switch (name) {
-                    case 'MAIN_CLASS_NAME':    value = 'org.lanternpowered.launch.Launch'; break;
-                    case 'VM_PARAMETERS':      value = '-Dlog4j.full-location=true';       break;
-                    case 'WORKING_DIRECTORY':  value = 'file://$PROJECT_DIR$/run';         break;
+        customNode.@default = 'false'
+        customNode.@name = appName
+        customNode.each {
+            if (it.name == 'option' && it.@name != null) {
+                switch (it.@name) {
+                    case 'MAIN_CLASS_NAME':    it.@value = 'org.lanternpowered.launch.Launch'; break
+                    case 'VM_PARAMETERS':      it.@value = '-Dlog4j.full-location=true';       break
+                    case 'WORKING_DIRECTORY':  it.@value = 'file://$PROJECT_DIR$/run';         break
                 }
-                if (value != null) {
-                    entry.attributes().put('value', value)
-                }
-            } else if ('module'.equals(type)) {
-                entry.attributes().put('name', project.name)
+            } else if (it.name == 'module') {
+                entry.@name = project.name
             }
         }
-        runManagerNode.append(customNode)
+        node.append customNode
     }
 }
 

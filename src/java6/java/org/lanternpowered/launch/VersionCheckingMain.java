@@ -30,29 +30,21 @@ import javax.swing.JOptionPane;
 
 public class VersionCheckingMain {
 
-    private static final double REQUIRED_VERSION = 52.0;
-    private static final String ERROR_MESSAGE = "We have detected that you are running JRE version 1.7 or below.\n"
-            + "In order to run Sponge, you **must** be running JRE version 1.8.0_66 (or above).\n"
-            + "Previous builds of JRE version 1.8 may not work with Sponge.\n"
+    private static final String REQUIRED_VERSION = "1.8.0_40";
+    private static final String ERROR_MESSAGE = "We have detected that you are JRE version %s, which is out of date!\n"
+            + "In order to run LanternServer, you **must** be running JRE version %s (or above).\n"
+            + "Previous builds of JRE version 1.8 will not work with the LanternServer.\n"
             + "This can be downloaded from Oracle: http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html";
 
-    private static void ensureJava8() {
-        double version = getCurrentVersion();
-        if (version < REQUIRED_VERSION) {
-            if (!GraphicsEnvironment.isHeadless()) {
-                JOptionPane.showMessageDialog(null, ERROR_MESSAGE, "PEBKACException!", JOptionPane.ERROR_MESSAGE);
-            }
-            throw new RuntimeException(ERROR_MESSAGE);
-        }
-    }
-
-    // Code shamelessly copy/pasted from Mixin's JavaVersion#resolveCurrentVersion
-    private static double getCurrentVersion() {
-        return Double.parseDouble(System.getProperty("java.class.version"));
-    }
-
     public static void main(String[] args) throws Exception {
-        ensureJava8();
+        String version = System.getProperty("java.version");
+        if (version.compareTo(REQUIRED_VERSION) < 0) {
+            String error = String.format(ERROR_MESSAGE, version, REQUIRED_VERSION);
+            if (!GraphicsEnvironment.isHeadless()) {
+                JOptionPane.showMessageDialog(null, error, "PEBKACException!", JOptionPane.ERROR_MESSAGE);
+            }
+            throw new RuntimeException(error);
+        }
         Launch.main(args);
     }
 

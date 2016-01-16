@@ -24,22 +24,25 @@
  */
 package org.lanternpowered.server.util.collect;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValueMap;
 
 import java.util.AbstractMap;
+import java.util.AbstractSet;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import javax.annotation.Nullable;
+
 public final class Maps2 {
 
-    public static <K, V, B extends ExpirableValue<V>> ExpirableValueMap<K, V, B> createExpirableValueMap(BiFunction<K, V, B> backingEntrySupplier) {
+    public static <K, V, B extends ExpirableValue<V>> ExpirableValueMap<K, V, B> createExpirableValueMap(
+            BiFunction<K, V, B> backingEntrySupplier) {
         return new ExpirableValueMapImpl<>(Maps.newHashMap(), backingEntrySupplier);
     }
 
@@ -54,35 +57,13 @@ public final class Maps2 {
         private final Set<Entry<K, E>> backingEntrySet;
         private final Map<K, E> backingMap;
 
-        private final Set<Entry<K, V>> entrySet = new Set<Entry<K, V>>() {
-
-            @Override
-            public int size() {
-                return (int) this.stream().count();
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return backingEntrySet.isEmpty();
-            }
-
-            @Override
-            public boolean contains(Object o) {
-                if (o instanceof Map.Entry && !backingEntrySet.isEmpty()) {
-                    for (Entry<K, V> entry : this) {
-                        if (entry.equals(o)) {
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
+        private final Set<Entry<K, V>> entrySet = new AbstractSet<Entry<K, V>>() {
 
             @Override
             public Iterator<Entry<K, V>> iterator() {
                 final Iterator<Entry<K, E>> backIterator = backingEntrySet.iterator();
                 return new Iterator<Entry<K,V>>() {
-                    private Entry<K, E> next;
+                    @Nullable private Entry<K, E> next;
 
                     @Override
                     public void remove() {
@@ -124,83 +105,13 @@ public final class Maps2 {
             }
 
             @Override
-            public Object[] toArray() {
-                return this.toArray(new Object[this.size()]);
-            }
-
-            @Override
-            public <T> T[] toArray(T[] a) {
-                return Lists.newArrayList(this).toArray(a);
+            public int size() {
+                return (int) this.stream().count();
             }
 
             @Override
             public boolean add(Entry<K, V> entry) {
-                boolean found = this.remove(entry);
-                backingEntrySet.add(new AbstractMap.SimpleEntry<>(entry.getKey(), backEntrySupplier.apply(entry.getKey(), entry.getValue())));
-                return found;
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                if (o instanceof Map.Entry && !backingEntrySet.isEmpty()) {
-                    final Iterator<Entry<K, V>> it = this.iterator();
-                    while (it.hasNext()) {
-                        if (it.next().equals(o)) {
-                            it.remove();
-                            return true;
-                        }
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public boolean containsAll(Collection<?> c) {
-                final List<?> checkList = Lists.newArrayList(c);
-                this.forEach(checkList::remove);
-                return checkList.isEmpty();
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends Entry<K, V>> c) {
-                boolean result = true;
-                for (Entry<K, V> entry : c) {
-                    result &= this.add(entry);
-                }
-                return result;
-            }
-
-            @Override
-            public boolean retainAll(Collection<?> c) {
-                final List<?> checkList = Lists.newArrayList(c);
-                final Iterator<Entry<K, V>> it = this.iterator();
-                while (it.hasNext()) {
-                    Entry<K, V> entry = it.next();
-                    if (!c.contains(entry)) {
-                        it.remove();
-                    } else {
-                        checkList.remove(entry);
-                    }
-                }
-                return checkList.isEmpty();
-            }
-
-            @Override
-            public boolean removeAll(Collection<?> c) {
-                int count = 0;
-                final Iterator<Entry<K, V>> it = this.iterator();
-                while (it.hasNext()) {
-                    if (c.contains(it.next())) {
-                        it.remove();
-                        count++;
-                    }
-                }
-                return count == c.size();
-            }
-
-            @Override
-            public void clear() {
-                backingEntrySet.clear();
+                return put(entry.getKey(), entry.getValue()) != null;
             }
 
         };
@@ -211,10 +122,61 @@ public final class Maps2 {
             this.backingMap = backingMap;
         }
 
+        @Nullable
         @Override
-        public V put(K key, V value) {
+        public V put(K key, @Nullable V value) {
             final ExpirableValue<V> old = this.backingMap.put(key, this.backEntrySupplier.apply(key, value));
             return old != null && !old.isExpired() ? old.getValue() : null;
+        }
+
+        @Override
+        public boolean containsKey(Object key) {
+            final Iterator<Entry<K, E>> it = this.backingEntrySet.iterator();
+            while (it.hasNext()) {
+                final Entry<K, E> entry = it.next();
+                if (entry.getValue().isExpired()) {
+                    it.remove();
+                } else if (Objects.equals(entry.getKey(), key)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Override
+        public boolean containsValue(Object value) {
+            final Iterator<Entry<K, E>> it = this.backingEntrySet.iterator();
+            while (it.hasNext()) {
+                final Entry<K, E> entry = it.next();
+                if (entry.getValue().isExpired()) {
+                    it.remove();
+                } else if (Objects.equals(entry.getValue().getValue(), value)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        @Nullable
+        @Override
+        public V get(Object key) {
+            final Iterator<Entry<K, E>> it = this.backingEntrySet.iterator();
+            while (it.hasNext()) {
+                final Entry<K, E> entry = it.next();
+                if (entry.getValue().isExpired()) {
+                    it.remove();
+                } else if (Objects.equals(entry.getKey(), key)) {
+                    return entry.getValue().getValue();
+                }
+            }
+            return null;
+        }
+
+        @Nullable
+        @Override
+        public V remove(Object key) {
+            final ExpirableValue<V> old = this.backingMap.remove(key);
+            return old == null || old.isExpired() ? null : old.getValue();
         }
 
         @Override

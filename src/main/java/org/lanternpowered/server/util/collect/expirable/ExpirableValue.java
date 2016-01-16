@@ -24,6 +24,8 @@
  */
 package org.lanternpowered.server.util.collect.expirable;
 
+import javax.annotation.Nullable;
+
 public interface ExpirableValue<V> {
 
     /**
@@ -31,6 +33,7 @@ public interface ExpirableValue<V> {
      *
      * @return the value
      */
+    @Nullable
     V getValue();
 
     /**

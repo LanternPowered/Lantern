@@ -41,6 +41,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 @NonnullByDefault
 public final class Lists2 {
 
@@ -101,6 +103,7 @@ public final class Lists2 {
             }
         }
 
+        @Nullable
         @Override
         public V set(int index, V element) {
             this.clean(index);
@@ -114,6 +117,7 @@ public final class Lists2 {
             this.backing.add(index, this.backValueSupplier.apply(element));
         }
 
+        @Nullable
         @Override
         public V remove(int index) {
             this.clean(index);

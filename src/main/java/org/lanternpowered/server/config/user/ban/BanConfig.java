@@ -34,8 +34,6 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.user.UserStorage;
 import org.lanternpowered.server.util.collect.Lists2;
-import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
-import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.util.GuavaCollectors;

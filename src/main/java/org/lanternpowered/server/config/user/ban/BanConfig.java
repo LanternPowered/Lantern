@@ -33,6 +33,9 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.user.UserStorage;
+import org.lanternpowered.server.util.collect.Lists2;
+import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
+import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.util.GuavaCollectors;
@@ -42,6 +45,7 @@ import org.spongepowered.api.util.ban.Ban.Ip;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -70,7 +74,10 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     private List<BanEntry> entries = Lists.newArrayList();
 
     // A version of the entries list that allows concurrent operations
-    private final List<BanEntry> entries0 = Lists.newCopyOnWriteArrayList();
+    private final List<BanEntry> entries0 = Lists2.createCopyOnWriteExpirableValueListWithPredicate(entry -> {
+        final Optional<Instant> optExpirationDate = entry.getExpirationDate();
+        return optExpirationDate.isPresent() && Instant.now().compareTo(optExpirationDate.get()) > 0;
+    });
 
     public BanConfig(Path path) throws IOException {
         super(path, OPTIONS);

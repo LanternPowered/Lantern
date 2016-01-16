@@ -66,6 +66,12 @@ public class ExpirableValueListTest {
         assertEquals(3, list.size());
     }
 
+    @Test
+    public void testGet() {
+        assertEquals("D", createList().get(1));
+        assertEquals("A", createList().get(3));
+    }
+
     private static class Value extends SimpleExpirableValue<String> {
 
         private boolean expired;

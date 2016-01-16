@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValueList;
+import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.AbstractList;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 @NonnullByDefault
 public final class Lists2 {
@@ -46,8 +48,35 @@ public final class Lists2 {
         return new ExpirableValueListImpl<>(Lists.newArrayList(), backValueSupplier);
     }
 
+    public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createExpirableValueListWithPredicate(
+            Predicate<V> expirationChecker) {
+        // Casting weirdness...
+        return new ExpirableValueListImpl<>(Lists.newArrayList(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
+    }
+
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createCopyOnWriteExpirableValueList(Function<V, B> backValueSupplier) {
         return new ExpirableValueListImpl<>(Lists.newCopyOnWriteArrayList(), backValueSupplier);
+    }
+
+    public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createCopyOnWriteExpirableValueListWithPredicate(
+            Predicate<V> expirationChecker) {
+        // Casting weirdness...
+        return new ExpirableValueListImpl<>(Lists.newArrayList(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
+    }
+
+    private static class PredicateExpirableValue<V> extends SimpleExpirableValue<V> {
+
+        private final Predicate<V> predicate;
+
+        public PredicateExpirableValue(V value, Predicate<V> predicate) {
+            super(value);
+            this.predicate = predicate;
+        }
+
+        @Override
+        public boolean isExpired() {
+            return this.predicate.test(this.getValue());
+        }
     }
 
     private static class ExpirableValueListImpl<V, B extends ExpirableValue<V>> extends AbstractList<V> implements ExpirableValueList<V, B> {

@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.util.Lists2;
+import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;

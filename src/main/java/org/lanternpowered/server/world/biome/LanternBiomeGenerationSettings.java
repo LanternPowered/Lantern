@@ -25,7 +25,7 @@
 package org.lanternpowered.server.world.biome;
 
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.util.Lists2;
+import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.GroundCoverLayer;

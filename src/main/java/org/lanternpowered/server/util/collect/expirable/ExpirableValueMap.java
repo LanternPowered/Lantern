@@ -22,22 +22,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.map;
+package org.lanternpowered.server.util.collect.expirable;
 
-public interface ExpirableValue<V> {
+import java.util.Map;
 
-    /**
-     * Gets the value that is attached to the backing value.
-     *
-     * @return the value
-     */
-    V getValue();
+public interface ExpirableValueMap<K, V, E extends ExpirableValue<V>> extends Map<K, V> {
 
     /**
-     * Whether this entry is expired, the value will be removed the
-     * next time if it's accessed when it returns true.
+     * Gets the map backing this map.
      *
-     * @return is valid
+     * @return the backing map
      */
-    boolean isExpired();
+    Map<K, E> getBacking();
 }

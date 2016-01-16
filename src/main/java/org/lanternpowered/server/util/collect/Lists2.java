@@ -22,20 +22,110 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.util.collect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.Lists;
+import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
+import org.lanternpowered.server.util.collect.expirable.ExpirableValueList;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import java.util.AbstractList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 @NonnullByDefault
 public final class Lists2 {
+
+    public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createExpirableValueList(Function<V, B> backValueSupplier) {
+        return new ExpirableValueListImpl<>(Lists.newArrayList(), backValueSupplier);
+    }
+
+    public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createCopyOnWriteExpirableValueList(Function<V, B> backValueSupplier) {
+        return new ExpirableValueListImpl<>(Lists.newCopyOnWriteArrayList(), backValueSupplier);
+    }
+
+    private static class ExpirableValueListImpl<V, B extends ExpirableValue<V>> extends AbstractList<V> implements ExpirableValueList<V, B> {
+
+        private final List<B> backing;
+        private final Function<V, B> backValueSupplier;
+
+        public ExpirableValueListImpl(List<B> backing, Function<V, B> backValueSupplier) {
+            this.backValueSupplier = backValueSupplier;
+            this.backing = backing;
+        }
+
+        private void clean(int endIndex) {
+            final Iterator<B> it = this.backing.iterator();
+            while (it.hasNext() && endIndex >= 0) {
+                final B value = it.next();
+                if (value.isExpired()) {
+                    it.remove();
+                } else {
+                    endIndex--;
+                }
+            }
+        }
+
+        @Override
+        public V set(int index, V element) {
+            this.clean(index);
+            final B old = this.backing.set(index, this.backValueSupplier.apply(element));
+            return old == null ? null : old.getValue();
+        }
+
+        @Override
+        public void add(int index, V element) {
+            this.clean(index);
+            this.backing.add(index, this.backValueSupplier.apply(element));
+        }
+
+        @Override
+        public V remove(int index) {
+            this.clean(index);
+            final B old = this.backing.remove(index);
+            return old == null ? null : old.getValue();
+        }
+
+        @Override
+        public V get(int index) {
+            final Iterator<B> it = this.backing.iterator();
+            while (it.hasNext()) {
+                final B value = it.next();
+                if (value.isExpired()) {
+                    it.remove();
+                } else if (--index < 0) {
+                    return value.getValue();
+                }
+            }
+            throw new IndexOutOfBoundsException();
+        }
+
+        @Override
+        public int size() {
+            final Iterator<B> it = this.backing.iterator();
+            int size = 0;
+            while (it.hasNext()) {
+                final B value = it.next();
+                if (value.isExpired()) {
+                    it.remove();
+                } else {
+                    size++;
+                }
+            }
+            return size;
+        }
+
+        @Override
+        public List<B> getBacking() {
+            return this.backing;
+        }
+    }
 
     /**
      * Creates a non null list for the specified list, all the operations

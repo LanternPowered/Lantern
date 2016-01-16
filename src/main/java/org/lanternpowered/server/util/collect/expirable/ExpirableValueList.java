@@ -22,28 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util.map;
+package org.lanternpowered.server.util.collect.expirable;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import java.util.List;
 
-@ConfigSerializable
-public class SimpleExpirableValue<V> implements ExpirableValue<V> {
+public interface ExpirableValueList<V, B extends ExpirableValue<V>> extends List<V> {
 
-    @Setting(value = "value")
-    private final V value;
-
-    public SimpleExpirableValue(V value) {
-        this.value = value;
-    }
-
-    @Override
-    public V getValue() {
-        return this.value;
-    }
-
-    @Override
-    public boolean isExpired() {
-        return false;
-    }
+    List<B> getBacking();
 }

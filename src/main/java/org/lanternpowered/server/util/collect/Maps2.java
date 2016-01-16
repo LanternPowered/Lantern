@@ -22,12 +22,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.util.collect;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.util.map.ExpirableValue;
-import org.lanternpowered.server.util.map.ExpirableValueMap;
+import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
+import org.lanternpowered.server.util.collect.expirable.ExpirableValueMap;
 
 import java.util.AbstractMap;
 import java.util.Collection;
@@ -40,15 +40,15 @@ import java.util.function.BiFunction;
 public final class Maps2 {
 
     public static <K, V, B extends ExpirableValue<V>> ExpirableValueMap<K, V, B> createExpirableValueMap(BiFunction<K, V, B> backingEntrySupplier) {
-        return new ExpirableMap<>(Maps.newHashMap(), backingEntrySupplier);
+        return new ExpirableValueMapImpl<>(Maps.newHashMap(), backingEntrySupplier);
     }
 
     public static <K, V, B extends ExpirableValue<V>> ExpirableValueMap<K, V, B> createConcurrentExpirableValueMap(
             BiFunction<K, V, B> backingEntrySupplier) {
-        return new ExpirableMap<>(Maps.newConcurrentMap(), backingEntrySupplier);
+        return new ExpirableValueMapImpl<>(Maps.newConcurrentMap(), backingEntrySupplier);
     }
 
-    private static class ExpirableMap<K, V, E extends ExpirableValue<V>> extends AbstractMap<K, V> implements ExpirableValueMap<K, V, E> {
+    private static class ExpirableValueMapImpl<K, V, E extends ExpirableValue<V>> extends AbstractMap<K, V> implements ExpirableValueMap<K, V, E> {
 
         private final BiFunction<K, V, E> backEntrySupplier;
         private final Set<Entry<K, E>> backingEntrySet;
@@ -58,7 +58,7 @@ public final class Maps2 {
 
             @Override
             public int size() {
-                return backingEntrySet.size();
+                return (int) this.stream().count();
             }
 
             @Override
@@ -205,7 +205,7 @@ public final class Maps2 {
 
         };
 
-        public ExpirableMap(Map<K, E> backingMap, BiFunction<K, V, E> backEntrySupplier) {
+        public ExpirableValueMapImpl(Map<K, E> backingMap, BiFunction<K, V, E> backEntrySupplier) {
             this.backEntrySupplier = backEntrySupplier;
             this.backingEntrySet = backingMap.entrySet();
             this.backingMap = backingMap;

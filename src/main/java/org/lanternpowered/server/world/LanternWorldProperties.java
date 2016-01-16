@@ -347,6 +347,16 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     @Override
+    public boolean doesGenerateSpawnOnLoad() {
+        return this.worldConfig.getGeneration().doesGenerateSpawnOnLoad();
+    }
+
+    @Override
+    public void setGenerateSpawnOnLoad(boolean state) {
+        this.worldConfig.getGeneration().setGenerateSpawnOnLoad(state);
+    }
+
+    @Override
     public String getWorldName() {
         return this.name;
     }

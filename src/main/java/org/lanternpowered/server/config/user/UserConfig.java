@@ -75,7 +75,10 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
             this.byName.clear();
             for (T entry : this.entries) {
                 this.byUUID.put(entry.getProfile().getUniqueId(), entry);
-                this.byName.put(entry.getProfile().getName().toLowerCase(), entry);
+                final Optional<String> optName = entry.getProfile().getName();
+                if (optName.isPresent()) {
+                    this.byName.put(optName.get(), entry);
+                }
             }
         }
     }
@@ -99,14 +102,20 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
     public void addEntry(T entry) {
         final GameProfile gameProfile = entry.getProfile();
         this.byUUID.put(gameProfile.getUniqueId(), entry);
-        this.byName.put(gameProfile.getName().toLowerCase(), entry);
+        final Optional<String> optName = entry.getProfile().getName();
+        if (optName.isPresent()) {
+            this.byName.put(optName.get(), entry);
+        }
     }
 
     @Override
     public boolean removeEntry(UUID uniqueId) {
         T entry = this.byUUID.remove(uniqueId);
         if (entry != null) {
-            this.byName.remove(entry.getProfile().getName().toLowerCase());
+            final Optional<String> optName = entry.getProfile().getName();
+            if (optName.isPresent()) {
+                this.byName.remove(optName.get().toLowerCase());
+            }
             return true;
         }
         return false;

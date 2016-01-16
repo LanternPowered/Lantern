@@ -25,8 +25,9 @@
 package org.lanternpowered.server.network.vanilla.message.type.handshake;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.profile.LanternGameProfile.Property;
+import org.spongepowered.api.profile.property.ProfileProperty;
 
 import java.net.SocketAddress;
 import java.util.List;
@@ -51,9 +52,11 @@ public final class MessageHandshakeIn implements Message {
      * Creates a new handshake message.
      * 
      * @param state the next state
+     * @param hostname the hostname
      * @param address the address
-     * @param port the port
      * @param protocol the client protocol
+     * @param proxyData the proxy data
+     * @param fmlMarker whether a fml marker was found
      */
     public MessageHandshakeIn(int state, String hostname, SocketAddress address,
             int protocol, @Nullable ProxyData proxyData, boolean fmlMarker) {
@@ -117,10 +120,10 @@ public final class MessageHandshakeIn implements Message {
     public static class ProxyData {
 
         private final UUID uniqueId;
-        private final List<Property> properties;
+        private final Multimap<String, ProfileProperty> properties;
 
-        public ProxyData(UUID uniqueId, List<Property> properties) {
-            this.properties = ImmutableList.copyOf(properties);
+        public ProxyData(UUID uniqueId, Multimap<String, ProfileProperty> properties) {
+            this.properties = properties;
             this.uniqueId = uniqueId;
         }
 
@@ -128,8 +131,9 @@ public final class MessageHandshakeIn implements Message {
             return this.uniqueId;
         }
 
-        public List<Property> getProperties() {
+        public Multimap<String, ProfileProperty> getProperties() {
             return this.properties;
         }
+
     }
 }

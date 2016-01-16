@@ -25,19 +25,17 @@
 package org.lanternpowered.server.profile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.persistence.DataBuilder;
-import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.property.ProfileProperty;
 
 import java.util.List;
 import java.util.Objects;
@@ -56,25 +54,26 @@ public final class LanternGameProfile implements GameProfile {
     private static final DataQuery SIGNATURE = DataQuery.of("Signature");
 
     @Setting("properties")
-    private List<Property> properties;
+    private Multimap<String, ProfileProperty> properties;
 
     @Setting("uniqueId")
     private UUID uniqueId;
 
+    @Nullable
     @Setting("name")
     private String name;
 
     protected LanternGameProfile() {
     }
 
-    public LanternGameProfile(UUID uniqueId, String name) {
-        this(uniqueId, name, Lists.newArrayList());
+    public LanternGameProfile(UUID uniqueId, @Nullable String name) {
+        this(uniqueId, name, LinkedHashMultimap.create());
     }
 
-    public LanternGameProfile(UUID uniqueId, String name, List<Property> properties) {
-        this.properties = ImmutableList.copyOf(checkNotNull(properties, "properties"));
+    public LanternGameProfile(UUID uniqueId, @Nullable String name, Multimap<String, ProfileProperty> properties) {
+        this.properties = checkNotNull(properties, "properties");
         this.uniqueId = checkNotNull(uniqueId, "uniqueId");
-        this.name = checkNotNullOrEmpty(name, "name");
+        this.name = name;
     }
 
     /**
@@ -102,31 +101,44 @@ public final class LanternGameProfile implements GameProfile {
     @Override
     public DataContainer toContainer() {
         DataContainer container = new MemoryDataContainer()
-                .set(NAME, this.name)
                 .set(UNIQUE_ID, this.uniqueId.toString());
+        if (this.name != null) {
+            container.set(NAME, this.name);
+        }
         if (!this.properties.isEmpty()) {
-            List<DataContainer> list = Lists.newArrayListWithCapacity(this.properties.size());
-            for (Property property : this.properties) {
-                DataContainer entry = new MemoryDataContainer()
-                       .set(NAME, property.name)
-                       .set(VALUE, property.value);
-                if (property.signature != null) {
-                    entry.set(SIGNATURE, property.signature);
+            DataContainer propertiesMap = new MemoryDataContainer();
+            for (String key : this.properties.keySet()) {
+                List<DataContainer> entries = Lists.newArrayList();
+                for (ProfileProperty property : this.properties.get(key)) {
+                    DataContainer entry = new MemoryDataContainer()
+                            .set(VALUE, property.getValue());
+                    property.getSignature().ifPresent(signature -> entry.set(SIGNATURE, signature));
+                    entries.add(entry);
                 }
-                list.add(entry);
+                propertiesMap.set(DataQuery.of(key), entries);
             }
-            container.set(PROPERTIES, list);
+            container.set(PROPERTIES, propertiesMap);
         }
         return container;
     }
 
     @Override
-    public String getName() {
-        return this.name;
+    public Optional<String> getName() {
+        return Optional.ofNullable(this.name);
     }
 
-    public List<Property> getProperties() {
+    public void setName(@Nullable String name) {
+        this.name = name;
+    }
+
+    @Override
+    public Multimap<String, ProfileProperty> getPropertyMap() {
         return this.properties;
+    }
+
+    @Override
+    public boolean isFilled() {
+        return this.name != null;
     }
 
     @Override
@@ -138,7 +150,7 @@ public final class LanternGameProfile implements GameProfile {
             return false;
         }
         final LanternGameProfile o = (LanternGameProfile) other;
-        return this.name.equals(o.name) && this.uniqueId.equals(o.uniqueId) &&
+        return Objects.equals(this.name, o.name) && this.uniqueId.equals(o.uniqueId) &&
                 this.properties.equals(o.properties);
     }
 
@@ -147,6 +159,7 @@ public final class LanternGameProfile implements GameProfile {
         return Objects.hash(this.uniqueId, this.name, this.properties);
     }
 
+    /*
     public static class LanternDataBuilder implements DataBuilder<GameProfile> {
 
         // Why use both the optional and data exception?
@@ -181,59 +194,5 @@ public final class LanternGameProfile implements GameProfile {
             }
             return Optional.of(new LanternGameProfile(uniqueId0, name, properties));
         }
-    }
-
-    @ConfigSerializable
-    public static final class Property {
-
-        @Setting(value = "name")
-        private String name;
-
-        @Setting(value = "value")
-        private String value;
-
-        @Nullable
-        @Setting(value = "signature")
-        private String signature;
-
-        protected Property() {
-        }
-
-        public Property(String name, String value, @Nullable String signature) {
-            this.signature = signature;
-            this.value = value;
-            this.name = name;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public String getValue() {
-            return this.value;
-        }
-
-        @Nullable
-        public String getSignature() {
-            return this.signature;
-        }
-
-        @Override
-        public boolean equals(@Nullable Object other) {
-            if (this == other) {
-                return true;
-            }
-            if (other == null || other.getClass() != this.getClass()) {
-                return false;
-            }
-            final Property o = (Property) other;
-            return this.name.equals(o.name) && this.value.equals(o.value) && Objects.equals(
-                    this.signature, o.signature);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.name, this.value, this.signature);
-        }
-    }
+    }*/
 }

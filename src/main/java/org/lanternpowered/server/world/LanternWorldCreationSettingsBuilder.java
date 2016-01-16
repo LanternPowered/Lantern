@@ -75,6 +75,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
     private boolean bonusChestEnabled; // No builder method available
     private boolean commandsAllowed; // No builder method available
     private boolean pvpEnabled;
+    private boolean generateSpawnOnLoad;
 
     private long seed;
 
@@ -105,6 +106,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
         this.buildHeight = settings0.getBuildHeight();
         this.allowPlayerRespawns = settings0.allowPlayerRespawns();
         this.pvpEnabled = settings0.isPVPEnabled();
+        this.generateSpawnOnLoad = settings0.doesGenerateSpawnOnLoad();
         return this;
     }
 
@@ -133,6 +135,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
         this.waterEvaporates = properties0.doesWaterEvaporate();
         this.buildHeight = properties0.getBuildHeight();
         this.pvpEnabled = properties0.isPVPEnabled();
+        this.generateSpawnOnLoad = properties0.doesGenerateSpawnOnLoad();
         return this;
     }
 
@@ -157,6 +160,12 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
     @Override
     public LanternWorldCreationSettingsBuilder keepsSpawnLoaded(boolean state) {
         this.keepsSpawnLoaded = state;
+        return this;
+    }
+
+    @Override
+    public WorldCreationSettings.Builder generateSpawnOnLoad(boolean state) {
+        this.generateSpawnOnLoad = state;
         return this;
     }
 
@@ -242,6 +251,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
         this.hardcore = false;
         this.keepsSpawnLoaded = null;
         this.loadsOnStartup = false;
+        this.generateSpawnOnLoad = true;
         this.enabled = true;
         this.bonusChestEnabled = false;
         this.commandsAllowed = true;
@@ -279,8 +289,8 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
         return new LanternWorldCreationSettings(this.name, this.gameMode, this.dimensionType, generatorType,
                 this.generatorModifiers, generatorSettings, this.teleporterAgent, this.difficulty, this.hardcore,
                 this.enabled, this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
-                this.bonusChestEnabled, this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.seed,
-                this.buildHeight);
+                this.bonusChestEnabled, this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.generateSpawnOnLoad,
+                this.seed, this.buildHeight);
     }
 
     @Override

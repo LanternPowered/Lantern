@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.user.UserEntry;
 import org.lanternpowered.server.config.user.ban.BanEntry;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -42,6 +41,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -52,8 +52,6 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 public class LanternUserStorageService implements UserStorageService {
-
-    public static final String FAKEPLAYER_UUID = "41C82C87-7AfB-4024-BA57-13D2C99CAE77";
 
     private static final Cache<UUID, User> userCache = CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.DAYS)
@@ -154,18 +152,12 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Override
     public Optional<User> get(GameProfile profile) {
-        return Optional.ofNullable(findByUUID(checkNotNull(checkNotNull(profile, "profile").getUniqueId(), "profile UUID")));
+        return Optional.ofNullable(findByUUID(checkNotNull(profile, "profile").getUniqueId()));
     }
 
     @Override
     public User getOrCreate(GameProfile profile) {
-        if (profile.getUniqueId() == null) {
-            String name = profile.getName();
-            // Use Forge's FakePlayer UUID
-            UUID uuid = UUID.fromString(FAKEPLAYER_UUID);
-            profile = (GameProfile) new LanternGameProfile(uuid, name);
-        }
-        Optional<User> user = get(profile);
+        Optional<User> user = this.get(profile);
         if (user.isPresent()) {
             return user.get();
         }
@@ -193,15 +185,11 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Override
     public Collection<GameProfile> match(String lastKnownName) {
-        lastKnownName = checkNotNull(lastKnownName, "lastKnownName").toLowerCase(Locale.ROOT);
-        Collection<GameProfile> allProfiles = getAllProfiles();
-        Collection<GameProfile> matching = Sets.newHashSet();
-        for (GameProfile profile : allProfiles) {
-            if (profile.getName().startsWith(lastKnownName)) {
-                matching.add(profile);
-            }
-        }
-        return matching;
+        final String lastKnownName0 = checkNotNull(lastKnownName, "lastKnownName").toLowerCase(Locale.ROOT);
+        return getAllProfiles().stream().filter(profile -> {
+            final Optional<String> optName = profile.getName();
+            return optName.isPresent() && optName.get().startsWith(lastKnownName0);
+        }).collect(GuavaCollectors.toImmutableList());
     }
 
 }

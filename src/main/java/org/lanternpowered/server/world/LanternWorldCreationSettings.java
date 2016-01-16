@@ -56,6 +56,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     private final boolean waterEvaporates;
     private final boolean allowPlayerRespawns;
     private final boolean pvpEnabled;
+    private final boolean generateSpawnOnLoad;
 
     private final int buildHeight;
     private final long seed;
@@ -64,7 +65,8 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
             Difficulty difficulty, boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
             boolean pvpEnabled, boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns,
-            long seed, int buildHeight) {
+            boolean generateSpawnOnLoad, long seed, int buildHeight) {
+        this.generateSpawnOnLoad = generateSpawnOnLoad;
         this.allowPlayerRespawns = allowPlayerRespawns;
         this.generatorModifiers = generatorModifiers;
         this.generatorSettings = generatorSettings;
@@ -109,6 +111,11 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     @Override
     public boolean doesKeepSpawnLoaded() {
         return this.keepsSpawnLoaded;
+    }
+
+    @Override
+    public boolean doesGenerateSpawnOnLoad() {
+        return this.generateSpawnOnLoad;
     }
 
     @Override

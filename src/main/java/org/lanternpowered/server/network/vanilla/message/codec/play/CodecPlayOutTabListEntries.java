@@ -34,11 +34,12 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries.Entry;
-import org.lanternpowered.server.profile.LanternGameProfile.Property;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTabListEntries> {
 
@@ -71,16 +72,16 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
             switch (type) {
                 case ADD:
                     context.write(buf, String.class, entry.getName());
-                    Collection<Property> properties = entry.getProperties();
+                    Collection<ProfileProperty> properties = entry.getProperties();
                     context.writeVarInt(buf, properties.size());
-                    for (Property property : properties) {
+                    for (ProfileProperty property : properties) {
                         context.write(buf, String.class, property.getName());
                         context.write(buf, String.class, property.getValue());
-                        String signature = property.getSignature();
-                        boolean flag = signature != null;
+                        Optional<String> signature = property.getSignature();
+                        boolean flag = signature.isPresent();
                         buf.writeBoolean(flag);
                         if (flag) {
-                            context.write(buf, String.class, signature);
+                            context.write(buf, String.class, signature.get());
                         }
                     }
                     context.writeVarInt(buf, ((LanternGameMode) entry.getGameMode()).getInternalId());

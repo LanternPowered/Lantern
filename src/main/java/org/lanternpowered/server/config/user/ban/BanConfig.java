@@ -102,8 +102,13 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public Optional<BanEntry> getEntryByName(String username) {
-        return this.entries0.stream().filter(e -> e instanceof BanEntry.Profile &&
-                ((BanEntry.Profile) e).getProfile().getName().equalsIgnoreCase(username)).findFirst();
+        return this.entries0.stream().filter(e -> {
+            if (!(e instanceof BanEntry.Profile)) {
+                return false;
+            }
+            final Optional<String> optName = ((BanEntry.Profile) e).getProfile().getName();
+            return optName.isPresent() && optName.get().equalsIgnoreCase(username);
+        }).findFirst();
     }
 
     @Override

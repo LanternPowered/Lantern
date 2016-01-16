@@ -430,6 +430,11 @@ public class LanternServer implements Server {
     }
 
     @Override
+    public String getDefaultWorldName() {
+        return this.game.getGlobalConfig().getRootWorldFolder();
+    }
+
+    @Override
     public Optional<World> loadWorld(String worldName) {
         return this.worldManager.loadWorld(worldName);
     }

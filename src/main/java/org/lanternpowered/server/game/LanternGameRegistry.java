@@ -87,7 +87,6 @@ import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryM
 import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
-import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.status.LanternFavicon;
@@ -136,7 +135,6 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
 import org.spongepowered.api.network.status.Favicon;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.CatalogRegistryModule;
@@ -195,7 +193,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
@@ -677,11 +674,6 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public Optional<Rotation> getRotationFromDegree(int degrees) {
         return this.getRegistryModule(RotationRegistryModule.class).get().getRotationFromDegree(degrees);
-    }
-
-    @Override
-    public GameProfile createGameProfile(UUID uuid, String name) {
-        return new LanternGameProfile(uuid, name);
     }
 
     @Override

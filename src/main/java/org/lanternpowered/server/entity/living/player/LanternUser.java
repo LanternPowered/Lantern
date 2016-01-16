@@ -318,7 +318,7 @@ public class LanternUser implements AbstractArmorEquipable, User {
 
     @Override
     public String getName() {
-        return this.gameProfile.getName();
+        return this.gameProfile.getName().get();
     }
 
     @Override

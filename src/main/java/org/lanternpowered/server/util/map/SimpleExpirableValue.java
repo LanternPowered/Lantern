@@ -22,47 +22,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.config.world;
+package org.lanternpowered.server.util.map;
 
-import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 
-import java.util.List;
-import java.util.Random;
-
 @ConfigSerializable
-public final class WorldGeneration {
+public class SimpleExpirableValue<V> implements ExpirableValue<V> {
 
-    @Setting(value = "modifiers", comment = "The generation modifiers to apply to this world.")
-    private List<String> generationModifiers = Lists.newArrayList();
+    @Setting(value = "value")
+    private final V value;
 
-    @Setting(value = "seed", comment = "The seed that will be used to generate this world.")
-    private long seed = new Random().nextLong();
-
-    @Setting(value = "generate-spawn-on-load", comment =
-            "Whether the spawn should be generated when the world loads,\n" +
-            "otherwise will the spawn generate when a player joins.")
-    private boolean generateSpawnOnLoad = true;
-
-    public List<String> getGenerationModifiers() {
-        return this.generationModifiers;
+    public SimpleExpirableValue(V value) {
+        this.value = value;
     }
 
-    public long getSeed() {
-        return this.seed;
+    @Override
+    public V getValue() {
+        return this.value;
     }
 
-    public void setSeed(long seed) {
-        this.seed = seed;
+    @Override
+    public boolean isExpired() {
+        return false;
     }
-
-    public boolean doesGenerateSpawnOnLoad() {
-        return this.generateSpawnOnLoad;
-    }
-
-    public void setGenerateSpawnOnLoad(boolean state) {
-        this.generateSpawnOnLoad = state;
-    }
-
 }

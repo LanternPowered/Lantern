@@ -103,8 +103,12 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
             if (!profiles.isEmpty()) {
                 JsonArray array = new JsonArray();
                 for (GameProfile profile : profiles) {
+                    Optional<String> optName = profile.getName();
+                    if (!optName.isPresent()) {
+                        continue;
+                    }
                     JsonObject object3 = new JsonObject();
-                    object3.addProperty("name", profile.getName());
+                    object3.addProperty("name", optName.get());
                     object3.addProperty("uuid", profile.getUniqueId().toString());
                     array.add(object3);
                 }

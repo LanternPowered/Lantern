@@ -80,7 +80,7 @@ public class LanternTabList implements TabList {
                     entries.add(new Entry.Remove(info.uniqueId));
                 } else if (entry.gameProfileOrName) {
                     entries0.add(new Entry.Add(info.uniqueId, info.name,
-                            info.gameProfile.getProperties(), info.gameMode,
+                            info.gameProfile.getPropertyMap().values(), info.gameMode,
                             info.displayName, info.latency));
                 } else {
                     if (entry.gameMode) {

@@ -26,8 +26,8 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.profile.LanternGameProfile.Property;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
 
 import java.util.Collection;
@@ -52,12 +52,12 @@ public final class MessagePlayOutTabListEntries implements Message {
         private final UUID uniqueId;
 
         @Nullable private final String name;
-        @Nullable private final Collection<Property> properties;
+        @Nullable private final Collection<ProfileProperty> properties;
         @Nullable private final GameMode gameMode;
         @Nullable private final Text displayName;
         @Nullable private final Integer ping;
 
-        Entry(UUID uniqueId, @Nullable String name, @Nullable Collection<Property> properties,
+        Entry(UUID uniqueId, @Nullable String name, @Nullable Collection<ProfileProperty> properties,
                 @Nullable GameMode gameMode, @Nullable Text displayName, @Nullable Integer ping) {
             this.properties = properties == null ? null : ImmutableList.copyOf(properties);
             this.displayName = displayName;
@@ -68,7 +68,7 @@ public final class MessagePlayOutTabListEntries implements Message {
         }
 
         @Nullable
-        public Collection<Property> getProperties() {
+        public Collection<ProfileProperty> getProperties() {
             return this.properties;
         }
 
@@ -99,7 +99,7 @@ public final class MessagePlayOutTabListEntries implements Message {
 
         public static final class Add extends Entry {
 
-            public Add(UUID uniqueId, String name, Collection<Property> properties, GameMode gameMode,
+            public Add(UUID uniqueId, String name, Collection<ProfileProperty> properties, GameMode gameMode,
                     @Nullable Text displayName, Integer ping) {
                 super(uniqueId, name, properties, gameMode, displayName, ping);
             }

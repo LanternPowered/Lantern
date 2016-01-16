@@ -24,7 +24,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -37,8 +39,9 @@ import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 import org.lanternpowered.server.profile.LanternGameProfile;
-import org.lanternpowered.server.profile.LanternGameProfile.Property;
+import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.lanternpowered.server.util.UUIDHelper;
+import org.spongepowered.api.profile.property.ProfileProperty;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -180,13 +183,13 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 JsonArray propsArray = json.getAsJsonArray("properties");
 
                 // Parse properties
-                List<Property> properties = Lists.newArrayListWithCapacity(propsArray.size());
+                Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
                 for (JsonElement element : propsArray) {
                     JsonObject json0 = element.getAsJsonObject();
                     String propName = json0.get("name").getAsString();
                     String value = json0.get("value").getAsString();
                     String signature = json0.has("signature") ? json0.get("signature").getAsString() : null;
-                    properties.add(new Property(propName, value, signature));
+                    properties.put(propName, new LanternProfileProperty(propName, value, signature));
                 }
 
                 /*

@@ -27,6 +27,7 @@ package org.lanternpowered.server.text.xml;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.text.LanternTextHelper;
 import org.lanternpowered.server.text.LanternTextHelper.RawAction;
+import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
@@ -122,13 +123,22 @@ public abstract class Element {
         if (this.onClick != null) {
             Matcher matcher = FUNCTION_PATTERN.matcher(this.onClick);
             if (!matcher.matches()) {
-                throw new RuntimeException("Invalid click handler!");
+                throw new RuntimeException("Invalid onClick handler in " + this.getClass().getSimpleName() + " tag.");
             }
 
             String action = matcher.group(1);
             String value = matcher.group(2);
 
-            ClickAction<?> clickAction = LanternTextHelper.parseClickAction(action, value);
+            ClickAction<?> clickAction;
+            try {
+                clickAction = LanternTextHelper.parseClickAction(action, value);
+            } catch (Exception e) {
+                if (e instanceof IllegalArgumentException && e.getMessage().startsWith("Unknown")) {
+                    throw new RuntimeException("Unknown onClick action " + action + " in " + this.getClass().getSimpleName() + " tag.");
+                } else {
+                    throw e;
+                }
+            }
             if (clickAction != null) {
                 builder.onClick(clickAction);
             }
@@ -137,14 +147,14 @@ public abstract class Element {
         if (this.onShiftClick != null) {
             Matcher matcher = FUNCTION_PATTERN.matcher(this.onShiftClick);
             if (!matcher.matches()) {
-                throw new RuntimeException("Invalid shift click handler!");
+                throw new RuntimeException("Invalid onShiftClick handler in " + this.getClass().getSimpleName() + " tag.");
             }
 
             String action = matcher.group(1);
             String value = matcher.group(2);
 
             if (!action.equalsIgnoreCase("insert_text")) {
-                throw new RuntimeException("Unknown click action " + value);
+                throw new RuntimeException("Unknown onShiftClick action " + action + " in " + this.getClass().getSimpleName() + " tag.");
             }
 
             builder.onShiftClick(TextActions.insertText(value));
@@ -153,13 +163,22 @@ public abstract class Element {
         if (this.onHover != null) {
             final Matcher matcher = FUNCTION_PATTERN.matcher(this.onHover);
             if (!matcher.matches()) {
-                throw new RuntimeException("Invalid hover handler!");
+                throw new RuntimeException("Invalid onHover handler in " + this.getClass().getSimpleName() + " tag.");
             }
 
             String action = matcher.group(1);
             String value = matcher.group(2);
 
-            HoverAction<?> hoverAction = LanternTextHelper.parseHoverAction(action, value);
+            HoverAction<?> hoverAction;
+            try {
+                hoverAction = LanternTextHelper.parseHoverAction(action, value);
+            } catch (Exception e) {
+                if (e instanceof IllegalArgumentException && e.getMessage().startsWith("Unknown")) {
+                    throw new RuntimeException("Unknown onHover action " + action + " in " + this.getClass().getSimpleName() + " tag.");
+                } else {
+                    throw e;
+                }
+            }
             if (hoverAction != null) {
                 builder.onHover(hoverAction);
             }
@@ -195,8 +214,8 @@ public abstract class Element {
                     fixedRoot.set(currentElement = new Span());
                 }
                 RawAction raw = LanternTextHelper.raw(text.getClickAction().get());
-                // TODO: Apply the locale again?
-                currentElement.onClick = raw.getAction() + "('" + TextSerializers.TEXT_XML.serialize(raw.getValueAsText()) + "')";
+                currentElement.onClick = raw.getAction() + "('" + ((LanternTextSerializer) TextSerializers.TEXT_XML)
+                        .serialize(raw.getValueAsText(), locale) + "')";
             }
         } else {
             if (currentElement == null) {
@@ -206,8 +225,8 @@ public abstract class Element {
 
         if (text.getHoverAction().isPresent()) {
             RawAction raw = LanternTextHelper.raw(text.getHoverAction().get());
-            // TODO: Apply the locale again?
-            currentElement.onHover = raw.getAction() + "('" + TextSerializers.TEXT_XML.serialize(raw.getValueAsText()) + "')";
+            currentElement.onHover = raw.getAction() + "('" + ((LanternTextSerializer) TextSerializers.TEXT_XML)
+                    .serialize(raw.getValueAsText(), locale) + "')";
         }
 
         if (text.getShiftClickAction().isPresent()) {
@@ -215,7 +234,7 @@ public abstract class Element {
             if (!(action instanceof ShiftClickAction.InsertText)) {
                 throw new IllegalArgumentException("Shift-click action is not an insertion. Currently not supported!");
             }
-            currentElement.onShiftClick = "insert_text('" + action.getResult() + ')';
+            currentElement.onShiftClick = "insert_text('" + action.getResult() + "')";
         }
 
         if (text instanceof LiteralText) {

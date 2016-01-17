@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.objects.LocalizedText;
 
 public final class MessagePlayOutUpdateSign implements Message {
 

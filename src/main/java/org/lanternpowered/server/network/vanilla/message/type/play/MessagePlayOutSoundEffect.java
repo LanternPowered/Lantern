@@ -41,9 +41,7 @@ public final class MessagePlayOutSoundEffect implements Message {
      * Creates a new sound effect message.
      * 
      * @param name The effect name
-     * @param x The x coordinate
-     * @param y The y coordinate
-     * @param z The z coordinate
+     * @param position The position
      * @param volume The volume
      * @param pitch The pitch value
      */

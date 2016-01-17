@@ -26,6 +26,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
@@ -43,7 +44,8 @@ import java.util.Optional;
 public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChatMessage> {
 
     @Override
-    public void handle(Session session, MessagePlayInChatMessage message) {
+    public void handle(NetworkContext context, MessagePlayInChatMessage message) {
+        Session session = context.getSession();
         Player player = session.getPlayer();
         String message0 = message.getMessage();
         String message1 = StringUtils.normalizeSpace(message0);

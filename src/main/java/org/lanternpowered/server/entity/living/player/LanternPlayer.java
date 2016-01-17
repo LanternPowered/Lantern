@@ -32,7 +32,7 @@ import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;

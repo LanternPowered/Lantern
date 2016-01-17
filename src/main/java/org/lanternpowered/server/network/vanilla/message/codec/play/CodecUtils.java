@@ -24,14 +24,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
-import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayInClientSettings;
-
-import java.util.Locale;
-
 public class CodecUtils {
 
     /**
@@ -58,24 +50,6 @@ public class CodecUtils {
      */
     public static float unwrapAngle(byte angle) {
         return ((float) angle / 256f) * 360f;
-    }
-
-    public static Locale getLocale(ObjectSerializerContext context) {
-        if (context instanceof CodecContext) {
-            Locale locale0 = ((CodecContext) context).channel().attr(ProcessorPlayInClientSettings.LOCALE).get();
-            if (locale0 != null) {
-                return locale0;
-            }
-        }
-        return Locale.ENGLISH;
-    }
-
-    public static class LocaleCachingHash implements CachingHashGenerator<Message> {
-
-        @Override
-        public int generate(CodecContext context, Message message) {
-            return getLocale(context).hashCode();
-        }
     }
 
     private CodecUtils() {

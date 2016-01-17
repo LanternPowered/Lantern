@@ -24,39 +24,103 @@
  */
 package org.lanternpowered.server.network.message;
 
+import com.google.common.collect.Lists;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 import javax.annotation.Nullable;
 
-public interface MessageRegistration<M extends Message> {
+public final class MessageRegistration<M extends Message> {
+
+    private final Class<M> messageType;
+    Optional<CodecRegistration<? super M, Codec<? super M>>> codecRegistration = Optional.empty();
+    private Optional<Handler<? super M>> handler = Optional.empty();
+    private List<Processor<? super M>> processors = Lists.newArrayList();
+    private List<Processor<? super M>> unmodifiableProcessors = Collections.unmodifiableList(this.processors);
+
+    public MessageRegistration(Class<M> messageType) {
+        this.messageType = messageType;
+    }
 
     /**
-     * Gets the message type of the registration.
-     * 
+     * Gets the message type of this registration.
+     *
      * @return the message type
      */
-    Class<M> getType();
+    public Class<M> getMessageType() {
+        return this.messageType;
+    }
 
     /**
-     * Gets the opcode of the registration.
-     * 
-     * @return the opcode
+     * Gets the {@link CodecRegistration} that is bound to this message registration,
+     * may be {@link Optional#empty()}.
+     *
+     * @return the codec registration
      */
-    @Nullable
-    Integer getOpcode();
+    public Optional<CodecRegistration<? super M, Codec<? super M>>> getCodecRegistration() {
+        return this.codecRegistration;
+    }
 
     /**
-     * Gets the processor of the registration.
-     * 
-     * @return the processor
+     * Gets the {@link Handler} that is bound to this message registration,
+     * may be {@link Optional#empty()}.
+     *
+     * @return the handler
      */
-    <P extends Processor<? super M>> P getProcessor();
+    public Optional<Handler<? super M>> getHandler() {
+        return this.handler;
+    }
 
-    @Nullable
-    <C extends Codec<? super M>> C getCodec();
+    /**
+     * Gets the {@link Processor}s that are bound to this message registration.
+     *
+     * @return the processors
+     */
+    public List<Processor<? super M>> getProcessors() {
+        return this.unmodifiableProcessors;
+    }
 
-    @Nullable
-    <H extends Handler<? super M>> H getHandler();
+    /**
+     * Binds the handler to this message registration.
+     *
+     * @param handler the handler
+     * @return this message registration
+     */
+    public MessageRegistration<M> bindHandler(@Nullable Handler<? super M> handler) {
+        this.handler = Optional.ofNullable(handler);
+        return this;
+    }
+
+    /**
+     * Binds the processor to this message registration.
+     *
+     * @param processor the processor
+     * @return this message registration
+     */
+    public MessageRegistration<M> bindProcessor(Processor<? super M> processor) {
+        this.processors.add(processor);
+        return this;
+    }
+
+    /**
+     * Binds the processor to this message registration.
+     *
+     * @param index the index to insert the processor at
+     * @param processor the processor
+     * @return this message registration
+     */
+    public MessageRegistration<M> bindProcessor(int index, Processor<? super M> processor) {
+        if (index >= this.processors.size()) {
+            this.processors.add(processor);
+        } else {
+            this.processors.add(index < 0 ? 0 : index, processor);
+        }
+        return this;
+    }
+
 }

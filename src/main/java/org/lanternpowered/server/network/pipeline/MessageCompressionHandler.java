@@ -24,7 +24,7 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import static org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializerContext.CONTEXT;
+import static org.lanternpowered.server.network.message.codec.serializer.SimpleSerializerContext.DEFAULT;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -73,18 +73,18 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
             } else if (compressedLength >= length) {
                 // Compression increased the size. threshold is probably too low
                 // Send as an uncompressed packet
-                CONTEXT.writeVarInt(prefixBuf, 0);
+                DEFAULT.writeVarInt(prefixBuf, 0);
                 msg.readerIndex(index);
                 msg.retain();
                 contentsBuf = msg;
             } else {
                 // All is well
-                CONTEXT.writeVarInt(prefixBuf, length);
+                DEFAULT.writeVarInt(prefixBuf, length);
                 contentsBuf = Unpooled.wrappedBuffer(compressedData, 0, compressedLength);
             }
         } else {
             // Message should be sent through
-            CONTEXT.writeVarInt(prefixBuf, 0);
+            DEFAULT.writeVarInt(prefixBuf, 0);
             msg.retain();
             contentsBuf = msg;
         }
@@ -95,7 +95,7 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         int index = msg.readerIndex();
-        int uncompressedSize = CONTEXT.readVarInt(msg);
+        int uncompressedSize = DEFAULT.readVarInt(msg);
         if (uncompressedSize == 0) {
             // Message is uncompressed
             int length = msg.readableBytes();
@@ -125,7 +125,8 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
                 msg.retain();
                 out.add(msg);
             } else if (resultLength != uncompressedSize) {
-                throw new DecoderException("Received compressed message claiming to be of size " + uncompressedSize + " but actually " + resultLength);
+                throw new DecoderException("Received compressed message claiming to be of size "
+                        + uncompressedSize + " but actually " + resultLength);
             } else {
                 out.add(Unpooled.wrappedBuffer(destData));
             }

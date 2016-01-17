@@ -26,8 +26,8 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -36,8 +36,8 @@ import org.spongepowered.api.event.entity.living.humanoid.player.PlayerChangeCli
 public final class HandlerPlayInClientSettings implements Handler<MessagePlayInClientSettings> {
 
     @Override
-    public void handle(Session session, MessagePlayInClientSettings message) {
-        LanternPlayer player = session.getPlayer();
+    public void handle(NetworkContext context, MessagePlayInClientSettings message) {
+        LanternPlayer player = context.getSession().getPlayer();
         PlayerChangeClientSettingsEvent event = SpongeEventFactory.createPlayerChangeClientSettingsEvent(
                 Cause.of(player), message.getChatVisibility(), LanternSkinPart.fromBitPattern(message.getSkinPartsBitPattern()),
                 message.getLocale(), player, message.getEnableColors(), message.getViewDistance());

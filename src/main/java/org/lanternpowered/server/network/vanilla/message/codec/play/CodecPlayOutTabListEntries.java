@@ -32,6 +32,7 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries.Entry;
 import org.spongepowered.api.profile.property.ProfileProperty;
@@ -52,7 +53,7 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
     private final TObjectIntMap<Class<?>> typeLookup;
 
     {
-        TObjectIntMap<Class<?>> typeLookup = new TObjectIntHashMap<Class<?>>();
+        TObjectIntMap<Class<?>> typeLookup = new TObjectIntHashMap<>();
         typeLookup.put(Entry.Add.class, ADD);
         typeLookup.put(Entry.UpdateGameMode.class, UPDATE_GAME_MODE);
         typeLookup.put(Entry.UpdateLatency.class, UPDATE_LATENCY);
@@ -71,17 +72,17 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
         for (Entry entry : entries) {
             switch (type) {
                 case ADD:
-                    context.write(buf, String.class, entry.getName());
+                    context.write(buf, Types.STRING, entry.getName());
                     Collection<ProfileProperty> properties = entry.getProperties();
                     context.writeVarInt(buf, properties.size());
                     for (ProfileProperty property : properties) {
-                        context.write(buf, String.class, property.getName());
-                        context.write(buf, String.class, property.getValue());
+                        context.write(buf, Types.STRING, property.getName());
+                        context.write(buf, Types.STRING, property.getValue());
                         Optional<String> signature = property.getSignature();
                         boolean flag = signature.isPresent();
                         buf.writeBoolean(flag);
                         if (flag) {
-                            context.write(buf, String.class, signature.get());
+                            context.write(buf, Types.STRING, signature.get());
                         }
                     }
                     context.writeVarInt(buf, ((LanternGameMode) entry.getGameMode()).getInternalId());
@@ -90,7 +91,7 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
                     boolean flag = displayName != null;
                     buf.writeBoolean(flag);
                     if (flag) {
-                        context.write(buf, Text.class, displayName);
+                        context.write(buf, Types.TEXT, displayName);
                     }
                     break;
                 case UPDATE_GAME_MODE:
@@ -104,7 +105,7 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
                     boolean flag0 = displayName0 != null;
                     buf.writeBoolean(flag0);
                     if (flag0) {
-                        context.write(buf, Text.class, displayName0);
+                        context.write(buf, Types.TEXT, displayName0);
                     }
                     break;
                 case REMOVE:

@@ -28,6 +28,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 
 public final class CodecPlayOutPlayerRespawn implements Codec<MessagePlayOutPlayerRespawn> {
@@ -38,7 +39,7 @@ public final class CodecPlayOutPlayerRespawn implements Codec<MessagePlayOutPlay
         buf.writeInt(message.getDimensionType().getInternalId());
         buf.writeByte(message.getDifficulty().getInternalId());
         buf.writeByte(message.getGameMode().getInternalId());
-        context.write(buf, String.class, "default"); // Not used
+        context.write(buf, Types.STRING, "default"); // Not used
         return buf;
     }
 

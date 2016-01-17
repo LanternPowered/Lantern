@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.forge.message.handler.handshake;
 import com.google.common.collect.Maps;
 import io.netty.util.Attribute;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutModList;
@@ -36,8 +37,9 @@ import org.lanternpowered.server.network.session.Session;
 public final class HandlerForgeHandshakeInModList implements Handler<MessageForgeHandshakeInOutModList> {
 
     @Override
-    public void handle(Session session, MessageForgeHandshakeInOutModList message) {
-        Attribute<ForgeServerHandshakePhase> phase = session.getChannel().attr(ForgeHandshakePhase.PHASE);
+    public void handle(NetworkContext context, MessageForgeHandshakeInOutModList message) {
+        Session session = context.getSession();
+        Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
         if (phase.get() != ForgeServerHandshakePhase.HELLO) {
             session.disconnect("Retrieved unexpected forge handshake modList message.");
             return;

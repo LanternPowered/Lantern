@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.forge.message.handler.handshake;
 import com.google.common.collect.Sets;
 import io.netty.util.Attribute;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
@@ -42,8 +43,9 @@ import java.util.Set;
 public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeHandshakeInStart> {
 
     @Override
-    public void handle(Session session, MessageForgeHandshakeInStart message) {
-        Attribute<ForgeServerHandshakePhase> phase = session.getChannel().attr(ForgeHandshakePhase.PHASE);
+    public void handle(NetworkContext context, MessageForgeHandshakeInStart message) {
+        Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
+        Session session = context.getSession();
         if (phase.get() != null && phase.get() != ForgeServerHandshakePhase.START) {
             session.disconnect("Retrieved unexpected forge handshake start message.");
             return;
@@ -63,9 +65,9 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         if (fml) {
             phase.set(ForgeServerHandshakePhase.HELLO);
             session.send(new MessageForgeHandshakeInOutHello());
-            LanternGame.log().info("{}: Start forge handshake.", session.getGameProfile().getName());
+            LanternGame.log().info("{}: Start forge handshake.", session.getGameProfile().getName().get());
         } else {
-            LanternGame.log().info("{}: Skip forge handshake.", session.getGameProfile().getName());
+            LanternGame.log().info("{}: Skip forge handshake.", session.getGameProfile().getName().get());
             phase.set(ForgeServerHandshakePhase.DONE);
             session.setProtocolState(ProtocolState.PLAY);
             session.spawnPlayer();

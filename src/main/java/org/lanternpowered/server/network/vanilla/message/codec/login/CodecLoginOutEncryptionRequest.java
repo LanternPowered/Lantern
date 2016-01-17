@@ -28,7 +28,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.object.VarInt;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
 
 public final class CodecLoginOutEncryptionRequest implements Codec<MessageLoginOutEncryptionRequest> {
@@ -40,15 +40,14 @@ public final class CodecLoginOutEncryptionRequest implements Codec<MessageLoginO
         byte[] publicKey = message.getPublicKey();
         byte[] verifyToken = message.getVerifyToken();
 
-        // Not used
-        context.write(buf, String.class, "");
+        context.write(buf, Types.STRING, message.getSessionId());
 
         // Write the public key
-        context.write(buf, VarInt.class, VarInt.of(publicKey.length));
+        context.writeVarInt(buf, publicKey.length);
         buf.writeBytes(publicKey);
 
         // Write the verify token
-        context.write(buf, VarInt.class, VarInt.of(verifyToken.length));
+        context.writeVarInt(buf, verifyToken.length);
         buf.writeBytes(verifyToken);
 
         return buf;

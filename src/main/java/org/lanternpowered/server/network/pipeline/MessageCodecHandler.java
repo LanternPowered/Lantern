@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import com.google.common.base.Optional;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -32,13 +31,19 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.message.BulkMessage;
+import org.lanternpowered.server.network.message.CodecRegistration;
+import org.lanternpowered.server.network.message.HandlerMessage;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
+import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
+import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 
 import java.util.List;
@@ -51,9 +56,14 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
     @Override
     protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
         Protocol protocol = ctx.channel().attr(Session.STATE).get().getProtocol();
-        MessageRegistration registration = protocol.outbound().find(message.getClass());
+        MessageRegistration<Message> registration = (MessageRegistration<Message>) protocol.outbound()
+                .findByMessageType(message.getClass()).orElse(null);
 
-        if (registration.getOpcode() == null) {
+        if (registration == null) {
+            throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered!");
+        }
+        CodecRegistration codecRegistration = registration.getCodecRegistration().orElse(null);
+        if (codecRegistration == null) {
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered to allow encoding!");
         }
 
@@ -61,21 +71,10 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         // Write the opcode of the message
         CodecContext context = ctx.channel().attr(CONTEXT).get();
-        context.writeVarInt(opcode, registration.getOpcode());
+        context.writeVarInt(opcode, codecRegistration.getOpcode());
 
-        Codec codec = registration.getCodec();
-        ByteBuf content = null;
-
-        // Handle first the caching system
-        Optional<CachingHashGenerator<?>> hashGen = CachedMessages.getHashGenerator(codec.getClass());
-        if (hashGen.isPresent()) {
-            int hash = ((CachingHashGenerator) hashGen.get()).generate(context, message);
-            content = CachedMessages.getCachedMessage(message).getEncodedMessage(hash);
-        }
-        if (content == null) {
-            // Write the content of the message
-            content = registration.getCodec().encode(context, message);
-        }
+        Codec codec = codecRegistration.getCodec();
+        ByteBuf content = codec.encode(context, message);
 
         // Add the buffer to the output
         output.add(Unpooled.wrappedBuffer(opcode, content));
@@ -90,11 +89,12 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         CodecContext context = ctx.channel().attr(CONTEXT).get();
         int opcode = context.readVarInt(input);
 
-        Protocol protocol = ctx.channel().attr(Session.STATE).get().getProtocol();
-        MessageRegistration registration = protocol.inbound().find(opcode);
+        final ProtocolState state = ctx.channel().attr(Session.STATE).get();
+        final Protocol protocol = state.getProtocol();
+        CodecRegistration registration = protocol.inbound().find(opcode).orElse(null);
 
         if (registration == null) {
-            throw new DecoderException("Failed to find a message registration with opcode " + opcode + "!");
+            throw new DecoderException("Failed to find a message registration with opcode " + opcode + " in state " + state.toString() + "!");
         }
 
         // Copy the remaining content of the buffer to a new buffer used by the
@@ -104,15 +104,38 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         // Read the content of the message
         Message message = registration.getCodec().decode(context, content);
+        this.processMessage(message, output, protocol, state, context);
+    }
 
-        Processor processor = registration.getProcessor();
+    private void processMessage(Message message, List<Object> output, Protocol protocol, ProtocolState state, CodecContext context) {
+        if (message == NullMessage.INSTANCE) {
+            return;
+        }
+
+        if (message instanceof BulkMessage) {
+            ((BulkMessage) message).getMessages().forEach(message1 ->
+                    this.processMessage(message1, output, protocol, state, context));
+            return;
+        }
+
+        final MessageRegistration messageRegistration = (MessageRegistration) protocol.inbound()
+                .findByMessageType(message.getClass()).orElseThrow(() -> new DecoderException(
+                        "The returned message type is not attached to the used protocol state (" + state.toString() + ")!"));
+
+        LanternGame.log().debug("Received message with type: " + message.getClass().getName());
+
+        final List<Processor> processors = messageRegistration.getProcessors();
         // Only process if there are processors found
-        if (processor != null) {
-            // The processor should handle the output messages
-            processor.process(context, message, output);
+        if (!processors.isEmpty()) {
+            for (Processor processor : processors) {
+                // The processor should handle the output messages
+                processor.process(context, message, output);
+            }
         } else {
-            // Add the message to the output
-            output.add(message);
+            messageRegistration.getHandler().ifPresent(handler -> {
+                // Add the message to the output
+                output.add(new HandlerMessage(message, (Handler) handler));
+            });
         }
     }
 }

@@ -25,8 +25,8 @@
 package org.lanternpowered.server.network.message.codec;
 
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
+import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
 
-public interface CodecContext extends ObjectSerializerContext, NetworkContext {
+public interface CodecContext extends SerializerContext, NetworkContext {
 
 }

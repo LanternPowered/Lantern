@@ -24,13 +24,11 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.handshake;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.profile.property.ProfileProperty;
 
 import java.net.SocketAddress;
-import java.util.List;
 import java.util.UUID;
 
 import javax.annotation.Nullable;

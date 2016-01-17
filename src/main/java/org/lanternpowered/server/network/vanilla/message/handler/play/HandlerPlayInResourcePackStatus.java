@@ -25,6 +25,7 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
@@ -38,7 +39,7 @@ import java.util.Optional;
 public final class HandlerPlayInResourcePackStatus implements Handler<MessagePlayInResourcePackStatus> {
 
     @Override
-    public void handle(Session session, MessagePlayInResourcePackStatus message) {
+    public void handle(NetworkContext context, MessagePlayInResourcePackStatus message) {
         LanternResourcePackFactory factory = LanternGame.get().getRegistry().getResourcePackFactory();
         Optional<ResourcePack> resourcePack = factory.getByHash(message.getHash());
         if (!resourcePack.isPresent()) {
@@ -49,6 +50,7 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
                     " and status: " + message.getStatus().toString().toLowerCase());
             return;
         }
+        Session session = context.getSession();
         LanternGame.get().getEventManager().post(SpongeEventFactory.createResourcePackStatusEvent(
                 Cause.of(session.getPlayer()), resourcePack.get(), session.getPlayer(), message.getStatus()));
     }

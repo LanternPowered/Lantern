@@ -26,10 +26,10 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
+import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.text.Text;
@@ -37,7 +37,6 @@ import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-@Caching
 public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMessage> {
 
     @SuppressWarnings("deprecation")
@@ -59,7 +58,7 @@ public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMe
         } else {
             throw new CodecException("Unknown chat type: " + type.getName());
         }
-        context.write(buf, LocalizedText.class, text);
+        context.write(buf, Types.LOCALIZED_TEXT, text);
         buf.writeByte(value);
         return buf;
     }

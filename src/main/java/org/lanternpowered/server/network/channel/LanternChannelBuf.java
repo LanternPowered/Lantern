@@ -24,15 +24,10 @@
  */
 package org.lanternpowered.server.network.channel;
 
+import static org.lanternpowered.server.network.message.codec.serializer.SimpleSerializerContext.DEFAULT;
+
 import io.netty.buffer.ByteBuf;
-import org.lanternpowered.server.network.message.codec.object.VarInt;
-import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
-import org.lanternpowered.server.network.message.codec.object.serializer.SerializerDataView;
-import org.lanternpowered.server.network.message.codec.object.serializer.SerializerString;
-import org.lanternpowered.server.network.message.codec.object.serializer.SerializerUUID;
-import org.lanternpowered.server.network.message.codec.object.serializer.SerializerVarInt;
-import org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializerContext;
-import org.lanternpowered.server.network.message.codec.object.serializer.SimpleObjectSerializers;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
@@ -42,19 +37,6 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 
 public class LanternChannelBuf implements ChannelBuf {
-
-    /**
-     * A object serializer context specific for the sponge channel buffer.
-     */
-    private static final ObjectSerializerContext CONTEXT = new SimpleObjectSerializerContext(
-            new SimpleObjectSerializers() {
-                {
-                    this.register(UUID.class, new SerializerUUID());
-                    this.register(DataView.class, new SerializerDataView());
-                    this.register(VarInt.class, new SerializerVarInt());
-                    this.register(String.class, new SerializerString());
-                }
-            });
 
     private final ByteBuf buf;
 
@@ -348,67 +330,67 @@ public class LanternChannelBuf implements ChannelBuf {
 
     @Override
     public LanternChannelBuf writeString(String data) {
-        CONTEXT.write(this.buf, String.class, data);
+        DEFAULT.write(this.buf, Types.STRING, data);
         return this;
     }
 
     @Override
     public LanternChannelBuf setString(int index, String data) {
-        CONTEXT.writeAt(this.buf, index, String.class, data);
+        DEFAULT.writeAt(this.buf, index, Types.STRING, data);
         return this;
     }
 
     @Override
     public String readString() {
-        return CONTEXT.read(this.buf, String.class);
+        return DEFAULT.read(this.buf, Types.STRING);
     }
 
     @Override
     public String getString(int index) {
-        return CONTEXT.readAt(this.buf, index, String.class);
+        return DEFAULT.readAt(this.buf, index, Types.STRING);
     }
 
     @Override
     public LanternChannelBuf writeUniqueId(UUID data) {
-        CONTEXT.write(this.buf, UUID.class, data);
+        DEFAULT.write(this.buf, Types.UNIQUE_ID, data);
         return this;
     }
 
     @Override
     public LanternChannelBuf setUniqueId(int index, UUID data) {
-        CONTEXT.writeAt(this.buf, index, UUID.class, data);
+        DEFAULT.writeAt(this.buf, index, Types.UNIQUE_ID, data);
         return this;
     }
 
     @Override
     public UUID readUniqueId() {
-        return CONTEXT.read(this.buf, UUID.class);
+        return DEFAULT.read(this.buf, Types.UNIQUE_ID);
     }
 
     @Override
     public UUID getUniqueId(int index) {
-        return CONTEXT.readAt(this.buf, index, UUID.class);
+        return DEFAULT.readAt(this.buf, index, Types.UNIQUE_ID);
     }
 
     @Override
     public LanternChannelBuf writeDataView(DataView data) {
-        CONTEXT.write(this.buf, DataView.class, data);
+        DEFAULT.write(this.buf, Types.DATA_VIEW, data);
         return this;
     }
 
     @Override
     public LanternChannelBuf setDataView(int index, DataView data) {
-        CONTEXT.writeAt(this.buf, index, DataView.class, data);
+        DEFAULT.writeAt(this.buf, index, Types.DATA_VIEW, data);
         return this;
     }
 
     @Override
     public DataView readDataView() {
-        return CONTEXT.read(this.buf, DataView.class);
+        return DEFAULT.read(this.buf, Types.DATA_VIEW);
     }
 
     @Override
     public DataView getDataView(int index) {
-        return CONTEXT.readAt(this.buf, index, DataView.class);
+        return DEFAULT.readAt(this.buf, index, Types.DATA_VIEW);
     }
 }

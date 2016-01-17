@@ -34,16 +34,18 @@ import io.netty.util.AttributeKey;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.AsyncHelper;
+import org.lanternpowered.server.network.message.BulkMessage;
+import org.lanternpowered.server.network.message.HandlerMessage;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
+import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
 import org.lanternpowered.server.network.pipeline.MessageEncryptionHandler;
 import org.lanternpowered.server.network.pipeline.NoopHandler;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.vanilla.message.type.compression.MessageOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
@@ -81,19 +83,22 @@ public class Session implements PlayerConnection {
     // The random for this session
     private final Random random = new Random();
 
-    // A queue of incoming and unprocessed messages
-    private final Queue<MessageEntry> messageQueue = new ArrayDeque<MessageEntry>();
+    // A queue of incoming messages that must be handled on
+    // the synchronous thread
+    private final Queue<HandlerMessage> messageQueue = new ArrayDeque<>();
 
-    private static class MessageEntry {
-
-        private final Handler handler;
-        private final Message message;
-
-        public MessageEntry(Message message, Handler handler) {
-            this.message = message;
-            this.handler = handler;
+    // The network context used by the handlers
+    private final NetworkContext networkContext = new NetworkContext() {
+        @Override
+        public Session getSession() {
+            return Session.this;
         }
-    }
+
+        @Override
+        public Channel getChannel() {
+            return channel;
+        }
+    };
 
     // A list with all the registered channels (client)
     private final Set<String> registeredChannels = Sets.newHashSet();
@@ -237,19 +242,6 @@ public class Session implements PlayerConnection {
     }
 
     /**
-     * Sets the compression using a threshold, use -1 to disable compression.
-     * 
-     * @param threshold the threshold
-     */
-    public void setCompression(int threshold) {
-        ProtocolState state = this.getProtocolState();
-        if (state.equals(ProtocolState.HANDSHAKE) || state.equals(ProtocolState.STATUS)) {
-            throw new IllegalStateException("Compression cannot be set in the state (" + state + ")");
-        }
-        this.send(new MessageOutSetCompression(threshold));
-    }
-
-    /**
      * Gets whether the session active is.
      * 
      * @return is active
@@ -266,29 +258,15 @@ public class Session implements PlayerConnection {
      */
     public ChannelFuture sendWithFuture(Message message) {
         if (!this.channel.isActive()) {
-            // discard messages sent if we're closed, since this happens a lot
+            // Discard messages sent if we're closed, since this happens a lot
             return null;
         }
 
-        ChannelFuture future = this.channel.writeAndFlush(message).addListener(future1 -> {
-            if (future1.cause() != null) {
-                this.onOutboundThrowable(future1.cause());
+        return this.channel.writeAndFlush(message).addListener(future -> {
+            if (future.cause() != null) {
+                this.onOutboundThrowable(future.cause());
             }
         });
-
-        // This is a special case, we need to make sure that the message is send
-        // before we set the compression on the server side
-        // MAY ONLY BE SET ONLY AT LOGIN, otherwise you may get some fireworks
-        if (message instanceof MessageOutSetCompression && this.getProtocolState() == ProtocolState.LOGIN) {
-            int threshold = ((MessageOutSetCompression) message).getThreshold();
-            if (threshold == -1) {
-                this.channel.pipeline().replace(COMPRESSION, COMPRESSION, NoopHandler.INSTANCE);
-            } else {
-                this.channel.pipeline().replace(COMPRESSION, COMPRESSION, new MessageCompressionHandler(threshold));
-            }
-        }
-
-        return future;
     }
 
     /**
@@ -331,7 +309,7 @@ public class Session implements PlayerConnection {
      */
     protected void handleMessage(Handler handler, Message message) {
         try {
-            handler.handle(this, message);
+            handler.handle(this.networkContext, message);
         } catch (Throwable throwable) {
             this.onHandlerThrowable(message, handler, throwable);
         }
@@ -351,20 +329,33 @@ public class Session implements PlayerConnection {
      * @param message the message
      */
     public void messageReceived(Message message) {
-        Class<? extends Message> messageClass = message.getClass();
-        MessageRegistration registration = this.getProtocol().inbound().find(messageClass);
-
-        if (registration == null) {
-            throw new DecoderException("Failed to find a message registration for " + messageClass.getName() + "!");
-        }
-
-        Handler handler = registration.getHandler();
-        if (handler != null) {
-            if (AsyncHelper.isAsyncMessage(message) || AsyncHelper.isAsyncHandler(handler)) {
-                this.handleMessage(handler, message);
+        if (message == NullMessage.INSTANCE) {
+            // Ignore
+        } else if (message instanceof BulkMessage) {
+            ((BulkMessage) message).getMessages().forEach(this::messageReceived);
+        } else if (message instanceof HandlerMessage) {
+            final HandlerMessage message1 = (HandlerMessage) message;
+            if (AsyncHelper.isAsyncMessage(message1.getMessage()) || AsyncHelper.isAsyncHandler(message1.getHandler())) {
+                this.handleMessage(message1.getHandler(), message1.getMessage());
             } else {
-                this.messageQueue.add(new MessageEntry(message, handler));
+                this.messageQueue.add(message1);
             }
+        } else {
+            Class<? extends Message> messageClass = message.getClass();
+            MessageRegistration registration = this.getProtocol().inbound().findByMessageType(messageClass).orElse(null);
+
+            if (registration == null) {
+                throw new DecoderException("Failed to find a message registration for " + messageClass.getName() + "!");
+            }
+
+            registration.getHandler().ifPresent(handler -> {
+                final Handler handler1 = (Handler) handler;
+                if (AsyncHelper.isAsyncMessage(message) || AsyncHelper.isAsyncHandler(handler1)) {
+                    this.handleMessage(handler1, message);
+                } else {
+                    this.messageQueue.add(new HandlerMessage(message, handler1));
+                }
+            });
         }
     }
 
@@ -393,6 +384,7 @@ public class Session implements PlayerConnection {
         if (throwable instanceof CodecException) {
             LanternGame.log().error("Error in network input!", throwable);
         } else {
+            LanternGame.log().error("Message read error!", throwable);
             if (this.quitReason == null) {
                 this.quitReason = Text.of("Message read error: " + throwable);
             }
@@ -409,8 +401,9 @@ public class Session implements PlayerConnection {
         // Generated by the pipeline, not a network error
         if (throwable instanceof CodecException) {
             LanternGame.log().error("Error in network output!", throwable);
-            // Probably a network-level error - consider the client gone
+        // Probably a network-level error - consider the client gone
         } else {
+            LanternGame.log().error("Message write error!", throwable);
             if (this.quitReason == null) {
                 this.quitReason = Text.of("Message write error: " + throwable);
             }
@@ -438,6 +431,8 @@ public class Session implements PlayerConnection {
     }
 
     public void onDisconnect() {
+        LanternGame.log().info("Connection for " + (this.gameProfile == null ? this.channel.remoteAddress().toString() : this.gameProfile.getName())
+                + " disconnected from the server.");
     }
 
     /**
@@ -504,7 +499,6 @@ public class Session implements PlayerConnection {
             long time = System.nanoTime() / 1000000L;
             long timed = time - this.pingTimeStart;
 
-            // Formula taken from nms
             this.ping = (int) ((this.ping * 3 + timed) / 4);
         }
     }
@@ -513,9 +507,9 @@ public class Session implements PlayerConnection {
      * Pulses the session.
      */
     protected void pulse() {
-        MessageEntry entry;
+        HandlerMessage entry;
         while ((entry = this.messageQueue.poll()) != null) {
-            this.handleMessage(entry.handler, entry.message);
+            this.handleMessage(entry.getHandler(), entry.getMessage());
         }
     }
 

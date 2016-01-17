@@ -25,19 +25,17 @@
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
 import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.lanternpowered.server.util.UUIDHelper;
@@ -53,8 +51,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import javax.crypto.Cipher;
@@ -63,11 +59,11 @@ import javax.crypto.spec.SecretKeySpec;
 
 public final class HandlerEncryptionResponse implements Handler<MessageLoginInEncryptionResponse> {
 
-    private final Random random = new Random();
     private final Gson gson = new Gson();
 
     @Override
-    public void handle(Session session, MessageLoginInEncryptionResponse message) {
+    public void handle(NetworkContext context, MessageLoginInEncryptionResponse message) {
+        Session session = context.getSession();
         PrivateKey privateKey = session.getServer().getKeyPair().getPrivate();
 
         // Create rsaCipher
@@ -108,14 +104,14 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             return;
         }
 
-        // initialize stream encryption
+        // Initialize stream encryption
         session.setEncryption(sharedSecret);
 
-        // create hash for auth
+        // Create hash for auth
         String hash;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
-            String sessionId = Long.toString(this.random.nextLong(), 16).trim();
+            String sessionId = context.getChannel().attr(HandlerLoginStart.SESSION_ID).getAndRemove();
 
             digest.update(sessionId.getBytes());
             digest.update(sharedSecret.getEncoded());
@@ -129,9 +125,9 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             return;
         }
 
-        // start auth thread
+        // Start auth thread
         Thread clientAuthThread = new Thread(new ClientAuthRunnable(session, session.getVerifyUsername(), hash));
-        clientAuthThread.setName("ClientAuthThread{" + session.getVerifyUsername() + "}");
+        clientAuthThread.setName("ClientAuth{" + session.getVerifyUsername() + "}");
         clientAuthThread.start();
     }
 
@@ -152,11 +148,15 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
         @Override
         public void run() {
             try {
-                // authenticate
+                // Authenticate
                 URLConnection connection = new URL(this.postURL).openConnection();
 
                 JsonObject json;
                 try (InputStream is = connection.getInputStream()) {
+                    if (is.available() == 0) {
+                        this.session.disconnect("Invalid username or session id!");
+                        return;
+                    }
                     try {
                         json = gson.fromJson(new InputStreamReader(is), JsonObject.class);
                     } catch (Exception e) {
@@ -192,17 +192,8 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                     properties.put(propName, new LanternProfileProperty(propName, value, signature));
                 }
 
-                /*
-                final AsyncPlayerPreLoginEvent event = EventFactory.onPlayerPreLogin(name, session.getAddress(), uuid);
-                if (event.getLoginResult() != AsyncPlayerPreLoginEvent.Result.ALLOWED) {
-                    session.disconnect(event.getKickMessage(), true);
-                    return;
-                }*/
-
-                this.session.send(new MessageLoginOutSuccess(uuid, name));
-                this.session.setPlayer(new LanternGameProfile(uuid, name, properties));
-                this.session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
-                this.session.messageReceived(new MessageForgeHandshakeInStart());
+                LanternGame.log().info("Finished authenticating.");
+                this.session.messageReceived(new MessageLoginInFinish(new LanternGameProfile(uuid, name, properties)));
             } catch (Exception e) {
                 LanternGame.log().error("Error in authentication thread", e);
                 this.session.disconnect("Internal error during authentication.", true);

@@ -30,7 +30,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;

@@ -30,6 +30,7 @@ import com.google.gson.JsonObject;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
@@ -56,7 +57,8 @@ import java.util.stream.Collectors;
 public final class HandlerStatusRequest implements Handler<MessageStatusInRequest> {
 
     @Override
-    public void handle(Session session, MessageStatusInRequest message) {
+    public void handle(NetworkContext context, MessageStatusInRequest message) {
+        Session session = context.getSession();
         LanternServer server = session.getServer();
         Gson gson = new Gson();
 

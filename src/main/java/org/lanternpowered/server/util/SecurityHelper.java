@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.util;
 
-import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.security.Key;
@@ -45,46 +44,32 @@ public final class SecurityHelper {
     private SecurityHelper() {
     }
 
-    /**
-     * Generate a RSA key pair
-     */
     @Nullable
     public static KeyPair generateKeyPair() {
-        KeyPair keyPair = null;
         try {
-            KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
+            final KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
             generator.initialize(1024);
-
-            keyPair = generator.generateKeyPair();
+            return generator.generateKeyPair();
         } catch (NoSuchAlgorithmException e) {
-            LanternGame.log().error("Unable to generate RSA key pair", e);
+            throw new IllegalStateException("Unable to generate RSA key pair", e);
         }
-        return keyPair;
     }
 
-    /**
-     * Generate a random verify token
-     */
     public static byte[] generateVerifyToken() {
         byte[] token = new byte[4];
         random.nextBytes(token);
         return token;
     }
 
-    /**
-     * Generates an X509 formatted key used in authentication
-     */
     @Nullable
     public static Key generateX509Key(Key base) {
-        Key key = null;
         try {
-            X509EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(base.getEncoded());
+            final X509EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(base.getEncoded());
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            key = keyFactory.generatePublic(encodedKeySpec);
-        } catch (Exception ex) {
-            LanternGame.log().error("Unable to generate X509 encoded key", ex);
+            return keyFactory.generatePublic(encodedKeySpec);
+        } catch (Exception e) {
+            throw new IllegalStateException("Unable to generate X509 encoded key", e);
         }
-        return key;
     }
 
 }

@@ -24,26 +24,34 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
-import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
+import io.netty.util.AttributeKey;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
-import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.SecurityHelper;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Random;
 import java.util.UUID;
 
 @Async
 public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
 
+    // The session id that will be used for authentication.
+    static final AttributeKey<String> SESSION_ID = AttributeKey.valueOf("login-session-id");
+
+    // The random used to generate the session ids
+    private static final Random random = new Random();
+
     @Override
-    public void handle(Session session, MessageLoginInStart message) {
+    public void handle(NetworkContext context, MessageLoginInStart message) {
+        Session session = context.getSession();
         String username = message.getUsername();
 
         if (session.getServer().getOnlineMode()) {
@@ -51,12 +59,15 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
                     .getPublic()).getEncoded(); // Convert to X509 format
             byte[] verifyToken = SecurityHelper.generateVerifyToken();
 
+            final String sessionId = Long.toString(random.nextLong(), 16).trim();
+            context.getChannel().attr(SESSION_ID).set(sessionId);
+
             // Set verify data on session for use in the response handler
             session.setVerifyToken(verifyToken);
             session.setVerifyUsername(username);
 
             // Send created request message and wait for the response
-            session.send(new MessageLoginOutEncryptionRequest(publicKey, verifyToken));
+            session.send(new MessageLoginOutEncryptionRequest(sessionId, publicKey, verifyToken));
         } else {
             ProxyData proxy = session.getProxyData();
             LanternGameProfile profile;
@@ -66,10 +77,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             } else {
                 profile = new LanternGameProfile(proxy.getUniqueId(), username, proxy.getProperties());
             }
-            session.setPlayer(profile);
-            session.send(new MessageLoginOutSuccess(profile.getUniqueId(), username));
-            session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
-            session.messageReceived(new MessageForgeHandshakeInStart());
+            session.messageReceived(new MessageLoginInFinish(profile));
         }
     }
 }

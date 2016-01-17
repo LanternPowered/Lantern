@@ -28,16 +28,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.caching.Caching;
-import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
 import java.util.List;
 
-@Caching(ProcessorPlayOutChannelPayload.CachingHash.class)
 public final class ProcessorPlayOutChannelPayload implements Processor<MessagePlayInOutChannelPayload> {
 
     @Override
@@ -48,7 +46,7 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
             output.add(message);
         // Support the multi part messages of forge, but only if the client supports it
         } else {
-            boolean enabled = context.channel().attr(Session.FML_MARKER).get();
+            boolean enabled = context.getChannel().attr(Session.FML_MARKER).get();
             if (!enabled) {
                 throw new CodecException("Payload may not be larger than 16777135 bytes.");
             }
@@ -57,7 +55,7 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
                 throw new CodecException("Payload may not be larger than -16797616 bytes.");
             }
             ByteBuf preamble = context.byteBufAlloc().buffer();
-            context.write(preamble, String.class, message.getChannel());
+            context.write(preamble, Types.STRING, message.getChannel());
             preamble.writeByte(parts);
             preamble.writeInt(content.length);
             output.add(new MessagePlayInOutChannelPayload("FML|MP", preamble));
@@ -71,14 +69,6 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
                 offset += tmp.length - 1;
                 output.add(new MessagePlayInOutChannelPayload("FML|MP", Unpooled.wrappedBuffer(tmp)));
             }
-        }
-    }
-
-    public static final class CachingHash implements CachingHashGenerator<MessagePlayInOutChannelPayload> {
-
-        @Override
-        public int generate(CodecContext context, MessagePlayInOutChannelPayload message) {
-            return context.channel().attr(Session.FML_MARKER).get() ? 1 : 0;
         }
     }
 }

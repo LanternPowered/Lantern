@@ -25,7 +25,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.objects.LocalizedText;
 
 public abstract class MessagePlayOutTitle implements Message {
 

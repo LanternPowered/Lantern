@@ -25,19 +25,21 @@
 package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.network.message.MessageRegistry;
-import org.lanternpowered.server.network.vanilla.message.codec.compression.CodecOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginInEncryptionResponse;
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginInStart;
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutEncryptionRequest;
+import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.codec.login.CodecLoginOutSuccess;
 import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerEncryptionResponse;
+import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginFinish;
 import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginStart;
-import org.lanternpowered.server.network.vanilla.message.type.compression.MessageOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
+import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 
 public final class ProtocolLogin extends ProtocolBase {
@@ -46,13 +48,14 @@ public final class ProtocolLogin extends ProtocolBase {
         MessageRegistry inbound = this.inbound();
         MessageRegistry outbound = this.outbound();
 
-        inbound.register(0x00, MessageLoginInStart.class, CodecLoginInStart.class, new HandlerLoginStart());
-        inbound.register(0x01, MessageLoginInEncryptionResponse.class, CodecLoginInEncryptionResponse.class,
-                new HandlerEncryptionResponse());
+        inbound.bind(0x00, CodecLoginInStart.class, MessageLoginInStart.class).bindHandler(new HandlerLoginStart());
+        inbound.bind(0x01, CodecLoginInEncryptionResponse.class, MessageLoginInEncryptionResponse.class)
+                .bindHandler(new HandlerEncryptionResponse());
+        inbound.bindHandler(MessageLoginInFinish.class, new HandlerLoginFinish());
 
-        outbound.register(0x00, MessageOutDisconnect.class, CodecOutDisconnect.class);
-        outbound.register(0x01, MessageLoginOutEncryptionRequest.class, CodecLoginOutEncryptionRequest.class);
-        outbound.register(0x02, MessageLoginOutSuccess.class, CodecLoginOutSuccess.class);
-        outbound.register(0x03, MessageOutSetCompression.class, CodecOutSetCompression.class);
+        outbound.bind(0x00, CodecOutDisconnect.class, MessageOutDisconnect.class);
+        outbound.bind(0x01, CodecLoginOutEncryptionRequest.class, MessageLoginOutEncryptionRequest.class);
+        outbound.bind(0x02, CodecLoginOutSuccess.class, MessageLoginOutSuccess.class);
+        outbound.bind(0x03, CodecLoginOutSetCompression.class, MessageLoginOutSetCompression.class);
     }
 }

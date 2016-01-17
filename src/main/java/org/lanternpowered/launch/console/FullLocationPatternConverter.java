@@ -30,6 +30,8 @@ import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
 import org.apache.logging.log4j.util.PropertiesUtil;
 
+import java.util.regex.Matcher;
+
 @ConverterKeys({ "fqcn", "loc" })
 @Plugin(name = "FQCN", category = "Converter")
 public final class FullLocationPatternConverter extends LogEventPatternConverter {
@@ -65,7 +67,8 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
             element = event.getSource();
         }
         if (element != null) {
-            builder.append(this.format.replaceAll("%path", element.toString()));
+            // quoteReplacement is required for elements leading to inner class (containing a $ character)
+            builder.append(this.format.replaceAll("%path", Matcher.quoteReplacement(element.toString())));
         }
     }
 

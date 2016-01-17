@@ -50,7 +50,7 @@ public enum ProtocolState {
      */
     FORGE_HANDSHAKE     (999, new ProtocolForgeHandshake());
 
-    private final static TIntObjectMap<ProtocolState> LOOKUP = new TIntObjectHashMap<ProtocolState>();
+    private final static TIntObjectMap<ProtocolState> lookup = new TIntObjectHashMap<>();
 
     private final int id;
     private final Protocol protocol;
@@ -86,12 +86,12 @@ public enum ProtocolState {
      * @return the protocol state
      */
     public static ProtocolState fromId(int id) {
-        return LOOKUP.get(id);
+        return lookup.get(id);
     }
 
     static {
         for (ProtocolState state : values()) {
-            LOOKUP.put(state.id, state);
+            lookup.put(state.id, state);
         }
     }
 }

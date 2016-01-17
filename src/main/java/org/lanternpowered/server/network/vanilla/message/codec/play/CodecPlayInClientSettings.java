@@ -28,6 +28,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.lanternpowered.server.text.chat.LanternChatVisibility;
 
@@ -42,7 +43,7 @@ public final class CodecPlayInClientSettings implements Codec<MessagePlayInClien
 
     @Override
     public MessagePlayInClientSettings decode(CodecContext context, ByteBuf buf) throws CodecException {
-        Locale locale = Locale.forLanguageTag(context.read(buf, String.class));
+        Locale locale = Locale.forLanguageTag(context.read(buf, Types.STRING));
         int viewDistance = buf.readByte();
         LanternChatVisibility visibility = LanternChatVisibility.fromInternalId(buf.readByte());
         boolean enableColors = buf.readBoolean();

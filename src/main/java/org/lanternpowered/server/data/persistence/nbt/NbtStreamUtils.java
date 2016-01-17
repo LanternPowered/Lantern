@@ -43,10 +43,9 @@ public final class NbtStreamUtils {
      * @throws IOException
      */
     public static DataContainer read(InputStream inputStream, boolean compressed) throws IOException {
-        NbtDataContainerInputStream input = new NbtDataContainerInputStream(inputStream, compressed);
-        DataContainer dataContainer = input.read();
-        input.close();
-        return dataContainer;
+        try (NbtDataContainerInputStream input = new NbtDataContainerInputStream(inputStream, compressed)) {
+            return input.read();
+        }
     }
 
     /**
@@ -58,10 +57,10 @@ public final class NbtStreamUtils {
      * @throws IOException
      */
     public static void write(DataView dataView, OutputStream outputStream, boolean compressed) throws IOException {
-        NbtDataContainerOutputStream output = new NbtDataContainerOutputStream(outputStream, compressed);
-        output.write(dataView);
-        output.flush();
-        output.close();
+        try (NbtDataContainerOutputStream output = new NbtDataContainerOutputStream(outputStream, compressed)) {
+            output.write(dataView);
+            output.flush();
+        }
     }
 
     private NbtStreamUtils() {

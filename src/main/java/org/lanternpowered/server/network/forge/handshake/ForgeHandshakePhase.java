@@ -31,5 +31,5 @@ public interface ForgeHandshakePhase {
     /**
      * The attribute key of the server handshake phase.
      */
-    public static final AttributeKey<ForgeServerHandshakePhase> PHASE = AttributeKey.valueOf("fml-handshake-phase");
+    AttributeKey<ForgeServerHandshakePhase> PHASE = AttributeKey.valueOf("fml-handshake-phase");
 }

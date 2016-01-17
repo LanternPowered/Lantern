@@ -30,6 +30,7 @@ import org.lanternpowered.server.network.message.Message;
 
 public final class MessageLoginOutEncryptionRequest implements Message {
 
+    private final String sessionId;
     private final byte[] publicKey;
     private final byte[] verifyToken;
 
@@ -39,9 +40,10 @@ public final class MessageLoginOutEncryptionRequest implements Message {
      * @param publicKey the public key
      * @param verifyToken the verify token
      */
-    public MessageLoginOutEncryptionRequest(byte[] publicKey, byte[] verifyToken) {
-        this.verifyToken = checkNotNull(verifyToken, "verify token");
-        this.publicKey = checkNotNull(publicKey, "public key");
+    public MessageLoginOutEncryptionRequest(String sessionId, byte[] publicKey, byte[] verifyToken) {
+        this.verifyToken = checkNotNull(verifyToken, "verifyToken");
+        this.publicKey = checkNotNull(publicKey, "publicKey");
+        this.sessionId = checkNotNull(sessionId, "sessionId");
     }
 
     /**
@@ -60,6 +62,16 @@ public final class MessageLoginOutEncryptionRequest implements Message {
      */
     public byte[] getVerifyToken() {
         return this.verifyToken;
+    }
+
+    /**
+     * Gets the session id (hash) that should be
+     * used for authenticating.
+     *
+     * @return the session id
+     */
+    public String getSessionId() {
+        return this.sessionId;
     }
 
 }

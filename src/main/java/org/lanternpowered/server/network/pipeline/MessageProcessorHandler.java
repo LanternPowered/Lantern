@@ -26,13 +26,11 @@ package org.lanternpowered.server.network.pipeline;
 
 import static org.lanternpowered.server.network.pipeline.MessageCodecHandler.CONTEXT;
 
-import com.google.common.base.Optional;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
-import org.lanternpowered.server.network.message.caching.CachingHashGenerator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
@@ -50,29 +48,23 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
         Protocol protocol = ctx.channel().attr(Session.STATE).get().getProtocol();
-        MessageRegistration registration = protocol.outbound().find(message.getClass());
+        MessageRegistration registration = protocol.outbound().findByMessageType(message.getClass()).orElse(null);
 
         if (registration == null) {
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered!");
         }
 
-        Processor processor = registration.getProcessor();
-        // Only process if there is a processor found
-        if (processor != null) {
+        List<Processor> processors = ((MessageRegistration) protocol.outbound()
+                .findByMessageType(message.getClass()).get()).getProcessors();
+        // Only process if there are processors found
+        if (!processors.isEmpty()) {
             CodecContext context = ctx.channel().attr(CONTEXT).get();
-            // Handle first the caching system
-            Optional<CachingHashGenerator<?>> hashGen = CachedMessages.getHashGenerator(processor.getClass());
-            if (hashGen.isPresent()) {
-                int hash = ((CachingHashGenerator) hashGen.get()).generate(context, message);
-                List<Message> messages = CachedMessages.getCachedMessage(message).getProcessedMessages(hash);
-                if (messages != null) {
-                    output.addAll(messages);
-                    return;
-                }
+            for (Processor processor : processors) {
+                // The processor should handle the output messages
+                processor.process(context, message, output);
             }
-            processor.process(context, message, output);
         } else {
-            // Push to the codec context
+            // Add the message to the output
             output.add(message);
         }
     }

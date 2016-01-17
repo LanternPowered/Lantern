@@ -27,16 +27,14 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.flowpowered.math.vector.Vector3f;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutSpawnParticle;
+import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutParticleEffect;
 
-@Caching
-public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpawnParticle> {
+public final class CodecPlayOutSpawnParticle implements Codec<ProcessorPlayOutParticleEffect.MessagePlayOutSpawnParticle> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnParticle message) throws CodecException {
+    public ByteBuf encode(CodecContext context, ProcessorPlayOutParticleEffect.MessagePlayOutSpawnParticle message) throws CodecException {
         Vector3f position = message.getPosition();
         Vector3f offset = message.getOffset();
         int[] extra = message.getExtra();
@@ -51,14 +49,14 @@ public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpaw
         buf.writeFloat(offset.getZ());
         buf.writeFloat(message.getData());
         buf.writeInt(message.getCount());
-        for (int i = 0; i < extra.length; i++) {
-            context.writeVarInt(buf, extra[i]);
+        for (int value : extra) {
+            context.writeVarInt(buf, value);
         }
         return buf;
     }
 
     @Override
-    public MessagePlayOutSpawnParticle decode(CodecContext context, ByteBuf buf) throws CodecException {
+    public ProcessorPlayOutParticleEffect.MessagePlayOutSpawnParticle decode(CodecContext context, ByteBuf buf) throws CodecException {
         throw new CodecException();
     }
 }

@@ -42,7 +42,7 @@ import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;

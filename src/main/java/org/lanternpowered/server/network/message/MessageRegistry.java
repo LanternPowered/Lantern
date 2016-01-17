@@ -24,35 +24,206 @@
  */
 package org.lanternpowered.server.network.message;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 
-import javax.annotation.Nullable;
+import java.lang.reflect.Constructor;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
-public interface MessageRegistry {
+public final class MessageRegistry {
 
-    <M extends Message, P extends Processor<? super M>> MessageRegistration<M> register(Class<M> message,
-            P processor);
+    private final Map<Class<? extends Message>, MessageRegistration<?>> registrationByMessageType = new HashMap<>();
+    private final TIntObjectMap<CodecRegistration<?, ?>> registrationByOpcode = new TIntObjectHashMap<>();
 
-    <M extends Message, P extends Processor<? super M>> MessageRegistration<M> register(Class<M> message,
-            Class<P> processor);
+    <M extends Message> MessageRegistration<M> checkCodecBinding(Class<M> messageType) {
+        final MessageRegistration messageRegistration = this.registrationByMessageType.computeIfAbsent(messageType,
+                messageType0 -> new MessageRegistration<>(messageType));
+        if (messageRegistration.codecRegistration.isPresent()) {
+            throw new IllegalArgumentException("The message type " + messageType.getName() +
+                    " is already bound to " + ((CodecRegistration) messageRegistration.codecRegistration.get()).getCodec().getClass().getName());
+        }
+        return messageRegistration;
+    }
 
-    <M extends Message, C extends Codec<? super M>> MessageRegistration<M> register(int opcode, Class<M> message,
-            Class<C> codec);
+    /**
+     * Registers a new {@link Codec} for the specified opcode.
+     *
+     * @param opcode the opcode
+     * @param codec the codec type
+     * @param <M> the type of the processed message
+     * @param <C> the type of the codec
+     * @return the codec registration
+     */
+    public <M extends Message, C extends Codec<M>> CodecRegistration<M, C> bind(int opcode, Class<C> codec) {
+        try {
+            Constructor<C> constructor = codec.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            return this.bind(opcode, constructor.newInstance());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Unable to instantiate the codec class.", e);
+        }
+    }
 
-    <M extends Message, C extends Codec<? super M>, H extends Handler<? super M>> MessageRegistration<M> register(
-            int opcode, Class<M> message, Class<C> codec, @Nullable Class<H> handler);
+    /**
+     * Registers a new {@link Codec} for the specified opcode.
+     *
+     * @param opcode the opcode
+     * @param codec the codec
+     * @param messageType the message type
+     * @param <M> the type of the processed message
+     * @param <C> the type of the codec
+     * @return the codec registration
+     */
+    public <N extends Message, M extends N, C extends Codec<N>> MessageRegistration<M> bind(int opcode, Class<C> codec, Class<M> messageType) {
+        MessageRegistration<M> registration = this.checkCodecBinding(messageType);
+        CodecRegistration<N, C> codecRegistration = this.bind(opcode, codec);
+        codecRegistration.bind(messageType, registration);
+        return registration;
+    }
 
-    <M extends Message, C extends Codec<? super M>, H extends Handler<? super M>> MessageRegistration<M> register(
-            int opcode, Class<M> message, Class<C> codec, @Nullable H handler);
+    /**
+     * Registers a new {@link Codec} for the specified opcode.
+     *
+     * @param opcode the opcode
+     * @param codec the codec
+     * @param <M> the type of the processed message
+     * @param <C> the type of the codec
+     * @return the codec registration
+     */
+    public <M extends Message, C extends Codec<M>> CodecRegistration<M, C> bind(int opcode, C codec) {
+        checkNotNull(codec, "codec");
+        if (this.registrationByOpcode.containsKey(opcode)) {
+            throw new IllegalArgumentException("Opcode " + opcode + " is already in use by " +
+                    this.registrationByOpcode.get(opcode).getCodec().getClass().getName());
+        }
+        final CodecRegistration<M, C> registration = new CodecRegistration<>(this, opcode, codec);
+        this.registrationByOpcode.put(opcode, registration);
+        return registration;
+    }
 
-    <M extends Message, H extends Handler<? super M>> MessageRegistration<M> register(
-            Class<M> message, H handler);
+    /**
+     * Registers a new {@link Codec} for the specified opcode.
+     *
+     * @param opcode the opcode
+     * @param codec the codec
+     * @param messageType the message type
+     * @param <M> the type of the processed message
+     * @param <C> the type of the codec
+     * @return the codec registration
+     */
+    public <N extends Message, M extends N, C extends Codec<N>> MessageRegistration<M> bind(int opcode, C codec, Class<M> messageType) {
+        MessageRegistration<M> registration = this.checkCodecBinding(messageType);
+        CodecRegistration<N, C> codecRegistration = this.bind(opcode, codec);
+        codecRegistration.bind(messageType, registration);
+        return registration;
+    }
 
-    @Nullable
-    <M extends Message> MessageRegistration<M> find(Class<M> message);
+    /**
+     * Binds a {@link Message} type to this registry and
+     * attaches the {@link Handler} to it.
+     *
+     * @param messageType the message type
+     * @param handler the handler
+     * @param <M> the type of the message
+     * @param <H> the type of the handler
+     * @return the registration
+     */
+    public <M extends Message, H extends Handler<? super M>> MessageRegistration<M> bindHandler(Class<M> messageType, H handler) {
+        MessageRegistration<M> registration = this.bind(messageType);
+        registration.bindHandler(handler);
+        return registration;
+    }
 
-    @Nullable
-    <M extends Message> MessageRegistration<M> find(int opcode);
+    /**
+     * Binds a {@link Message} type to this registry and
+     * attaches the {@link Processor} to it.
+     *
+     * @param messageType the message type
+     * @param processor the processor
+     * @param <M> the type of the message
+     * @param <P> the type of the processor
+     * @return the registration
+     */
+    public <M extends Message, P extends Processor<? super M>> MessageRegistration<M> bindProcessor(Class<M> messageType, P processor) {
+        MessageRegistration<M> registration = this.bind(messageType);
+        registration.bindProcessor(processor);
+        return registration;
+    }
+
+    /**
+     * Searches a {@link CodecRegistration} for the specified {@link Codec}.
+     *
+     * @param codec the codec
+     * @param <M> the type of the processed message
+     * @param <C> the type of the codec
+     * @return the codec registration
+     */
+    public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(C codec) {
+        for (CodecRegistration<?, ?> registration : this.registrationByOpcode.valueCollection()) {
+            if (codec.equals(registration.getCodec())) {
+                return Optional.of((CodecRegistration) registration);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Searches a {@link CodecRegistration} for the specified {@link Codec} type.
+     *
+     * @param codec the codec type
+     * @param <M> the type of the processed message
+     * @param <C> the type of the codec
+     * @return the codec registration
+     */
+    public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(Class<C> codec) {
+        for (CodecRegistration<?, ?> registration : this.registrationByOpcode.valueCollection()) {
+            if (codec.isInstance(registration.getCodec())) {
+                return Optional.of((CodecRegistration) registration);
+            }
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Searches a {@link CodecRegistration} for the specified opcode.
+     *
+     * @param opcode the opcode
+     * @param <M> the type of the processed message
+     * @param <C> the type of the codec
+     * @return the codec registration
+     */
+    public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(int opcode) {
+        return Optional.ofNullable((CodecRegistration) this.registrationByOpcode.get(opcode));
+    }
+
+    /**
+     * Searches a {@link MessageRegistration} for the specified message type.
+     *
+     * @param messageType the message type
+     * @param <M> the type of the message
+     * @return the message registration
+     */
+    public <M extends Message> Optional<MessageRegistration<M>> findByMessageType(Class<M> messageType) {
+        return Optional.ofNullable((MessageRegistration) this.registrationByMessageType.get(messageType));
+    }
+
+    /**
+     * Binds a {@link Message} type to this registry.
+     *
+     * @param messageType the message type
+     * @param <M> the type of the message
+     * @return the registration
+     */
+    public <M extends Message> MessageRegistration<M> bind(Class<M> messageType) {
+        return (MessageRegistration) this.registrationByMessageType.computeIfAbsent(messageType,
+                messageType0 -> new MessageRegistration<>(messageType));
+    }
+
 }

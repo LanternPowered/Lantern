@@ -26,6 +26,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.handshake;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.protocol.ProtocolState;
@@ -36,8 +37,9 @@ import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageH
 public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
 
     @Override
-    public void handle(Session session, MessageHandshakeIn message) {
+    public void handle(NetworkContext context, MessageHandshakeIn message) {
         ProtocolState next = ProtocolState.fromId(message.getNextState());
+        Session session = context.getSession();
         if (next == null) {
             session.disconnect("Unknown protocol state! (" + message.getNextState() + ")");
             return;
@@ -61,11 +63,6 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                 session.disconnect("Outdated client! I'm running " + LanternGame.get().getPlatform().getMinecraftVersion().getName());
             } else if (message.getProtocolVersion() > protocol) {
                 session.disconnect("Outdated server! I'm running " + LanternGame.get().getPlatform().getMinecraftVersion().getName());
-            } else {
-                int compressionThreshold = LanternGame.get().getGlobalConfig().getNetworkCompressionThreshold();
-                if (compressionThreshold != -1) {
-                    session.setCompression(compressionThreshold);
-                }
             }
         }
     }

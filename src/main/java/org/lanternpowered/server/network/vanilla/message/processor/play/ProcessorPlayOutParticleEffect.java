@@ -25,16 +25,17 @@
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
 import com.flowpowered.math.vector.Vector3f;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutSpawnParticle;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.type.NotePitch;
@@ -50,24 +51,36 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
-@Caching
+import javax.annotation.Nullable;
+
 public final class ProcessorPlayOutParticleEffect implements Processor<MessagePlayOutParticleEffect> {
 
-    @Override
-    public void process(CodecContext context, MessagePlayOutParticleEffect message, List<Message> output) throws CodecException {
-        ParticleEffect effect = message.getParticleEffect();
-        LanternParticleType type = (LanternParticleType) effect.getType();
+    /**
+     * Using a cache to bring the amount of operations down for spawning particles.
+     */
+    private final LoadingCache<ParticleEffect, CachedParticleEffect> cache =
+            CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<ParticleEffect, CachedParticleEffect>() {
+                @Override
+                public CachedParticleEffect load(ParticleEffect key) throws Exception {
+                    return preProcess(key);
+                }
+            });
 
-        Vector3f position = message.getPosition().toFloat();
+    private CachedParticleEffect preProcess(ParticleEffect effect) {
+        LanternParticleType type = (LanternParticleType) effect.getType();
         Vector3f offset = effect.getOffset().toFloat();
 
         int count = effect.getCount();
         // Don't even try...
         if (count <= 0) {
-            return;
+            return CachedParticleEffect.EMPTY;
         }
 
         int[] extra = new int[0];
@@ -96,7 +109,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 }
             }
             if (extraData == 0) {
-                return;
+                return CachedParticleEffect.EMPTY;
             }
             extra = new int[] { extraData };
         } else if (effect instanceof BlockParticle) {
@@ -106,7 +119,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 int data = Registries.getBlockRegistry().getStateData(blockState);
                 extra = new int[] { data << 12 | id };
             } else {
-                return;
+                return CachedParticleEffect.EMPTY;
             }
         }
 
@@ -122,8 +135,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             }
 
             if (size == 0f) {
-                output.add(new MessagePlayOutSpawnParticle(count, position, offset, size, count, extra));
-                return;
+                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
+                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
             }
 
             f0 = size;
@@ -132,8 +145,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             Color color1 = ((ParticleType.Colorable) type).getDefaultColor();
 
             if (color0.equals(color1)) {
-                output.add(new MessagePlayOutSpawnParticle(count, position, offset, 0f, count, extra));
-                return;
+                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
+                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
             }
 
             f0 = color0.getRed() / 255f;
@@ -149,8 +162,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             int internalId = ((LanternNotePitch) note).getInternalId();
 
             if (internalId == 0) {
-                output.add(new MessagePlayOutSpawnParticle(count, position, offset, 0f, count, extra));
-                return;
+                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
+                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
             }
 
             f0 = (float) internalId / 24f;
@@ -167,8 +180,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             }
 
             if (mx == 0f && my == 0f && mz == 0f) {
-                output.add(new MessagePlayOutSpawnParticle(count, position, offset, 0f, count, extra));
-                return;
+                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
+                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
             }
 
             f0 = mx;
@@ -176,36 +189,135 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             f2 = mz;
         }
 
-        // Is this check necessary?
         if (f0 == 0f && f1 == 0f && f2 == 0f) {
-            output.add(new MessagePlayOutSpawnParticle(count, position, offset, 0f, count, extra));
-            return;
+            return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
+                    type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
         }
 
+        final List<MessagePlayOutSpawnParticle> messages = new ArrayList<>(count);
         if (offset.equals(Vector3f.ZERO)) {
             for (int i = 0; i < count; i++) {
-                output.add(new MessagePlayOutSpawnParticle(count, position, offset, 1f, 0, extra));
+                messages.add(new MessagePlayOutSpawnParticle(count, Vector3f.ZERO, offset, 1f, 0, extra));
             }
+            return new CachedParticleEffect(messages, null);
         } else {
-            Random random = new Random();
-
-            float px = position.getX();
-            float py = position.getY();
-            float pz = position.getZ();
-
-            float ox = offset.getX();
-            float oy = offset.getY();
-            float oz = offset.getZ();
-
-            Vector3f value = new Vector3f(f0, f1, f2);
-
+            final Vector3f value = new Vector3f(f0, f1, f2);
             for (int i = 0; i < count; i++) {
-                double px0 = (px + (random.nextFloat() * 2f - 1f) * ox);
-                double py0 = (py + (random.nextFloat() * 2f - 1f) * oy);
-                double pz0 = (pz + (random.nextFloat() * 2f - 1f) * oz);
-
-                output.add(new MessagePlayOutSpawnParticle(count, new Vector3f(px0, py0, pz0), value, 1f, 0, extra));
+                messages.add(new MessagePlayOutSpawnParticle(count, Vector3f.ZERO, value, 1f, 0, extra));
             }
+            return new CachedParticleEffect(messages, offset);
         }
     }
+
+    @Override
+    public void process(CodecContext context, MessagePlayOutParticleEffect message, List<Message> output) throws CodecException {
+        try {
+            final CachedParticleEffect cached = this.cache.get(message.getParticleEffect());
+            final Vector3f position = message.getPosition().toFloat();
+
+            if (cached.offset == null) {
+                for (MessagePlayOutSpawnParticle message0 : cached.messages) {
+                    output.add(new MessagePlayOutSpawnParticle(message0.particleId, position, message0.offset,
+                            message0.data, message0.count, message0.extra));
+                }
+            } else {
+                Random random = new Random();
+
+                float px = position.getX();
+                float py = position.getY();
+                float pz = position.getZ();
+
+                float ox = cached.offset.getX();
+                float oy = cached.offset.getY();
+                float oz = cached.offset.getZ();
+
+                for (MessagePlayOutSpawnParticle message0 : cached.messages) {
+                    double px0 = (px + (random.nextFloat() * 2f - 1f) * ox);
+                    double py0 = (py + (random.nextFloat() * 2f - 1f) * oy);
+                    double pz0 = (pz + (random.nextFloat() * 2f - 1f) * oz);
+
+                    output.add(new MessagePlayOutSpawnParticle(message0.particleId, new Vector3f(px0, py0, pz0), message0.offset,
+                            message0.data, message0.count, message0.extra));
+                }
+            }
+        } catch (ExecutionException e) {
+            throw new CodecException(e);
+        }
+    }
+
+    /**
+     * Represents a {@link ParticleEffect} that is cached.
+     */
+    private static class CachedParticleEffect {
+
+        public static final CachedParticleEffect EMPTY = new CachedParticleEffect(Collections.emptyList(), null);
+
+        /**
+         * If the offset isn't null, it means that all the returned messages should have
+         * a offset added to them before sending to the client.
+         */
+        @Nullable private final Vector3f offset;
+
+        /**
+         * The messages that are valid for a
+         */
+        private final List<MessagePlayOutSpawnParticle> messages;
+
+        private CachedParticleEffect(List<MessagePlayOutSpawnParticle> messages, @Nullable Vector3f offset) {
+            this.messages = messages;
+            this.offset = offset;
+        }
+    }
+
+    /**
+     * A internal message type that is indirectly used to spawn particles, because of the strange way
+     * that this message is processed on the client do we have to apply our own logic.
+     */
+    public static final class MessagePlayOutSpawnParticle implements Message {
+
+        private final int particleId;
+
+        private final Vector3f position;
+        private final Vector3f offset;
+
+        private final float data;
+        private final int count;
+        private final int[] extra;
+
+        public MessagePlayOutSpawnParticle(int particleId, Vector3f position, Vector3f offset, float data,
+                int count, int[] extra) {
+            this.particleId = particleId;
+            this.position = position;
+            this.offset = offset;
+            this.count = count;
+            this.extra = extra;
+            this.data = data;
+        }
+
+        public int getParticleId() {
+            return this.particleId;
+        }
+
+        public Vector3f getPosition() {
+            return this.position;
+        }
+
+        public Vector3f getOffset() {
+            return this.offset;
+        }
+
+        public float getData() {
+            return this.data;
+        }
+
+        public int getCount() {
+            return this.count;
+        }
+
+        public int[] getExtra() {
+            return this.extra;
+        }
+
+    }
+
 }

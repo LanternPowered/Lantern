@@ -24,8 +24,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 
 import java.util.Set;
@@ -33,8 +33,8 @@ import java.util.Set;
 public final class HandlerPlayInUnregisterChannels implements Handler<MessagePlayInOutUnregisterChannels> {
 
     @Override
-    public void handle(Session session, MessagePlayInOutUnregisterChannels message) {
+    public void handle(NetworkContext context, MessagePlayInOutUnregisterChannels message) {
         Set<String> channels = message.getChannels();
-        session.getRegisteredChannels().removeAll(channels);
+        context.getSession().getRegisteredChannels().removeAll(channels);
     }
 }

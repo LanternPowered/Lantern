@@ -40,10 +40,10 @@ public final class ProtocolStatus extends ProtocolBase {
         MessageRegistry inbound = this.inbound();
         MessageRegistry outbound = this.outbound();
 
-        inbound.register(0x00, MessageStatusInRequest.class, CodecStatusInRequest.class, new HandlerStatusRequest());
-        inbound.register(0x01, MessageStatusInOutPing.class, CodecStatusInOutPing.class, new HandlerStatusPing());
+        inbound.bind(0x00, CodecStatusInRequest.class, MessageStatusInRequest.class).bindHandler(new HandlerStatusRequest());
+        inbound.bind(0x01, CodecStatusInOutPing.class, MessageStatusInOutPing.class).bindHandler(new HandlerStatusPing());
 
-        outbound.register(0x00, MessageStatusOutResponse.class, CodecStatusOutResponse.class);
-        outbound.register(0x01, MessageStatusInOutPing.class, CodecStatusInOutPing.class);
+        outbound.bind(0x00, CodecStatusOutResponse.class, MessageStatusOutResponse.class);
+        outbound.bind(0x01, CodecStatusInOutPing.class, MessageStatusInOutPing.class);
     }
 }

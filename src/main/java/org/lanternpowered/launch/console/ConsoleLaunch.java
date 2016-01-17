@@ -53,8 +53,8 @@ public final class ConsoleLaunch {
     // The fqcn of the stream that we use to redirect stream messages through a logger
     static final String REDIRECT_FQCN = LoggingPrintStream.class.getName();
 
-    static final String REDIRECT_ERR = "System.ERR";
-    static final String REDIRECT_OUT = "System.OUT";
+    static final String REDIRECT_ERR = "STDERR";
+    static final String REDIRECT_OUT = "STDOUT";
 
     // Whether jline should be enabled
     private static final boolean ENABLE_JLINE = PropertiesUtil.getProperties().getBooleanProperty("jline.enable", true);

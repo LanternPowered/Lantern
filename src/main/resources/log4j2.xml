@@ -26,6 +26,14 @@
             <AppenderRef ref="DefaultConsole" level="info"/>
             <AppenderRef ref="File"/>
         </Logger>
+        <Logger name="STDOUT" level="all" additivity="false">
+            <AppenderRef ref="DefaultConsole" level="info"/>
+            <AppenderRef ref="File"/>
+        </Logger>
+        <Logger name="STDERR" level="all" additivity="false">
+            <AppenderRef ref="DefaultConsole" level="info"/>
+            <AppenderRef ref="File"/>
+        </Logger>
         <!-- Log all other messages with prefix. -->
         <Root level="all">
             <AppenderRef ref="Console" level="info"/>

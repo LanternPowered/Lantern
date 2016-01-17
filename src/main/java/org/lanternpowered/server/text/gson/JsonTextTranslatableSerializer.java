@@ -60,6 +60,14 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
         currentLocale.set(locale);
     }
 
+    /**
+     * Removes the current locale that is attached to the thread, toggling
+     * the locale back to the default.
+     */
+    public static void removeCurrentLocale() {
+        currentLocale.remove();
+    }
+
     public static Locale getCurrentLocale() {
         return currentLocale.get();
     }

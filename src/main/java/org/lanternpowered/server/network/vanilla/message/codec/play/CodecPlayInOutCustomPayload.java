@@ -24,29 +24,94 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import com.flowpowered.math.vector.Vector3i;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.caching.Caching;
-import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeCommand;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 
-@Caching
-public final class CodecPlayInOutCustomPayload implements Codec<MessagePlayInOutChannelPayload> {
+public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCustomPayload {
+
+    private final static ByteBuf EMPTY = Unpooled.buffer(0);
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInOutChannelPayload message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, String.class, message.getChannel());
-        buf.writeBytes(message.getContent());
-        return buf;
+    protected MessageResult encode0(CodecContext context, Message message) throws CodecException {
+        if (message instanceof MessagePlayInOutBrand) {
+            return new MessageResult("MC|Brand", context.write(context.byteBufAlloc().buffer(), Types.STRING,
+                    ((MessagePlayInOutBrand) message).getBrand()));
+        } else if (message instanceof MessagePlayOutOpenBook) {
+            return new MessageResult("MC|BOpen", EMPTY);
+        }
+        return null;
     }
 
     @Override
-    public MessagePlayInOutChannelPayload decode(CodecContext context, ByteBuf buf) throws CodecException {
-        String channel = context.read(buf, String.class);
-        ByteBuf content = context.byteBufAlloc().heapBuffer(buf.readableBytes());
-        buf.readBytes(content);
-        return new MessagePlayInOutChannelPayload(channel, content);
+    protected Message decode0(CodecContext context, String channel, ByteBuf content) throws CodecException {
+        if ("MC|ItemName".equals(channel)) {
+            return new MessagePlayInChangeItemName(context.read(content, Types.STRING));
+        } else if ("MC|TrSel".equals(channel)) {
+            return new MessagePlayInChangeOffer(content.readInt());
+        } else if ("MC|Brand".equals(channel)) {
+            return new MessagePlayInOutBrand(context.read(content, Types.STRING));
+        } else if ("MC|Beacon".equals(channel)) {
+            // TODO
+        } else if ("MC|AdvCdm".equals(channel)) {
+            byte type = content.readByte();
+
+            Vector3i pos = null;
+            int entityId = 0;
+
+            if (type == 0) {
+                int x = content.readInt();
+                int y = content.readInt();
+                int z = content.readInt();
+                pos = new Vector3i(x, y, z);
+            } else if (type == 1) {
+                entityId = content.readInt();
+            } else {
+                throw new CodecException("Unknown modify command message type: " + type);
+            }
+
+            String command = context.read(content, Types.STRING);
+            boolean shouldTrackOutput = content.readBoolean();
+
+            if (pos != null) {
+                return new MessagePlayInChangeCommand.Block(pos, command, shouldTrackOutput);
+            } else {
+                return new MessagePlayInChangeCommand.Entity(entityId, command, shouldTrackOutput);
+            }
+        } else if ("MC|AutoCmd".equals(channel)) {
+            // New channel in 1.9
+            // TODO
+        } else if ("MC|BSign".equals(channel)) {
+            // TODO
+        } else if ("MC|BEdit".equals(channel)) {
+            // TODO
+        } else if ("MC|Struct".equals(channel)) {
+            // Something related to structure placing in minecraft 1.9,
+            // seems like it's something mojang doesn't want to share with use,
+            // they used this channel to build and save structures
+        } else if ("MC|PickItem".equals(channel)) {
+            // Also a new channel in 1.9
+            // TODO
+        } else if ("FML|HS".equals(channel)) {
+            throw new CodecException("Received and unexpected message with channel: " + channel);
+        } else if ("FML".equals(channel)) {
+            // Fml channel
+        } else if (channel.startsWith("FML")) {
+            // A unknown/ignored fml channel
+        } else {
+            return new MessagePlayInOutChannelPayload(channel, content);
+        }
+        return NullMessage.INSTANCE;
     }
 }

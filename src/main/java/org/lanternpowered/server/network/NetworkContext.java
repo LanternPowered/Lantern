@@ -30,16 +30,17 @@ import org.lanternpowered.server.network.session.Session;
 public interface NetworkContext {
 
     /**
-     * Gets the channel that is used with this context.
-     * 
-     * @return the channel
-     */
-    Channel channel();
-
-    /**
-     * Gets the session that is used with this context.
-     * 
+     * Gets the {@link Session} that is targeted.
+     *
      * @return the session
      */
-    Session session();
+    Session getSession();
+
+    /**
+     * Gets the {@link Channel} that is targeted.
+     *
+     * @return the channel
+     */
+    Channel getChannel();
+
 }

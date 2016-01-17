@@ -27,9 +27,9 @@ package org.lanternpowered.server.network.vanilla.message.item;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializer;
-import org.lanternpowered.server.network.message.codec.object.serializer.ObjectSerializerContext;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils;
+import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
+import org.lanternpowered.server.network.message.codec.serializer.ValueSerializer;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -46,17 +46,18 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.List;
 import java.util.Locale;
 
-public class SerializerItemStack implements ObjectSerializer<ItemStack> {
+public class SerializerItemStack implements ValueSerializer<ItemStack> {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void write(ObjectSerializerContext context, ByteBuf buf, ItemStack object) throws CodecException {
+    public void write(SerializerContext context, ByteBuf buf, ItemStack object) throws CodecException {
         if (object == null) {
             buf.writeShort(-1);
             return;
         }
 
-        Locale locale = CodecUtils.getLocale(context);
+        // Locale locale = CodecUtils.getLocale(context);
+        Locale locale = Locale.ENGLISH;
 
         DataContainer tag = new MemoryDataContainer();
         int id = 1; // TODO: Lookup the internal id
@@ -100,19 +101,19 @@ public class SerializerItemStack implements ObjectSerializer<ItemStack> {
         buf.writeShort(id);
         buf.writeByte(amount);
         buf.writeShort(data);
-        context.write(buf, DataView.class, tag);
+        context.write(buf, Types.DATA_VIEW, tag);
     }
 
     @Override
-    public ItemStack read(ObjectSerializerContext context, ByteBuf buf) throws CodecException {
+    public ItemStack read(SerializerContext context, ByteBuf buf) throws CodecException {
         short id = buf.readShort();
         if (id == -1) {
             return null;
         }
         int amount = buf.readByte();
         int data = buf.readShort();
-        DataView tag = context.read(buf, DataView.class);
-        Locale locale = CodecUtils.getLocale(context);
+        DataView tag = context.read(buf, Types.DATA_VIEW);
+        //Locale locale = CodecUtils.getLocale(context);
 
         return null;
     }

@@ -28,7 +28,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.object.LocalizedText;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle.SetTimes;
 
@@ -49,10 +49,10 @@ public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
             context.writeVarInt(buf, RESET);
         } else if (message instanceof MessagePlayOutTitle.SetTitle) {
             context.writeVarInt(buf, SET_TITLE);
-            context.write(buf, LocalizedText.class, ((MessagePlayOutTitle.SetTitle) message).getTitle());
+            context.write(buf, Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetTitle) message).getTitle());
         } else if (message instanceof MessagePlayOutTitle.SetSubtitle) {
             context.writeVarInt(buf, SET_SUBTITLE);
-            context.write(buf, LocalizedText.class, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
+            context.write(buf, Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
         } else {
             MessagePlayOutTitle.SetTimes message0 = (SetTimes) message;
             context.writeVarInt(buf, SET_TIMES);

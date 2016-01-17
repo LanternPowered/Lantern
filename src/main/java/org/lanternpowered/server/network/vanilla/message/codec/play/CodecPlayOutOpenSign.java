@@ -24,20 +24,18 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.flowpowered.math.vector.Vector3i;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
 
-@Caching
 public final class CodecPlayOutOpenSign implements Codec<MessagePlayOutOpenSign> {
 
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutOpenSign message) throws CodecException {
-        return context.write(context.byteBufAlloc().buffer(), Vector3i.class, message.getPosition());
+        return context.write(context.byteBufAlloc().buffer(), Types.POSITION, message.getPosition());
     }
 
     @Override

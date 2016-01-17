@@ -26,18 +26,16 @@ package org.lanternpowered.server.network.vanilla.message.codec.connection;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
-import org.spongepowered.api.text.Text;
 
-@Caching
 public final class CodecOutDisconnect implements Codec<MessageOutDisconnect> {
 
     @Override
     public ByteBuf encode(CodecContext context, MessageOutDisconnect message) throws CodecException {
-        return context.write(context.byteBufAlloc().buffer(), Text.class, message.getReason());
+        return context.write(context.byteBufAlloc().buffer(), Types.TEXT, message.getReason());
     }
 
     @Override

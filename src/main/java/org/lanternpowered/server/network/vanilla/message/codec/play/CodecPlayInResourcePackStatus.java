@@ -29,6 +29,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
 import org.spongepowered.api.event.entity.living.humanoid.player.ResourcePackStatusEvent.ResourcePackStatus;
 
@@ -50,7 +51,7 @@ public final class CodecPlayInResourcePackStatus implements Codec<MessagePlayInR
 
     @Override
     public MessagePlayInResourcePackStatus decode(CodecContext context, ByteBuf buf) throws CodecException {
-        String hash = context.read(buf, String.class);
+        String hash = context.read(buf, Types.STRING);
         int status0 = context.readVarInt(buf);
         ResourcePackStatus status = this.status.get(status0);
         if (status == null) {

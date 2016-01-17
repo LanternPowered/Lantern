@@ -25,7 +25,6 @@
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.caching.Caching;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
@@ -33,7 +32,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.internal.Mess
 
 import java.util.List;
 
-@Caching
 public final class ProcessorPlayOutWorldSky implements Processor<MessagePlayOutWorldSky> {
 
     @Override

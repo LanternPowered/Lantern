@@ -24,26 +24,53 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import com.beust.jcommander.internal.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import io.netty.util.AttributeKey;
+import org.lanternpowered.server.network.message.BulkMessage;
+import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayInPlayerVehicleControls;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 
-public final class CodecPlayInPlayerVehicleControls implements Codec<MessagePlayInPlayerVehicleControls> {
+import java.util.List;
+
+public final class CodecPlayInPlayerVehicleControls implements Codec<Message> {
+
+    private final static AttributeKey<Boolean> SNEAKING = AttributeKey.valueOf("last-sneaking-state");
+    private final static AttributeKey<Boolean> JUMPING = AttributeKey.valueOf("last-jumping-state");
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInPlayerVehicleControls message) throws CodecException {
+    public ByteBuf encode(CodecContext context, Message message) throws CodecException {
         throw new CodecException();
     }
 
     @Override
-    public MessagePlayInPlayerVehicleControls decode(CodecContext context, ByteBuf buf) throws CodecException {
+    public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
         float sideways = buf.readFloat();
         float forwards = buf.readFloat();
         byte flags = buf.readByte();
         boolean jump = (flags & 0x1) != 0;
         boolean sneak = (flags & 0x2) != 0;
-        return new MessagePlayInPlayerVehicleControls(forwards, sideways, jump, sneak);
+
+        final List<Message> messages = Lists.newArrayList();
+        boolean lastSneak = context.getChannel().attr(SNEAKING).getAndSet(sneak);
+        if (lastSneak != sneak) {
+            messages.add(new MessagePlayInPlayerSneak(sneak));
+        }
+        boolean lastJump = context.getChannel().attr(JUMPING).getAndSet(jump);
+        if (lastJump != jump && !context.getChannel().attr(CodecPlayInPlayerAction.CANCEL_NEXT_JUMP_MESSAGE).getAndSet(false)) {
+            messages.add(new MessagePlayInPlayerVehicleJump(jump, 0f));
+        }
+        // The mc client already applies the sneak speed, but we want to choose it
+        if (sneak) {
+            sideways /= 0.3f;
+            forwards /= 0.3f;
+        }
+        messages.add(new MessagePlayInPlayerVehicleMovement(forwards, sideways));
+        return messages.size() == 1 ? messages.get(0) : new BulkMessage(messages);
     }
 }

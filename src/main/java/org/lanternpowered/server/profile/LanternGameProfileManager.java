@@ -38,11 +38,12 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import ninja.leaping.configurate.objectmapping.Setting;
-import org.lanternpowered.server.util.collect.Maps2;
+import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.util.UUIDHelper;
 import org.lanternpowered.server.util.UniqueEvictingQueue;
+import org.lanternpowered.server.util.collect.Maps2;
+import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
 import org.lanternpowered.server.util.collect.expirable.ExpirableValueMap;
-import org.lanternpowered.server.util.collect.expirable.SimpleExpirableValue;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.profile.ProfileNotFoundException;
@@ -120,20 +121,31 @@ public final class LanternGameProfileManager implements GameProfileManager {
         return Instant.now().plus(EXPIRATION_TIME, EXPIRATION_TIME_UNIT);
     }
 
-    private class CacheEntry extends SimpleExpirableValue<GameProfile> {
+    @ConfigSerializable
+    private class CacheEntry implements ExpirableValue<GameProfile> {
 
+        @Setting(value = "profile")
+        private GameProfile gameProfile;
         @Setting(value = "expiration-date")
         private Instant expirationDate;
         @Setting(value = "signed")
         private boolean signed;
 
+        private CacheEntry() {
+        }
+
         public CacheEntry(GameProfile profile, Instant expirationDate) {
-            super(profile);
             this.expirationDate = expirationDate;
+            this.gameProfile = profile;
         }
 
         public CacheEntry(GameProfile profile) {
             this(profile, calculateExpirationDate());
+        }
+
+        @Override
+        public GameProfile getValue() {
+            return this.gameProfile;
         }
 
         @Override
@@ -306,7 +318,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
                 throw new ProfileNotFoundException("Failed to find a profile with the uuid: " + uniqueId);
             }
 
-            JsonObject json = gson.fromJson(new InputStreamReader(is), JsonObject.class);
+            JsonObject json = this.gson.fromJson(new InputStreamReader(is), JsonObject.class);
             if (json.has("error")) {
                 // If it fails too many times, just leave it
                 if (++attempts > 6) {
@@ -361,7 +373,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
     }
 
     private void postNameToUUIDPart(Map<String, UUID> results, List<String> names) throws IOException {
-        String body = gson.toJson(names);
+        String body = this.gson.toJson(names);
         URL url = new URL("https://api.mojang.com/profiles/minecraft");
 
         HttpURLConnection uc = (HttpURLConnection) url.openConnection();
@@ -376,7 +388,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
         os.flush();
         os.close();
 
-        JsonArray json = gson.fromJson(new InputStreamReader(uc.getInputStream()), JsonArray.class);
+        JsonArray json = this.gson.fromJson(new InputStreamReader(uc.getInputStream()), JsonArray.class);
         for (JsonElement element : json) {
             JsonObject obj = element.getAsJsonObject();
             results.put(obj.get("name").getAsString(), UUIDHelper.fromFlatString(obj.get("id").getAsString()));

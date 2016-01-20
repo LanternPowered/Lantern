@@ -74,11 +74,9 @@ import javax.annotation.Nullable;
 @NonnullByDefault
 public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, AbstractCommandSource {
 
-    private final User user;
+    private final LanternUser user;
     private final LanternGameProfile gameProfile;
     private final Session session;
-
-    @Nullable private volatile Subject subject;
 
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
@@ -106,9 +104,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.session = session;
         this.gameProfile = gameProfile;
         // Get or create the user object
-        this.user = LanternGame.get().getServiceManager().provideUnchecked(UserStorageService.class)
+        this.user = (LanternUser) LanternGame.get().getServiceManager().provideUnchecked(UserStorageService.class)
                 .getOrCreate(gameProfile);
-        this.initSubject();
+        this.user.setPlayer(this);
+        // We don't register a callback because only the
+        // user will hold the internal subject instance
     }
 
     public User getUserObject() {
@@ -117,25 +117,23 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public void setInternalSubject(Subject subject) {
-        this.subject = subject;
+        // We don't have to set the internal subject in the player instance
+        // because it's already set in the user
     }
 
     @Override
     public Subject getInternalSubject() {
-        if (this.subject == null) {
-            this.subject = this.findPermissionSubject();
-        }
-        return this.subject;
+        return this.user.getInternalSubject();
     }
 
     @Override
     public String getSubjectCollectionIdentifier() {
-        return PermissionService.SUBJECTS_USER;
+        return this.user.getSubjectCollectionIdentifier();
     }
 
     @Override
     public Tristate getPermissionDefault(String permission) {
-        return Tristate.TRUE;
+        return this.user.getPermissionDefault(permission);
     }
 
     @Override

@@ -24,8 +24,11 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.entity.AbstractArmorEquipable;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.permission.AbstractSubject;
+import org.lanternpowered.server.permission.AbstractSubjectBase;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
@@ -46,22 +49,27 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 @NonnullByDefault
-public class LanternUser implements AbstractArmorEquipable, User {
+public class LanternUser extends AbstractSubjectBase implements AbstractPropertyHolder, AbstractArmorEquipable, User {
 
     private final LanternGameProfile gameProfile;
+    @Nullable private WeakReference<Player> player;
 
     public LanternUser(LanternGameProfile gameProfile) {
         this.gameProfile = gameProfile;
@@ -86,18 +94,6 @@ public class LanternUser implements AbstractArmorEquipable, User {
 
     @Override
     public DataContainer toContainer() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -235,80 +231,22 @@ public class LanternUser implements AbstractArmorEquipable, User {
 
     @Override
     public String getIdentifier() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.gameProfile.getUniqueId().toString();
     }
 
     @Override
     public Optional<CommandSource> getCommandSource() {
-        // TODO Auto-generated method stub
-        return null;
+        return (Optional) this.getPlayer();
     }
 
     @Override
-    public SubjectCollection getContainingCollection() {
-        // TODO Auto-generated method stub
-        return null;
+    public String getSubjectCollectionIdentifier() {
+        return PermissionService.SUBJECTS_USER;
     }
 
     @Override
-    public SubjectData getSubjectData() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public SubjectData getTransientSubjectData() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean hasPermission(Set<Context> contexts, String permission) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean hasPermission(String permission) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Tristate getPermissionValue(Set<Context> contexts, String permission) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean isChildOf(Subject parent) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean isChildOf(Set<Context> contexts, Subject parent) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public List<Subject> getParents() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Subject> getParents(Set<Context> contexts) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Set<Context> getActiveContexts() {
-        // TODO Auto-generated method stub
-        return null;
+    public Tristate getPermissionDefault(String permission) {
+        return Tristate.FALSE;
     }
 
     @Override
@@ -328,7 +266,16 @@ public class LanternUser implements AbstractArmorEquipable, User {
 
     @Override
     public Optional<Player> getPlayer() {
-        return LanternGame.get().getServer().getPlayer(this.gameProfile.getUniqueId());
+        return this.player == null ? Optional.empty() : Optional.ofNullable(this.player.get());
+    }
+
+    /**
+     * Sets the {@link Player} that is attached to this user.
+     *
+     * @param player the player
+     */
+    public void setPlayer(Player player) {
+        this.player = new WeakReference<>(player);
     }
 
 }

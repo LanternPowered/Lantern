@@ -24,17 +24,12 @@
  */
 package org.lanternpowered.server.util.collect.expirable;
 
-import ninja.leaping.configurate.objectmapping.Setting;
-import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-
 import javax.annotation.Nullable;
 
-@ConfigSerializable
 public class SimpleExpirableValue<V> implements ExpirableValue<V> {
 
     @Nullable
-    @Setting(value = "value")
-    private V value;
+    private final V value;
 
     public SimpleExpirableValue(V value) {
         this.value = value;

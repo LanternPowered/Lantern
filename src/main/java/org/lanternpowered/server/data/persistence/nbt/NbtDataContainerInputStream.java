@@ -50,14 +50,26 @@ import javax.annotation.Nullable;
 public class NbtDataContainerInputStream implements Closeable, DataContainerInput {
 
     private final DataInputStream dis;
+    private final int maximumDepth;
 
     /**
-     * Creates a new (nbt) tag input stream.
-     * 
+     * Creates a new nbt data view input stream.
+     *
      * @param dataInputStream the data input stream
      */
     public NbtDataContainerInputStream(DataInputStream dataInputStream) {
+        this(dataInputStream, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Creates a new nbt data view input stream.
+     * 
+     * @param dataInputStream the data input stream
+     * @param maximumDepth the maximum depth of the data contains
+     */
+    public NbtDataContainerInputStream(DataInputStream dataInputStream, int maximumDepth) {
         this.dis = checkNotNull(dataInputStream, "dataInputStream");
+        this.maximumDepth = maximumDepth;
     }
 
     /**
@@ -66,8 +78,18 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
      * @param inputStream the data input stream
      */
     public NbtDataContainerInputStream(InputStream inputStream) {
+        this(inputStream, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Creates a new nbt data view input stream.
+     *
+     * @param inputStream the data input stream
+     * @param maximumDepth the maximum depth of the data contains
+     */
+    public NbtDataContainerInputStream(InputStream inputStream, int maximumDepth) {
         this(checkNotNull(inputStream, "inputStream") instanceof DataInputStream ?
-                (DataInputStream) inputStream : new DataInputStream(inputStream));
+                (DataInputStream) inputStream : new DataInputStream(inputStream), maximumDepth);
     }
 
     /**
@@ -78,7 +100,18 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
      * @throws IOException 
      */
     public NbtDataContainerInputStream(InputStream inputStream, boolean compressed) throws IOException {
-        this(compressed ? new GZIPInputStream(checkNotNull(inputStream, "inputStream")) : inputStream);
+        this(inputStream, compressed, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Creates a new nbt data view input stream.
+     *
+     * @param inputStream the data input stream
+     * @param compressed whether the content is compressed
+     * @throws IOException
+     */
+    public NbtDataContainerInputStream(InputStream inputStream, boolean compressed, int maximumDepth) throws IOException {
+        this(compressed ? new GZIPInputStream(checkNotNull(inputStream, "inputStream")) : inputStream, maximumDepth);
     }
 
     @Override
@@ -92,11 +125,11 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
         if (entry == null) {
             throw new IOException("There is no more data to read.");
         }
-        return (DataContainer) this.readObject(null, entry);
+        return (DataContainer) this.readObject(null, entry, 0);
     }
 
-    private Object readObject(@Nullable DataView container, Entry entry) throws IOException, InvalidDataFormatException {
-        return this.readPayload(container, entry.type);
+    private Object readObject(@Nullable DataView container, Entry entry, int depth) throws IOException, InvalidDataFormatException {
+        return this.readPayload(container, entry.type, depth);
     }
 
     @Nullable
@@ -115,7 +148,11 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private Object readPayload(@Nullable DataView container, byte type) throws IOException, InvalidDataFormatException {
+    private Object readPayload(@Nullable DataView container, byte type, int depth) throws IOException, InvalidDataFormatException {
+        if (depth > this.maximumDepth) {
+            throw new IOException("Attempted to read a data container with too high complexity,"
+                    + " exceeded the maximum depth of " + this.maximumDepth);
+        }
         if (type == BYTE) {
             return this.dis.readByte();
         } else if (type == BYTE_ARRAY) {
@@ -129,11 +166,12 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 container = new MemoryDataContainer();
             }
             Entry entry;
+            final int depth1 = depth + 1;
             while ((entry = this.readEntry()) != null) {
                 if (entry.type == COMPOUND) {
-                    this.readObject(container.createView(DataQuery.of(entry.name)), entry);
+                    this.readObject(container.createView(DataQuery.of(entry.name)), entry, depth1);
                 } else {
-                    container.set(DataQuery.of('.', entry.name), this.readObject(null, entry));
+                    container.set(DataQuery.of('.', entry.name), this.readObject(null, entry, depth1));
                 }
             }
             return container;
@@ -159,8 +197,9 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             if (size == 0 || type0 == END) {
                 return list;
             }
+            final int depth1 = depth + 1;
             for (int i = 0; i < size; i++) {
-                list.add(this.readPayload(null, type0));
+                list.add(this.readPayload(null, type0, depth1));
             }
             return list;
         } else if (type == LONG) {

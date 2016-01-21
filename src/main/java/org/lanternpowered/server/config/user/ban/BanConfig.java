@@ -45,6 +45,7 @@ import java.net.InetAddress;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -72,10 +73,10 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     private List<BanEntry> entries = Lists.newArrayList();
 
     // A version of the entries list that allows concurrent operations
-    private final List<BanEntry> entries0 = Lists2.createCopyOnWriteExpirableValueListWithPredicate(entry -> {
+    private final List<BanEntry> entries0 = Collections.synchronizedList(Lists2.createExpirableValueListWithPredicate(entry -> {
         final Optional<Instant> optExpirationDate = entry.getExpirationDate();
         return optExpirationDate.isPresent() && Instant.now().compareTo(optExpirationDate.get()) > 0;
-    });
+    }));
 
     public BanConfig(Path path) throws IOException {
         super(path, OPTIONS);
@@ -83,7 +84,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public void save() throws IOException {
-        synchronized (this.entries) {
+        synchronized (this.entries0) {
             this.entries.clear();
             this.entries.addAll(this.entries0);
             super.save();
@@ -92,7 +93,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public void load() throws IOException {
-        synchronized (this.entries) {
+        synchronized (this.entries0) {
             super.load();
             this.entries0.clear();
             this.entries0.addAll(this.entries);

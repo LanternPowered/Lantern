@@ -31,6 +31,7 @@ import com.google.common.collect.Lists;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -40,7 +41,7 @@ import javax.annotation.Nullable;
 public final class CombinedTranslationManager implements TranslationManager {
 
     // The primary translation manager that will be used
-    private final List<TranslationManager> translationManagers = Lists.newCopyOnWriteArrayList();
+    private final List<TranslationManager> translationManagers = new ArrayList<>();
 
     // The delegate translation manager
     @Nullable private volatile TranslationManager delegateTranslationManager;

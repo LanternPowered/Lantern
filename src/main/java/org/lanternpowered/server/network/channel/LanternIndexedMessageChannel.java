@@ -143,6 +143,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
     private <M extends Message> void applyRegistration(RegistrationLookup lookup, Class<M> messageClass, byte messageId,
             @Nullable MessageHandler<M> handler) {
         final IndexedMessageRegistration registration = lookup.classToRegistration.computeIfAbsent(messageClass, IndexedMessageRegistration::new);
+        lookup.opcodeToRegistration.put(messageId, registration);
         registration.opcode = messageId;
         if (handler != null) {
             registration.handler = handler;

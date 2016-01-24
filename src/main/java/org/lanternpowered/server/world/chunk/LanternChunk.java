@@ -47,6 +47,8 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.ExtentViewTransform;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -80,6 +82,8 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -656,6 +660,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Extent getRelativeExtentView() {
         return this.getExtentView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
+    }
+
+    @Override
+    public MutableBiomeAreaWorker<? extends Extent> getBiomeWorker() {
+        return new LanternMutableBiomeAreaWorker<>(this);
+    }
+
+    @Override
+    public MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     public Entity getEntity(UUID uniqueId) {

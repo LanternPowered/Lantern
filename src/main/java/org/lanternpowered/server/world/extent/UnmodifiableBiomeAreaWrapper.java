@@ -25,12 +25,14 @@
 package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.world.extent.worker.LanternBiomeAreaWorker;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
+import org.spongepowered.api.world.extent.worker.BiomeAreaWorker;
 
 public class UnmodifiableBiomeAreaWrapper implements UnmodifiableBiomeArea {
 
@@ -73,6 +75,11 @@ public class UnmodifiableBiomeAreaWrapper implements UnmodifiableBiomeArea {
     @Override
     public UnmodifiableBiomeArea getBiomeView(DiscreteTransform2 transform) {
         return new UnmodifiableBiomeAreaWrapper(this.area.getBiomeView(transform));
+    }
+
+    @Override
+    public BiomeAreaWorker<? extends UnmodifiableBiomeArea> getBiomeWorker() {
+        return new LanternBiomeAreaWorker<>(this);
     }
 
     @Override

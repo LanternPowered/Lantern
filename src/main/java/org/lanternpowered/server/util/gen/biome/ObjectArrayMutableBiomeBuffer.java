@@ -27,11 +27,13 @@ package org.lanternpowered.server.util.gen.biome;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 
 /**
  * Mutable view of a {@link BiomeType} array.
@@ -87,5 +89,10 @@ public final class ObjectArrayMutableBiomeBuffer extends AbstractMutableBiomeBuf
         checkNotNull(biome, "biome");
         this.checkRange(x, z);
         this.biomes[this.index(x, z)] = biome;
+    }
+
+    @Override
+    public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
+        return new LanternMutableBiomeAreaWorker<>(this);
     }
 }

@@ -51,6 +51,8 @@ import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.extent.ExtentBufferHelper;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -67,8 +69,11 @@ import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
+import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.WorldGenerator;
@@ -591,6 +596,11 @@ public final class LanternChunkManager {
         }
 
         @Override
+        public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
+            return new LanternMutableBiomeAreaWorker<>(this);
+        }
+
+        @Override
         public void reuse(Vector2i start) {
             super.reuse(start);
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
@@ -633,6 +643,11 @@ public final class LanternChunkManager {
                 this.nonAirCount[sy]++;
             }
             types[index] = type;
+        }
+
+        @Override
+        public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
+            return new LanternMutableBlockVolumeWorker<>(this);
         }
 
         @Override

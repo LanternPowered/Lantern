@@ -22,34 +22,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.extent;
+package org.lanternpowered.server.world.extent.worker;
 
-import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
-import org.spongepowered.api.util.DiscreteTransform3;
-import org.spongepowered.api.world.extent.ImmutableBlockVolume;
-import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
+import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.procedure.BiomeAreaFiller;
 
-public class ImmutableBlockViewTransform extends AbstractBlockViewTransform<ImmutableBlockVolume> implements ImmutableBlockVolume {
+public class LanternMutableBiomeAreaWorker<A extends MutableBiomeArea> extends LanternBiomeAreaWorker<A> implements MutableBiomeAreaWorker<A> {
 
-    public ImmutableBlockViewTransform(ImmutableBlockVolume area, DiscreteTransform3 transform) {
-        super(area, transform);
+    public LanternMutableBiomeAreaWorker(A area) {
+        super(area);
     }
 
     @Override
-    public ImmutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        return new ImmutableBlockViewDownsize(this.volume, this.inverseTransform.transform(newMin), this.inverseTransform.transform(newMax))
-            .getBlockView(this.transform);
+    public void fill(BiomeAreaFiller filler) {
+        final int xMin = this.area.getBiomeMin().getX();
+        final int zMin = this.area.getBiomeMin().getY();
+        final int xMax = this.area.getBiomeMax().getX();
+        final int zMax = this.area.getBiomeMax().getY();
+        for (int z = zMin; z <= zMax; z++) {
+            for (int x = xMin; x <= xMax; x++) {
+                final BiomeType biome = filler.produce(x, z);
+                this.area.setBiome(x, z, biome);
+            }
+        }
     }
-
-    @Override
-    public ImmutableBlockVolume getBlockView(DiscreteTransform3 transform) {
-        return new ImmutableBlockViewTransform(this.volume, this.transform.withTransformation(transform));
-    }
-
-    @Override
-    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker() {
-        return new LanternBlockVolumeWorker<>(this);
-    }
-
 }

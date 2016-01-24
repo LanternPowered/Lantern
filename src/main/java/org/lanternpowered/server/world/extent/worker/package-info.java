@@ -22,35 +22,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.extent;
-
-import com.flowpowered.math.vector.Vector2i;
-import org.lanternpowered.server.world.extent.worker.LanternBiomeAreaWorker;
-import org.spongepowered.api.util.DiscreteTransform2;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.worker.BiomeAreaWorker;
-
-public class ImmutableBiomeViewDownsize extends AbstractBiomeViewDownsize<ImmutableBiomeArea> implements ImmutableBiomeArea {
-
-    public ImmutableBiomeViewDownsize(ImmutableBiomeArea area, Vector2i min, Vector2i max) {
-        super(area, min, max);
-    }
-
-    @Override
-    public ImmutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY());
-        this.checkRange(newMax.getX(), newMax.getY());
-        return new ImmutableBiomeViewDownsize(this.area, newMin, newMax);
-    }
-
-    @Override
-    public ImmutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
-        return new ImmutableBiomeViewTransform(this, transform);
-    }
-
-    @Override
-    public BiomeAreaWorker<? extends ImmutableBiomeArea> getBiomeWorker() {
-        return new LanternBiomeAreaWorker<>(this);
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.world.extent.worker;

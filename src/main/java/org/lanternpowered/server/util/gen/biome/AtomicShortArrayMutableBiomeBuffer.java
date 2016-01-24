@@ -30,6 +30,7 @@ import org.lanternpowered.server.util.concurrent.AtomicShortArray;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -38,6 +39,7 @@ import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 
 /**
  * Mutable biome area backed by a atomic short array.
@@ -94,6 +96,11 @@ public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffe
     @Override
     public MutableBiomeArea getRelativeBiomeView() {
         return this.getBiomeView(DiscreteTransform2.fromTranslation(this.start.negate()));
+    }
+
+    @Override
+    public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
+        return new LanternMutableBiomeAreaWorker<>(this);
     }
 
     @Override

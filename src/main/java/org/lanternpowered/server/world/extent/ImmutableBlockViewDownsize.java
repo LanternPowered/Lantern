@@ -25,8 +25,10 @@
 package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
+import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
 
 public class ImmutableBlockViewDownsize extends AbstractBlockViewDownsize<ImmutableBlockVolume> implements ImmutableBlockVolume {
 
@@ -44,6 +46,11 @@ public class ImmutableBlockViewDownsize extends AbstractBlockViewDownsize<Immuta
     @Override
     public ImmutableBlockVolume getBlockView(DiscreteTransform3 transform) {
         return new ImmutableBlockViewTransform(this, transform);
+    }
+
+    @Override
+    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker() {
+        return new LanternBlockVolumeWorker<>(this);
     }
 
 }

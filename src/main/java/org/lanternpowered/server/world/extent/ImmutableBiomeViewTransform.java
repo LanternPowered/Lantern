@@ -25,8 +25,10 @@
 package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.world.extent.worker.LanternBiomeAreaWorker;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
+import org.spongepowered.api.world.extent.worker.BiomeAreaWorker;
 
 public class ImmutableBiomeViewTransform extends AbstractBiomeViewTransform<ImmutableBiomeArea> implements ImmutableBiomeArea {
 
@@ -43,6 +45,11 @@ public class ImmutableBiomeViewTransform extends AbstractBiomeViewTransform<Immu
     @Override
     public ImmutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
         return new ImmutableBiomeViewTransform(this.area, this.transform.withTransformation(transform));
+    }
+
+    @Override
+    public BiomeAreaWorker<? extends ImmutableBiomeArea> getBiomeWorker() {
+        return new LanternBiomeAreaWorker<>(this);
     }
 
 }

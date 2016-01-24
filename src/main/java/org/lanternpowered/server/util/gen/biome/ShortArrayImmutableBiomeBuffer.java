@@ -28,6 +28,7 @@ import com.flowpowered.math.vector.Vector2i;
 import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBiomeViewTransform;
+import org.lanternpowered.server.world.extent.worker.LanternBiomeAreaWorker;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -36,6 +37,7 @@ import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
+import org.spongepowered.api.world.extent.worker.BiomeAreaWorker;
 
 /**
  * Immutable biome area, backed by a short array. The array passed to the
@@ -104,6 +106,11 @@ public final class ShortArrayImmutableBiomeBuffer extends AbstractBiomeBuffer im
     @Override
     public ImmutableBiomeArea getImmutableBiomeCopy() {
         return this;
+    }
+
+    @Override
+    public BiomeAreaWorker<? extends ImmutableBiomeArea> getBiomeWorker() {
+        return new LanternBiomeAreaWorker<>(this);
     }
 
     /**

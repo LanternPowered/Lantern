@@ -28,6 +28,7 @@ import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;
+import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.util.DiscreteTransform3;
@@ -36,6 +37,7 @@ import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
+import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
 
 @NonnullByDefault
 public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implements ImmutableBlockVolume {
@@ -98,6 +100,11 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
     @Override
     public ImmutableBlockVolume getImmutableBlockCopy() {
         return this;
+    }
+
+    @Override
+    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker() {
+        return new LanternBlockVolumeWorker<>(this);
     }
 
     /**

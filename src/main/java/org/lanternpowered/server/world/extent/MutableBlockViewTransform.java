@@ -25,10 +25,12 @@
 package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
+import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 public class MutableBlockViewTransform extends AbstractBlockViewTransform<MutableBlockVolume> implements MutableBlockVolume {
 
@@ -51,6 +53,11 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
     @Override
     public MutableBlockVolume getBlockView(DiscreteTransform3 transform) {
         return new MutableBlockViewTransform(this.volume, this.transform.withTransformation(transform));
+    }
+
+    @Override
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override

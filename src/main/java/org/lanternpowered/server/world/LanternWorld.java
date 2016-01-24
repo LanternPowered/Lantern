@@ -56,6 +56,8 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.ExtentViewTransform;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.rules.RuleHolder;
@@ -100,6 +102,8 @@ import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.extent.Extent;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
@@ -323,6 +327,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public Extent getRelativeExtentView() {
         return this.getExtentView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
+    }
+
+    @Override
+    public MutableBiomeAreaWorker<? extends Extent> getBiomeWorker() {
+        return new LanternMutableBiomeAreaWorker<>(this);
+    }
+
+    @Override
+    public MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override

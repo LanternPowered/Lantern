@@ -25,10 +25,12 @@
 package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 
 public class MutableBiomeViewDownsize extends AbstractBiomeViewDownsize<MutableBiomeArea> implements MutableBiomeArea {
 
@@ -52,6 +54,11 @@ public class MutableBiomeViewDownsize extends AbstractBiomeViewDownsize<MutableB
     @Override
     public MutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
         return new MutableBiomeViewTransform(this, transform);
+    }
+
+    @Override
+    public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
+        return new LanternMutableBiomeAreaWorker<>(this);
     }
 
     @Override

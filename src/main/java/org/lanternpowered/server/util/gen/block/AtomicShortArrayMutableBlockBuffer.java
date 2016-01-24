@@ -27,12 +27,14 @@ package org.lanternpowered.server.util.gen.block;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 @NonnullByDefault
 public class AtomicShortArrayMutableBlockBuffer extends AbstractMutableBlockBuffer implements MutableBlockVolume {
@@ -54,6 +56,11 @@ public class AtomicShortArrayMutableBlockBuffer extends AbstractMutableBlockBuff
     public void setBlock(int x, int y, int z, BlockState block) {
         this.checkRange(x, y, z);
         this.blocks.set(this.index(x, y, z), Registries.getBlockRegistry().getStateInternalIdAndData(block));
+    }
+
+    @Override
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
     }
 
     @Override

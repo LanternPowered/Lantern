@@ -24,7 +24,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.beust.jcommander.internal.Lists;
+import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;

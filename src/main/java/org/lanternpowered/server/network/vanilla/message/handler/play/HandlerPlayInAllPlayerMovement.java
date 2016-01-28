@@ -25,30 +25,40 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.data.type.LanternSkinPart;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.entity.living.humanoid.player.PlayerChangeClientSettingsEvent;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementAndLook;
 
-public final class HandlerPlayInClientSettings implements Handler<MessagePlayInClientSettings> {
+public final class HandlerPlayInAllPlayerMovement {
 
-    @Override
-    public void handle(NetworkContext context, MessagePlayInClientSettings message) {
-        LanternPlayer player = context.getSession().getPlayer();
-        PlayerChangeClientSettingsEvent event = SpongeEventFactory.createPlayerChangeClientSettingsEvent(
-                Cause.of(player), message.getChatVisibility(), LanternSkinPart.fromBitPattern(message.getSkinPartsBitPattern()),
-                message.getLocale(), player, message.getEnableColors(), message.getViewDistance());
-        Sponge.getEventManager().post(event);
-        player.setLocale(event.getLocale());
-        player.setViewDistance(event.getViewDistance());
-        player.setSkinParts(event.getDisplayedSkinParts());
-        player.setChatVisibility(event.getChatVisibility());
-        player.setChatColorsEnabled(message.getEnableColors());
-        player.setMainHand(message.getMainHand());
+    private void handlePosition(NetworkContext context, Vector3d position) {
+        context.getSession().getPlayer().setServerPosition(position);
+    }
+
+    public class HandlerPlayInPlayerMovement implements Handler<MessagePlayInPlayerMovement> {
+
+        @Override
+        public void handle(NetworkContext context, MessagePlayInPlayerMovement message) {
+            handlePosition(context, new Vector3d(message.getX(), message.getY(), message.getZ()));
+        }
+    }
+
+    public class HandlerPlayInPlayerMovementAndLook implements Handler<MessagePlayInPlayerMovementAndLook> {
+
+        @Override
+        public void handle(NetworkContext context, MessagePlayInPlayerMovementAndLook message) {
+            handlePosition(context, new Vector3d(message.getX(), message.getY(), message.getZ()));
+        }
+    }
+
+    public class HandlerPlayInPlayerLook implements Handler<MessagePlayInPlayerLook> {
+
+        @Override
+        public void handle(NetworkContext context, MessagePlayInPlayerLook message) {
+
+        }
     }
 }

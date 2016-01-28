@@ -23,32 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.data.property.PropertyHolder;
-import org.spongepowered.api.data.property.PropertyStore;
+import com.flowpowered.math.vector.Vector3i;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 
 import java.util.Collection;
-import java.util.Optional;
 
-public interface AbstractPropertyHolder extends PropertyHolder {
-
-    @Override
-    default <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        return getPropertyFor(this, propertyClass);
-    }
+public final class CodecPlayOutMultiBlockChange implements Codec<MessagePlayOutMultiBlockChange> {
 
     @Override
-    default Collection<Property<?, ?>> getApplicableProperties() {
-        return LanternPropertyRegistry.getInstance().getPropertiesFor(this);
-    }
-
-    static <T extends Property<?, ?>> Optional<T> getPropertyFor(PropertyHolder propertyHolder, Class<T> propertyClass) {
-        final Optional<PropertyStore<T>> optional = LanternPropertyRegistry.getInstance().getStore(propertyClass);
-        if (optional.isPresent()) {
-            return optional.get().getFor(propertyHolder);
+    public ByteBuf encode(CodecContext context, MessagePlayOutMultiBlockChange message) throws CodecException {
+        ByteBuf buf = context.byteBufAlloc().buffer();
+        buf.writeInt(message.getChunkX());
+        buf.writeInt(message.getChunkZ());
+        Collection<MessagePlayOutBlockChange> changes = message.getChanges();
+        context.writeVarInt(buf, changes.size());
+        for (MessagePlayOutBlockChange change : changes) {
+            Vector3i position = change.getPosition();
+            buf.writeByte((position.getX() & 0xf) << 4 | position.getZ() & 0xf);
+            buf.writeByte(position.getY());
+            context.writeVarInt(buf, change.getBlockState());
         }
-        return Optional.empty();
+        return buf;
     }
 }

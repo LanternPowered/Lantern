@@ -23,41 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.world.chunk;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import com.flowpowered.math.vector.Vector2i;
 
 import java.util.UUID;
 
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
+/**
+ * A reference where the entity is stored in the world,
+ * if it's not already loaded.
+ */
+public final class EntityReference {
 
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
+    private final Vector2i chunkCoords;
+    private final UUID uniqueId;
+
+    public EntityReference(Vector2i chunkCoords, UUID uniqueId) {
+        this.chunkCoords = chunkCoords;
+        this.uniqueId = uniqueId;
     }
 
-    public LanternEntityLiving() {
-        super();
+    public Vector2i getChunkCoords() {
+        return this.chunkCoords;
     }
 
-    @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    public UUID getUniqueId() {
+        return this.uniqueId;
     }
-
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
-    }
-
-    @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

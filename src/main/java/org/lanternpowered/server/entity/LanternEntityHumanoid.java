@@ -36,11 +36,20 @@ import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 @NonnullByDefault
 public class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
+
+    public LanternEntityHumanoid(UUID uniqueId) {
+        super(uniqueId);
+    }
+
+    public LanternEntityHumanoid() {
+        super();
+    }
 
     @Override
     public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {

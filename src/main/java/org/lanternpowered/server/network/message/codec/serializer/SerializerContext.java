@@ -29,8 +29,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.handler.codec.CodecException;
 
-import javax.annotation.Nullable;
-
 public interface SerializerContext {
 
     /**
@@ -48,7 +46,7 @@ public interface SerializerContext {
      * @param object the object instance, can be null depending on the type
      * @return the byte buffer for chaining
      */
-    <V> ByteBuf write(ByteBuf buf, Type<V> type, @Nullable V object) throws CodecException;
+    <V> ByteBuf write(ByteBuf buf, Type<V> type, V object) throws CodecException;
 
     /**
      * Attempts to write a object with the specified type at the specified buffer index.
@@ -59,7 +57,7 @@ public interface SerializerContext {
      * @param object the object instance, can be null depending on the type
      * @return the byte buffer for chaining
      */
-    <V> ByteBuf writeAt(ByteBuf buf, int index, Type<V> type, @Nullable V object) throws CodecException;
+    <V> ByteBuf writeAt(ByteBuf buf, int index, Type<V> type, V object) throws CodecException;
 
     /**
      * Attempts to write a variable integer.
@@ -114,7 +112,6 @@ public interface SerializerContext {
      * @param type the type of the object
      * @return the object instance, can be null depending on the type
      */
-    @Nullable
     <V> V read(ByteBuf buf, Type<V> type) throws CodecException;
 
     /**
@@ -125,7 +122,6 @@ public interface SerializerContext {
      * @param type the type of the object
      * @return the object instance, can be null depending on the type
      */
-    @Nullable
     <V> V readAt(ByteBuf buf, int index, Type<V> type) throws CodecException;
 
     /**

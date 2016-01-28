@@ -23,41 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.util;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+public final class FastMath {
 
-import java.util.UUID;
-
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
-
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
+    public static int floor(float value) {
+        return (int) (value + bigEnoughFloor) - bigEnoughInt;
     }
 
-    public LanternEntityLiving() {
-        super();
+    public static int round(float value) {
+        return (int) (value + bigEnoughRound) - bigEnoughInt;
     }
 
-    @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    public static int ceil(float value) {
+        return (int) (value + bigEnoughCeil) - bigEnoughInt;
     }
 
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
-    }
+    private static final int bigEnoughInt = 16 * 1024;
+    private static final double bigEnoughFloor = bigEnoughInt;
+    private static final double bigEnoughRound = bigEnoughInt + 0.5;
+    private static final double bigEnoughCeil = bigEnoughInt + 0.9999;
 
-    @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
+    private FastMath() {
     }
-
 }

@@ -139,7 +139,7 @@ public final class FlatGeneratorSettingsParser {
         if (!layersPart.isEmpty()) {
             // The seperator that can be used to create a layer
             // of x amount of blocks
-            final String depthSeperator = version >= 3 ? "\\*" : "x";
+            final char depthSeperator = version >= 3 ? '*' : 'x';
             Splitter.on(',').split(layersPart).forEach(s -> {
                 // The block type
                 BlockType blockType;
@@ -149,7 +149,7 @@ public final class FlatGeneratorSettingsParser {
                 int depth = 1;
 
                 // The depth seperated by the depth seperator followed by the block state
-                List<String> parts1 = Lists.newArrayList(Splitter.on(depthSeperator).limit(2).split(value));
+                List<String> parts1 = Lists.newArrayList(Splitter.on(depthSeperator).limit(2).split(s));
                 if (parts1.size() > 1) {
                     Optional<Integer> optDepth = Coerce.asInteger(parts1.remove(0));
                     if (optDepth.isPresent()) {
@@ -210,7 +210,7 @@ public final class FlatGeneratorSettingsParser {
             String extraPart = parts.remove(0);
             if (!extraPart.isEmpty()) {
                 Splitter.on(',').split(extraPart).forEach(s -> {
-                    String key = extraPart;
+                    String key = s;
 
                     // Check if there is extra data attached to the key
                     int valuesIndex = s.indexOf('(');

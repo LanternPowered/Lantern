@@ -45,8 +45,20 @@ import java.nio.file.Path;
 
 public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
 
-    @Setting(value = ChunkLoading.CHUNK_LOADING, comment = "Configuration for the chunk loading control.")
-    private WorldChunkLoading chunkLoading = new WorldChunkLoading();
+    @Setting(value = "chunks")
+    private Chunks chunks = new Chunks();
+
+    @ConfigSerializable
+    private static class Chunks {
+
+        @Setting(value = ChunkLoading.CHUNK_LOADING, comment = "Configuration for the chunk loading control.")
+        private WorldChunkLoading chunkLoading = new WorldChunkLoading();
+
+        @Setting(value = "clumping-threshold", comment =
+                "Controls the number threshold at which the chunk data message\n " +
+                "is preferred over the multi block change message.")
+        private int clumpingThreshold = 64;
+    }
 
     @Setting(value = "pvp-enabled", comment = "Enable if this world allows PVP combat.")
     private boolean pvpEnabled = true;
@@ -100,10 +112,14 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
 
     @Override
     public ChunkLoadingTickets getChunkLoadingTickets(String plugin) {
-        if (this.chunkLoading.isEnabled()) {
-            return this.chunkLoading.getChunkLoadingTickets(plugin);
+        if (this.chunks.chunkLoading.isEnabled()) {
+            return this.chunks.chunkLoading.getChunkLoadingTickets(plugin);
         }
         return this.globalConfig.getChunkLoadingTickets(plugin);
+    }
+
+    public int getChunkClumpingThreshold() {
+        return this.chunks.clumpingThreshold;
     }
 
     public GameMode getGameMode() {

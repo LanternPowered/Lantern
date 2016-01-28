@@ -26,16 +26,22 @@
 package org.lanternpowered.server.data;
 
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
+import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.MatterPropertyStore;
+import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.property.PropertyRegistry;
+import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
 
 public class DataRegistrar {
 
     public static void setupRegistrations(Game game) {
         final PropertyRegistry propertyRegistry = LanternPropertyRegistry.getInstance();
         propertyRegistry.register(MatterProperty.class, new MatterPropertyStore());
+        propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
+        propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
     }
 
     public static void finalizeRegistrations(Game game) {

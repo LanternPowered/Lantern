@@ -25,6 +25,9 @@
  */
 package org.lanternpowered.server.world.chunk;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
 
@@ -46,9 +49,9 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
 
     @Override
     public void bindToEntity(Entity entity) {
-        if (entity == null || !entity.getUniqueId().equals(this.uniqueId)) {
-            throw new IllegalArgumentException("Only a player with the uuid (" + this.uniqueId + ") can be applied to this ticket!");
-        }
+        checkNotNull(entity, "entity");
+        checkArgument(entity.getUniqueId().equals(this.uniqueId),
+                "Only a player with the uuid (" + this.uniqueId + ") can be applied to this ticket!");
         super.bindToEntity(entity);
     }
 

@@ -26,25 +26,23 @@
 package org.lanternpowered.server.world.chunk;
 
 import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.world.chunk.LanternEntityLoadingTicket.EntityReference;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
@@ -78,10 +76,10 @@ public class LanternLoadingTicketIO {
     private static final byte TYPE_NORMAL = 0;
     private static final byte TYPE_ENTITY = 1;
 
-    static void save(File worldFolder, Set<LanternLoadingTicket> tickets) throws IOException {
-        File file = new File(worldFolder, TICKETS_FILE);
-        if (!file.exists()) {
-            file.createNewFile();
+    static void save(Path worldFolder, Set<LanternLoadingTicket> tickets) throws IOException {
+        Path file = worldFolder.resolve(TICKETS_FILE);
+        if (!Files.exists(file)) {
+            Files.createFile(file);
         }
 
         Multimap<String, LanternLoadingTicket> sortedByPlugin = HashMultimap.create();
@@ -113,18 +111,16 @@ public class LanternLoadingTicketIO {
                 if (ticket0.extraData != null) {
                     ticketData.set(MOD_DATA, ticket0.extraData);
                 }
-                if (ticket0 instanceof EntityLoadingTicket) {
-                    EntityLoadingTicket ticket1 = (EntityLoadingTicket) ticket0;
-                    Entity entity = ticket1.getBoundEntity();
-                    if (entity != null) {
-                        Vector3i position = LanternGame.get().getServer().getChunkLayout().toChunk(
-                                entity.getLocation().getBlockPosition()).get();
-                        UUID uniqueId = entity.getUniqueId();
+                if (ticket0 instanceof EntityChunkLoadingTicket) {
+                    EntityChunkLoadingTicket ticket1 = (EntityChunkLoadingTicket) ticket0;
+                    ticket1.getOrCreateEntityReference().ifPresent(ref -> {
+                        Vector2i position = ref.getChunkCoords();
+                        UUID uniqueId = ref.getUniqueId();
                         ticketData.set(CHUNK_X, position.getX());
-                        ticketData.set(CHUNK_Z, position.getZ());
+                        ticketData.set(CHUNK_Z, position.getY());
                         ticketData.set(ENTITY_UUID_MOST, uniqueId.getMostSignificantBits());
                         ticketData.set(ENTITY_UUID_LEAST, uniqueId.getLeastSignificantBits());
-                    }
+                    });
                 }
                 ticketEntries.add(ticketData);
             }
@@ -137,19 +133,19 @@ public class LanternLoadingTicketIO {
         DataContainer dataContainer = new MemoryDataContainer()
                 .set(HOLDER_LIST, ticketHolders);
 
-        NbtStreamUtils.write(dataContainer, new FileOutputStream(file), true);
+        NbtStreamUtils.write(dataContainer, new FileOutputStream(file.toFile()), true);
     }
 
-    static Multimap<String, LanternLoadingTicket> load(File worldFolder, LanternChunkManager chunkManager, LanternChunkTicketManager service)
+    static Multimap<String, LanternLoadingTicket> load(Path worldFolder, LanternChunkManager chunkManager, LanternChunkTicketManager service)
             throws IOException {
         Multimap<String, LanternLoadingTicket> tickets = HashMultimap.create();
 
-        File file = new File(worldFolder, TICKETS_FILE);
-        if (!file.exists()) {
+        Path file = worldFolder.resolve(TICKETS_FILE);
+        if (!Files.exists(file)) {
             return tickets;
         }
 
-        DataContainer dataContainer = NbtStreamUtils.read(new FileInputStream(file), true);
+        DataContainer dataContainer = NbtStreamUtils.read(new FileInputStream(file.toFile()), true);
         Set<String> callbacks = service.getCallbacks().keySet();
 
         List<DataView> ticketHolders = dataContainer.getViewList(HOLDER_LIST).get();
@@ -206,7 +202,7 @@ public class LanternLoadingTicketIO {
                     long uuidLeast = ticketEntry.getLong(ENTITY_UUID_LEAST).get();
                     Vector2i chunkCoords = new Vector2i(chunkX, chunkZ);
                     UUID uuid = new UUID(uuidMost, uuidLeast);
-                    ticket0.entityRef = new EntityReference(chunkCoords, uuid);
+                    ticket0.setEntityReference(new EntityReference(chunkCoords, uuid));
                     ticket = ticket0;
                 } else {
                     LanternGame.log().warn("Unknown ticket entry type {} for {}, skipping...", type, holderName);

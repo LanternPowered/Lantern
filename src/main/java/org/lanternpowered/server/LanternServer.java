@@ -28,7 +28,7 @@ package org.lanternpowered.server;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -79,6 +79,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.security.KeyPair;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.Executors;
@@ -222,6 +223,12 @@ public class LanternServer implements Server {
 
     // The amount of ticks the server is running
     private final AtomicInteger runningTimeTicks = new AtomicInteger(0);
+
+    // All the players by their name
+    private final Map<String, LanternPlayer> playersByName = Maps.newConcurrentMap();
+
+    // All the players by their uniqueId
+    private final Map<UUID, LanternPlayer> playersByUUID = Maps.newConcurrentMap();
 
     private Favicon favicon;
     private boolean onlineMode;
@@ -378,9 +385,29 @@ public class LanternServer implements Server {
         return commandSources.build();
     }
 
+    /**
+     * Adds a {@link Player} to the online players lookups.
+     *
+     * @param player the player
+     */
+    public void addPlayer(LanternPlayer player) {
+        this.playersByName.put(player.getName(), player);
+        this.playersByUUID.put(player.getUniqueId(), player);
+    }
+
+    /**
+     * Removes a {@link Player} from the online players lookups.
+     *
+     * @param player the player
+     */
+    public void removePlayer(LanternPlayer player) {
+        this.playersByName.remove(player.getName());
+        this.playersByUUID.remove(player.getUniqueId());
+    }
+
     @Override
     public Collection<Player> getOnlinePlayers() {
-        return Lists.newArrayList();
+        return ImmutableList.copyOf(this.playersByName.values());
     }
 
     @Override
@@ -390,14 +417,12 @@ public class LanternServer implements Server {
 
     @Override
     public Optional<Player> getPlayer(UUID uniqueId) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
+        return Optional.ofNullable(this.playersByUUID.get(checkNotNull(uniqueId, "uniqueId")));
     }
 
     @Override
     public Optional<Player> getPlayer(String name) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
+        return Optional.ofNullable(this.playersByName.get(checkNotNull(name, "name")));
     }
 
     @Override

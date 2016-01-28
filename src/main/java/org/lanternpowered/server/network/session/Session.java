@@ -47,6 +47,10 @@
  */
 package org.lanternpowered.server.network.session;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Sets;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -55,6 +59,7 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.AttributeKey;
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.entity.EntityIdAllocator;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
@@ -73,11 +78,15 @@ import org.lanternpowered.server.network.vanilla.message.type.connection.Message
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayDeque;
+import java.util.Iterator;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -279,12 +288,12 @@ public class Session implements PlayerConnection {
      * @param message the message
      * @return the future
      */
-    public ChannelFuture sendWithFuture(Message message) {
+    public ChannelFuture send(Message message) {
+        checkNotNull(message, "message");
         if (!this.channel.isActive()) {
             // Discard messages sent if we're closed, since this happens a lot
             return null;
         }
-
         return this.channel.writeAndFlush(message).addListener(future -> {
             if (future.cause() != null) {
                 this.onOutboundThrowable(future.cause());
@@ -293,23 +302,18 @@ public class Session implements PlayerConnection {
     }
 
     /**
-     * Sends a message to the client.
-     * 
-     * @param message the message
-     */
-    public void send(Message message) {
-        this.sendWithFuture(message);
-    }
-
-    /**
      * Sends any amount of messages to the client.
      * 
      * @param messages the messages
      */
-    public void sendAll(Message... messages) {
+    public ChannelFuture sendAll(Message... messages) {
+        checkNotNull(messages, "messages");
+        checkArgument(messages.length != 0, "messages cannot be empty");
+        ChannelFuture future = null;
         for (Message message : messages) {
-            this.send(message);
+            future = this.send(message);
         }
+        return future;
     }
 
     /**
@@ -317,10 +321,15 @@ public class Session implements PlayerConnection {
      * 
      * @param messages the messages
      */
-    public void sendAll(Iterable<Message> messages) {
-        for (Message message : messages) {
-            this.send(message);
+    public ChannelFuture sendAll(Iterable<Message> messages) {
+        checkNotNull(messages, "messages");
+        Iterator<Message> it = messages.iterator();
+        checkArgument(it.hasNext(), "messages cannot be empty");
+        ChannelFuture future = null;
+        while (it.hasNext()) {
+            future = this.send(it.next());
         }
+        return future;
     }
 
     /**
@@ -450,12 +459,21 @@ public class Session implements PlayerConnection {
     }
 
     public void spawnPlayer() {
-        
+        this.player = new LanternPlayer(this.gameProfile, this);
+        this.player.setEntityId(EntityIdAllocator.get().poll());
+        // TODO: Which world?
+        LanternWorld world = (LanternWorld) Sponge.getServer().getWorlds().iterator().next();
+        // TODO: Read player data
+        // TODO: User the proper location
+        this.player.setLocation(new Location<>(world, new Vector3d(0, 100, 0)));
     }
 
     public void onDisconnect() {
         LanternGame.log().info("Connection for " + (this.gameProfile == null ? this.channel.remoteAddress().toString() : this.gameProfile.getName())
                 + " disconnected from the server.");
+        if (this.player != null) {
+            this.player.setWorld(null);
+        }
     }
 
     /**
@@ -583,16 +601,16 @@ public class Session implements PlayerConnection {
 
         // Log that the player was kicked/disconnected.
         if (this.player != null) {
-            LanternGame.log().info("{0} kicked: {1}", this.player.getName(), reason);
+            LanternGame.log().info("{} kicked: {}", this.player.getName(), reason);
         } else {
-            LanternGame.log().info("[{0}] kicked: {1}", this.address, reason);
+            LanternGame.log().info("[{}] kicked: {}", this.address, reason);
         }
 
         ProtocolState current = this.getProtocolState();
 
         // Perform the kick, sending a kick message if possible
         if (this.channel.isActive() && (current.equals(ProtocolState.LOGIN) || current.equals(ProtocolState.PLAY))) {
-            this.sendWithFuture(new MessageOutDisconnect(reason)).addListener(ChannelFutureListener.CLOSE);
+            this.send(new MessageOutDisconnect(reason)).addListener(ChannelFutureListener.CLOSE);
         } else {
             this.channel.close();
         }

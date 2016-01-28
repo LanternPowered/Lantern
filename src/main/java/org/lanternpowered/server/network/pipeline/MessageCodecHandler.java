@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
+import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -48,6 +49,7 @@ import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 
 import java.util.List;
+import java.util.Set;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Message> {
@@ -81,6 +83,8 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         output.add(Unpooled.wrappedBuffer(opcode, content));
     }
 
+    private static final Set<Integer> warnedMissingOpcodes = Sets.newConcurrentHashSet();
+
     @Override
     public void decode(ChannelHandlerContext ctx, ByteBuf input, List<Object> output) throws Exception {
         if (input.readableBytes() == 0) {
@@ -95,7 +99,10 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         CodecRegistration registration = protocol.inbound().find(opcode).orElse(null);
 
         if (registration == null) {
-            throw new DecoderException("Failed to find a message registration with opcode " + opcode + " in state " + state.toString() + "!");
+            if (warnedMissingOpcodes.add(opcode)) {
+                LanternGame.log().warn("Failed to find a message registration with opcode {} in state {}!", Integer.toHexString(opcode), state);
+            }
+            return;
         }
 
         // Copy the remaining content of the buffer to a new buffer used by the

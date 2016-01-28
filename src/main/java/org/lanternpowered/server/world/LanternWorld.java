@@ -33,8 +33,8 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
@@ -43,6 +43,7 @@ import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.effect.sound.SoundCategory;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
@@ -63,8 +64,8 @@ import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.lanternpowered.server.world.rules.Rule;
-import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.rules.RuleHolder;
+import org.lanternpowered.server.world.rules.RuleType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -121,6 +122,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -154,8 +156,17 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The weather universe
     @Nullable final LanternWeatherUniverse weatherUniverse;
 
+    // All the players in this world
+    private final Set<LanternPlayer> players = Sets.newConcurrentHashSet();
+
     // The chunk manager of this world
     private final LanternChunkManager chunkManager;
+
+    /**
+     * The chunk manager that will allows observers to track
+     * changes in chunks.
+     */
+    private final ObservedChunkManager observedChunkManager = new ObservedChunkManager(this);
 
     // The dimension instance attached to this world
     private final Dimension dimension;
@@ -177,7 +188,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder.toFile(), properties);
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder, properties);
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type
@@ -197,6 +208,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Finally, create the chunk manager
         this.chunkManager = new LanternChunkManager(this.game, this, this.worldConfig, chunkLoadService,
                 chunkIOService, worldGenerator, worldFolder);
+    }
+
+    public ObservedChunkManager getObservedChunkManager() {
+        return this.observedChunkManager;
     }
 
     public void initialize() {
@@ -245,7 +260,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
-                    this.chunkManager.getOrCreateChunk(x, z, Cause.of(this.game.getMinecraftPlugin()), true);
+                    this.chunkManager.getOrCreateChunk(x, z, () -> Cause.of(this, this.game.getMinecraftPlugin()), true);
                     this.spawnLoadingTicket.forceChunk(new Vector3i(x, 0, z));
                 }
             }
@@ -261,8 +276,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
      * 
      * @return the players
      */
-    public List<LanternPlayer> getPlayers() {
-        return Lists.newArrayList();
+    public Set<LanternPlayer> getPlayers() {
+        return this.players;
+    }
+
+    public void addPlayer(LanternPlayer player) {
+        this.players.add(player);
+    }
+
+    public void removePlayer(LanternPlayer player) {
+        this.players.remove(player);
     }
 
     /**
@@ -288,7 +311,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
         if (chunk != null) {
-            return chunk.getScheduledUpdates(x & 0xf, y, z & 0xf);
+            return chunk.getScheduledUpdates(x, y, z);
         }
         return ImmutableSet.of();
     }
@@ -399,7 +422,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x & 0xf, y, z & 0xf, block);
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, block);
     }
 
     @Override
@@ -409,7 +432,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBlock(x & 0xf, y, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBlock(x, y, z);
     }
 
     @Override
@@ -419,7 +442,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBiome(x & 0xf, z & 0xf, biome);
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBiome(x, z, biome);
     }
 
     @Override
@@ -459,27 +482,27 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public BiomeType getBiome(int x, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBiome(x & 0xf, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBiome(x, z);
     }
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x & 0xf, y, z & 0xf, block, notifyNeighbors);
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, block, notifyNeighbors);
     }
 
     @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).createSnapshot(x & 0xf, y, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).createSnapshot(x, y, z);
     }
 
     @Override
     public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).restoreSnapshot(x & 0xf, y, z & 0xf, snapshot, force, notifyNeighbors);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
     }
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(new Vector3i(x & 0xf, y, z & 0xf),
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(new Vector3i(x, y, z),
                 direction, propertyClass);
     }
 
@@ -491,130 +514,127 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(x & 0xf, y, z & 0xf, propertyClass);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(x, y, z, propertyClass);
     }
 
     @Override
     public Collection<Property<?, ?>> getProperties(int x, int y, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperties(x & 0xf, y, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperties(x, y, z);
     }
 
     @Override
     public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).get(x & 0xf, y, z & 0xf, key);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).get(x, y, z, key);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> get(int x, int y, int z, Class<T> manipulatorClass) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).get(x & 0xf, y, z & 0xf, manipulatorClass);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).get(x, y, z, manipulatorClass);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(int x, int y, int z, Class<T> manipulatorClass) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrCreate(x & 0xf, y, z & 0xf, manipulatorClass);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrCreate(x, y, z, manipulatorClass);
     }
 
     @Override
     public <E> E getOrNull(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrNull(x & 0xf, y, z & 0xf, key);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrNull(x, y, z, key);
     }
 
     @Override
     public <E> E getOrElse(int x, int y, int z, Key<? extends BaseValue<E>> key, E defaultValue) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrElse(x & 0xf, y, z & 0xf, key, defaultValue);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getOrElse(x, y, z, key, defaultValue);
     }
 
     @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValue(x & 0xf, y, z & 0xf, key);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValue(x, y, z, key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Key<?> key) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, key);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x, y, z, key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, BaseValue<?> value) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, value);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x, y, z, value);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, manipulatorClass);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x, y, z, manipulatorClass);
     }
 
     @Override
     public boolean supports(int x, int y, int z, DataManipulator<?, ?> manipulator) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x & 0xf, y, z & 0xf, manipulator);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).supports(x, y, z, manipulator);
     }
 
     @Override
     public ImmutableSet<Key<?>> getKeys(int x, int y, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getKeys(x & 0xf, y, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getKeys(x, y, z);
     }
 
     @Override
     public ImmutableSet<ImmutableValue<?>> getValues(int x, int y, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValues(x & 0xf, y, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getValues(x, y, z);
     }
 
     @Override
     public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).transform(x & 0xf, y, z & 0xf, key, function);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).transform(x, y, z, key, function);
     }
 
     @Override
     public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, key, value);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, key, value);
     }
 
     @Override
     public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, value);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, value);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, manipulator);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, manipulator);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, manipulator, function);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, manipulator, function);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, Iterable<DataManipulator<?, ?>> manipulators) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x & 0xf, y, z & 0xf, manipulators);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, manipulators);
     }
 
     @Override
     public DataTransactionResult offer(Vector3i coords, Iterable<DataManipulator<?, ?>> values, MergeFunction function) {
-        int x = coords.getX();
-        int y = coords.getY();
-        int z = coords.getZ();
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(new Vector3i(x & 0xf, y, z & 0xf), values, function);
+        return this.chunkManager.getOrLoadChunk(coords.getX() >> 4, coords.getZ() >> 4).offer(coords, values, function);
     }
 
     @Override
     public DataTransactionResult remove(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).remove(x & 0xf, y, z & 0xf, manipulatorClass);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).remove(x, y, z, manipulatorClass);
     }
 
     @Override
     public DataTransactionResult remove(int x, int y, int z, Key<?> key) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).remove(x & 0xf, y, z & 0xf, key);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).remove(x, y, z, key);
     }
 
     @Override
     public DataTransactionResult undo(int x, int y, int z, DataTransactionResult result) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).undo(x & 0xf, y, z & 0xf, result);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).undo(x, y, z, result);
     }
 
     @Override
     public DataTransactionResult copyFrom(int x, int y, int z, DataHolder from) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).copyFrom(x & 0xf, y, z & 0xf, from);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).copyFrom(x, y, z, from);
     }
 
     @Override
@@ -625,7 +645,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public DataTransactionResult copyFrom(int x, int y, int z, DataHolder from, MergeFunction function) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).copyFrom(x & 0xf, y, z & 0xf, from, function);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).copyFrom(x, y, z, from, function);
     }
 
     @Override
@@ -636,17 +656,17 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Collection<DataManipulator<?, ?>> getManipulators(int x, int y, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getManipulators(x & 0xf, y, z & 0xf);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getManipulators(x, y, z);
     }
 
     @Override
     public boolean validateRawData(int x, int y, int z, DataView container) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).validateRawData(x & 0xf, y, z & 0xf, container);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).validateRawData(x, y, z, container);
     }
 
     @Override
     public void setRawData(int x, int y, int z, DataView container) throws InvalidDataException {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setRawData(x & 0xf, y, z & 0xf, container);
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setRawData(x, y, z, container);
     }
 
     @Override
@@ -722,8 +742,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
-        List<LanternPlayer> players = this.getPlayers();
-        if (!players.isEmpty()) {
+        if (!this.players.isEmpty()) {
             Message message;
             final OptionalInt eventId = ((LanternSoundType) sound).getEventId();
             if (eventId.isPresent()) {
@@ -733,7 +752,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
                 message = new MessagePlayOutNamedSoundEffect(sound.getName(), position,
                         SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
             }
-            for (LanternPlayer player : players) {
+            for (LanternPlayer player : this.players) {
                 player.getConnection().send(message);
             }
         }
@@ -741,10 +760,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void sendMessage(ChatType type, Text message) {
-        List<LanternPlayer> players = this.getPlayers();
-        if (!players.isEmpty()) {
+        if (!this.players.isEmpty()) {
             final Map<Locale, Message> netwMessages = Maps.newHashMap();
-            for (LanternPlayer player : players) {
+            for (LanternPlayer player : this.players) {
                 player.getConnection().send(netwMessages.computeIfAbsent(player.getLocale(),
                         locale -> new MessagePlayOutChatMessage(new LocalizedText(message, locale), type)));
             }
@@ -754,10 +772,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public void sendTitle(Title title) {
         checkNotNull(title, "title");
-        List<LanternPlayer> players = this.getPlayers();
-        if (!players.isEmpty()) {
+        if (!this.players.isEmpty()) {
             List<Message> networkMessages = LanternTitles.getMessages(title);
-            players.forEach(player -> player.getConnection().sendAll(networkMessages));
+            this.players.forEach(player -> player.getConnection().sendAll(networkMessages));
         }
     }
 
@@ -810,8 +827,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             return Optional.empty();
         }
         if (generate) {
-            return Optional.of(this.chunkManager.getOrCreateChunk(
-                    new Vector2i(x, z), Cause.of(this), generate));
+            return Optional.of(this.chunkManager.getOrCreateChunk(new Vector2i(x, z), () -> Cause.of(this), generate));
         } else {
             return Optional.ofNullable(this.chunkManager.getChunk(x, z));
         }
@@ -897,7 +913,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Location<World> getSpawnLocation() {
-        return new Location<World>(this, this.properties.getSpawnPosition());
+        return new Location<>(this, this.properties.getSpawnPosition());
     }
 
     @Override
@@ -937,6 +953,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         if (this.weatherUniverse != null) {
             this.weatherUniverse.pulse();
         }
+        // TODO: This is temporarily, pulses will be given to all
+        // entities in the future and it will be chunk based
+        this.players.forEach(player -> player.pulse());
+        // TODO: Maybe async?
+        this.observedChunkManager.pulse();
     }
 
     public void broadcast(Supplier<Message> message) {
@@ -944,9 +965,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     public void broadcast(Supplier<Message> message, @Nullable Predicate<LanternPlayer> filter) {
-        List<LanternPlayer> players = this.getPlayers();
+        Set<LanternPlayer> players = this.getPlayers();
         if (filter != null) {
-            players = players.stream().filter(filter).collect(Collectors.toList());
+            players = players.stream().filter(filter).collect(Collectors.toSet());
         }
         if (players.isEmpty()) {
             return;

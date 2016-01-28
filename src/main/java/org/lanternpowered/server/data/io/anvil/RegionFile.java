@@ -75,9 +75,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -106,16 +107,16 @@ public class RegionFile {
     private int sizeDelta;
     private long lastModified = 0;
 
-    public RegionFile(File path) throws IOException {
+    public RegionFile(Path path) throws IOException {
         offsets = new int[SECTOR_INTS];
         chunkTimestamps = new int[SECTOR_INTS];
         sizeDelta = 0;
 
-        if (path.exists()) {
-            lastModified = path.lastModified();
+        if (Files.isRegularFile(path)) {
+            lastModified = Files.getLastModifiedTime(path).toMillis();
         }
 
-        file = new RandomAccessFile(path, "rw");
+        file = new RandomAccessFile(path.toFile(), "rw");
         // seek to the end to prepare size checking
         file.seek(file.length());
 
@@ -224,7 +225,8 @@ public class RegionFile {
             return new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
         }
 
-        throw new IOException("Unknown version: " + version);
+        LanternGame.log().info("Unknown version ({}) in region file, possibly corrupt?", version);
+        return null;
     }
 
     public DataOutputStream getChunkDataOutputStream(int x, int z) {

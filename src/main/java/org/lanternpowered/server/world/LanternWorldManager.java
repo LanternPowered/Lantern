@@ -594,6 +594,12 @@ public final class LanternWorldManager {
         }
         // The world is ready for ticks
         this.addWorldTask(world);
+        // Load the chunk loading tickets, they may load some chunks
+        try {
+            world.getChunkManager().loadTickets();
+        } catch (IOException e) {
+            LanternGame.log().warn("An error occurred while loading the chunk loading tickets", e);
+        }
         return Optional.of(world);
     }
 

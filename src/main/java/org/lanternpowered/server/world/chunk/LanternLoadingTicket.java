@@ -126,29 +126,39 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
 
     @Override
     public void forceChunk(Vector3i chunk) {
+        this.forceChunk(checkNotNull(chunk, "chunk").toVector2(true));
+    }
+
+    @Override
+    public void forceChunk(Vector2i chunk) {
+        checkNotNull(chunk, "chunk");
         if (this.released) {
             LanternGame.log().warn("The plugin {} attempted to force load a chunk with an invalid ticket. "
                     + "This is not permitted.", this.plugin);
             return;
         }
-        Vector2i chunk0 = checkNotNull(chunk, "chunk").toVector2(true);
         // Only force if not done before
-        if (!this.queue.contains(chunk0)) {
+        if (!this.queue.contains(chunk)) {
             // Remove the oldest chunk if necessary
             if (this.queue.size() >= this.numChunks) {
                 this.chunkManager.unforce(this, this.queue.poll());
             }
-            this.queue.add(chunk0);
-            this.chunkManager.force(this, chunk0);
+            this.queue.add(chunk);
+            this.chunkManager.force(this, chunk);
         }
     }
 
     @Override
     public void unforceChunk(Vector3i chunk) {
+        this.unforceChunk(checkNotNull(chunk, "chunk").toVector2(true));
+    }
+
+    @Override
+    public void unforceChunk(Vector2i chunk) {
+        final Vector2i chunk0 = checkNotNull(chunk, "chunk");
         if (this.released) {
             return;
         }
-        final Vector2i chunk0 = checkNotNull(chunk, "chunk").toVector2(true);
         if (this.queue.remove(chunk0)) {
             this.chunkManager.unforce(this, chunk0);
         }
@@ -165,11 +175,17 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
+    public boolean isReleased() {
+        return this.released;
+    }
+
+    @Override
     public void prioritizeChunk(Vector3i chunk) {
+        checkNotNull(chunk, "chunk");
         if (this.released) {
             return;
         }
-        final Vector2i chunk0 = checkNotNull(chunk, "chunk").toVector2(true);
+        final Vector2i chunk0 = chunk.toVector2(true);
         // Move the chunk to the bottom of the queue if found
         if (this.queue.remove(chunk0)) {
             this.queue.add(chunk0);

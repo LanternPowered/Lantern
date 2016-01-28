@@ -44,7 +44,7 @@ public final class SerializerText implements ValueSerializer<Text> {
 
     @Override
     public void write(SerializerContext context, ByteBuf buf, Text object) throws CodecException {
-        context.write(buf, Types.STRING, GSON.toJson(object));
+        context.write(buf, Types.STRING, fixJson(GSON.toJson(object)));
     }
 
     @Override
@@ -53,6 +53,23 @@ public final class SerializerText implements ValueSerializer<Text> {
             return GSON.fromJson(context.read(buf, Types.STRING), Text.class);
         } catch (JsonSyntaxException e) {
             throw new CodecException(e);
+        }
+    }
+
+    /**
+     * The client doesn't like it when the server just sends a
+     * primitive json string, so we put it as one entry in an array
+     * to avoid errors.
+     *
+     * @param json the json
+     * @return the result json
+     */
+    static String fixJson(String json) {
+        char start = json.charAt(0);
+        if (start == '[' || start == '{') {
+            return json;
+        } else {
+            return '[' + json + ']';
         }
     }
 }

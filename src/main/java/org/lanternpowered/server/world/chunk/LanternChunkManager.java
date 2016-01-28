@@ -27,6 +27,7 @@ package org.lanternpowered.server.world.chunk;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
+import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_AREA;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_HEIGHT;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTIONS;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_SIZE;
@@ -35,15 +36,20 @@ import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_ARE
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
+import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.util.SoftThreadLocal;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
@@ -54,13 +60,15 @@ import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.extent.ExtentBufferHelper;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.world.chunk.ForcedChunkEvent;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
@@ -77,28 +85,48 @@ import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GenerationPopulator;
+import org.spongepowered.api.world.gen.Populator;
 import org.spongepowered.api.world.gen.WorldGenerator;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Future;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 public final class LanternChunkManager {
 
-    // The maximum amount of chunks that may be loaded during
-    // a game tick
-    private static final int CHUNK_LOADING_LIMIT = 100;
+    // The maximum amount of threads that can load chunks asynchronously
+    private static final int CHUNK_LOADING_MAX_POOL_SIZE = Integer.MAX_VALUE;
+
+    // The core amount of threads that can load chunks asynchronously
+    private static final int CHUNK_LOADING_CORE_POOL_SIZE = 4;
+
+    // The delay to unload chunks that are not forced,
+    // loaded through loadChunk methods
+    private static final long UNLOAD_DELAY = TimeUnit.SECONDS.toMillis(1);
 
     // All the attached tickets mapped by the forced chunk coordinates
-    private final Map<Vector2i, Set<LanternLoadingTicket>> ticketsByPos = Maps.newConcurrentMap();
+    private final Map<Vector2i, Set<ChunkLoadingTicket>> ticketsByPos = Maps.newConcurrentMap();
 
     // All the loading tickets that are still usable
     private final Set<LanternLoadingTicket> tickets = Sets.newConcurrentHashSet();
@@ -110,8 +138,155 @@ public final class LanternChunkManager {
     // so much after all, because of active references to the chunk
     private final Map<Vector2i, LanternChunk> reusableChunks = new MapMaker().weakValues().makeMap();
 
-    // A queue of all the chunks that should be loaded
-    private final ConcurrentLinkedQueue<Vector2i> forcedChunkLoadingQueue = new ConcurrentLinkedQueue<>();
+    // A set which contains chunks that are pending for removal,
+    // chunks loaded by loadChunk may not have been locked in the process,
+    // and using a queue for removal should prevent the chunks from unloading too early
+    private final Queue<UnloadingChunkEntry> pendingForUnload = new ConcurrentLinkedQueue<>();
+
+    private class UnloadingChunkEntry {
+
+        final Vector2i coords;
+        final long time;
+
+        private UnloadingChunkEntry(Vector2i coords) {
+            this.time = System.currentTimeMillis();
+            this.coords = coords;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            return obj instanceof UnloadingChunkEntry && ((UnloadingChunkEntry) obj).coords.equals(this.coords);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.coords.hashCode();
+        }
+    }
+
+    // All the futures that will cause chunk loading/unloading, they are stored
+    // here to allow them to be cancelled
+    private final Map<Vector2i, LanternChunkQueueTask> chunkQueueTasks = Maps.newConcurrentMap();
+
+    // The chunk load executor
+    private final ThreadPoolExecutor chunkTaskExecutor = new ThreadPoolExecutor(
+            CHUNK_LOADING_CORE_POOL_SIZE, CHUNK_LOADING_MAX_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+
+    // Some objects that can be used in {@link Chunk} population.
+    private class PopulationData {
+
+        private final Random random = new Random();
+        private final ChunkLoadingTicket lockTicket = new InternalLoadingTicket();
+    }
+
+    private LanternChunkQueueTask queueTask(Vector2i coords, Runnable runnable) {
+        final LanternChunkQueueTask task = new LanternChunkQueueTask(coords, runnable);
+        task.setFuture(this.chunkTaskExecutor.submit(task));
+        return task;
+    }
+
+    private class LanternChunkQueueTask implements Callable<Void> {
+
+        private final Vector2i coords;
+        // The runnable that should be executed
+        private final Runnable runnable;
+        // The future attached to this callable
+        @Nullable private Future<Void> future;
+
+        public LanternChunkQueueTask(Vector2i coords, Runnable runnable) {
+            this.runnable = runnable;
+            this.coords = coords;
+        }
+
+        public void setFuture(Future<Void> future) {
+            if (this.future != null) {
+                throw new IllegalStateException();
+            }
+            this.future = future;
+            synchronized (this) {
+                this.notifyAll();
+            }
+        }
+
+        @Override
+        public Void call() throws Exception {
+            // Wait for the future to be set, in case it's getting directly executed
+            synchronized (this) {
+                while (this.future == null) {
+                    this.wait();
+                }
+            }
+            this.runnable.run();
+            this.future = null;
+            return null;
+        }
+
+        public boolean cancel() {
+            // We have to wait for the future to be set before we
+            // can cancel it, shouldn't be long
+            synchronized (this) {
+                while (this.future == null) {
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                    }
+                }
+            }
+            return this.future.cancel(false);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            return other instanceof LanternChunkQueueTask && ((LanternChunkQueueTask) other).coords.equals(this.coords);
+        }
+
+        @Override
+        public int hashCode() {
+            return this.coords.hashCode();
+        }
+    }
+
+    private class LanternChunkUnloadTask implements Runnable {
+
+        // The callable that is bound to the unloading task
+        private final LanternChunkQueueTask callable;
+
+        private LanternChunkUnloadTask(LanternChunkQueueTask callable) {
+            this.callable = callable;
+        }
+
+        @Override
+        public void run() {
+            unload0(this.callable.coords, () -> Cause.of(world), false);
+        }
+    }
+
+    private class LanternChunkLoadTask implements Runnable {
+
+        // The coordinates of the chunk
+        private final Vector2i coords;
+
+        private LanternChunkLoadTask(Vector2i coords) {
+            this.coords = coords;
+        }
+
+        @Override
+        public void run() {
+            doChunkLoad(this.coords);
+        }
+    }
+
+    private void doChunkLoad(Vector2i coords) {
+        final Set<ChunkLoadingTicket> tickets = ticketsByPos.get(coords);
+        if (tickets == null) {
+            return;
+        }
+        // Chunk may be null if's already being loaded by a different thread.
+        final LanternChunk chunk = getOrCreateChunk(coords, () -> {
+            // Build the cause only if the chunk isn't already loaded
+            return Cause.of(world, tickets.toArray(new Object[tickets.size()]));
+        }, true, false);
+    }
 
     // The game instance
     private final LanternGame game;
@@ -131,16 +306,17 @@ public final class LanternChunkManager {
     // The world folder
     private final Path worldFolder;
 
-    // The biome buffers that will be reused
-    private final ThreadLocal<ChunkBiomeBuffer> biomeBuffer = ThreadLocal.withInitial(() -> {
-                final ChunkBiomeBuffer buffer = new ChunkBiomeBuffer(
-                        Vector2i.ZERO, CHUNK_AREA_SIZE);
-                buffer.detach();
-                return buffer;
-            });
+    private class GenerationBuffers {
 
-    // The block buffers that will be reused
-    private final ThreadLocal<ChunkBlockBuffer> blockBuffer = ThreadLocal.withInitial(ChunkBlockBuffer::new);
+        final ChunkBiomeBuffer chunkBiomeBuffer = new ChunkBiomeBuffer();
+        final ChunkBlockBuffer chunkBlockBuffer = new ChunkBlockBuffer();
+    }
+
+    // The world generation buffers that will be reused
+    private final SoftThreadLocal<GenerationBuffers> genBuffers = SoftThreadLocal.withInitial(GenerationBuffers::new);
+
+    // The randoms that will be shared for population
+    private final SoftThreadLocal<PopulationData> populationData = SoftThreadLocal.withInitial(PopulationData::new);
 
     // The world generator
     private volatile WorldGenerator worldGenerator;
@@ -217,10 +393,10 @@ public final class LanternChunkManager {
     public ImmutableSetMultimap<Vector3i, LoadingTicket> getForced() {
         final ImmutableSetMultimap.Builder<Vector3i, LoadingTicket> builder =
                 ImmutableSetMultimap.builder();
-        for (Entry<Vector2i, Set<LanternLoadingTicket>> en : this.ticketsByPos.entrySet()) {
+        for (Entry<Vector2i, Set<ChunkLoadingTicket>> en : this.ticketsByPos.entrySet()) {
             final Vector2i pos0 = en.getKey();
             final Vector3i pos = new Vector3i(pos0.getX(), 0, pos0.getY());
-            for (LanternLoadingTicket ticket : en.getValue()) {
+            for (ChunkLoadingTicket ticket : en.getValue()) {
                 builder.put(pos, ticket);
             }
         }
@@ -389,13 +565,33 @@ public final class LanternChunkManager {
     /**
      * Gets a chunk for the coordinates,
      * may not be loaded yet.
-     * 
+     *
      * @param coords the coordinates
      * @return the chunk if loaded, otherwise null
      */
     @Nullable
     public LanternChunk getChunk(Vector2i coords) {
-        return this.loadedChunks.get(checkNotNull(coords, "coords"));
+        return this.getChunk(coords, true);
+    }
+
+    @Nullable
+    public LanternChunk getChunkIfLoaded(Vector2i coords) {
+        final LanternChunk chunk = this.loadedChunks.get(checkNotNull(coords, "coords"));
+        if (chunk != null && !chunk.loaded) {
+            return null;
+        }
+        return chunk;
+    }
+
+    @Nullable
+    private LanternChunk getChunk(Vector2i coords, boolean wait) {
+        final LanternChunk chunk = this.loadedChunks.get(checkNotNull(coords, "coords"));
+        if (wait && chunk != null && !chunk.loaded &&
+                chunk.lockState == LanternChunk.LockState.LOADING) {
+            // Wait for the chunk to finish loading
+            chunk.lockCondition.awaitUninterruptibly();
+        }
+        return chunk;
     }
 
     /**
@@ -433,7 +629,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrCreateChunk(int x, int z, boolean generate) {
-        return this.getOrCreateChunk(x, z, Cause.of(this.world), generate);
+        return this.getOrCreateChunk(x, z, () -> Cause.of(this.world), generate);
     }
 
     /**
@@ -444,7 +640,7 @@ public final class LanternChunkManager {
      * @param z the z coordinate
      * @return the chunk
      */
-    public LanternChunk getOrCreateChunk(int x, int z, Cause cause, boolean generate) {
+    public LanternChunk getOrCreateChunk(int x, int z, Supplier<Cause> cause, boolean generate) {
         return this.getOrCreateChunk(new Vector2i(x, z), cause, generate);
     }
 
@@ -457,69 +653,325 @@ public final class LanternChunkManager {
      * @param generate whether the chunk should be generated if missing
      * @return the chunk
      */
-    public LanternChunk getOrCreateChunk(Vector2i coords, Cause cause, boolean generate) {
+    public LanternChunk getOrCreateChunk(Vector2i coords, Supplier<Cause> cause, boolean generate) {
+        return this.getOrCreateChunk(coords, cause, generate, true);
+    }
+
+    /**
+     *
+     * @param coords the coordinates of the chunk to load
+     * @param cause a supplier of the cause that triggered the chunk load
+     * @param generate whether the chunk should be generated if not found
+     * @param wait whether the current thread should wait for the loading to finish, this should only
+     *             be internally used inside the chunk manager
+     * @return the chunk
+     */
+    private LanternChunk getOrCreateChunk(Vector2i coords, Supplier<Cause> cause, boolean generate, boolean wait) {
         checkNotNull(cause, "cause");
         LanternChunk chunk = this.loadedChunks.get(checkNotNull(coords, "coords"));
         // Chunk is already loaded
         if (chunk != null) {
+            if (!this.ticketsByPos.containsKey(coords)) {
+                this.pendingForUnload.add(new UnloadingChunkEntry(coords));
+            }
             return chunk;
         }
-        // Lets try to visit the graveyard
+        // Lets try to visit the graveyard, try to retrieve chunks that where
+        // not gc yet, allowing us to reuse them to avoid loading a new chunk
         chunk = this.reusableChunks.get(coords);
         if (chunk != null) {
             this.loadedChunks.put(coords, chunk);
+            this.reusableChunks.remove(coords);
+            this.tryChunkForceEvents(coords, chunk);
+            if (!this.ticketsByPos.containsKey(coords)) {
+                this.pendingForUnload.add(new UnloadingChunkEntry(coords));
+            }
+            this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause.get(), chunk));
             return chunk;
         }
+        boolean[] newChunk = new boolean[1];
         // Finally, create a new chunk if needed
-        chunk = new LanternChunk(this.world, coords.getX(), coords.getY());
-        final LanternChunk chunk0 = this.loadedChunks.putIfAbsent(coords, chunk);
-        if (chunk0 != null) {
-            return chunk0;
+        chunk = this.loadedChunks.computeIfAbsent(coords, coords0 -> {
+            newChunk[0] = true;
+            return new LanternChunk(this.world, coords.getX(), coords.getY());
+        });
+        // This method call was too late
+        if (!newChunk[0]) {
+            // If the chunk is already loaded, just return it
+            if (chunk.loaded) {
+                return chunk;
+            }
+            if (chunk.lockState == LanternChunk.LockState.LOADING) {
+                // Don't bother waiting for the chunk to finish
+                if (!wait) {
+                    return chunk;
+                }
+                // Wait for the chunk to finish loading
+                chunk.lockCondition.awaitUninterruptibly();
+            }
+            // Loading is not triggered?
+            return chunk;
         }
+        // Try to load the chunk
         this.load(chunk, cause, generate);
+        this.tryChunkForceEvents(coords, chunk);
+        if (!this.ticketsByPos.containsKey(coords)) {
+            this.pendingForUnload.add(new UnloadingChunkEntry(coords));
+        }
         return chunk;
+    }
+
+    /**
+     * Calls the force chunk events that are triggered by loading tickets, we
+     * had to wait to the point that the chunk was actually loaded before we
+     * could call this events.
+     *
+     * @param coords the coordinates of the chunk
+     * @param chunk the chunk instance
+     */
+    private void tryChunkForceEvents(Vector2i coords, LanternChunk chunk) {
+        final Set<ChunkLoadingTicket> tickets = ticketsByPos.get(coords);
+        if (tickets == null || tickets.isEmpty()) {
+            return;
+        }
+        final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
+        for (LoadingTicket ticket : tickets) {
+            this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
+                    Cause.of(this.world, ticket), coords0, chunk, ticket));
+        }
+    }
+
+    private static final int UP = 0;
+    private static final int DOWN = 1;
+    private static final int RIGHT = 2;
+    private static final int RIGHT_UP = 3;
+    private static final int RIGHT_DOWN = 4;
+    private static final int LEFT = 5;
+    private static final int LEFT_UP = 6;
+    private static final int LEFT_DOWN = 7;
+
+    private static Vector2i[] getSides(Vector2i center) {
+        final Vector2i[] sides = new Vector2i[8];
+        sides[UP] = center.add(0, 1);
+        sides[DOWN] = center.add(0, -1);
+        sides[RIGHT] = center.add(1, 0);
+        sides[RIGHT_UP] = center.add(1, 1);
+        sides[RIGHT_DOWN] = center.add(1, -1);
+        sides[LEFT] = center.add(-1, 0);
+        sides[LEFT_UP] = center.add(-1, 1);
+        sides[LEFT_DOWN] = center.add(-1, -1);
+        return sides;
+    }
+
+    /**
+     * This is taken from the {@link Populator} class to give a bit more info
+     * about what we are trying here to achieve.
+     *
+     * +----------+----------+ . . The chunk provided as a parameter
+     * |          |          | . . to this method.
+     * |          |          |
+     * |     #####|#####     | ### The area you (the populator) should populate.
+     * |     #####|#####     | ###
+     * +----------+----------+
+     * | . . #####|#####     |
+     * | . . #####|#####     |
+     * | . . . . .|          |
+     * | . . . . .|          |
+     * +----------+----------+
+     *
+     * @param chunk the chunk
+     */
+    private void tryPopulateSurroundingChunks(LanternChunk chunk, Cause cause) {
+        final Vector2i pos = chunk.chunkPos;
+        final Vector2i[] sides = getSides(pos);
+        final PopulationData populationData = this.populationData.get();
+        final Random random = populationData.random;
+        // TODO: Populating must be done in the sync thread???
+        for (Vector2i side : sides) {
+            this.lockInternally(side, populationData.lockTicket);
+        }
+        LanternChunk up = this.isChunkLoaded(sides[UP]);
+        LanternChunk right = this.isChunkLoaded(sides[RIGHT]);
+        LanternChunk rightUp = this.isChunkLoaded(sides[RIGHT_UP]);
+        if (up != null && right != null && rightUp != null) {
+            if (!chunk.populating && !chunk.populated) {
+                this.populateChunk(chunk, cause, random);
+            }
+        }
+        LanternChunk left = this.isChunkLoaded(sides[LEFT]);
+        LanternChunk leftDown = this.isChunkLoaded(sides[LEFT_DOWN]);
+        LanternChunk down = this.isChunkLoaded(sides[DOWN]);
+        if (leftDown != null && left != null && down != null) {
+            if (!leftDown.populating && !leftDown.populated) {
+                this.populateChunk(leftDown, cause, random);
+            }
+        }
+        if (up == null) { // Maybe it is loaded by now?
+            up = this.isChunkLoaded(sides[UP]);
+        }
+        if (left == null) { // Maybe it is loaded by now?
+            left = this.isChunkLoaded(sides[LEFT]);
+        }
+        LanternChunk leftUp = this.isChunkLoaded(sides[LEFT_UP]);
+        if (left != null && leftUp != null && up != null) {
+            if (!left.populating && !left.populated) {
+                this.populateChunk(left, cause, random);
+            }
+        }
+        if (right == null) { // Maybe it is loaded by now?
+            right = this.isChunkLoaded(sides[RIGHT]);
+        }
+        if (down == null) { // Maybe it is loaded by now?
+            down = this.isChunkLoaded(sides[DOWN]);
+        }
+        LanternChunk rightDown = this.isChunkLoaded(sides[RIGHT_DOWN]);
+        if (down != null && rightDown != null && right != null) {
+            if (!down.populating && !down.populated) {
+                this.populateChunk(down, cause, random);
+            }
+        }
+        for (Vector2i side : sides) {
+            this.unlockInternally(side, populationData.lockTicket);
+        }
+    }
+
+    private void populateChunk(LanternChunk chunk, Cause cause, Random random) {
+        chunk.populating = true;
+
+        // Populate
+        int chunkX = chunk.getX() * 16;
+        int chunkZ = chunk.getZ() * 16;
+        long worldSeed = this.world.getProperties().getSeed();
+        random.setSeed(worldSeed);
+        long xSeed = random.nextLong() / 2 * 2 + 1;
+        long zSeed = random.nextLong() / 2 * 2 + 1;
+        long chunkSeed = xSeed * chunkX + zSeed * chunkZ ^ worldSeed;
+        random.setSeed(chunkSeed);
+
+        // Using the biome at an arbitrary point within the chunk
+        // ({16, 0, 16} in the vanilla game)
+        final BiomeType biomeType = chunk.getWorld().getBiome(chunkX + 16, chunkZ + 16);
+
+        // Get the generation settings
+        final BiomeGenerationSettings biomeGenSettings = this.worldGenerator.getBiomeSettings(biomeType);
+
+        final List<Populator> populators = new LinkedList<>(biomeGenSettings.getPopulators());
+        populators.addAll(this.worldGenerator.getPopulators());
+
+        final EventManager eventManager = Sponge.getEventManager();
+
+        // Call the pre populate event, this allows
+        // modifications to the populators list
+        // Called before a chunk begins populating. (javadoc)
+        eventManager.post(SpongeEventFactory.createPopulateChunkEventPre(cause, populators, chunk));
+
+        // First populate the chunk with the biome populators
+        for (Populator populator : populators) {
+            // Called when a populator is about to run against a chunk. (javadoc)
+            eventManager.post(SpongeEventFactory.createPopulateChunkEventPopulate(cause, populator, chunk));
+            populator.populate(chunk, random);
+        }
+
+        // Called when a chunk finishes populating. (javadoc)
+        // TODO: Capture the block transactions for every populator and add them to the event
+        eventManager.post(SpongeEventFactory.createPopulateChunkEventPost(cause, Collections.emptyMap(), chunk));
+
+        // We are done
+        chunk.populated = true;
+        chunk.populating = false;
+    }
+
+    @Nullable
+    private LanternChunk isChunkLoaded(Vector2i pos) {
+        final LanternChunk chunk = this.getChunk(pos, false);
+        return chunk != null && chunk.loaded ? chunk : null;
     }
 
     /**
      * Loads the specified chunk and attempts to generate it if not done before
      * if {@code generate} is set to {@code true}.
-     * 
+     *
      * @param chunk the chunk to load
      * @param cause the cause
      * @param generate whether the chunk should be generated if missing
      * @return true if it was successful
      */
-    public boolean load(LanternChunk chunk, Cause cause, boolean generate) {
+    public boolean load(LanternChunk chunk, Supplier<Cause> cause, boolean generate) {
+        return this.load0(chunk, cause, generate, true);
+    }
+
+    private boolean load0(LanternChunk chunk, Supplier<Cause> cause, boolean generate, boolean wait) {
         checkNotNull(chunk, "chunk");
         checkNotNull(cause, "cause");
-        try {
-            // Try to load the chunk
-            if (this.chunkIOService.read(chunk)) {
-                this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause, chunk));
+        if (chunk.loaded) {
+            return chunk.loadingSuccess;
+        }
+        // The chunk is already getting lock by a different thread,
+        // wait for the task to finish
+        if (!chunk.lock.tryLock()) {
+            if (chunk.lockState == LanternChunk.LockState.LOADING) {
+                if (wait) {
+                    // Wait for the chunk to finish loading
+                    chunk.lockCondition.awaitUninterruptibly();
+                    // Consider it was a success?
+                    return chunk.loadingSuccess;
+                } else {
+                    return false;
+                }
+            } else if (chunk.lockState == LanternChunk.LockState.UNLOADING) {
+                // Acquire the lock and wait for the chunk to get unloaded
+                chunk.lock.lock();
+            // The chunk can only be saved if it was once loaded, so return true
+            } else if (chunk.lockState == LanternChunk.LockState.SAVING) {
                 return true;
             }
-        } catch (Exception e) {
-            LanternGame.log().error("Error while loading chunk ({};{})",
-                    chunk.getX(), chunk.getZ(), e);
-            // An error in chunk reading may have left the chunk in an invalid state
-            // (i.e. double initialization errors), so it's forcibly unloaded here
-            chunk.unloadChunk();
         }
-        // Stop here if we can't generate
-        if (!generate) {
-            chunk.initializeEmpty();
-            return false;
-        }
-        // Generate chunk
+        boolean success = true;
         try {
-            this.generate(chunk);
-        } catch (Throwable e) {
-            LanternGame.log().error("Error while generating chunk ({};{})",
-                    chunk.getX(), chunk.getZ(), e);
-            return false;
+            chunk.lockState = LanternChunk.LockState.LOADING;
+            final LanternChunkQueueTask task = this.chunkQueueTasks.remove(chunk.getCoords());
+            // Try to cancel the task, the task will probably be ignored
+            // because we are already locked
+            if (task != null) {
+                task.cancel();
+            }
+            try {
+                // Try to load the chunk
+                if (this.chunkIOService.read(chunk)) {
+                    this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause.get(), chunk));
+                    return true;
+                }
+            } catch (Exception e) {
+                LanternGame.log().error("Error while loading chunk ({};{})",
+                        chunk.getX(), chunk.getZ(), e);
+                // An error in chunk reading may have left the chunk in an invalid state
+                // (i.e. double initialization errors), so it's forcibly unloaded here
+                // chunk.unloadChunk(); TODO
+            }
+            // Stop here if we can't generate
+            if (!generate) {
+                chunk.initializeEmpty();
+                return success = false;
+            }
+            Cause cause0 = cause.get();
+            // Generate chunk
+            try {
+                this.generate(chunk, cause0);
+            } catch (Throwable e) {
+                LanternGame.log().error("Error while generating chunk ({};{})", chunk.getX(), chunk.getZ(), e);
+                return success = false;
+            }
+            // Try to populate the chunk
+            this.tryPopulateSurroundingChunks(chunk, cause0);
+            this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause0, chunk));
+            return true;
+        } finally {
+            chunk.lockState = LanternChunk.LockState.NONE;
+            chunk.loaded = true;
+            chunk.loadingSuccess = success;
+            chunk.lockCondition.signalAll();
+            chunk.lock.unlock();
         }
-        this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause, chunk));
-        return true;
     }
 
     /**
@@ -527,8 +979,12 @@ public final class LanternChunkManager {
      * 
      * @param chunk the chunk
      */
-    void generate(LanternChunk chunk) {
-        final ChunkBiomeBuffer biomeBuffer = this.biomeBuffer.get();
+    void generate(LanternChunk chunk, Cause cause) {
+        final EventManager eventManager = Sponge.getEventManager();
+        eventManager.post(SpongeEventFactory.createGenerateChunkEventPre(cause, chunk));
+
+        final GenerationBuffers buffers = this.genBuffers.get();
+        final ChunkBiomeBuffer biomeBuffer = buffers.chunkBiomeBuffer;
         biomeBuffer.reuse(new Vector2i(chunk.getX() << 4, chunk.getZ() << 4));
 
         // Generate the biomes
@@ -539,7 +995,7 @@ public final class LanternChunkManager {
         final ImmutableBiomeArea immutableBiomeArea = biomeBuffer.getImmutableBiomeCopy();
         chunk.initializeBiomes(biomeBuffer.detach());
 
-        final ChunkBlockBuffer blockBuffer = this.blockBuffer.get();
+        final ChunkBlockBuffer blockBuffer = buffers.chunkBlockBuffer;
         blockBuffer.reuse(new Vector3i(chunk.getX() << 4, 0, chunk.getZ() << 4));
 
         // Apply the main world generator
@@ -564,13 +1020,16 @@ public final class LanternChunkManager {
         final ChunkSection[] sections = new ChunkSection[CHUNK_SECTIONS];
         for (int sy = 0; sy < CHUNK_SECTIONS; sy++) {
             if (blockBuffer.nonAirCount[sy] > 0) {
-                sections[sy] = new ChunkSection(blockBuffer.types[sy], blockBuffer.nonAirCount[sy]);
+                sections[sy] = new ChunkSection(blockBuffer.types[sy]);
             }
         }
 
         // Initialize the chunk
         chunk.initializeSections(sections);
-        chunk.automaticHeightMap();
+        chunk.initializeHeightMap(null);
+        chunk.initializeLight();
+
+        eventManager.post(SpongeEventFactory.createGenerateChunkEventPost(cause, chunk));
     }
 
     private static final Vector3i CHUNK_SIZE = new Vector3i(
@@ -584,10 +1043,11 @@ public final class LanternChunkManager {
 
         private final BiomeType[] biomeTypes;
 
-        public ChunkBiomeBuffer(Vector2i start, Vector2i size) {
-            super(start, size);
-            this.biomeTypes = new BiomeType[size.getX() * size.getY()];
+        public ChunkBiomeBuffer() {
+            super(Vector2i.ZERO, CHUNK_AREA_SIZE);
+            this.biomeTypes = new BiomeType[CHUNK_AREA];
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
+            this.detach();
         }
 
         @Override
@@ -618,7 +1078,7 @@ public final class LanternChunkManager {
         private final int[] nonAirCount = new int[CHUNK_SECTIONS];
 
         protected ChunkBlockBuffer() {
-            super(new Vector3i(0 , 0, 0), CHUNK_SIZE);
+            super(Vector3i.ZERO, CHUNK_SIZE);
         }
 
         public void reuse(Vector3i start) {
@@ -688,13 +1148,23 @@ public final class LanternChunkManager {
      */
     public boolean save(LanternChunk chunk) {
         checkNotNull(chunk, "chunk");
-        if (chunk.isLoaded()) {
-            try {
-                this.chunkIOService.write(chunk);
-                return true;
-            } catch (IOException e) {
-                LanternGame.log().error("Error while saving " + chunk, e);
-            }
+        chunk.lock.lock();
+        try {
+            chunk.lockState = LanternChunk.LockState.SAVING;
+            return this.save0(chunk);
+        } finally {
+            chunk.lockState = LanternChunk.LockState.NONE;
+            chunk.lockCondition.signalAll();
+            chunk.lock.unlock();
+        }
+    }
+
+    private boolean save0(LanternChunk chunk) {
+        try {
+            this.chunkIOService.write(chunk);
+            return true;
+        } catch (IOException e) {
+            LanternGame.log().error("Error while saving " + chunk, e);
         }
         return false;
     }
@@ -707,7 +1177,7 @@ public final class LanternChunkManager {
      * @param cause the cause
      * @return true if it was successful
      */
-    public boolean unload(int x, int z, Cause cause) {
+    public boolean unload(int x, int z, Supplier<Cause> cause) {
         return this.unload(new Vector2i(x, z), cause);
     }
 
@@ -718,11 +1188,15 @@ public final class LanternChunkManager {
      * @param cause the cause
      * @return true if it was successful
      */
-    public boolean unload(Vector2i coords, Cause cause) {
+    public boolean unload(Vector2i coords, Supplier<Cause> cause) {
+        return this.unload0(coords, cause, true);
+    }
+
+    private boolean unload0(Vector2i coords, Supplier<Cause> cause, boolean wait) {
         checkNotNull(cause, "cause");
         final LanternChunk chunk = this.getChunk(checkNotNull(coords, "coords"));
         if (chunk != null) {
-            return this.unload(chunk, cause);
+            return this.unload0(chunk, cause, wait);
         }
         return true;
     }
@@ -734,22 +1208,87 @@ public final class LanternChunkManager {
      * @param cause the cause
      * @return true if it was successful
      */
-    public boolean unload(LanternChunk chunk, Cause cause) {
+    public boolean unload(LanternChunk chunk, Supplier<Cause> cause) {
         checkNotNull(chunk, "chunk");
         checkNotNull(cause, "cause");
-        final Vector2i coords = new Vector2i(chunk.getX(), chunk.getZ());
+        return this.unload0(chunk, cause, true);
+    }
+
+    private boolean unload0(LanternChunk chunk, Supplier<Cause> cause, boolean wait) {
+        final Vector2i coords = chunk.getCoords();
         // Forced chunks cannot be unloaded
         if (this.ticketsByPos.containsKey(coords)) {
+            chunk.unloadingSuccess = false;
             return false;
         }
-        // Post the chunk unload event
-        this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(cause, chunk));
-        // Remove from the loaded chunks
-        this.loadedChunks.remove(coords);
-        // Move the chunk to the graveyard
-        this.reusableChunks.put(coords, chunk);
-        this.save(chunk);
-        return true;
+        if (!chunk.lock.tryLock()) {
+            // The chunk is already unloading, so wait for it to complete
+            if (chunk.lockState == LanternChunk.LockState.UNLOADING) {
+                if (wait) {
+                    chunk.lockCondition.awaitUninterruptibly();
+                    return chunk.unloadingSuccess;
+                } else {
+                    return false;
+                }
+            // The chunk is currently loading or saving, wait for it to complete
+            // and then unload it again
+            } else {
+                chunk.lock.lock();
+            }
+        }
+        try {
+            chunk.lockState = LanternChunk.LockState.UNLOADING;
+            // The chunk isn't loaded yet, fast fail
+            if (!chunk.loaded) {
+                return true;
+            }
+            final LanternChunkQueueTask task = this.chunkQueueTasks.remove(coords);
+            // Try to cancel all the current tasks
+            if (task != null) {
+                task.cancel();
+            }
+            // Post the chunk unload event
+            this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(cause.get(), chunk));
+            // Remove from the loaded chunks
+            this.loadedChunks.remove(coords);
+            // Move the chunk to the graveyard
+            this.reusableChunks.put(coords, chunk);
+            this.save0(chunk);
+            return true;
+        } finally {
+            chunk.lockState = LanternChunk.LockState.NONE;
+            chunk.unloadingSuccess = true;
+            chunk.lockCondition.signalAll();
+            chunk.lock.unlock();
+        }
+    }
+
+    /**
+     * Locks the chunk of the coordinates with a internal loading ticket. This
+     * method does not trigger the loading of a chunk but locks the chunk from
+     * unloading.
+     *
+     * @param coords the coordinates
+     * @return whether it was previously empty
+     */
+    private boolean lockInternally(Vector2i coords, ChunkLoadingTicket ticket) {
+        final boolean[] empty = new boolean[1];
+        this.ticketsByPos.computeIfAbsent(coords, coords0 -> {
+            empty[0] = true;
+            return Sets.newConcurrentHashSet();
+        }).add(ticket);
+        return empty[0];
+    }
+
+    private boolean unlockInternally(Vector2i coords, ChunkLoadingTicket ticket) {
+        final Set<ChunkLoadingTicket> set = this.ticketsByPos.get(coords);
+        if (set != null && set.remove(ticket)) {
+            if (set.isEmpty()) {
+                this.ticketsByPos.remove(coords);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -770,18 +1309,34 @@ public final class LanternChunkManager {
      * @param callEvents whether the force chunk events should be called
      */
     void force(LanternLoadingTicket ticket, Vector2i coords, boolean callEvents) {
-        final Set<LanternLoadingTicket> set = this.ticketsByPos.computeIfAbsent(
-                coords, coords0 -> Sets.newConcurrentHashSet());
-        final LanternChunk chunk = this.getChunk(coords);
-        if (set.isEmpty() && chunk == null && !this.forcedChunkLoadingQueue.contains(coords)) {
-            // Queue the chunk for loading
-            this.forcedChunkLoadingQueue.add(coords);
+        final LanternChunk chunk = this.getChunk(coords, false);
+        // The chunk at this coords is already loaded,
+        // wa can call the event directly
+        this.lockInternally(coords, ticket);
+        // Remove from unload through loadChunk
+        this.pendingForUnload.removeIf(e -> e.coords.equals(coords));
+        // Whether the chunk should be queued for loading
+        boolean queueLoad = false;
+        if (chunk != null) {
+            if (chunk.lock.isLocked() && chunk.lockState == LanternChunk.LockState.UNLOADING) {
+                queueLoad = true;
+            }
+            // The chunk is already loaded
+            if (chunk.loaded && !queueLoad && callEvents) {
+                final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
+                this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
+                        Cause.of(this.world, ticket), coords0, chunk, ticket));
+            }
+        // Queue the chunk to load
+        } else {
+            queueLoad = true;
         }
-        set.add(ticket);
-        if (chunk != null && callEvents) {
-            final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
-            final ForcedChunkEvent event = SpongeEventFactory.createForcedChunkEvent(Cause.of(ticket), coords0, chunk, ticket);
-            this.game.getEventManager().post(event);
+        if (queueLoad) {
+            LanternChunkQueueTask task = this.chunkQueueTasks.get(coords);
+            if (task == null || !(task.runnable instanceof LanternChunkLoadTask)) {
+                this.chunkQueueTasks.computeIfAbsent(coords, coords1 ->
+                        this.queueTask(coords, new LanternChunkLoadTask(coords)));
+            }
         }
     }
 
@@ -792,14 +1347,20 @@ public final class LanternChunkManager {
      * @param coords the coordinates
      */
     void unforce(LanternLoadingTicket ticket, Vector2i coords) {
-        final Set<LanternLoadingTicket> set = this.ticketsByPos.get(ticket);
-        if (set != null) {
-            set.remove(ticket);
-            // Remove the chunk from the cache (can unload) if it's doesn't
-            // have any attached tickets
-            if (set.isEmpty()) {
-                this.ticketsByPos.remove(coords);
-                this.forcedChunkLoadingQueue.remove(coords);
+        if (this.unlockInternally(coords, ticket)) {
+            final LanternChunk chunk = this.getChunk(coords, false);
+            // Try to cancel any queued chunk loadings
+            if (chunk != null && chunk.lock.isLocked() && chunk.lockState == LanternChunk.LockState.LOADING) {
+                final LanternChunkQueueTask task = this.chunkQueueTasks.get(coords);
+                if (task != null && task.runnable instanceof LanternChunkLoadTask) {
+                    task.cancel();
+                }
+            // Queue the chunk for unload, will be some ticks later
+            } else {
+                final UnloadingChunkEntry entry = new UnloadingChunkEntry(coords);
+                if (!this.pendingForUnload.contains(entry)) {
+                    this.pendingForUnload.offer(entry);
+                }
             }
         }
     }
@@ -818,6 +1379,11 @@ public final class LanternChunkManager {
      * be saved in the process.
      */
     public void shutdown() {
+        try {
+            LanternLoadingTicketIO.save(this.worldFolder, this.tickets);
+        } catch (IOException e) {
+            LanternGame.log().warn("An error occurred while saving the chunk loading tickets", e);
+        }
         for (Entry<Vector2i, LanternChunk> entry : this.loadedChunks.entrySet()) {
             final LanternChunk chunk = entry.getValue();
             // Post the chunk unload event
@@ -835,78 +1401,71 @@ public final class LanternChunkManager {
      * Pulses the chunk manager.
      */
     public void pulse() {
-        final PluginContainer minecraft = this.game.getMinecraftPlugin();
-        final Cause unloadCause = Cause.of(minecraft);
-        for (Entry<Vector2i, LanternChunk> en : this.loadedChunks.entrySet()) {
-            // The chunk is no longer locked, try to unload
-            if (!this.ticketsByPos.containsKey(en.getKey())) {
-                this.unload(en.getValue(), unloadCause);
-            }
-        }
-        // TODO: Async chunk loading/unloading?
-        int counter = 0;
-        Vector2i coords;
-        while (++counter < CHUNK_LOADING_LIMIT && (coords = this.forcedChunkLoadingQueue.poll()) != null) {
-            final Set<LanternLoadingTicket> set = this.ticketsByPos.get(coords);
-            Cause cause = Cause.of(minecraft);
-            if (set != null) {
-                for (LanternLoadingTicket ticket : set) {
-                    cause = cause.with(ticket);
-                }
-            }
-            final LanternChunk chunk = this.getOrCreateChunk(coords, cause, true);
-            if (set != null && !set.isEmpty()) {
-                final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
-                for (LanternLoadingTicket ticket : set) {
-                    final ForcedChunkEvent event = SpongeEventFactory.createForcedChunkEvent(
-                            Cause.of(ticket), coords0, chunk, ticket);
-                    this.game.getEventManager().post(event);
-                }
+        UnloadingChunkEntry entry;
+        while ((entry = this.pendingForUnload.peek()) != null &&
+                (System.currentTimeMillis() - entry.time) > UNLOAD_DELAY) {
+            this.pendingForUnload.poll();
+            if (!this.ticketsByPos.containsKey(entry.coords)) {
+                // TODO: Create unload tasks
+                this.unload(entry.coords, () -> Cause.of(this.world));
             }
         }
     }
 
-    /*
-    void loadTickets() throws IOException {
+    public void loadTickets() throws IOException {
         Multimap<String, LanternLoadingTicket> tickets = LanternLoadingTicketIO.load(this.worldFolder, this, this.chunkLoadService);
-        for (Entry<String, Collection<LanternLoadingTicket>> ticket : tickets.asMap().entrySet()) {
+        Iterator<Entry<String, LanternLoadingTicket>> it = tickets.entries().iterator();
+        while (it.hasNext()) {
+            LanternLoadingTicket ticket = (LanternLoadingTicket) it.next();
             if (ticket instanceof LanternEntityLoadingTicket) {
                 LanternEntityLoadingTicket ticket0 = (LanternEntityLoadingTicket) ticket;
-                if (ticket0.getBoundEntity() != null) {
-                    EntityReference ref = ticket0.entityRef;
-                    if (ref != null) {
-                        LanternChunk chunk = this.getOrLoadChunk(ref.chunkCoords);
-                        Entity entity = chunk.getEntity(ref.uniqueId);
-                        if (entity != null) {
-                            ticket0.bindToEntity(entity);
-                        }
+                EntityReference ref = ticket0.getEntityReference().orElse(null);
+                if (ref != null) {
+                    LanternChunk chunk = this.getOrCreateChunk(ref.getChunkCoords(), () -> Cause.of(ticket0, this.world), true, true);
+                    Entity entity = chunk.getEntity(ref.getUniqueId()).orElse(null);
+                    if (entity != null) {
+                        ticket0.bindToEntity(entity);
+                    } else {
+                        // The entity is gone?
+                        it.remove();
                     }
+                } else {
+                    // The entity is gone?
+                    it.remove();
                 }
             }
         }
         for (Entry<String, Collection<LanternLoadingTicket>> ticket : tickets.asMap().entrySet()) {
-            Collection<Callback> callbacks = this.chunkLoadService.getCallbacks().get(ticket.getKey());
+            Collection<ChunkTicketManager.Callback> callbacks = this.chunkLoadService.getCallbacks().get(ticket.getKey());
             ImmutableList<LoadingTicket> tickets0 = ImmutableList.copyOf(ticket.getValue());
             ImmutableListMultimap<UUID, LoadingTicket> map = null;
-            for (Callback callback : callbacks) {
-                if (callback instanceof OrderedCallback) {
-                    tickets0 = ImmutableList.copyOf(((OrderedCallback) callback).onLoaded(
-                            tickets0, this.world, this.chunkLoadService.getMaxTicketsForPlugin(ticket.getKey())));
+            for (ChunkTicketManager.Callback callback : callbacks) {
+                if (callback instanceof ChunkTicketManager.OrderedCallback) {
+                    List<LoadingTicket> result = ((ChunkTicketManager.OrderedCallback) callback).onLoaded(
+                            tickets0, this.world, this.chunkLoadService.getMaxTicketsById(ticket.getKey()));
+                    if (result == null) {
+                        throw new IllegalStateException("The OrderedCallback#onLoaded method may not return null, error caused by (plugin="
+                                + ticket.getKey() + ", clazz=" + callback.getClass().getName() + ")");
+                    }
+                    tickets0 = ImmutableList.copyOf(result);
                 }
-                if (callback instanceof PlayerOrderedCallback) {
+                if (callback instanceof ChunkTicketManager.PlayerOrderedCallback) {
                     if (map == null) {
                         ImmutableListMultimap.Builder<UUID, LoadingTicket> mapBuilder = ImmutableListMultimap.builder();
-                        for (LoadingTicket ticket0 : tickets0) {
-                            if (ticket0 instanceof PlayerLoadingTicket) {
-                                mapBuilder.put(((PlayerLoadingTicket) ticket0).getPlayerUniqueId(), ticket0);
-                            }
-                        }
+                        tickets0.stream().filter(ticket0 -> ticket0 instanceof PlayerLoadingTicket).forEach(ticket0 ->
+                                mapBuilder.put(((PlayerLoadingTicket) ticket0).getPlayerUniqueId(), ticket0));
                         map = mapBuilder.build();
                     }
-                    map = ImmutableListMultimap.copyOf(((PlayerOrderedCallback) callback).onPlayerLoaded(map, this.world));
+                    ListMultimap<UUID, LoadingTicket> result = ((ChunkTicketManager.PlayerOrderedCallback) callback)
+                            .onPlayerLoaded(map, this.world);
+                    if (result == null) {
+                        throw new IllegalStateException("The PlayerOrderedCallback#onPlayerLoaded method may not return null, "
+                                + "error caused by (plugin=" + ticket.getKey() + ", clazz=" + callback.getClass().getName() + ")");
+                    }
+                    map = ImmutableListMultimap.copyOf(result);
                 }
                 callback.onLoaded(tickets0, this.world);
             }
         }
-    }*/
+    }
 }

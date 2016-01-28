@@ -45,7 +45,7 @@ public final class MessagePlayOutChunkData implements Message {
         checkNotNull(sections, "sections");
         for (Section section : sections) {
             if (section != null) {
-                checkArgument((section.skyLight == null) == skylight,
+                checkArgument((section.skyLight != null) == skylight,
                         "Skylight must be present in every section if skylight is to true, and absent if false.");
             }
         }
@@ -86,7 +86,7 @@ public final class MessagePlayOutChunkData implements Message {
         private final byte[] blockLight;
         @Nullable private final byte[] skyLight;
 
-        public Section(VariableValueArray types, int[] palette, byte[] blockLight, @Nullable byte[] skyLight) {
+        public Section(VariableValueArray types, @Nullable int[] palette, byte[] blockLight, @Nullable byte[] skyLight) {
             this.blockLight = blockLight;
             this.skyLight = skyLight;
             this.palette = palette;

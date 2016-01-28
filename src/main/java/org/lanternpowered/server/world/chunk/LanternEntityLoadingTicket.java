@@ -25,19 +25,20 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import com.flowpowered.math.vector.Vector2i;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import java.util.UUID;
+import org.spongepowered.api.entity.Entity;
+
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityLoadingTicket {
+class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityChunkLoadingTicket {
 
     // The reference of the entity while it's not loaded yet,
     // this field will be cleared once the entity available is
-    @Nullable volatile EntityReference entityRef;
+    @Nullable private volatile EntityReference entityReference;
 
     // The entity instance
     @Nullable private volatile Entity entity;
@@ -52,30 +53,41 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityL
 
     @Override
     public void bindToEntity(Entity entity) {
-        this.entity = entity;
+        this.setEntity(checkNotNull(entity, "entity"));
     }
 
-    // This method may not return null, but we can not ensure that
-    // until the ticket entity is loaded
-    @Nullable
     @Override
     public Entity getBoundEntity() {
+        checkState(this.entity != null, "No entity bound to the ticket.");
         return this.entity;
     }
 
-    /**
-     * A reference where the entity is stored in the world,
-     * if it's not already loaded.
-     */
-    static class EntityReference {
-
-        final Vector2i chunkCoords;
-        final UUID uniqueId;
-
-        EntityReference(Vector2i chunkCoords, UUID uniqueId) {
-            this.chunkCoords = chunkCoords;
-            this.uniqueId = uniqueId;
-        }
+    @Override
+    public void setEntity(@Nullable Entity entity) {
+        this.entity = entity;
     }
 
+    @Override
+    public Optional<Entity> getEntity() {
+        return Optional.ofNullable(this.entity);
+    }
+
+    @Override
+    public void setEntityReference(@Nullable EntityReference entityReference) {
+        this.entityReference = entityReference;
+    }
+
+    @Override
+    public Optional<EntityReference> getEntityReference() {
+        return Optional.ofNullable(this.entityReference);
+    }
+
+    @Override
+    public Optional<EntityReference> getOrCreateEntityReference() {
+        if (this.entity != null) {
+            return Optional.of(new EntityReference(this.entity.getLocation().getChunkPosition().toVector2(true),
+                    this.entity.getUniqueId()));
+        }
+        return Optional.ofNullable(this.entityReference);
+    }
 }

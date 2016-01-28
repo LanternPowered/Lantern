@@ -23,41 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.serializer.Types;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 
-import java.util.UUID;
-
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
-
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
-    }
-
-    public LanternEntityLiving() {
-        super();
-    }
+public final class CodecPlayOutBlockChange implements Codec<MessagePlayOutBlockChange> {
 
     @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    public ByteBuf encode(CodecContext context, MessagePlayOutBlockChange message) throws CodecException {
+        ByteBuf buf = context.byteBufAlloc().buffer();
+        context.write(buf, Types.POSITION, message.getPosition());
+        context.writeVarInt(buf, message.getBlockState());
+        return buf;
     }
-
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
-    }
-
-    @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

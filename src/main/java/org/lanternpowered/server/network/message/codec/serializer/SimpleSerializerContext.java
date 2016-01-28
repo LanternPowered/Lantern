@@ -32,8 +32,6 @@ import io.netty.handler.codec.CodecException;
 
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 public class SimpleSerializerContext implements SerializerContext {
 
     public static final SerializerContext DEFAULT = new SimpleSerializerContext(
@@ -53,7 +51,7 @@ public class SimpleSerializerContext implements SerializerContext {
     }
 
     @Override
-    public <V> ByteBuf write(ByteBuf buf, Type<V> type, @Nullable V object) throws CodecException {
+    public <V> ByteBuf write(ByteBuf buf, Type<V> type, V object) throws CodecException {
         final Optional<ValueSerializer<V>> optSerializer = this.serializers.get(type);
         if (!optSerializer.isPresent()) {
             throw new CodecException("Unable to find a value serializer for the specified type.");
@@ -63,7 +61,7 @@ public class SimpleSerializerContext implements SerializerContext {
     }
 
     @Override
-    public <V> ByteBuf writeAt(ByteBuf buf, int index, Type<V> type, @Nullable V object) throws CodecException {
+    public <V> ByteBuf writeAt(ByteBuf buf, int index, Type<V> type, V object) throws CodecException {
         int index0 = buf.writerIndex();
         buf.writerIndex(index);
         this.write(buf, type, object);
@@ -71,7 +69,6 @@ public class SimpleSerializerContext implements SerializerContext {
         return buf;
     }
 
-    @Nullable
     @Override
     public <V> V read(ByteBuf buf, Type<V> type) throws CodecException {
         final Optional<ValueSerializer<V>> optSerializer = this.serializers.get(type);
@@ -81,7 +78,6 @@ public class SimpleSerializerContext implements SerializerContext {
         return optSerializer.get().read(this, buf);
     }
 
-    @Nullable
     @Override
     public <V> V readAt(ByteBuf buf, int index, Type<V> type) throws CodecException {
         int index0 = buf.readerIndex();

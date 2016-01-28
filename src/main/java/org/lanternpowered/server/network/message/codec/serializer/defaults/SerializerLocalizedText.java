@@ -40,7 +40,7 @@ public final class SerializerLocalizedText implements ValueSerializer<LocalizedT
     @Override
     public void write(SerializerContext context, ByteBuf buf, LocalizedText object) throws CodecException {
         JsonTextTranslatableSerializer.setCurrentLocale(object.getLocale());
-        context.write(buf, Types.STRING, SerializerText.GSON.toJson(object.getText()));
+        context.write(buf, Types.STRING, SerializerText.fixJson(SerializerText.GSON.toJson(object.getText())));
         JsonTextTranslatableSerializer.removeCurrentLocale();
     }
 

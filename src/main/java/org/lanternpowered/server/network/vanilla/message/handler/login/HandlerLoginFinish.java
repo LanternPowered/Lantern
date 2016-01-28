@@ -47,10 +47,10 @@ public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
         final Session session = context.getSession();
         int compressionThreshold = LanternGame.get().getGlobalConfig().getNetworkCompressionThreshold();
         if (compressionThreshold != -1) {
-            session.sendWithFuture(new MessageLoginOutSetCompression(compressionThreshold)).addListener(future ->
+            session.send(new MessageLoginOutSetCompression(compressionThreshold)).addListener(future ->
                     context.getChannel().pipeline().replace(COMPRESSION, COMPRESSION, new MessageCompressionHandler(compressionThreshold)));
         }
-        session.sendWithFuture(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
+        session.send(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
                 .addListener(future -> {
                     session.setPlayer(gameProfile);
                     session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);

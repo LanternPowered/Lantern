@@ -25,14 +25,42 @@
  */
 package org.lanternpowered.server.world.chunk;
 
+import com.flowpowered.math.vector.Vector2i;
 import org.spongepowered.api.world.ChunkTicketManager.LoadingTicket;
 
 public interface ChunkLoadingTicket extends LoadingTicket {
 
     /**
-     * Unforces all the chunks that are attached
-     * to this loading ticket.
+     * Force-loads a chunk using this ticket. If the configured concurrently
+     * loaded chunk limit is reached, the oldest loaded chunk will be
+     * removed.
+     *
+     * <p>This does not cause an immediate load of the chunk. Forced chunks
+     * will be loaded eventually, but may not be available for a few ticks.
+     * Forced chunk loading is equivalent to the loading caused by a
+     * player.</p>
+     *
+     * @param chunk The chunk to force-load
+     */
+    void forceChunk(Vector2i chunk);
+
+    /**
+     * Removes a chunk from the force-loaded set of this ticket.
+     *
+     * @param chunk The chunk to remove from force-loading
+     */
+    void unforceChunk(Vector2i chunk);
+
+    /**
+     * Removes all the chunks from the force-loaded set of this ticket.
      */
     void unforceChunks();
+
+    /**
+     * Whether this chunk is released.
+     *
+     * @return is released
+     */
+    boolean isReleased();
 
 }

@@ -60,8 +60,6 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
         return ImmutableMultimap.copyOf(this.callbacks);
     }
 
-    // TODO: Add values that make more sense, and make the server owner specify the limits
-
     /**
      * Gets the maximum amount of tickets the player can have.
      * 
@@ -69,7 +67,7 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
      * @return the maximum amount of tickets
      */
     public int getMaxTicketsForPlayer(UUID playerUUID) {
-        return this.globalConfig.getMaxPlayers();
+        return this.globalConfig.getPlayerTicketCount();
     }
 
     @Override
@@ -99,8 +97,11 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
 
     @Override
     public int getMaxTickets(Object plugin) {
-        return this.globalConfig.getChunkLoadingTickets(
-                checkPlugin(plugin, "plugin").getId()).getMaximumTicketCount();
+        return this.getMaxTickets(checkPlugin(plugin, "plugin").getId());
+    }
+
+    public int getMaxTicketsById(String plugin) {
+        return this.globalConfig.getChunkLoadingTickets(checkNotNull(plugin, "plugin")).getMaximumTicketCount();
     }
 
     @Override

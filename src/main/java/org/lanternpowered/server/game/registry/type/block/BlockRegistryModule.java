@@ -70,6 +70,11 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
     private int blockIdCounter = 1024;
 
     @Override
+    public int getBlockStatesCount() {
+        return this.blockStateByPackedType.size();
+    }
+
+    @Override
     public Map<String, BlockType> provideCatalogMap() {
         Map<String, BlockType> mappings = Maps.newHashMap();
         for (Map.Entry<String, BlockType> entry : this.blockTypes.entrySet()) {
@@ -96,18 +101,25 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
             int internalStateIdBase = (internalId & 0xfff) << 4;
             for (byte b = 0; b <= 0xf; b++) {
                 BlockState blockState = dataToStateConverter.apply(b, blockType.getDefaultState());
+                boolean unknown = false;
                 if (blockState == null) {
                     blockState = blockType.getDefaultState();
+                    unknown = true;
                 }
                 short internalStateId = (short) (internalStateIdBase | b & 0xf);
                 this.blockStateByPackedType.put(internalStateId, blockState);
-                this.packedTypeByBlockState.put(blockState, internalStateId);
+                if (!unknown || !this.packedTypeByBlockState.containsKey(blockState)) {
+                    this.packedTypeByBlockState.put(blockState, internalStateId);
+                }
             }
         } else {
             BlockState state = blockType.getDefaultState();
             short internalStateId = (short) ((internalId & 0xfff) << 4);
             this.blockStateByPackedType.put(internalStateId, state);
             this.packedTypeByBlockState.put(state, internalStateId);
+            for (byte b = 0; b <= 0xf; b++) {
+                this.blockStateByPackedType.put((short) (internalStateId | b & 0xf), state);
+            }
         }
     }
 
@@ -199,11 +211,17 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
     @Override
     public void registerDefaults() {
         this.register(0, new BlockAir("minecraft", "air"));
-        this.register(1, new BlockStone("minecraft", "stone"), (data, state) -> state.withTrait(BlockStone.TYPE,
-                Arrays.stream(LanternStoneType.values()).filter(t -> t.getInternalId() == data).findFirst().orElse(LanternStoneType.STONE)).get());
-        this.register(2, new BlockGrass("minecraft", "grass"), (data, state) -> state);
-        this.register(3, new BlockDirt("minecraft", "dirt"), (data, state) -> state.withTrait(BlockDirt.TYPE,
-                Arrays.stream(LanternDirtType.values()).filter(t -> t.getInternalId() == data).findFirst().orElse(LanternDirtType.DIRT)).get());
+        this.register(1, new BlockStone("minecraft", "stone"), (data, state) -> {
+            final LanternStoneType stoneType = Arrays.stream(LanternStoneType.values()).filter(t -> t.getInternalId() == data)
+                    .findFirst().orElse(null);
+            return stoneType != null ? state.withTrait(BlockStone.TYPE, stoneType).get() : null;
+        });
+        this.register(2, new BlockGrass("minecraft", "grass"), (data, state) -> data == 0 ? state : null);
+        this.register(3, new BlockDirt("minecraft", "dirt"), (data, state) -> {
+            final LanternDirtType dirtType = Arrays.stream(LanternDirtType.values()).filter(t -> t.getInternalId() == data)
+                    .findFirst().orElse(null);
+            return dirtType != null ? state.withTrait(BlockDirt.TYPE, dirtType).get() : null;
+        });
         this.register(7, new BlockBedrock("minecraft", "bedrock"));
     }
 

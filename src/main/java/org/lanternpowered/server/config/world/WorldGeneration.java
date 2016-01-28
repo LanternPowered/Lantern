@@ -46,6 +46,9 @@ public final class WorldGeneration {
             "otherwise will the spawn generate when a player joins.")
     private boolean generateSpawnOnLoad = true;
 
+    @Setting(value = "view-distance")
+    private int viewDistance = 10;
+
     public List<String> getGenerationModifiers() {
         return this.generationModifiers;
     }
@@ -66,4 +69,7 @@ public final class WorldGeneration {
         this.generateSpawnOnLoad = state;
     }
 
+    public int getViewDistance() {
+        return this.viewDistance;
+    }
 }

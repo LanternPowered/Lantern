@@ -84,7 +84,12 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
         ByteBuf content = context.byteBufAlloc().heapBuffer(buf.readableBytes());
         buf.readBytes(content);
         if ("REGISTER".equals(channel)) {
-            Set<String> channels = decodeChannels(content);
+            Set<String> channels;
+            try {
+                channels = decodeChannels(content);
+            } finally {
+                content.release();
+            }
             Iterator<String> it = channels.iterator();
             while (it.hasNext()) {
                 String channel0 = it.next();
@@ -96,7 +101,12 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
                 return new MessagePlayInOutRegisterChannels(channels);
             }
         } else if ("UNREGISTER".equals(channel)) {
-            Set<String> channels = decodeChannels(content);
+            Set<String> channels;
+            try {
+                channels = decodeChannels(content);
+            } finally {
+                content.release();
+            }
             Iterator<String> it = channels.iterator();
             while (it.hasNext()) {
                 String channel0 = it.next();
@@ -108,33 +118,41 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
                 return new MessagePlayInOutUnregisterChannels(channels);
             }
         } else if ("FML|MP".equals(channel)) {
-            Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
-            MultiPartMessage message0 = attribute.get();
-            if (message0 == null) {
-                String channel0 = context.read(content, Types.STRING);
-                int parts = content.readUnsignedByte();
-                int size = content.readInt();
-                if (size <= 0 || size >= -16797616) {
-                    throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Max: -16797616, Received: " + size);
+            try {
+                Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
+                MultiPartMessage message0 = attribute.get();
+                if (message0 == null) {
+                    String channel0 = context.read(content, Types.STRING);
+                    int parts = content.readUnsignedByte();
+                    int size = content.readInt();
+                    if (size <= 0 || size >= -16797616) {
+                        throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Max: -16797616, Received: " + size);
+                    }
+                    attribute.set(new MultiPartMessage(channel0, context.byteBufAlloc().buffer(size), parts));
+                } else {
+                    int part = content.readUnsignedByte();
+                    if (part != message0.index) {
+                        throw new CodecException("Received FML MultiPart packet out of order, Expected: " + message0.index + ", Got: " + part);
+                    }
+                    int len = content.readableBytes() - 1;
+                    content.readBytes(message0.buffer, message0.offset, len);
+                    message0.offset += len;
+                    message0.index++;
+                    if (message0.index >= message0.parts) {
+                        final Message message = this.decode0(context, message0.channel, message0.buffer);
+                        attribute.set(null);
+                        return message;
+                    }
                 }
-                attribute.set(new MultiPartMessage(channel0, context.byteBufAlloc().buffer(size), parts));
-            } else {
-                int part = content.readUnsignedByte();
-                if (part != message0.index) {
-                    throw new CodecException("Received FML MultiPart packet out of order, Expected: " + message0.index + ", Got: " + part);
-                }
-                int len = content.readableBytes() - 1;
-                content.readBytes(message0.buffer, message0.offset, len);
-                message0.offset += len;
-                message0.index++;
-                if (message0.index >= message0.parts) {
-                    final Message message = this.decode0(context, message0.channel, message0.buffer);
-                    attribute.set(null);
-                    return message;
-                }
+            } finally {
+                content.release();
             }
         } else {
-            return this.decode0(context, channel, content);
+            try {
+                return this.decode0(context, channel, content);
+            } finally {
+                content.release();
+            }
         }
         return NullMessage.INSTANCE;
     }

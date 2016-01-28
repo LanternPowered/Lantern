@@ -23,41 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.world.chunk;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.ChunkTicketManager;
 
-import java.util.UUID;
+import java.util.Optional;
 
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
+import javax.annotation.Nullable;
 
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
-    }
+public interface EntityChunkLoadingTicket extends ChunkLoadingTicket, ChunkTicketManager.EntityLoadingTicket {
 
-    public LanternEntityLiving() {
-        super();
-    }
+    void setEntity(@Nullable Entity entity);
 
-    @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
-    }
+    Optional<Entity> getEntity();
 
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
-    }
+    void setEntityReference(@Nullable EntityReference entityReference);
 
-    @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
+    Optional<EntityReference> getEntityReference();
 
+    /**
+     * Gets the latest version of the {@link EntityReference} of the bound {@link Entity}
+     * or uses the default one.
+     *
+     * @return the entity reference
+     */
+    Optional<EntityReference> getOrCreateEntityReference();
 }

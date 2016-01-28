@@ -25,11 +25,16 @@
  */
 package org.lanternpowered.server.entity;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
+
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -64,21 +69,47 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     protected final static float EPSILON = 1.0e-004f;
 
-    protected double x;
-    protected double y;
-    protected double z;
+    // The entity id that will be used for the client
+    private int entityId;
 
-    protected float yaw;
-    protected float pitch;
+    // The unique id of this entity
+    private final UUID uniqueId;
+
+    // The random object of this entity
+    private final Random random = new Random();
+
+    // The world this entity is located in, may be null
+    private LanternWorld world;
+
+    // The position of the entity
+    private Vector3d position = Vector3d.ZERO;
+
+    // The rotation of the entity
+    private Vector3d rotation = Vector3d.ZERO;
 
     protected float motionX;
     protected float motionY;
     protected float motionZ;
 
+    public LanternEntity(UUID uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public LanternEntity() {
+        this(UUID.randomUUID());
+    }
+
+    public int getEntityId() {
+        return this.entityId;
+    }
+
+    public void setEntityId(int entityId) {
+        this.entityId = entityId;
+    }
+
     @Override
     public UUID getUniqueId() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.uniqueId;
     }
 
     @Override
@@ -111,88 +142,166 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public World getWorld() {
-        // TODO Auto-generated method stub
-        return null;
+    public LanternWorld getWorld() {
+        return this.world;
+    }
+
+    protected void setWorld(@Nullable LanternWorld world) {
+        this.world = world;
+    }
+
+    public Vector3d getPosition() {
+        return this.position;
+    }
+
+    public void setPosition(Vector3d position) {
+        this.position = checkNotNull(position, "position");
+    }
+
+    public void setPositionAndWorld(World world, Vector3d position) {
+        this.setPosition(position);
+        this.setWorld((LanternWorld) world);
     }
 
     @Override
     public Location<World> getLocation() {
-        // TODO Auto-generated method stub
-        return null;
+        checkState(this.world != null, "This entity doesn't have a world.");
+        return new Location<>(this.world, this.position);
     }
 
     @Override
     public void setLocation(Location<World> location) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void setLocationAndRotation(Location<World> location, Vector3d rotation) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public boolean setLocationSafely(Location<World> location) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean transferToWorld(String worldName, Vector3d position) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean transferToWorld(UUID uuid, Vector3d position) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Optional<Entity> getPassenger() {
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult setPassenger(@Nullable Entity entity) {
-        return null;
-    }
-
-    @Override
-    public Optional<Entity> getVehicle() {
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult setVehicle(@Nullable Entity entity) {
-        return null;
-    }
-
-    @Override
-    public Entity getBaseVehicle() {
-        return null;
+        checkNotNull(location, "location");
+        this.setPositionAndWorld(location.getExtent(), location.getPosition());
     }
 
     @Override
     public Vector3d getRotation() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.rotation;
     }
 
     @Override
     public void setRotation(Vector3d rotation) {
-        // TODO Auto-generated method stub
-        
+        this.rotation = checkNotNull(rotation, "rotation");
+    }
+
+    @Override
+    public void setLocationAndRotation(Location<World> location, Vector3d rotation) {
+        this.setLocation(location);
+        this.setRotation(rotation);
+    }
+
+    @Override
+    public boolean setLocationSafely(Location<World> location) {
+        this.setLocation(location);
+        // TODO: Check whether the location safe is
+        return true;
+    }
+
+    @Override
+    public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation) {
+        this.setLocationAndRotation(location, rotation);
+        // TODO: Check whether the location safe is
+        return true;
+    }
+
+    @Override
+    public boolean transferToWorld(String worldName, Vector3d position) {
+        final Optional<World> world = Sponge.getServer().getWorld(checkNotNull(worldName, "worldName"));
+        if (!world.isPresent()) {
+            return false;
+        }
+        this.setPositionAndWorld(world.get(), position);
+        return true;
+    }
+
+    @Override
+    public boolean transferToWorld(UUID uuid, Vector3d position) {
+        final Optional<World> world = Sponge.getServer().getWorld(checkNotNull(uuid, "uuid"));
+        if (!world.isPresent()) {
+            return false;
+        }
+        this.setPositionAndWorld(world.get(), position);
+        return true;
+    }
+
+    @Override
+    public Transform<World> getTransform() {
+        return new Transform<>(this.world, this.position, this.rotation);
+    }
+
+    @Override
+    public void setTransform(Transform<World> transform) {
+        this.setLocationAndRotation(transform.getLocation(), transform.getRotation());
+    }
+
+    @Override
+    public void setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+        checkNotNull(location, "location");
+        checkNotNull(rotation, "rotation");
+        checkNotNull(relativePositions, "relativePositions");
+
+        World world = location.getExtent();
+        Vector3d pos = location.getPosition();
+
+        double x = pos.getX();
+        double y = pos.getY();
+        double z = pos.getZ();
+        double pitch = rotation.getX();
+        double yaw = rotation.getY();
+        double roll = rotation.getZ();
+
+        if (relativePositions.contains(RelativePositions.X)) {
+            x += this.position.getX();
+        }
+        if (relativePositions.contains(RelativePositions.Y)) {
+            y += this.position.getY();
+        }
+        if (relativePositions.contains(RelativePositions.Z)) {
+            z += this.position.getZ();
+        }
+        if (relativePositions.contains(RelativePositions.PITCH)) {
+            pitch += this.rotation.getX();
+        }
+        if (relativePositions.contains(RelativePositions.YAW)) {
+            yaw += this.rotation.getY();
+        }
+        // TODO: No relative roll?
+
+        this.setPositionAndWorld(world, new Vector3d(x, y, z));
+        this.setRotation(new Vector3d(pitch, yaw, roll));
+    }
+
+    @Override
+    public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+        this.setLocationAndRotation(location, rotation, relativePositions);
+        // TODO: Check whether the location safe is
+        return true;
+    }
+
+    @Override
+    public Optional<Entity> getPassenger() {
+        return Optional.empty();
+    }
+
+    @Override
+    public DataTransactionResult setPassenger(@Nullable Entity entity) {
+        return DataTransactionResult.failNoData();
+    }
+
+    @Override
+    public Optional<Entity> getVehicle() {
+        return Optional.empty();
+    }
+
+    @Override
+    public DataTransactionResult setVehicle(@Nullable Entity entity) {
+        return DataTransactionResult.failNoData();
+    }
+
+    @Override
+    public Entity getBaseVehicle() {
+        return this;
     }
 
     @Override
@@ -220,9 +329,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     /**
-     * Ticks the entity.
+     * Pulses the entity.
      */
-    protected void tick() {
+    protected void pulse() {
 
     }
 
@@ -396,30 +505,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public Transform<World> getTransform() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setTransform(Transform<World> transform) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public EntitySnapshot createSnapshot() {
         // TODO Auto-generated method stub
         return null;
@@ -427,8 +512,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public Random getRandom() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.random;
     }
 
     @Override
@@ -440,7 +524,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         return false;
     }
 
-    @Override public Translation getTranslation() {
+    @Override
+    public Translation getTranslation() {
         return null;
     }
+
 }

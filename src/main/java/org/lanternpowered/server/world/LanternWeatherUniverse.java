@@ -40,6 +40,7 @@ import org.spongepowered.api.world.weather.Weathers;
 
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 @Locked
 @AttachableTo(LanternWorld.class)
@@ -142,7 +143,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
             updateSky = true;
         }
         if (updateSky) {
-            List<LanternPlayer> players = this.world.getPlayers();
+            Set<LanternPlayer> players = this.world.getPlayers();
             if (!players.isEmpty()) {
                 MessagePlayOutWorldSky message = this.createSkyUpdateMessage();
                 players.forEach(player -> player.getConnection().send(message));

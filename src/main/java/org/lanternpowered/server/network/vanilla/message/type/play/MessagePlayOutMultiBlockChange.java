@@ -23,41 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.lanternpowered.server.network.message.Message;
 
-import java.util.UUID;
+import java.util.Collection;
 
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
+public final class MessagePlayOutMultiBlockChange implements Message {
 
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
+    private final int chunkX;
+    private final int chunkZ;
+
+    private final Collection<MessagePlayOutBlockChange> changes;
+
+    public MessagePlayOutMultiBlockChange(int chunkX, int chunkZ, Collection<MessagePlayOutBlockChange> changes) {
+        this.changes = changes;
+        this.chunkX = chunkX;
+        this.chunkZ = chunkZ;
     }
 
-    public LanternEntityLiving() {
-        super();
+    public int getChunkX() {
+        return this.chunkX;
     }
 
-    @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    public int getChunkZ() {
+        return this.chunkZ;
     }
 
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
+    public Collection<MessagePlayOutBlockChange> getChanges() {
+        return this.changes;
     }
-
-    @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

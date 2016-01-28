@@ -25,9 +25,6 @@
  */
 package org.lanternpowered.server.util;
 
-/**
- * TODO: Better name?
- */
 public final class VariableValueArray {
 
     private final long[] backing;

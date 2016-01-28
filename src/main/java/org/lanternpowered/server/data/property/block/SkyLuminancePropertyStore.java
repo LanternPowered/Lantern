@@ -25,11 +25,12 @@
  */
 package org.lanternpowered.server.data.property.block;
 
-import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
+import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -37,21 +38,25 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class MatterPropertyStore extends AbstractBlockPropertyStore<MatterProperty> {
+public final class SkyLuminancePropertyStore extends AbstractBlockPropertyStore<SkyLuminanceProperty> {
 
-    private static final Optional<MatterProperty> SOLID = Optional.of(new MatterProperty(MatterProperty.Matter.SOLID));
-    private static final Optional<MatterProperty> LIQUID = Optional.of(new MatterProperty(MatterProperty.Matter.LIQUID));
-    private static final Optional<MatterProperty> GAS = Optional.of(new MatterProperty(MatterProperty.Matter.GAS));
+    // We will be using a cache since it can only be 16 different values
+    private final Optional<SkyLuminanceProperty>[] lookup = new Optional[16];
 
-    @Override
-    protected Optional<MatterProperty> getFor(BlockState blockState, @Nullable Location<World> location, @Nullable Direction direction) {
-        MatterProperty.Matter matter = ((LanternBlockType) blockState.getType()).getMatter(blockState);
-        if (matter == MatterProperty.Matter.SOLID) {
-            return SOLID;
-        } else if (matter == MatterProperty.Matter.LIQUID) {
-            return LIQUID;
-        } else {
-            return GAS;
+    public SkyLuminancePropertyStore() {
+        for (int i = 0; i < this.lookup.length; i++) {
+            this.lookup[i] = Optional.of(new SkyLuminanceProperty((float) i / (float) this.lookup.length));
         }
     }
+
+    @Override
+    protected Optional<SkyLuminanceProperty> getFor(BlockState blockState, @Nullable Location<World> location, @Nullable Direction direction) {
+        if (location == null) {
+            return Optional.empty();
+        }
+        final Optional<Chunk> chunk = location.getExtent().getChunk(location.getChunkPosition());
+        return chunk.isPresent() ? this.lookup[((LanternChunk) chunk.get()).getSkyLight(
+                location.getBlockX(), location.getBlockY(), location.getBlockZ())] : Optional.empty();
+    }
+    
 }

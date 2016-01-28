@@ -39,61 +39,44 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
         final MessagePlayOutChunkData.Section[] sections = message.getSections();
         final byte[] biomes = message.getBiomes();
 
-        int sectionBitmask = 0;
-        if (sections != null) {
-            final int maxBitmask = (1 << sections.length) - 1;
-
-            if (biomes != null) {
-                sectionBitmask = maxBitmask;
-            } else {
-                sectionBitmask &= maxBitmask;
-            }
-
-            for (int i = 0; i < sections.length; ++i) {
-                if (sections[i] == null) {
-                    // Remove empty sections from bitmask
-                    sectionBitmask &= ~(1 << i);
-                }
-            }
-        }
-
         final ByteBuf buf = context.byteBufAlloc().buffer();
         buf.writeInt(message.getX());
         buf.writeInt(message.getZ());
         buf.writeBoolean(biomes != null);
-        context.writeVarInt(buf, sectionBitmask);
+
+        int sectionBitmask = 0;
 
         final ByteBuf dataBuf = context.byteBufAlloc().buffer();
-        if (sections != null) {
-            for (int i = 0, mask = 1; i < sections.length; ++i, mask <<= 1) {
-                if ((sectionBitmask & mask) != 0) {
-                    MessagePlayOutChunkData.Section section = sections[i];
-                    VariableValueArray types = section.getTypes();
-                    dataBuf.writeByte(types.getBitsPerValue());
-                    int[] palette = section.getPalette();
-                    if (palette != null) {
-                        context.writeVarInt(dataBuf, palette.length);
-                        for (int value : palette) {
-                            context.writeVarInt(dataBuf, value);
-                        }
-                    } else {
-                        // Using global palette
-                        context.writeVarInt(dataBuf, 0);
-                    }
-                    long[] backing = types.getBacking();
-                    context.writeVarInt(dataBuf, backing.length);
-                    byte[] blockLight = section.getBlockLight();
-                    byte[] skyLightData = section.getSkyLight();
-                    dataBuf.ensureWritable(backing.length * 8 + blockLight.length +
-                            (skyLightData != null ? skyLightData.length : 0));
-                    for (long value : backing) {
-                        dataBuf.writeLong(value);
-                    }
-                    dataBuf.writeBytes(blockLight);
-                    if (skyLightData != null) {
-                        dataBuf.writeBytes(skyLightData);
-                    }
+        for (int i = 0; i < sections.length; i++) {
+            if (sections[i] == null) {
+                continue;
+            }
+            sectionBitmask |= 1 << i;
+            MessagePlayOutChunkData.Section section = sections[i];
+            VariableValueArray types = section.getTypes();
+            dataBuf.writeByte(types.getBitsPerValue());
+            int[] palette = section.getPalette();
+            if (palette != null) {
+                context.writeVarInt(dataBuf, palette.length);
+                for (int value : palette) {
+                    context.writeVarInt(dataBuf, value);
                 }
+            } else {
+                // Using global palette
+                context.writeVarInt(dataBuf, 0);
+            }
+            long[] backing = types.getBacking();
+            context.writeVarInt(dataBuf, backing.length);
+            byte[] blockLight = section.getBlockLight();
+            byte[] skyLight = section.getSkyLight();
+            dataBuf.ensureWritable(backing.length * 8 + blockLight.length +
+                    (skyLight != null ? skyLight.length : 0));
+            for (long value : backing) {
+                dataBuf.writeLong(value);
+            }
+            dataBuf.writeBytes(blockLight);
+            if (skyLight != null) {
+                dataBuf.writeBytes(skyLight);
             }
         }
 
@@ -101,6 +84,7 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             dataBuf.writeBytes(biomes);
         }
 
+        context.writeVarInt(buf, sectionBitmask);
         context.writeVarInt(buf, dataBuf.writerIndex());
         try {
             buf.writeBytes(dataBuf);

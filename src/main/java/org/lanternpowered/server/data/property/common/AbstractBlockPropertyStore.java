@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> extends AbstractLanternPropertyStore<T>
         implements DirectionRelativePropertyStore<T> {
 
-    protected abstract Optional<T> getFor(BlockState blockState, @Nullable Direction direction);
+    protected abstract Optional<T> getFor(BlockState blockState, @Nullable Location<World> location, @Nullable Direction direction);
 
     @Override
     public Optional<T> getFor(PropertyHolder propertyHolder) {
@@ -66,28 +66,28 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
     private Optional<T> getFor0(PropertyHolder propertyHolder, @Nullable Direction direction) {
         checkNotNull(propertyHolder, "propertyHolder");
         if (propertyHolder instanceof BlockState) {
-            return this.getFor((BlockState) propertyHolder, direction);
+            return this.getFor((BlockState) propertyHolder, null, direction);
         } else if (propertyHolder instanceof BlockType) {
-            return this.getFor(((BlockType) propertyHolder).getDefaultState(), direction);
+            return this.getFor(((BlockType) propertyHolder).getDefaultState(), null, direction);
         } else if (propertyHolder instanceof Location) {
-            return this.getFor0((Location<?>) propertyHolder, direction);
+            return this.getFor0((Location<World>) propertyHolder, direction);
         } else if (propertyHolder instanceof ItemType) {
             Optional<BlockType> type = ((ItemType) propertyHolder).getBlock();
             if (type.isPresent()) {
-                return this.getFor(type.get().getDefaultState(), direction);
+                return this.getFor(type.get().getDefaultState(), null, direction);
             }
         } else if (propertyHolder instanceof ItemStack) {
             Optional<BlockType> type = ((ItemStack) propertyHolder).getItem().getBlock();
             if (type.isPresent()) {
-                return this.getFor(((LanternBlockType) type.get()).getStateFromItemStack((ItemStack) propertyHolder), direction);
+                return this.getFor(((LanternBlockType) type.get()).getStateFromItemStack((ItemStack) propertyHolder), null, direction);
             }
         }
         return Optional.empty();
     }
 
-    private Optional<T> getFor0(Location<?> location, @Nullable Direction direction) {
+    private Optional<T> getFor0(Location<World> propertyHolder, @Nullable Direction direction) {
         try {
-            return this.getFor(location.getBlock(), direction);
+            return this.getFor(propertyHolder.getBlock(), propertyHolder, direction);
         // Can be thrown if the extent is gc
         } catch (IllegalStateException e) {
             return Optional.empty();

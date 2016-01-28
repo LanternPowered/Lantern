@@ -35,6 +35,13 @@ import java.util.function.BiFunction;
 public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
 
     /**
+     * Gets the amount of different block states that are registered.
+     *
+     * @return the count
+     */
+    int getBlockStatesCount();
+
+    /**
      * Registers a new catalog type in the registry with a predefined internal id.
      * 
      * @param internalId the internal id

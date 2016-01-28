@@ -23,41 +23,72 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.world.chunk;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.game.LanternGame;
 
-import java.util.UUID;
+final class InternalLoadingTicket implements ChunkLoadingTicket {
 
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
+    private static final ImmutableSet<Vector3i> CHUNK_LIST = ImmutableSet.of();
 
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
-    }
-
-    public LanternEntityLiving() {
-        super();
+    @Override
+    public boolean setNumChunks(int numChunks) {
+        return false;
     }
 
     @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    public int getNumChunks() {
+        return Integer.MAX_VALUE;
     }
 
     @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
+    public int getMaxNumChunks() {
+        return Integer.MAX_VALUE;
     }
 
     @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
+    public String getPlugin() {
+        return LanternGame.MINECRAFT_ID;
     }
 
+    @Override
+    public ImmutableSet<Vector3i> getChunkList() {
+        return CHUNK_LIST;
+    }
+
+    @Override
+    public void forceChunk(Vector3i chunk) {
+    }
+
+    @Override
+    public void unforceChunk(Vector3i chunk) {
+    }
+
+    @Override
+    public void prioritizeChunk(Vector3i chunk) {
+    }
+
+    @Override
+    public void release() {
+    }
+
+    @Override
+    public void forceChunk(Vector2i chunk) {
+    }
+
+    @Override
+    public void unforceChunk(Vector2i chunk) {
+    }
+
+    @Override
+    public void unforceChunks() {
+    }
+
+    @Override
+    public boolean isReleased() {
+        return false;
+    }
 }

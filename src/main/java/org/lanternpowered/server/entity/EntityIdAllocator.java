@@ -25,39 +25,53 @@
  */
 package org.lanternpowered.server.entity;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import java.util.UUID;
+public final class EntityIdAllocator {
 
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
+    private static final EntityIdAllocator INSTANCE = new EntityIdAllocator();
 
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
+    public static EntityIdAllocator get() {
+        return INSTANCE;
     }
 
-    public LanternEntityLiving() {
-        super();
+    private final Queue<Integer> reusableIds = new LinkedBlockingQueue<>();
+    private final AtomicInteger idCounter = new AtomicInteger();
+
+    /**
+     * Polls a new id from the allocator.
+     *
+     * @return the id
+     */
+    public int poll() {
+        Integer id = this.reusableIds.poll();
+        if (id != null) {
+            return id;
+        }
+        return this.idCounter.getAndIncrement();
     }
 
-    @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    public int[] poll(int count) {
+        return this.poll(new int[count]);
     }
 
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
+    public int[] poll(int[] array) {
+        for (int i = 0; i < array.length; i++) {
+            array[i] = this.poll();
+        }
+        return array;
     }
 
-    @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
+    /**
+     * Pushes a id back to be reused.
+     *
+     * <p>WARNING: Do not push ids back twice or
+     * when they are still in use, it may cause
+     * some unforeseen issues.</p>
+     */
+    public void push(int id) {
+        this.reusableIds.offer(id);
     }
-
 }

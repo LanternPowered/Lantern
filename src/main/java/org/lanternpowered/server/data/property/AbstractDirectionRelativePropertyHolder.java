@@ -27,6 +27,7 @@ package org.lanternpowered.server.data.property;
 
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.DirectionRelativePropertyHolder;
+import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.data.property.PropertyStore;
 import org.spongepowered.api.util.Direction;
 
@@ -36,13 +37,17 @@ public interface AbstractDirectionRelativePropertyHolder extends AbstractPropert
 
     @Override
     default <T extends Property<?, ?>> Optional<T> getProperty(Direction direction, Class<T> clazz) {
+        return getPropertyFor(this, direction, clazz);
+    }
+
+    static <T extends Property<?, ?>> Optional<T> getPropertyFor(PropertyHolder propertyHolder, Direction direction, Class<T> clazz) {
         final Optional<PropertyStore<T>> optional = LanternPropertyRegistry.getInstance().getStore(clazz);
         if (optional.isPresent()) {
             PropertyStore<T> propertyStore = optional.get();
             if (propertyStore instanceof DirectionRelativePropertyStore) {
-                return ((DirectionRelativePropertyStore<T>) propertyStore).getFor(this, direction);
+                return ((DirectionRelativePropertyStore<T>) propertyStore).getFor(propertyHolder, direction);
             } else {
-                return propertyStore.getFor(this);
+                return propertyStore.getFor(propertyHolder);
             }
         }
         return Optional.empty();

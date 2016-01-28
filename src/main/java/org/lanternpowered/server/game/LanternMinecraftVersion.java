@@ -32,7 +32,7 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 @NonnullByDefault
 public class LanternMinecraftVersion implements MinecraftVersion {
 
-    public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion(LanternGame.MINECRAFT_VERSION, 99, false);
+    public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion(LanternGame.MINECRAFT_VERSION, 104, false);
 
     public static final LanternMinecraftVersion V1_3 = new LanternMinecraftVersion("<=1.3", 39, true);
     public static final LanternMinecraftVersion V1_5 = new LanternMinecraftVersion("1.4-1.5", 61, true);

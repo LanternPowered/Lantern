@@ -31,7 +31,6 @@ import org.lanternpowered.server.util.collect.expirable.ExpirableValueMap;
 
 import java.util.AbstractMap;
 import java.util.AbstractSet;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;

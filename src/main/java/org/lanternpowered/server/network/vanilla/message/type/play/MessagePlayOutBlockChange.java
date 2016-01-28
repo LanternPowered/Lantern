@@ -23,41 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.network.message.Message;
 
-import java.util.UUID;
+public final class MessagePlayOutBlockChange implements Message {
 
-@NonnullByDefault
-public class LanternEntityLiving extends LanternEntity implements Living {
+    private final Vector3i position;
+    private final int blockState;
 
-    public LanternEntityLiving(UUID uniqueId) {
-        super(uniqueId);
+    public MessagePlayOutBlockChange(Vector3i position, int blockState) {
+        this.blockState = blockState;
+        this.position = position;
     }
 
-    public LanternEntityLiving() {
-        super();
+    public Vector3i getPosition() {
+        return this.position;
     }
 
-    @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
+    public int getBlockState() {
+        return this.blockState;
     }
-
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
-    }
-
-    @Override
-    public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

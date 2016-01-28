@@ -205,7 +205,7 @@ shadowJar {
         include dependency('com.typesafe:config')
 
         // Database
-        include dependency('com.zaxxer:HikariCP-java6')
+        include dependency('com.zaxxer:HikariCP')
         include dependency('org.mariadb.jdbc:mariadb-java-client')
         include dependency('com.h2database:h2')
         include dependency('org.xerial:sqlite-jdbc')

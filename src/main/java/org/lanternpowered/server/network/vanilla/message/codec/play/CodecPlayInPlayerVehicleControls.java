@@ -44,11 +44,6 @@ public final class CodecPlayInPlayerVehicleControls implements Codec<Message> {
     private final static AttributeKey<Boolean> JUMPING = AttributeKey.valueOf("last-jumping-state");
 
     @Override
-    public ByteBuf encode(CodecContext context, Message message) throws CodecException {
-        throw new CodecException();
-    }
-
-    @Override
     public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
         float sideways = buf.readFloat();
         float forwards = buf.readFloat();

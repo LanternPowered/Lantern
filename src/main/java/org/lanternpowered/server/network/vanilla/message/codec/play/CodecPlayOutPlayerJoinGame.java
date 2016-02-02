@@ -53,9 +53,4 @@ public final class CodecPlayOutPlayerJoinGame implements Codec<MessagePlayOutPla
         buf.writeBoolean(message.getReducedDebug());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutPlayerJoinGame decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

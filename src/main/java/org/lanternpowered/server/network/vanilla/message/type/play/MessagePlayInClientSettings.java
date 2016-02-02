@@ -24,6 +24,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
+import org.lanternpowered.server.entity.living.player.PlayerHand;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.text.chat.ChatVisibility;
 
@@ -33,12 +34,14 @@ public final class MessagePlayInClientSettings implements Message {
 
     private final Locale locale;
     private final ChatVisibility chatVisibility;
+    private final PlayerHand mainHand;
     private final int viewDistance;
     private final int skinPartsBitPattern;
     private final boolean enableColors;
 
     public MessagePlayInClientSettings(Locale locale, int viewDistance, ChatVisibility chatVisibility,
-            boolean enableColors, int skinPartsBitPattern) {
+            PlayerHand mainHand, boolean enableColors, int skinPartsBitPattern) {
+        this.mainHand = mainHand;
         this.skinPartsBitPattern = skinPartsBitPattern;
         this.chatVisibility = chatVisibility;
         this.viewDistance = viewDistance;
@@ -64,5 +67,9 @@ public final class MessagePlayInClientSettings implements Message {
 
     public boolean getEnableColors() {
         return this.enableColors;
+    }
+
+    public PlayerHand getMainHand() {
+        return this.mainHand;
     }
 }

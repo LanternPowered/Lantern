@@ -43,9 +43,4 @@ public final class CodecPlayOutEntityVelocity implements Codec<MessagePlayOutEnt
         buf.writeShort((short) Math.min(velocity.getZ() * 8000d, Short.MAX_VALUE));
         return buf;
     }
-
-    @Override
-    public MessagePlayOutEntityVelocity decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

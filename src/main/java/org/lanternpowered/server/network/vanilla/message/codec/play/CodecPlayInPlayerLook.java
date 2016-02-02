@@ -33,16 +33,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInPlayerLook implements Codec<MessagePlayInPlayerLook> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInPlayerLook message) throws CodecException {
-        throw new CodecException();
-    }
-
-    @Override
     public MessagePlayInPlayerLook decode(CodecContext context, ByteBuf buf) throws CodecException {
         float yaw = buf.readFloat();
         float pitch = buf.readFloat();
         boolean onGround = buf.readBoolean();
         return new MessagePlayInPlayerLook(yaw, pitch , onGround);
     }
-
 }

@@ -45,11 +45,6 @@ public final class CodecPlayInResourcePackStatus implements Codec<MessagePlayInR
             .build();
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInResourcePackStatus message) throws CodecException {
-        throw new CodecException();
-    }
-
-    @Override
     public MessagePlayInResourcePackStatus decode(CodecContext context, ByteBuf buf) throws CodecException {
         String hash = context.read(buf, Types.STRING);
         int status0 = context.readVarInt(buf);

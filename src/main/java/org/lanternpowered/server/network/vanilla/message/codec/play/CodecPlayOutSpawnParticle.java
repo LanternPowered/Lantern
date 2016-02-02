@@ -54,9 +54,4 @@ public final class CodecPlayOutSpawnParticle implements Codec<ProcessorPlayOutPa
         }
         return buf;
     }
-
-    @Override
-    public ProcessorPlayOutParticleEffect.MessagePlayOutSpawnParticle decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

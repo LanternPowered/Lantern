@@ -24,19 +24,61 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.entity.living.player.PlayerHand;
 import org.lanternpowered.server.network.message.Message;
 
-public final class MessagePlayInPlayerArmSwings implements Message {
+public final class MessagePlayOutPlayerPositionAndLook implements Message {
 
-    private final PlayerHand hand;
+    private final double x;
+    private final double y;
+    private final double z;
+    private final float yaw;
+    private final float pitch;
+    private final int flags;
+    private final int teleportId;
 
-    public MessagePlayInPlayerArmSwings(PlayerHand hand) {
-        this.hand = hand;
+    public MessagePlayOutPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch, int flags, int teleportId) {
+        this.teleportId = teleportId;
+        this.pitch = pitch;
+        this.flags = flags;
+        this.yaw = yaw;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
-    public PlayerHand getHand() {
-        return this.hand;
+    public double getY() {
+        return this.y;
     }
 
+    public double getX() {
+        return this.x;
+    }
+
+    public double getZ() {
+        return this.z;
+    }
+
+    public float getYaw() {
+        return this.yaw;
+    }
+
+    public float getPitch() {
+        return this.pitch;
+    }
+
+    public int getFlags() {
+        return this.flags;
+    }
+
+    public int getTeleportId() {
+        return this.teleportId;
+    }
+
+    public static class Flags {
+        public static final int RELATIVE_X = 0x1;
+        public static final int RELATIVE_Y = 0x2;
+        public static final int RELATIVE_Z = 0x4;
+        public static final int RELATIVE_PITCH = 0x8;
+        public static final int RELATIVE_YAW = 0x10;
+    }
 }

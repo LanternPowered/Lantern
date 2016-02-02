@@ -28,13 +28,18 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -45,6 +50,12 @@ public final class SoundTypeRegistryModule implements CatalogRegistryModule<Soun
 
     @Override
     public void registerDefaults() {
+        /**
+         * TODO: Fix all the mappings, but wait for the SpongeAPI, they will
+         *       probably have to change all the names.
+         *
+         * @see https://bugs.mojang.com/secure/attachment/102693/sounds.json
+         */
         final Map<String, String> soundMappings = Maps.newHashMap();
         soundMappings.put("ambience_cave", "ambient.cave.cave");
         soundMappings.put("ambience_rain", "ambient.weather.rain");
@@ -293,8 +304,19 @@ public final class SoundTypeRegistryModule implements CatalogRegistryModule<Soun
         soundMappings.put("villager_no", "mob.villager.no");
         soundMappings.put("villager_yes", "mob.villager.yes");
 
+        final Map<String, Integer> soundEventIds = new HashMap<>();
+
+        final Gson gson = new Gson();
+        final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
+                .getResourceAsStream("/assets/lantern/internal/sound-events.json"))), JsonArray.class);
+
+        for (int i = 0; i < array.size(); i++) {
+            soundEventIds.put(array.get(i).getAsString(), i);
+        }
+
         soundMappings.forEach((soundName, soundId) -> {
-            final SoundType soundType = new LanternSoundType(soundName, soundId);
+            final SoundType soundType = new LanternSoundType(soundName, soundId,
+                    soundEventIds.get(soundId));
             this.soundNames.put(soundName, soundType);
             this.soundNames.put(soundId, soundType);
         });

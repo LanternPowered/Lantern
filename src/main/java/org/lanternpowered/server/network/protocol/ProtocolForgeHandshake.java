@@ -61,7 +61,7 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         MessageRegistry inbound = this.inbound();
         MessageRegistry outbound = this.outbound();
 
-        inbound.bind(0x00, CodecInOutPing.class, MessageInOutPing.class).bindHandler(new HandlerInPing());
+        inbound.bind(0x0b, CodecInOutPing.class, MessageInOutPing.class).bindHandler(new HandlerInPing());
         CodecRegistration<Message, CodecPlayInOutCustomPayload> registration = inbound.bind(0x17, CodecPlayInOutCustomPayload.class);
         registration.bind(MessagePlayInOutChannelPayload.class).bindHandler(new HandlerPlayInChannelPayload());
         registration.bind(MessageForgeHandshakeInOutAck.class).bindHandler(new HandlerForgeHandshakeInAck());
@@ -71,9 +71,9 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         registration.bind(MessagePlayInOutRegisterChannels.class).bindHandler(new HandlerPlayInRegisterChannels());
         registration.bind(MessagePlayInOutUnregisterChannels.class).bindHandler(new HandlerPlayInUnregisterChannels());
 
-        outbound.bind(0x00, CodecInOutPing.class, MessageInOutPing.class);
-        outbound.bind(0x3f, CodecPlayInOutCustomPayload.class, MessagePlayInOutChannelPayload.class);
-        outbound.bind(0x40, CodecOutDisconnect.class, MessageOutDisconnect.class);
+        outbound.bind(0x1f, CodecInOutPing.class, MessageInOutPing.class);
+        outbound.bind(0x18, CodecPlayInOutCustomPayload.class, MessagePlayInOutChannelPayload.class);
+        outbound.bind(0x1a, CodecOutDisconnect.class, MessageOutDisconnect.class);
         outbound.bindProcessor(MessageForgeHandshakeOutRegistryData.class, new ProcessorForgeHandshakeOutRegistryData());
     }
 }

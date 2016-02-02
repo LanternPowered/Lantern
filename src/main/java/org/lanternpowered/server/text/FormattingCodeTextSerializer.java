@@ -55,7 +55,7 @@ import javax.annotation.Nullable;
 
 public class FormattingCodeTextSerializer implements org.spongepowered.api.text.serializer.FormattingCodeTextSerializer, LanternTextSerializer {
 
-    private static final BiMap<Object, Character> FORMATS = ImmutableBiMap.<Object, Character>builder()
+    public static final BiMap<Object, Character> FORMATS = ImmutableBiMap.<Object, Character>builder()
             .put(TextColors.BLACK, TextConstants.BLACK)
             .put(TextColors.DARK_BLUE, TextConstants.DARK_BLUE)
             .put(TextColors.DARK_GREEN, TextConstants.DARK_GREEN)

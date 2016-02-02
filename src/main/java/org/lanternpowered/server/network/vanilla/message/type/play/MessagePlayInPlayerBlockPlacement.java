@@ -24,12 +24,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.entity.living.player.PlayerHand;
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 
 public final class MessagePlayInPlayerBlockPlacement implements Message {
@@ -37,16 +35,16 @@ public final class MessagePlayInPlayerBlockPlacement implements Message {
     private final Vector3i position;
     private final Vector3d clickOffset;
     private final Direction face;
-    private final ItemStack heldItem;
+    private final PlayerHand hand;
 
-    public MessagePlayInPlayerBlockPlacement(Vector3i position, Vector3d clickOffset, Direction face, ItemStack heldItem) {
-        this.clickOffset = checkNotNull(clickOffset, "click offset");
-        this.position = checkNotNull(position, "position");
-        this.heldItem = checkNotNull(heldItem, "held item");
-        this.face = checkNotNull(face, "face");
+    public MessagePlayInPlayerBlockPlacement(Vector3i position, Vector3d clickOffset, Direction face, PlayerHand hand) {
+        this.clickOffset = clickOffset;
+        this.position = position;
+        this.face = face;
+        this.hand = hand;
     }
 
-    public Vector3i getBlockPosition() {
+    public Vector3i getPosition() {
         return this.position;
     }
 
@@ -54,16 +52,11 @@ public final class MessagePlayInPlayerBlockPlacement implements Message {
         return this.clickOffset;
     }
 
-    public Vector3d getClickPosition() {
-        return this.position.toDouble().add(this.clickOffset);
-    }
-
-    public Direction getBlockFace() {
+    public Direction getFace() {
         return this.face;
     }
 
-    public ItemStack getHeldItem() {
-        return this.heldItem;
+    public PlayerHand getHand() {
+        return this.hand;
     }
-
 }

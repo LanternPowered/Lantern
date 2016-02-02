@@ -40,10 +40,4 @@ public final class CodecLoginOutSuccess implements Codec<MessageLoginOutSuccess>
         context.write(buf, Types.STRING, message.getUsername());
         return buf;
     }
-
-    @Override
-    public MessageLoginOutSuccess decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
-
 }

@@ -48,9 +48,4 @@ public final class CodecPlayOutEntityLookAndRelativeMove implements Codec<Messag
         buf.writeBoolean(message.isOnGround());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutEntityLookAndRelativeMove decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

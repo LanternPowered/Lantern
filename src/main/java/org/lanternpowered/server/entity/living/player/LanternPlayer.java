@@ -30,11 +30,15 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
+import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.effect.sound.SoundCategory;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
@@ -52,7 +56,6 @@ import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
@@ -67,9 +70,8 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
-
-import javax.annotation.Nullable;
 
 @NonnullByDefault
 public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, AbstractCommandSource {
@@ -87,8 +89,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     // When specified -1, the render distance will match the server one
     private int viewDistance = -1;
 
-    // The char visibility
+    // The chat visibility
     private ChatVisibility chatVisibility = ChatVisibilities.FULL;
+
+    // The main hand of the player
+    private PlayerHand mainHand = PlayerHand.RIGHT;
 
     // Whether the chat colors are enabled
     private boolean chatColorsEnabled;
@@ -202,8 +207,16 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
         checkNotNull(sound, "sound");
         checkNotNull(position, "position");
-        this.session.send(new MessagePlayOutSoundEffect(sound.getName(), position,
-                (float) Math.max(minVolume, volume), (float) pitch));
+        Message message;
+        final OptionalInt eventId = ((LanternSoundType) sound).getEventId();
+        if (eventId.isPresent()) {
+            message = new MessagePlayOutSoundEffect(eventId.getAsInt(), position,
+                    SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
+        } else {
+            message = new MessagePlayOutNamedSoundEffect(sound.getName(), position,
+                    SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
+        }
+        this.session.send(message);
     }
 
     @Override
@@ -254,6 +267,14 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     public void setSkinParts(Set<SkinPart> skinParts) {
         this.skinParts = skinParts;
+    }
+
+    public PlayerHand getMainHand() {
+        return this.mainHand;
+    }
+
+    public void setMainHand(PlayerHand mainHand) {
+        this.mainHand = mainHand;
     }
 
     @Override

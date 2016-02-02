@@ -43,9 +43,4 @@ public final class CodecPlayOutEntityLook implements Codec<MessagePlayOutEntityL
         buf.writeBoolean(message.isOnGround());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutEntityLook decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

@@ -33,11 +33,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInPlayerAbilities implements Codec<MessagePlayInPlayerAbilities> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInPlayerAbilities message) throws CodecException {
-        throw new CodecException();
-    }
-
-    @Override
     public MessagePlayInPlayerAbilities decode(CodecContext context, ByteBuf buf) throws CodecException {
         boolean flying = (buf.readByte() & 0x02) != 0;
         buf.readFloat();

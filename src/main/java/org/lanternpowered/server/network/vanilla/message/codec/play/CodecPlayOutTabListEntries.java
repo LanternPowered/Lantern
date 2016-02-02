@@ -114,9 +114,4 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
         }
         return buf;
     }
-
-    @Override
-    public MessagePlayOutTabListEntries decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

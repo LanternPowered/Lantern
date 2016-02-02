@@ -34,11 +34,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInChatMessage implements Codec<MessagePlayInChatMessage> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInChatMessage message) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public MessagePlayInChatMessage decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessagePlayInChatMessage(context.read(buf, Types.STRING));
     }

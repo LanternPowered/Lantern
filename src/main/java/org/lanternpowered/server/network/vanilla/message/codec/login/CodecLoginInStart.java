@@ -34,11 +34,6 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 public final class CodecLoginInStart implements Codec<MessageLoginInStart> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessageLoginInStart message) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public MessageLoginInStart decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessageLoginInStart(context.read(buf, Types.STRING));
     }

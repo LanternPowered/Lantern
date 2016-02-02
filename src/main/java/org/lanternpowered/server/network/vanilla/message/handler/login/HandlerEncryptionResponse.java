@@ -127,7 +127,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
 
         // Start auth thread
         Thread clientAuthThread = new Thread(new ClientAuthRunnable(session, session.getVerifyUsername(), hash));
-        clientAuthThread.setName("ClientAuth{" + session.getVerifyUsername() + "}");
+        clientAuthThread.setName("auth{" + session.getVerifyUsername() + "}");
         clientAuthThread.start();
     }
 

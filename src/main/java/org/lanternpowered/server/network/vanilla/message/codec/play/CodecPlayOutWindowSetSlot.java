@@ -41,9 +41,4 @@ public final class CodecPlayOutWindowSetSlot implements Codec<MessagePlayOutSetW
         context.write(buf, Types.ITEM_STACK, message.getItem());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutSetWindowSlot decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

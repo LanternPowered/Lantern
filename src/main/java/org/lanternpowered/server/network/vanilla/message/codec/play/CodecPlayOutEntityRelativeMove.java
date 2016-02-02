@@ -44,9 +44,4 @@ public final class CodecPlayOutEntityRelativeMove implements Codec<MessagePlayOu
         buf.writeBoolean(message.isOnGround());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutEntityRelativeMove decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

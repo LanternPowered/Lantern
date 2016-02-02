@@ -37,9 +37,4 @@ public final class CodecPlayOutPlayerSpawnPosition implements Codec<MessagePlayO
     public ByteBuf encode(CodecContext context, MessagePlayOutPlayerSpawnPosition message) throws CodecException {
         return context.write(context.byteBufAlloc().buffer(), Types.POSITION, message.getPosition());
     }
-
-    @Override
-    public MessagePlayOutPlayerSpawnPosition decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

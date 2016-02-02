@@ -46,5 +46,6 @@ public final class HandlerPlayInClientSettings implements Handler<MessagePlayInC
         player.setSkinParts(event.getDisplayedSkinParts());
         player.setChatVisibility(event.getChatVisibility());
         player.setChatColorsEnabled(message.getEnableColors());
+        player.setMainHand(message.getMainHand());
     }
 }

@@ -41,9 +41,4 @@ public final class CodecPlayOutEntityHeadLook implements Codec<MessagePlayOutEnt
         buf.writeByte(wrapAngle(message.getYaw()));
         return buf;
     }
-
-    @Override
-    public MessagePlayOutEntityHeadLook decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

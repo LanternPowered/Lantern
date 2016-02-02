@@ -22,25 +22,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.entity.living.player.PlayerHand;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerArmSwings;
+import org.lanternpowered.server.network.message.Message;
 
-public final class CodecPlayInPlayerArmSwings implements Codec<MessagePlayInPlayerArmSwings> {
+public final class MessagePlayInTeleportConfirm implements Message {
 
-    @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInPlayerArmSwings message) throws CodecException {
-        throw new UnsupportedOperationException();
+    private final int teleportId;
+
+    public MessagePlayInTeleportConfirm(int teleportId) {
+        this.teleportId = teleportId;
     }
 
-    @Override
-    public MessagePlayInPlayerArmSwings decode(CodecContext context, ByteBuf buf) throws CodecException {
-        return new MessagePlayInPlayerArmSwings(PlayerHand.RIGHT);
+    public int getTeleportId() {
+        return this.teleportId;
     }
-
 }

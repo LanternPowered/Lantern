@@ -33,13 +33,7 @@ import org.lanternpowered.server.network.vanilla.message.type.status.MessageStat
 public final class CodecStatusInRequest implements Codec<MessageStatusInRequest> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessageStatusInRequest message) throws CodecException {
-        throw new CodecException();
-    }
-
-    @Override
     public MessageStatusInRequest decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessageStatusInRequest();
     }
-
 }

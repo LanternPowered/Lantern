@@ -54,9 +54,4 @@ public final class CodecPlayOutWorldTime implements Codec<MessagePlayOutWorldTim
 
         return buf;
     }
-
-    @Override
-    public MessagePlayOutWorldTime decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
 }

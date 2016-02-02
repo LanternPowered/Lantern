@@ -50,11 +50,6 @@ public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
     private static final Gson GSON = new Gson();
 
     @Override
-    public ByteBuf encode(CodecContext context, MessageHandshakeIn message) throws CodecException {
-        throw new CodecException();
-    }
-
-    @Override
     public MessageHandshakeIn decode(CodecContext context, ByteBuf buf) throws CodecException {
         int protocol = context.readVarInt(buf);
         String hostname = context.read(buf, Types.STRING);

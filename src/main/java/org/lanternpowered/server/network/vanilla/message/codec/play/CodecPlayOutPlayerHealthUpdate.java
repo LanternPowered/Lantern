@@ -38,11 +38,6 @@ public final class CodecPlayOutPlayerHealthUpdate implements Codec<MessagePlayOu
         buf.writeFloat(message.getHealth());
         context.writeVarInt(buf, (int) message.getFood());
         buf.writeFloat(message.getSaturation());
-        return null;
-    }
-
-    @Override
-    public MessagePlayOutPlayerHealthUpdate decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
+        return buf;
     }
 }

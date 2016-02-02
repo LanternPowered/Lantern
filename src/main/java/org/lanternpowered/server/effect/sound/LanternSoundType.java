@@ -25,14 +25,26 @@
 package org.lanternpowered.server.effect.sound;
 
 import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.util.OptInt;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.OptionalInt;
+
+import javax.annotation.Nullable;
 
 @NonnullByDefault
 public final class LanternSoundType extends LanternCatalogType implements SoundType {
 
-    public LanternSoundType(String identifier, String name) {
+    private final OptionalInt eventId;
+
+    public LanternSoundType(String identifier, String name, @Nullable Integer eventId) {
         super(identifier, name);
+        this.eventId = OptInt.ofNullable(eventId);
+    }
+
+    public OptionalInt getEventId() {
+        return this.eventId;
     }
 
 }

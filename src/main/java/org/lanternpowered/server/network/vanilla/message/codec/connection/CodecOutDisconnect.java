@@ -37,9 +37,4 @@ public final class CodecOutDisconnect implements Codec<MessageOutDisconnect> {
     public ByteBuf encode(CodecContext context, MessageOutDisconnect message) throws CodecException {
         return context.write(context.byteBufAlloc().buffer(), Types.TEXT, message.getReason());
     }
-
-    @Override
-    public MessageOutDisconnect decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
 }

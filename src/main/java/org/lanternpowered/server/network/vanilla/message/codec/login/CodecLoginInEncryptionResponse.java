@@ -33,11 +33,6 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 public final class CodecLoginInEncryptionResponse implements Codec<MessageLoginInEncryptionResponse> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessageLoginInEncryptionResponse message) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public MessageLoginInEncryptionResponse decode(CodecContext context, ByteBuf buf) throws CodecException {
         byte[] sharedSecret = new byte[context.readVarInt(buf)];
         buf.readBytes(sharedSecret);
@@ -45,5 +40,4 @@ public final class CodecLoginInEncryptionResponse implements Codec<MessageLoginI
         buf.readBytes(verifyToken);
         return new MessageLoginInEncryptionResponse(sharedSecret, verifyToken);
     }
-
 }

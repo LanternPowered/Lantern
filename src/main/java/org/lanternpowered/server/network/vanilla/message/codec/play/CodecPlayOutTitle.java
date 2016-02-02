@@ -62,9 +62,4 @@ public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
         }
         return buf;
     }
-
-    @Override
-    public MessagePlayOutTitle decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

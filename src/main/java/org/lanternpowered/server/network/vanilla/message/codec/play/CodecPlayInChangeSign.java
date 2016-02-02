@@ -31,24 +31,16 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeSign;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 public final class CodecPlayInChangeSign implements Codec<MessagePlayInChangeSign> {
-
-    @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInChangeSign message) throws CodecException {
-        throw new CodecException();
-    }
 
     @Override
     public MessagePlayInChangeSign decode(CodecContext context, ByteBuf buf) throws CodecException {
         Vector3i position = context.read(buf, Types.POSITION);
         String[] lines = new String[4];
         for (int i = 0; i < lines.length; i++) {
-            // In the current protocol version are the lines send in json format,
-            // this will change in 1.9
             // TODO: Limit length
-            lines[i] = TextSerializers.PLAIN.serialize(TextSerializers.JSON.deserializeUnchecked(context.read(buf, Types.STRING)));
+            lines[i] = context.read(buf, Types.STRING);
         }
         return new MessagePlayInChangeSign(position, lines);
     }

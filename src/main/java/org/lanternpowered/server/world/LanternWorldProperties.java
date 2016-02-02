@@ -598,7 +598,7 @@ public final class LanternWorldProperties implements WorldProperties {
     }
 
     public MessagePlayOutWorldBorder createWorldBorderMessage() {
-        return MessagePlayOutWorldBorder.initialize(this.borderCenterX, this.borderCenterZ, this.borderDiameterStart,
+        return new MessagePlayOutWorldBorder.Initialize(this.borderCenterX, this.borderCenterZ, this.borderDiameterStart,
                 this.borderDiameterEnd, this.getWorldBorderTimeRemaining(), BOUNDARY, this.borderWarningDistance,
                 this.borderWarningTime);
     }
@@ -614,14 +614,14 @@ public final class LanternWorldProperties implements WorldProperties {
             this.borderDiameterEnd = endDiameter;
             this.setCurrentBorderTime(0);
             if (this.world != null) {
-                this.world.broadcast(() -> MessagePlayOutWorldBorder.setSize(endDiameter));
+                this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateDiameter(endDiameter));
             }
         } else {
             this.borderDiameterStart = startDiameter;
             this.borderDiameterEnd = endDiameter;
             this.setCurrentBorderTime(time);
             if (this.world != null) {
-                this.world.broadcast(() -> MessagePlayOutWorldBorder.lerpSize(startDiameter,
+                this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateLerpedDiameter(startDiameter,
                         endDiameter, time));
             }
         }
@@ -633,7 +633,7 @@ public final class LanternWorldProperties implements WorldProperties {
         this.borderCenterZ = z;
 
         if (this.world != null) {
-            this.world.broadcast(() -> MessagePlayOutWorldBorder.setCenter(this.borderCenterX,
+            this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateCenter(this.borderCenterX,
                     this.borderCenterZ));
         }
     }
@@ -687,8 +687,8 @@ public final class LanternWorldProperties implements WorldProperties {
     public void setWorldBorderTimeRemaining(long time) {
         this.setCurrentBorderTime(time);
         if (this.world != null) {
-            this.world.broadcast(() -> time == 0 ? MessagePlayOutWorldBorder.setSize(this.borderDiameterEnd) :
-                MessagePlayOutWorldBorder.lerpSize(this.getWorldBorderDiameter(), this.borderDiameterEnd,
+            this.world.broadcast(() -> time == 0 ? new MessagePlayOutWorldBorder.UpdateDiameter(this.borderDiameterEnd) :
+                new MessagePlayOutWorldBorder.UpdateLerpedDiameter(this.getWorldBorderDiameter(), this.borderDiameterEnd,
                         this.getWorldBorderTimeRemaining()));
         }
     }
@@ -702,8 +702,8 @@ public final class LanternWorldProperties implements WorldProperties {
     public void setWorldBorderTargetDiameter(double diameter) {
         this.borderDiameterEnd = diameter;
         if (this.world != null) {
-            this.world.broadcast(() -> this.getWorldBorderTimeRemaining() == 0 ? MessagePlayOutWorldBorder.setSize(
-                    diameter) : MessagePlayOutWorldBorder.lerpSize(this.getWorldBorderDiameter(),
+            this.world.broadcast(() -> this.getWorldBorderTimeRemaining() == 0 ? new MessagePlayOutWorldBorder.UpdateDiameter(
+                    diameter) : new MessagePlayOutWorldBorder.UpdateLerpedDiameter(this.getWorldBorderDiameter(),
                             diameter, this.getWorldBorderTimeRemaining()));
         }
     }
@@ -737,7 +737,7 @@ public final class LanternWorldProperties implements WorldProperties {
     public void setWorldBorderWarningTime(int time) {
         this.borderWarningTime = time;
         if (this.world != null) {
-            this.world.broadcast(() -> MessagePlayOutWorldBorder.setWarningTime(time));
+            this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningTime(time));
         }
     }
 
@@ -750,7 +750,7 @@ public final class LanternWorldProperties implements WorldProperties {
     public void setWorldBorderWarningDistance(int distance) {
         this.borderWarningDistance = distance;
         if (this.world != null) {
-            this.world.broadcast(() -> MessagePlayOutWorldBorder.setWarningBlocks(distance));
+            this.world.broadcast(() -> new MessagePlayOutWorldBorder.UpdateWarningDistance(distance));
         }
     }
 

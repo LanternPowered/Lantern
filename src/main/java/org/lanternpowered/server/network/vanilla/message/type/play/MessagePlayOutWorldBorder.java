@@ -26,231 +26,153 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
 
-public final class MessagePlayOutWorldBorder implements Message {
+public abstract class MessagePlayOutWorldBorder implements Message {
 
-    /**
-     * Builds a world border message with the {@link Action#SET_SIZE} action.
-     * 
-     * @param radius the new radius
-     * @return the message
-     */
-    public static MessagePlayOutWorldBorder setSize(double radius) {
-        MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
-        message.action = Action.SET_SIZE;
-        message.radiusNew = radius;
-        return message;
-    }
+    public static final class Initialize extends MessagePlayOutWorldBorder {
 
-    /**
-     * Builds a world border message with the {@link Action#LERP_SIZE} action.
-     * 
-     * @param radiusOld the start radius
-     * @param radiusNew the end radius
-     * @param lerpTime the lerp time in seconds
-     * @return the message
-     */
-    public static MessagePlayOutWorldBorder lerpSize(double radiusOld, double radiusNew, long lerpTime) {
-        MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
-        message.action = Action.LERP_SIZE;
-        message.radiusOld = radiusOld;
-        message.radiusNew = radiusNew;
-        message.lerpTime = lerpTime;
-        return message;
-    }
+        private final double centerX;
+        private final double centerZ;
 
-    /**
-     * Builds a world border message with the {@link Action#SET_CENTER} action.
-     * 
-     * @param x the x coordinate
-     * @param z the z coordinate
-     * @return the message
-     */
-    public static MessagePlayOutWorldBorder setCenter(double x, double z) {
-        MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
-        message.action = Action.SET_CENTER;
-        message.x = x;
-        message.z = z;
-        return message;
-    }
+        private final double oldDiameter;
+        private final double newDiameter;
 
-    /**
-     * Builds a world border message with the {@link Action#INITIALIZE} action.
-     * 
-     * @param x the x coordinate
-     * @param z the z coordinate
-     * @param radiusOld the start radius
-     * @param radiusNew the end radius
-     * @param lerpTime the lerp time in seconds
-     * @param worldSize the size of the world the border is located in
-     * @param warningTime the amount of time before your screen becomes red
-     * @param warningBlocks the amount of blocks from the border
-     * @return the message
-     */
-    public static MessagePlayOutWorldBorder initialize(double x, double z, double radiusOld,
-            double radiusNew, long lerpTime, int worldSize, int warningBlocks, int warningTime) {
-        MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
-        message.action = Action.INITIALIZE;
-        message.worldSize = worldSize;
-        message.warningBlocks = warningBlocks;
-        message.warningTime = warningTime;
-        message.radiusOld = radiusOld;
-        message.radiusNew = radiusNew;
-        message.lerpTime = lerpTime;
-        message.x = x;
-        message.z = z;
-        return message;
-    }
+        private final long lerpTime;
 
-    /**
-     * Builds a world border message with the {@link Action#SET_WARNING_TIME}
-     * action.
-     * 
-     * @param warningTime the amount of time before your screen becomes red
-     * @return the message
-     */
-    public static MessagePlayOutWorldBorder setWarningTime(int warningTime) {
-        MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
-        message.action = Action.SET_WARNING_TIME;
-        message.warningTime = warningTime;
-        return message;
-    }
+        // The (maximum) size of the world
+        private final int worldSize;
 
-    /**
-     * Builds a world border message with the {@link Action#SET_WARNING_BLOCKS}
-     * action.
-     * 
-     * @param warningBlocks the amount of blocks from the border
-     * @return the message
-     */
-    public static MessagePlayOutWorldBorder setWarningBlocks(int warningBlocks) {
-        MessagePlayOutWorldBorder message = new MessagePlayOutWorldBorder();
-        message.action = Action.SET_WARNING_BLOCKS;
-        message.warningBlocks = warningBlocks;
-        return message;
-    }
+        private final int warningDistance;
+        private final int warningTime;
 
-    private Action action;
-
-    private double x;
-    private double z;
-
-    private double radiusOld;
-    private double radiusNew;
-
-    private long lerpTime;
-
-    // The (maximum) size of the world
-    private int worldSize;
-
-    private int warningBlocks;
-    private int warningTime;
-
-    private MessagePlayOutWorldBorder() {
-    }
-
-    /**
-     * Gets the action of this message.
-     * 
-     * @return the action
-     */
-    public Action getAction() {
-        return this.action;
-    }
-
-    /**
-     * Gets the x coordinate of the center.
-     * 
-     * @return the x coordinate
-     */
-    public double getX() {
-        return this.x;
-    }
-
-    /**
-     * Gets the z coordinate of the center.
-     * 
-     * @return the z coordinate
-     */
-    public double getZ() {
-        return this.z;
-    }
-
-    /**
-     * Gets the old or start radius.
-     * 
-     * @return the radius
-     */
-    public double getOldRadius() {
-        return this.radiusOld;
-    }
-
-    /**
-     * Gets the new or end radius.
-     * 
-     * @return the radius
-     */
-    public double getNewRadius() {
-        return this.radiusNew;
-    }
-
-    /**
-     * Gets the amount of time it takes to lerp from the old to new radius.
-     * 
-     * @return the amount of time
-     */
-    public long getLerpTime() {
-        return this.lerpTime;
-    }
-
-    /**
-     * The size of the world the border is located in.
-     * 
-     * @return the size
-     */
-    public int getWorldSize() {
-        return this.worldSize;
-    }
-
-    /**
-     * Gets the warning blocks.
-     * 
-     * @return the warning blocks
-     */
-    public int getWarningBlocks() {
-        return this.warningBlocks;
-    }
-
-    /**
-     * Gets the warning time.
-     * 
-     * @return the warning time
-     */
-    public int getWarningTime() {
-        return this.warningTime;
-    }
-
-    public enum Action {
-        SET_SIZE            (0),
-        LERP_SIZE           (1),
-        SET_CENTER          (2),
-        INITIALIZE          (3),
-        SET_WARNING_TIME    (4),
-        SET_WARNING_BLOCKS  (5);
-
-        private final byte id;
-
-        Action(int id) {
-            this.id = (byte) id;
+        public Initialize(double centerX, double centerZ, double oldDiameter, double newDiameter, long lerpTime,
+                int worldSize, int warningDistance, int warningTime) {
+            this.centerX = centerX;
+            this.centerZ = centerZ;
+            this.oldDiameter = oldDiameter;
+            this.newDiameter = newDiameter;
+            this.lerpTime = lerpTime;
+            this.worldSize = worldSize;
+            this.warningDistance = warningDistance;
+            this.warningTime = warningTime;
         }
 
-        /**
-         * Gets the id of the action.
-         * 
-         * @return the id
-         */
-        public byte getId() {
-            return this.id;
+        public double getCenterX() {
+            return this.centerX;
         }
 
+        public double getCenterZ() {
+            return this.centerZ;
+        }
+
+        public double getOldDiameter() {
+            return this.oldDiameter;
+        }
+
+        public double getNewDiameter() {
+            return this.newDiameter;
+        }
+
+        public long getLerpTime() {
+            return this.lerpTime;
+        }
+
+        public int getWorldSize() {
+            return this.worldSize;
+        }
+
+        public int getWarningDistance() {
+            return this.warningDistance;
+        }
+
+        public int getWarningTime() {
+            return this.warningTime;
+        }
+    }
+
+    public static final class UpdateDiameter extends MessagePlayOutWorldBorder {
+
+        private final double diameter;
+
+        public UpdateDiameter(double diameter) {
+            this.diameter = diameter;
+        }
+
+        public double getDiameter() {
+            return this.diameter;
+        }
+    }
+
+    public static final class UpdateLerpedDiameter extends MessagePlayOutWorldBorder {
+
+        private final double oldDiameter;
+        private final double newDiameter;
+
+        private final long lerpTime;
+
+        public UpdateLerpedDiameter(double oldDiameter, double newDiameter, long lerpTime) {
+            this.oldDiameter = oldDiameter;
+            this.newDiameter = newDiameter;
+            this.lerpTime = lerpTime;
+        }
+
+        public double getOldDiameter() {
+            return this.oldDiameter;
+        }
+
+        public double getNewDiameter() {
+            return this.newDiameter;
+        }
+
+        public long getLerpTime() {
+            return this.lerpTime;
+        }
+    }
+
+    public static final class UpdateCenter extends MessagePlayOutWorldBorder {
+
+        private final double x;
+        private final double z;
+
+        public UpdateCenter(double x, double z) {
+            this.x = x;
+            this.z = z;
+        }
+
+        public double getX() {
+            return this.x;
+        }
+
+        public double getZ() {
+            return this.z;
+        }
+    }
+
+    public static final class UpdateWarningTime extends MessagePlayOutWorldBorder {
+
+        private final int time;
+
+        public UpdateWarningTime(int time) {
+            this.time = time;
+        }
+
+        public int getTime() {
+            return this.time;
+        }
+    }
+
+    public static final class UpdateWarningDistance extends MessagePlayOutWorldBorder {
+
+        private final int distance;
+
+        public UpdateWarningDistance(int distance) {
+            this.distance = distance;
+        }
+
+        public int getDistance() {
+            return this.distance;
+        }
+    }
+
+    MessagePlayOutWorldBorder() {
     }
 }

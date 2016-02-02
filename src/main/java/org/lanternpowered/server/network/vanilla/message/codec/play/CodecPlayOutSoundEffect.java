@@ -30,14 +30,20 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
 
-public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundEffect> {
+public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundEffectBase> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSoundEffect message) throws CodecException {
+    public ByteBuf encode(CodecContext context, MessagePlayOutSoundEffectBase message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, Types.STRING, message.getName());
+        context.writeVarInt(buf, message.getCategory().ordinal());
+        final Object type = message.getType();
+        if (type instanceof Integer) {
+            context.writeVarInt(buf, (Integer) type);
+        } else {
+            context.write(buf, Types.STRING, (String) type);
+        }
         Vector3d pos = message.getPosition();
         buf.writeInt((int) (pos.getX() * 8d));
         buf.writeInt((int) (pos.getY() * 8d));
@@ -45,10 +51,5 @@ public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundE
         buf.writeFloat(message.getVolume());
         buf.writeByte((byte) Math.max(message.getPitch() * 63f, Byte.MAX_VALUE));
         return buf;
-    }
-
-    @Override
-    public MessagePlayOutSoundEffect decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new UnsupportedOperationException();
     }
 }

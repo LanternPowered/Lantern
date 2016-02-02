@@ -39,9 +39,4 @@ public final class CodecPlayOutEntityCollectItem implements Codec<MessagePlayOut
         context.writeVarInt(buf, message.getCollectorId());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutEntityCollectItem decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

@@ -41,5 +41,4 @@ public final class CodecStatusInOutPing implements Codec<MessageStatusInOutPing>
     public MessageStatusInOutPing decode(CodecContext context, ByteBuf buf) throws CodecException {
         return new MessageStatusInOutPing(buf.readLong());
     }
-
 }

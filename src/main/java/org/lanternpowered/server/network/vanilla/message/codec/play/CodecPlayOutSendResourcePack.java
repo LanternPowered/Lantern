@@ -40,9 +40,4 @@ public final class CodecPlayOutSendResourcePack implements Codec<MessagePlayOutS
         context.write(buf, Types.STRING, message.getHash());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutSendResourcePack decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

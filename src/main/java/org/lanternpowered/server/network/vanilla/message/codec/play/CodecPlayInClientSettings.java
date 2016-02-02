@@ -26,6 +26,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.entity.living.player.PlayerHand;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -37,18 +38,13 @@ import java.util.Locale;
 public final class CodecPlayInClientSettings implements Codec<MessagePlayInClientSettings> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayInClientSettings message) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public MessagePlayInClientSettings decode(CodecContext context, ByteBuf buf) throws CodecException {
         Locale locale = Locale.forLanguageTag(context.read(buf, Types.STRING));
         int viewDistance = buf.readByte();
         LanternChatVisibility visibility = LanternChatVisibility.fromInternalId(buf.readByte());
         boolean enableColors = buf.readBoolean();
         int skinPartsBitPattern = buf.readByte() & 0xff;
-        return new MessagePlayInClientSettings(locale, viewDistance, visibility, enableColors, skinPartsBitPattern);
+        PlayerHand mainHand = PlayerHand.values()[context.readVarInt(buf)];
+        return new MessagePlayInClientSettings(locale, viewDistance, visibility, mainHand, enableColors, skinPartsBitPattern);
     }
-
 }

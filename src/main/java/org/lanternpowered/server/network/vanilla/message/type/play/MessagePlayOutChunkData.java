@@ -28,6 +28,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.util.VariableValueArray;
 
 import javax.annotation.Nullable;
 
@@ -38,7 +39,6 @@ public final class MessagePlayOutChunkData implements Message {
 
     private final Section[] sections;
     @Nullable private final byte[] biomes;
-    private final boolean skylight;
 
     public MessagePlayOutChunkData(int x, int z, boolean skylight, Section[] sections, @Nullable byte[] biomes) {
         checkNotNull(sections, "sections");
@@ -48,7 +48,6 @@ public final class MessagePlayOutChunkData implements Message {
                         "Skylight must be present in every section if skylight is to true, and absent if false.");
             }
         }
-        this.skylight = skylight;
         this.sections = sections;
         this.biomes = biomes;
         this.x = x;
@@ -57,10 +56,6 @@ public final class MessagePlayOutChunkData implements Message {
 
     public Section[] getSections() {
         return this.sections;
-    }
-
-    public boolean hasSkyLight() {
-        return this.skylight;
     }
 
     public int getX() {
@@ -78,21 +73,23 @@ public final class MessagePlayOutChunkData implements Message {
 
     /**
      * Represents the data of chunk section.
+     *
+     * Notes:
+     * - If bitsPerValue is smaller then 4 bits, the client will round up to 4
+     * - When bitsPerValue is greater then 8 bits, the client will use the global palette
      */
     public static class Section {
 
-        private final short[] blockTypes;
+        private final VariableValueArray types;
+        @Nullable private final int[] palette;
         private final byte[] blockLight;
         @Nullable private final byte[] skyLight;
 
-        public Section(short[] blockTypes, byte[] blockLight, @Nullable byte[] skyLight) {
-            this.blockTypes = blockTypes;
+        public Section(VariableValueArray types, int[] palette, byte[] blockLight, @Nullable byte[] skyLight) {
             this.blockLight = blockLight;
             this.skyLight = skyLight;
-        }
-
-        public short[] getBlockTypes() {
-            return this.blockTypes;
+            this.palette = palette;
+            this.types = types;
         }
 
         public byte[] getBlockLight() {
@@ -102,6 +99,15 @@ public final class MessagePlayOutChunkData implements Message {
         @Nullable
         public byte[] getSkyLight() {
             return this.skyLight;
+        }
+
+        public VariableValueArray getTypes() {
+            return this.types;
+        }
+
+        @Nullable
+        public int[] getPalette() {
+            return this.palette;
         }
     }
 

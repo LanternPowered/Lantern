@@ -24,7 +24,22 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-public class CodecUtils {
+import org.spongepowered.api.util.Direction;
+
+final class CodecUtils {
+
+    public static Direction fromFace(int face) {
+        switch (face) {
+            case 0: return Direction.DOWN;
+            case 1: return Direction.UP;
+            case 2: return Direction.NORTH;
+            case 3: return Direction.SOUTH;
+            case 4: return Direction.WEST;
+            case 5: return Direction.EAST;
+            default:
+                throw new IllegalStateException("Unknown face: " + face);
+        }
+    }
 
     /**
      * Wraps the float angle into a byte.

@@ -37,10 +37,4 @@ public final class CodecStatusOutResponse implements Codec<MessageStatusOutRespo
     public ByteBuf encode(CodecContext context, MessageStatusOutResponse message) throws CodecException {
         return context.write(context.byteBufAlloc().buffer(), Types.STRING, message.getResponse());
     }
-
-    @Override
-    public MessageStatusOutResponse decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
-
 }

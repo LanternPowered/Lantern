@@ -36,9 +36,4 @@ public final class CodecLoginOutSetCompression implements Codec<MessageLoginOutS
     public ByteBuf encode(CodecContext context, MessageLoginOutSetCompression message) throws CodecException {
         return context.writeVarInt(context.byteBufAlloc().buffer(), message.getThreshold());
     }
-
-    @Override
-    public MessageLoginOutSetCompression decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
 }

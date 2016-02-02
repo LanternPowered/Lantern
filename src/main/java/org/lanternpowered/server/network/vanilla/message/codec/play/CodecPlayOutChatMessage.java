@@ -62,9 +62,4 @@ public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMe
         buf.writeByte(value);
         return buf;
     }
-
-    @Override
-    public MessagePlayOutChatMessage decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

@@ -41,11 +41,6 @@ public final class CodecPlayInPlayerAction implements Codec<Message> {
     static final AttributeKey<Boolean> CANCEL_NEXT_JUMP_MESSAGE = AttributeKey.valueOf("cancel-next-jump-message");
 
     @Override
-    public ByteBuf encode(CodecContext context, Message message) throws CodecException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
         // Normally should this be the entity id, but only the
         // client player will send this, so it won't be used
@@ -73,5 +68,4 @@ public final class CodecPlayInPlayerAction implements Codec<Message> {
         }
         throw new CodecException("Unknown action type: " + action);
     }
-
 }

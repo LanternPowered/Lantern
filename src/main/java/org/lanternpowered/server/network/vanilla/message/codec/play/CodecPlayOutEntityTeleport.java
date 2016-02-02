@@ -48,9 +48,4 @@ public final class CodecPlayOutEntityTeleport implements Codec<MessagePlayOutEnt
         buf.writeBoolean(message.isOnGround());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutEntityTeleport decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

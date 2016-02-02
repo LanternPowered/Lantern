@@ -44,9 +44,4 @@ public final class CodecPlayOutUpdateSign implements Codec<MessagePlayOutUpdateS
         }
         return buf;
     }
-
-    @Override
-    public MessagePlayOutUpdateSign decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

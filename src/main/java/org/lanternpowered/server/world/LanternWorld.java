@@ -39,11 +39,14 @@ import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.effect.AbstractViewer;
+import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.effect.sound.SoundCategory;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.text.title.LanternTitles;
@@ -116,6 +119,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -719,8 +723,15 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
         List<LanternPlayer> players = this.getPlayers();
         if (!players.isEmpty()) {
-            MessagePlayOutSoundEffect message = new MessagePlayOutSoundEffect(sound.getName(), position,
-                    (float) Math.max(minVolume, volume), (float) pitch);
+            Message message;
+            final OptionalInt eventId = ((LanternSoundType) sound).getEventId();
+            if (eventId.isPresent()) {
+                message = new MessagePlayOutSoundEffect(eventId.getAsInt(), position,
+                        SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
+            } else {
+                message = new MessagePlayOutNamedSoundEffect(sound.getName(), position,
+                        SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
+            }
             for (LanternPlayer player : players) {
                 player.getConnection().send(message);
             }

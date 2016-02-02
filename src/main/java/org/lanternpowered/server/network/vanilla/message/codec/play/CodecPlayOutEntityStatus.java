@@ -49,9 +49,4 @@ public final class CodecPlayOutEntityStatus implements Codec<Message> {
         }
         return context.byteBufAlloc().buffer(9).writeInt(entityId).writeByte(action);
     }
-
-    @Override
-    public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

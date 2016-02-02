@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.network.message.Message;
 
-public class MessagePlayInChangeCommand implements Message {
+public abstract class MessagePlayInChangeCommand implements Message {
 
     private final String command;
     private final boolean shouldTrackOutput;
@@ -45,7 +45,7 @@ public class MessagePlayInChangeCommand implements Message {
         return this.shouldTrackOutput;
     }
 
-    public static class Entity extends MessagePlayInChangeCommand {
+    public static final class Entity extends MessagePlayInChangeCommand {
 
         private final int entityId;
 
@@ -59,7 +59,7 @@ public class MessagePlayInChangeCommand implements Message {
         }
     }
 
-    public static class Block extends MessagePlayInChangeCommand {
+    public static final class Block extends MessagePlayInChangeCommand {
 
         private final Vector3i position;
 

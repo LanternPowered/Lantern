@@ -40,9 +40,4 @@ public final class CodecPlayOutTabListHeaderAndFooter implements Codec<MessagePl
         context.write(buf, Types.TEXT, message.getFooter());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutTabListHeaderAndFooter decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

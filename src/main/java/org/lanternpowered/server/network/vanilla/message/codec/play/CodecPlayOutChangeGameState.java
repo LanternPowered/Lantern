@@ -39,9 +39,4 @@ public final class CodecPlayOutChangeGameState implements Codec<MessagePlayOutCh
         buf.writeFloat(message.getValue());
         return buf;
     }
-
-    @Override
-    public MessagePlayOutChangeGameState decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

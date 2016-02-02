@@ -50,11 +50,6 @@ public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAb
         return buf;
     }
 
-    @Override
-    public MessagePlayOutPlayerAbilities decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
-
     private static float calculateFieldOfView(float fov, boolean flying) {
         float x = Math.max(Math.min(fov, 1f), 0f) * 2.8f - 0.8f;
         float y = flying ? 1.1f : 1.0f; // Is this needed?

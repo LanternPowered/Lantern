@@ -43,9 +43,4 @@ public final class CodecPlayOutBlockBreakAnimation implements Codec<MessagePlayO
         buf.writeByte((byte) (state >= 0 && state <= 9 ? state : 10));
         return null;
     }
-
-    @Override
-    public MessagePlayOutBlockBreakAnimation decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

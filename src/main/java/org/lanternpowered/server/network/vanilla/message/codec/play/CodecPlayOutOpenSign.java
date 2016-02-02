@@ -37,9 +37,4 @@ public final class CodecPlayOutOpenSign implements Codec<MessagePlayOutOpenSign>
     public ByteBuf encode(CodecContext context, MessagePlayOutOpenSign message) throws CodecException {
         return context.write(context.byteBufAlloc().buffer(), Types.POSITION, message.getPosition());
     }
-
-    @Override
-    public MessagePlayOutOpenSign decode(CodecContext context, ByteBuf buf) throws CodecException {
-        throw new CodecException();
-    }
 }

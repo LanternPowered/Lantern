@@ -256,7 +256,7 @@ public final class LanternWorldManager {
         final LanternWorld world0 = (LanternWorld) world;
         // We cannot unload the world if there are
         // still players active
-        if (world0.getPlayers().isEmpty()) {
+        if (!world0.getPlayers().isEmpty()) {
             return false;
         }
         // Post the unload world event

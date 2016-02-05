@@ -24,34 +24,27 @@
  */
 package org.lanternpowered.server.world.chunk;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTIONS;
+import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_SIZE;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.storage.ChunkLayout;
-
-import java.util.Optional;
 
 public class LanternChunkLayout implements ChunkLayout {
 
-    /**
-     * The instance of the chunk layout.
-     */
+    // The instance of the chunk layout.
     public static final LanternChunkLayout INSTANCE = new LanternChunkLayout();
 
-    // The amount of chunk sections
-    public static final int CHUNK_SECTIONS = 8;
     // The size of one chunk section
-    public static final Vector3i CHUNK_SECTION_SIZE = new Vector3i(16, 16, 16);
-    public static final Vector3i CHUNK_SECTION_MASK = CHUNK_SECTION_SIZE.sub(Vector3i.ONE);
+    public static final Vector3i CHUNK_SECTION_SIZE_VECTOR = new Vector3i(CHUNK_SECTION_SIZE, CHUNK_SECTION_SIZE, CHUNK_SECTION_SIZE);
+    public static final Vector3i CHUNK_SECTION_MASK = CHUNK_SECTION_SIZE_VECTOR.sub(Vector3i.ONE);
     // The size of one chunk
-    public static final Vector3i CHUNK_SIZE = CHUNK_SECTION_SIZE.mul(1, CHUNK_SECTIONS, 1);
+    public static final Vector3i CHUNK_SIZE = CHUNK_SECTION_SIZE_VECTOR.mul(1, CHUNK_SECTIONS, 1);
     public static final Vector3i CHUNK_MASK = CHUNK_SIZE.sub(Vector3i.ONE);
 
-    public static final Vector2i CHUNK_AREA_SIZE = CHUNK_SECTION_SIZE.toVector2(true);
+    public static final Vector2i CHUNK_AREA_SIZE = CHUNK_SECTION_SIZE_VECTOR.toVector2(true);
 
     public static final Vector3i SPACE_MAX = LanternWorld.BLOCK_MAX.div(CHUNK_SIZE);
     public static final Vector3i SPACE_MIN = LanternWorld.BLOCK_MIN.div(CHUNK_SIZE);
@@ -83,95 +76,24 @@ public class LanternChunkLayout implements ChunkLayout {
     }
 
     @Override
-    public boolean isValidChunk(Vector3i coords) {
-        checkNotNull(coords, "coords");
-        return this.isValidChunk(coords.getX(), coords.getY(), coords.getZ());
-    }
-
-    @Override
-    public boolean isValidChunk(int x, int y, int z) {
-        return VecHelper.inBounds(x, y, z, SPACE_MIN, SPACE_MAX);
-    }
-
-    @Override
-    public boolean isInChunk(Vector3i localCoords) {
-        checkNotNull(localCoords, "localCoords");
-        return this.isInChunk(localCoords.getX(), localCoords.getY(), localCoords.getZ());
-    }
-
-    @Override
     public boolean isInChunk(int x, int y, int z) {
-        return (x >> 4) == 0 && (y >> 4) == 0 && (z >> 4) == 0;
-    }
-
-    @Override
-    public boolean isInChunk(Vector3i worldCoords, Vector3i chunkCoords) {
-        checkNotNull(worldCoords, "worldCoords");
-        checkNotNull(chunkCoords, "chunkCoords");
-        return this.isInChunk(worldCoords.getX(), worldCoords.getY(), worldCoords.getZ(), chunkCoords.getX(), chunkCoords.getY(), chunkCoords.getZ());
+        // No bits allowed outside the mask!
+        return (x & ~CHUNK_MASK.getX()) == 0 && (y & ~CHUNK_MASK.getY()) == 0 && (z & ~CHUNK_MASK.getZ()) == 0;
     }
 
     @Override
     public boolean isInChunk(int wx, int wy, int wz, int cx, int cy, int cz) {
-        return this.isInChunk(wx - (cx << 4), wy - (cy << 4), wz - (cz << 4));
+        return this.isInChunk(wx - (cx << 4), wy - (cy << 8), wz - (cz << 4));
     }
 
     @Override
-    public Optional<Vector3i> toChunk(Vector3i worldCoords) {
-        checkNotNull(worldCoords, "worldCoords");
-        return this.toChunk(worldCoords.getX(), worldCoords.getY(), worldCoords.getZ());
+    public Vector3i forceToChunk(int x, int y, int z) {
+        return new Vector3i(x >> 4, y >> 8, z >> 4);
     }
 
     @Override
-    public Optional<Vector3i> toChunk(int x, int y, int z) {
-        Vector3i chunkCoords = new Vector3i(x >> 4, y >> 4, z >> 4);
-        return this.isValidChunk(chunkCoords) ? Optional.of(chunkCoords) : Optional.empty();
-    }
-
-    @Override
-    public Optional<Vector3i> toWorld(Vector3i chunkCoords) {
-        checkNotNull(chunkCoords, "chunkCoords");
-        return this.toChunk(chunkCoords.getX(), chunkCoords.getY(), chunkCoords.getZ());
-    }
-
-    @Override
-    public Optional<Vector3i> toWorld(int x, int y, int z) {
-        return this.isValidChunk(x, y, z) ? Optional.of(new Vector3i(x << 4, 0, z << 4)) : Optional.empty();
-    }
-
-    @Override
-    public Optional<Vector3i> addToChunk(Vector3i chunkCoords, Vector3i chunkOffset) {
-        checkNotNull(chunkCoords, "chunkCoords");
-        checkNotNull(chunkOffset, "chunkOffset");
-        return addToChunk(chunkCoords.getX(), chunkCoords.getY(), chunkCoords.getZ(), chunkOffset.getX(), chunkOffset.getY(), chunkOffset.getZ());
-    }
-
-    @Override
-    public Optional<Vector3i> addToChunk(int cx, int cy, int cz, int ox, int oy, int oz) {
-        Vector3i newChunkCoords = new Vector3i(cx + ox, cy + oy, cz + oz);
-        return this.isValidChunk(newChunkCoords) ? Optional.of(newChunkCoords) : Optional.empty();
-    }
-
-    @Override
-    public Optional<Vector3i> moveToChunk(Vector3i chunkCoords, Direction direction) {
-        return this.moveToChunk(chunkCoords, direction, 1);
-    }
-
-    @Override
-    public Optional<Vector3i> moveToChunk(int x, int y, int z, Direction direction) {
-        return this.moveToChunk(x, y, z, direction, 1);
-    }
-
-    @Override
-    public Optional<Vector3i> moveToChunk(Vector3i chunkCoords, Direction direction, int steps) {
-        checkNotNull(chunkCoords, "chunkCoords");
-        checkNotNull(direction, "direction");
-        return this.addToChunk(chunkCoords, direction.toVector3d().ceil().toInt().mul(steps));
-    }
-
-    @Override
-    public Optional<Vector3i> moveToChunk(int x, int y, int z, Direction direction, int steps) {
-        return this.moveToChunk(new Vector3i(x, y, z), direction, steps);
+    public Vector3i forceToWorld(int x, int y, int z) {
+        return new Vector3i(x << 4, y << 8, z << 4);
     }
 
 }

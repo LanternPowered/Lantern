@@ -24,7 +24,6 @@
  */
 package org.lanternpowered.server.network.pipeline.legacy;
 
-import com.google.common.base.Charsets;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -44,6 +43,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
@@ -53,21 +53,45 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object object) throws Exception {
         LanternServer server = ctx.channel().attr(Session.SESSION).get().getServer();
 
-        ByteBuf buf0 = (ByteBuf) object;
-        buf0.markReaderIndex();
+        ByteBuf buf = (ByteBuf) object;
+        buf.markReaderIndex();
 
         // Whether it was a valid legacy message
         boolean legacy = false;
 
         try {
-            // Check for the right message id.
-            if (buf0.readUnsignedByte() != 0xfe) {
+            int messageId = buf.readUnsignedByte();
+            // Old client's are not so smart, make sure that
+            // they don't attempt to login
+            if (messageId == 0x02) {
+                buf.readByte(); // Protocol version
+                int value = buf.readShort();
+                // Check the length
+                if (value < 0 || value > 16) {
+                    return;
+                }
+                buf.readBytes(value << 1); // Username
+                value = buf.readShort();
+                // Check the length
+                if (value < 0 || value > 255) {
+                    return;
+                }
+                buf.readBytes(value << 1); // Host address
+                buf.readInt(); // Port
+                if (buf.readableBytes() > 0) {
+                    return;
+                }
+                legacy = true;
+                ctx.channel().close();
                 return;
             }
 
-            int readable = buf0.readableBytes();
+            // Check for the ping message id.
+            if (messageId != 0xfe) {
+                return;
+            }
 
-            boolean valid = true;
+            int readable = buf.readableBytes();
             boolean full = false;
 
             // The version used to ping the server
@@ -75,7 +99,11 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
 
             // Versions 1.4 - 1.5.x + 1.6 - Can request full data.
             if (readable > 0) {
-                full = buf0.readUnsignedByte() == 1;
+                // Is always 1
+                if (buf.readUnsignedByte() != 1) {
+                    return;
+                }
+                full = true;
                 version = LanternMinecraftVersion.V1_5;
             }
 
@@ -84,35 +112,35 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
 
             // Version 1.6 - Used extra data.
             if (readable > 1) {
-                valid &= buf0.readUnsignedByte() == 0xfa;
-                valid &= new String(buf0.readBytes(buf0.readShort() * 2).array(), Charsets.UTF_16BE).equals("MC|PingHost");
+                if (buf.readUnsignedByte() != 0xfa) {
+                    return;
+                }
+                byte[] bytes = new byte[buf.readShort() << 1];
+                buf.readBytes(bytes);
+                if (!new String(bytes, StandardCharsets.UTF_16BE).equals("MC|PingHost")){
+                    return;
+                }
 
-                int restLength = buf0.readShort();
+                // Not used
+                buf.readShort();
 
-                // Validate the protocol version
-                valid &= buf0.readUnsignedByte() >= 73;
+                // There is extra host and port data
+                if (buf.readUnsignedByte() >= 73) {
+                    bytes = new byte[buf.readShort() << 1];
+                    buf.readBytes(bytes);
 
-                int hostLength = buf0.readShort();
-                byte[] hostBytes = new byte[hostLength];
-                buf0.readBytes(hostBytes);
+                    String host = new String(bytes, StandardCharsets.UTF_16BE);
+                    int port = buf.readInt();
 
-                String host = new String(hostBytes, Charsets.UTF_16BE);
+                    virtualAddress = InetSocketAddress.createUnresolved(host, port);
+                }
 
-                // Two times the amount of bytes of the host length
-                // no idea why this would be useful
-                buf0.readBytes(hostBytes);
+                readable = buf.readableBytes();
+                if (readable > 0) {
+                    LanternGame.log().warn("Trailing bytes on a legacy ping message: {}b", readable);
+                }
 
-                valid &= (hostLength * 2 + 7) == restLength;
-                int port = buf0.readInt();
-                valid &= port < 65535;
-                valid &= buf0.readableBytes() == 0;
-
-                virtualAddress = InetSocketAddress.createUnresolved(host, port);
                 version = LanternMinecraftVersion.V1_6;
-            }
-
-            if (!valid) {
-                return;
             }
 
             // The message was successfully decoded as a legacy one
@@ -127,7 +155,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
             InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
             LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
             LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(server.getOnlinePlayers()
-            		.stream().map(p -> p.getProfile()).collect(Collectors.toList()), online, max);
+                    .stream().map(p -> p.getProfile()).collect(Collectors.toList()), online, max);
             LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
             ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.of(client), client, response);
@@ -149,51 +177,54 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                 online = -1;
             }
 
-            String motd0 = TextSerializers.LEGACY_FORMATTING_CODE.serialize(motd);
             StringBuilder builder = new StringBuilder();
 
             if (full) {
+                String motd0 = TextSerializers.LEGACY_FORMATTING_CODE.serialize(motd);
                 builder
-                    .append('\u00A7')
-                    // This value is always 1.
-                    .append(1)
-                    .append('\u0000')
-                    // The protocol version, just use a value out of range
-                    // of the available ones.
-                    .append(127)
-                    .append('\u0000')
-                    // The version/name string of the server.
-                    .append(LanternGame.get().getPlatform().getImplementation().getName())
-                    .append('\u0000')
-                    // The motd of the server. In legacy format.
-                    .append(motd0)
-                    .append('\u0000')
-                    .append(online)
-                    .append('\u0000')
-                    .append(max);
+                        .append('\u00A7')
+                        // This value is always 1.
+                        .append(1)
+                        .append('\u0000')
+                        // The protocol version, just use a value out of range
+                        // of the available ones.
+                        .append(127)
+                        .append('\u0000')
+                        // The version/name string of the server.
+                        .append(LanternGame.get().getPlatform().getImplementation().getName())
+                        .append('\u0000')
+                        // The motd of the server. In legacy format.
+                        .append(motd0)
+                        .append('\u0000')
+                        .append(online)
+                        .append('\u0000')
+                        .append(max);
             } else {
+                String motd0 = TextSerializers.PLAIN.serialize(motd);
                 builder
-                    .append(motd0)
-                    .append('\u00A7')
-                    .append(online)
-                    .append('\u00A7')
-                    .append(max);
+                        .append(motd0)
+                        .append('\u00A7')
+                        .append(online)
+                        .append('\u00A7')
+                        .append(max);
             }
 
-            byte[] data = builder.toString().getBytes(Charsets.UTF_16BE);
+            byte[] data = builder.toString().getBytes(StandardCharsets.UTF_16BE);
 
-            ByteBuf buf1 = ctx.alloc().buffer();
-            buf1.writeByte(0xff);
-            buf1.writeShort(data.length);
-            buf1.writeBytes(data);
+            ByteBuf output = ctx.alloc().buffer();
+            output.writeByte(0xff);
+            output.writeShort(data.length >> 1);
+            output.writeBytes(data);
 
-            ctx.channel().pipeline().firstContext().writeAndFlush(buf1).addListener(ChannelFutureListener.CLOSE);
+            ctx.channel().pipeline().firstContext().writeAndFlush(output).addListener(ChannelFutureListener.CLOSE);
         } catch (Exception ignore) {
         } finally {
-            if (!legacy) {
-                buf0.resetReaderIndex();
+            if (legacy) {
+                buf.release();
+            } else {
+                buf.resetReaderIndex();
                 ctx.channel().pipeline().remove(this);
-                ctx.fireChannelRead(object);
+                ctx.fireChannelRead(buf);
             }
         }
     }

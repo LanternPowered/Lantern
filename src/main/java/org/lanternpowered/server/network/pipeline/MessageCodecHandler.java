@@ -103,7 +103,12 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         input.readBytes(content, input.readableBytes());
 
         // Read the content of the message
-        Message message = registration.getCodec().decode(context, content);
+        Message message;
+        try {
+            message = registration.getCodec().decode(context, content);
+        } finally {
+            content.release();
+        }
         this.processMessage(message, output, protocol, state, context);
     }
 

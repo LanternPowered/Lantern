@@ -106,7 +106,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     // The volume of a chunk section
     public static final int CHUNK_SECTION_VOLUME = CHUNK_AREA * CHUNK_SECTION_SIZE;
     // The amount of sections inside one chunk
-    public static final int CHUNK_SECTIONS = 8;
+    public static final int CHUNK_SECTIONS = 16;
     // The volume of a chunk
     public static final int CHUNK_VOLUME = CHUNK_SECTION_VOLUME * CHUNK_SECTIONS;
     // The height of a chunk
@@ -236,7 +236,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      */
     public void initializeSections(ChunkSection[] sections) {
         checkArgument(sections.length == CHUNK_SECTIONS, "Sections array length mismatch: Got "
-                + sections.length + ", but expected " + CHUNK_SECTION_VOLUME);
+                + sections.length + ", but expected " + CHUNK_SECTIONS);
         this.sections = new AtomicReferenceArray<>(sections);
         this.loaded = true;
     }

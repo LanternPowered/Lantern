@@ -90,6 +90,14 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.9.0'
 }
 
+idea.module {
+    // The java6 sourceset
+    sourceDirs += file('src/java6/java')
+    // The gradle java/groovy sourceset
+    sourceDirs += file('buildSrc/src/main/java')
+    sourceDirs += file('buildSrc/src/main/groovy')
+}
+
 // Generate application setups, currently only for intellij
 idea.workspace.iws.withXml { provider ->
     // The app name
@@ -116,9 +124,9 @@ idea.workspace.iws.withXml { provider ->
         customNode.each {
             if (it.name == 'option' && it.@name != null) {
                 switch (it.@name) {
-                    case 'MAIN_CLASS_NAME':    it.@value = 'org.lanternpowered.launch.Launch'; break
-                    case 'VM_PARAMETERS':      it.@value = '-Dlog4j.full-location=true';       break
-                    case 'WORKING_DIRECTORY':  it.@value = 'file://$PROJECT_DIR$/run';         break
+                    case 'MAIN_CLASS_NAME':   it.@value = 'org.lanternpowered.launch.Launch'; break
+                    case 'VM_PARAMETERS':     it.@value = '-Dlog4j.full-location=true';       break
+                    case 'WORKING_DIRECTORY': it.@value = 'file://$PROJECT_DIR$/run';         break
                 }
             } else if (it.name == 'module') {
                 entry.@name = project.name

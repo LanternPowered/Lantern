@@ -93,9 +93,9 @@ dependencies {
 idea.module {
     // The java6 sourceset
     sourceDirs += file('src/java6/java')
-    // The gradle java/groovy sourceset
-    sourceDirs += file('buildSrc/src/main/java')
-    sourceDirs += file('buildSrc/src/main/groovy')
+    // The gradle java/groovy source set
+    // sourceDirs += file('buildSrc/src/main/java')
+    // sourceDirs += file('buildSrc/src/main/groovy')
 }
 
 // Generate application setups, currently only for intellij

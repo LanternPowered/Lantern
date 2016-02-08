@@ -41,15 +41,17 @@ import static org.apache.logging.log4j.core.config.plugins.processor.PluginProce
  */
 class Log4jCacheFileTransformer implements Transformer {
 
-    private final List<File> tempFiles = new ArrayList<File>()
+    private final List<File> tempFiles = []
 
+    @Override
     boolean canTransformResource(FileTreeElement element) {
-        return PLUGIN_CACHE_FILE.equals(element.relativePath.pathString)
+        PLUGIN_CACHE_FILE.equals(element.relativePath.pathString)
     }
 
+    @Override
     void transform(String path, InputStream is, List<Relocator> relocators) {
-        final File tempFile = File.createTempFile("Log4j2Plugins", "dat")
-        FileOutputStream fos = new FileOutputStream(tempFile)
+        def tempFile = File.createTempFile('Log4j2Plugins', '.dat')
+        def fos = new FileOutputStream(tempFile)
         try {
             IOUtil.copy(is, fos)
         } finally {
@@ -59,28 +61,20 @@ class Log4jCacheFileTransformer implements Transformer {
         tempFiles.add(tempFile)
     }
 
+    @Override
     boolean hasTransformedResource() {
-        return tempFiles.size() > 1
+        tempFiles.size() > 1
     }
 
+    @Override
     void modifyOutputStream(ZipOutputStream os) {
         try {
-            PluginCache aggregator = new PluginCache()
-            aggregator.loadCacheFiles(this.getUrls())
+            def aggregator = new PluginCache()
+            aggregator.loadCacheFiles(Collections.enumeration(tempFiles.collect { it.toURI().toURL() }))
             os.putNextEntry(new ZipEntry(PLUGIN_CACHE_FILE))
             aggregator.writeCache(os)
         } finally {
-            for (File tempFile : tempFiles) {
-                tempFile.delete()
-            }
+            tempFiles.each { it.delete() }
         }
-    }
-
-    private Enumeration<URL> getUrls() throws MalformedURLException {
-        List<URL> urls = new ArrayList<URL>()
-        for (File tempFile : tempFiles) {
-            urls.add(tempFile.toURI().toURL())
-        }
-        return Collections.enumeration(urls)
     }
 }

@@ -240,8 +240,10 @@ license {
 
     ext {
         name = project.name
-        url = project.url
-        organization = project.organization
+        urla = project.url
+        organizationa = project.organization
+        urlb = api.url
+        organizationb = api.organization
     }
 
     mapping {

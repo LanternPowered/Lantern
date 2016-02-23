@@ -52,6 +52,7 @@ public final class RconSource extends AbstractSubjectBase implements AbstractCom
 
     public RconSource(RconConnection connection) {
         this.connection = connection;
+        this.initSubject();
     }
 
     @Override

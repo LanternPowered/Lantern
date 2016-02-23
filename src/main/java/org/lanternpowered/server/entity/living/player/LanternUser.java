@@ -66,6 +66,7 @@ public class LanternUser extends AbstractSubjectBase implements AbstractProperty
 
     public LanternUser(LanternGameProfile gameProfile) {
         this.gameProfile = gameProfile;
+        this.initSubject();
     }
 
     @Override

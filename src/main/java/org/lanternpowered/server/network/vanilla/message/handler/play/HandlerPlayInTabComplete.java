@@ -25,11 +25,16 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.command.TabCompleteEvent;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -44,12 +49,32 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
             if (prefix && message.getAssumeCommand()) {
                 text = '/' + text;
             }
-            List<String> suggestions = Sponge.getCommandManager().getSuggestions(
-                    context.getSession().getPlayer(), text);
+            List<String> suggestions = Sponge.getCommandManager().getSuggestions(context.getSession().getPlayer(), text);
             if (!prefix) {
                 suggestions = suggestions.stream().map(s -> s.charAt(0) == '/' ? s.substring(1) : s).collect(Collectors.toList());
             }
             context.getSession().send(new MessagePlayOutTabComplete(suggestions));
+        } else {
+            // Vanilla mc will complete user names if
+            // no command is being completed
+            int index = text.lastIndexOf(' ');
+            String part;
+            if (index == -1) {
+                part = text;
+            } else {
+                part = text.substring(index + 1);
+            }
+            if (part.isEmpty()) {
+                return;
+            }
+            final String part1 = part.toLowerCase();
+            List<String> suggestions = Sponge.getServer().getOnlinePlayers().stream()
+                    .map(CommandSource::getName).filter(n -> n.toLowerCase().startsWith(part1)).collect(Collectors.toList());
+            TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(Cause.of(context.getSession().getPlayer()),
+                    ImmutableList.copyOf(suggestions), suggestions, text);
+            if (!Sponge.getEventManager().post(event)) {
+                context.getSession().send(new MessagePlayOutTabComplete(suggestions));
+            }
         }
     }
 }

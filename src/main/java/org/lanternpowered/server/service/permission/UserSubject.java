@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.service.permission;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -53,8 +55,8 @@ public class UserSubject extends LanternSubject {
     private final UserCollection collection;
 
     public UserSubject(final GameProfile player, final UserCollection users) {
-        this.player = player;
-        this.data = new SingleParentMemorySubjectData(users.getService()) {
+        this.player = checkNotNull(player, "player");
+        this.data = new SingleParentMemorySubjectData(checkNotNull(users, "userCollection").getService()) {
 
             @Override
             public Subject getParent() {

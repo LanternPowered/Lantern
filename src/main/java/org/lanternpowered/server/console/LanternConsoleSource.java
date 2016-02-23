@@ -52,6 +52,7 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements A
     @Nullable private MessageChannel messageChannel;
 
     private LanternConsoleSource() {
+        this.initSubject();
     }
 
     @Override

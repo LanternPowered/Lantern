@@ -33,10 +33,6 @@ public abstract class AbstractSubjectBase implements AbstractSubject {
 
     @Nullable private volatile Subject subject;
 
-    public AbstractSubjectBase() {
-        this.initSubject();
-    }
-
     @Override
     public void setInternalSubject(@Nullable Subject subj) {
         this.subject = subj;

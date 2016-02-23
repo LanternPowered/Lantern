@@ -144,8 +144,6 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.user = (LanternUser) LanternGame.get().getServiceManager().provideUnchecked(UserStorageService.class)
                 .getOrCreate(gameProfile);
         this.user.setPlayer(this);
-        // We don't register a callback because only the
-        // user will hold the internal subject instance
     }
 
     @Override

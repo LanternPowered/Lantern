@@ -25,7 +25,11 @@
  */
 package org.lanternpowered.server.effect.sound;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
 import org.lanternpowered.server.util.OptInt;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -46,6 +50,17 @@ public final class LanternSoundType extends LanternCatalogType implements SoundT
 
     public OptionalInt getEventId() {
         return this.eventId;
+    }
+
+    public MessagePlayOutSoundEffectBase createMessage(Vector3d position, SoundCategory soundCategory,
+            float volume, float pitch) {
+        if (this.eventId.isPresent()) {
+            return new MessagePlayOutSoundEffect(this.eventId.getAsInt(), position,
+                    SoundCategory.MASTER, volume, pitch);
+        } else {
+            return new MessagePlayOutNamedSoundEffect(this.getName(), position,
+                    SoundCategory.MASTER, volume, pitch);
+        }
     }
 
 }

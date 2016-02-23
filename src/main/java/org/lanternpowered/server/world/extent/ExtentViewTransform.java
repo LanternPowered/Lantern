@@ -71,6 +71,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 public class ExtentViewTransform implements AbstractExtent {
 
     public static class DiscreteTransform3to2 {
@@ -287,6 +289,12 @@ public class ExtentViewTransform implements AbstractExtent {
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
         this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
                 .transformZ(x, y, z), block, notifyNeighbors);
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
+        this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
+                .transformZ(x, y, z), blockState, notifyNeighbors, cause);
     }
 
     @Override
@@ -619,6 +627,30 @@ public class ExtentViewTransform implements AbstractExtent {
     @Override
     public MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
         return new LanternMutableBlockVolumeWorker<>(this);
+    }
+
+    @Override
+    public Optional<UUID> getCreator(int x, int y, int z) {
+        return this.extent.getCreator(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z));
+    }
+
+    @Override
+    public Optional<UUID> getNotifier(int x, int y, int z) {
+        return this.extent.getNotifier(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z));
+    }
+
+    @Override
+    public void setCreator(int x, int y, int z, @Nullable UUID uuid) {
+        this.extent.setCreator(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), uuid);
+    }
+
+    @Override
+    public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
+        this.extent.setNotifier(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), uuid);
     }
 
     private static class EntityInBounds implements Predicate<Entity> {

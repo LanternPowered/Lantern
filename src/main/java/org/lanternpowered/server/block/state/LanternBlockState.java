@@ -27,6 +27,7 @@ package org.lanternpowered.server.block.state;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -53,6 +54,7 @@ import org.spongepowered.api.util.Cycleable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -78,6 +80,9 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
     // The base block state
     private final LanternBlockStateMap baseState;
 
+    // The id of the block state
+    private final String id;
+
     LanternBlockState(LanternBlockStateMap baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
         this.traitValues = traitValues;
         this.baseState = baseState;
@@ -87,6 +92,20 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
             builder.put(((LanternBlockTrait) trait).getKey(), trait);
         }
         this.keyToBlockTrait = builder.build();
+
+        StringBuilder idBuilder = new StringBuilder();
+        idBuilder.append(baseState.getBlockType().getId());
+        if (!traitValues.isEmpty()) {
+            idBuilder.append('[');
+            Joiner joiner = Joiner.on(',');
+            List<String> propertyValues = new ArrayList<>();
+            for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
+                propertyValues.add(entry.getKey().getName() + "=" + entry.getValue());
+            }
+            idBuilder.append(joiner.join(propertyValues));
+            idBuilder.append(']');
+        }
+        this.id = idBuilder.toString();
     }
 
     @Override
@@ -404,4 +423,13 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
         return this.traitValues;
     }
 
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getName() {
+        return this.id;
+    }
 }

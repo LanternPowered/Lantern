@@ -101,29 +101,4 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Override
-    public boolean isViewingInventory() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Optional<Inventory> getOpenInventory() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void openInventory(Inventory inventory) {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void closeInventory() {
-        // TODO Auto-generated method stub
-        
-    }
-
 }

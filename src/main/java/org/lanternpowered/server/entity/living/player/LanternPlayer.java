@@ -37,19 +37,16 @@ import org.lanternpowered.server.effect.sound.SoundCategory;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.title.LanternTitles;
@@ -67,6 +64,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.living.player.tab.TabList;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -90,7 +88,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 
 import javax.annotation.Nullable;
@@ -415,16 +412,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
         checkNotNull(sound, "sound");
         checkNotNull(position, "position");
-        Message message;
-        final OptionalInt eventId = ((LanternSoundType) sound).getEventId();
-        if (eventId.isPresent()) {
-            message = new MessagePlayOutSoundEffect(eventId.getAsInt(), position,
-                    SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
-        } else {
-            message = new MessagePlayOutNamedSoundEffect(sound.getName(), position,
-                    SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
-        }
-        this.session.send(message);
+        this.session.send(((LanternSoundType) sound).createMessage(position,
+                SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch));
     }
 
     @Override
@@ -442,6 +431,26 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
+    public boolean isViewingInventory() {
+        return false;
+    }
+
+    @Override
+    public Optional<Inventory> getOpenInventory() {
+        return null;
+    }
+
+    @Override
+    public void openInventory(Inventory inventory) {
+
+    }
+
+    @Override
+    public void closeInventory() {
+
+    }
+
+    @Override
     public int getViewDistance() {
         return this.viewDistance;
     }
@@ -456,7 +465,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     public void setChatVisibility(ChatVisibility chatVisibility) {
-        this.chatVisibility = chatVisibility;
+        this.chatVisibility = checkNotNull(chatVisibility, "chatVisibility");
     }
 
     @Override
@@ -474,7 +483,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     public void setSkinParts(Set<SkinPart> skinParts) {
-        this.skinParts = skinParts;
+        this.skinParts = checkNotNull(skinParts, "skinParts");
     }
 
     public PlayerHand getMainHand() {
@@ -482,7 +491,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     public void setMainHand(PlayerHand mainHand) {
-        this.mainHand = mainHand;
+        this.mainHand = checkNotNull(mainHand, "mainHand");
     }
 
     @Override

@@ -873,8 +873,7 @@ public final class LanternChunkManager {
         }
 
         // Called when a chunk finishes populating. (javadoc)
-        // TODO: Capture the block transactions for every populator and add them to the event
-        eventManager.post(SpongeEventFactory.createPopulateChunkEventPost(cause, Collections.emptyMap(), chunk));
+        eventManager.post(SpongeEventFactory.createPopulateChunkEventPost(cause, ImmutableList.copyOf(populators), chunk));
 
         // We are done
         chunk.populated = true;

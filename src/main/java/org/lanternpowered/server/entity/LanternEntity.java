@@ -525,6 +525,26 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
+    public Optional<UUID> getCreator() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<UUID> getNotifier() {
+        return Optional.empty();
+    }
+
+    @Override
+    public void setCreator(@Nullable UUID uuid) {
+
+    }
+
+    @Override
+    public void setNotifier(@Nullable UUID uuid) {
+
+    }
+
+    @Override
     public Translation getTranslation() {
         return null;
     }

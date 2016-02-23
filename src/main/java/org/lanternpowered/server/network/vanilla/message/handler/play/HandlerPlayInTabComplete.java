@@ -46,7 +46,7 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
         String text = message.getText().trim();
         boolean prefix = text.startsWith("/");
         if (prefix || message.getAssumeCommand()) {
-            if (prefix && message.getAssumeCommand()) {
+            if (!prefix && message.getAssumeCommand()) {
                 text = '/' + text;
             }
             List<String> suggestions = Sponge.getCommandManager().getSuggestions(context.getSession().getPlayer(), text);

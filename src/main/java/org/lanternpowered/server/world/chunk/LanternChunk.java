@@ -1079,13 +1079,33 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public MutableBiomeAreaWorker<? extends Extent> getBiomeWorker() {
+    public MutableBiomeAreaWorker<? extends Chunk> getBiomeWorker() {
         return new LanternMutableBiomeAreaWorker<>(this);
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
+    public MutableBlockVolumeWorker<? extends Chunk> getBlockWorker() {
         return new LanternMutableBlockVolumeWorker<>(this);
+    }
+
+    @Override
+    public Optional<UUID> getCreator(int x, int y, int z) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<UUID> getNotifier(int x, int y, int z) {
+        return Optional.empty();
+    }
+
+    @Override
+    public void setCreator(int x, int y, int z, @Nullable UUID uuid) {
+
+    }
+
+    @Override
+    public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
+
     }
 
     public Optional<Entity> getEntity(UUID uniqueId) {
@@ -1181,6 +1201,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
         this.setBlock(x, y, z, block);
+        // TODO: Events
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
+        this.setBlock(x, y, z, blockState);
+        // TODO: Events
     }
 
     @Override

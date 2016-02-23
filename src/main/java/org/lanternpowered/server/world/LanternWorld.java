@@ -358,13 +358,33 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public MutableBiomeAreaWorker<? extends Extent> getBiomeWorker() {
+    public MutableBiomeAreaWorker<? extends World> getBiomeWorker() {
         return new LanternMutableBiomeAreaWorker<>(this);
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
+    public MutableBlockVolumeWorker<? extends World> getBlockWorker() {
         return new LanternMutableBlockVolumeWorker<>(this);
+    }
+
+    @Override
+    public Optional<UUID> getCreator(int x, int y, int z) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getCreator(x, y, z);
+    }
+
+    @Override
+    public Optional<UUID> getNotifier(int x, int y, int z) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getNotifier(x, y, z);
+    }
+
+    @Override
+    public void setCreator(int x, int y, int z, @Nullable UUID uuid) {
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setCreator(x, y, z, uuid);
+    }
+
+    @Override
+    public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setNotifier(x, y, z, uuid);
     }
 
     @Override
@@ -486,8 +506,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, block, notifyNeighbors);
+    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors) {
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, notifyNeighbors);
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, notifyNeighbors, cause);
     }
 
     @Override
@@ -502,14 +527,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(new Vector3i(x, y, z),
-                direction, propertyClass);
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getProperty(new Vector3i(x, y, z), direction, propertyClass);
     }
 
     @Override
     public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getFacesWithProperty(x, y, z, propertyClass);
     }
 
     @Override
@@ -742,24 +765,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
-        if (!this.players.isEmpty()) {
-            Message message;
-            final OptionalInt eventId = ((LanternSoundType) sound).getEventId();
-            if (eventId.isPresent()) {
-                message = new MessagePlayOutSoundEffect(eventId.getAsInt(), position,
-                        SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
-            } else {
-                message = new MessagePlayOutNamedSoundEffect(sound.getName(), position,
-                        SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch);
-            }
-            for (LanternPlayer player : this.players) {
-                player.getConnection().send(message);
-            }
-        }
+        checkNotNull(sound, "sound");
+        checkNotNull(position, "position");
+        this.broadcast(() -> ((LanternSoundType) sound).createMessage(position,
+                SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch));
     }
 
     @Override
     public void sendMessage(ChatType type, Text message) {
+        checkNotNull(type, "chatType");
+        checkNotNull(message, "message");
         if (!this.players.isEmpty()) {
             final Map<Locale, Message> netwMessages = Maps.newHashMap();
             for (LanternPlayer player : this.players) {

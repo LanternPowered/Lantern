@@ -71,6 +71,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+import javax.annotation.Nullable;
+
 public class ExtentViewDownsize implements AbstractExtent {
 
     private final Extent extent;
@@ -252,6 +254,12 @@ public class ExtentViewDownsize implements AbstractExtent {
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
         this.checkRange(x, y, z);
         this.extent.setBlock(x, y, z, block, notifyNeighbors);
+    }
+
+    @Override
+    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
+        this.checkRange(x, y, z);
+        this.extent.setBlock(x, y, z, blockState, notifyNeighbors, cause);
     }
 
     @Override
@@ -587,6 +595,30 @@ public class ExtentViewDownsize implements AbstractExtent {
     @Override
     public MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
         return new LanternMutableBlockVolumeWorker<>(this);
+    }
+
+    @Override
+    public Optional<UUID> getCreator(int x, int y, int z) {
+        this.checkRange(x, y, z);
+        return this.extent.getCreator(x, y, z);
+    }
+
+    @Override
+    public Optional<UUID> getNotifier(int x, int y, int z) {
+        this.checkRange(x, y, z);
+        return this.extent.getNotifier(x, y, z);
+    }
+
+    @Override
+    public void setCreator(int x, int y, int z, @Nullable UUID uuid) {
+        this.checkRange(x, y, z);
+        this.extent.setCreator(x, y, z, uuid);
+    }
+
+    @Override
+    public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
+        this.checkRange(x, y, z);
+        this.extent.setNotifier(x, y, z, uuid);
     }
 
     private static class EntityInBounds implements Predicate<Entity> {

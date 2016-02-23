@@ -26,27 +26,12 @@
 package org.lanternpowered.server.effect;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public interface AbstractViewer extends Viewer {
-
-    @Override
-    default void sendMessages(ChatType type, Iterable<Text> messages) {
-        for (Text message : messages) {
-            this.sendMessage(type, message);
-        }
-    }
-
-    @Override
-    default void sendMessages(ChatType type, Text... messages) {
-        this.sendMessages(type, ImmutableList.copyOf(messages));
-    }
 
     @Override
     default void playSound(SoundType sound, Vector3d position, double volume) {

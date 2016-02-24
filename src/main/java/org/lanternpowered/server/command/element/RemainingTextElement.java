@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.command.element;
 
-import com.google.common.collect.Lists;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
@@ -33,6 +32,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.text.Text;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,7 +48,8 @@ public final class RemainingTextElement extends CommandElement {
 
     @Override
     protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        Text text = Text.of(args.getRaw().substring(args.getRawPosition()));
+        args.next();
+        String text = args.getRaw().substring(args.getRawPosition());
         // Move the position to the end
         while (args.hasNext()) {
             args.next();
@@ -58,7 +59,7 @@ public final class RemainingTextElement extends CommandElement {
 
     @Override
     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        return Lists.newArrayList();
+        return Collections.emptyList();
     }
 
     public static RemainingTextElement of(Text key) {

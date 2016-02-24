@@ -72,7 +72,7 @@ public final class ConsoleManager {
                 if (command != null) {
                     command = command.trim();
                     if (!command.isEmpty()) {
-                        final String runCommand = command;
+                        final String runCommand = command.startsWith("/") ? command.substring(1) : command;
                         Sponge.getScheduler().createTaskBuilder().execute(() -> {
                             Sponge.getCommandManager().process(LanternConsoleSource.INSTANCE, runCommand);
                         }).submit(LanternGame.plugin());

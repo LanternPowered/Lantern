@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.config;
 
+import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -38,11 +39,14 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
 import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
 import org.lanternpowered.server.config.serializer.InstantTypeSerializer;
+import org.lanternpowered.server.config.serializer.MultimapTypeSerializer;
 import org.lanternpowered.server.config.serializer.TextTypeSerializer;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.lanternpowered.server.util.IpSet;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -65,8 +69,11 @@ public abstract class ConfigBase {
                 .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
                 .registerType(TypeToken.of(GameProfile.class), (TypeSerializer) typeSerializers.get(
                         TypeToken.of(LanternGameProfile.class)))
+                .registerType(TypeToken.of(ProfileProperty.class), (TypeSerializer) typeSerializers.get(
+                        TypeToken.of(LanternProfileProperty.class)))
                 .registerType(TypeToken.of(InetAddress.class), new InetAddressTypeSerializer())
-                .registerType(TypeToken.of(Instant.class), new InstantTypeSerializer());
+                .registerType(TypeToken.of(Instant.class), new InstantTypeSerializer())
+                .registerType(TypeToken.of(Multimap.class), new MultimapTypeSerializer());
         DEFAULT_OPTIONS = ConfigurationOptions.defaults().setSerializers(typeSerializers);
     }
 

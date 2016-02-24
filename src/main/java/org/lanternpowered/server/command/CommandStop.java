@@ -48,7 +48,7 @@ public final class CommandStop {
                 .executor((src, args) -> {
                     final LanternServer server = LanternGame.get().getServer();
                     if (args.hasAny("kick-message")) {
-                        server.shutdown(args.<Text>getOne("kick-message").get());
+                        server.shutdown(Text.of(args.<String>getOne("kick-message").get()));
                     } else {
                         server.shutdown();
                     }

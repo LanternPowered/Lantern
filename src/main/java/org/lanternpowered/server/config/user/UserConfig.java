@@ -59,7 +59,7 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
 
     @Override
     public void save() throws IOException {
-        synchronized (this.entries) {
+        synchronized (this) {
             this.entries.clear();
             for (T entry : this.byUUID.values()) {
                 this.entries.add(entry);
@@ -70,7 +70,7 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
 
     @Override
     public void load() throws IOException {
-        synchronized (this.entries) {
+        synchronized (this) {
             super.load();
             this.byUUID.clear();
             this.byName.clear();

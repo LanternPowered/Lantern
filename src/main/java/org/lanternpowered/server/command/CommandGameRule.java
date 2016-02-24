@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.command;
 
+import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.Lists;
@@ -98,18 +99,7 @@ public final class CommandGameRule {
                         GenericArguments.optional(GenericArguments.world(Text.of("world"))))
                 .permission(PERMISSION)
                 .executor((src, args) -> {
-                    WorldProperties world;
-                    if (args.hasAny("world")) {
-                        world = args.<WorldProperties>getOne("world").get();
-                    } else if (src instanceof LocatedSource) {
-                        world = ((LocatedSource) src).getWorld().getProperties();
-                    } else {
-                        world = LanternGame.get().getServer().getDefaultWorld().orElse(null);
-                        if (world == null) {
-                            // Shouldn't happen
-                            throw new CommandException(t("Unable to find the default world."));
-                        }
-                    }
+                    WorldProperties world = getWorld(src, args);
                     ((LanternWorldProperties) world).getRules()
                             .getOrCreateRule(args.<RuleType>getOne("rule").get())
                             .setValue(args.getOne("value").get());

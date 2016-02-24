@@ -54,8 +54,8 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             session.disconnect("Illegal characters in chat!");
             return;
         }
-        if (message0.startsWith("/")) {
-            LanternGame.get().getCommandManager().process(player, message1);
+        if (message1.startsWith("/")) {
+            LanternGame.get().getCommandManager().process(player, message1.substring(1));
         } else {
             Translation translation = LanternGame.get().getRegistry().getTranslationManager().get("chat.type.text");
             Object displayName = player.getName(); // TODO: player.getDisplayNameData().displayName().get();

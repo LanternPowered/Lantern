@@ -264,6 +264,16 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     }
 
     @Override
+    public Optional<UUID> getCreator() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<UUID> getNotifier() {
+        return Optional.empty();
+    }
+
+    @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
         // TODO Auto-generated method stub
         return null;

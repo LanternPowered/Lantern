@@ -25,33 +25,30 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Text;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-public final class CommandSeed {
+class CommandHelper {
 
-    public static final String PERMISSION = "minecraft.command.seed";
-
-    public static CommandSpec create() {
-        return CommandSpec.builder()
-                .arguments(
-                        GenericArguments.optional(GenericArguments.world(Text.of("world"))))
-                .permission(PERMISSION)
-                .executor((src, args) -> {
-                    WorldProperties world = getWorld(src, args);
-                    src.sendMessage(t("commands.seed.success", world.getSeed()));
-                    return CommandResult.success();
-                })
-                .build();
+    public static WorldProperties getWorld(CommandSource src, CommandContext args) throws CommandException {
+        WorldProperties world;
+        if (args.hasAny("world")) {
+            world = args.<WorldProperties>getOne("world").get();
+        } else if (src instanceof LocatedSource) {
+            world = ((LocatedSource) src).getWorld().getProperties();
+        } else {
+            world = LanternGame.get().getServer().getDefaultWorld().orElse(null);
+            if (world == null) {
+                // Shouldn't happen
+                throw new CommandException(t("Unable to find the default world."));
+            }
+        }
+        return world;
     }
-
-    private CommandSeed() {
-    }
-
 }

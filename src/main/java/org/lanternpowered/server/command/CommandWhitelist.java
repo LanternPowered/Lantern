@@ -32,18 +32,21 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import org.lanternpowered.server.config.user.UserEntry;
 import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -53,34 +56,44 @@ public final class CommandWhitelist {
     public static final String PERMISSION = "minecraft.command.whitelist";
 
     public static CommandSpec create() {
-        return CommandSpec.builder().children(
-                ImmutableMap.of(
-                        Lists.newArrayList("add"), CommandSpec.builder()
+        return CommandSpec.builder().children(ImmutableMap.<List<String>, CommandSpec>builder()
+                        .put(Lists.newArrayList("add"), CommandSpec.builder()
                                 .arguments(GenericArguments.string(Text.of("player")))
                                 .executor((src, args) -> {
                                     String playerName = args.<String>getOne("player").get();
                                     WhitelistConfig config = LanternGame.get().getWhitelistConfig();
                                     Futures.addCallback(LanternGame.get().getGameProfileManager().get(playerName),
                                             new FutureCallback<GameProfile>() {
-                                        @Override
-                                        public void onSuccess(@Nullable GameProfile result) {
-                                            if (result != null) {
-                                                config.addProfile(((LanternGameProfile) result).withoutProperties());
-                                            } else {
-                                                config.addProfile(new LanternGameProfile(UUID.randomUUID(), playerName));
-                                            }
-                                        }
+                                                @Override
+                                                public void onSuccess(@Nullable GameProfile result) {
+                                                    src.sendMessage(t("commands.whitelist.add.success", playerName));
+                                                    config.addProfile(((LanternGameProfile) result).withoutProperties());
+                                                }
 
-                                        @Override
-                                        public void onFailure(Throwable t) {
-                                            config.addProfile(new LanternGameProfile(UUID.randomUUID(), playerName));
-                                        }
-                                    });
-                                    src.sendMessage(t("commands.whitelist.add.success", playerName));
+                                                @Override
+                                                public void onFailure(Throwable t) {
+                                                    src.sendMessage(t("commands.whitelist.add.failed", playerName));
+                                                }
+                                            });
                                     return CommandResult.success();
                                 })
-                                .build(),
-                        Lists.newArrayList("list"), CommandSpec.builder()
+                                .build())
+                        .put(Lists.newArrayList("remove"), CommandSpec.builder()
+                                .arguments(GenericArguments.string(Text.of("player")))
+                                .executor((src, args) -> {
+                                    String playerName = args.<String>getOne("player").get();
+                                    WhitelistConfig config = LanternGame.get().getWhitelistConfig();
+                                    Optional<UserEntry> entry = config.getEntryByName(playerName);
+                                    if (entry.isPresent()) {
+                                        config.removeProfile(entry.get().getProfile());
+                                        src.sendMessage(t("commands.whitelist.remove.success", playerName));
+                                    } else {
+                                        src.sendMessage(t("commands.whitelist.remove.failed", playerName));
+                                    }
+                                    return CommandResult.success();
+                                })
+                                .build())
+                        .put(Lists.newArrayList("list"), CommandSpec.builder()
                                 .executor((src, args) -> {
                                     WhitelistConfig config = LanternGame.get().getWhitelistConfig();
                                     List<String> whitelisted = config.getWhitelistedProfiles().stream()
@@ -90,22 +103,32 @@ public final class CommandWhitelist {
                                     src.sendMessage(Text.of(Joiner.on(", ").join(whitelisted)));
                                     return CommandResult.success();
                                 })
-                                .build(),
-                        Lists.newArrayList("on"), CommandSpec.builder()
+                                .build())
+                        .put(Lists.newArrayList("on"), CommandSpec.builder()
                                 .executor((src, args) -> {
+                                    LanternGame.get().getGlobalConfig().setWhitelistEnabled(true);
+                                    src.sendMessage(t("commands.whitelist.enabled"));
                                     return CommandResult.success();
                                 })
-                                .build(),
-                        Lists.newArrayList("off"), CommandSpec.builder()
+                                .build())
+                        .put(Lists.newArrayList("off"), CommandSpec.builder()
                                 .executor((src, args) -> {
+                                    LanternGame.get().getGlobalConfig().setWhitelistEnabled(false);
+                                    src.sendMessage(t("commands.whitelist.disabled"));
                                     return CommandResult.success();
                                 })
-                                .build(),
-                        Lists.newArrayList("reload"), CommandSpec.builder()
+                                .build())
+                        .put(Lists.newArrayList("reload"), CommandSpec.builder()
                                 .executor((src, args) -> {
+                                    WhitelistConfig config = LanternGame.get().getWhitelistConfig();
+                                    try {
+                                        config.load();
+                                    } catch (IOException e) {
+                                        throw new CommandException(Text.of("Unable to reload the whitelist config."), e);
+                                    }
                                     return CommandResult.success();
                                 })
-                                .build()))
+                                .build()).build())
                 .permission(PERMISSION)
                 .build();
     }

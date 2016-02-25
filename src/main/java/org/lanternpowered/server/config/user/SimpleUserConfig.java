@@ -25,43 +25,24 @@
  */
 package org.lanternpowered.server.config.user;
 
-import org.lanternpowered.server.profile.LanternGameProfile;
-import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.service.whitelist.WhitelistService;
-import org.spongepowered.api.util.GuavaCollectors;
+import ninja.leaping.configurate.objectmapping.Setting;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-public final class WhitelistConfig extends SimpleUserConfig implements WhitelistService {
+public class SimpleUserConfig extends UserConfig<UserEntry> {
 
-    public WhitelistConfig(Path path) throws IOException {
+    @Setting(value = "entries")
+    private List<UserEntry> entries = new ArrayList<>();
+
+    public SimpleUserConfig(Path path) throws IOException {
         super(path);
     }
 
     @Override
-    public Collection<GameProfile> getWhitelistedProfiles() {
-        return this.getEntries().stream().map(UserEntry::getProfile).collect(GuavaCollectors.toImmutableList());
+    protected List<UserEntry> getBackingList() {
+        return this.entries;
     }
-
-    @Override
-    public boolean isWhitelisted(GameProfile profile) {
-        return this.getEntryByProfile(profile).isPresent();
-    }
-
-    @Override
-    public boolean addProfile(GameProfile profile) {
-        if (this.isWhitelisted(profile)) {
-            return true;
-        }
-        this.addEntry(new UserEntry((LanternGameProfile) profile));
-        return false;
-    }
-
-    @Override
-    public boolean removeProfile(GameProfile profile) {
-        return this.removeEntry(profile.getUniqueId());
-    }
-
 }

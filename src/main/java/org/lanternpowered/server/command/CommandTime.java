@@ -112,13 +112,13 @@ public final class CommandTime {
                                     QueryType queryType = args.<QueryType>getOne("value").get();
                                     int result;
                                     switch (queryType) {
-                                        case daytime:
+                                        case DAYTIME:
                                             result = (int) (world.getWorldTime() % Integer.MAX_VALUE);
                                             break;
-                                        case gametime:
+                                        case GAMETIME:
                                             result = (int) (world.getTotalTime() % Integer.MAX_VALUE);
                                             break;
-                                        case day:
+                                        case DAY:
                                             result = (int) (world.getTotalTime() / 24000);
                                             break;
                                         default:
@@ -133,9 +133,9 @@ public final class CommandTime {
     }
 
     private enum QueryType {
-        daytime,
-        gametime,
-        day,
+        DAYTIME,
+        GAMETIME,
+        DAY,
     }
 
     private CommandTime() {

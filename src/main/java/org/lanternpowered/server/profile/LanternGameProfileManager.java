@@ -42,9 +42,6 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.util.UUIDHelper;
 import org.lanternpowered.server.util.UniqueEvictingQueue;
-import org.lanternpowered.server.util.collect.Maps2;
-import org.lanternpowered.server.util.collect.expirable.ExpirableValue;
-import org.lanternpowered.server.util.collect.expirable.ExpirableValueMap;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.profile.ProfileNotFoundException;
@@ -58,9 +55,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -77,53 +73,30 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     private static final int CACHE_SIZE = 1000;
 
-    private static final TemporalUnit EXPIRATION_TIME_UNIT = ChronoUnit.MONTHS;
-    private static final int EXPIRATION_TIME = 1;
-
     private final AtomicInteger counter = new AtomicInteger();
     private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(
             runnable -> new Thread(runnable, "profile-resolver-" + this.counter.getAndIncrement())));
 
+    private static final Duration EXPIRATION_DURATION = Duration.ofDays(30);
+
     // The gson instance
     private final Gson gson = new Gson();
 
-    // Whether the two lookups should be linked
-    private final ThreadLocal<Boolean> linkLookups = ThreadLocal.withInitial(() -> true);
-
     // Lookup by name
-    private final ExpirableValueMap<String, GameProfile, CacheEntry> byName = Maps2.createConcurrentExpirableValueMap(
-            (k, v) -> {
-                final UUID uniqueId = v.getUniqueId();
-                if (this.linkLookups.get() && this.cacheByUUID().containsKey(uniqueId)) {
-                    return this.cacheByUUID().getBacking().get(uniqueId);
-                }
-                return new CacheEntry(v);
-            });
+    private final Map<String, CacheEntry> byName = Maps.newConcurrentMap();
 
     // Lookup by unique id
-    private final ExpirableValueMap<UUID, GameProfile, CacheEntry> byUUID = Maps2.createConcurrentExpirableValueMap(
-            (k, v) -> {
-                final Optional<String> optName;
-                if (this.linkLookups.get() && (optName = v.getName()).isPresent() && this.byName.containsKey(optName.get())) {
-                    return this.byName.getBacking().get(optName.get());
-                }
-                return new CacheEntry(v);
-            });
-
-    // Lambda logic...
-    private ExpirableValueMap<UUID, GameProfile, CacheEntry> cacheByUUID() {
-        return this.byUUID;
-    }
+    private final Map<UUID, CacheEntry> byUUID = Maps.newConcurrentMap();
 
     // All the game profiles that where used
     private final Queue<GameProfile> profiles = UniqueEvictingQueue.createConcurrent((Equivalence) Equivalence.equals(), CACHE_SIZE);
 
     private Instant calculateExpirationDate() {
-        return Instant.now().plus(EXPIRATION_TIME, EXPIRATION_TIME_UNIT);
+        return Instant.now().plus(EXPIRATION_DURATION);
     }
 
     @ConfigSerializable
-    private class CacheEntry implements ExpirableValue<GameProfile> {
+    private class CacheEntry {
 
         @Setting(value = "profile")
         private GameProfile gameProfile;
@@ -144,12 +117,6 @@ public final class LanternGameProfileManager implements GameProfileManager {
             this(profile, calculateExpirationDate());
         }
 
-        @Override
-        public GameProfile getValue() {
-            return this.gameProfile;
-        }
-
-        @Override
         public boolean isExpired() {
             return Instant.now().compareTo(this.expirationDate) > 0;
         }
@@ -168,14 +135,17 @@ public final class LanternGameProfileManager implements GameProfileManager {
      * @param gameProfile the game profile
      */
     public void putProfile(GameProfile gameProfile) {
-        this.linkLookups.set(false);
-        this.byUUID.put(gameProfile.getUniqueId(), gameProfile);
-        gameProfile.getName().ifPresent(name -> this.byName.put(name, gameProfile));
-        this.linkLookups.set(true);
+        final CacheEntry entry = new CacheEntry(gameProfile, this.calculateExpirationDate());
+        this.byUUID.put(gameProfile.getUniqueId(), entry);
+        gameProfile.getName().ifPresent(name -> this.byName.put(name, entry));
     }
 
     public Optional<GameProfile> getCachedProfile(String name) {
-        return Optional.ofNullable(this.byName.get(name));
+        CacheEntry entry = this.byName.get(name);
+        if (entry == null || entry.isExpired()) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(entry.gameProfile);
     }
 
     @Override
@@ -188,26 +158,29 @@ public final class LanternGameProfileManager implements GameProfileManager {
         return new LanternProfileProperty(name, value, signature);
     }
 
-    private GameProfile getById(UUID uniqueId, boolean useCache, boolean signed) throws Exception {
-        GameProfile gameProfile;
+    private CacheEntry getById(UUID uniqueId, boolean useCache, boolean signed) throws Exception {
+        CacheEntry entry;
         if (useCache) {
-            gameProfile = this.byUUID.get(uniqueId);
-            if (gameProfile != null && (!signed || this.byUUID.getBacking().get(uniqueId).signed == signed)) {
-                return gameProfile;
+            entry = this.byUUID.get(uniqueId);
+            if (entry != null && !entry.isExpired()
+                    && (!signed || entry.signed == signed)) {
+                return entry;
             }
         }
         // Can throw IOException or ProfileNotFoundException
-        gameProfile = this.queryProfileByUUID(uniqueId, signed);
+        GameProfile gameProfile = this.queryProfileByUUID(uniqueId, signed);
+        Instant time = this.calculateExpirationDate();
+        entry = new CacheEntry(gameProfile, this.calculateExpirationDate());
         if (useCache) {
-            this.byUUID.put(uniqueId, gameProfile);
-            this.byUUID.getBacking().get(uniqueId).signed = signed;
+            this.byUUID.put(uniqueId, entry);
+            entry.signed = signed;
         }
-        return gameProfile;
+        return entry;
     }
 
     @Override
     public ListenableFuture<GameProfile> get(UUID uniqueId, boolean useCache) {
-        return this.service.submit(() -> this.getById(uniqueId, useCache, true));
+        return this.service.submit(() -> this.getById(uniqueId, useCache, true).gameProfile);
     }
 
     @Override
@@ -215,7 +188,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
         return this.service.submit(() -> {
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
             for (UUID uniqueId : uniqueIds) {
-                builder.add(this.getById(uniqueId, useCache, true));
+                builder.add(this.getById(uniqueId, useCache, true).gameProfile);
             }
             return builder.build();
         });
@@ -224,22 +197,22 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public ListenableFuture<GameProfile> get(String name, boolean useCache) {
         return this.service.submit(() -> {
-            GameProfile gameProfile;
+            CacheEntry entry;
             if (useCache) {
-                gameProfile = this.byName.get(name);
-                if (gameProfile != null) {
-                    return gameProfile;
+                entry = this.byName.get(name);
+                if (entry != null && !entry.isExpired()) {
+                    return entry.gameProfile;
                 }
             }
             final Map<String, UUID> result = this.queryUUIDByName(Collections.singletonList(name));
-            if (result.containsKey(name)) {
+            if (!result.containsKey(name)) {
                 throw new ProfileNotFoundException("Unable to find a profile with the name: " + name);
             }
-            gameProfile = this.getById(result.get(name), useCache, true);
+            entry = this.getById(result.get(name), useCache, true);
             if (useCache) {
-                this.byName.put(name, gameProfile);
+                this.byName.put(name, entry);
             }
-            return gameProfile;
+            return entry.gameProfile;
         });
     }
 
@@ -247,15 +220,15 @@ public final class LanternGameProfileManager implements GameProfileManager {
     public ListenableFuture<Collection<GameProfile>> getAllByName(Iterable<String> names, boolean useCache) {
         return this.service.submit(() -> {
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
-            GameProfile gameProfile;
+            CacheEntry entry;
 
             List<String> rest;
             if (useCache) {
                 rest = Lists.newArrayList();
                 for (String name : names) {
-                    gameProfile = this.byName.get(name);
-                    if (gameProfile != null) {
-                        builder.add(gameProfile);
+                    entry = this.byName.get(name);
+                    if (entry != null && !entry.isExpired()) {
+                        builder.add(entry.gameProfile);
                     } else {
                         rest.add(name);
                     }
@@ -270,11 +243,11 @@ public final class LanternGameProfileManager implements GameProfileManager {
                     if (!results.containsKey(name)) {
                         throw new ProfileNotFoundException("Unable to find a profile with the name: " + name);
                     }
-                    gameProfile = this.getById(results.get(name), useCache, true);
+                    entry = this.getById(results.get(name), useCache, true);
                     if (useCache) {
-                        this.byName.put(name, gameProfile);
+                        this.byName.put(name, entry);
                     }
-                    builder.add(gameProfile);
+                    builder.add(entry.gameProfile);
                 }
             }
 
@@ -285,7 +258,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public ListenableFuture<GameProfile> fill(GameProfile profile, boolean signed, boolean useCache) {
         return this.service.submit(() -> {
-            final GameProfile gameProfile = this.getById(profile.getUniqueId(), useCache, signed);
+            final GameProfile gameProfile = this.getById(profile.getUniqueId(), useCache, signed).gameProfile;
             ((LanternGameProfile) profile).setName(gameProfile.getName().get());
             profile.getPropertyMap().putAll(gameProfile.getPropertyMap());
             return profile;
@@ -319,12 +292,13 @@ public final class LanternGameProfileManager implements GameProfileManager {
                 throw new ProfileNotFoundException("Failed to find a profile with the uuid: " + uniqueId);
             }
 
+            // If it fails too many times, just leave it
+            if (++attempts > 6) {
+                throw new IOException("Failed to retrieve the profile after 6 attempts: " + uniqueId);
+            }
+
             JsonObject json = this.gson.fromJson(new InputStreamReader(is), JsonObject.class);
             if (json.has("error")) {
-                // If it fails too many times, just leave it
-                if (++attempts > 6) {
-                    throw new IOException("Failed to retrieve the profile after 6 attempts: " + uniqueId);
-                }
                 // Too many requests, lets wait for 10 seconds
                 try {
                     Thread.sleep(10000);

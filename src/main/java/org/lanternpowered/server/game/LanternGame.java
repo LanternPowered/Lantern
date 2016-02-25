@@ -28,9 +28,11 @@ package org.lanternpowered.server.game;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandBan;
 import org.lanternpowered.server.command.CommandBorder;
+import org.lanternpowered.server.command.CommandDeop;
 import org.lanternpowered.server.command.CommandDifficulty;
 import org.lanternpowered.server.command.CommandGameRule;
 import org.lanternpowered.server.command.CommandHelp;
+import org.lanternpowered.server.command.CommandOp;
 import org.lanternpowered.server.command.CommandSay;
 import org.lanternpowered.server.command.CommandSeed;
 import org.lanternpowered.server.command.CommandSetSpawn;
@@ -44,6 +46,7 @@ import org.lanternpowered.server.command.LanternCommandDisambiguator;
 import org.lanternpowered.server.command.LanternCommandManager;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
+import org.lanternpowered.server.config.user.OpsConfig;
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.config.user.WhitelistConfig;
@@ -294,7 +297,7 @@ public class LanternGame implements Game {
         this.globalConfig.load();
 
         // Create the ops config
-        this.opsConfig = new UserConfig<>(this.configFolder.resolve(OPS_CONFIG));
+        this.opsConfig = new OpsConfig(this.configFolder.resolve(OPS_CONFIG));
         this.opsConfig.load();
 
         // Create the whitelist config
@@ -368,6 +371,8 @@ public class LanternGame implements Game {
         this.commandManager.register(this.minecraft, CommandWhitelist.create(), "whitelist");
         this.commandManager.register(this.minecraft, CommandTime.create(), "time");
         this.commandManager.register(this.minecraft, CommandBorder.create(), "worldborder");
+        this.commandManager.register(this.minecraft, CommandOp.create(), "op");
+        this.commandManager.register(this.minecraft, CommandDeop.create(), "deop");
         this.commandManager.register(this.implContainer, CommandVersion.create(), "version");
         this.commandManager.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
                 LanternCallbackHolder.CALLBACK_COMMAND);
@@ -432,6 +437,8 @@ public class LanternGame implements Game {
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN_IP, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandWhitelist.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandOp.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandDeop.PERMISSION, Tristate.TRUE);
             // Group level 4 permissions
             subjectData = service.getGroupForOpLevel(4).getSubjectData();
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandStop.PERMISSION, Tristate.TRUE);

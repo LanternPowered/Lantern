@@ -26,10 +26,8 @@
 package org.lanternpowered.server.config.user;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.objectmapping.Setting;
 import org.lanternpowered.server.config.ConfigBase;
 import org.spongepowered.api.profile.GameProfile;
 
@@ -41,10 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class UserConfig<T extends UserEntry> extends ConfigBase implements UserStorage<T> {
-
-    @Setting(value = "entries")
-    private List<T> entries = Lists.newArrayList();
+public abstract class UserConfig<T extends UserEntry> extends ConfigBase implements UserStorage<T> {
 
     private final Map<UUID, T> byUUID = Maps.newConcurrentMap();
     private final Map<String, T> byName = Maps.newConcurrentMap();
@@ -57,12 +52,14 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
         super(path, options);
     }
 
+    protected abstract List<T> getBackingList();
+
     @Override
     public void save() throws IOException {
         synchronized (this) {
-            this.entries.clear();
+            this.getBackingList().clear();
             for (T entry : this.byUUID.values()) {
-                this.entries.add(entry);
+                this.getBackingList().add(entry);
             }
             super.save();
         }
@@ -74,11 +71,11 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
             super.load();
             this.byUUID.clear();
             this.byName.clear();
-            for (T entry : this.entries) {
+            for (T entry : this.getBackingList()) {
                 this.byUUID.put(entry.getProfile().getUniqueId(), entry);
                 final Optional<String> optName = entry.getProfile().getName();
                 if (optName.isPresent()) {
-                    this.byName.put(optName.get(), entry);
+                    this.byName.put(optName.get().toLowerCase(), entry);
                 }
             }
         }
@@ -105,7 +102,7 @@ public class UserConfig<T extends UserEntry> extends ConfigBase implements UserS
         this.byUUID.put(gameProfile.getUniqueId(), entry);
         final Optional<String> optName = entry.getProfile().getName();
         if (optName.isPresent()) {
-            this.byName.put(optName.get(), entry);
+            this.byName.put(optName.get().toLowerCase(), entry);
         }
     }
 

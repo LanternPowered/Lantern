@@ -152,6 +152,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         // TODO: Move this?
         @Setting(value = "op-permission-level", comment = "The default op level of all the operators.")
         private int opPermissionLevel = 4;
+
+        @Setting(value = "white-list", comment = "Whether the white-list is enabled.")
+        private boolean whitelist = false;
     }
 
     @ConfigSerializable
@@ -162,6 +165,14 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    public boolean isWhitelistEnabled() {
+        return this.server.whitelist;
+    }
+
+    public void setWhitelistEnabled(boolean enabled) {
+        this.server.whitelist = enabled;
     }
 
     public Map<String, String> getCommandAliases() {

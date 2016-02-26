@@ -44,12 +44,12 @@ public abstract class UserConfig<T extends UserEntry> extends ConfigBase impleme
     private final Map<UUID, T> byUUID = Maps.newConcurrentMap();
     private final Map<String, T> byName = Maps.newConcurrentMap();
 
-    public UserConfig(Path path) throws IOException {
-        super(path);
+    public UserConfig(Path path, boolean hocon) throws IOException {
+        super(path, hocon);
     }
 
-    public UserConfig(Path path, ConfigurationOptions options) throws IOException {
-        super(path, options);
+    public UserConfig(Path path, ConfigurationOptions options, boolean hocon) throws IOException {
+        super(path, options, hocon);
     }
 
     protected abstract List<T> getBackingList();

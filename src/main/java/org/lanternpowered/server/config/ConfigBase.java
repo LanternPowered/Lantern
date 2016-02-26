@@ -27,9 +27,10 @@ package org.lanternpowered.server.config;
 
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
+import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.commented.SimpleCommentedConfigurationNode;
+import ninja.leaping.configurate.gson.GsonConfigurationLoader;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
@@ -78,11 +79,11 @@ public abstract class ConfigBase {
     }
 
     private final ObjectMapper<ConfigBase>.BoundInstance configMapper;
-    private final ConfigurationLoader<CommentedConfigurationNode> loader;
+    private final ConfigurationLoader<ConfigurationNode> loader;
     private final ConfigurationOptions options;
     private final Path path;
 
-    private volatile CommentedConfigurationNode root;
+    private volatile ConfigurationNode root;
 
     /**
      * Creates a new config object.
@@ -90,8 +91,8 @@ public abstract class ConfigBase {
      * @param path the config path
      * @throws IOException 
      */
-    public ConfigBase(Path path) throws IOException {
-        this(path, DEFAULT_OPTIONS);
+    public ConfigBase(Path path, boolean hocon) throws IOException {
+        this(path, DEFAULT_OPTIONS, hocon);
     }
 
     /**
@@ -101,8 +102,12 @@ public abstract class ConfigBase {
      * @param options the config options
      * @throws IOException 
      */
-    public ConfigBase(Path path, ConfigurationOptions options) throws IOException {
-        this.loader = HoconConfigurationLoader.builder().setPath(path).setDefaultOptions(options).build();
+    public ConfigBase(Path path, ConfigurationOptions options, boolean hocon) throws IOException {
+        if (hocon) {
+            this.loader = (ConfigurationLoader) HoconConfigurationLoader.builder().setPath(path).setDefaultOptions(options).build();
+        } else {
+            this.loader = GsonConfigurationLoader.builder().setPath(path).setDefaultOptions(options).build();
+        }
         try {
             this.configMapper = ObjectMapper.forObject(this);
         } catch (ObjectMappingException e) {

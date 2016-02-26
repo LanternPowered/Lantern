@@ -40,6 +40,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.lanternpowered.server.config.ConfigBase;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.UUIDHelper;
 import org.lanternpowered.server.util.UniqueEvictingQueue;
 import org.spongepowered.api.profile.GameProfile;
@@ -55,8 +57,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -66,6 +70,7 @@ import java.util.Queue;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -78,6 +83,9 @@ public final class LanternGameProfileManager implements GameProfileManager {
             runnable -> new Thread(runnable, "profile-resolver-" + this.counter.getAndIncrement())));
 
     private static final Duration EXPIRATION_DURATION = Duration.ofDays(30);
+
+    // The cache file
+    private final ProfileCacheFile cacheFile;
 
     // The gson instance
     private final Gson gson = new Gson();
@@ -93,6 +101,40 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     private Instant calculateExpirationDate() {
         return Instant.now().plus(EXPIRATION_DURATION);
+    }
+
+    private class ProfileCacheFile extends ConfigBase {
+
+        @Setting(value = "entries")
+        private List<CacheEntry> entries = new ArrayList<>();
+
+        public ProfileCacheFile(Path path) throws IOException {
+            super(path, false);
+        }
+
+        @Override
+        public void save() throws IOException {
+            synchronized (this) {
+                this.entries.clear();
+                this.entries.addAll(byUUID.values().stream().collect(Collectors.toList()));
+                this.entries.addAll(byName.values().stream().filter(e -> !this.entries.contains(e)).collect(Collectors.toList()));
+                super.save();
+            }
+        }
+
+        @Override
+        public void load() throws IOException {
+            synchronized (this) {
+                super.load();
+                byUUID.clear();
+                byName.clear();
+                this.entries.stream().filter(e -> !e.isExpired()).forEach(entry -> {
+                    byUUID.put(entry.gameProfile.getUniqueId(), entry);
+                    entry.gameProfile.getName().ifPresent(n -> byName.put(n.toLowerCase(), entry));
+                });
+            }
+        }
+
     }
 
     @ConfigSerializable
@@ -122,10 +164,30 @@ public final class LanternGameProfileManager implements GameProfileManager {
         }
     }
 
+    public LanternGameProfileManager(Path cacheFile) {
+        ProfileCacheFile cache = null;
+        try {
+            cache = new ProfileCacheFile(cacheFile);
+            try {
+                cache.load();
+            } catch (IOException e) {
+                LanternGame.log().warn("An error occurred while loading the profile cache file.", e);
+            }
+        } catch (IOException e) {
+            LanternGame.log().warn("An error occurred while instantiating the profile cache file.", e);
+        }
+        this.cacheFile = cache;
+    }
+
     /**
      * Stops the profile resolver service.
      */
     public void shutdown() {
+        try {
+            this.cacheFile.save();
+        } catch (IOException e) {
+            LanternGame.log().warn("An error occurred while saving the profile cache file.", e);
+        }
         this.service.shutdown();
     }
 
@@ -133,9 +195,11 @@ public final class LanternGameProfileManager implements GameProfileManager {
      * Puts the game profile into the cache.
      *
      * @param gameProfile the game profile
+     * @param signed whether the properties of the profile are signed
      */
-    public void putProfile(GameProfile gameProfile) {
+    public void putProfile(GameProfile gameProfile, boolean signed) {
         final CacheEntry entry = new CacheEntry(gameProfile, this.calculateExpirationDate());
+        entry.signed = signed;
         this.byUUID.put(gameProfile.getUniqueId(), entry);
         gameProfile.getName().ifPresent(name -> this.byName.put(name, entry));
     }
@@ -169,7 +233,6 @@ public final class LanternGameProfileManager implements GameProfileManager {
         }
         // Can throw IOException or ProfileNotFoundException
         GameProfile gameProfile = this.queryProfileByUUID(uniqueId, signed);
-        Instant time = this.calculateExpirationDate();
         entry = new CacheEntry(gameProfile, this.calculateExpirationDate());
         if (useCache) {
             this.byUUID.put(uniqueId, entry);

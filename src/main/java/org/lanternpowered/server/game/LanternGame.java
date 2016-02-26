@@ -129,16 +129,19 @@ public class LanternGame implements Game {
     public static final String GLOBAL_CONFIG = "global.conf";
 
     // The name of the ops config file
-    public static final String OPS_CONFIG = "ops.conf";
+    public static final String OPS_CONFIG = "ops.json";
 
     // The name of the whitelist config file
-    public static final String WHITELIST_CONFIG = "whitelist.conf";
+    public static final String WHITELIST_CONFIG = "whitelist.json";
 
     // The name of the ban config file
-    public static final String BANS_CONFIG = "bans.conf";
+    public static final String BANS_CONFIG = "bans.json";
 
     // The name of the config folder
     public static final String PLUGINS_FOLDER = "plugins";
+
+    // The name of the profile cache file
+    public static final String PROFILE_CACHE_FILE = "profile-cache.json";
 
     // The singleton instance of the game
     @Nullable private static LanternGame game;
@@ -346,7 +349,7 @@ public class LanternGame implements Game {
         this.dataManager = new LanternDataManager();
 
         // Register the game profile resolver
-        this.gameProfileManager = new LanternGameProfileManager();
+        this.gameProfileManager = new LanternGameProfileManager(this.configFolder.resolve(PROFILE_CACHE_FILE));
 
         this.registerService(WhitelistService.class, this.whitelistConfig);
         this.registerService(BanService.class, this.banConfig);

@@ -37,7 +37,7 @@ import java.util.Collection;
 public final class WhitelistConfig extends SimpleUserConfig implements WhitelistService {
 
     public WhitelistConfig(Path path) throws IOException {
-        super(path);
+        super(path, false);
     }
 
     @Override

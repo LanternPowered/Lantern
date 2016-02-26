@@ -106,7 +106,7 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     private final GlobalConfig globalConfig;
 
     public WorldConfig(GlobalConfig globalConfig, Path path) throws IOException {
-        super(path);
+        super(path, true);
         this.globalConfig = globalConfig;
     }
 

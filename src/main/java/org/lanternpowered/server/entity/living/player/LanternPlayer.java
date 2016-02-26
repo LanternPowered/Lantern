@@ -207,6 +207,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             final Vector3d position = this.getPosition();
             final Vector3d rotation = this.getRotation();
             this.session.send(world.getProperties().createWorldBorderMessage());
+            world.getWeatherUniverse().ifPresent(u -> this.session.send(u.createSkyUpdateMessage()));
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(),
                     (float) rotation.getY(), (float) rotation.getX(), 0, 0));
         } else {

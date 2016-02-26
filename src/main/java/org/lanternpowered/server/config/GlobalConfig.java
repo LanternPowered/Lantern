@@ -51,7 +51,7 @@ import javax.annotation.Nullable;
 public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public GlobalConfig(Path path) throws IOException {
-        super(path);
+        super(path, true);
     }
 
     @Setting(value = "server", comment = "Configuration for the server.")

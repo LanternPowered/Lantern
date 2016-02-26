@@ -38,7 +38,7 @@ public final class OpsConfig extends UserConfig<OpsEntry> {
     private List<OpsEntry> entries = new ArrayList<>();
 
     public OpsConfig(Path path) throws IOException {
-        super(path);
+        super(path, false);
     }
 
     @Override

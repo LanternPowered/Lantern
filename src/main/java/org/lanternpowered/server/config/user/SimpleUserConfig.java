@@ -37,8 +37,8 @@ public class SimpleUserConfig extends UserConfig<UserEntry> {
     @Setting(value = "entries")
     private List<UserEntry> entries = new ArrayList<>();
 
-    public SimpleUserConfig(Path path) throws IOException {
-        super(path);
+    public SimpleUserConfig(Path path, boolean hocon) throws IOException {
+        super(path, hocon);
     }
 
     @Override

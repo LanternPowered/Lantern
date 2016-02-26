@@ -80,12 +80,12 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     }));
 
     public BanConfig(Path path) throws IOException {
-        super(path, OPTIONS);
+        super(path, OPTIONS, false);
     }
 
     @Override
     public void save() throws IOException {
-        synchronized (this.entries0) {
+        synchronized (this) {
             this.entries.clear();
             this.entries.addAll(this.entries0);
             super.save();
@@ -94,7 +94,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public void load() throws IOException {
-        synchronized (this.entries0) {
+        synchronized (this) {
             super.load();
             this.entries0.clear();
             this.entries0.addAll(this.entries);

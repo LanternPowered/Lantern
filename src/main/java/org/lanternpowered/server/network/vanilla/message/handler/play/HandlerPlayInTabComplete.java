@@ -35,6 +35,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.command.TabCompleteEvent;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,12 +47,19 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
         String text = message.getText().trim();
         boolean prefix = text.startsWith("/");
         if (prefix || message.getAssumeCommand()) {
-            if (!prefix && message.getAssumeCommand()) {
-                text = '/' + text;
+            if (prefix) {
+                text = text.substring(1);
             }
             List<String> suggestions = Sponge.getCommandManager().getSuggestions(context.getSession().getPlayer(), text);
             if (!prefix) {
-                suggestions = suggestions.stream().map(s -> s.charAt(0) == '/' ? s.substring(1) : s).collect(Collectors.toList());
+                suggestions = suggestions.stream()
+                        .map(s -> s.charAt(0) == '/' ? s.substring(1) : s)
+                        .collect(GuavaCollectors.toImmutableList());
+            // Make the command name start with '/'
+            } else if (text.split(" ").length == 1) {
+                suggestions = suggestions.stream()
+                        .map(s -> s.charAt(0) == '/' ? s : '/' + s)
+                        .collect(GuavaCollectors.toImmutableList());
             }
             context.getSession().send(new MessagePlayOutTabComplete(suggestions));
         } else {
@@ -69,7 +77,9 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
             }
             final String part1 = part.toLowerCase();
             List<String> suggestions = Sponge.getServer().getOnlinePlayers().stream()
-                    .map(CommandSource::getName).filter(n -> n.toLowerCase().startsWith(part1)).collect(Collectors.toList());
+                    .map(CommandSource::getName)
+                    .filter(n -> n.toLowerCase().startsWith(part1))
+                    .collect(Collectors.toList());
             TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(Cause.of(context.getSession().getPlayer()),
                     ImmutableList.copyOf(suggestions), suggestions, text);
             if (!Sponge.getEventManager().post(event)) {

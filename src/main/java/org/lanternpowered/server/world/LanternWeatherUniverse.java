@@ -107,6 +107,9 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         }
     }
 
+    /**
+     * Pulses the weather.
+     */
     void pulse() {
         if (this.world.properties.raining && this.world.properties.rainTime > 0) {
             this.world.properties.rainTime--;
@@ -143,19 +146,27 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
             updateSky = true;
         }
         if (updateSky) {
-            Set<LanternPlayer> players = this.world.getPlayers();
-            if (!players.isEmpty()) {
-                MessagePlayOutWorldSky message = this.createSkyUpdateMessage();
-                players.forEach(player -> player.getConnection().send(message));
-            }
+            this.world.broadcast(this::createSkyUpdateMessage);
         }
     }
 
-    MessagePlayOutWorldSky createSkyUpdateMessage() {
+    /**
+     * Creates a new {@link MessagePlayOutWorldSky} for the
+     * current state of the sky.
+     *
+     * @return the message
+     */
+    public MessagePlayOutWorldSky createSkyUpdateMessage() {
         return new MessagePlayOutWorldSky(this.rainStrength, this.darkness);
     }
 
-    LanternWeather nextWeather() {
+    /**
+     * Gets the next possible {@link LanternWeather}, ignoring
+     * the last weather type.
+     *
+     * @return the next weather type
+     */
+    private LanternWeather nextWeather() {
         List<Weather> weathers = Lists.newArrayList(this.world.game.getRegistry().getAllOf(Weather.class));
         while (weathers.size() > 1) {
             LanternWeather next = (LanternWeather) weathers.remove(this.random.nextInt(weathers.size()));

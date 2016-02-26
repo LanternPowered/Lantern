@@ -39,6 +39,7 @@ import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
+import org.lanternpowered.server.data.world.MoonPhase;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.effect.sound.SoundCategory;
@@ -51,6 +52,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
@@ -66,6 +68,7 @@ import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWo
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
 import org.lanternpowered.server.world.rules.RuleType;
+import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -208,6 +211,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Finally, create the chunk manager
         this.chunkManager = new LanternChunkManager(this.game, this, this.worldConfig, chunkLoadService,
                 chunkIOService, worldGenerator, worldFolder);
+    }
+
+    public Optional<LanternWeatherUniverse> getWeatherUniverse() {
+        return Optional.ofNullable(this.weatherUniverse);
     }
 
     public ObservedChunkManager getObservedChunkManager() {
@@ -959,12 +966,23 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         return new LanternChunkPreGenerate(this, checkNotNull(center, "center"), diameter);
     }
 
+    private static final int timeSyncDelay = 6;
+    private int timeSyncTime;
+
     public void pulse() {
         this.chunkManager.pulse();
+        // Increase the age of the world
+        this.properties.age++;
+        // Increase the time of the world
         if (++this.properties.time > 24000) {
             this.properties.time %= 24000;
         }
-        this.properties.age++;
+        // Sync the client time with the server time
+        if (this.timeSyncTime-- <= 0) {
+            this.timeSyncTime = this.timeSyncDelay;
+            this.broadcast(() -> new MessagePlayOutWorldTime(MoonPhase.NEW_MOON, (int) this.properties.time,
+                    this.getOrCreateRule(RuleTypes.DO_DAYLIGHT_CYCLE).getValue()));
+        }
         if (this.weatherUniverse != null) {
             this.weatherUniverse.pulse();
         }

@@ -618,12 +618,8 @@ public class LanternServer implements Server {
             }
         });
 
-        // Shutdown the game profile resolver if possible
-        this.game.getServiceManager().provide(GameProfileManager.class).ifPresent(gameProfileResolver -> {
-            if (gameProfileResolver instanceof LanternGameProfileManager) {
-                ((LanternGameProfileManager) gameProfileResolver).shutdown();
-            }
-        });
+        // Shutdown the game profile manager
+        this.game.getGameProfileManager().shutdown();
 
         try {
             this.game.getOpsConfig().save();

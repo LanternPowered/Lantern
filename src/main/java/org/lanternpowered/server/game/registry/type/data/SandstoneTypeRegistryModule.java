@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternSandstoneType;
 import org.spongepowered.api.data.type.SandstoneType;
@@ -58,7 +58,7 @@ public final class SandstoneTypeRegistryModule implements CatalogRegistryModule<
 
     @Override
     public Collection<SandstoneType> getAll() {
-        return ImmutableList.copyOf(this.sandstoneTypes.values());
+        return ImmutableSet.copyOf(this.sandstoneTypes.values());
     }
 
 }

@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
 import org.spongepowered.api.data.type.DoublePlantType;
@@ -58,7 +58,7 @@ public final class DoublePlantTypeRegistryModule implements CatalogRegistryModul
 
     @Override
     public Collection<DoublePlantType> getAll() {
-        return ImmutableList.copyOf(this.plantTypes.values());
+        return ImmutableSet.copyOf(this.plantTypes.values());
     }
 
 }

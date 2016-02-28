@@ -28,7 +28,7 @@ package org.lanternpowered.server.game.registry.type.attribute;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.attribute.AttributeTargets;
 import org.lanternpowered.server.attribute.LanternAttribute;
@@ -103,7 +103,7 @@ public final class AttributeRegistryModule implements AdditionalCatalogRegistryM
 
     @Override
     public Collection<LanternAttribute> getAll() {
-        return ImmutableList.copyOf(this.attributes.values());
+        return ImmutableSet.copyOf(this.attributes.values());
     }
 
 }

@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternHinge;
 import org.spongepowered.api.data.type.Hinge;
@@ -58,7 +58,7 @@ public final class HingeRegistryModule implements CatalogRegistryModule<Hinge> {
 
     @Override
     public Collection<Hinge> getAll() {
-        return ImmutableList.copyOf(this.hinges.values());
+        return ImmutableSet.copyOf(this.hinges.values());
     }
 
 }

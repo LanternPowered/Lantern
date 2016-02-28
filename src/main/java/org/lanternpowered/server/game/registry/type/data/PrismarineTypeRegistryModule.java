@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
 import org.spongepowered.api.data.type.PrismarineType;
@@ -58,7 +58,7 @@ public final class PrismarineTypeRegistryModule implements CatalogRegistryModule
 
     @Override
     public Collection<PrismarineType> getAll() {
-        return ImmutableList.copyOf(this.prismarineTypes.values());
+        return ImmutableSet.copyOf(this.prismarineTypes.values());
     }
 
 }

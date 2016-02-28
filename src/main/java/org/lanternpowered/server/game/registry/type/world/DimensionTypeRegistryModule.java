@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.world.dimension.LanternDimensionEnd;
@@ -85,7 +85,7 @@ public class DimensionTypeRegistryModule implements AlternateCatalogRegistryModu
 
     @Override
     public Collection<DimensionType> getAll() {
-        return ImmutableList.copyOf(this.dimensionTypes.values());
+        return ImmutableSet.copyOf(this.dimensionTypes.values());
     }
 
 }

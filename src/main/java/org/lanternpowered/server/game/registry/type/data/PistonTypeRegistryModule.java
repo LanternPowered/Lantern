@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternPistonType;
 import org.spongepowered.api.data.type.PistonType;
@@ -58,7 +58,7 @@ public final class PistonTypeRegistryModule implements CatalogRegistryModule<Pis
 
     @Override
     public Collection<PistonType> getAll() {
-        return ImmutableList.copyOf(this.pistonTypes.values());
+        return ImmutableSet.copyOf(this.pistonTypes.values());
     }
 
 }

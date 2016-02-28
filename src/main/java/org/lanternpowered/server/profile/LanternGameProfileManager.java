@@ -138,10 +138,10 @@ public final class LanternGameProfileManager implements GameProfileManager {
     }
 
     @ConfigSerializable
-    private class CacheEntry {
+    private static class CacheEntry {
 
         @Setting(value = "profile")
-        private GameProfile gameProfile;
+        private LanternGameProfile gameProfile;
         @Setting(value = "expiration-date")
         private Instant expirationDate;
         @Setting(value = "signed")
@@ -151,12 +151,8 @@ public final class LanternGameProfileManager implements GameProfileManager {
         }
 
         public CacheEntry(GameProfile profile, Instant expirationDate) {
+            this.gameProfile = (LanternGameProfile) profile;
             this.expirationDate = expirationDate;
-            this.gameProfile = profile;
-        }
-
-        public CacheEntry(GameProfile profile) {
-            this(profile, calculateExpirationDate());
         }
 
         public boolean isExpired() {

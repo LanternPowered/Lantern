@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
@@ -69,10 +69,7 @@ public final class TextColorRegistryModule implements CatalogRegistryModule<Text
         types.add(new LanternTextColor("white", Color.WHITE));
         types.add(new LanternTextColor("reset", Color.WHITE));
         types.add(TextColors.NONE);
-
-        for (TextColor type : types) {
-            this.chatColors.put(type.getId(), type);
-        }
+        types.forEach(type -> this.chatColors.put(type.getId(), type));
     }
 
     @Override
@@ -82,7 +79,7 @@ public final class TextColorRegistryModule implements CatalogRegistryModule<Text
 
     @Override
     public Collection<TextColor> getAll() {
-        return ImmutableList.copyOf(this.chatColors.values());
+        return ImmutableSet.copyOf(this.chatColors.values());
     }
 
 }

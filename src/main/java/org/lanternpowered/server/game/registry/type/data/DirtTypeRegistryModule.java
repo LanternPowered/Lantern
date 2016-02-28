@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.spongepowered.api.data.type.DirtType;
@@ -58,7 +58,7 @@ public final class DirtTypeRegistryModule implements CatalogRegistryModule<DirtT
 
     @Override
     public Collection<DirtType> getAll() {
-        return ImmutableList.copyOf(this.dirtTypes.values());
+        return ImmutableSet.copyOf(this.dirtTypes.values());
     }
 
 }

@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
@@ -74,7 +74,7 @@ public final class GeneratorTypeRegistryModule implements CatalogRegistryModule<
 
     @Override
     public Collection<GeneratorType> getAll() {
-        return ImmutableList.copyOf(this.generatorTypes.values());
+        return ImmutableSet.copyOf(this.generatorTypes.values());
     }
 
 }

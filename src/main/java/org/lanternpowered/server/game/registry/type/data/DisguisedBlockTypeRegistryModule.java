@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.spongepowered.api.data.type.DisguisedBlockType;
@@ -58,7 +58,7 @@ public final class DisguisedBlockTypeRegistryModule implements CatalogRegistryMo
 
     @Override
     public Collection<DisguisedBlockType> getAll() {
-        return ImmutableList.copyOf(this.blockTypes.values());
+        return ImmutableSet.copyOf(this.blockTypes.values());
     }
 
 }

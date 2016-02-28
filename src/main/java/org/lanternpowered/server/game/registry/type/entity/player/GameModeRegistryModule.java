@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.entity.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
@@ -64,7 +64,7 @@ public final class GameModeRegistryModule implements CatalogRegistryModule<GameM
 
     @Override
     public Collection<GameMode> getAll() {
-        return ImmutableList.copyOf(this.gameModes.values());
+        return ImmutableSet.copyOf(this.gameModes.values());
     }
 
 }

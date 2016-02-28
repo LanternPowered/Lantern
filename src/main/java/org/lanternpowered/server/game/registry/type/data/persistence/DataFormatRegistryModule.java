@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data.persistence;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.persistence.HoconDataFormat;
@@ -61,7 +61,7 @@ public final class DataFormatRegistryModule implements CatalogRegistryModule<Dat
 
     @Override
     public Collection<DataFormat> getAll() {
-        return ImmutableList.copyOf(this.dataFormats.values());
+        return ImmutableSet.copyOf(this.dataFormats.values());
     }
 
 }

@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternNotePitch;
@@ -66,7 +66,7 @@ public final class NotePitchRegistryModule implements CatalogRegistryModule<Note
 
     @Override
     public Collection<NotePitch> getAll() {
-        return ImmutableList.copyOf(this.notePitches.values());
+        return ImmutableSet.copyOf(this.notePitches.values());
     }
 
 }

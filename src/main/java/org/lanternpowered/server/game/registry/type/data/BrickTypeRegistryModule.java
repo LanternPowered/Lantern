@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternBrickType;
 import org.spongepowered.api.data.type.BrickType;
@@ -58,7 +58,7 @@ public final class BrickTypeRegistryModule implements CatalogRegistryModule<Bric
 
     @Override
     public Collection<BrickType> getAll() {
-        return ImmutableList.copyOf(this.brickTypes.values());
+        return ImmutableSet.copyOf(this.brickTypes.values());
     }
 
 }

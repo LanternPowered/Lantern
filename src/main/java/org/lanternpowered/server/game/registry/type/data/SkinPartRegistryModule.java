@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternSkinPart;
@@ -65,7 +65,7 @@ public final class SkinPartRegistryModule implements CatalogRegistryModule<SkinP
 
     @Override
     public Collection<SkinPart> getAll() {
-        return ImmutableList.copyOf(this.skinParts.values());
+        return ImmutableSet.copyOf(this.skinParts.values());
     }
 
 }

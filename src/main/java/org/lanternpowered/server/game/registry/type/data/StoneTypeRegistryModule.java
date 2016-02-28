@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.spongepowered.api.data.type.StoneType;
@@ -58,7 +58,7 @@ public final class StoneTypeRegistryModule implements CatalogRegistryModule<Ston
 
     @Override
     public Collection<StoneType> getAll() {
-        return ImmutableList.copyOf(this.stoneTypes.values());
+        return ImmutableSet.copyOf(this.stoneTypes.values());
     }
 
 }

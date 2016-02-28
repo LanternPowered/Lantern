@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
@@ -62,7 +62,7 @@ public final class DifficultyRegistryModule implements CatalogRegistryModule<Dif
 
     @Override
     public Collection<Difficulty> getAll() {
-        return ImmutableList.copyOf(this.difficulties.values());
+        return ImmutableSet.copyOf(this.difficulties.values());
     }
 
 }

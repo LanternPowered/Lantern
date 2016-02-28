@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
@@ -67,7 +67,7 @@ public final class TextStyleRegistryModule implements CatalogRegistryModule<Text
 
     @Override
     public Collection<TextStyle.Base> getAll() {
-        return ImmutableList.copyOf(this.chatStyles.values());
+        return ImmutableSet.copyOf(this.chatStyles.values());
     }
 
 }

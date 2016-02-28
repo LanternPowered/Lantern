@@ -41,6 +41,7 @@ import org.lanternpowered.server.command.CommandTell;
 import org.lanternpowered.server.command.CommandTime;
 import org.lanternpowered.server.command.CommandTitle;
 import org.lanternpowered.server.command.CommandVersion;
+import org.lanternpowered.server.command.CommandWeather;
 import org.lanternpowered.server.command.CommandWhitelist;
 import org.lanternpowered.server.command.LanternCommandDisambiguator;
 import org.lanternpowered.server.command.LanternCommandManager;
@@ -376,6 +377,7 @@ public class LanternGame implements Game {
         this.commandManager.register(this.minecraft, CommandBorder.create(), "worldborder");
         this.commandManager.register(this.minecraft, CommandOp.create(), "op");
         this.commandManager.register(this.minecraft, CommandDeop.create(), "deop");
+        this.commandManager.register(this.minecraft, CommandWeather.create(), "weather");
         this.commandManager.register(this.implContainer, CommandVersion.create(), "version");
         this.commandManager.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
                 LanternCallbackHolder.CALLBACK_COMMAND);
@@ -435,6 +437,7 @@ public class LanternGame implements Game {
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandTitle.PERMISSION, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandTime.PERMISSION, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBorder.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandWeather.PERMISSION, Tristate.TRUE);
             // Group level 3 permissions
             subjectData = service.getGroupForOpLevel(3).getSubjectData();
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN, Tristate.TRUE);

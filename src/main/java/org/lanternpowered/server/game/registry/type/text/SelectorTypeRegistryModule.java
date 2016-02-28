@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.text.selector.LanternSelectorType;
 import org.spongepowered.api.registry.CatalogRegistryModule;
@@ -64,7 +64,7 @@ public final class SelectorTypeRegistryModule implements CatalogRegistryModule<S
 
     @Override
     public Collection<SelectorType> getAll() {
-        return ImmutableList.copyOf(this.selectorMappings.values());
+        return ImmutableSet.copyOf(this.selectorMappings.values());
     }
 
 }

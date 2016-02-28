@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternShrubType;
 import org.spongepowered.api.data.type.ShrubType;
@@ -58,7 +58,7 @@ public final class ShrubTypeRegistryModule implements CatalogRegistryModule<Shru
 
     @Override
     public Collection<ShrubType> getAll() {
-        return ImmutableList.copyOf(this.shrubTypes.values());
+        return ImmutableSet.copyOf(this.shrubTypes.values());
     }
 
 }

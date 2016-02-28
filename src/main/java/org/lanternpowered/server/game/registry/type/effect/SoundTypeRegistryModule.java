@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.effect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -330,7 +330,7 @@ public final class SoundTypeRegistryModule implements CatalogRegistryModule<Soun
 
     @Override
     public Collection<SoundType> getAll() {
-        return ImmutableList.copyOf(this.soundNames.values());
+        return ImmutableSet.copyOf(this.soundNames.values());
     }
 
 }

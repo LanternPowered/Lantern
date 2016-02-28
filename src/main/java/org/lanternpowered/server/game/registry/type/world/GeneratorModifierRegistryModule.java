@@ -28,7 +28,7 @@ package org.lanternpowered.server.game.registry.type.world;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
@@ -79,7 +79,7 @@ public final class GeneratorModifierRegistryModule implements AdditionalCatalogR
 
     @Override
     public Collection<WorldGeneratorModifier> getAll() {
-        return ImmutableList.copyOf(this.generatorModifiers.values());
+        return ImmutableSet.copyOf(this.generatorModifiers.values());
     }
 
 }

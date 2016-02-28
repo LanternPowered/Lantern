@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternLogAxis;
 import org.spongepowered.api.data.type.LogAxes;
@@ -57,7 +57,7 @@ public final class LogAxisRegistryModule implements CatalogRegistryModule<LogAxi
 
     @Override
     public Collection<LogAxis> getAll() {
-        return ImmutableList.copyOf(this.logAxes.values());
+        return ImmutableSet.copyOf(this.logAxes.values());
     }
 
 }

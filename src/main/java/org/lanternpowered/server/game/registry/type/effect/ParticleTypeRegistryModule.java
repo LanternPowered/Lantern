@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.effect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
@@ -110,7 +110,7 @@ public class ParticleTypeRegistryModule implements CatalogRegistryModule<Particl
 
     @Override
     public Collection<ParticleType> getAll() {
-        return ImmutableList.copyOf(this.particleTypes.values());
+        return ImmutableSet.copyOf(this.particleTypes.values());
     }
 
 }

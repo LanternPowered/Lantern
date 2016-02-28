@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternWallType;
 import org.spongepowered.api.data.type.WallType;
@@ -58,7 +58,7 @@ public final class WallTypeRegistryModule implements CatalogRegistryModule<WallT
 
     @Override
     public Collection<WallType> getAll() {
-        return ImmutableList.copyOf(this.wallTypes.values());
+        return ImmutableSet.copyOf(this.wallTypes.values());
     }
 
 }

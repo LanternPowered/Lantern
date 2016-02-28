@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.text.chat.LanternChatType;
@@ -62,7 +62,7 @@ public final class ChatTypeRegistryModule implements CatalogRegistryModule<ChatT
 
     @Override
     public Collection<ChatType> getAll() {
-        return ImmutableList.copyOf(this.chatTypes.values());
+        return ImmutableSet.copyOf(this.chatTypes.values());
     }
 
 }

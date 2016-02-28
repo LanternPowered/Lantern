@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.util.rotation.LanternRotation;
@@ -67,7 +67,7 @@ public final class RotationRegistryModule implements CatalogRegistryModule<Rotat
 
     @Override
     public Collection<Rotation> getAll() {
-        return ImmutableList.copyOf(this.rotations.values());
+        return ImmutableSet.copyOf(this.rotations.values());
     }
 
     public Optional<Rotation> getRotationFromDegree(int degrees) {

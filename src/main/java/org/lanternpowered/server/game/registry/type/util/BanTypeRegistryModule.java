@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.config.user.ban.LanternBanType;
@@ -64,7 +64,7 @@ public final class BanTypeRegistryModule implements CatalogRegistryModule<BanTyp
 
     @Override
     public Collection<BanType> getAll() {
-        return ImmutableList.copyOf(this.banTypes.values());
+        return ImmutableSet.copyOf(this.banTypes.values());
     }
 
 }

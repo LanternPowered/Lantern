@@ -55,7 +55,7 @@ public final class LanternGameProfile implements GameProfile {
     private static final DataQuery SIGNATURE = DataQuery.of("Signature");
 
     @Setting("properties")
-    private Multimap<String, ProfileProperty> properties;
+    private Multimap<String, LanternProfileProperty> properties;
 
     @Setting("uniqueId")
     private UUID uniqueId;
@@ -72,7 +72,7 @@ public final class LanternGameProfile implements GameProfile {
     }
 
     public LanternGameProfile(UUID uniqueId, @Nullable String name, Multimap<String, ProfileProperty> properties) {
-        this.properties = checkNotNull(properties, "properties");
+        this.properties = (Multimap) checkNotNull(properties, "properties");
         this.uniqueId = checkNotNull(uniqueId, "uniqueId");
         this.name = name;
     }
@@ -134,7 +134,7 @@ public final class LanternGameProfile implements GameProfile {
 
     @Override
     public Multimap<String, ProfileProperty> getPropertyMap() {
-        return this.properties;
+        return (Multimap) this.properties;
     }
 
     @Override

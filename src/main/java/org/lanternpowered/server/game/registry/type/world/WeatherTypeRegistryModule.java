@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.world.LanternWeather;
 import org.spongepowered.api.registry.CatalogRegistryModule;
@@ -63,7 +63,7 @@ public final class WeatherTypeRegistryModule implements CatalogRegistryModule<We
 
     @Override
     public Collection<Weather> getAll() {
-        return ImmutableList.copyOf(this.weathers.values());
+        return ImmutableSet.copyOf(this.weathers.values());
     }
 
 }

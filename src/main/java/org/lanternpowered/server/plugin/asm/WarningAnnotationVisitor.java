@@ -23,34 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.plugin.asm;
 
-import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
+import org.objectweb.asm.AnnotationVisitor;
+import org.slf4j.Logger;
 
-import java.util.Optional;
+abstract class WarningAnnotationVisitor extends AnnotationVisitor {
 
-public final class LanternServerContainer extends AbstractPluginContainer {
+    private static final Logger logger = LanternGame.log();
+
+    final String className;
+
+    protected WarningAnnotationVisitor(int api, String className) {
+        super(api);
+        this.className = className;
+    }
+
+    abstract String getAnnotation();
 
     @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
+    public void visit(String name, Object value) {
+        logger.warn("Found unknown {} annotation element in {}: {} = {}", getAnnotation(), this.className, name, value);
     }
 
     @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
+    public void visitEnum(String name, String desc, String value) {
+        logger.warn("Found unknown {} annotation element in {}: {} ({}) = {}", getAnnotation(), this.className, name, desc, value);
     }
 
     @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
+    public AnnotationVisitor visitAnnotation(String name, String desc) {
+        logger.warn("Found unknown {} annotation element in {}: {} ({})", getAnnotation(), this.className, name, desc);
+        return null;
     }
 
     @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.of(LanternGame.get().getServer());
+    public AnnotationVisitor visitArray(String name) {
+        logger.warn("Found unknown {} annotation element in {}: {}", getAnnotation(), this.className, name);
+        return null;
     }
 
 }

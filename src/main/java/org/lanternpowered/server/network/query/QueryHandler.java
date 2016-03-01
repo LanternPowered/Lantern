@@ -199,7 +199,8 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         final QueryServerEvent.Full event = SpongeEventFactory.createQueryServerEventFull(
                 Cause.of(ctx.channel().remoteAddress()), (InetSocketAddress) ctx.channel().localAddress(), Maps.newHashMap(), "MINECRAFT",
                 "SMP", this.getWorldName(), game.getServer().getMotd().toPlain(), game.getServer().getOnlinePlayers()
-                .stream().map(p -> p.getName()).collect(Collectors.toList()), plugins.toString(), game.getMinecraftPlugin().getVersion(),
+                .stream().map(p -> p.getName()).collect(Collectors.toList()), plugins.toString(),
+                game.getMinecraftPlugin().getVersion().orElse("unknown"),
                 game.getServer().getMaxPlayers(), Integer.MAX_VALUE, game.getServer().getOnlinePlayers().size(), 0);
         final InetSocketAddress address = event.getAddress();
 

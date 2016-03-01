@@ -35,6 +35,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Iterator;
@@ -42,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -189,4 +191,7 @@ public class LanternScheduler implements Scheduler {
         return new TaskExecutorService(() -> this.createTaskBuilder().async(), this.asyncScheduler, checkPlugin(plugin, "plugin"));
     }
 
+    public <T> CompletableFuture<T> submitAsyncTask(Callable<T> callable) {
+        return Functional.asyncFailableFuture(callable, this.asyncScheduler.getExecutor());
+    }
 }

@@ -31,7 +31,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.Optional;
 
-public final class SpongeApiContainer implements PluginContainer {
+public final class SpongeApiContainer extends AbstractPluginContainer {
 
     @Override
     public String getId() {
@@ -44,7 +44,7 @@ public final class SpongeApiContainer implements PluginContainer {
     }
 
     @Override
-    public String getVersion() {
+    public Optional<String> getVersion() {
         return LanternPlatform.API_VERSION;
     }
 

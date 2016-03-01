@@ -27,8 +27,6 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserConfig;
 import org.lanternpowered.server.game.LanternGame;
@@ -43,7 +41,6 @@ import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
@@ -85,19 +82,14 @@ public final class CommandOp {
                         throw new CommandException(Text.of("Only the console may specify the op level."));
                     }
                     int opLevel = args.<Integer>getOne("level").orElse(LanternGame.get().getGlobalConfig().getDefaultOpPermissionLevel());
-                    Futures.addCallback(LanternGame.get().getGameProfileManager().get(playerName),
-                            new FutureCallback<GameProfile>() {
-                                @Override
-                                public void onSuccess(@Nullable GameProfile result) {
-                                    src.sendMessage(t("commands.op.success", playerName));
-                                    config.addEntry(new OpsEntry(((LanternGameProfile) result).withoutProperties(), opLevel));
-                                }
-
-                                @Override
-                                public void onFailure(Throwable t) {
-                                    src.sendMessage(t("commands.op.failed", playerName));
-                                }
-                            });
+                    LanternGame.get().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
+                        if (error != null) {
+                            src.sendMessage(t("commands.op.failed", playerName));
+                        } else {
+                            src.sendMessage(t("commands.op.success", playerName));
+                            config.addEntry(new OpsEntry(((LanternGameProfile) profile).withoutProperties(), opLevel));
+                        }
+                    });
                     return CommandResult.success();
                 })
                 .permission(PERMISSION)

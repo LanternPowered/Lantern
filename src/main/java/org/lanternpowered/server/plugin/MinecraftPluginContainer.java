@@ -27,11 +27,10 @@ package org.lanternpowered.server.plugin;
 
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.Optional;
 
-public final class MinecraftPluginContainer implements PluginContainer {
+public final class MinecraftPluginContainer extends AbstractPluginContainer {
 
     private final Game game;
 
@@ -50,8 +49,8 @@ public final class MinecraftPluginContainer implements PluginContainer {
     }
 
     @Override
-    public String getVersion() {
-        return LanternGame.MINECRAFT_VERSION;
+    public Optional<String> getVersion() {
+        return Optional.of(LanternGame.MINECRAFT_VERSION);
     }
 
     @Override

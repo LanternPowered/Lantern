@@ -42,7 +42,7 @@ public final class MessageForgeHandshakeInOutModList implements Message {
     public MessageForgeHandshakeInOutModList(Iterable<PluginContainer> plugins) {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         for (PluginContainer plugin : plugins) {
-            builder.put(plugin.getId(), plugin.getVersion());
+            builder.put(plugin.getId(), plugin.getVersion().orElse("unknown"));
         }
         this.entries = builder.build();
     }

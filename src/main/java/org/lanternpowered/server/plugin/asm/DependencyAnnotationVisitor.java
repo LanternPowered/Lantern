@@ -23,34 +23,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.plugin.asm;
 
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.objectweb.asm.Opcodes.ASM5;
 
-import java.util.Optional;
+import org.spongepowered.plugin.meta.PluginMetadata;
 
-public final class LanternServerContainer extends AbstractPluginContainer {
+final class DependencyAnnotationVisitor extends WarningAnnotationVisitor {
 
-    @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
+    private final PluginMetadata metadata;
+
+    private String id;
+    private String version;
+    private boolean optional;
+
+    DependencyAnnotationVisitor(String className, PluginMetadata metadata) {
+        super(ASM5, className);
+        this.metadata = metadata;
     }
 
     @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
+    String getAnnotation() {
+        return "@Dependency";
     }
 
     @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
+    public void visit(String name, Object value) {
+        checkNotNull(name, "name");
+        switch (name) {
+            case "id":
+                this.id = (String) value;
+                return;
+            case "version":
+                this.version = (String) value;
+                return;
+            case "optional":
+                this.optional = (boolean) value;
+                return;
+            default:
+                super.visit(name, value);
+        }
     }
 
     @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.of(LanternGame.get().getServer());
+    public void visitEnd() {
+        // TODO: Load order
+        this.metadata.loadAfter(new PluginMetadata.Dependency(this.id, this.version), this.optional);
     }
 
 }

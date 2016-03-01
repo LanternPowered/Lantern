@@ -23,34 +23,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.plugin.asm;
 
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
+import static org.objectweb.asm.Opcodes.ASM5;
 
-import java.util.Optional;
+import org.objectweb.asm.AnnotationVisitor;
+import org.objectweb.asm.ClassVisitor;
+import org.spongepowered.plugin.meta.PluginMetadata;
 
-public final class LanternServerContainer extends AbstractPluginContainer {
+import javax.annotation.Nullable;
 
-    @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
+public final class PluginClassVisitor extends ClassVisitor {
+
+    private static final String PLUGIN_DESCRIPTOR = "Lorg/spongepowered/api/plugin/Plugin;";
+
+    private String className;
+    private PluginAnnotationVisitor annotationVisitor;
+
+    public PluginClassVisitor() {
+        super(ASM5);
+    }
+
+    public String getClassName() {
+        return this.className;
+    }
+
+    public PluginMetadata getMetadata() {
+        return this.annotationVisitor != null ? this.annotationVisitor.getMetadata() : null;
     }
 
     @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
+    public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+        this.className = name;
     }
 
-    @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
-    }
+    @Override @Nullable
+    public AnnotationVisitor visitAnnotation(String desc, boolean visible) {
+        if (visible && desc.equals(PLUGIN_DESCRIPTOR)) {
+            return this.annotationVisitor = new PluginAnnotationVisitor(className);
+        }
 
-    @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.of(LanternGame.get().getServer());
+        return null;
     }
 
 }

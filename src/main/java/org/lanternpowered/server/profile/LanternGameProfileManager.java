@@ -42,6 +42,7 @@ import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.UUIDHelper;
 import org.lanternpowered.server.util.UniqueEvictingQueue;
 import org.spongepowered.api.profile.GameProfile;
@@ -68,6 +69,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -78,10 +80,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     private static final int CACHE_SIZE = 1000;
 
-    private final AtomicInteger counter = new AtomicInteger();
-    private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(
-            runnable -> new Thread(runnable, "profile-resolver-" + this.counter.getAndIncrement())));
-
+    // The duraton before a profile expires
     private static final Duration EXPIRATION_DURATION = Duration.ofDays(30);
 
     // The cache file
@@ -184,7 +183,6 @@ public final class LanternGameProfileManager implements GameProfileManager {
         } catch (IOException e) {
             LanternGame.log().warn("An error occurred while saving the profile cache file.", e);
         }
-        this.service.shutdown();
     }
 
     /**
@@ -238,13 +236,13 @@ public final class LanternGameProfileManager implements GameProfileManager {
     }
 
     @Override
-    public ListenableFuture<GameProfile> get(UUID uniqueId, boolean useCache) {
-        return this.service.submit(() -> this.getById(uniqueId, useCache, true).gameProfile);
+    public CompletableFuture<GameProfile> get(UUID uniqueId, boolean useCache) {
+        return LanternScheduler.getInstance().submitAsyncTask(() -> this.getById(uniqueId, useCache, true).gameProfile);
     }
 
     @Override
-    public ListenableFuture<Collection<GameProfile>> getAllById(Iterable<UUID> uniqueIds, boolean useCache) {
-        return this.service.submit(() -> {
+    public CompletableFuture<Collection<GameProfile>> getAllById(Iterable<UUID> uniqueIds, boolean useCache) {
+        return LanternScheduler.getInstance().submitAsyncTask(() -> {
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
             for (UUID uniqueId : uniqueIds) {
                 builder.add(this.getById(uniqueId, useCache, true).gameProfile);
@@ -254,8 +252,8 @@ public final class LanternGameProfileManager implements GameProfileManager {
     }
 
     @Override
-    public ListenableFuture<GameProfile> get(String name, boolean useCache) {
-        return this.service.submit(() -> {
+    public CompletableFuture<GameProfile> get(String name, boolean useCache) {
+        return LanternScheduler.getInstance().submitAsyncTask(() -> {
             CacheEntry entry;
             if (useCache) {
                 entry = this.byName.get(name);
@@ -276,8 +274,8 @@ public final class LanternGameProfileManager implements GameProfileManager {
     }
 
     @Override
-    public ListenableFuture<Collection<GameProfile>> getAllByName(Iterable<String> names, boolean useCache) {
-        return this.service.submit(() -> {
+    public CompletableFuture<Collection<GameProfile>> getAllByName(Iterable<String> names, boolean useCache) {
+        return LanternScheduler.getInstance().submitAsyncTask(() -> {
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
             CacheEntry entry;
 
@@ -315,8 +313,8 @@ public final class LanternGameProfileManager implements GameProfileManager {
     }
 
     @Override
-    public ListenableFuture<GameProfile> fill(GameProfile profile, boolean signed, boolean useCache) {
-        return this.service.submit(() -> {
+    public CompletableFuture<GameProfile> fill(GameProfile profile, boolean signed, boolean useCache) {
+        return LanternScheduler.getInstance().submitAsyncTask(() -> {
             final GameProfile gameProfile = this.getById(profile.getUniqueId(), useCache, signed).gameProfile;
             ((LanternGameProfile) profile).setName(gameProfile.getName().get());
             profile.getPropertyMap().putAll(gameProfile.getPropertyMap());

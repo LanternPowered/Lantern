@@ -25,32 +25,21 @@
  */
 package org.lanternpowered.server.plugin;
 
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
+public final class InvalidPluginException extends RuntimeException {
 
-import java.util.Optional;
-
-public final class LanternServerContainer extends AbstractPluginContainer {
-
-    @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
+    public InvalidPluginException() {
     }
 
-    @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
+    public InvalidPluginException(String message) {
+        super(message);
     }
 
-    @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
+    public InvalidPluginException(String message, Throwable cause) {
+        super(message, cause);
     }
 
-    @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.of(LanternGame.get().getServer());
+    public InvalidPluginException(Throwable cause) {
+        super(cause);
     }
 
 }

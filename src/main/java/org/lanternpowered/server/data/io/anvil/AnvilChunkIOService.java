@@ -53,13 +53,11 @@ import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_SIZ
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
@@ -79,7 +77,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.concurrent.Executors;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
@@ -106,7 +104,6 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final DataQuery HEIGHT_MAP = DataQuery.of("HeightMap");  // int array
     private static final DataQuery LAST_UPDATE = DataQuery.of("LastUpdate"); // long
 
-    private final ListeningExecutorService service = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool());
     private final WorldProperties properties;
     private final RegionFileCache cache;
     private final Path baseDir;
@@ -333,7 +330,6 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public void unload() throws IOException {
-        this.service.shutdown();
         this.cache.clear();
     }
 
@@ -459,13 +455,13 @@ public class AnvilChunkIOService implements ChunkIOService {
     }
 
     @Override
-    public ListenableFuture<Boolean> doesChunkExist(final Vector3i chunkCoords) {
-        return this.service.submit(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
+    public CompletableFuture<Boolean> doesChunkExist(final Vector3i chunkCoords) {
+        return LanternScheduler.getInstance().submitAsyncTask(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
     }
 
     @Override
-    public ListenableFuture<Optional<DataContainer>> getChunkData(final Vector3i chunkCoords) {
-        return this.service.submit(() -> {
+    public CompletableFuture<Optional<DataContainer>> getChunkData(final Vector3i chunkCoords) {
+        return LanternScheduler.getInstance().submitAsyncTask(() -> {
             int x = chunkCoords.getX();
             int z = chunkCoords.getZ();
 

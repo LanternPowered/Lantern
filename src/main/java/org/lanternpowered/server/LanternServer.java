@@ -82,6 +82,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -491,7 +492,7 @@ public class LanternServer implements Server {
     }
 
     @Override
-    public ListenableFuture<Optional<WorldProperties>> copyWorld(WorldProperties worldProperties, String copyName) {
+    public CompletableFuture<Optional<WorldProperties>> copyWorld(WorldProperties worldProperties, String copyName) {
         return this.worldManager.copyWorld(worldProperties, copyName);
     }
 
@@ -501,7 +502,7 @@ public class LanternServer implements Server {
     }
 
     @Override
-    public ListenableFuture<Boolean> deleteWorld(WorldProperties worldProperties) {
+    public CompletableFuture<Boolean> deleteWorld(WorldProperties worldProperties) {
         return this.worldManager.deleteWorld(worldProperties);
     }
 

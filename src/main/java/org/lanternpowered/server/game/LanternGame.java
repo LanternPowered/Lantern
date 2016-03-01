@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.game;
 
+import org.apache.logging.log4j.util.PropertiesUtil;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.CommandBan;
 import org.lanternpowered.server.command.CommandBorder;
@@ -111,13 +112,13 @@ import javax.annotation.Nullable;
 @NonnullByDefault
 public class LanternGame implements Game {
 
+    private final static boolean SCAN_CLASSPATH = PropertiesUtil.getProperties().getBooleanProperty("scanClasspath", false);
+
     public static final String API_NAME = "SpongeAPI";
     public static final String API_ID = "spongeapi";
-    public static final String API_VERSION = "DEV";
 
     public static final String IMPL_NAME = "LanternServer";
     public static final String IMPL_ID = "lanternserver";
-    public static final String IMPL_VERSION = "DEV";
 
     public static final String MINECRAFT_ID = "minecraft";
     public static final String MINECRAFT_NAME = "Minecraft";
@@ -391,7 +392,7 @@ public class LanternGame implements Game {
 
         // Load the plugin instances
         try {
-            this.pluginManager.loadPlugins();
+            this.pluginManager.loadPlugins(SCAN_CLASSPATH);
         } catch (IOException e) {
             throw new RuntimeException("An error occurred while loading the plugins.", e);
         }

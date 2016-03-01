@@ -35,19 +35,20 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @NonnullByDefault
 public class LanternPlatform implements Platform {
 
     public static final String API_NAME = firstNonNull(Platform.class.getPackage()
             .getSpecificationTitle(), LanternGame.API_NAME);
-    public static final String API_VERSION = firstNonNull(Platform.class.getPackage()
-            .getSpecificationVersion(), LanternGame.API_VERSION);
+    public static final Optional<String> API_VERSION = Optional.ofNullable(Platform.class.getPackage()
+            .getSpecificationVersion());
 
     public static final String IMPL_NAME = firstNonNull(LanternPlatform.class.getPackage()
             .getImplementationTitle(), LanternGame.IMPL_NAME);
-    public static final String IMPL_VERSION = firstNonNull(LanternPlatform.class.getPackage()
-            .getImplementationVersion(), LanternGame.IMPL_VERSION);
+    public static final Optional<String> IMPL_VERSION = Optional.ofNullable(LanternPlatform.class.getPackage()
+            .getImplementationVersion());
 
     private final PluginContainer apiContainer;
     private final PluginContainer implContainer;

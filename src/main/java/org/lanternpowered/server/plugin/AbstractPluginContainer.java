@@ -25,32 +25,39 @@
  */
 package org.lanternpowered.server.plugin;
 
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.plugin.PluginContainer;
 
-import java.util.Optional;
+public abstract class AbstractPluginContainer implements PluginContainer {
 
-public final class LanternServerContainer extends AbstractPluginContainer {
-
-    @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
+    protected AbstractPluginContainer() {
     }
 
     @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
+    public String getUnqualifiedId() {
+        return this.getId();
+    }
+
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects.toStringHelper("Plugin")
+                .omitNullValues()
+                .add("id", this.getId())
+                .add("name", this.getName())
+                .add("version", this.getVersion().orElse(null))
+                .add("description", this.getDescription().orElse(null))
+                .add("url", this.getUrl().orElse(null))
+                .add("authors", this.getAuthors().isEmpty() ? null : this.getAuthors())
+                .add("source", this.getSource().orElse(null));
     }
 
     @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
+    public final String toString() {
+        return this.toStringHelper().toString();
     }
 
-    @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.of(LanternGame.get().getServer());
+    public static String getUnqualifiedId(String id) {
+        int pos = id.lastIndexOf('.');
+        return pos >= 0 ? id.substring(pos + 1) : id;
     }
 
 }

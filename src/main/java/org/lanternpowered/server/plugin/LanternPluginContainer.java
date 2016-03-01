@@ -25,27 +25,51 @@
  */
 package org.lanternpowered.server.plugin;
 
+import com.google.common.collect.ImmutableList;
+import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.lanternpowered.server.game.LanternGame;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.file.Path;
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class LanternPluginContainer implements PluginContainer {
+public final class LanternPluginContainer extends AbstractPluginContainer {
 
     private final String id;
-    private final String name;
-    private final String version;
+    private final String unqualifiedId;
 
-    // The instance of the plugin
-    @Nullable private Object instance;
-    @Nullable private Injector injector;
+    private final Optional<String> name;
+    private final Optional<String> version;
+    private final Optional<String> description;
+    private final Optional<String> url;
+    private final ImmutableList<String> authors;
 
-    LanternPluginContainer(String id, String name, String version) {
-        this.version = version;
-        this.name = name;
+    private final Optional<Path> source;
+
+    private final Optional<?> instance;
+    private final Logger logger;
+
+    private final Injector injector;
+
+    LanternPluginContainer(String id, Class<?> pluginClass, @Nullable String name, @Nullable String version, @Nullable String description,
+            @Nullable String url, List<String> authors, Optional<Path> source) {
         this.id = id;
+        this.unqualifiedId = getUnqualifiedId(id);
+        this.name = Optional.ofNullable(name);
+        this.version = Optional.ofNullable(version);
+        this.description = Optional.ofNullable(description);
+        this.url = Optional.ofNullable(url);
+        this.authors = ImmutableList.copyOf(authors);
+        this.logger = LoggerFactory.getLogger(id);
+        this.source = source;
+
+        this.injector = Guice.createInjector(new PluginModule(this, pluginClass, LanternGame.get()));
+        this.instance = Optional.of(this.injector.getInstance(pluginClass));
     }
 
     @Override
@@ -54,36 +78,51 @@ public final class LanternPluginContainer implements PluginContainer {
     }
 
     @Override
-    public String getName() {
-        return this.name;
+    public String getUnqualifiedId() {
+        return this.unqualifiedId;
     }
 
     @Override
-    public String getVersion() {
+    public String getName() {
+        return this.name.orElse(this.unqualifiedId);
+    }
+
+    @Override
+    public Optional<String> getVersion() {
         return this.version;
     }
 
     @Override
-    public Optional<Object> getInstance() {
-        return Optional.ofNullable(this.instance);
+    public Optional<String> getDescription() {
+        return this.description;
     }
 
-    @Nullable
+    @Override
+    public Optional<String> getUrl() {
+        return this.url;
+    }
+
+    @Override
+    public List<String> getAuthors() {
+        return this.authors;
+    }
+
+    @Override
+    public Optional<Path> getSource() {
+        return this.source;
+    }
+
+    @Override
+    public Optional<?> getInstance() {
+        return this.instance;
+    }
+
+    @Override
+    public Logger getLogger() {
+        return this.logger;
+    }
+
     public Injector getInjector() {
         return this.injector;
-    }
-
-    void setInjector(Injector injector) {
-        if (this.injector != null) {
-            throw new IllegalStateException("Injector for (" + this.getId() + ") can only be set once!");
-        }
-        this.injector = injector;
-    }
-
-    void setInstance(Object instance) {
-        if (this.instance != null) {
-            throw new IllegalStateException("Instance for (" + this.getId() + ") can only be set once!");
-        }
-        this.instance = instance;
     }
 }

@@ -62,19 +62,14 @@ public final class CommandWhitelist {
                                 .executor((src, args) -> {
                                     String playerName = args.<String>getOne("player").get();
                                     WhitelistConfig config = LanternGame.get().getWhitelistConfig();
-                                    Futures.addCallback(LanternGame.get().getGameProfileManager().get(playerName),
-                                            new FutureCallback<GameProfile>() {
-                                                @Override
-                                                public void onSuccess(@Nullable GameProfile result) {
-                                                    src.sendMessage(t("commands.whitelist.add.success", playerName));
-                                                    config.addProfile(((LanternGameProfile) result).withoutProperties());
-                                                }
-
-                                                @Override
-                                                public void onFailure(Throwable t) {
-                                                    src.sendMessage(t("commands.whitelist.add.failed", playerName));
-                                                }
-                                            });
+                                    LanternGame.get().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
+                                        if (error != null) {
+                                            src.sendMessage(t("commands.whitelist.add.failed", playerName));
+                                        } else {
+                                            src.sendMessage(t("commands.whitelist.add.success", playerName));
+                                            config.addProfile(((LanternGameProfile) profile).withoutProperties());
+                                        }
+                                    });
                                     return CommandResult.success();
                                 })
                                 .build())

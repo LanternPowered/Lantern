@@ -40,6 +40,7 @@ import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
@@ -61,6 +62,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.RejectedExecutionException;
@@ -73,8 +76,8 @@ public final class LanternWorldManager {
     // The counter for the executor threads
     private final AtomicInteger counter = new AtomicInteger();
     // The executor for async world manager operations
-    private final ListeningExecutorService executor = MoreExecutors.listeningDecorator(Executors.newCachedThreadPool(
-            runnable -> new Thread(runnable, "worlds-" + this.counter.getAndIncrement())));
+    private final ExecutorService executor = Executors.newCachedThreadPool(
+            runnable -> new Thread(runnable, "worlds-" + this.counter.getAndIncrement()));
 
     // The name of the world configs
     static final String WORLD_CONFIG = "world.conf";
@@ -294,10 +297,10 @@ public final class LanternWorldManager {
      * @return An {@link Optional} containing the properties of the new world
      *         instance, if the copy was successful
      */
-    public ListenableFuture<Optional<WorldProperties>> copyWorld(WorldProperties worldProperties, String copyName) {
+    public CompletableFuture<Optional<WorldProperties>> copyWorld(WorldProperties worldProperties, String copyName) {
         checkNotNull(worldProperties, "worldProperties");
         checkNotNull(copyName, "copyName");
-        return this.executor.submit(() -> {
+        return Functional.asyncFailableFuture(() -> {
             // Get the new dimension id
             final int dimensionId = this.getNextFreeDimensionId();
 
@@ -361,7 +364,7 @@ public final class LanternWorldManager {
             LanternWorldPropertiesIO.write(targetFolder, newData);
 
             return Optional.of(properties);
-        });
+        }, this.executor);
     }
 
     /**
@@ -401,9 +404,9 @@ public final class LanternWorldManager {
      * @param worldProperties the world properties to delete
      * @return true if the deletion was successful
      */
-    public ListenableFuture<Boolean> deleteWorld(WorldProperties worldProperties) {
+    public CompletableFuture<Boolean> deleteWorld(WorldProperties worldProperties) {
         checkNotNull(worldProperties, "worldProperties");
-        return this.executor.submit(() -> {
+        return Functional.asyncFailableFuture(() -> {
             final WorldLookupEntry entry = this.worldByProperties.get(worldProperties);
             if (entry.world != null) {
                 return false;
@@ -429,7 +432,7 @@ public final class LanternWorldManager {
             this.dimensionMap.clear(entry.dimensionId);
             Files.delete(entry.folder);
             return flag[0];
-        });
+        }, this.executor);
     }
 
     /**

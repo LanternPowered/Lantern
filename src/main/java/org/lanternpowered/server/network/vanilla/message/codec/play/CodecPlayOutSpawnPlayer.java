@@ -43,9 +43,9 @@ public final class CodecPlayOutSpawnPlayer implements Codec<MessagePlayOutSpawnP
         context.writeVarInt(buf, message.getEntityId());
         context.write(buf, Types.UNIQUE_ID, message.getUniqueId());
         Vector3d vector = message.getPosition();
-        buf.writeInt((int) (vector.getX() * 32.0));
-        buf.writeInt((int) (vector.getY() * 32.0));
-        buf.writeInt((int) (vector.getZ() * 32.0));
+        buf.writeDouble(vector.getX());
+        buf.writeDouble(vector.getY());
+        buf.writeDouble(vector.getZ());
         buf.writeByte(wrapAngle(message.getYaw()));
         buf.writeByte(wrapAngle(message.getPitch()));
         context.write(buf, Types.PARAMETERS, message.getParameters());

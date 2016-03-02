@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.config.user.ban;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.game.LanternGame;
@@ -53,7 +55,9 @@ public abstract class BanEntry implements Ban {
     @Setting(value = "expiration-date")
     private Instant expirationDate;
 
-    @Setting(value = "reason") private Text reason;
+    @Nullable
+    @Setting(value = "reason")
+    private Text reason;
 
     @Nullable
     @Setting(value = "source")
@@ -64,10 +68,10 @@ public abstract class BanEntry implements Ban {
     protected BanEntry() {
     }
 
-    protected BanEntry(Text reason, Instant startDate, @Nullable Instant expirationDate,
-            @Nullable Text source) {
+    protected BanEntry(Instant startDate, @Nullable Instant expirationDate,
+            @Nullable Text source, @Nullable Text reason) {
+        this.startDate = checkNotNull(startDate, "startDate");
         this.expirationDate = expirationDate;
-        this.startDate = startDate;
         this.source = source;
         this.reason = reason;
     }
@@ -78,8 +82,8 @@ public abstract class BanEntry implements Ban {
     }
 
     @Override
-    public Text getReason() {
-        return this.reason;
+    public Optional<Text> getReason() {
+        return Optional.ofNullable(this.reason);
     }
 
     @Override
@@ -128,21 +132,22 @@ public abstract class BanEntry implements Ban {
     public static class Ip extends BanEntry implements Ban.Ip {
 
         @Setting(value = "ip")
-        private InetAddress ip;
+        private InetAddress ipAddress;
 
         // It is actually used...
         @SuppressWarnings("unused")
         private Ip() {
         }
 
-        public Ip(InetAddress ipAddress, Text reason, Instant startDate, @Nullable Instant expirationDate,
-                @Nullable Text source) {
-            super(reason, startDate, expirationDate, source);
+        public Ip(InetAddress ipAddress, Instant startDate, @Nullable Instant expirationDate,
+                @Nullable Text source, @Nullable Text reason) {
+            super(startDate, expirationDate, source, reason);
+            this.ipAddress = checkNotNull(ipAddress, "ipAddress");
         }
 
         @Override
         public InetAddress getAddress() {
-            return this.ip;
+            return this.ipAddress;
         }
     }
 
@@ -157,10 +162,10 @@ public abstract class BanEntry implements Ban {
         private Profile() {
         }
 
-        public Profile(LanternGameProfile profile, Text reason, Instant startDate, @Nullable Instant expirationDate,
-                @Nullable Text source) {
-            super(reason, startDate, expirationDate, source);
-            this.profile = profile;
+        public Profile(LanternGameProfile profile, Instant startDate, @Nullable Instant expirationDate,
+                @Nullable Text source, @Nullable Text reason) {
+            super(startDate, expirationDate, source, reason);
+            this.profile = checkNotNull(profile, "profile");
         }
 
         public LanternGameProfile getProfile() {

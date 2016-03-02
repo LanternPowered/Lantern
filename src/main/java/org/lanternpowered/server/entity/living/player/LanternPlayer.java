@@ -376,7 +376,9 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void sendMessage(ChatType type, Text message) {
         checkNotNull(message, "message");
         checkNotNull(type, "type");
-        this.session.send(new MessagePlayOutChatMessage(new LocalizedText(message, this.locale), type));
+        if (this.chatVisibility.isVisible(type)) {
+            this.session.send(new MessagePlayOutChatMessage(new LocalizedText(message, this.locale), type));
+        }
     }
 
     @Override

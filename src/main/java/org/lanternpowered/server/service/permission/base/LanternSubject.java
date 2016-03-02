@@ -50,11 +50,6 @@ public abstract class LanternSubject implements Subject {
     }
 
     @Override
-    public boolean hasPermission(String permission) {
-        return this.hasPermission(this.getActiveContexts(), permission);
-    }
-
-    @Override
     public Tristate getPermissionValue(Set<Context> contexts, String permission) {
         return this.getDataPermissionValue(this.getSubjectData(), permission);
     }
@@ -75,18 +70,8 @@ public abstract class LanternSubject implements Subject {
     }
 
     @Override
-    public boolean isChildOf(Subject parent) {
-        return isChildOf(getActiveContexts(), parent);
-    }
-
-    @Override
     public boolean isChildOf(Set<Context> contexts, Subject parent) {
         return getSubjectData().getParents(contexts).contains(parent);
-    }
-
-    @Override
-    public List<Subject> getParents() {
-        return getParents(getActiveContexts());
     }
 
     @Override

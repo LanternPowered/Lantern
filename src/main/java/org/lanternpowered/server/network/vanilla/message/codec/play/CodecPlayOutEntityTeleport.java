@@ -41,9 +41,9 @@ public final class CodecPlayOutEntityTeleport implements Codec<MessagePlayOutEnt
         ByteBuf buf = context.byteBufAlloc().buffer();
         context.writeVarInt(buf, message.getEntityId());
         Vector3d position = message.getPosition();
-        buf.writeInt((byte) (position.getX() * 32d));
-        buf.writeInt((byte) (position.getY() * 32d));
-        buf.writeInt((byte) (position.getZ() * 32d));
+        buf.writeDouble(position.getX());
+        buf.writeDouble(position.getY());
+        buf.writeDouble(position.getZ());
         buf.writeByte(wrapAngle(message.getYaw()));
         buf.writeByte(wrapAngle(message.getPitch()));
         buf.writeBoolean(message.isOnGround());

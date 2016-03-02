@@ -617,7 +617,6 @@ public class Session implements PlayerConnection {
     }
 
     @Override
-    @Nullable
     public LanternPlayer getPlayer() {
         return this.player;
     }

@@ -91,8 +91,8 @@ public final class BanBuilder implements Ban.Builder {
     }
 
     @Override
-    public BanBuilder reason(Text reason) {
-        this.reason = checkNotNull(reason, "reason");
+    public BanBuilder reason(@Nullable Text reason) {
+        this.reason = reason;
         return this;
     }
 
@@ -123,13 +123,12 @@ public final class BanBuilder implements Ban.Builder {
     @Override
     public BanEntry build() {
         checkState(this.banType != null, "banType is not set");
-        checkState(this.reason != null, "reason is not set");
         if (this.banType == BanTypes.IP) {
             checkState(this.address != null, "address is not set");
-            return new BanEntry.Ip(this.address, this.reason, this.startDate, this.expirationDate, this.source);
+            return new BanEntry.Ip(this.address, this.startDate, this.expirationDate, this.source, this.reason);
         } else {
             checkState(this.gameProfile != null, "gameProfile is not set");
-            return new BanEntry.Profile((LanternGameProfile) this.gameProfile, this.reason, this.startDate, this.expirationDate, this.source);
+            return new BanEntry.Profile((LanternGameProfile) this.gameProfile, this.startDate, this.expirationDate, this.source, this.reason);
         }
     }
 
@@ -138,7 +137,7 @@ public final class BanBuilder implements Ban.Builder {
         this.reset();
         this.source = value.getBanSource().orElse(null);
         this.banType = value.getType();
-        this.reason = value.getReason();
+        this.reason = value.getReason().orElse(null);
         this.startDate = value.getCreationDate();
         this.expirationDate = value.getExpirationDate().orElse(null);
         if (this.banType == BanTypes.IP) {

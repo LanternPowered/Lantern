@@ -40,7 +40,7 @@ public final class MessagePlayOutEntityRelativeMove implements Message {
 
     public MessagePlayOutEntityRelativeMove(int entityId, Vector3d delta, boolean onGround) {
         checkNotNull(delta, "delta");
-        checkArgument(Math.abs(delta.getX()) < 4 && Math.abs(delta.getY()) < 4 && Math.abs(delta.getZ()) < 4, "delta must be smaller then 4");
+        checkArgument(Math.abs(delta.getX()) < 7 && Math.abs(delta.getY()) < 7 && Math.abs(delta.getZ()) < 7, "delta must be smaller then 7.0");
 
         this.onGround = onGround;
         this.entityId = entityId;

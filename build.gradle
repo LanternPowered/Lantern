@@ -5,6 +5,10 @@ buildscript {
             name = 'sponge'
             url = 'http://repo.spongepowered.org/maven'
         }
+        maven {
+            name = 'eclipse-staging'
+            url = 'https://repo.eclipse.org/content/repositories/eclipse-staging'
+        }
     }
     dependencies {
         classpath 'org.spongepowered:spongegradle:0.3.1-SNAPSHOT'

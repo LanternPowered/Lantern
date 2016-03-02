@@ -39,9 +39,9 @@ public final class CodecPlayOutEntityRelativeMove implements Codec<MessagePlayOu
         ByteBuf buf = context.byteBufAlloc().buffer();
         context.writeVarInt(buf, message.getEntityId());
         Vector3d delta = message.getDelta();
-        buf.writeByte((byte) (delta.getX() * 32.0));
-        buf.writeByte((byte) (delta.getY() * 32.0));
-        buf.writeByte((byte) (delta.getZ() * 32.0));
+        buf.writeShort((int) (delta.getX() * 4096.0));
+        buf.writeShort((int) (delta.getY() * 4096.0));
+        buf.writeShort((int) (delta.getZ() * 4096.0));
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

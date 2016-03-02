@@ -39,9 +39,9 @@ public final class CodecPlayOutSpawnExperienceOrb implements Codec<MessagePlayOu
         ByteBuf buf = context.byteBufAlloc().buffer();
         context.writeVarInt(buf, message.getEntityId());
         Vector3d position = message.getPosition();
-        buf.writeInt((int) (position.getX() * 32.0));
-        buf.writeInt((int) (position.getY() * 32.0));
-        buf.writeInt((int) (position.getZ() * 32.0));
+        buf.writeDouble(position.getX());
+        buf.writeDouble(position.getY());
+        buf.writeDouble(position.getZ());
         buf.writeShort(Math.min(message.getOrbsCount(), Short.MAX_VALUE));
         return buf;
     }

@@ -138,6 +138,8 @@ public class LanternCommandManager implements CommandManager {
                         throw new IllegalArgumentException("A plugin may not register multiple commands for the same alias ('" + alias + "')!");
                     }
                 }
+
+                aliasesWithPrefix.add(alias);
                 // Alias commands with unqualified ID and qualified ID
                 String unqualifiedId = container.getUnqualifiedId();
                 aliasesWithPrefix.add(unqualifiedId + ':' + alias);

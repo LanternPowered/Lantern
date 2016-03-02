@@ -55,7 +55,7 @@ public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer impl
     @Override
     public JsonElement serialize(LiteralText src, Type typeOfSrc, JsonSerializationContext context) {
         if (!src.getHoverAction().isPresent() && !src.getClickAction().isPresent() &&
-                src.getStyle().isEmpty() && src.getColor().equals(TextColors.NONE)) {
+                src.getStyle().isEmpty() && src.getColor().equals(TextColors.NONE) && src.getChildren().isEmpty()) {
             return new JsonPrimitive(src.getContent());
         }
         JsonObject json = new JsonObject();

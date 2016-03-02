@@ -25,6 +25,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
@@ -45,7 +49,6 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -56,6 +59,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChatMessage> {
+
+    private final static AttributeKey<Long> LAST_CHAT_TIME = AttributeKey.valueOf("last-chat-time");
 
     @Override
     public void handle(NetworkContext context, MessagePlayInChatMessage message) {
@@ -79,6 +84,12 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             if (!Sponge.getEventManager().post(event) && !event.isMessageCancelled()) {
                 event.getChannel().ifPresent(c -> c.send(player, event.getMessage(), ChatTypes.CHAT));
             }
+        }
+        Attribute<Long> attr = context.getChannel().attr(LAST_CHAT_TIME);
+        long currentTime = System.currentTimeMillis();
+        Long lastTime = attr.getAndSet(currentTime);
+        if (lastTime != null && currentTime - lastTime < LanternGame.get().getGlobalConfig().getChatSpamThreshold()) {
+            session.disconnect(t("disconnect.spam"));
         }
     }
 
@@ -110,15 +121,13 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
 
             try {
                 URI uri = new URI(url);
+                String url0 = url;
                 if (uri.getScheme() == null) {
                     if (!allowMissingHeader) {
                         uri = null;
                     } else {
-                        if (!url.startsWith("//")) {
-                            url = "//" + url;
-                        }
-                        url = "http:" + url;
-                        uri = new URI(url);
+                        url0 = "http://" + url0;
+                        uri = new URI(url0);
                     }
                 }
                 if (uri != null) {

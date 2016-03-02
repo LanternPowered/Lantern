@@ -31,7 +31,6 @@ import com.google.common.collect.Lists;
 import org.lanternpowered.server.component.AttachableTo;
 import org.lanternpowered.server.component.Component;
 import org.lanternpowered.server.component.Locked;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.spongepowered.api.world.weather.Weather;
@@ -40,7 +39,6 @@ import org.spongepowered.api.world.weather.Weathers;
 
 import java.util.List;
 import java.util.Random;
-import java.util.Set;
 
 @Locked
 @AttachableTo(LanternWorld.class)

@@ -143,6 +143,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "network-compression-threshold")
         private int networkCompressionThreshold = 256;
 
+        @Setting(value = "chat-spam-threshold", comment =
+                "The minimum time between messages (in milliseconds) when they will be considered spam.")
+        private int chatSpamThreshold = 900;
+
         // Some context related stuff, check this issue for more information
         // https://github.com/SpongePowered/SpongeCommon/commit/71220742baf4b0317ddefe625b12cc64a7ec9084
         // TODO: Move this?
@@ -155,6 +159,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "white-list", comment = "Whether the white-list is enabled.")
         private boolean whitelist = false;
+
     }
 
     @ConfigSerializable
@@ -165,6 +170,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    public int getChatSpamThreshold() {
+        return this.server.chatSpamThreshold;
     }
 
     public boolean isWhitelistEnabled() {

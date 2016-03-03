@@ -33,7 +33,6 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.effect.sound.SoundCategory;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.LanternGame;
@@ -59,6 +58,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
 import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.sound.SoundCategoryType;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -412,11 +412,12 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
+    public void playSound(SoundType sound, SoundCategoryType category, Vector3d position, double volume, double pitch, double minVolume) {
         checkNotNull(sound, "sound");
         checkNotNull(position, "position");
+        checkNotNull(category, "category");
         this.session.send(((LanternSoundType) sound).createMessage(position,
-                SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch));
+                category, (float) Math.max(minVolume, volume), (float) pitch));
     }
 
     @Override

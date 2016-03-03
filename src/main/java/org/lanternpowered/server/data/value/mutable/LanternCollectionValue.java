@@ -40,8 +40,7 @@ import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public abstract class LanternCollectionValue<E, V extends Collection<E>, I extends CollectionValue<E, V, I, L>,
-    L extends ImmutableCollectionValue<E, V, L, I>> extends LanternValue<V> implements CollectionValue<E, V, I, L> {
-
+        L extends ImmutableCollectionValue<E, V, L, I>> extends LanternValue<V> implements CollectionValue<E, V, I, L> {
 
     public LanternCollectionValue(Key<? extends BaseValue<V>> key, V defaultValue) {
         super(key, defaultValue);

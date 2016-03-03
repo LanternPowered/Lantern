@@ -26,21 +26,35 @@
 package org.lanternpowered.server.effect;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.effect.sound.SoundCategoryType;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
 public interface AbstractViewer extends Viewer {
 
-    @Override
     default void playSound(SoundType sound, Vector3d position, double volume) {
         this.playSound(sound, position, volume, 1.0);
     }
 
-    @Override
     default void playSound(SoundType sound, Vector3d position, double volume, double pitch) {
         this.playSound(sound, position, volume, pitch, 0.0);
+    }
+
+    default void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
+        this.playSound(sound, ((LanternSoundType) sound).getDefaultCategory(), position, volume, pitch, minVolume);
+    }
+
+    @Override
+    default void playSound(SoundType sound, SoundCategoryType category, Vector3d position, double volume) {
+        this.playSound(sound, category, position, volume, 1.0);
+    }
+
+    @Override
+    default void playSound(SoundType sound, SoundCategoryType category, Vector3d position, double volume, double pitch) {
+        this.playSound(sound, category, position, volume, pitch, 0.0);
     }
 
 }

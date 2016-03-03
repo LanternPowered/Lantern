@@ -586,6 +586,11 @@ public class LanternGame implements Game {
     }
 
     @Override
+    public boolean isServerAvailable() {
+        return true;
+    }
+
+    @Override
     public LanternScheduler getScheduler() {
         return this.scheduler;
     }

@@ -23,17 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound;
-
-public enum SoundCategory {
-    MASTER,
-    MUSIC,
-    RECORD,
-    WEATHER,
-    BLOCK,
-    HOSTILE,
-    NEUTRAL,
-    PLAYER,
-    AMBIENT,
-    VOICE,
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.data;

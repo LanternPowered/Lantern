@@ -64,7 +64,7 @@ public class LanternMapValue<K, V> extends LanternValue<Map<K, V>> implements Ma
 
     @Override
     public ImmutableMapValue<K, V> asImmutable() {
-        return new ImmutableLanternMapValue<K, V>(getKey(), ImmutableMap.copyOf(this.actualValue));
+        return new ImmutableLanternMapValue<>(this.getKey(), ImmutableMap.copyOf(this.actualValue));
     }
 
     @Override

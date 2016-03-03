@@ -23,41 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.mutable;
-
-import org.lanternpowered.server.data.value.AbstractBaseValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
-
-import java.util.function.Function;
-
-public class LanternValue<E> extends AbstractBaseValue<E> implements Value<E> {
-
-    public LanternValue(Key<? extends BaseValue<E>> key, E defaultValue) {
-        this(key, defaultValue, defaultValue);
-    }
-
-    public LanternValue(Key<? extends BaseValue<E>> key, E defaultValue, E actualValue) {
-        super(key, defaultValue, actualValue);
-    }
-
-    @Override
-    public Value<E> set(E value) {
-        this.actualValue = value;
-        return this;
-    }
-
-    @Override
-    public Value<E> transform(Function<E, E> function) {
-        this.actualValue = function.apply(this.actualValue);
-        return this;
-    }
-
-    @Override
-    public ImmutableValue<E> asImmutable() {
-        return ImmutableLanternValue.cachedOf(this.getKey(), this.getDefault(), this.actualValue);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.data.value.mutable;

@@ -51,26 +51,26 @@ public class ImmutableLanternOptionalValue<E> extends ImmutableLanternValue<Opti
 
     @Override
     public ImmutableOptionalValue<E> with(Optional<E> value) {
-        return new ImmutableLanternOptionalValue<E>(getKey(), checkNotNull(value));
+        return new ImmutableLanternOptionalValue<>(this.getKey(), checkNotNull(value));
     }
 
     @Override
     public ImmutableOptionalValue<E> transform(Function<Optional<E>, Optional<E>> function) {
-        return new ImmutableLanternOptionalValue<E>(getKey(), checkNotNull(function.apply(get())));
+        return new ImmutableLanternOptionalValue<>(this.getKey(), checkNotNull(function.apply(this.get())));
     }
 
     @Override
     public OptionalValue<E> asMutable() {
-        return new LanternOptionalValue<E>(getKey(), this.actualValue);
+        return new LanternOptionalValue<>(this.getKey(), this.actualValue);
     }
 
     @Override
     public ImmutableOptionalValue<E> instead(@Nullable E value) {
-        return new ImmutableLanternOptionalValue<E>(getKey(), Optional.ofNullable(value));
+        return new ImmutableLanternOptionalValue<>(this.getKey(), Optional.ofNullable(value));
     }
 
     @Override
     public ImmutableValue<E> or(E value) { // TODO actually construct a new key for this kind...
-        return new ImmutableLanternValue<E>(null, get().isPresent() ? get().get() : checkNotNull(value));
+        return new ImmutableLanternValue<>(null, this.get().isPresent() ? this.get().get() : checkNotNull(value));
     }
 }

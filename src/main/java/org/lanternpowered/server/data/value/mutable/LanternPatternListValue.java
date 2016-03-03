@@ -135,6 +135,6 @@ public class LanternPatternListValue extends LanternListValue<PatternLayer> impl
 
     @Override
     public ImmutablePatternListValue asImmutable() {
-        return new ImmutableLanternPatternListValue(getKey(), ImmutableList.copyOf(this.actualValue));
+        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.copyOf(this.actualValue));
     }
 }

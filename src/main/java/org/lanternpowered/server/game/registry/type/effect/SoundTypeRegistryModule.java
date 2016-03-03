@@ -32,10 +32,12 @@ import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.spongepowered.api.effect.sound.SoundCategoryTypes;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -44,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@RegistrationDependency({ SoundCategoryTypeRegistryModule.class })
 public final class SoundTypeRegistryModule implements CatalogRegistryModule<SoundType> {
 
     @RegisterCatalog(SoundTypes.class)
@@ -316,7 +319,7 @@ public final class SoundTypeRegistryModule implements CatalogRegistryModule<Soun
         }
 
         soundMappings.forEach((soundName, soundId) -> {
-            final SoundType soundType = new LanternSoundType(soundName, soundId,
+            final SoundType soundType = new LanternSoundType(soundName, soundId, SoundCategoryTypes.MASTER,
                     soundEventIds.get(soundId));
             this.soundNames.put(soundName, soundType);
             this.soundNames.put(soundId, soundType);

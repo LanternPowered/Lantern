@@ -56,7 +56,9 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -226,6 +228,26 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
+    public List<Entity> getPassengers() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public DataTransactionResult addPassenger(Entity entity) {
+        return DataTransactionResult.failNoData();
+    }
+
+    @Override
+    public DataTransactionResult removePassenger(Entity entity) {
+        return DataTransactionResult.failNoData();
+    }
+
+    @Override
+    public DataTransactionResult clearPassengers() {
+        return DataTransactionResult.failNoData();
+    }
+
+    @Override
     public Transform<World> getTransform() {
         return new Transform<>(this.world, this.position, this.rotation);
     }
@@ -277,16 +299,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         this.setLocationAndRotation(location, rotation, relativePositions);
         // TODO: Check whether the location safe is
         return true;
-    }
-
-    @Override
-    public Optional<Entity> getPassenger() {
-        return Optional.empty();
-    }
-
-    @Override
-    public DataTransactionResult setPassenger(@Nullable Entity entity) {
-        return DataTransactionResult.failNoData();
     }
 
     @Override

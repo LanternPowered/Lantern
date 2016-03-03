@@ -23,41 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.mutable;
+package org.lanternpowered.server.effect.sound;
 
-import org.lanternpowered.server.data.value.AbstractBaseValue;
-import org.lanternpowered.server.data.value.immutable.ImmutableLanternValue;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.effect.sound.SoundCategoryType;
+import org.spongepowered.api.text.translation.Translatable;
+import org.spongepowered.api.text.translation.Translation;
 
-import java.util.function.Function;
+public final class LanternSoundCategoryType extends SimpleLanternCatalogType implements SoundCategoryType, Translatable {
 
-public class LanternValue<E> extends AbstractBaseValue<E> implements Value<E> {
+    private final Translation translation;
+    private final int internalId;
 
-    public LanternValue(Key<? extends BaseValue<E>> key, E defaultValue) {
-        this(key, defaultValue, defaultValue);
-    }
-
-    public LanternValue(Key<? extends BaseValue<E>> key, E defaultValue, E actualValue) {
-        super(key, defaultValue, actualValue);
-    }
-
-    @Override
-    public Value<E> set(E value) {
-        this.actualValue = value;
-        return this;
+    public LanternSoundCategoryType(String identifier, int internalId) {
+        super(identifier);
+        this.translation = LanternGame.get().getRegistry().getTranslationManager()
+                .get("soundCategory." + identifier);
+        this.internalId = internalId;
     }
 
     @Override
-    public Value<E> transform(Function<E, E> function) {
-        this.actualValue = function.apply(this.actualValue);
-        return this;
+    public Translation getTranslation() {
+        return this.translation;
     }
 
-    @Override
-    public ImmutableValue<E> asImmutable() {
-        return ImmutableLanternValue.cachedOf(this.getKey(), this.getDefault(), this.actualValue);
+    public int getInternalId() {
+        return this.internalId;
     }
 }

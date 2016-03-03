@@ -27,6 +27,7 @@ package org.lanternpowered.server.data.value.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.data.ImmutableDataCachingUtil;
 import org.lanternpowered.server.data.value.AbstractBaseValue;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.data.key.Key;
@@ -38,6 +39,19 @@ import java.util.function.Function;
 
 public class ImmutableLanternValue<E> extends AbstractBaseValue<E> implements ImmutableValue<E> {
 
+    /**
+     * Gets a cached {@link ImmutableValue} of the default value and the actual value.
+     *
+     * @param key The key for the value
+     * @param defaultValue The default value
+     * @param actualValue The actual value
+     * @param <T> The type of value
+     * @return The cached immutable value
+     */
+    public static <T> ImmutableValue<T> cachedOf(Key<? extends BaseValue<T>> key, T defaultValue, T actualValue) {
+        return ImmutableDataCachingUtil.getValue(ImmutableLanternValue.class, key, defaultValue, actualValue);
+    }
+
     public ImmutableLanternValue(Key<? extends BaseValue<E>> key, E defaultValue) {
         super(key, defaultValue, defaultValue);
     }
@@ -48,17 +62,17 @@ public class ImmutableLanternValue<E> extends AbstractBaseValue<E> implements Im
 
     @Override
     public ImmutableValue<E> with(E value) {
-        return new ImmutableLanternValue<E>(this.getKey(), getDefault(), value);
+        return new ImmutableLanternValue<>(this.getKey(), this.getDefault(), value);
     }
 
     @Override
     public ImmutableValue<E> transform(Function<E, E> function) {
-        final E value = checkNotNull(function).apply(get());
-        return new ImmutableLanternValue<E>(this.getKey(), getDefault(), value);
+        final E value = checkNotNull(function).apply(this.get());
+        return new ImmutableLanternValue<>(this.getKey(), this.getDefault(), value);
     }
 
     @Override
     public Value<E> asMutable() {
-        return new LanternValue<E>(getKey(), getDefault(), get());
+        return new LanternValue<>(this.getKey(), this.getDefault(), this.get());
     }
 }

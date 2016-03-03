@@ -39,6 +39,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, ListValue<E>, ImmutableListValue<E>> implements ListValue<E> {
 
@@ -62,13 +63,9 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
 
     @Override
     public ListValue<E> filter(Predicate<? super E> predicate) {
-        final List<E> list = Lists.newArrayList();
-        for (E element : this.actualValue) {
-            if (checkNotNull(predicate).test(element)) {
-                list.add(element);
-            }
-        }
-        return new LanternListValue<E>(getKey(), list);
+        return new LanternListValue<>(this.getKey(), this.actualValue.stream()
+                .filter(element -> checkNotNull(predicate).test(element))
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -78,7 +75,7 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
 
     @Override
     public ImmutableListValue<E> asImmutable() {
-        return new ImmutableLanternListValue<E>(getKey(), ImmutableList.copyOf(this.actualValue));
+        return new ImmutableLanternListValue<>(this.getKey(), ImmutableList.copyOf(this.actualValue));
     }
 
     @Override

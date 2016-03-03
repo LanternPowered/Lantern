@@ -39,6 +39,7 @@ import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutablePatternListValue;
 import org.spongepowered.api.data.value.mutable.PatternListValue;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.ListIterator;
@@ -53,63 +54,48 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
 
     @Override
     public ImmutablePatternListValue with(List<PatternLayer> value) {
-        return new ImmutableLanternPatternListValue(getKey(), ImmutableList.copyOf(checkNotNull(value)));
+        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.copyOf(checkNotNull(value)));
     }
 
     @Override
     public ImmutablePatternListValue transform(Function<List<PatternLayer>, List<PatternLayer>> function) {
-        return new ImmutableLanternPatternListValue(getKey(), ImmutableList.copyOf(checkNotNull(checkNotNull(function).apply(this.actualValue))));
+        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.copyOf(checkNotNull(checkNotNull(function).apply(this.actualValue))));
     }
 
     @Override
     public PatternListValue asMutable() {
-        final List<PatternLayer> list = Lists.newArrayList();
-        list.addAll(this.actualValue);
-        return new LanternPatternListValue(getKey(), list);
+        return new LanternPatternListValue(this.getKey(), Lists.newArrayList(this.actualValue));
     }
 
     @Override
     public ImmutablePatternListValue withElement(PatternLayer element) {
-        return new ImmutableLanternPatternListValue(getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).add(element).build());
+        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).add(element).build());
     }
 
     @Override
     public ImmutablePatternListValue withAll(Iterable<PatternLayer> elements) {
-        return new ImmutableLanternPatternListValue(getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).addAll(elements).build());
+        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).addAll(elements).build());
     }
 
     @Override
     public ImmutablePatternListValue without(PatternLayer element) {
-        final ImmutableList.Builder<PatternLayer> builder = ImmutableList.builder();
-        for (PatternLayer existingElement : this.actualValue) {
-            if (!existingElement.equals(element)) {
-                builder.add(existingElement);
-            }
-        }
-        return new ImmutableLanternPatternListValue(getKey(), builder.build());
-
+        return new ImmutableLanternPatternListValue(this.getKey(), this.actualValue.stream()
+                .filter(existingElement -> !existingElement.equals(element))
+                .collect(GuavaCollectors.toImmutableList()));
     }
 
     @Override
     public ImmutablePatternListValue withoutAll(Iterable<PatternLayer> elements) {
-        final ImmutableList.Builder<PatternLayer> builder = ImmutableList.builder();
-        for (PatternLayer existingElement : this.actualValue) {
-            if (!Iterables.contains(elements, existingElement)) {
-                builder.add(existingElement);
-            }
-        }
-        return new ImmutableLanternPatternListValue(getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.actualValue.stream()
+                .filter(existingElement -> !Iterables.contains(elements, existingElement))
+                .collect(GuavaCollectors.toImmutableList()));
     }
 
     @Override
     public ImmutablePatternListValue withoutAll(Predicate<PatternLayer> predicate) {
-        final ImmutableList.Builder<PatternLayer> builder = ImmutableList.builder();
-        for (PatternLayer existing : this.actualValue) {
-            if (checkNotNull(predicate).test(existing)) {
-                builder.add(existing);
-            }
-        }
-        return new ImmutableLanternPatternListValue(getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.actualValue.stream()
+                .filter(existing -> checkNotNull(predicate).test(existing))
+                .collect(GuavaCollectors.toImmutableList()));
     }
 
     @Override
@@ -123,7 +109,7 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternPatternListValue(getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), builder.build());
     }
 
     @Override
@@ -146,14 +132,14 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternPatternListValue(getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), builder.build());
     }
 
     @Override
     public ImmutablePatternListValue set(int index, PatternLayer element) {
         final ImmutableList.Builder<PatternLayer> builder = ImmutableList.builder();
         for (final ListIterator<PatternLayer> iterator = this.actualValue.listIterator(); iterator.hasNext(); ) {
-            if (iterator.nextIndex() -1 == index) {
+            if (iterator.nextIndex() - 1 == index) {
                 builder.add(checkNotNull(element));
                 iterator.next();
             } else {
@@ -165,16 +151,16 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
 
     @Override
     public ImmutablePatternListValue with(BannerPatternShape patternShape, DyeColor color) {
-        return withElement(new LanternPatternLayer(patternShape, color));
+        return this.withElement(new LanternPatternLayer(patternShape, color));
     }
 
     @Override
     public ImmutablePatternListValue with(int index, BannerPatternShape patternShape, DyeColor color) {
-        return with(index, new LanternPatternLayer(patternShape, color));
+        return this.with(index, new LanternPatternLayer(patternShape, color));
     }
 
     @Override
     public ImmutablePatternListValue set(int index, BannerPatternShape patternShape, DyeColor color) {
-        return set(index, new LanternPatternLayer(patternShape, color));
+        return this.set(index, new LanternPatternLayer(patternShape, color));
     }
 }

@@ -121,13 +121,11 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
 
             try {
                 URI uri = new URI(url);
-                String url0 = url;
                 if (uri.getScheme() == null) {
                     if (!allowMissingHeader) {
                         uri = null;
                     } else {
-                        url0 = "http://" + url0;
-                        uri = new URI(url0);
+                        uri = new URI("http://" + url);
                     }
                 }
                 if (uri != null) {

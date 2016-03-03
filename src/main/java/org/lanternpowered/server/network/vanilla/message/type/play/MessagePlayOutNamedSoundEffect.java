@@ -26,11 +26,11 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.effect.sound.SoundCategory;
+import org.spongepowered.api.effect.sound.SoundCategoryType;
 
 public final class MessagePlayOutNamedSoundEffect extends MessagePlayOutSoundEffectBase<String> {
 
-    public MessagePlayOutNamedSoundEffect(String type, Vector3d position, SoundCategory category, float volume, float pitch) {
+    public MessagePlayOutNamedSoundEffect(String type, Vector3d position, SoundCategoryType category, float volume, float pitch) {
         super(type, position, category, volume, pitch);
     }
 }

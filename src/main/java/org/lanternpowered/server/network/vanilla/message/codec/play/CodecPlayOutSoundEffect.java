@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.effect.sound.LanternSoundCategoryType;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -38,7 +39,7 @@ public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundE
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutSoundEffectBase message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getCategory().ordinal());
+        context.writeVarInt(buf, ((LanternSoundCategoryType) message.getCategory()).getInternalId());
         final Object type = message.getType();
         if (type instanceof Integer) {
             context.writeVarInt(buf, (Integer) type);

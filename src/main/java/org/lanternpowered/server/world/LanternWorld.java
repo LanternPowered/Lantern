@@ -42,16 +42,13 @@ import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.data.world.MoonPhase;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.effect.sound.SoundCategory;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
@@ -86,6 +83,7 @@ import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.sound.SoundCategoryType;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -124,7 +122,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
@@ -760,6 +757,15 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
                 particleEffect, position);
     }
 
+    @Override
+    public void playSound(SoundType sound, SoundCategoryType category, Vector3d position, double volume, double pitch, double minVolume) {
+        checkNotNull(sound, "sound");
+        checkNotNull(position, "position");
+        checkNotNull(category, "category");
+        this.broadcast(() -> ((LanternSoundType) sound).createMessage(position,
+                category, (float) Math.max(minVolume, volume), (float) pitch));
+    }
+
     private void spawnParticles(Iterator<LanternPlayer> players, ParticleEffect particleEffect, Vector3d position) {
         if (!players.hasNext()) {
             return;
@@ -768,14 +774,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         while (players.hasNext()) {
             players.next().getConnection().send(message);
         }
-    }
-
-    @Override
-    public void playSound(SoundType sound, Vector3d position, double volume, double pitch, double minVolume) {
-        checkNotNull(sound, "sound");
-        checkNotNull(position, "position");
-        this.broadcast(() -> ((LanternSoundType) sound).createMessage(position,
-                SoundCategory.MASTER, (float) Math.max(minVolume, volume), (float) pitch));
     }
 
     @Override

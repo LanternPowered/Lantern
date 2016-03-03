@@ -54,12 +54,12 @@ public class ImmutableLanternItemValue extends ImmutableLanternValue<ItemStack> 
     @Override
     public ImmutableValue<ItemStack> transform(Function<ItemStack, ItemStack> function) {
         final ItemStack value = checkNotNull(function).apply(get());
-        return new ImmutableLanternItemValue(this.getKey(), getDefault(), checkNotNull(value));
+        return new ImmutableLanternItemValue(this.getKey(), this.getDefault(), checkNotNull(value));
     }
 
     @Override
     public Value<ItemStack> asMutable() {
-        return new LanternItemValue(getKey(), getDefault(), get());
+        return new LanternItemValue(this.getKey(), this.getDefault(), this.get());
     }
 
     @Override

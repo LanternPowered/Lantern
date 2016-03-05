@@ -31,7 +31,6 @@ import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.value.mutable.LanternMapValue;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
@@ -48,23 +47,27 @@ public class ImmutableLanternMapValue<K, V> extends ImmutableLanternValue<Map<K,
         this(key, ImmutableMap.<K, V>of());
     }
 
+    public ImmutableLanternMapValue(Key<? extends BaseValue<Map<K, V>>> key, Map<K, V> defaultValue, Map<K, V> actualValue) {
+        super(key, ImmutableMap.copyOf(defaultValue), ImmutableMap.copyOf(actualValue));
+    }
+
     public ImmutableLanternMapValue(Key<? extends BaseValue<Map<K, V>>> key, Map<K, V> actualValue) {
-        super(key, ImmutableMap.<K, V>of(), ImmutableMap.copyOf(actualValue));
+        super(key, ImmutableMap.of(), ImmutableMap.copyOf(actualValue));
     }
 
     @Override
     public ImmutableMapValue<K, V> with(Map<K, V> value) {
-        return new ImmutableLanternMapValue<>(this.getKey(), checkNotNull(value));
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), checkNotNull(value));
     }
 
     @Override
     public ImmutableMapValue<K, V> transform(Function<Map<K, V>, Map<K, V>> function) {
-        return new ImmutableLanternMapValue<>(this.getKey(), checkNotNull(checkNotNull(function).apply(this.actualValue)));
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), checkNotNull(checkNotNull(function).apply(this.actualValue)));
     }
 
     @Override
     public MapValue<K, V> asMutable() {
-        return new LanternMapValue<>(this.getKey(), Maps.newHashMap(this.actualValue));
+        return new LanternMapValue<>(this.getKey(), this.getDefault(), this.actualValue);
     }
 
     @Override
@@ -74,13 +77,13 @@ public class ImmutableLanternMapValue<K, V> extends ImmutableLanternValue<Map<K,
 
     @Override
     public ImmutableMapValue<K, V> with(K key, V value) {
-        return new ImmutableLanternMapValue<>(this.getKey(), ImmutableMap.<K, V>builder()
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), ImmutableMap.<K, V>builder()
                 .putAll(this.actualValue).put(checkNotNull(key), checkNotNull(value)).build());
     }
 
     @Override
     public ImmutableMapValue<K, V> withAll(Map<K, V> map) {
-        return new ImmutableLanternMapValue<>(this.getKey(), ImmutableMap.<K, V>builder()
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), ImmutableMap.<K, V>builder()
                 .putAll(this.actualValue).putAll(map).build());
     }
 
@@ -90,7 +93,7 @@ public class ImmutableLanternMapValue<K, V> extends ImmutableLanternValue<Map<K,
         this.actualValue.entrySet().stream()
                 .filter(entry -> !entry.getKey().equals(key))
                 .forEach(entry -> builder.put(entry.getKey(), entry.getValue()));
-        return new ImmutableLanternMapValue<>(this.getKey(), builder.build());
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), builder.build());
     }
 
     @Override
@@ -99,7 +102,7 @@ public class ImmutableLanternMapValue<K, V> extends ImmutableLanternValue<Map<K,
         this.actualValue.entrySet().stream()
                 .filter(entry -> !Iterables.contains(keys, entry.getKey()))
                 .forEach(entry -> builder.put(entry.getKey(), entry.getValue()));
-        return new ImmutableLanternMapValue<>(this.getKey(), builder.build());
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), builder.build());
     }
 
     @Override
@@ -108,7 +111,7 @@ public class ImmutableLanternMapValue<K, V> extends ImmutableLanternValue<Map<K,
         this.actualValue.entrySet().stream()
                 .filter(entry -> checkNotNull(predicate).test(entry))
                 .forEach(entry -> builder.put(entry.getKey(), entry.getValue()));
-        return new ImmutableLanternMapValue<>(this.getKey(), builder.build());
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), builder.build());
     }
 
     @Override

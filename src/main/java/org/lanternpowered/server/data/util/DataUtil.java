@@ -27,10 +27,19 @@ package org.lanternpowered.server.data.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.data.LanternDataManager;
+import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.manipulator.DataManipulator;
+import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
+
+import java.util.List;
+import java.util.Optional;
 
 @NonnullByDefault
 public final class DataUtil {
@@ -41,6 +50,45 @@ public final class DataUtil {
         } else {
             return dataView;
         }
+    }
+
+    public static DataView getOrCreateView(final DataView dataView, final DataQuery query) {
+        return dataView.getView(query).orElseGet(() -> dataView.createView(query));
+    }
+
+    public static List<DataView> getSerializedManipulatorList(Iterable<DataManipulator<?, ?>> manipulators) {
+        checkNotNull(manipulators);
+        final ImmutableList.Builder<DataView> builder = ImmutableList.builder();
+        for (DataManipulator<?, ?> manipulator : manipulators) {
+            builder.add(new MemoryDataContainer()
+                    .set(DataQueries.DATA_CLASS, manipulator.getClass().getName())
+                    .set(DataQueries.INTERNAL_DATA, manipulator.toContainer()));
+        }
+        return builder.build();
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+    public static ImmutableList<DataManipulator<?, ?>> deserializeManipulatorList(List<DataView> containers) {
+        checkNotNull(containers);
+        final ImmutableList.Builder<DataManipulator<?, ?>> builder = ImmutableList.builder();
+        for (DataView view : containers) {
+            final String clazzName = view.getString(DataQueries.DATA_CLASS).get();
+            final DataView manipulatorView = view.getView(DataQueries.INTERNAL_DATA).get();
+            try {
+                final Class<?> clazz = Class.forName(clazzName);
+                final Optional<DataManipulatorBuilder<?, ?>> optional = LanternDataManager.getInstance().getBuilder((Class) clazz);
+                if (optional.isPresent()) {
+                    final Optional<? extends DataManipulator<?, ?>> manipulatorOptional = optional.get().build(manipulatorView);
+                    if (manipulatorOptional.isPresent()) {
+                        builder.add(manipulatorOptional.get());
+                    }
+                }
+            } catch (Exception e) {
+                new InvalidDataException("Could not deserialize " + clazzName
+                        + "! Don't worry though, we'll try to deserialize the rest of the data.", e).printStackTrace();
+            }
+        }
+        return builder.build();
     }
 
     private DataUtil() {

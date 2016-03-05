@@ -29,21 +29,23 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
+import org.lanternpowered.server.data.AbstractDataHolder;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.util.IdAllocator;
+import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
@@ -60,24 +62,23 @@ import org.spongepowered.api.world.World;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
-import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public class LanternEntity extends BaseComponentHolder implements Entity, AbstractPropertyHolder {
+public class LanternEntity extends BaseComponentHolder implements Entity, AbstractDataHolder, AbstractPropertyHolder {
 
     private static final IdAllocator idAllocator = new IdAllocator();
 
     public static IdAllocator getIdAllocator() {
         return idAllocator;
     }
-
-    protected final static float EPSILON = 1.0e-004f;
 
     // The entity id that will be used for the client
     private int entityId;
@@ -88,6 +89,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     // The random object of this entity
     private final Random random = new Random();
 
+    // The raw value map
+    private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
+
     // The world this entity is located in, may be null
     private LanternWorld world;
 
@@ -97,29 +101,72 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     // The rotation of the entity
     private Vector3d rotation = Vector3d.ZERO;
 
-    protected float motionX;
-    protected float motionY;
-    protected float motionZ;
+    // The scale of the entity
+    private Vector3d scale = Vector3d.ONE;
+
+    private boolean onGround;
 
     public LanternEntity(UUID uniqueId) {
         this.uniqueId = uniqueId;
+        this.registerKeys();
     }
 
     public LanternEntity() {
         this(UUID.randomUUID());
     }
 
+    @Override
+    public void registerKeys() {
+        this.registerKey(Keys.DISPLAY_NAME, null);
+        this.registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
+        this.registerKey(Keys.VELOCITY, Vector3d.ZERO);
+        this.registerKey(Keys.FIRE_TICKS, 0).nonRemovableAttachedValueProcessor();
+        this.registerKey(Keys.FALL_DISTANCE, 0f).nonRemovableAttachedValueProcessor();
+        this.registerKey(LanternKeys.INVULNERABLE, false).nonRemovableAttachedValueProcessor();
+        this.registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).nonRemovableAttachedValueProcessor();
+    }
+
+    /**
+     * Gets the internal entity id.
+     *
+     * @return The entity id
+     */
     public int getEntityId() {
         return this.entityId;
     }
 
+    /**
+     * Sets the internal entity id, this will be
+     * used for the client.
+     *
+     * @param entityId The entity id
+     */
     public void setEntityId(int entityId) {
         this.entityId = entityId;
     }
 
     @Override
+    public boolean isOnGround() {
+        return this.onGround;
+    }
+
+    /**
+     * Sets the on ground state of this entity.
+     *
+     * @param onGround The on ground state
+     */
+    public void setOnGround(boolean onGround) {
+        this.onGround = onGround;
+    }
+
+    @Override
     public UUID getUniqueId() {
         return this.uniqueId;
+    }
+
+    @Override
+    public Map<Key<?>, KeyRegistration> getRawValueMap() {
+        return this.rawValueMap;
     }
 
     @Override
@@ -136,7 +183,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public int getContentVersion() {
-        return 0;
+        return 1;
     }
 
     @Override
@@ -193,6 +240,16 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     public boolean setLocation(Location<World> location) {
         checkNotNull(location, "location");
         return this.setPositionAndWorld(location.getExtent(), location.getPosition());
+    }
+
+    @Override
+    public Vector3d getScale() {
+        return this.scale;
+    }
+
+    @Override
+    public void setScale(Vector3d scale) {
+        this.scale = checkNotNull(scale, "scale");
     }
 
     @Override
@@ -318,12 +375,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public boolean isOnGround() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public boolean isRemoved() {
         // TODO Auto-generated method stub
         return false;
@@ -346,185 +397,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
      */
     protected void pulse() {
 
-    }
-
-    @Override
-    public <T extends org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <T extends org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> Optional<T> getOrCreate(Class<T> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean supports(Class<? extends org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> holderClass) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public <E> DataTransactionResult transform(Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E value, Cause cause) {
-        return null;
-    }
-
-    @Override
-    public <E> DataTransactionResult offer(BaseValue<E> value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult offer(org.spongepowered.api.data.manipulator.DataManipulator<?, ?> valueContainer) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult offer(org.spongepowered.api.data.manipulator.DataManipulator<?, ?> valueContainer, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function, Cause cause) {
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult offer(Iterable<org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> valueContainers) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult
-            offer(Iterable<org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> valueContainers, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult remove(Class<? extends org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> containerClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult remove(BaseValue<?> value) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult remove(Key<?> key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult undo(DataTransactionResult result) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult copyFrom(DataHolder that) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public DataTransactionResult copyFrom(DataHolder that, MergeFunction function) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<org.spongepowered.api.data.manipulator.DataManipulator<?, ?>> getContainers() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
-    }
-
-    @Override
-    public <E> E getOrNull(Key<? extends BaseValue<E>> key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E> E getOrElse(Key<? extends BaseValue<E>> key, E defaultValue) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean supports(Key<?> key) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean supports(BaseValue<?> baseValue) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public DataHolder copy() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ImmutableSet<Key<?>> getKeys() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public ImmutableSet<ImmutableValue<?>> getValues() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Vector3d getScale() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setScale(Vector3d scale) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override
@@ -572,4 +444,8 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         return null;
     }
 
+    @Override
+    public DataHolder copy() {
+        return null;
+    }
 }

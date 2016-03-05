@@ -52,48 +52,55 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
         super(key, ImmutableList.copyOf(actualValue));
     }
 
+    public ImmutableLanternPatternListValue(Key<? extends BaseValue<List<PatternLayer>>> key, List<PatternLayer> defaultValue,
+            List<PatternLayer> actualValue) {
+        super(key, ImmutableList.copyOf(defaultValue), ImmutableList.copyOf(actualValue));
+    }
+
     @Override
     public ImmutablePatternListValue with(List<PatternLayer> value) {
-        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.copyOf(checkNotNull(value)));
+        return new ImmutableLanternPatternListValue(this.getKey(), checkNotNull(value));
     }
 
     @Override
     public ImmutablePatternListValue transform(Function<List<PatternLayer>, List<PatternLayer>> function) {
-        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.copyOf(checkNotNull(checkNotNull(function).apply(this.actualValue))));
+        return new ImmutableLanternPatternListValue(this.getKey(), checkNotNull(checkNotNull(function).apply(this.actualValue)));
     }
 
     @Override
     public PatternListValue asMutable() {
-        return new LanternPatternListValue(this.getKey(), Lists.newArrayList(this.actualValue));
+        return new LanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue);
     }
 
     @Override
     public ImmutablePatternListValue withElement(PatternLayer element) {
-        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).add(element).build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(),
+                ImmutableList.<PatternLayer>builder().addAll(this.actualValue).add(element).build());
     }
 
     @Override
     public ImmutablePatternListValue withAll(Iterable<PatternLayer> elements) {
-        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.<PatternLayer>builder().addAll(this.actualValue).addAll(elements).build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(),
+                ImmutableList.<PatternLayer>builder().addAll(this.actualValue).addAll(elements).build());
     }
 
     @Override
     public ImmutablePatternListValue without(PatternLayer element) {
-        return new ImmutableLanternPatternListValue(this.getKey(), this.actualValue.stream()
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existingElement -> !existingElement.equals(element))
                 .collect(GuavaCollectors.toImmutableList()));
     }
 
     @Override
     public ImmutablePatternListValue withoutAll(Iterable<PatternLayer> elements) {
-        return new ImmutableLanternPatternListValue(this.getKey(), this.actualValue.stream()
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existingElement -> !Iterables.contains(elements, existingElement))
                 .collect(GuavaCollectors.toImmutableList()));
     }
 
     @Override
     public ImmutablePatternListValue withoutAll(Predicate<PatternLayer> predicate) {
-        return new ImmutableLanternPatternListValue(this.getKey(), this.actualValue.stream()
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(existing -> checkNotNull(predicate).test(existing))
                 .collect(GuavaCollectors.toImmutableList()));
     }
@@ -109,7 +116,7 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternPatternListValue(this.getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), builder.build());
     }
 
     @Override
@@ -121,7 +128,7 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
             }
             builder.add(iterator.next());
         }
-        return new ImmutableLanternPatternListValue(getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), builder.build());
     }
 
     @Override
@@ -132,7 +139,7 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternPatternListValue(this.getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), builder.build());
     }
 
     @Override
@@ -146,7 +153,7 @@ public class ImmutableLanternPatternListValue extends ImmutableLanternListValue<
                 builder.add(iterator.next());
             }
         }
-        return new ImmutableLanternPatternListValue(getKey(), builder.build());
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), builder.build());
    }
 
     @Override

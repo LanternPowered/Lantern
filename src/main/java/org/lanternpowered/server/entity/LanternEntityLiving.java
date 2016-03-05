@@ -28,6 +28,10 @@ package org.lanternpowered.server.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -45,6 +49,67 @@ public class LanternEntityLiving extends LanternEntity implements Living {
 
     public LanternEntityLiving() {
         super();
+    }
+
+    @Override
+    public void registerKeys() {
+        super.registerKeys();
+        this.registerKey(Keys.REMAINING_AIR, 200).applyAttachedValueProcessor(builder -> builder
+                .offerHandler((key, container, elementHolder, element) -> {
+                    int maxAir = container.getElementHolder(Keys.MAX_AIR).get();
+                    if (element > maxAir) {
+                        return DataTransactionResult.errorResult(buildRemainingAirValue(elementHolder.get(), maxAir));
+                    } else {
+                        int oldAir = elementHolder.set(element);
+                        return DataTransactionResult.successReplaceResult(
+                                buildRemainingAirValue(element, maxAir),
+                                buildRemainingAirValue(oldAir, maxAir));
+                    }
+                })
+                .failAlwaysRemoveHandler());
+        this.registerKey(Keys.MAX_AIR, 200).applyAttachedValueProcessor(builder -> builder
+                .valueBuilder((key, container, element) -> Sponge.getRegistry().getValueFactory().createBoundedValueBuilder(Keys.MAX_AIR)
+                        .actualValue(element)
+                        .minimum(0)
+                        .maximum(Integer.MAX_VALUE)
+                        .build())
+                .failAlwaysRemoveHandler());
+        this.registerKey(Keys.HEALTH, 20.0).applyAttachedValueProcessor(builder -> builder
+                .offerHandler((key, container, elementHolder, element) -> {
+                    double maxHealth = container.getElementHolder(Keys.MAX_HEALTH).get();
+                    if (element > maxHealth) {
+                       return DataTransactionResult.errorResult(buildHealthValue(elementHolder.get(), maxHealth));
+                    } else {
+                        double oldHealth = elementHolder.set(element);
+                        return DataTransactionResult.successReplaceResult(
+                                buildHealthValue(element, maxHealth),
+                                buildHealthValue(oldHealth, maxHealth));
+                    }
+                })
+                .failAlwaysRemoveHandler());
+        this.registerKey(Keys.MAX_HEALTH, 20.0).applyAttachedValueProcessor(builder -> builder
+                .valueBuilder((key, container, element) -> Sponge.getRegistry().getValueFactory().createBoundedValueBuilder(Keys.MAX_HEALTH)
+                        .actualValue(element)
+                        .minimum(1.0)
+                        .maximum((double) Float.MAX_VALUE)
+                        .build())
+                .failAlwaysRemoveHandler());
+    }
+
+    private static ImmutableBoundedValue<Integer> buildRemainingAirValue(int air, int maxAir) {
+        return Sponge.getRegistry().getValueFactory().createBoundedValueBuilder(Keys.REMAINING_AIR)
+                .actualValue(air)
+                .minimum(0)
+                .maximum(maxAir)
+                .build().asImmutable();
+    }
+
+    private static ImmutableBoundedValue<Double> buildHealthValue(double health, double maxHealth) {
+        return Sponge.getRegistry().getValueFactory().createBoundedValueBuilder(Keys.HEALTH)
+                .actualValue(health)
+                .minimum(0.0)
+                .maximum(maxHealth)
+                .build().asImmutable();
     }
 
     @Override

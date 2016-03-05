@@ -25,13 +25,18 @@
  */
 package org.lanternpowered.server.data;
 
+import org.lanternpowered.server.data.persistence.DataSerializers;
+import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
+import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
 import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.util.RespawnLocation;
 
 public class DataRegistrar {
 
@@ -39,6 +44,16 @@ public class DataRegistrar {
         final PropertyRegistry propertyRegistry = LanternPropertyRegistry.getInstance();
         propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
         propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
+
+        final LanternDataManager dataManager = LanternDataManager.getInstance();
+        // Register the data type serializers
+        DataTypeSerializers.registerSerializers(dataManager);
+        // Register the data serializers
+        DataSerializers.registerSerializers(dataManager);
+
+        // Register the data builders
+        dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
+        dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
     }
 
     public static void finalizeRegistrations(Game game) {

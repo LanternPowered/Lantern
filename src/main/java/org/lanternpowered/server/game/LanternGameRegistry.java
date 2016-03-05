@@ -77,6 +77,7 @@ import org.lanternpowered.server.data.type.LanternSlabType;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
 import org.lanternpowered.server.data.type.LanternWallType;
+import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
@@ -281,6 +282,7 @@ import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.ResettableBuilder;
+import org.spongepowered.api.util.RespawnLocation;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
@@ -446,6 +448,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
                 .registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
                 .registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
+                .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
                 ;
         this.registerFactories();
     }
@@ -660,7 +663,7 @@ public class LanternGameRegistry implements GameRegistry {
                                 + " cannot have an empty mapping during registration!");
                     } catch (Exception e) {
                         this.game.getLogger().error("Failed to retrieve a registry field from module: " +
-                                module.getClass().getCanonicalName());
+                                module.getClass().getCanonicalName(), e);
                     }
                 }
                 data.add(new CatalogMappingData(annotation, mappings));
@@ -914,8 +917,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public ValueFactory getValueFactory() {
-        // TODO Auto-generated method stub
-        return null;
+        return LanternValueFactory.getInstance();
     }
 
     @Override

@@ -49,4 +49,5 @@ class NbtConstants {
     public static final byte BOOLEAN_LIST = 98;
     public static final String BOOLEAN_IDENTIFER = "$Boolean";
 
+    public static final byte UNKNOWN = 97;
 }

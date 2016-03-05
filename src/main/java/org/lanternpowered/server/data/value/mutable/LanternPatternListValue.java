@@ -50,6 +50,10 @@ public class LanternPatternListValue extends LanternListValue<PatternLayer> impl
         super(key, actualValue);
     }
 
+    public LanternPatternListValue(Key<? extends BaseValue<List<PatternLayer>>> key, List<PatternLayer> actualValue, List<PatternLayer> defaults) {
+        super(key, actualValue, defaults);
+    }
+
     @Override
     public PatternListValue set(List<PatternLayer> value) {
         super.set(value);
@@ -135,6 +139,6 @@ public class LanternPatternListValue extends LanternListValue<PatternLayer> impl
 
     @Override
     public ImmutablePatternListValue asImmutable() {
-        return new ImmutableLanternPatternListValue(this.getKey(), ImmutableList.copyOf(this.actualValue));
+        return new ImmutableLanternPatternListValue(this.getKey(), this.getDefault(), this.actualValue);
     }
 }

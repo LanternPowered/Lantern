@@ -52,6 +52,12 @@ public final class DataQueries {
 
     // Sponge data
     public static final DataQuery SPONGE_DATA = of("SpongeData");
+    // Extended sponge data - Only used to separate player data and player sponge data files
+    public static final DataQuery EXTENDED_SPONGE_DATA = of("ExtendedSpongeData");
+    // Forge data
+    public static final DataQuery FORGE_DATA = of("ForgeData");
+    // Custom data manipulators
+    public static final DataQuery CUSTOM_MANIPULATORS = of("CustomManipulators");
 
     // Potions
     public static final DataQuery POTION_TYPE = of("PotionType");
@@ -59,4 +65,21 @@ public final class DataQueries {
     public static final DataQuery POTION_SHOWS_PARTICLES = of("ShowsParticles");
     public static final DataQuery POTION_AMBIANCE = of("Ambiance");
     public static final DataQuery POTION_DURATION = of("Duration");
+
+    // TileEntity
+    public static final DataQuery X_POS = of("x");
+    public static final DataQuery Y_POS = of("y");
+    public static final DataQuery Z_POS = of("z");
+    public static final DataQuery W_POS = of("w");
+
+    // Java API Queries for DataSerializers
+    public static final DataQuery LOCAL_TIME_HOUR = of("LocalTimeHour");
+    public static final DataQuery LOCAL_TIME_MINUTE = of("LocalTimeMinute");
+    public static final DataQuery LOCAL_TIME_SECOND = of("LocalTimeSecond");
+    public static final DataQuery LOCAL_TIME_NANO = of("LocalTimeNano");
+    public static final DataQuery LOCAL_DATE_YEAR = of("LocalDateYear");
+    public static final DataQuery LOCAL_DATE_MONTH = of("LocalDateMonth");
+    public static final DataQuery LOCAL_DATE_DAY = of("LocalDateDay");
+    public static final DataQuery ZONE_TIME_ID = of("ZoneDateTimeId");
+
 }

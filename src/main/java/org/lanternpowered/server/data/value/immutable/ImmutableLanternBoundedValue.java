@@ -68,7 +68,7 @@ public class ImmutableLanternBoundedValue<E> extends ImmutableLanternValue<E> im
 
     @Override
     public ImmutableBoundedValue<E> transform(Function<E, E> function) {
-        return with(checkNotNull(checkNotNull(function).apply(this.get())));
+        return this.with(checkNotNull(checkNotNull(function).apply(this.get())));
     }
 
     @Override

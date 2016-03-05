@@ -39,6 +39,7 @@ import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LIST;
 import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LONG;
 import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.SHORT;
 import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.STRING;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.UNKNOWN;
 
 import org.lanternpowered.server.data.persistence.DataContainerOutput;
 import org.spongepowered.api.data.DataQuery;
@@ -109,7 +110,9 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
 
     @SuppressWarnings("unchecked")
     private void writePayload(byte type, Object object) throws IOException {
-        if (type == BYTE) {
+        if (type == UNKNOWN) {
+            throw new IOException("Attempted to serialize a unsupported object type: " + object.getClass().getName());
+        } else if (type == BYTE) {
             if (object instanceof Boolean) {
                 object = (byte) (((Boolean) object) ? 1 : 0);
             }
@@ -194,7 +197,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             return BYTE;
         } else if (object instanceof Byte[] || object instanceof byte[]) {
             return BYTE_ARRAY;
-        } else if (object instanceof Map || object instanceof DataView || object instanceof DataSerializable) {
+        } else if (object instanceof Map || object instanceof DataView) {
             return COMPOUND;
         } else if (object instanceof Double) {
             return DOUBLE;
@@ -213,7 +216,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
         } else if (object instanceof String) {
             return STRING;
         }
-        return 0;
+        return UNKNOWN;
     }
 
 }

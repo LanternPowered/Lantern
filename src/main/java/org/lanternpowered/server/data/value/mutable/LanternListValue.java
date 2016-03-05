@@ -27,7 +27,6 @@ package org.lanternpowered.server.data.value.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.value.immutable.ImmutableLanternListValue;
 import org.spongepowered.api.data.key.Key;
@@ -35,6 +34,7 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableListValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, ListValue<E>, ImmutableListValue<E>> implements ListValue<E> {
 
     public LanternListValue(Key<? extends BaseValue<List<E>>> key) {
-        super(key, Lists.<E>newArrayList());
+        this(key, Collections.emptyList());
     }
 
     public LanternListValue(Key<? extends BaseValue<List<E>>> key, List<E> defaultList, List<E> actualList) {
@@ -52,7 +52,7 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
     }
 
     public LanternListValue(Key<? extends BaseValue<List<E>>> key, List<E> actualValue) {
-        this(key, Lists.<E>newArrayList(), actualValue);
+        this(key, Collections.emptyList(), actualValue);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
 
     @Override
     public ListValue<E> filter(Predicate<? super E> predicate) {
-        return new LanternListValue<>(this.getKey(), this.actualValue.stream()
+        return new LanternListValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(element -> checkNotNull(predicate).test(element))
                 .collect(Collectors.toList()));
     }
@@ -75,7 +75,7 @@ public class LanternListValue<E> extends LanternCollectionValue<E, List<E>, List
 
     @Override
     public ImmutableListValue<E> asImmutable() {
-        return new ImmutableLanternListValue<>(this.getKey(), ImmutableList.copyOf(this.actualValue));
+        return new ImmutableLanternListValue<>(this.getKey(), this.getDefault(), this.actualValue);
     }
 
     @Override

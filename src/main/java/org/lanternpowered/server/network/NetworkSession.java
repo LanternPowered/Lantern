@@ -45,6 +45,8 @@ import io.netty.util.AttributeKey;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.config.user.ban.BanEntry;
+import org.lanternpowered.server.config.world.WorldConfig;
+import org.lanternpowered.server.data.io.PlayerIO;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
@@ -62,8 +64,11 @@ import org.lanternpowered.server.network.vanilla.message.type.connection.Message
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.message.MessageEvent;
@@ -76,6 +81,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.World;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.time.Instant;
@@ -732,7 +738,6 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             throw new IllegalStateException("The player must first be available!");
         }
         final LanternWorld world = this.player.getWorld();
-        this.player.setWorld(null);
         if (world != null) {
             final MessageChannel messageChannel = this.player.getMessageChannel();
             final Text quitMessage = t("multiplayer.player.left", this.player.getName());
@@ -745,6 +750,15 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             if (!event.isMessageCancelled()) {
                 event.getChannel().ifPresent(channel -> channel.send(this.player, event.getMessage()));
             }
+
+            // Save the player data
+            try {
+                PlayerIO.save(Lantern.getGame().getSavesDirectory(), this.player);
+            } catch (IOException e) {
+                Lantern.getLogger().warn("An error occurred while saving the player data of {} ({})", this.gameProfile.getName().get(),
+                        this.gameProfile.getUniqueId(), e);
+            }
+            this.player.setWorld(null);
         }
     }
 
@@ -759,13 +773,38 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         this.player = new LanternPlayer(this.gameProfile, this);
         this.player.setEntityId(LanternEntity.getIdAllocator().poll());
-        // TODO: Which world?
-        LanternWorld world = (LanternWorld) Sponge.getServer().getWorlds().iterator().next();
-        // TODO: Read player data
-        // TODO: User the proper location
-        // Use the raw method to avoid triggering any network messages
-        this.player.setRawWorld(world);
-        this.player.setRawPosition(new Vector3d(0, 100, 0));
+
+        try {
+            PlayerIO.load(Lantern.getGame().getSavesDirectory(), this.player);
+        } catch (IOException e) {
+            Lantern.getLogger().warn("An error occurred while loading the player data", e);
+        }
+
+        LanternWorld world = this.player.getWorld();
+        if (world == null) {
+            LanternWorldProperties worldProperties = this.player.getTempWorld();
+            boolean fixSpawnLocation = false;
+            if (worldProperties == null) {
+                Lantern.getLogger().warn("The player [{}] attempted to login in a non-existent world, this is not possible "
+                        + "so we have moved them to the default's world spawn point.", this.gameProfile.getName().get());
+                worldProperties = (LanternWorldProperties) Lantern.getServer().getDefaultWorld().get();
+                fixSpawnLocation = true;
+            } else if (!worldProperties.isEnabled()) {
+                Lantern.getLogger().warn("The player [{}] attempted to login in a unloaded and not-enabled world [{}], this is not possible "
+                        + "so we have moved them to the default's world spawn point.", this.gameProfile.getName().get(),
+                        worldProperties.getWorldName());
+                worldProperties = (LanternWorldProperties) Lantern.getServer().getDefaultWorld().get();
+                fixSpawnLocation = true;
+            }
+            Optional<World> optWorld = Lantern.getWorldManager().loadWorld(worldProperties);
+            // Use the raw method to avoid triggering any network messages
+            this.player.setRawWorld((LanternWorld) optWorld.get());
+            this.player.setTempWorld(null);
+            if (fixSpawnLocation) {
+                // TODO: Use a proper spawn position
+                this.player.setRawPosition(new Vector3d(0, 100, 0));
+            }
+        }
 
         // The kick reason
         Text kickReason = null;
@@ -812,7 +851,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 kickReason != null ? kickReason : t("disconnect.notAllowedToJoin"));
 
         Cause cause = Cause.source(this.player).build();
-        Transform<World> fromTransform = this.player.getTransform().setExtent(world);
+        Transform<World> fromTransform = this.player.getTransform();
         ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
                 fromTransform, fromTransform, this, messageFormatter, this.gameProfile, this.player, false);
 
@@ -826,7 +865,22 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             return;
         }
 
+        // Update the first join and last played data
+        Instant lastJoined = Instant.now();
+        this.player.offer(Keys.LAST_DATE_PLAYED, lastJoined);
+        if (!this.player.get(Keys.FIRST_DATE_PLAYED).isPresent()) {
+            this.player.offer(Keys.FIRST_DATE_PLAYED, lastJoined);
+        }
+
         Transform<World> toTransform = loginEvent.getToTransform();
+        world = (LanternWorld) toTransform.getExtent();
+        WorldConfig config = world.getProperties().getConfig();
+
+        // Update the game mode if necessary
+        if (config.isGameModeForced() || this.player.get(Keys.GAME_MODE).get().equals(GameModes.NOT_SET)) {
+            this.player.offer(Keys.GAME_MODE, config.getGameMode());
+        }
+
         // Reset the raw world
         this.player.setRawWorld(null);
         // Set the transform, this will trigger the initial

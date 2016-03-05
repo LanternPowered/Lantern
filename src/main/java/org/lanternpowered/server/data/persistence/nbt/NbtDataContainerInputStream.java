@@ -226,7 +226,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
         } else if (type == BOOLEAN) {
             return this.dis.readByte() != 0;
         } else {
-            throw new InvalidDataFormatException("Attempt to deserialize unknown type: " + type);
+            throw new InvalidDataFormatException("Attempt to deserialize a unknown nbt tag type: " + type);
         }
     }
 

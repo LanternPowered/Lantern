@@ -37,6 +37,7 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableMapValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.function.Function;
@@ -45,11 +46,11 @@ import java.util.function.Predicate;
 public class LanternMapValue<K, V> extends LanternValue<Map<K, V>> implements MapValue<K, V> {
 
     public LanternMapValue(Key<? extends BaseValue<Map<K, V>>> key) {
-        this(key, Maps.<K, V>newHashMap());
+        this(key, Collections.emptyMap());
     }
 
     public LanternMapValue(Key<? extends BaseValue<Map<K, V>>> key, Map<K, V> actualValue) {
-        this(key, ImmutableMap.<K, V>of(), actualValue);
+        this(key, Collections.emptyMap(), actualValue);
     }
 
     public LanternMapValue(Key<? extends BaseValue<Map<K, V>>> key, Map<K, V> defaultMap, Map<K, V> actualMap) {
@@ -64,7 +65,7 @@ public class LanternMapValue<K, V> extends LanternValue<Map<K, V>> implements Ma
 
     @Override
     public ImmutableMapValue<K, V> asImmutable() {
-        return new ImmutableLanternMapValue<>(this.getKey(), ImmutableMap.copyOf(this.actualValue));
+        return new ImmutableLanternMapValue<>(this.getKey(), this.getDefault(), this.actualValue);
     }
 
     @Override

@@ -67,12 +67,12 @@ public class LanternOptionalValue<E> extends LanternValue<Optional<E>> implement
 
     @Override
     public ImmutableOptionalValue<E> asImmutable() {
-        return new ImmutableLanternOptionalValue<>(this.getKey(), this.actualValue);
+        return new ImmutableLanternOptionalValue<>(this.getKey(), this.getDefault(), this.actualValue);
     }
 
     @Override
     public OptionalValue<E> setTo(@Nullable E value) {
-        return set(Optional.ofNullable(value));
+        return this.set(Optional.ofNullable(value));
     }
 
     @Override

@@ -33,6 +33,8 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.bossbar.LanternBossBar;
+import org.lanternpowered.server.data.io.store.entity.PlayerStore;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
@@ -65,6 +67,7 @@ import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -72,6 +75,7 @@ import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -106,6 +110,7 @@ import org.spongepowered.api.world.World;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -191,6 +196,13 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
      */
     private long lastActiveTime;
 
+    /**
+     * This field is for internal use only, it is used while finding a proper
+     * world to spawn the player in. Used at {@link NetworkSession#initPlayer()} and
+     * {@link PlayerStore}.
+     */
+    @Nullable private LanternWorldProperties tempWorld;
+
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
@@ -215,6 +227,28 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
      */
     public void resetIdleTimeoutCounter() {
         this.lastActiveTime = System.currentTimeMillis();
+    }
+
+    @Override
+    public void registerKeys() {
+        super.registerKeys();
+        this.registerKey(Keys.LAST_DATE_PLAYED, null);
+        this.registerKey(Keys.FIRST_DATE_PLAYED, null);
+        this.registerKey(Keys.IS_FLYING, false).nonRemovableAttachedValueProcessor();
+        this.registerKey(Keys.FLYING_SPEED, 0.1).nonRemovableAttachedValueProcessor();
+        this.registerKey(Keys.CAN_FLY, false).nonRemovableAttachedValueProcessor();
+        this.registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();
+        this.registerKey(Keys.GAME_MODE, GameModes.NOT_SET).nonRemovableAttachedValueProcessor();
+        this.registerKey(LanternKeys.SCORE, 0).nonRemovableAttachedValueProcessor();
+    }
+
+    @Nullable
+    public LanternWorldProperties getTempWorld() {
+        return this.tempWorld;
+    }
+
+    public void setTempWorld(@Nullable LanternWorldProperties tempTargetWorld) {
+        this.tempWorld = tempTargetWorld;
     }
 
     @Override
@@ -259,7 +293,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             oldWorld.removePlayer(this);
         }
         if (world != null) {
-            LanternGameMode gameMode = (LanternGameMode) GameModes.SURVIVAL; // TODO
+            LanternGameMode gameMode = (LanternGameMode) this.get(Keys.GAME_MODE).get();
             LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
             LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
             boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
@@ -324,7 +358,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         return new LanternTabListEntryBuilder()
                 .profile(player.getProfile())
                 .displayName(Text.of(player.getName())) // TODO
-                .gameMode(GameModes.CREATIVE) // TODO
+                .gameMode(player.get(Keys.GAME_MODE).get())
                 .latency(player.getConnection().getLatency());
     }
 

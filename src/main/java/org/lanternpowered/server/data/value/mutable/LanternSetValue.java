@@ -35,6 +35,7 @@ import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableSetValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -43,11 +44,11 @@ import java.util.stream.Collectors;
 public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetValue<E>, ImmutableSetValue<E>> implements SetValue<E> {
 
     public LanternSetValue(Key<? extends BaseValue<Set<E>>> key) {
-        this(key, Sets.<E>newHashSet());
+        this(key, Collections.emptySet());
     }
 
     public LanternSetValue(Key<? extends BaseValue<Set<E>>> key, Set<E> actualValue) {
-        this(key, Sets.<E>newHashSet(), actualValue);
+        this(key, Collections.emptySet(), actualValue);
     }
 
     public LanternSetValue(Key<? extends BaseValue<Set<E>>> key, Set<E> defaultSet, Set<E> actualValue) {
@@ -62,7 +63,7 @@ public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetVal
 
     @Override
     public SetValue<E> filter(Predicate<? super E> predicate) {
-        return new LanternSetValue<>(this.getKey(), this.actualValue.stream()
+        return new LanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue.stream()
                 .filter(element -> checkNotNull(predicate).test(element))
                 .collect(Collectors.toSet()));
     }
@@ -74,6 +75,6 @@ public class LanternSetValue<E> extends LanternCollectionValue<E, Set<E>, SetVal
 
     @Override
     public ImmutableSetValue<E> asImmutable() {
-        return new ImmutableLanternSetValue<>(this.getKey(), ImmutableSet.copyOf(this.actualValue));
+        return new ImmutableLanternSetValue<>(this.getKey(), this.getDefault(), this.actualValue);
     }
 }

@@ -219,7 +219,8 @@ public final class LanternWorldManager {
      */
     public Optional<WorldProperties> getWorldProperties(String worldName) {
         checkNotNull(worldName, "worldName");
-        return this.worldByName.containsKey(worldName) ? Optional.ofNullable(this.worldByName.get(worldName).properties) : Optional.empty();
+        WorldLookupEntry entry = this.worldByName.get(worldName);
+        return entry != null ? Optional.of(entry.properties) : Optional.empty();
     }
 
     /**
@@ -233,7 +234,28 @@ public final class LanternWorldManager {
      */
     public Optional<WorldProperties> getWorldProperties(UUID uniqueId) {
         checkNotNull(uniqueId, "uniqueId");
-        return this.worldByUUID.containsKey(uniqueId) ? Optional.ofNullable(this.worldByUUID.get(uniqueId).properties) : Optional.empty();
+        WorldLookupEntry entry = this.worldByUUID.get(uniqueId);
+        return entry != null ? Optional.of(entry.properties) : Optional.empty();
+    }
+
+    /**
+     * Gets the {@link WorldProperties} of a world. If a world with the given
+     * UUID is loaded then this is equivalent to calling
+     * {@link World#getProperties()}. However, if no loaded world is found then
+     * an attempt will be made to match unloaded worlds.
+     *
+     * @param dimensionId the uuid to lookup
+     * @return the world properties, if found
+     */
+    public Optional<WorldProperties> getWorldProperties(int dimensionId) {
+        WorldLookupEntry entry = this.worldByDimensionId.get(dimensionId);
+        return entry != null ? Optional.of(entry.properties) : Optional.empty();
+    }
+
+    public Optional<Integer> getWorldDimensionId(UUID uniqueId) {
+        checkNotNull(uniqueId, "uniqueId");
+        WorldLookupEntry entry = this.worldByUUID.get(uniqueId);
+        return entry != null ? Optional.of(entry.dimensionId) : Optional.empty();
     }
 
     /**
@@ -242,8 +264,9 @@ public final class LanternWorldManager {
      * @return the world properties
      */
     public Optional<WorldProperties> getDefaultWorld() {
+        WorldLookupEntry entry = this.worldByDimensionId.get(0);
         // Can be empty if the properties aren't loaded yet
-        return this.worldByDimensionId.containsKey(0) ? Optional.ofNullable(this.worldByDimensionId.get(0).properties) : Optional.empty();
+        return entry != null ? Optional.of(entry.properties) : Optional.empty();
     }
 
     /**
@@ -887,6 +910,7 @@ public final class LanternWorldManager {
                                 path.getFileName().toString());
                         continue;
                     }
+
                     Integer dimensionId = levelData.dimensionId;
                     Tuple<Path, LevelData> tuple = Tuple.of(path, levelData);
                     if (dimensionId == null || idToLevelData.containsValue(dimensionId) || dimensionId < MIN_CUSTOM_DIMENSION_ID) {

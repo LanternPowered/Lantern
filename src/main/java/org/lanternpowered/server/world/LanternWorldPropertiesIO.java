@@ -325,8 +325,8 @@ public final class LanternWorldPropertiesIO {
                             .getOrCreateRule(RuleType.getOrCreate(en.getKey().toString(), RuleDataTypes.STRING, ""))
                             .setRawValue((String) en.getValue());
                 } catch (IllegalArgumentException e) {
-                    Lantern.getLogger().warn("An error occurred while loading a game rule (" + en.getKey().toString() +
-                            ") this one will be skipped", e);
+                    Lantern.getLogger().warn("An error occurred while loading a game rule ({}) this one will be skipped",
+                            en.getKey().toString(), e);
                 }
             }
         }

@@ -436,11 +436,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
-        return false;
-    }
-
-    @Override
     public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
         return Collections.emptySet();
     }
@@ -524,6 +519,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
         // TODO Auto-generated method stub
         return Optional.empty();
+    }
+
+    @Override
+    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+        return false;
     }
 
     @Override

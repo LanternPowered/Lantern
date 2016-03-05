@@ -65,7 +65,7 @@ import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.WallTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.effect.SoundCategoryTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
@@ -128,7 +128,7 @@ import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ResizableParticle;
-import org.spongepowered.api.effect.sound.SoundCategoryType;
+import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.ai.task.AITaskType;
@@ -246,7 +246,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(StoneType.class, new StoneTypeRegistryModule())
                 .registerModule(WallType.class, new WallTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
-                .registerModule(SoundCategoryType.class, new SoundCategoryTypeRegistryModule())
+                .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
                 .registerModule(GameMode.class, new GameModeRegistryModule())
                 .registerModule(ItemType.class, new ItemRegistryModule())

@@ -29,13 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.effect.sound.SoundCategoryType;
+import org.spongepowered.api.effect.sound.SoundCategory;
 
 public abstract class MessagePlayOutSoundEffectBase<T> implements Message {
 
     private final T type;
     private final Vector3d position;
-    private final SoundCategoryType category;
+    private final SoundCategory category;
 
     private final float volume;
     private final float pitch;
@@ -49,7 +49,7 @@ public abstract class MessagePlayOutSoundEffectBase<T> implements Message {
      * @param volume The volume
      * @param pitch The pitch value
      */
-    public MessagePlayOutSoundEffectBase(T type, Vector3d position, SoundCategoryType category, float volume, float pitch) {
+    public MessagePlayOutSoundEffectBase(T type, Vector3d position, SoundCategory category, float volume, float pitch) {
         this.position = checkNotNull(position, "position");
         this.category = checkNotNull(category, "category");
         this.type = checkNotNull(type, "type");
@@ -93,7 +93,7 @@ public abstract class MessagePlayOutSoundEffectBase<T> implements Message {
         return this.position;
     }
 
-    public SoundCategoryType getCategory() {
+    public SoundCategory getCategory() {
         return this.category;
     }
 }

@@ -28,12 +28,12 @@ package org.lanternpowered.server.effect.sound;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
 import org.lanternpowered.server.util.OptInt;
-import org.spongepowered.api.effect.sound.SoundCategoryType;
+import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -42,32 +42,27 @@ import java.util.OptionalInt;
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public final class LanternSoundType extends LanternCatalogType implements SoundType {
+public final class LanternSoundType extends SimpleLanternCatalogType implements SoundType {
 
     private final OptionalInt eventId;
-    private final SoundCategoryType defaultCategory;
 
-    public LanternSoundType(String identifier, String name, SoundCategoryType defaultCategory,
-            @Nullable Integer eventId) {
-        super(identifier, name);
-        this.eventId = OptInt.ofNullable(eventId);
-        this.defaultCategory = checkNotNull(defaultCategory, "defaultCategory");
+    public LanternSoundType(String identifier) {
+        this(identifier, null);
     }
 
-    public MessagePlayOutSoundEffectBase createMessage(Vector3d position, SoundCategoryType soundCategory,
+    public LanternSoundType(String identifier, @Nullable Integer eventId) {
+        super(identifier);
+        this.eventId = OptInt.ofNullable(eventId);
+    }
+
+    public MessagePlayOutSoundEffectBase createMessage(Vector3d position, SoundCategory soundCategory,
             float volume, float pitch) {
         checkNotNull(soundCategory, "soundCategory");
         checkNotNull(position, "position");
         if (this.eventId.isPresent()) {
-            return new MessagePlayOutSoundEffect(this.eventId.getAsInt(), position,
-                    soundCategory, volume, pitch);
+            return new MessagePlayOutSoundEffect(this.eventId.getAsInt(), position, soundCategory, volume, pitch);
         } else {
-            return new MessagePlayOutNamedSoundEffect(this.getName(), position,
-                    soundCategory, volume, pitch);
+            return new MessagePlayOutNamedSoundEffect(this.getName(), position, soundCategory, volume, pitch);
         }
-    }
-
-    public SoundCategoryType getDefaultCategory() {
-        return this.defaultCategory;
     }
 }

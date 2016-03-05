@@ -66,11 +66,6 @@ public abstract class LanternDimension implements Dimension {
     }
 
     @Override
-    public void setAllowsPlayerRespawns(boolean allow) {
-        this.world.getProperties().setAllowsPlayerRespawns(allow);
-    }
-
-    @Override
     public int getMinimumSpawnHeight() {
         return this.getGeneratorType().getMinimalSpawnHeight();
     }
@@ -78,11 +73,6 @@ public abstract class LanternDimension implements Dimension {
     @Override
     public boolean doesWaterEvaporate() {
         return this.world.getProperties().doesWaterEvaporate();
-    }
-
-    @Override
-    public void setWaterEvaporates(boolean evaporates) {
-        this.world.getProperties().setWaterEvaporates(evaporates);
     }
 
     @Override

@@ -56,13 +56,11 @@ public interface AbstractSubject extends Subject {
         LanternServiceListeners.getInstance().registerExpirableServiceCallback(PermissionService.class, new SubjectSettingCallback(this));
     }
 
-    @Nullable
-    default Subject findPermissionSubject() {
+    default void findPermissionSubject() {
         Optional<PermissionService> service = LanternGame.get().getServiceManager().provide(PermissionService.class);
         if (service.isPresent()) {
             new SubjectSettingCallback(this).test(service.get());
         }
-        return null;
     }
 
     @Override

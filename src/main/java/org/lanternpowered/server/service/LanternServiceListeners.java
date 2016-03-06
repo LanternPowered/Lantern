@@ -43,13 +43,12 @@ public final class LanternServiceListeners {
         return instance;
     }
 
-    private final Object lock = new Object();
     private final Multimap<Class<?>, Predicate<Object>> serviceCallbacks = HashMultimap.create();
 
     @SuppressWarnings("unchecked")
     public <T> void registerExpirableServiceCallback(Class<T> service, Predicate<T> callback) {
         Sponge.getServiceManager().provide(service).ifPresent(callback::test);
-        synchronized (this.lock) {
+        synchronized (this.serviceCallbacks) {
             this.serviceCallbacks.put(service, (Predicate<Object>) callback);
         }
     }
@@ -63,7 +62,7 @@ public final class LanternServiceListeners {
 
     @Listener
     public void onServiceChange(ChangeServiceProviderEvent event) {
-        synchronized (this.lock) {
+        synchronized (this.serviceCallbacks) {
             Iterator<Predicate<Object>> it = this.serviceCallbacks.get(event.getService()).iterator();
             while (it.hasNext()) {
                 if (!it.next().test(event.getNewProvider())) {

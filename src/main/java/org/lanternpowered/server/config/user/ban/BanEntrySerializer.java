@@ -34,7 +34,7 @@ public final class BanEntrySerializer implements TypeSerializer<BanEntry> {
 
     @Override
     public BanEntry deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        if (value.getNode("ip").isVirtual()) {
+        if (!value.getNode("ip").isVirtual()) {
             return value.getValue(TypeToken.of(BanEntry.Ip.class));
         } else {
             return value.getValue(TypeToken.of(BanEntry.Profile.class));

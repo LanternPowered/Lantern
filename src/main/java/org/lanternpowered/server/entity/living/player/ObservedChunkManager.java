@@ -51,6 +51,7 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.world.UnloadWorldEvent;
 import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
+import org.spongepowered.api.event.world.chunk.PopulateChunkEvent;
 import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
@@ -110,6 +111,15 @@ public final class ObservedChunkManager {
                 }
             }
         }
+
+        @Listener(order = Order.POST)
+        public void onChunkPopulate(PopulateChunkEvent.Post event) {
+            final LanternChunk chunk = (LanternChunk) event.getTargetChunk();
+            final ObservedChunk observedChunk = observedChunks.get(chunk.getCoords());
+            if (observedChunk != null) {
+                observedChunk.dirtyChunk = true;
+            }
+        }
     }
 
     public void addObserver(Vector2i coords, LanternPlayer observer) {
@@ -161,10 +171,12 @@ public final class ObservedChunkManager {
         private final Queue<Vector3i> dirtyBlocks = new ConcurrentLinkedQueue<>();
 
         /**
-         * Whether the biomes are modified and the client should be updated.
-         * TODO: Add a listener to change this state
+         * Whether all the chunk sections are modified or whether the biomes are modified
+         * and the client should be updated.
+         *
+         * TODO: Add a listener to change this state for biomes
          */
-        private volatile boolean dirtyBiomes;
+        private volatile boolean dirtyChunk;
 
         public ObservedChunk(Vector2i coords) {
             this.coords = coords;
@@ -173,7 +185,7 @@ public final class ObservedChunkManager {
         void addBlockChange(Supplier<Vector3i> coords) {
             // There is not need to track the changes if no one wants to see them
             // dirtyBiomes will force the chunk to be completely resend
-            if (!this.dirtyBiomes && !this.observers.isEmpty() && this.clientObservers.isEmpty()) {
+            if (!this.dirtyChunk && !this.observers.isEmpty() && this.clientObservers.isEmpty()) {
                 this.dirtyBlocks.add(coords.get());
             }
         }
@@ -184,10 +196,10 @@ public final class ObservedChunkManager {
                 return;
             }
 
-            if (this.dirtyBiomes) {
+            if (this.dirtyChunk) {
                 MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true);
                 this.clientObservers.forEach(player -> player.getConnection().send(message));
-                this.dirtyBiomes = false;
+                this.dirtyChunk = false;
                 this.dirtyBlocks.clear();
                 return;
             }

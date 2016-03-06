@@ -114,6 +114,9 @@ public final class ObservedChunkManager {
 
         @Listener(order = Order.POST)
         public void onChunkPopulate(PopulateChunkEvent.Post event) {
+            if (event.getAppliedPopulators().isEmpty()) {
+                return;
+            }
             final LanternChunk chunk = (LanternChunk) event.getTargetChunk();
             final ObservedChunk observedChunk = observedChunks.get(chunk.getCoords());
             if (observedChunk != null) {
@@ -352,7 +355,7 @@ public final class ObservedChunkManager {
             // Clear the dirty states, since no one will still want to see them
             if (this.clientObservers.isEmpty()) {
                 this.dirtyBlocks.clear();
-                this.dirtyBiomes = false;
+                this.dirtyChunk = false;
             }
         }
 

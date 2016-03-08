@@ -27,6 +27,7 @@ package org.lanternpowered.server.profile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import ninja.leaping.configurate.objectmapping.Setting;
@@ -36,7 +37,6 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.ProfileNotFoundException;
-import org.spongepowered.api.util.GuavaCollectors;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -281,6 +281,17 @@ public class LanternGameProfileCache implements GameProfileCache {
 
     @Override
     public Collection<GameProfile> getProfiles() {
-        return this.byUUID.values().stream().map(entry -> entry.gameProfile).collect(GuavaCollectors.toImmutableList());
+        ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
+        Iterator<Map.Entry<UUID, ProfileCacheEntry>> it = this.byUUID.entrySet().iterator();
+        while (it.hasNext()) {
+            ProfileCacheEntry entry = it.next().getValue();
+            if (entry.isExpired()) {
+                entry.gameProfile.getName().ifPresent(this.byName::remove);
+                it.remove();
+            } else {
+                builder.add(entry.gameProfile);
+            }
+        }
+        return builder.build();
     }
 }

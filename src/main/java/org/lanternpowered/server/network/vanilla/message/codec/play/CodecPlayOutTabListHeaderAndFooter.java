@@ -31,14 +31,29 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
+import org.spongepowered.api.text.Text;
 
 public final class CodecPlayOutTabListHeaderAndFooter implements Codec<MessagePlayOutTabListHeaderAndFooter> {
+
+    // This is the only text type that can be empty on the client
+    // for the result of #getFormattedText
+    private static final String EMPTY_TEXT = "{\"translate\":\"\"}";
 
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutTabListHeaderAndFooter message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, Types.TEXT, message.getHeader());
-        context.write(buf, Types.TEXT, message.getFooter());
+        Text header = message.getHeader();
+        Text footer = message.getFooter();
+        if (header != null) {
+            context.write(buf, Types.TEXT, header);
+        } else {
+            context.write(buf, Types.STRING, EMPTY_TEXT);
+        }
+        if (footer != null) {
+            context.write(buf, Types.TEXT, footer);
+        } else {
+            context.write(buf, Types.STRING, EMPTY_TEXT);
+        }
         return buf;
     }
 }

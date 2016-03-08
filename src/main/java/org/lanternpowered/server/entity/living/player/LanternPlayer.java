@@ -35,6 +35,9 @@ import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
+import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
+import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
@@ -54,6 +57,7 @@ import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
@@ -64,6 +68,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.living.player.tab.TabList;
+import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.profile.GameProfile;
@@ -90,6 +95,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -99,6 +105,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
     private final Session session;
+
+    private final LanternTabList tabList = new LanternTabList(this);
 
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
@@ -184,8 +192,21 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                         this.session.getServer().getMaxPlayers(), reducedDebug, false));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(LanternGame.IMPL_NAME));
+                // Send the player list
+                List<LanternTabListEntry> tabListEntries = new ArrayList<>();
+                for (Player player : Sponge.getServer().getOnlinePlayers()) {
+                    LanternTabListEntryBuilder builder = new LanternTabListEntryBuilder()
+                            .profile(player.getProfile())
+                            .displayName(Text.of(player.getName())) // TODO
+                            .gameMode(GameModes.CREATIVE) // TODO
+                            .latency(player.getConnection().getLatency());
+                    tabListEntries.add(builder.list(this.tabList).build());
+                    if (player != this) {
+                        player.getTabList().addEntry(builder.list(player.getTabList()).build());
+                    }
+                }
+                this.tabList.init(tabListEntries);
             } else {
-                //
                 if (oldWorld != null && oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();
                     // The client only creates a new world instance on the client if a
@@ -513,9 +534,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public TabList getTabList() {
-        // TODO Auto-generated method stub
-        return null;
+    public LanternTabList getTabList() {
+        return this.tabList;
     }
 
     @Override

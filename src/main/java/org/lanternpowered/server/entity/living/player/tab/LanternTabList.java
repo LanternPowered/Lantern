@@ -52,8 +52,8 @@ public class LanternTabList implements TabList {
     private final LanternPlayer player;
 
     private final Map<UUID, LanternTabListEntry> tabListEntries = new ConcurrentHashMap<>();
-    private Optional<Text> header;
-    private Optional<Text> footer;
+    private Optional<Text> header = Optional.empty();
+    private Optional<Text> footer = Optional.empty();
 
     public LanternTabList(LanternPlayer player) {
         this.player = player;
@@ -77,11 +77,13 @@ public class LanternTabList implements TabList {
                     e.getDisplayName().orElse(null), e.getLatency()));
         });
         this.player.getConnection().send(new MessagePlayOutTabListEntries(messageEntries));
-        this.sendHeaderAndFooterUpdate();
+        if (this.footer.isPresent() || this.header.isPresent()) {
+            this.sendHeaderAndFooterUpdate();
+        }
     }
 
     private void sendHeaderAndFooterUpdate() {
-        this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header.orElse(Text.of()), this.footer.orElse(Text.of())));
+        this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header.orElse(null), this.footer.orElse(null)));
     }
 
     @Override

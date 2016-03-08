@@ -218,7 +218,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
 
                 LanternGame.log().info("Finished authenticating.");
-                LanternGame.get().getGameProfileManager().putProfile(gameProfile, true);
+                LanternGame.get().getGameProfileManager().getCache().add(gameProfile, true, null);
                 this.session.messageReceived(new MessageLoginInFinish(gameProfile));
             } catch (Exception e) {
                 LanternGame.log().error("Error in authentication thread", e);

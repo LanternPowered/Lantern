@@ -80,7 +80,7 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                     .map(CommandSource::getName)
                     .filter(n -> n.toLowerCase().startsWith(part1))
                     .collect(Collectors.toList());
-            TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(Cause.of(context.getSession().getPlayer()),
+            TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(Cause.source(context.getSession().getPlayer()).build(),
                     ImmutableList.copyOf(suggestions), suggestions, text);
             if (!Sponge.getEventManager().post(event)) {
                 context.getSession().send(new MessagePlayOutTabComplete(suggestions));

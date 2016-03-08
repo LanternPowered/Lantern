@@ -264,7 +264,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
-                    this.chunkManager.getOrCreateChunk(x, z, () -> Cause.of(this, this.game.getMinecraftPlugin()), true);
+                    this.chunkManager.getOrCreateChunk(x, z, () -> Cause.source(LanternGame.plugin()).owner(this).build(), true);
                     this.spawnLoadingTicket.forceChunk(new Vector3i(x, 0, z));
                 }
             }
@@ -847,7 +847,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             return Optional.empty();
         }
         if (generate) {
-            return Optional.of(this.chunkManager.getOrCreateChunk(new Vector2i(x, z), () -> Cause.of(this), generate));
+            return Optional.of(this.chunkManager.getOrCreateChunk(new Vector2i(x, z),
+                    () -> Cause.source(LanternGame.plugin()).owner(this).build(), true));
         } else {
             return Optional.ofNullable(this.chunkManager.getChunk(x, z));
         }

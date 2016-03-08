@@ -622,6 +622,11 @@ public class Session implements PlayerConnection {
     }
 
     @Override
+    public int getLatency() {
+        return this.ping;
+    }
+
+    @Override
     public InetSocketAddress getAddress() {
         return this.address;
     }
@@ -661,8 +666,4 @@ public class Session implements PlayerConnection {
         return this.virtualAddress;
     }
 
-    @Override
-    public int getPing() {
-        return this.ping;
-    }
 }

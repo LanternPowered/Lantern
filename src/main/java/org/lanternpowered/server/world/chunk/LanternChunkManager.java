@@ -257,7 +257,7 @@ public final class LanternChunkManager {
 
         @Override
         public void run() {
-            unload0(this.callable.coords, () -> Cause.of(world), false);
+            unload0(this.callable.coords, () -> Cause.source(world).build(), false);
         }
     }
 
@@ -284,7 +284,7 @@ public final class LanternChunkManager {
         // Chunk may be null if's already being loaded by a different thread.
         final LanternChunk chunk = getOrCreateChunk(coords, () -> {
             // Build the cause only if the chunk isn't already loaded
-            return Cause.of(world, tickets.toArray(new Object[tickets.size()]));
+            return Cause.source(world).named("tickets", tickets.toArray(new Object[tickets.size()])).build();
         }, true, false);
     }
 
@@ -629,7 +629,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrCreateChunk(int x, int z, boolean generate) {
-        return this.getOrCreateChunk(x, z, () -> Cause.of(this.world), generate);
+        return this.getOrCreateChunk(x, z, () -> Cause.source(this.world).build(), generate);
     }
 
     /**
@@ -737,7 +737,7 @@ public final class LanternChunkManager {
         final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
         for (LoadingTicket ticket : tickets) {
             this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
-                    Cause.of(this.world, ticket), coords0, chunk, ticket));
+                    Cause.source(ticket).owner(this.world).build(), coords0, chunk, ticket));
         }
     }
 
@@ -1324,7 +1324,7 @@ public final class LanternChunkManager {
             if (chunk.loaded && !queueLoad && callEvents) {
                 final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
                 this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
-                        Cause.of(this.world, ticket), coords0, chunk, ticket));
+                        Cause.source(ticket).owner(this.world).build(), coords0, chunk, ticket));
             }
         // Queue the chunk to load
         } else {
@@ -1387,7 +1387,7 @@ public final class LanternChunkManager {
             final LanternChunk chunk = entry.getValue();
             // Post the chunk unload event
             this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(
-                    Cause.of(LanternGame.get().getServer()), chunk));
+                    Cause.source(LanternGame.plugin()).owner(this.world).build(), chunk));
             // Save the chunk
             this.save(chunk);
         }
@@ -1406,7 +1406,7 @@ public final class LanternChunkManager {
             this.pendingForUnload.poll();
             if (!this.ticketsByPos.containsKey(entry.coords)) {
                 // TODO: Create unload tasks
-                this.unload(entry.coords, () -> Cause.of(this.world));
+                this.unload(entry.coords, () -> Cause.source(this.world).build());
             }
         }
     }
@@ -1420,7 +1420,8 @@ public final class LanternChunkManager {
                 LanternEntityLoadingTicket ticket0 = (LanternEntityLoadingTicket) ticket;
                 EntityReference ref = ticket0.getEntityReference().orElse(null);
                 if (ref != null) {
-                    LanternChunk chunk = this.getOrCreateChunk(ref.getChunkCoords(), () -> Cause.of(ticket0, this.world), true, true);
+                    LanternChunk chunk = this.getOrCreateChunk(ref.getChunkCoords(),
+                            () -> Cause.source(ticket0).owner(this.world).build(), true, true);
                     Entity entity = chunk.getEntity(ref.getUniqueId()).orElse(null);
                     if (entity != null) {
                         ticket0.bindToEntity(entity);

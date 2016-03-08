@@ -26,117 +26,121 @@
 package org.lanternpowered.server.service.pagination;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.spongepowered.api.command.CommandMessageFormatting.error;
 
-import com.google.common.base.Function;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ProxySource;
-import org.spongepowered.api.service.pagination.PaginationBuilder;
-import org.spongepowered.api.service.pagination.PaginationCalculator;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
-
-import java.util.List;
-import java.util.Map;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.channel.MessageReceiver;
 
 import javax.annotation.Nullable;
 
-class LanternPaginationBuilder implements PaginationBuilder {
+public class LanternPaginationBuilder implements PaginationList.Builder {
 
     private final LanternPaginationService service;
     private Iterable<Text> contents;
-    @Nullable private Text title;
-    @Nullable private Text header;
-    @Nullable private Text footer;
-    private String paginationSpacer = "=";
+    private Text title;
+    private Text header;
+    private Text footer;
+    private Text paginationSpacer = Text.of("=");
+    private int linesPerPage = 20;
+
+    private PaginationList paginationList;
 
     public LanternPaginationBuilder(LanternPaginationService service) {
         this.service = service;
     }
 
     @Override
-    public PaginationBuilder contents(Iterable<Text> contents) {
+    public PaginationList.Builder contents(Iterable<Text> contents) {
         this.contents = contents;
+        this.paginationList = null;
         return this;
     }
 
     @Override
-    public PaginationBuilder contents(Text... contents) {
+    public PaginationList.Builder contents(Text... contents) {
         this.contents = ImmutableList.copyOf(contents);
+        this.paginationList = null;
         return this;
     }
 
     @Override
-    public PaginationBuilder title(@Nullable Text title) {
+    public PaginationList.Builder title(Text title) {
         this.title = title;
+        this.paginationList = null;
         return this;
     }
 
     @Override
-    public PaginationBuilder header(@Nullable Text header) {
+    public PaginationList.Builder header(@Nullable Text header) {
         this.header = header;
+        this.paginationList = null;
         return this;
     }
 
     @Override
-    public PaginationBuilder footer(@Nullable Text footer) {
+    public PaginationList.Builder footer(@Nullable Text footer) {
         this.footer = footer;
+        this.paginationList = null;
         return this;
     }
 
     @Override
-    public PaginationBuilder paddingString(String padding) {
+    public PaginationList.Builder padding(Text padding) {
         this.paginationSpacer = padding;
+        this.paginationList = null;
         return this;
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
-    public void sendTo(final CommandSource source) {
+    public PaginationList.Builder linesPerPage(int linesPerPage) {
+        this.linesPerPage = linesPerPage;
+        return this;
+    }
+
+    @Override
+    public PaginationList build() {
         checkNotNull(this.contents, "contents");
-        checkNotNull(source, "source");
-        this.service.registerCommandOnce();
-
-        CommandSource realSource = source;
-        while (realSource instanceof ProxySource) {
-            realSource = ((ProxySource) realSource).getOriginalSource();
+        if (this.paginationList == null) {
+            this.paginationList = new LanternPaginationList(this.service, this.contents, this.title, this.header, this.footer,
+                    this.paginationSpacer, this.linesPerPage);
         }
-        @SuppressWarnings("unchecked")
-        PaginationCalculator<CommandSource> calculator = (PaginationCalculator) this.service.calculators.get(realSource.getClass());
-        if (calculator == null) {
-            calculator = this.service.getUnpaginatedCalculator(); // TODO: or like 50 lines?
-        }
-        final PaginationCalculator<CommandSource> finalCalculator = calculator;
-        Iterable<Map.Entry<Text, Integer>> counts = Iterables.transform(this.contents, new Function<Text, Map.Entry<Text, Integer>>() {
-            @Nullable
-            @Override
-            public Map.Entry<Text, Integer> apply(@Nullable Text input) {
-                int lines = finalCalculator.getLines(source, input);
-                return Maps.immutableEntry(input, lines);
-            }
-        });
+        return this.paginationList;
+    }
 
-        Text title = this.title;
-        if (title != null) {
-            title = calculator.center(source, title, this.paginationSpacer);
-        }
+    @Override
+    public void sendTo(MessageReceiver source) {
+        this.build().sendTo(source);
+    }
 
-        ActivePagination pagination;
-        if (this.contents instanceof List) { // If it started out as a list, it's probably reasonable to copy it to another list
-            pagination = new ListPagination(source, calculator, ImmutableList.copyOf(counts), title, this.header, this.footer, this.paginationSpacer);
-        } else {
-            pagination = new IterablePagination(source, calculator, counts, title, this.header, this.footer, this.paginationSpacer);
-        }
+    @Override
+    public void sendTo(MessageChannel channel) {
+        this.build().sendTo(channel);
+    }
 
-        this.service.getPaginationState(source, true).put(pagination);
-        try {
-            pagination.nextPage();
-        } catch (CommandException e) {
-            source.sendMessage(error(e.getText()));
-        }
+    @Override
+    public PaginationList.Builder from(PaginationList list) {
+        this.reset();
+        this.contents = list.getContents();
+        this.title = list.getTitle().orElse(null);
+        this.header = list.getHeader().orElse(null);
+        this.footer = list.getFooter().orElse(null);
+        this.paginationSpacer = list.getPadding();
 
+        this.paginationList = null;
+        return this;
+    }
+
+    @Override
+    public PaginationList.Builder reset() {
+        this.contents = null;
+        this.title = null;
+        this.header = null;
+        this.footer = null;
+        this.paginationSpacer = Text.of("=");
+        this.paginationList = null;
+        return this;
     }
 }
+

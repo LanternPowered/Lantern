@@ -28,13 +28,17 @@ package org.lanternpowered.server.service.pagination;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import static org.spongepowered.api.command.args.GenericArguments.integer;
 
-import com.google.common.base.Functions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.service.pagination.PaginationList;
+import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -42,12 +46,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.service.pagination.PaginationBuilder;
-import org.spongepowered.api.service.pagination.PaginationCalculator;
-import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.List;
 import java.util.Map;
@@ -63,11 +61,9 @@ import javax.annotation.Nullable;
 public class LanternPaginationService implements PaginationService {
 
     static class SourcePaginations {
+        private final Map<UUID, ActivePagination> paginations = new ConcurrentHashMap<>();
+        private volatile UUID lastUuid;
 
-        private final Map<UUID, ActivePagination> paginations = new ConcurrentHashMap<UUID, ActivePagination>();
-        @Nullable private volatile UUID lastUuid;
-
-        @Nullable
         public ActivePagination get(UUID uuid) {
             return this.paginations.get(uuid);
         }
@@ -83,25 +79,16 @@ public class LanternPaginationService implements PaginationService {
             return this.paginations.keySet();
         }
 
-        @Nullable
         public UUID getLastUuid() {
             return this.lastUuid;
         }
-
     }
-    final ConcurrentMap<Class<? extends CommandSource>, PaginationCalculator<?>> calculators = Maps.newConcurrentMap();
-    final ConcurrentMap<CommandSource, SourcePaginations> activePaginations = new MapMaker().weakKeys().makeMap();
+    final ConcurrentMap<MessageReceiver, SourcePaginations> activePaginations = new MapMaker().weakKeys().makeMap();
     private final AtomicBoolean commandRegistered = new AtomicBoolean();
-    private final LanternGame game;
-
-    public LanternPaginationService(LanternGame game) {
-        this.game = game;
-        this.setPaginationCalculator(LanternPlayer.class, new PlayerPaginationCalculator());
-    }
 
     void registerCommandOnce() {
         if (this.commandRegistered.compareAndSet(false, true)) {
-            this.game.getCommandManager().register(LanternGame.plugin(), CommandSpec.builder()
+            Sponge.getGame().getCommandManager().register(LanternGame.plugin(), CommandSpec.builder()
                     .description(t("Helper command for paginations occurring"))
                     .arguments(new ActivePaginationCommandElement(t("pagination-id")))
                     .child(CommandSpec.builder()
@@ -129,36 +116,18 @@ public class LanternPaginationService implements PaginationService {
     }
 
     @Override
-    public PaginationBuilder builder() {
+    public PaginationList.Builder builder() {
         return new LanternPaginationBuilder(this);
     }
 
-    @Override
-    public <T extends CommandSource> void setPaginationCalculator(Class<T> type, PaginationCalculator<? super T> calculator) throws
-            IllegalArgumentException {
-        PaginationCalculator<?> existing = this.calculators.putIfAbsent(type, calculator);
-        if (existing != null) {
-            throw new IllegalArgumentException("Pagination calculator already registered for the type " + type);
-        }
-    }
-
-    private static final PaginationCalculator<CommandSource> UNPAGINATED_CALCULATOR = new FixedLengthPaginationCalculator(-1);
-
-    @Override
-    public PaginationCalculator<CommandSource> getUnpaginatedCalculator() {
-        return UNPAGINATED_CALCULATOR;
-    }
-
-    @Override
-    public PaginationCalculator<CommandSource> getFixedLinesCalculator(int lines) {
-        return new FixedLengthPaginationCalculator(lines);
-    }
-
-    @Nullable
-    SourcePaginations getPaginationState(CommandSource source, boolean create) {
+    SourcePaginations getPaginationState(MessageReceiver source, boolean create) {
         SourcePaginations ret = this.activePaginations.get(source);
         if (ret == null && create) {
-            ret = this.activePaginations.computeIfAbsent(source, source0 -> new SourcePaginations());
+            ret = new SourcePaginations();
+            SourcePaginations existing = this.activePaginations.putIfAbsent(source, ret);
+            if (existing != null) {
+                ret = existing;
+            }
         }
         return ret;
     }
@@ -202,6 +171,7 @@ public class LanternPaginationService implements PaginationService {
             if (paginations == null) {
                 return ImmutableList.of();
             }
+
             final Optional<String> optNext = args.nextIfPresent();
             if (optNext.isPresent()) {
                 return paginations.keys().stream()
@@ -209,9 +179,8 @@ public class LanternPaginationService implements PaginationService {
                         .filter(new StartsWithPredicate(optNext.get()))
                         .collect(GuavaCollectors.toImmutableList());
             } else {
-                return ImmutableList.copyOf(Iterables.transform(paginations.keys(), Functions.toStringFunction()));
+                return ImmutableList.copyOf(Iterables.transform(paginations.keys(), Object::toString));
             }
         }
     }
-
 }

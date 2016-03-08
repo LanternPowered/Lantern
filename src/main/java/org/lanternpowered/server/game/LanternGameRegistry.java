@@ -136,6 +136,7 @@ import org.spongepowered.api.entity.ai.task.AbstractAITask;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
@@ -741,6 +742,11 @@ public class LanternGameRegistry implements GameRegistry {
     @Override
     public ValueFactory getValueFactory() {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public VillagerRegistry getVillagerRegistry() {
         return null;
     }
 

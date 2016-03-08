@@ -264,7 +264,7 @@ public final class LanternWorldManager {
             return false;
         }
         // Post the unload world event
-        this.game.getEventManager().post(SpongeEventFactory.createUnloadWorldEvent(Cause.of(this), world));
+        this.game.getEventManager().post(SpongeEventFactory.createUnloadWorldEvent(Cause.source(LanternGame.plugin()).build(), world));
         // Save all the world data
         world0.shutdown();
         // Remove the tick task

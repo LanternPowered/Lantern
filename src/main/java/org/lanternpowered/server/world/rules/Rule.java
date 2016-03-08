@@ -112,7 +112,7 @@ public final class Rule<T> {
                 newRawValue = this.ruleType.getDataType().serialize(newValue);
             }
             if (cause == null) {
-                cause = Cause.of(world);
+                cause = Cause.source(LanternGame.plugin()).owner(world).build();
             }
             ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(
                     cause, this.getRawValue(), newRawValue, this.ruleType.getName(), world);

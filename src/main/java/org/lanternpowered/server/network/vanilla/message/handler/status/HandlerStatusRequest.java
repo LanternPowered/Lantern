@@ -42,6 +42,7 @@ import org.lanternpowered.server.status.LanternStatusResponse;
 import org.lanternpowered.server.status.LanternStatusResponsePlayers;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.spongepowered.api.MinecraftVersion;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
@@ -77,10 +78,10 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         LanternMinecraftVersion version = new LanternMinecraftVersion(String.valueOf(protocol), protocol, false);
         LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
         LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(server.getOnlinePlayers()
-        		.stream().map(p -> p.getProfile()).collect(Collectors.toList()), online, max);
+        		.stream().map(User::getProfile).collect(Collectors.toList()), online, max);
         LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
-        ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.of(client), client, response);
+        ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
 
         // Cancelled, we are done here
         if (event.isCancelled()) {

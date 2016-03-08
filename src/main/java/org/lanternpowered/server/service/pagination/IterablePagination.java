@@ -25,14 +25,15 @@
  */
 package org.lanternpowered.server.service.pagination;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.PeekingIterator;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.text.channel.MessageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,8 @@ class IterablePagination extends ActivePagination {
     private final PeekingIterator<Map.Entry<Text, Integer>> countIterator;
     private int lastPage;
 
-    public IterablePagination(CommandSource src, PaginationCalculator<CommandSource> calc, Iterable<Map.Entry<Text, Integer>> counts,
-            @Nullable Text title, @Nullable Text header, @Nullable Text footer, String padding) {
+    public IterablePagination(MessageReceiver src, PaginationCalculator calc, Iterable<Map.Entry<Text, Integer>> counts, Text title,
+            Text header, Text footer, Text padding) {
         super(src, calc, title, header, footer, padding);
         this.countIterator = Iterators.peekingIterator(counts.iterator());
     }
@@ -57,11 +58,11 @@ class IterablePagination extends ActivePagination {
     @Override
     protected Iterable<Text> getLines(int page) throws CommandException {
         if (!this.countIterator.hasNext()) {
-            throw new CommandException(Text.of("Already at end of iterator"));
+            throw new CommandException(t("Already at end of iterator"));
         }
 
         if (page <= this.lastPage) {
-            throw new CommandException(Text.of("Cannot go backward in an IterablePagination"));
+            throw new CommandException(t("Cannot go backward in an IterablePagination"));
         } else if (page > this.lastPage + 1) {
             getLines(page - 1);
         }
@@ -69,10 +70,11 @@ class IterablePagination extends ActivePagination {
 
         if (getMaxContentLinesPerPage() <= 0) {
             return Lists.newArrayList(Iterators.transform(this.countIterator, new Function<Map.Entry<Text, Integer>, Text>() {
+
                 @Nullable
                 @Override
-                public Text apply(@Nullable Map.Entry<Text, Integer> input) {
-                    return input == null ? null : input.getKey();
+                public Text apply(Map.Entry<Text, Integer> input) {
+                    return input.getKey();
                 }
             }));
         }
@@ -110,7 +112,6 @@ class IterablePagination extends ActivePagination {
 
     @Override
     public void previousPage() throws CommandException {
-        throw new CommandException(Text.of("Cannot go backwards in a streaming pagination"));
+        throw new CommandException(t("Cannot go backwards in a streaming pagination"));
     }
-
 }

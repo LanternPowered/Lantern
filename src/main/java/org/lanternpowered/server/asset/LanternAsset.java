@@ -23,42 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.asset;
 
-import com.google.common.base.MoreObjects;
+import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public abstract class AbstractPluginContainer implements PluginContainer {
+import java.net.URL;
 
-    protected AbstractPluginContainer() {
+public final class LanternAsset implements Asset {
+
+    final PluginContainer plugin;
+    final URL url;
+
+    protected LanternAsset(PluginContainer plugin, URL url) {
+        this.plugin = plugin;
+        this.url = url;
     }
 
     @Override
-    public String getUnqualifiedId() {
-        return this.getId();
-    }
-
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return MoreObjects.toStringHelper("Plugin")
-                .omitNullValues()
-                .add("id", this.getId())
-                .add("name", this.getName())
-                .add("version", this.getVersion().orElse(null))
-                .add("description", this.getDescription().orElse(null))
-                .add("assets", getAssetDirectory().orElse(null))
-                .add("url", this.getUrl().orElse(null))
-                .add("authors", this.getAuthors().isEmpty() ? null : this.getAuthors())
-                .add("source", this.getSource().orElse(null));
+    public PluginContainer getOwner() {
+        return this.plugin;
     }
 
     @Override
-    public final String toString() {
-        return this.toStringHelper().toString();
-    }
-
-    public static String getUnqualifiedId(String id) {
-        int pos = id.lastIndexOf('.');
-        return pos >= 0 ? id.substring(pos + 1) : id;
+    public URL getUrl() {
+        return this.url;
     }
 
 }

@@ -37,7 +37,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.service.pagination.PaginationBuilder;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -90,7 +90,8 @@ public final class CommandHelp {
                     Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
 
                     if (paginate) {
-                        PaginationBuilder builder = Sponge.getServiceManager().provide(PaginationService.class).get().builder();
+                        PaginationList.Builder builder = Sponge.getGame().getServiceManager()
+                                .provide(PaginationService.class).get().builder();
                         builder.title(title);
                         builder.contents(lines);
                         builder.sendTo(src);

@@ -41,7 +41,7 @@ public final class HandlerPlayInClientSettings implements Handler<MessagePlayInC
     public void handle(NetworkContext context, MessagePlayInClientSettings message) {
         LanternPlayer player = context.getSession().getPlayer();
         PlayerChangeClientSettingsEvent event = SpongeEventFactory.createPlayerChangeClientSettingsEvent(
-                Cause.of(player), message.getChatVisibility(), LanternSkinPart.fromBitPattern(message.getSkinPartsBitPattern()),
+                Cause.source(player).build(), message.getChatVisibility(), LanternSkinPart.fromBitPattern(message.getSkinPartsBitPattern()),
                 message.getLocale(), player, message.getEnableColors(), message.getViewDistance());
         Sponge.getEventManager().post(event);
         player.setLocale(event.getLocale());

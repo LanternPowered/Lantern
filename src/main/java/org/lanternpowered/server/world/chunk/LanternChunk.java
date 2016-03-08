@@ -1515,7 +1515,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean loadChunk(boolean generate) {
-        if (this.world.getChunkManager().load(this, () -> Cause.of(this.world, this), generate)) {
+        if (this.world.getChunkManager().load(this, () -> Cause.source(this.world).named("chunk", this).build(), generate)) {
             this.loaded = true;
             return true;
         }
@@ -1524,7 +1524,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean unloadChunk() {
-        if (this.world.getChunkManager().unload(this, () -> Cause.of(this.world, this))) {
+        if (this.world.getChunkManager().unload(this, () -> Cause.source(this.world).named("chunk", this).build())) {
             this.loaded = false;
             return true;
         }

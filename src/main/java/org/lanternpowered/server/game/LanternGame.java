@@ -27,6 +27,7 @@ package org.lanternpowered.server.game;
 
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.asset.LanternAssetManager;
 import org.lanternpowered.server.command.CommandBan;
 import org.lanternpowered.server.command.CommandBorder;
 import org.lanternpowered.server.command.CommandDeop;
@@ -80,6 +81,7 @@ import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.data.property.PropertyRegistry;
@@ -243,6 +245,9 @@ public class LanternGame implements Game {
     // The serialization service 
     private LanternDataManager dataManager;
 
+    // The asset manager
+    private LanternAssetManager assetManager;
+
     // The config manager
     private ConfigManager configManager;
 
@@ -291,6 +296,7 @@ public class LanternGame implements Game {
         this.apiContainer = new SpongeApiContainer();
         this.implContainer = new LanternServerContainer();
         this.platform = new LanternPlatform(this.apiContainer, this.implContainer);
+        this.assetManager = new LanternAssetManager();
 
         // Pre register some game objects
         this.gameRegistry = new LanternGameRegistry(this);
@@ -359,7 +365,7 @@ public class LanternGame implements Game {
 
         this.registerService(UserStorageService.class, new LanternUserStorageService());
         // Register the pagination service
-        this.registerService(PaginationService.class, new LanternPaginationService(this));
+        this.registerService(PaginationService.class, new LanternPaginationService());
 
         // Register the command service
         this.commandManager = new LanternCommandManager(this.getLogger(), new LanternCommandDisambiguator(this));
@@ -387,7 +393,7 @@ public class LanternGame implements Game {
         this.teleportHelper = new LanternTeleportHelper();
 
         // Call the construction events
-        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(Cause.of(this),
+        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(Cause.source(this).build(),
                 GameState.CONSTRUCTION));
 
         // Load the plugin instances
@@ -408,7 +414,7 @@ public class LanternGame implements Game {
 
         // Pre-init phase
         this.setGameState(GameState.PRE_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(Cause.of(this),
+        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(Cause.source(this).build(),
                 GameState.PRE_INITIALIZATION));
 
         // Create the default sql service
@@ -456,7 +462,7 @@ public class LanternGame implements Game {
 
         // Init phase
         this.setGameState(GameState.INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(Cause.of(this),
+        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(Cause.source(this).build(),
                 GameState.INITIALIZATION));
 
         // Call post init phase for registry
@@ -464,12 +470,12 @@ public class LanternGame implements Game {
 
         // Post-init phase
         this.setGameState(GameState.POST_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(Cause.of(this),
+        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(Cause.source(this).build(),
                 GameState.POST_INITIALIZATION));
 
         // Load-complete phase
         this.setGameState(GameState.LOAD_COMPLETE);
-        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(Cause.of(this),
+        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(Cause.source(this).build(),
                 GameState.LOAD_COMPLETE));
     }
 
@@ -553,6 +559,11 @@ public class LanternGame implements Game {
     @Override
     public EventManager getEventManager() {
         return this.eventManager;
+    }
+
+    @Override
+    public AssetManager getAssetManager() {
+        return this.assetManager;
     }
 
     @Override

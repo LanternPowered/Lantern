@@ -114,7 +114,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
         this.server.onChannelActive(channel, source);
 
-        RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(Cause.of(source), source);
+        RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(Cause.source(source).build(), source);
         LanternGame.get().getEventManager().post(event);
     }
 
@@ -123,7 +123,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         Channel channel = ctx.channel();
         RconSource source = channel.attr(SOURCE).getAndRemove();
 
-        RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(Cause.of(source), source);
+        RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(Cause.source(source).build(), source);
         LanternGame.get().getEventManager().post(event);
 
         this.server.onChannelInactive(channel, source);
@@ -132,7 +132,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {
         RconSource source = ctx.channel().attr(SOURCE).get();
         if (password.equals(payload)) {
-            RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(Cause.of(source), source);
+            RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(Cause.source(source).build(), source);
 
             if (!LanternGame.get().getEventManager().post(event)) {
                 source.setLoggedIn(true);

@@ -257,6 +257,14 @@ public class LanternCommandManager implements CommandManager {
             return event.getResult();
         }
 
+        // Only the first part of argSplit is used at the moment, do the other in the future if needed.
+        argSplit[0] = event.getCommand();
+
+        commandLine = event.getCommand();
+        if (!event.getArguments().isEmpty()) {
+            commandLine = commandLine + ' ' + event.getArguments();
+        }
+
         try {
             try {
                 return this.dispatcher.process(source, commandLine);
@@ -275,16 +283,18 @@ public class LanternCommandManager implements CommandManager {
                     source.sendMessage(error(text));
                 }
 
-                final Optional<CommandMapping> mapping = this.dispatcher.get(argSplit[0], source);
-                if (mapping.isPresent()) {
-                    source.sendMessage(error(t("Usage: /%s %s", argSplit[0], mapping.get().getCallable().getUsage(source))));
+                if (ex.shouldIncludeUsage()) {
+                    final Optional<CommandMapping> mapping = this.dispatcher.get(argSplit[0], source);
+                    if (mapping.isPresent()) {
+                        source.sendMessage(error(t("Usage: /%s %s", argSplit[0], mapping.get().getCallable().getUsage(source))));
+                    }
                 }
             }
         } catch (Throwable thr) {
             Text.Builder excBuilder;
             if (thr instanceof TextMessageException) {
                 Text text = ((TextMessageException) thr).getText();
-                excBuilder = text == null ? Text.builder("null") : text.builder();
+                excBuilder = text == null ? Text.builder("null") : Text.builder();
             } else {
                 excBuilder = Text.builder(String.valueOf(thr.getMessage()));
             }
@@ -308,7 +318,7 @@ public class LanternCommandManager implements CommandManager {
         try {
             final String[] argSplit = arguments.split(" ", 2);
             List<String> suggestions = new ArrayList<>(this.dispatcher.getSuggestions(src, arguments));
-            final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.of(src),
+            final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.source(src).build(),
                     ImmutableList.copyOf(suggestions), suggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0], arguments);
             Sponge.getGame().getEventManager().post(event);
             if (event.isCancelled()) {

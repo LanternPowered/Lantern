@@ -71,10 +71,11 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
         context.writeVarInt(buf, type);
         context.writeVarInt(buf, entries.size());
         for (Entry entry : entries) {
+            context.write(buf, Types.UNIQUE_ID, entry.getGameProfile().getUniqueId());
             switch (type) {
                 case ADD:
-                    context.write(buf, Types.STRING, entry.getName());
-                    Collection<ProfileProperty> properties = entry.getProperties();
+                    context.write(buf, Types.STRING, entry.getGameProfile().getName().orElse("unknown"));
+                    Collection<ProfileProperty> properties = entry.getGameProfile().getPropertyMap().values();
                     context.writeVarInt(buf, properties.size());
                     for (ProfileProperty property : properties) {
                         context.write(buf, Types.STRING, property.getName());

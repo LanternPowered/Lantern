@@ -29,145 +29,129 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.entity.living.player.tab.LanternPlayerTabInfo.UpdateEntry;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries.Entry;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListHeaderAndFooter;
-import org.spongepowered.api.entity.living.player.tab.PlayerTabInfo;
 import org.spongepowered.api.entity.living.player.tab.TabList;
+import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-@NonnullByDefault
+import javax.annotation.Nullable;
+
 public class LanternTabList implements TabList {
 
-    final Deque<LanternPlayerTabInfo.UpdateEntry> updateEntries = new ArrayDeque<>();
-
-    private final List<LanternPlayerTabInfo> infoEntries = Lists.newArrayList();
     private final LanternPlayer player;
 
-    private Text header = Text.EMPTY;
-    private Text footer = Text.EMPTY;
+    private final Map<UUID, LanternTabListEntry> tabListEntries = new ConcurrentHashMap<>();
+    private Optional<Text> header;
+    private Optional<Text> footer;
 
     public LanternTabList(LanternPlayer player) {
         this.player = player;
     }
 
-    void pulse() {
-        List<Entry> entries = null;
+    /**
+     * Initializes the {@link TabList} for the player and sends
+     * the initial entries as a bulk.
+     *
+     * @param entries the entries
+     */
+    public void init(List<LanternTabListEntry> entries) {
+        if (entries.isEmpty()) {
+            return;
+        }
+        List<MessagePlayOutTabListEntries.Entry> messageEntries = new ArrayList<>();
+        entries.forEach(e -> {
+            checkArgument(e.getList() == this, "Tab list entry targets the wrong tab list!");
+            this.tabListEntries.put(e.getProfile().getUniqueId(), e);
+            messageEntries.add(new MessagePlayOutTabListEntries.Entry.Add(e.getProfile(), e.getGameMode(),
+                    e.getDisplayName().orElse(null), e.getLatency()));
+        });
+        this.player.getConnection().send(new MessagePlayOutTabListEntries(messageEntries));
+        this.sendHeaderAndFooterUpdate();
+    }
 
-        LanternPlayerTabInfo.UpdateEntry entry;
-        while ((entry = this.updateEntries.poll()) != null) {
-            if (entries == null) {
-                entries = Lists.newArrayList();
-            }
-            if (!entry.tabInfo.tabLists.contains(this)) {
-                continue;
-            }
-            if (entry.entryCache != null) {
-                entries.addAll(entry.entryCache);
-            } else {
-                List<Entry> entries0 = Lists.newArrayList();
-                LanternPlayerTabInfo info = entry.tabInfo;
-                if (entry.remove) {
-                    entries.add(new Entry.Remove(info.uniqueId));
-                } else if (entry.gameProfileOrName) {
-                    entries0.add(new Entry.Add(info.uniqueId, info.name,
-                            info.gameProfile.getPropertyMap().values(), info.gameMode,
-                            info.displayName, info.latency));
-                } else {
-                    if (entry.gameMode) {
-                        entries0.add(new Entry.UpdateGameMode(info.uniqueId, info.gameMode));
-                    }
-                    if (entry.displayName) {
-                        entries0.add(new Entry.UpdateDisplayName(info.uniqueId, info.displayName));
-                    }
-                    if (entry.latency) {
-                        entries0.add(new Entry.UpdateLatency(info.uniqueId, info.latency));
-                    }
-                }
-                entry.entryCache = entries0;
-                info.updateEntry = null;
-                entries.addAll(entries0);
-            }
-        }
-        if (entries != null) {
-            this.player.getConnection().send(new MessagePlayOutTabListEntries(entries));
-        }
+    private void sendHeaderAndFooterUpdate() {
+        this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header.orElse(Text.of()), this.footer.orElse(Text.of())));
     }
 
     @Override
-    public Text getHeader() {
+    public LanternPlayer getPlayer() {
+        return this.player;
+    }
+
+    @Override
+    public Optional<Text> getHeader() {
         return this.header;
     }
 
     @Override
-    public void setHeader(Text header) {
-        this.header = checkNotNull(header, "header");
-        this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header, this.footer));
+    public LanternTabList setHeader(@Nullable Text header) {
+        this.header = Optional.ofNullable(header);
+        this.sendHeaderAndFooterUpdate();
+        return this;
     }
 
     @Override
-    public Text getFooter() {
+    public Optional<Text> getFooter() {
         return this.footer;
     }
 
     @Override
-    public void setFooter(Text footer) {
-        this.footer = checkNotNull(footer, "footer");
-        this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header, this.footer));
+    public LanternTabList setFooter(@Nullable Text footer) {
+        this.footer = Optional.ofNullable(footer);
+        this.sendHeaderAndFooterUpdate();
+        return this;
     }
 
     @Override
-    public List<PlayerTabInfo> getPlayers() {
-        return ImmutableList.copyOf(this.infoEntries);
+    public LanternTabList setHeaderAndFooter(@Nullable Text header, @Nullable Text footer) {
+        this.header = Optional.ofNullable(header);
+        this.footer = Optional.ofNullable(footer);
+        this.sendHeaderAndFooterUpdate();
+        return this;
     }
 
     @Override
-    public void addPlayer(PlayerTabInfo player) throws IllegalArgumentException {
-        LanternPlayerTabInfo info = (LanternPlayerTabInfo) checkNotNull(player, "player");
-        checkArgument(!this.getPlayer(info.uniqueId).isPresent(),
-                "Already a player present with uniqueId " + info.uniqueId);
-        info.tabLists.add(this);
-        this.infoEntries.add(info);
-        UpdateEntry entry = new UpdateEntry(info);
-        entry.gameProfileOrName = true;
-        this.updateEntries.add(entry);
+    public Collection<TabListEntry> getEntries() {
+        return ImmutableList.copyOf(this.tabListEntries.values());
     }
 
     @Override
-    public LanternPlayerTabInfo removePlayer(UUID playerId) {
-        checkNotNull(playerId, "playerId");
-        LanternPlayerTabInfo info = (LanternPlayerTabInfo) this.getPlayer(playerId).orElse(null);
-        if (info != null) {
-            this.removeInfo(info);
-        }
-        return info;
-    }
-
-    void removeInfo(LanternPlayerTabInfo info) {
-        info.tabLists.remove(this);
-        this.infoEntries.remove(info);
-        UpdateEntry entry = new UpdateEntry(info);
-        entry.remove = true;
-        this.updateEntries.add(entry);
+    public Optional<TabListEntry> getEntry(UUID uniqueId) {
+        return Optional.ofNullable(this.tabListEntries.get(checkNotNull(uniqueId, "uniqueId")));
     }
 
     @Override
-    public Optional<PlayerTabInfo> getPlayer(UUID playerId) {
-        checkNotNull(playerId, "playerId");
-        for (LanternPlayerTabInfo info : this.infoEntries) {
-            if (info.uniqueId.equals(playerId)) {
-                return Optional.of(info);
-            }
+    public TabList addEntry(TabListEntry entry) throws IllegalArgumentException {
+        checkNotNull(entry, "entry");
+        UUID uniqueId = entry.getProfile().getUniqueId();
+        checkArgument(entry.getList() == this,
+                "The tab list entries #getList() list does not match to this list.");
+        checkArgument(!this.tabListEntries.containsKey(uniqueId),
+                "There is already a tab list entry assigned with the unique id: " + uniqueId.toString());
+        this.tabListEntries.put(uniqueId, (LanternTabListEntry) entry);
+        this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(new MessagePlayOutTabListEntries.Entry.Add(
+                entry.getProfile(), entry.getGameMode(), entry.getDisplayName().orElse(null), entry.getLatency()))));
+        ((LanternTabListEntry) entry).attached = true;
+        return this;
+    }
+
+    @Override
+    public Optional<TabListEntry> removeEntry(UUID uniqueId) {
+        LanternTabListEntry entry = this.tabListEntries.remove(uniqueId);
+        if (entry != null) {
+            entry.attached = false;
+            return Optional.of(entry);
         }
         return Optional.empty();
     }

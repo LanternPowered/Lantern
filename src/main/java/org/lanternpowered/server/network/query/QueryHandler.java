@@ -56,6 +56,7 @@ import io.netty.channel.socket.DatagramPacket;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -150,7 +151,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
         // TODO: Find out how to support the size and max size properties
         final QueryServerEvent.Basic event = SpongeEventFactory.createQueryServerEventBasic(
-                Cause.of(ctx.channel().remoteAddress()), (InetSocketAddress) ctx.channel().localAddress(),
+                Cause.source(ctx.channel().remoteAddress()).build(), (InetSocketAddress) ctx.channel().localAddress(),
                 "SMP", this.getWorldName(), server.getMotd().toPlain(), server.getMaxPlayers(),
                 Integer.MAX_VALUE, server.getOnlinePlayers().size(), 0);
         LanternGame.get().getEventManager().post(event);
@@ -197,9 +198,9 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         }
 
         final QueryServerEvent.Full event = SpongeEventFactory.createQueryServerEventFull(
-                Cause.of(ctx.channel().remoteAddress()), (InetSocketAddress) ctx.channel().localAddress(), Maps.newHashMap(), "MINECRAFT",
-                "SMP", this.getWorldName(), game.getServer().getMotd().toPlain(), game.getServer().getOnlinePlayers()
-                .stream().map(p -> p.getName()).collect(Collectors.toList()), plugins.toString(),
+                Cause.source(ctx.channel().remoteAddress()).build(), (InetSocketAddress) ctx.channel().localAddress(), Maps.newHashMap(),
+                "MINECRAFT", "SMP", this.getWorldName(), game.getServer().getMotd().toPlain(), game.getServer().getOnlinePlayers()
+                .stream().map(CommandSource::getName).collect(Collectors.toList()), plugins.toString(),
                 game.getMinecraftPlugin().getVersion().orElse("unknown"),
                 game.getServer().getMaxPlayers(), Integer.MAX_VALUE, game.getServer().getOnlinePlayers().size(), 0);
         final InetSocketAddress address = event.getAddress();
@@ -215,11 +216,8 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         data.put("maxplayers", event.getMaxPlayerCount());
         data.put("hostport", address.getPort());
         data.put("hostip", address.getHostString());
-        for (Entry<String, String> entry : event.getCustomValuesMap().entrySet()) {
-            if (!data.containsKey(entry.getKey())) {
-                data.put(entry.getKey(), entry.getValue());
-            }
-        }
+        event.getCustomValuesMap().entrySet().stream().filter(entry -> !data.containsKey(entry.getKey()))
+                .forEach(entry -> data.put(entry.getKey(), entry.getValue()));
 
         ByteBuf buf = ctx.alloc().buffer();
         buf.writeByte(ACTION_STATS);

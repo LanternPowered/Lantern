@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ListenableFuture;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import org.lanternpowered.server.config.GlobalConfig;
@@ -43,7 +42,6 @@ import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.BaseRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
-import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
@@ -311,10 +309,10 @@ public class LanternServer implements Server {
         this.worldManager.init();
 
         this.game.setGameState(GameState.SERVER_ABOUT_TO_START);
-        this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(Cause.of(this.game),
+        this.game.getEventManager().post(SpongeEventFactory.createGameAboutToStartServerEvent(Cause.source(this.game).build(),
                 GameState.SERVER_ABOUT_TO_START));
         this.game.setGameState(GameState.SERVER_STARTING);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(Cause.of(this.game), 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartingServerEvent(Cause.source(this.game).build(),
                 GameState.SERVER_STARTING));
 
         final GlobalConfig config = this.game.getGlobalConfig();
@@ -339,7 +337,7 @@ public class LanternServer implements Server {
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
         this.game.setGameState(GameState.SERVER_STARTED);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(Cause.of(this.game), 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStartedServerEvent(Cause.source(this.game).build(),
                 GameState.SERVER_STARTED));
     }
 
@@ -576,7 +574,7 @@ public class LanternServer implements Server {
         this.shuttingDown = true;
 
         this.game.setGameState(GameState.SERVER_STOPPING);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(Cause.of(this.game), 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(Cause.source(this.game).build(),
                 GameState.SERVER_STOPPING));
 
         // Debug a message
@@ -620,7 +618,7 @@ public class LanternServer implements Server {
         });
 
         // Shutdown the game profile manager
-        this.game.getGameProfileManager().shutdown();
+        this.game.getGameProfileManager().getDefaultCache().save();
 
         try {
             this.game.getOpsConfig().save();
@@ -639,7 +637,7 @@ public class LanternServer implements Server {
         }
 
         this.game.setGameState(GameState.SERVER_STOPPED);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(Cause.of(this.game), 
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppedServerEvent(Cause.source(this.game).build(),
                 GameState.SERVER_STOPPED));
 
         // Wait for a while and terminate any rogue threads

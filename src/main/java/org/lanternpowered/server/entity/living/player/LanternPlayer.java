@@ -64,6 +64,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.living.player.tab.TabList;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
@@ -445,12 +446,12 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public void openInventory(Inventory inventory) {
+    public void openInventory(Inventory inventory, Cause cause) {
 
     }
 
     @Override
-    public void closeInventory() {
+    public void closeInventory(Cause cause) {
 
     }
 

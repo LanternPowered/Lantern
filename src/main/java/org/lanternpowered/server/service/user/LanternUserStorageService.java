@@ -68,7 +68,7 @@ public class LanternUserStorageService implements UserStorageService {
     private static User findByUsername(String username) {
         final LanternGameProfileManager gameProfileManager = LanternGame.get()
                 .getGameProfileManager();
-        Optional<GameProfile> gameProfile = gameProfileManager.getCachedProfile(username);
+        Optional<GameProfile> gameProfile = gameProfileManager.getCache().getByName(username);
         if (gameProfile.isPresent()) {
             return findByUUID(gameProfile.get().getUniqueId());
         }

@@ -31,9 +31,11 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.value.BaseValue;
 
 import java.util.Optional;
 
@@ -66,6 +68,15 @@ public class LanternBlockStateBuilder implements BlockState.Builder {
     @Override
     public LanternBlockStateBuilder add(ImmutableDataManipulator<?, ?> manipulator) {
         final Optional<BlockState> optional = this.blockState.with(manipulator);
+        if (optional.isPresent()) {
+            this.blockState = optional.get();
+        }
+        return this;
+    }
+
+    @Override
+    public <V> BlockState.Builder add(Key<? extends BaseValue<V>> key, V value) {
+        final Optional<BlockState> optional = this.blockState.with(key, value);
         if (optional.isPresent()) {
             this.blockState = optional.get();
         }

@@ -28,24 +28,22 @@ package org.lanternpowered.server.service.pagination;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.pagination.PaginationCalculator;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
 /**
  * Pagination working with a list of values.
  */
 class ListPagination extends ActivePagination {
+
     private final List<List<Text>> pages;
 
-    public ListPagination(CommandSource src, PaginationCalculator<CommandSource> calc, List<Map.Entry<Text, Integer>> lines,
-            @Nullable Text title, @Nullable Text header, @Nullable Text footer, String padding) {
+    public ListPagination(MessageReceiver src, PaginationCalculator calc, List<Map.Entry<Text, Integer>> lines,
+            Text title, Text header, Text footer, Text padding) {
         super(src, calc, title, header, footer, padding);
         List<List<Text>> pages = new ArrayList<>();
         List<Text> currentPage = new ArrayList<>();
@@ -90,5 +88,4 @@ class ListPagination extends ActivePagination {
     protected int getTotalPages() {
         return this.pages.size();
     }
-
 }

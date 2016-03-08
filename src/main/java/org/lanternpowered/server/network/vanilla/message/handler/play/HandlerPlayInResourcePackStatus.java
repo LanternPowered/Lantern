@@ -53,6 +53,6 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
         }
         Session session = context.getSession();
         LanternGame.get().getEventManager().post(SpongeEventFactory.createResourcePackStatusEvent(
-                Cause.of(session.getPlayer()), resourcePack.get(), session.getPlayer(), message.getStatus()));
+                Cause.source(session.getPlayer()).build(), resourcePack.get(), session.getPlayer(), message.getStatus()));
     }
 }

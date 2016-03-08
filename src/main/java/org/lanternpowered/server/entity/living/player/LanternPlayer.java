@@ -234,6 +234,10 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                     (float) rotation.getY(), (float) rotation.getX(), 0, 0));
         } else {
             this.session.getServer().removePlayer(this);
+            // Remove this player from all the tab lists
+            for (Player player : Sponge.getServer().getOnlinePlayers()) {
+                player.getTabList().removeEntry(this.getProfile().getUniqueId());
+            }
         }
     }
 

@@ -150,7 +150,7 @@ public class LanternTabList implements TabList {
 
     @Override
     public Optional<TabListEntry> removeEntry(UUID uniqueId) {
-        LanternTabListEntry entry = this.tabListEntries.remove(uniqueId);
+        LanternTabListEntry entry = this.tabListEntries.remove(checkNotNull(uniqueId, "uniqueId"));
         if (entry != null) {
             entry.attached = false;
             return Optional.of(entry);

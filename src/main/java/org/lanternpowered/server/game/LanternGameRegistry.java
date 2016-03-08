@@ -40,6 +40,7 @@ import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
+import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
@@ -135,6 +136,7 @@ import org.spongepowered.api.entity.ai.task.AITaskType;
 import org.spongepowered.api.entity.ai.task.AbstractAITask;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
@@ -282,6 +284,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(BlockParticle.Builder.class, LanternParticleEffectBuilder.Block::new)
                 .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(LanternGame.get().getScheduler()))
                 .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
+                .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)
                 ;
         this.registerFactories();
     }

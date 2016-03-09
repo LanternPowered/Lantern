@@ -65,6 +65,7 @@ import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.WallTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
+import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
@@ -155,6 +156,7 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
+import org.spongepowered.api.service.economy.transaction.TransactionType;
 import org.spongepowered.api.statistic.BlockStatistic;
 import org.spongepowered.api.statistic.EntityStatistic;
 import org.spongepowered.api.statistic.ItemStatistic;
@@ -248,6 +250,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(ShrubType.class, new ShrubTypeRegistryModule())
                 .registerModule(StoneType.class, new StoneTypeRegistryModule())
                 .registerModule(WallType.class, new WallTypeRegistryModule())
+                .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())

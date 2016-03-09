@@ -23,65 +23,57 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.world;
+package org.lanternpowered.server.game.registry.type.economy;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.game.registry.RegistryModuleHelper.validateIdentifier;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
+import org.lanternpowered.server.economy.LanternTransactionType;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.world.gen.WorldGeneratorModifier;
-import org.spongepowered.api.world.gen.WorldGeneratorModifiers;
+import org.spongepowered.api.service.economy.transaction.TransactionType;
+import org.spongepowered.api.service.economy.transaction.TransactionTypes;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public final class GeneratorModifierRegistryModule implements AdditionalCatalogRegistryModule<WorldGeneratorModifier>,
-        AlternateCatalogRegistryModule<WorldGeneratorModifier> {
+public final class TransactionTypeRegistryModule implements AdditionalCatalogRegistryModule<TransactionType> {
 
-    @RegisterCatalog(WorldGeneratorModifiers.class) private final Map<String, WorldGeneratorModifier> generatorModifiers = Maps.newHashMap();
-
-    @Override
-    public Map<String, WorldGeneratorModifier> provideCatalogMap() {
-        Map<String, WorldGeneratorModifier> mappings = Maps.newHashMap();
-        for (WorldGeneratorModifier type : this.generatorModifiers.values()) {
-            mappings.put(type.getName(), type);
-        }
-        return mappings;
-    }
-
-    @Override
-    public void registerAdditionalCatalog(WorldGeneratorModifier modifier) {
-        checkNotNull(modifier, "modifier");
-        final String id = modifier.getId();
-        validateIdentifier(id);
-        checkState(!this.generatorModifiers.containsKey(id),
-                "There is already a generator modifiers registered with the id. (" + id + ")");
-        this.generatorModifiers.put(id, modifier);
-    }
+    @RegisterCatalog(TransactionTypes.class)
+    private final Map<String, TransactionType> transactionTypes = Maps.newHashMap();
 
     @Override
     public void registerDefaults() {
-        this.registerAdditionalCatalog(new SkylandsWorldGeneratorModifier());
+        List<TransactionType> types = Lists.newArrayList();
+        types.add(new LanternTransactionType("deposit"));
+        types.add(new LanternTransactionType("withdraw"));
+        types.add(new LanternTransactionType("transfer"));
+        types.forEach(type -> this.transactionTypes.put(type.getId(), type));
     }
 
     @Override
-    public Optional<WorldGeneratorModifier> getById(String id) {
-        if (checkNotNull(id).indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.generatorModifiers.get(id.toLowerCase()));
+    public Optional<TransactionType> getById(String id) {
+        return Optional.ofNullable(this.transactionTypes.get(checkNotNull(id).toLowerCase()));
     }
 
     @Override
-    public Collection<WorldGeneratorModifier> getAll() {
-        return ImmutableSet.copyOf(this.generatorModifiers.values());
+    public Collection<TransactionType> getAll() {
+        return ImmutableSet.copyOf(this.transactionTypes.values());
     }
 
+    @Override
+    public void registerAdditionalCatalog(TransactionType transactionType) {
+        checkNotNull(transactionType, "transactionType");
+        String id = transactionType.getId();
+        validateIdentifier(id);
+        checkState(!this.transactionTypes.containsKey(id),
+                "There is already a transaction type registered with the id. (" + id + ")");
+        this.transactionTypes.put(id, transactionType);
+    }
 }

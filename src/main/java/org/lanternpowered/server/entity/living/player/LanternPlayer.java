@@ -194,15 +194,12 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                 this.session.send(new MessagePlayInOutBrand(LanternGame.IMPL_NAME));
                 // Send the player list
                 List<LanternTabListEntry> tabListEntries = new ArrayList<>();
+                LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);
                 for (Player player : Sponge.getServer().getOnlinePlayers()) {
-                    LanternTabListEntryBuilder builder = new LanternTabListEntryBuilder()
-                            .profile(player.getProfile())
-                            .displayName(Text.of(player.getName())) // TODO
-                            .gameMode(GameModes.CREATIVE) // TODO
-                            .latency(player.getConnection().getLatency());
+                    LanternTabListEntryBuilder builder = player == this ? thisBuilder : createTabListEntryBuilder((LanternPlayer) player);
                     tabListEntries.add(builder.list(this.tabList).build());
                     if (player != this) {
-                        player.getTabList().addEntry(builder.list(player.getTabList()).build());
+                        player.getTabList().addEntry(thisBuilder.list(player.getTabList()).build());
                     }
                 }
                 this.tabList.init(tabListEntries);
@@ -239,6 +236,14 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                 player.getTabList().removeEntry(this.getProfile().getUniqueId());
             }
         }
+    }
+
+    private static LanternTabListEntryBuilder createTabListEntryBuilder(LanternPlayer player) {
+        return new LanternTabListEntryBuilder()
+                .profile(player.getProfile())
+                .displayName(Text.of(player.getName())) // TODO
+                .gameMode(GameModes.CREATIVE) // TODO
+                .latency(player.getConnection().getLatency());
     }
 
     @Override

@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.forge.message.handler.handshake;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.netty.util.Attribute;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.handshake.ForgeClientHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
@@ -60,7 +60,7 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                     session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.WAITING_ACK));
                     phase.set(ForgeServerHandshakePhase.COMPLETE);
                 }
-                LanternGame.log().info("{}: Forge handshake -> Received ack (waitingServerData) message.", session.getGameProfile().getName());
+                Lantern.getLogger().info("{}: Forge handshake -> Received ack (waitingServerData) message.", session.getGameProfile().getName());
                 break;
             case COMPLETE:
                 if (!message.getPhase().equals(ForgeClientHandshakePhase.WAITING_SERVER_COMPLETE)) {
@@ -70,7 +70,7 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                     session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.COMPLETE));
                     phase.set(ForgeServerHandshakePhase.DONE);
                 }
-                LanternGame.log().info("{}: Forge handshake -> Received ack (waitingServerComplete) message.", session.getGameProfile().getName());
+                Lantern.getLogger().info("{}: Forge handshake -> Received ack (waitingServerComplete) message.", session.getGameProfile().getName());
                 break;
             case DONE:
                 if (!message.getPhase().equals(ForgeClientHandshakePhase.PENDING_COMPLETE) &&
@@ -81,11 +81,11 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                 } else {
                     if (message.getPhase().equals(ForgeClientHandshakePhase.PENDING_COMPLETE)) {
                         session.send(new MessageForgeHandshakeInOutAck(ForgeServerHandshakePhase.DONE));
-                        LanternGame.log().info("{}: Forge handshake -> Received ack (pendingComplete) message.", session.getGameProfile().getName());
+                        Lantern.getLogger().info("{}: Forge handshake -> Received ack (pendingComplete) message.", session.getGameProfile().getName());
                     } else {
                         session.setProtocolState(ProtocolState.PLAY);
                         session.spawnPlayer();
-                        LanternGame.log().info("{}: Forge handshake -> Received ack (complete) message.", session.getGameProfile().getName());
+                        Lantern.getLogger().info("{}: Forge handshake -> Received ack (complete) message.", session.getGameProfile().getName());
                     }
                 }
                 break;

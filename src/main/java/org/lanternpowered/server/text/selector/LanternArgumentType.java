@@ -28,8 +28,9 @@ package org.lanternpowered.server.text.selector;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.selector.ArgumentType;
 
@@ -43,14 +44,8 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
 
     static {
         converters.put(String.class.getName(), Function.<String>identity());
-        converters.put(EntityType.class.getName(), new Function<String, EntityType>() {
-
-            @Override
-            public EntityType apply(String input) {
-                return LanternGame.get().getRegistry().getType(EntityType.class, input).orElse(null);
-            }
-
-        });
+        converters.put(EntityType.class.getName(), input ->
+                Sponge.getRegistry().getType(EntityType.class, input).orElse(null));
     }
 
     @SuppressWarnings("unchecked")
@@ -62,13 +57,13 @@ public class LanternArgumentType<T> extends LanternArgumentHolder<ArgumentType<T
             } catch (NoSuchMethodException ignored) {
                 if (CatalogType.class.isAssignableFrom(type)) {
                     Class<? extends CatalogType> type2 = type.asSubclass(CatalogType.class);
-                    converters.put(converterKey, input -> (T) LanternGame.get().getRegistry()
+                    converters.put(converterKey, input -> (T) Sponge.getRegistry()
                             .getType(type2, input).get());
                 } else {
                     throw new IllegalStateException("Can't convert " + type);
                 }
             } catch (SecurityException e) {
-                LanternGame.log().warn("There occurred a security exception", e);
+                Lantern.getLogger().warn("There occurred a security exception", e);
             }
         }
         return (Function<String, T>) converters.get(converterKey);

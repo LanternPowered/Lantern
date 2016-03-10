@@ -35,6 +35,7 @@ import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.console.ConsoleManager;
 import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.game.LanternPlatform;
@@ -145,10 +146,10 @@ public class LanternServer implements Server {
             final LanternServer server = new LanternServer(game, consoleManager, rconServer, queryServer);
 
             // Send some startup info
-            LanternGame.log().info("Starting Lantern Server {}", LanternPlatform.IMPL_VERSION.orElse(""));
-            LanternGame.log().info("\tfor Minecraft {} with protocol {}",  LanternMinecraftVersion.CURRENT.getName(),
+            Lantern.getLogger().info("Starting Lantern Server {}", LanternPlatform.IMPL_VERSION.orElse(""));
+            Lantern.getLogger().info("\tfor Minecraft {} with protocol {}",  LanternMinecraftVersion.CURRENT.getName(),
                     LanternMinecraftVersion.CURRENT.getProtocol());
-            LanternGame.log().info("\ton  SpongeAPI {}", LanternPlatform.API_VERSION.orElse(""));
+            Lantern.getLogger().info("\ton  SpongeAPI {}", LanternPlatform.API_VERSION.orElse(""));
 
             // The root world folder
             final Path worldFolder = new File(game.getGlobalConfig().getRootWorldFolder()).toPath();
@@ -165,26 +166,26 @@ public class LanternServer implements Server {
             server.bindRcon();
             // Start the server
             server.start();
-            LanternGame.log().info("Ready for connections.");
+            Lantern.getLogger().info("Ready for connections.");
         } catch (BindException e) {
             // descriptive bind error messages
-            LanternGame.log().error("The server could not bind to the requested address.");
+            Lantern.getLogger().error("The server could not bind to the requested address.");
             if (e.getMessage().startsWith("Cannot assign requested address")) {
-                LanternGame.log().error("The 'server.ip' in your configuration may not be valid.");
-                LanternGame.log().error("Unless you are sure you need it, try removing it.");
-                LanternGame.log().error(e.toString());
+                Lantern.getLogger().error("The 'server.ip' in your configuration may not be valid.");
+                Lantern.getLogger().error("Unless you are sure you need it, try removing it.");
+                Lantern.getLogger().error(e.toString());
             } else if (e.getMessage().startsWith("Address already in use")) {
-                LanternGame.log().error("The address was already in use. Check that no server is");
-                LanternGame.log().error("already running on that port. If needed, try killing all");
-                LanternGame.log().error("Java processes using Task Manager or similar.");
-                LanternGame.log().error(e.toString());
+                Lantern.getLogger().error("The address was already in use. Check that no server is");
+                Lantern.getLogger().error("already running on that port. If needed, try killing all");
+                Lantern.getLogger().error("Java processes using Task Manager or similar.");
+                Lantern.getLogger().error(e.toString());
             } else {
-                LanternGame.log().error("An unknown bind error has occurred.", e);
+                Lantern.getLogger().error("An unknown bind error has occurred.", e);
             }
             System.exit(1);
         } catch (Throwable t) {
             // general server startup crash
-            LanternGame.log().error("Error during server startup.", t);
+            Lantern.getLogger().error("Error during server startup.", t);
             System.exit(1);
         }
     }
@@ -271,7 +272,7 @@ public class LanternServer implements Server {
             throw new RuntimeException("Failed to bind to address", cause);
         }
 
-        LanternGame.log().info("Successfully bound to: " + channel.localAddress());
+        Lantern.getLogger().info("Successfully bound to: " + channel.localAddress());
     }
 
     private void bindQuery() {
@@ -324,7 +325,7 @@ public class LanternServer implements Server {
             try {
                 this.favicon = LanternFavicon.load(faviconFile.toPath());
             } catch (IOException e) {
-                LanternGame.log().error("Failed to load the favicon", e);
+                Lantern.getLogger().error("Failed to load the favicon", e);
             }
         }
 
@@ -332,7 +333,7 @@ public class LanternServer implements Server {
             try {
                 pulse();
             } catch (Exception e) {
-                LanternGame.log().error("Error while pulsing", e);
+                Lantern.getLogger().error("Error while pulsing", e);
             }
         }, 0, LanternGame.TICK_DURATION, TimeUnit.MILLISECONDS);
 
@@ -574,11 +575,12 @@ public class LanternServer implements Server {
         this.shuttingDown = true;
 
         this.game.setGameState(GameState.SERVER_STOPPING);
-        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(Cause.source(this.game).build(),
-                GameState.SERVER_STOPPING));
+        this.game.getEventManager().post(SpongeEventFactory.createGameStoppingServerEvent(
+                Cause.source(this.game).build(), GameState.SERVER_STOPPING));
 
         // Debug a message
-        LanternGame.log().info("Stopping the server... ({})", TextSerializers.LEGACY_FORMATTING_CODE.serialize(kickMessage));
+        Lantern.getLogger().info("Stopping the server... ({})",
+                TextSerializers.LEGACY_FORMATTING_CODE.serialize(kickMessage));
 
         // Stop the console
         this.consoleManager.shutdown();
@@ -612,7 +614,7 @@ public class LanternServer implements Server {
                 try {
                     ((Closeable) service).close();
                 } catch (IOException e) {
-                    LanternGame.log().error("A error occurred while closing the sql service.", e);
+                    Lantern.getLogger().error("A error occurred while closing the sql service.", e);
                 }
             }
         });
@@ -623,17 +625,17 @@ public class LanternServer implements Server {
         try {
             this.game.getOpsConfig().save();
         } catch (IOException e) {
-            LanternGame.log().error("A error occurred while saving the ops config.", e);
+            Lantern.getLogger().error("A error occurred while saving the ops config.", e);
         }
         try {
             this.game.getWhitelistConfig().save();
         } catch (IOException e) {
-            LanternGame.log().error("A error occurred while saving the whitelist config.", e);
+            Lantern.getLogger().error("A error occurred while saving the whitelist config.", e);
         }
         try {
             this.game.getBanConfig().save();
         } catch (IOException e) {
-            LanternGame.log().error("A error occurred while saving the bans config.", e);
+            Lantern.getLogger().error("A error occurred while saving the bans config.", e);
         }
 
         this.game.setGameState(GameState.SERVER_STOPPED);

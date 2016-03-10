@@ -26,7 +26,7 @@
 package org.lanternpowered.server.effect.sound;
 
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;
@@ -38,7 +38,7 @@ public final class LanternSoundCategory extends LanternPluginCatalogType impleme
 
     public LanternSoundCategory(String pluginId, String identifier, int internalId) {
         super(pluginId, identifier);
-        this.translation = LanternGame.get().getRegistry().getTranslationManager()
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager()
                 .get("soundCategory." + identifier);
         this.internalId = internalId;
     }

@@ -30,8 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.launch.LaunchClassLoader;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.plugin.meta.PluginMetadata;
@@ -78,17 +78,17 @@ public final class LanternPluginManager implements PluginManager {
     }
 
     public void loadPlugins(boolean scanClasspath) throws IOException {
-        LanternGame.log().info("Searching for plugins...");
+        this.game.getLogger().info("Searching for plugins...");
 
         PluginScanner pluginScanner = new PluginScanner();
         if (scanClasspath) {
-            LanternGame.log().info("Scanning classpath for plugins...");
+            Lantern.getLogger().info("Scanning classpath for plugins...");
 
             ClassLoader loader = LaunchClassLoader.class.getClassLoader();
             if (loader instanceof URLClassLoader) {
                 pluginScanner.scanClassPath((URLClassLoader) loader);
             } else {
-                LanternGame.log().error("Cannot search for plugins on classpath: Unsupported class loader: {}", loader.getClass());
+                this.game.getLogger().error("Cannot search for plugins on classpath: Unsupported class loader: {}", loader.getClass());
             }
         }
 
@@ -100,7 +100,7 @@ public final class LanternPluginManager implements PluginManager {
         }
 
         Map<String, PluginCandidate> plugins = pluginScanner.getPlugins();
-        LanternGame.log().info("{} plugin(s) found", plugins.size());
+        this.game.getLogger().info("{} plugin(s) found", plugins.size());
 
         try {
             PluginHelper.sort(checkRequirements(plugins)).forEach(this::loadPlugin);
@@ -149,9 +149,10 @@ public final class LanternPluginManager implements PluginManager {
 
         for (PluginCandidate failed : failedCandidates) {
             if (failed.isInvalid()) {
-                LanternGame.log().error("Plugin '{}' from {} cannot be loaded because it is invalid", failed.getId(), failed.getDisplaySource());
+                this.game.getLogger().error("Plugin '{}' from {} cannot be loaded because it is invalid",
+                        failed.getId(), failed.getDisplaySource());
             } else {
-                LanternGame.log().error("Cannot load plugin '{}' from {} because it is missing the required dependencies {}",
+                this.game.getLogger().error("Cannot load plugin '{}' from {} because it is missing the required dependencies {}",
                         failed.getId(), failed.getDisplaySource(), PluginHelper.formatRequirements(failed.getMissingRequirements()));
             }
         }
@@ -179,11 +180,11 @@ public final class LanternPluginManager implements PluginManager {
             PluginContainer container = new LanternPluginContainer(id, pluginClass, metadata.getName(), metadata.getVersion(),
                     metadata.getDescription(), metadata.getUrl(), metadata.getAuthors(), candidate.getSource());
             this.registerPlugin(container);
-            Sponge.getEventManager().registerListeners(container, container.getInstance().get());
+            this.game.getEventManager().registerListeners(container, container.getInstance().get());
 
-            LanternGame.log().info("Loaded plugin: {} {} (from {})", name, version, candidate.getDisplaySource());
+            this.game.getLogger().info("Loaded plugin: {} {} (from {})", name, version, candidate.getDisplaySource());
         } catch (Throwable e) {
-            LanternGame.log().error("Failed to load plugin: {} {} (from {})", name, version, candidate.getDisplaySource(), e);
+            this.game.getLogger().error("Failed to load plugin: {} {} (from {})", name, version, candidate.getDisplaySource(), e);
         }
     }
 

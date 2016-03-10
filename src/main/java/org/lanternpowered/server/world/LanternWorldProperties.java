@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.config.world.WorldConfig;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
@@ -45,6 +45,7 @@ import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.rules.Rules;
 import org.spongepowered.api.GameRegistry;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -222,13 +223,13 @@ public final class LanternWorldProperties implements WorldProperties {
         }
         if (worldGenModifiers != null) {
             final ImmutableSet.Builder<WorldGeneratorModifier> genModifiers = ImmutableSet.builder();
-            final GameRegistry registry = LanternGame.get().getRegistry();
+            final GameRegistry registry = Sponge.getRegistry();
             for (String modifier : worldGenModifiers) {
                 Optional<WorldGeneratorModifier> genModifier = registry.getType(WorldGeneratorModifier.class, modifier);
                 if (genModifier.isPresent()) {
                     genModifiers.add(genModifier.get());
                 } else {
-                    LanternGame.log().error("World generator modifier with id " + modifier +
+                    Lantern.getLogger().error("World generator modifier with id " + modifier +
                             " not found. Missing plugin?");
                 }
             }

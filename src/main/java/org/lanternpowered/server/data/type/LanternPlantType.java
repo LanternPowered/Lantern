@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -53,7 +53,7 @@ public enum LanternPlantType implements PlantType, SimpleCatalogType, InternalCa
 
     LanternPlantType(FlowerColor flowerColor, int internalId, String identifier, String translationPart) {
         final String part0 = flowerColor == FlowerColor.YELLOW ? "flower1" : "flower2";
-        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
                 "tile."  + part0 + "." + translationPart + ".name");
         this.internalId = (byte) internalId;
         this.flowerColor = flowerColor;

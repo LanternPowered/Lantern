@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.text.xml;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
@@ -61,7 +61,7 @@ public class Color extends Element {
             this.name = this.n;
         }
         if (this.name != null) {
-            Optional<TextColor> color = LanternGame.get().getRegistry().getType(TextColor.class, this.name.toUpperCase());
+            Optional<TextColor> color = Sponge.getRegistry().getType(TextColor.class, this.name.toUpperCase());
             if (color.isPresent()) {
                 builder.color(color.get());
             }

@@ -67,7 +67,7 @@
  */
 package org.lanternpowered.server.data.io.anvil;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.BufferedOutputStream;
@@ -125,7 +125,7 @@ public class RegionFile {
             sizeDelta += 2 * SECTOR_BYTES - file.length();
             if (lastModified != 0) {
                 // only give a warning if the region file existed beforehand
-                LanternGame.log().warn("Region \"" + path + "\" under 8K: " + file.length() + " increasing by " + (2 * SECTOR_BYTES - file.length()));
+                Lantern.getLogger().warn("Region \"" + path + "\" under 8K: " + file.length() + " increasing by " + (2 * SECTOR_BYTES - file.length()));
             }
 
             for (long i = file.length(); i < 2 * SECTOR_BYTES; ++i) {
@@ -136,7 +136,7 @@ public class RegionFile {
         // if the file size is not a multiple of 4KB, grow it
         if ((file.length() & 0xfff) != 0) {
             sizeDelta += SECTOR_BYTES - (file.length() & 0xfff);
-            LanternGame.log().warn("Region \"" + path + "\" not aligned: " + file.length() + " increasing by " + (SECTOR_BYTES - (file.length() & 0xfff)));
+            Lantern.getLogger().warn("Region \"" + path + "\" not aligned: " + file.length() + " increasing by " + (SECTOR_BYTES - (file.length() & 0xfff)));
 
             for (long i = file.length() & 0xfff; i < SECTOR_BYTES; ++i) {
                 file.write(0);
@@ -167,7 +167,7 @@ public class RegionFile {
                     sectorFree.set(startSector + sectorNum, false);
                 }
             } else if (offset != 0) {
-                LanternGame.log().warn("Region \"" + path + "\": offsets[" + i + "] = " + offset + " -> " + startSector + "," + numSectors + " does not fit");
+                Lantern.getLogger().warn("Region \"" + path + "\": offsets[" + i + "] = " + offset + " -> " + startSector + "," + numSectors + " does not fit");
             }
         }
         // read timestamps from timestamp table
@@ -225,7 +225,7 @@ public class RegionFile {
             return new DataInputStream(new InflaterInputStream(new ByteArrayInputStream(data)));
         }
 
-        LanternGame.log().info("Unknown version ({}) in region file, possibly corrupt?", version);
+        Lantern.getLogger().info("Unknown version ({}) in region file, possibly corrupt?", version);
         return null;
     }
 

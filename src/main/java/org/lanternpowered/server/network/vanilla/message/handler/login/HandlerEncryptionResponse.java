@@ -53,7 +53,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
@@ -94,7 +94,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
         try {
             rsaCipher = Cipher.getInstance("RSA");
         } catch (GeneralSecurityException e) {
-            LanternGame.log().error("Could not initialize RSA cipher", e);
+            Lantern.getLogger().error("Could not initialize RSA cipher", e);
             session.disconnect("Unable to initialize RSA cipher.");
             return;
         }
@@ -105,7 +105,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             rsaCipher.init(Cipher.DECRYPT_MODE, privateKey);
             sharedSecret = new SecretKeySpec(rsaCipher.doFinal(message.getSharedSecret()), "AES");
         } catch (Exception e) {
-            LanternGame.log().warn("Could not decrypt shared secret", e);
+            Lantern.getLogger().warn("Could not decrypt shared secret", e);
             session.disconnect("Unable to decrypt shared secret.");
             return;
         }
@@ -116,7 +116,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             rsaCipher.init(Cipher.DECRYPT_MODE, privateKey);
             verifyToken = rsaCipher.doFinal(message.getVerifyToken());
         } catch (Exception e) {
-            LanternGame.log().warn("Could not decrypt verify token", e);
+            Lantern.getLogger().warn("Could not decrypt verify token", e);
             session.disconnect("Unable to decrypt verify token.");
             return;
         }
@@ -143,7 +143,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             // BigInteger takes care of sign and leading zeroes
             hash = new BigInteger(digest.digest()).toString(16);
         } catch (NoSuchAlgorithmException e) {
-            LanternGame.log().error("Unable to generate SHA-1 digest", e);
+            Lantern.getLogger().error("Unable to generate SHA-1 digest", e);
             session.disconnect("Failed to hash login data.");
             return;
         }
@@ -183,7 +183,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                     try {
                         json = gson.fromJson(new InputStreamReader(is), JsonObject.class);
                     } catch (Exception e) {
-                        LanternGame.log().warn("Username \"" + this.username + "\" failed to authenticate!");
+                        Lantern.getLogger().warn("Username \"" + this.username + "\" failed to authenticate!");
                         this.session.disconnect("Failed to verify username!");
                         return;
                     }
@@ -198,7 +198,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 try {
                     uuid = UUIDHelper.fromFlatString(id);
                 } catch (IllegalArgumentException e) {
-                    LanternGame.log().error("Returned authentication UUID invalid: " + id, e);
+                    Lantern.getLogger().error("Returned authentication UUID invalid: " + id, e);
                     this.session.disconnect("Invalid UUID.");
                     return;
                 }
@@ -217,11 +217,11 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
 
                 LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
 
-                LanternGame.log().info("Finished authenticating.");
-                LanternGame.get().getGameProfileManager().getCache().add(gameProfile, true, null);
+                Lantern.getLogger().info("Finished authenticating.");
+                Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
                 this.session.messageReceived(new MessageLoginInFinish(gameProfile));
             } catch (Exception e) {
-                LanternGame.log().error("Error in authentication thread", e);
+                Lantern.getLogger().error("Error in authentication thread", e);
                 this.session.disconnect("Internal error during authentication.", true);
             }
         }

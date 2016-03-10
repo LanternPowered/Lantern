@@ -26,7 +26,7 @@
 package org.lanternpowered.server.console;
 
 import jline.console.completer.Completer;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.spongepowered.api.Sponge;
 
@@ -75,7 +75,7 @@ public class ConsoleCommandCompleter implements Completer {
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         } catch (ExecutionException e) {
-            LanternGame.log().error("Failed to tab complete", e);
+            Lantern.getLogger().error("Failed to tab complete", e);
         }
 
         return cursor;

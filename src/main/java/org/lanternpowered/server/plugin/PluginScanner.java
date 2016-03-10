@@ -28,7 +28,7 @@ package org.lanternpowered.server.plugin;
 import static java.util.stream.Collectors.joining;
 import static org.spongepowered.api.plugin.Plugin.ID_PATTERN;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.plugin.asm.PluginClassVisitor;
 import org.objectweb.asm.ClassReader;
 import org.slf4j.Logger;
@@ -79,7 +79,7 @@ final class PluginScanner {
     private static final String METADATA_FILE = McModInfo.STANDARD_FILENAME;
 
     private static final String JAVA_HOME = System.getProperty("java.home");
-    private static final Logger logger = LanternGame.log();
+    private static final Logger logger = Lantern.getLogger();
 
     private final Map<String, PluginCandidate> plugins = new HashMap<>();
     private final Set<String> pluginClasses = new HashSet<>();

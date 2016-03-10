@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.plugin;
 
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternPlatform;
-import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.Optional;
 
@@ -50,7 +50,7 @@ public final class SpongeApiContainer extends AbstractPluginContainer {
 
     @Override
     public Optional<Object> getInstance() {
-        return Optional.of(LanternGame.get());
+        return Optional.of(Lantern.getGame());
     }
 
 }

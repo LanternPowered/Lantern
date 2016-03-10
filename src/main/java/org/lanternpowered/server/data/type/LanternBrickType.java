@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -43,7 +43,7 @@ public enum LanternBrickType implements BrickType, SimpleCatalogType, InternalCa
     private final Translation translation;
 
     LanternBrickType(String identifier, String translationPart) {
-        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
                 "tile.stonebricksmooth." + translationPart + ".name");
         this.identifier = identifier;
     }

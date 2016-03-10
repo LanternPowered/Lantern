@@ -30,9 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.game.LanternGame;
@@ -264,7 +261,8 @@ public final class LanternWorldManager {
             return false;
         }
         // Post the unload world event
-        this.game.getEventManager().post(SpongeEventFactory.createUnloadWorldEvent(Cause.source(LanternGame.plugin()).build(), world));
+        this.game.getEventManager().post(SpongeEventFactory.createUnloadWorldEvent(
+                Cause.source(this.game.getMinecraftPlugin()).build(), world));
         // Save all the world data
         world0.shutdown();
         // Remove the tick task
@@ -331,7 +329,7 @@ public final class LanternWorldManager {
                     }
                 });
             } catch (IOException e) {
-                LanternGame.log().error("Failed to copy the world folder of {}: {} to {}",
+                this.game.getLogger().error("Failed to copy the world folder of {}: {} to {}",
                         copyName, folder, targetFolder, e);
                 return Optional.empty();
             }
@@ -340,7 +338,7 @@ public final class LanternWorldManager {
             try {
                 data = LanternWorldPropertiesIO.read(this.rootWorldFolder, copyName);
             } catch (IOException e) {
-                LanternGame.log().error("Unable to open the copied world properties of {}", copyName, e);
+                this.game.getLogger().error("Unable to open the copied world properties of {}", copyName, e);
                 return Optional.empty();
             }
 
@@ -418,7 +416,7 @@ public final class LanternWorldManager {
                     try {
                         Files.delete(path);
                     } catch (IOException e) {
-                        LanternGame.log().error("Unable to delete the file {} of world {}",
+                        game.getLogger().error("Unable to delete the file {} of world {}",
                                 path.toFile().getAbsolutePath(), worldProperties.getWorldName(), e);
                         flag[0] = false;
                     }
@@ -452,7 +450,7 @@ public final class LanternWorldManager {
                     entry.dimensionId, dimensionMap, null));
             worldProperties0.getConfig().save();
         } catch (IOException e) {
-            LanternGame.log().error("Unable to save the world properties of {}: {}",
+            this.game.getLogger().error("Unable to save the world properties of {}: {}",
                     worldProperties.getWorldName(), e.getMessage(), e);
             return false;
         }
@@ -601,7 +599,7 @@ public final class LanternWorldManager {
         try {
             world.getChunkManager().loadTickets();
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while loading the chunk loading tickets", e);
+            this.game.getLogger().warn("An error occurred while loading the chunk loading tickets", e);
         }
         return Optional.of(world);
     }
@@ -650,7 +648,7 @@ public final class LanternWorldManager {
                         try {
                             world.pulse();
                         } catch (Exception e) {
-                            LanternGame.log().error("Error occurred while pulsing the world {}", world.getName(), e);
+                            game.getLogger().error("Error occurred while pulsing the world {}", world.getName(), e);
                         } finally {
                             tickEnd.arriveAndAwaitAdvance();
                         }
@@ -685,7 +683,8 @@ public final class LanternWorldManager {
         // Mark ourselves as arrived so world threads automatically trigger advance once done
         int endPhase = this.tickEnd.arriveAndAwaitAdvance();
         if (endPhase != nextTick) {
-            LanternGame.log().warn("Tick end barrier {} has advanced differently from tick begin barrier: {}", endPhase, nextTick);
+            this.game.getLogger().warn("Tick end barrier {} has advanced differently from tick begin barrier: {}",
+                    endPhase, nextTick);
         }
     }
 
@@ -813,7 +812,7 @@ public final class LanternWorldManager {
                 // We can ignore this exception, because this means
                 // that we have to generate the world
             } catch (IOException e) {
-                LanternGame.log().error("Unable to load world folder.", e);
+                this.game.getLogger().error("Unable to load world folder.", e);
             }
         }
 
@@ -855,8 +854,8 @@ public final class LanternWorldManager {
                         // match the ones of the folder.
                         if (data.dimensionId != null) {
                             if (data.dimensionId != i) {
-                                LanternGame.log().warn("Dimension id ({}) stored in the world save ({})"
-                                        + " does not match the one of the world folder ({}), modifying...",
+                                this.game.getLogger().warn("Dimension id ({}) stored in the world save ({})"
+                                                + " does not match the one of the world folder ({}), modifying...",
                                         data.dimensionId, i, data.properties.getWorldName());
                             }
                             data = new LevelData(data.properties, i, null, data.configLevelData);
@@ -877,11 +876,11 @@ public final class LanternWorldManager {
                             loadQueue.add(this.worldByProperties.get(data.properties));
                         }
                     } catch (FileNotFoundException e) {
-                        LanternGame.log().warn("Missing dimension (level file) with id {}, skipping...", i);
+                        this.game.getLogger().warn("Missing dimension (level file) with id {}, skipping...", i);
                         // The world (dimension) is missing, so remove it
                         this.dimensionMap.clear(i);
                     } catch (IOException e) {
-                        LanternGame.log().error("Unable to load world (dimension) folder: {}", folder.toFile().getName(), e);
+                        this.game.getLogger().error("Unable to load world (dimension) folder: {}", folder.toFile().getName(), e);
                     }
                 }
             }

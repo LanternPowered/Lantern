@@ -29,11 +29,10 @@ import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
-import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -41,7 +40,6 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.GuavaCollectors;
@@ -59,7 +57,7 @@ public final class CommandGameRule {
     public static final String PERMISSION = "minecraft.command.gamerule";
 
     public static CommandSpec create() {
-        final List<String> defaultRules = Lists.newArrayList(LanternGame.get().getRegistry().getDefaultGameRules());
+        final List<String> defaultRules = Lists.newArrayList(Sponge.getRegistry().getDefaultGameRules());
         final ThreadLocal<RuleType<?>> currentRule = new ThreadLocal<>();
         return CommandSpec.builder()
                 .arguments(

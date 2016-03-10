@@ -27,7 +27,7 @@ package org.lanternpowered.server.console;
 
 import jline.console.ConsoleReader;
 import org.lanternpowered.launch.console.ConsoleLaunch;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 
 import java.io.IOException;
@@ -75,11 +75,11 @@ public final class ConsoleManager {
                         final String runCommand = command.startsWith("/") ? command.substring(1) : command;
                         Sponge.getScheduler().createTaskBuilder().execute(() -> {
                             Sponge.getCommandManager().process(LanternConsoleSource.INSTANCE, runCommand);
-                        }).submit(LanternGame.plugin());
+                        }).submit(Lantern.getMinecraftPlugin());
                     }
                 }
             } catch (IOException e) {
-                LanternGame.log().error("Error while reading commands!", e);
+                Lantern.getLogger().error("Error while reading commands!", e);
             }
         }
     }

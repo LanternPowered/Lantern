@@ -30,7 +30,7 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.config.ConfigRoot;
 
 import java.io.IOException;
@@ -59,7 +59,7 @@ public final class LanternConfigRoot implements ConfigRoot {
             try {
                 Files.createDirectories(this.baseDir);
             } catch (IOException e) {
-                LanternGame.log().error("Failed to create plugin dir for {} at {}", this.pluginName, this.baseDir, e);
+                Lantern.getLogger().error("Failed to create plugin dir for {} at {}", this.pluginName, this.baseDir, e);
             }
         }
         return configFile;

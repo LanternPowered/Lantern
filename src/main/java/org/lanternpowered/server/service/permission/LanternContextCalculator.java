@@ -32,7 +32,7 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.source.RemoteSource;
@@ -67,7 +67,7 @@ public class LanternContextCalculator implements ContextCalculator<Subject> {
                     ImmutableSet.Builder<Context> builder = ImmutableSet.builder();
                     final InetAddress addr = checkNotNull(function.apply(key), "addr");
                     builder.add(new Context(contextKey, addr.getHostAddress()));
-                    for (String set : Maps.filterValues(LanternGame.get().getGlobalConfig().getIpSets(), input -> {
+                    for (String set : Maps.filterValues(Lantern.getGame().getGlobalConfig().getIpSets(), input -> {
                         return input.apply(addr);
                     }).keySet()) {
                         builder.add(new Context(contextKey, set));

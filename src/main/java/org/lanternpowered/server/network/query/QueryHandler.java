@@ -56,6 +56,7 @@ import io.netty.channel.socket.DatagramPacket;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -154,7 +155,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
                 Cause.source(ctx.channel().remoteAddress()).build(), (InetSocketAddress) ctx.channel().localAddress(),
                 "SMP", this.getWorldName(), server.getMotd().toPlain(), server.getMaxPlayers(),
                 Integer.MAX_VALUE, server.getOnlinePlayers().size(), 0);
-        LanternGame.get().getEventManager().post(event);
+        Sponge.getEventManager().post(event);
 
         final InetSocketAddress address = event.getAddress();
 

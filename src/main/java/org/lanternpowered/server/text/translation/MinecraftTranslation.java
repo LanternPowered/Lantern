@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.IllegalFormatException;
@@ -58,7 +58,7 @@ public final class MinecraftTranslation implements Translation {
         try {
             return String.format(value, args);
         } catch (IllegalFormatException e) {
-            LanternGame.log().error("Illegal format used in the translation: " + this.id, e);
+            Lantern.getLogger().error("Illegal format used in the translation: " + this.id, e);
             return value;
         }
     }

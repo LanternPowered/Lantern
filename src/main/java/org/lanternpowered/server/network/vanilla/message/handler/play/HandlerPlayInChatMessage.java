@@ -30,7 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
@@ -73,7 +73,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             return;
         }
         if (message1.startsWith("/")) {
-            LanternGame.get().getCommandManager().process(player, message1.substring(1));
+            Sponge.getCommandManager().process(player, message1.substring(1));
         } else {
             Text nameText = Text.of(player.getName()); // TODO: player.getDisplayNameData().displayName().get();
             Text rawMessageText = Text.of(message0);
@@ -88,7 +88,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         Attribute<Long> attr = context.getChannel().attr(LAST_CHAT_TIME);
         long currentTime = System.currentTimeMillis();
         Long lastTime = attr.getAndSet(currentTime);
-        if (lastTime != null && currentTime - lastTime < LanternGame.get().getGlobalConfig().getChatSpamThreshold()) {
+        if (lastTime != null && currentTime - lastTime < Lantern.getGame().getGlobalConfig().getChatSpamThreshold()) {
             session.disconnect(t("disconnect.spam"));
         }
     }

@@ -92,7 +92,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -941,7 +940,7 @@ public final class LanternChunkManager {
                     return true;
                 }
             } catch (Exception e) {
-                LanternGame.log().error("Error while loading chunk ({};{})",
+                this.game.getLogger().error("Error while loading chunk ({};{})",
                         chunk.getX(), chunk.getZ(), e);
                 // An error in chunk reading may have left the chunk in an invalid state
                 // (i.e. double initialization errors), so it's forcibly unloaded here
@@ -957,7 +956,7 @@ public final class LanternChunkManager {
             try {
                 this.generate(chunk, cause0);
             } catch (Throwable e) {
-                LanternGame.log().error("Error while generating chunk ({};{})", chunk.getX(), chunk.getZ(), e);
+                this.game.getLogger().error("Error while generating chunk ({};{})", chunk.getX(), chunk.getZ(), e);
                 return success = false;
             }
             // Try to populate the chunk
@@ -1163,7 +1162,7 @@ public final class LanternChunkManager {
             this.chunkIOService.write(chunk);
             return true;
         } catch (IOException e) {
-            LanternGame.log().error("Error while saving " + chunk, e);
+            this.game.getLogger().error("Error while saving " + chunk, e);
         }
         return false;
     }
@@ -1381,13 +1380,13 @@ public final class LanternChunkManager {
         try {
             LanternLoadingTicketIO.save(this.worldFolder, this.tickets);
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while saving the chunk loading tickets", e);
+            this.game.getLogger().warn("An error occurred while saving the chunk loading tickets", e);
         }
         for (Entry<Vector2i, LanternChunk> entry : this.loadedChunks.entrySet()) {
             final LanternChunk chunk = entry.getValue();
             // Post the chunk unload event
             this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(
-                    Cause.source(LanternGame.plugin()).owner(this.world).build(), chunk));
+                    Cause.source(this.game.getMinecraftPlugin()).owner(this.world).build(), chunk));
             // Save the chunk
             this.save(chunk);
         }

@@ -38,6 +38,7 @@ import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
@@ -67,8 +68,6 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.entity.living.player.tab.TabList;
-import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.profile.GameProfile;
@@ -95,12 +94,12 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, AbstractCommandSource {
+public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer,
+        AbstractCommandSource {
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
@@ -147,7 +146,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.session = session;
         this.gameProfile = gameProfile;
         // Get or create the user object
-        this.user = (LanternUser) LanternGame.get().getServiceManager().provideUnchecked(UserStorageService.class)
+        this.user = (LanternUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
                 .getOrCreate(gameProfile);
         this.user.setPlayer(this);
     }
@@ -274,8 +273,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         // Allocate a new loading ticket, this can be null after
         // joining the server or switching worlds
         if (this.loadingTicket == null || ((ChunkLoadingTicket) this.loadingTicket).isReleased()) {
-            this.loadingTicket = this.getWorld().getChunkManager().createPlayerEntityTicket(LanternGame.plugin(),
-                    this.gameProfile.getUniqueId()).get();
+            this.loadingTicket = this.getWorld().getChunkManager().createPlayerEntityTicket(
+                    Lantern.getMinecraftPlugin(), this.gameProfile.getUniqueId()).get();
             this.loadingTicket.bindToEntity(this);
         }
         return (ChunkLoadingTicket) this.loadingTicket;

@@ -28,7 +28,7 @@ package org.lanternpowered.server.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
@@ -60,7 +60,8 @@ public final class LanternEntityType extends SimpleLanternCatalogType implements
      * @param entityClass the entity class
      */
     public LanternEntityType(String identifier, String minecraftId, Class<? extends Entity> entityClass) {
-        this(identifier, minecraftId, entityClass, LanternGame.get().getRegistry().getTranslationManager().get("entity." + minecraftId + ".name"));
+        this(identifier, minecraftId, entityClass, Lantern.getGame().getRegistry().getTranslationManager().get(
+                "entity." + minecraftId + ".name"));
     }
 
     /**

@@ -29,7 +29,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -54,17 +55,14 @@ public final class Conditions {
      * @throws IllegalArgumentException - if reference is invalid
      */
     public static PluginContainer checkPlugin(Object object, @Nullable Object message) {
-        // Make sure that the game and plugin manager is already loaded
-        LanternGame game = LanternGame.get();
-
-        checkState(game != null && game.getPluginManager() != null, NOT_AVAILABLE);
+        checkState(Lantern.getGame() != null, NOT_AVAILABLE);
         checkNotNull(object, message);
 
         if (object instanceof PluginContainer) {
             return (PluginContainer) object;
         }
 
-        Optional<PluginContainer> container = LanternGame.get().getPluginManager().fromInstance(object);
+        Optional<PluginContainer> container = Sponge.getPluginManager().fromInstance(object);
         checkArgument(container.isPresent(), (message != null ? message + ": " : "") + "invalid plugin (%s)", object);
         return container.get();
     }

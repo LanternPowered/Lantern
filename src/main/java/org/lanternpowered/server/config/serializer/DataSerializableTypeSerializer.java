@@ -30,7 +30,7 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.lanternpowered.server.game.LanternGame;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataSerializable;
@@ -48,7 +48,7 @@ public final class DataSerializableTypeSerializer implements TypeSerializer<Data
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public DataSerializable deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        DataManager dataManager = LanternGame.get().getDataManager();
+        DataManager dataManager = Sponge.getDataManager();
         Optional<DataBuilder<?>> builderOpt = (Optional) dataManager.getBuilder(type.getRawType().asSubclass(DataSerializable.class));
         if (!builderOpt.isPresent()) {
             throw new ObjectMappingException("No data builder is registered for " + type);

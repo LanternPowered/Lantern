@@ -26,7 +26,7 @@
 package org.lanternpowered.server.text.xml;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -55,7 +55,7 @@ public class Tr extends Element {
         for (Object child : this.mixedContent) {
             build.add(this.builderFromObject(child).build());
         }
-        Translation translation = LanternGame.get().getRegistry().getTranslationManager().get(this.key);
+        Translation translation = Lantern.getGame().getRegistry().getTranslationManager().get(this.key);
         Text.Builder builder = Text.builder(translation, build.build().toArray());
         this.applyTextActions(builder);
         return builder;

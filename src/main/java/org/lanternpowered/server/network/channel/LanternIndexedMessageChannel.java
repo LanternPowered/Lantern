@@ -34,7 +34,7 @@ import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelBinding;
@@ -215,7 +215,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER)
                 .opcodeToRegistration.get(opcode);
         if (registration == null) {
-            LanternGame.log().warn("Received unexpected message type with id: " + opcode +
+            Lantern.getLogger().warn("Received unexpected message type with id: " + opcode +
                     " in the indexed message channel: " + this.name);
             return;
         }
@@ -224,7 +224,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         try {
             message = registration.messageType.newInstance();
         } catch (Exception e) {
-            LanternGame.log().error("Failed to instantiate message: " + registration.messageType.getName(), e);
+            Lantern.getLogger().error("Failed to instantiate message: " + registration.messageType.getName(), e);
             return;
         }
 

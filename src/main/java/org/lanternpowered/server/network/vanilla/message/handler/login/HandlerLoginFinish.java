@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.login;
 
 import static org.lanternpowered.server.network.session.Session.COMPRESSION;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -45,7 +45,7 @@ public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
     public void handle(NetworkContext context, MessageLoginInFinish message) {
         final LanternGameProfile gameProfile = message.getGameProfile();
         final Session session = context.getSession();
-        int compressionThreshold = LanternGame.get().getGlobalConfig().getNetworkCompressionThreshold();
+        int compressionThreshold = Lantern.getGame().getGlobalConfig().getNetworkCompressionThreshold();
         if (compressionThreshold != -1) {
             session.send(new MessageLoginOutSetCompression(compressionThreshold)).addListener(future ->
                     context.getChannel().pipeline().replace(COMPRESSION, COMPRESSION, new MessageCompressionHandler(compressionThreshold)));

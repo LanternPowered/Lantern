@@ -29,8 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -118,9 +118,9 @@ public abstract class BanEntry implements Ban {
         }
         String plainSource = TextSerializers.LEGACY_FORMATTING_CODE.serialize(this.source);
         if (plainSource.equals("Console")) {
-            source = LanternGame.get().getServer().getConsole();
+            source = Sponge.getServer().getConsole();
         } else {
-            source = LanternGame.get().getServer().getPlayer(plainSource).orElse(null);
+            source = Sponge.getServer().getPlayer(plainSource).orElse(null);
         }
         if (source != null) {
             this.commandSource = new WeakReference<>(source);

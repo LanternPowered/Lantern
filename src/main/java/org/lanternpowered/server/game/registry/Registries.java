@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.game.registry;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistry;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistry;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistry;
@@ -33,15 +33,15 @@ import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistry;
 public final class Registries {
 
     public static BlockRegistry getBlockRegistry() {
-        return LanternGame.get().getRegistry().getBlockRegistry();
+        return Lantern.getGame().getRegistry().getBlockRegistry();
     }
 
     public static ItemRegistry getItemRegistry() {
-        return LanternGame.get().getRegistry().getItemRegistry();
+        return Lantern.getGame().getRegistry().getItemRegistry();
     }
 
     public static BiomeRegistry getBiomeRegistry() {
-        return LanternGame.get().getRegistry().getBiomeRegistry();
+        return Lantern.getGame().getRegistry().getBiomeRegistry();
     }
 
     private Registries() {

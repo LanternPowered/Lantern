@@ -30,13 +30,14 @@ import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusResponse;
 import org.lanternpowered.server.status.LanternStatusResponsePlayers;
 import org.spongepowered.api.MinecraftVersion;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -139,7 +140,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
 
                 readable = buf.readableBytes();
                 if (readable > 0) {
-                    LanternGame.log().warn("Trailing bytes on a legacy ping message: {}b", readable);
+                    Lantern.getLogger().warn("Trailing bytes on a legacy ping message: {}b", readable);
                 }
 
                 version = LanternMinecraftVersion.V1_6;
@@ -148,7 +149,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
             // The message was successfully decoded as a legacy one
             legacy = true;
 
-            MinecraftVersion version0 = LanternGame.get().getPlatform().getMinecraftVersion();
+            MinecraftVersion version0 = Lantern.getGame().getPlatform().getMinecraftVersion();
             Text motd = server.getMotd();
 
             int online = server.getOnlinePlayers().size();
@@ -161,7 +162,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
             LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
 
             ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
-            LanternGame.get().getEventManager().post(event);
+            Sponge.getEventManager().post(event);
 
             // Cancelled, we are done here
             if (event.isCancelled()) {
@@ -193,7 +194,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                         .append(127)
                         .append('\u0000')
                         // The version/name string of the server.
-                        .append(LanternGame.get().getPlatform().getImplementation().getName())
+                        .append(Lantern.getGame().getPlatform().getImplementation().getName())
                         .append('\u0000')
                         // The motd of the server. In legacy format.
                         .append(motd0)

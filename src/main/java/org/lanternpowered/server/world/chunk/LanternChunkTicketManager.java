@@ -34,8 +34,8 @@ import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.config.GlobalConfig;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.World;
 
@@ -115,7 +115,7 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
     public int getAvailableTickets(UUID player) {
         checkNotNull(player, "player");
         int count = 0;
-        for (World world : LanternGame.get().getServer().getWorlds()) {
+        for (World world : Sponge.getServer().getWorlds()) {
             count += ((LanternWorld) world).getChunkManager().getTicketsForPlayer(player);
         }
         return this.getMaxTicketsForPlayer(player) - count;

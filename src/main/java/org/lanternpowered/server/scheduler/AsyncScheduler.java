@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.scheduler;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
@@ -119,7 +119,7 @@ public class AsyncScheduler extends SchedulerBase {
             // The taskMap has been modified; there is work to do.
             // Continue on without handling the Exception.
         } catch (IllegalMonitorStateException e) {
-            LanternGame.log().error("The scheduler internal state machine suffered a catastrophic error", e);
+            Lantern.getLogger().error("The scheduler internal state machine suffered a catastrophic error", e);
         }
     }
 

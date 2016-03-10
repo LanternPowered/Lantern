@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
@@ -34,7 +34,7 @@ public final class HandlerPlayInChannelPayload implements Handler<MessagePlayInO
 
     @Override
     public void handle(NetworkContext context, MessagePlayInOutChannelPayload message) {
-        LanternGame.get().getChannelRegistrar().handlePlayload(message.getContent(),
+        Lantern.getGame().getChannelRegistrar().handlePlayload(message.getContent(),
                 message.getChannel(), context.getSession());
     }
 }

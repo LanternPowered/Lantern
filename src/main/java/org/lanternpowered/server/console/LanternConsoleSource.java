@@ -28,7 +28,7 @@ package org.lanternpowered.server.console;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.command.AbstractCommandSource;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.permission.AbstractSubjectBase;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -63,7 +63,7 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements A
     @SuppressWarnings("deprecation")
     @Override
     public void sendMessage(Text message) {
-        LanternGame.log().info(TextSerializers.LEGACY_FORMATTING_CODE.serialize(message));
+        Lantern.getLogger().info(TextSerializers.LEGACY_FORMATTING_CODE.serialize(message));
     }
 
     @Override

@@ -39,7 +39,7 @@ import com.google.common.collect.Sets;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.event.gen.DefineableClassLoader;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
@@ -145,14 +145,14 @@ public class LanternEventManager implements EventManager {
                     try {
                         handler = this.handlerFactory.create(listener, method);
                     } catch (Exception e) {
-                        LanternGame.log().error("Failed to create handler for {} on {}", method, handle, e);
+                        Lantern.getLogger().error("Failed to create handler for {} on {}", method, handle, e);
                         continue;
                     }
 
                     handlers.add(createRegistration(plugin, eventClass, subscribe, handler));
                 } else {
-                    LanternGame.log().warn("The method {} on {} has @{} but has the wrong signature", method, handle.getName(),
-                            Listener.class.getName());
+                    Lantern.getLogger().warn("The method {} on {} has @{} but has the wrong signature", method,
+                            handle.getName(), Listener.class.getName());
                 }
             }
         }
@@ -237,7 +237,8 @@ public class LanternEventManager implements EventManager {
             try {
                 handler.handle(event);
             } catch (Throwable e) {
-                LanternGame.log().error("Could not pass {} to {}", event.getClass().getSimpleName(), handler.getPlugin(), e);
+                Lantern.getLogger().error("Could not pass {} to {}", event.getClass().getSimpleName(),
+                        handler.getPlugin(), e);
             }
         }
         return event instanceof Cancellable && ((Cancellable) event).isCancelled();

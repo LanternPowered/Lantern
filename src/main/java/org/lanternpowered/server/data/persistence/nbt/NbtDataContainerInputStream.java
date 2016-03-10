@@ -26,7 +26,21 @@
 package org.lanternpowered.server.data.persistence.nbt;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.*;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BOOLEAN;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BOOLEAN_IDENTIFER;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BOOLEAN_LIST;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BYTE;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.BYTE_ARRAY;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.COMPOUND;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.DOUBLE;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.END;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.FLOAT;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.INT;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.INT_ARRAY;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LIST;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.LONG;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.SHORT;
+import static org.lanternpowered.server.data.persistence.nbt.NbtConstants.STRING;
 
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.persistence.DataContainerInput;

@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.plugin.meta.PluginMetadata;
 import org.spongepowered.plugin.meta.version.DefaultArtifactVersion;
@@ -165,7 +165,7 @@ public final class PluginCandidate {
         for (PluginMetadata.Dependency dependency : this.metadata.getRequiredDependencies()) {
             final String id = dependency.getId();
             if (this.id.equals(id)) {
-                LanternGame.log().warn("Plugin '{}' from {} requires itself to be loaded. "
+                Lantern.getLogger().warn("Plugin '{}' from {} requires itself to be loaded. "
                         + "This is redundant and can be removed from the dependencies.", this.id, getDisplaySource());
                 continue;
             }
@@ -197,7 +197,7 @@ public final class PluginCandidate {
 
         if (!this.metadata.getLoadBefore().isEmpty()) {
             //this.invalid = true;
-            LanternGame.log().error("Invalid dependency with load order BEFORE on plugin '{}' from {}. "
+            Lantern.getLogger().error("Invalid dependency with load order BEFORE on plugin '{}' from {}. "
                             + "This is currently not supported for Sponge plugins! Requested dependencies: {}",
                     this.id, getDisplaySource(), this.metadata.getLoadBefore());
         }
@@ -210,7 +210,7 @@ public final class PluginCandidate {
         for (PluginMetadata.Dependency dependency : dependencies) {
             final String id = dependency.getId();
             if (this.id.equals(id)) {
-                LanternGame.log().error("Plugin '{}' from {} cannot have a dependency on itself. This is redundant and should be "
+                Lantern.getLogger().error("Plugin '{}' from {} cannot have a dependency on itself. This is redundant and should be "
                         + "removed.", this.id, getDisplaySource());
                 this.invalid = true;
                 continue;
@@ -278,7 +278,7 @@ public final class PluginCandidate {
                     return true;
                 }
             } catch (InvalidVersionSpecificationException e) {
-                LanternGame.log().error("Failed to parse version range {} for dependency {} of plugin {} from {}: {}",
+                Lantern.getLogger().error("Failed to parse version range {} for dependency {} of plugin {} from {}: {}",
                         version, id, this.id, getDisplaySource(), e.getMessage());
                 this.invalid = true;
             }

@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.plugin.asm;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.objectweb.asm.AnnotationVisitor;
 import org.slf4j.Logger;
 
 abstract class WarningAnnotationVisitor extends AnnotationVisitor {
 
-    private static final Logger logger = LanternGame.log();
+    private static final Logger logger = Lantern.getLogger();
 
     final String className;
 

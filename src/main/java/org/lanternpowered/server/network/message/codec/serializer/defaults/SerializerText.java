@@ -30,7 +30,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.message.codec.serializer.ValueSerializer;
@@ -40,7 +40,7 @@ import org.spongepowered.api.text.Text;
 public final class SerializerText implements ValueSerializer<Text> {
 
     static final Gson GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
-            LanternGame.get().getRegistry().getTranslationManager(), true).create();
+            Lantern.getGame().getRegistry().getTranslationManager(), true).create();
 
     @Override
     public void write(SerializerContext context, ByteBuf buf, Text object) throws CodecException {

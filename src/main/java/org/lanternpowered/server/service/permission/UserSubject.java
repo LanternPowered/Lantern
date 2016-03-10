@@ -28,7 +28,7 @@ package org.lanternpowered.server.service.permission;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.config.user.OpsEntry;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.SingleParentMemorySubjectData;
@@ -76,9 +76,9 @@ public class UserSubject extends LanternSubject {
                     opLevel = ((OpLevelCollection.OpLevelSubject) parent).getOpLevel();
                 }
                 if (opLevel > 0) {
-                    LanternGame.get().getOpsConfig().addEntry(new OpsEntry(((LanternGameProfile) player).withoutProperties(), opLevel));
+                    Lantern.getGame().getOpsConfig().addEntry(new OpsEntry(((LanternGameProfile) player).withoutProperties(), opLevel));
                 } else {
-                    LanternGame.get().getOpsConfig().removeEntry(player.getUniqueId());
+                    Lantern.getGame().getOpsConfig().removeEntry(player.getUniqueId());
                 }
                 return true;
             }
@@ -95,11 +95,11 @@ public class UserSubject extends LanternSubject {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public Optional<CommandSource> getCommandSource() {
-        return (Optional) LanternGame.get().getServer().getPlayer(this.player.getUniqueId());
+        return (Optional) Lantern.getGame().getServer().getPlayer(this.player.getUniqueId());
     }
 
     int getOpLevel() {
-        Optional<OpsEntry> entry = LanternGame.get().getOpsConfig().getEntryByUUID(this.player.getUniqueId());
+        Optional<OpsEntry> entry = Lantern.getGame().getOpsConfig().getEntryByUUID(this.player.getUniqueId());
         if (entry.isPresent()) {
             return entry.get().getOpLevel();
         }
@@ -122,7 +122,7 @@ public class UserSubject extends LanternSubject {
         if (ret == Tristate.UNDEFINED) {
             ret = getDataPermissionValue(this.collection.getService().getDefaultData(), permission);
         }
-        if (ret == Tristate.UNDEFINED && this.getOpLevel() >= LanternGame.get().getGlobalConfig().getDefaultOpPermissionLevel()) {
+        if (ret == Tristate.UNDEFINED && this.getOpLevel() >= Lantern.getGame().getGlobalConfig().getDefaultOpPermissionLevel()) {
             ret = Tristate.TRUE;
         }
         return ret;

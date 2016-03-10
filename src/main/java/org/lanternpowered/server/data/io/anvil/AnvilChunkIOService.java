@@ -56,7 +56,7 @@ import com.google.common.collect.Lists;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
@@ -425,7 +425,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                         try {
                             this.region = cache.getRegionFile(regionX, regionZ);
                         } catch (IOException e) {
-                            LanternGame.log().error("Failed to read the region file ({};{}) in the world folder {}",
+                            Lantern.getLogger().error("Failed to read the region file ({};{}) in the world folder {}",
                                     regionX, regionZ, baseDir.getFileName().toString(), e);
                             this.region = null;
                         }

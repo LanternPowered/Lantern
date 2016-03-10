@@ -52,7 +52,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.util.AttributeKey;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
@@ -115,7 +116,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         this.server.onChannelActive(channel, source);
 
         RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(Cause.source(source).build(), source);
-        LanternGame.get().getEventManager().post(event);
+        Sponge.getEventManager().post(event);
     }
 
     @Override
@@ -124,7 +125,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         RconSource source = channel.attr(SOURCE).getAndRemove();
 
         RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(Cause.source(source).build(), source);
-        LanternGame.get().getEventManager().post(event);
+        Sponge.getEventManager().post(event);
 
         this.server.onChannelInactive(channel, source);
     }
@@ -134,11 +135,11 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         if (password.equals(payload)) {
             RconConnectionEvent.Login event = SpongeEventFactory.createRconConnectionEventLogin(Cause.source(source).build(), source);
 
-            if (!LanternGame.get().getEventManager().post(event)) {
+            if (!Sponge.getEventManager().post(event)) {
                 source.setLoggedIn(true);
                 sendResponse(ctx, requestId, TYPE_COMMAND, "");
 
-                LanternGame.log().info("Rcon connection from [" + ctx.channel().remoteAddress() + "]");
+                Lantern.getLogger().info("Rcon connection from [" + ctx.channel().remoteAddress() + "]");
                 return;
             }
         }
@@ -152,7 +153,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
             sendResponse(ctx, FAILURE, TYPE_COMMAND, "");
             return;
         }
-        LanternGame.get().getCommandManager().process(source, payload);
+        Sponge.getCommandManager().process(source, payload);
         sendLargeResponse(ctx, requestId, source.flush());
     }
 

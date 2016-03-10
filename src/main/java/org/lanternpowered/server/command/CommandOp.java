@@ -29,7 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserConfig;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -66,8 +66,8 @@ public final class CommandOp {
                             @Override
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                                 final String prefix = args.nextIfPresent().orElse("");
-                                final UserConfig<OpsEntry> config = LanternGame.get().getOpsConfig();
-                                return LanternGame.get().getGameProfileManager().getCachedProfiles().stream()
+                                final UserConfig<OpsEntry> config = Lantern.getGame().getOpsConfig();
+                                return Lantern.getGame().getGameProfileManager().getCachedProfiles().stream()
                                         .filter(p -> p.getName().isPresent() && !config.getEntryByUUID(p.getUniqueId()).isPresent())
                                         .map(p -> p.getName().get())
                                         .filter(new StartsWithPredicate(prefix))
@@ -77,12 +77,12 @@ public final class CommandOp {
                         GenericArguments.optional(GenericArguments.integer(Text.of("level"))))
                 .executor((src, args) -> {
                     String playerName = args.<String>getOne("player").get();
-                    UserConfig<OpsEntry> config = LanternGame.get().getOpsConfig();
+                    UserConfig<OpsEntry> config = Lantern.getGame().getOpsConfig();
                     if (!(src instanceof ConsoleSource) && args.hasAny("level")) {
                         throw new CommandException(Text.of("Only the console may specify the op level."));
                     }
-                    int opLevel = args.<Integer>getOne("level").orElse(LanternGame.get().getGlobalConfig().getDefaultOpPermissionLevel());
-                    LanternGame.get().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
+                    int opLevel = args.<Integer>getOne("level").orElse(Lantern.getGame().getGlobalConfig().getDefaultOpPermissionLevel());
+                    Lantern.getGame().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
                         if (error != null) {
                             src.sendMessage(t("commands.op.failed", playerName));
                         } else {

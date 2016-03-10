@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;
@@ -42,7 +42,7 @@ public enum LanternWallType implements WallType, SimpleCatalogType, InternalCata
     private final Translation translation;
 
     LanternWallType(String identifier, String translationPart) {
-        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
                 "tile.cobbleWall." + translationPart + ".name");
         this.identifier = identifier;
     }

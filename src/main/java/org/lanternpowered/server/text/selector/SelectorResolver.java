@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.LocatedSource;
@@ -379,7 +378,7 @@ public class SelectorResolver {
 
     private Set<? extends Extent> getExtentSet() {
         if (!this.alwaysUsePosition && Collections.disjoint(getArgumentTypes(this.selector.getArguments()), LOCATION_BASED_ARGUMENTS)) {
-            return ImmutableSet.copyOf(LanternGame.get().getServer().getWorlds());
+            return ImmutableSet.copyOf(Sponge.getServer().getWorlds());
         }
         return ImmutableSet.copyOf(this.extents);
     }

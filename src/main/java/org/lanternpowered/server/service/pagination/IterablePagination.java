@@ -31,8 +31,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.PeekingIterator;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.command.CommandException;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageReceiver;
 
 import java.util.ArrayList;

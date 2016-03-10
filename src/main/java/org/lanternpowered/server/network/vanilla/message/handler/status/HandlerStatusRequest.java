@@ -29,7 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -64,7 +64,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         LanternServer server = session.getServer();
         Gson gson = new Gson();
 
-        MinecraftVersion version0 = LanternGame.get().getPlatform().getMinecraftVersion();
+        MinecraftVersion version0 = Lantern.getGame().getPlatform().getMinecraftVersion();
         Text motd = server.getMotd();
 
         int online = server.getOnlinePlayers().size();
@@ -95,7 +95,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         JsonObject rootObject = new JsonObject();
         JsonObject versionObject = new JsonObject();
 
-        versionObject.addProperty("name", LanternGame.get().getPlatform().getImplementation().getName());
+        versionObject.addProperty("name", Lantern.getGame().getPlatform().getImplementation().getName());
         versionObject.addProperty("protocol", ((LanternMinecraftVersion) version0).getProtocol());
 
         if (response.getPlayers().isPresent()) {

@@ -28,7 +28,7 @@ package org.lanternpowered.server.text.chat;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.translation.Translation;
@@ -47,7 +47,7 @@ public final class LanternChatVisibility extends SimpleLanternCatalogType implem
         super(identifier);
         this.internalId = internalId;
         this.chatTypePredicate = chatTypePredicate;
-        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
                 "options.chat.visibility." + identifier);
         lookup.put(internalId, this);
     }

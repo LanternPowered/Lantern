@@ -28,7 +28,7 @@ package org.lanternpowered.server.util;
 import static com.google.common.base.Preconditions.checkArgument;
 import static org.apache.commons.lang3.ClassUtils.isAssignable;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Constructor;
@@ -81,7 +81,7 @@ public final class ReflectionHelper {
         try {
             return ctor.newInstance(args);
         } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            LanternGame.log().error("Couldn't find an appropriate constructor for " + objectClass.getCanonicalName()
+            Lantern.getLogger().error("Couldn't find an appropriate constructor for " + objectClass.getCanonicalName()
                     + "with the args: " + Arrays.toString(args), e);
         }
         throw new IllegalArgumentException("Couldn't find an appropriate constructor for " + objectClass.getCanonicalName()

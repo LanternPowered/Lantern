@@ -51,7 +51,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.File;
@@ -94,7 +94,7 @@ public class RegionFileCache {
         try {
             Files.createDirectories(this.regionDir);
         } catch (IOException e){
-            LanternGame.log().warn("Failed to create directory: " + this.regionDir);
+            Lantern.getLogger().warn("Failed to create directory: " + this.regionDir);
         }
 
         this.cache = CacheBuilder.<Long, RegionFile>newBuilder()

@@ -30,6 +30,7 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFutureTask;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Scheduler;
@@ -142,7 +143,7 @@ public class LanternScheduler implements Scheduler {
      */
     public <V> Future<V> callSync(Callable<V> callable) {
         ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
-        this.createTaskBuilder().execute(future).submit(LanternGame.plugin());
+        this.createTaskBuilder().execute(future).submit(Lantern.getMinecraftPlugin());
         return future;
     }
 

@@ -51,7 +51,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 
 import java.nio.ByteBuffer;
 import java.security.GeneralSecurityException;
@@ -73,7 +73,7 @@ public final class MessageEncryptionHandler extends MessageToMessageCodec<ByteBu
             this.decodeBuf = new CryptBuf(Cipher.DECRYPT_MODE, sharedSecret);
         } catch (GeneralSecurityException e) {
             // should never happen
-            LanternGame.log().error("Failed to initialize encrypted channel", e);
+            Lantern.getLogger().error("Failed to initialize encrypted channel", e);
             throw new AssertionError("Failed to initialize encrypted channel", e);
         }
     }

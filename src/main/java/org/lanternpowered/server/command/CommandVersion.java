@@ -27,7 +27,7 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.command.CommandResult;
@@ -43,10 +43,10 @@ public final class CommandVersion {
                 .permission(PERMISSION)
                 .description(t("commands.version.description"))
                 .executor((src, args) -> {
-                    PluginContainer plugin = LanternGame.get().getMinecraftPlugin();
+                    PluginContainer plugin = Lantern.getMinecraftPlugin();
                     src.sendMessage(t("commands.version.minecraft", plugin.getVersion(),
                             LanternMinecraftVersion.CURRENT.getProtocol()));
-                    Platform platform = LanternGame.get().getPlatform();
+                    Platform platform = Lantern.getGame().getPlatform();
                     plugin = platform.getImplementation();
                     src.sendMessage(t("commands.version.implementation", plugin.getName(), plugin.getVersion()));
                     plugin = platform.getApi();

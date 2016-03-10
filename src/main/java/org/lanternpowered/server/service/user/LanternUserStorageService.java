@@ -35,9 +35,11 @@ import org.lanternpowered.server.config.user.UserEntry;
 import org.lanternpowered.server.config.user.ban.BanEntry;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.LanternUser;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
@@ -66,8 +68,7 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Nullable
     private static User findByUsername(String username) {
-        final LanternGameProfileManager gameProfileManager = LanternGame.get()
-                .getGameProfileManager();
+        final LanternGameProfileManager gameProfileManager = Lantern.getGame().getGameProfileManager();
         Optional<GameProfile> gameProfile = gameProfileManager.getCache().getByName(username);
         if (gameProfile.isPresent()) {
             return findByUUID(gameProfile.get().getUniqueId());
@@ -99,7 +100,7 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Nullable
     private static User getOnlinePlayer(UUID uniqueId) {
-        Optional<Player> player = LanternGame.get().getServer().getPlayer(uniqueId);
+        Optional<Player> player = Sponge.getServer().getPlayer(uniqueId);
         if (player.isPresent()) {
             return ((LanternPlayer) player.get()).getUserObject();
         }
@@ -114,7 +115,7 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Nullable
     private static User getFromWhitelist(UUID uniqueId) {
-        final Optional<UserEntry> optEntry = LanternGame.get().getWhitelistConfig().getEntryByUUID(uniqueId);
+        final Optional<UserEntry> optEntry = Lantern.getGame().getWhitelistConfig().getEntryByUUID(uniqueId);
         if (optEntry.isPresent()) {
             return create(optEntry.get().getProfile());
         }
@@ -123,7 +124,7 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Nullable
     private static User getFromBanlist(UUID uniqueId) {
-        final Optional<BanEntry> optEntry = LanternGame.get().getBanConfig().getEntryByUUID(uniqueId);
+        final Optional<BanEntry> optEntry = Lantern.getGame().getBanConfig().getEntryByUUID(uniqueId);
         if (optEntry.isPresent()) {
             return create(((BanEntry.Profile) optEntry.get()).getProfile());
         }
@@ -132,7 +133,7 @@ public class LanternUserStorageService implements UserStorageService {
 
     static Collection<GameProfile> getAllProfiles() {
         ImmutableList.Builder<GameProfile> profiles = ImmutableList.builder();
-        for (Player player : LanternGame.get().getServer().getOnlinePlayers()) {
+        for (Player player : Sponge.getServer().getOnlinePlayers()) {
             profiles.add(player.getProfile());
         }
         // TODO: Add whitelist, ban, etc entries
@@ -172,7 +173,7 @@ public class LanternUserStorageService implements UserStorageService {
 
     @Override
     public boolean delete(GameProfile profile) {
-        final LanternGame game = LanternGame.get();
+        final LanternGame game = Lantern.getGame();
         game.getOpsConfig().removeEntry(profile.getUniqueId());
         game.getWhitelistConfig().removeEntry(profile.getUniqueId());
         game.getBanConfig().removeEntry(profile.getUniqueId());

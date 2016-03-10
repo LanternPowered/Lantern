@@ -26,7 +26,7 @@
 package org.lanternpowered.server.entity.living.player.gamemode;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -43,7 +43,7 @@ public class LanternGameMode extends SimpleLanternCatalogType implements GameMod
 
     @Override
     public Translation getTranslation() {
-        return LanternGame.get().getRegistry().getTranslationManager().get("gameMode." + this.getName());
+        return Lantern.getGame().getRegistry().getTranslationManager().get("gameMode." + this.getName());
     }
 
     public byte getInternalId() {

@@ -29,7 +29,6 @@ import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;

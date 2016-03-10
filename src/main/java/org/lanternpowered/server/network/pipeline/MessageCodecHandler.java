@@ -33,7 +33,7 @@ import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.AttributeKey;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.message.BulkMessage;
 import org.lanternpowered.server.network.message.CodecRegistration;
 import org.lanternpowered.server.network.message.HandlerMessage;
@@ -100,7 +100,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         if (registration == null) {
             if (warnedMissingOpcodes.add(opcode)) {
-                LanternGame.log().warn("Failed to find a message registration with opcode {} in state {}!", Integer.toHexString(opcode), state);
+                Lantern.getLogger().warn("Failed to find a message registration with opcode {} in state {}!", Integer.toHexString(opcode), state);
             }
             return;
         }
@@ -135,7 +135,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
                 .findByMessageType(message.getClass()).orElseThrow(() -> new DecoderException(
                         "The returned message type is not attached to the used protocol state (" + state.toString() + ")!"));
 
-        LanternGame.log().debug("Received message with type: " + message.getClass().getName());
+        Lantern.getLogger().debug("Received message with type: " + message.getClass().getName());
 
         final List<Processor> processors = messageRegistration.getProcessors();
         // Only process if there are processors found

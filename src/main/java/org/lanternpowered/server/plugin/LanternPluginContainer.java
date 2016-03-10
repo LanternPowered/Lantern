@@ -28,7 +28,7 @@ package org.lanternpowered.server.plugin;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
         this.logger = LoggerFactory.getLogger(id);
         this.source = source;
 
-        this.injector = Guice.createInjector(new PluginModule(this, pluginClass, LanternGame.get()));
+        this.injector = Guice.createInjector(new PluginModule(this, pluginClass, Lantern.getGame()));
         this.instance = Optional.of(this.injector.getInstance(pluginClass));
     }
 

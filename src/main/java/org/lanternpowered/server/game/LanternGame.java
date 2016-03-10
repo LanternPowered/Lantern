@@ -109,8 +109,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Nullable;
-
 @NonnullByDefault
 public class LanternGame implements Game {
 
@@ -148,7 +146,7 @@ public class LanternGame implements Game {
     public static final String PROFILE_CACHE_FILE = "profile-cache.json";
 
     // The singleton instance of the game
-    @Nullable private static LanternGame game;
+    static LanternGame game;
 
     // The server will aim for 20 ticks per second
     public static final int TICKS_PER_SECOND = 20;
@@ -171,33 +169,6 @@ public class LanternGame implements Game {
      */
     public static long currentTimeTicks() {
         return System.currentTimeMillis() / TICK_DURATION;
-    }
-
-    /**
-     * Gets the instance of the game.
-     * 
-     * @return the instance
-     */
-    public static LanternGame get() {
-        return game;
-    }
-
-    /**
-     * Gets the logger of the game.
-     * 
-     * @return the logger
-     */
-    public static Logger log() {
-        return logger;
-    }
-
-    /**
-     * Gets the internal plugin of the game.
-     * 
-     * @return the plugin
-     */
-    public static PluginContainer plugin() {
-        return game.minecraft;
     }
 
     // The platform
@@ -488,12 +459,30 @@ public class LanternGame implements Game {
     }
 
     /**
-     * Gets the plugin container that represents the minecraft (lantern) server.
+     * Gets the plugin container that represents the minecraft server.
      * 
      * @return the plugin container
      */
     public PluginContainer getMinecraftPlugin() {
         return this.minecraft;
+    }
+
+    /**
+     * Gets the plugin container that represents the implementation.
+     *
+     * @return the plugin container
+     */
+    public PluginContainer getImplementationPlugin() {
+        return this.implContainer;
+    }
+
+    /**
+     * Gets the plugin container that represents the api.
+     *
+     * @return the plugin container
+     */
+    public PluginContainer getApiPlugin() {
+        return this.apiContainer;
     }
 
     /**
@@ -543,7 +532,7 @@ public class LanternGame implements Game {
      * @return the logger
      */
     public Logger getLogger() {
-        return log();
+        return logger;
     }
 
     @Override
@@ -651,6 +640,10 @@ public class LanternGame implements Game {
     @Override
     public LanternDataManager getDataManager() {
         return this.dataManager;
+    }
+
+    public Path getConfigDir() {
+        return this.configFolder;
     }
 
 }

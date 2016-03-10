@@ -28,7 +28,7 @@ package org.lanternpowered.server.component;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inject.Injector;
 import org.lanternpowered.server.inject.Injectors;
 import org.lanternpowered.server.inject.MethodSpec;
@@ -67,7 +67,7 @@ public class BaseComponentHolder implements ComponentHolder {
                     return holder.getComponent(info.getType()).orElse(null);
                 }
             })
-            .bindInstance(ParameterSpec.of(Game.class), LanternGame.get())
+            .bindInstance(ParameterSpec.of(Game.class), Lantern.getGame())
             .bind(ON_ATTACH)
             .bind(ON_DETACH)
             .build());

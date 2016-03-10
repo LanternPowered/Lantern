@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.gen;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.gen.PopulatorType;
 
@@ -43,7 +43,7 @@ public final class LanternPopulatorType extends LanternPluginCatalogType impleme
 
     public LanternPopulatorType(String pluginId, String name) {
         super(pluginId, name);
-        this.translation = LanternGame.get().getRegistry().getTranslationManager().get("populator." + name + ".name");
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get("populator." + name + ".name");
     }
 
     @Override

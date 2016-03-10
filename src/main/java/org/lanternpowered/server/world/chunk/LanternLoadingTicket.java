@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.util.GuavaCollectors;
 
@@ -133,7 +133,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     public void forceChunk(Vector2i chunk) {
         checkNotNull(chunk, "chunk");
         if (this.released) {
-            LanternGame.log().warn("The plugin {} attempted to force load a chunk with an invalid ticket. "
+            Lantern.getLogger().warn("The plugin {} attempted to force load a chunk with an invalid ticket. "
                     + "This is not permitted.", this.plugin);
             return;
         }

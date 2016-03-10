@@ -260,16 +260,17 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             final int chunkX = spawnPoint.getX() >> 4;
             final int chunkZ = spawnPoint.getZ() >> 4;
 
-            LanternGame.log().info("Generating spawn area...");
+            this.game.getLogger().info("Generating spawn area...");
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
-                    this.chunkManager.getOrCreateChunk(x, z, () -> Cause.source(LanternGame.plugin()).owner(this).build(), true);
+                    this.chunkManager.getOrCreateChunk(x, z, () -> Cause.source(this.game.getMinecraftPlugin())
+                            .owner(this).build(), true);
                     this.spawnLoadingTicket.forceChunk(new Vector3i(x, 0, z));
                 }
             }
 
-            LanternGame.log().info("Finished generating spawn area.");
+            this.game.getLogger().info("Finished generating spawn area.");
         } else if (this.spawnLoadingTicket != null) {
             this.spawnLoadingTicket.unforceChunks();
         }
@@ -848,7 +849,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         }
         if (generate) {
             return Optional.of(this.chunkManager.getOrCreateChunk(new Vector2i(x, z),
-                    () -> Cause.source(LanternGame.plugin()).owner(this).build(), true));
+                    () -> Cause.source(this.game.getMinecraftPlugin()).owner(this).build(), true));
         } else {
             return Optional.ofNullable(this.chunkManager.getChunk(x, z));
         }

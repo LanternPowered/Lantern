@@ -34,7 +34,7 @@ import com.google.common.collect.Maps;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.ConfigBase;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.ProfileNotFoundException;
@@ -79,10 +79,10 @@ public class LanternGameProfileCache implements GameProfileCache {
             try {
                 cache.load();
             } catch (IOException e) {
-                LanternGame.log().warn("An error occurred while loading the profile cache file.", e);
+                Lantern.getLogger().warn("An error occurred while loading the profile cache file.", e);
             }
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while instantiating the profile cache file.", e);
+            Lantern.getLogger().warn("An error occurred while instantiating the profile cache file.", e);
         }
         this.cacheFile = cache;
     }
@@ -154,7 +154,7 @@ public class LanternGameProfileCache implements GameProfileCache {
         try {
             this.cacheFile.save();
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while saving the profile cache file.", e);
+            Lantern.getLogger().warn("An error occurred while saving the profile cache file.", e);
         }
     }
 
@@ -214,7 +214,7 @@ public class LanternGameProfileCache implements GameProfileCache {
             this.byUUID.get(gameProfile.getUniqueId()).signed = true;
             return Optional.of(gameProfile);
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while retrieving game profile data.", e);
+            Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);
         } catch (ProfileNotFoundException ignored) {
         }
         return Optional.empty();
@@ -311,7 +311,7 @@ public class LanternGameProfileCache implements GameProfileCache {
                 }
             });
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while retrieving game profile data.", e);
+            Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);
         }
     }
 
@@ -324,7 +324,7 @@ public class LanternGameProfileCache implements GameProfileCache {
             }
             return this.lookupById(result.get(name));
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while retrieving game profile data.", e);
+            Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);
         }
         return Optional.empty();
     }
@@ -341,7 +341,7 @@ public class LanternGameProfileCache implements GameProfileCache {
             }
             return Optional.of(gameProfile);
         } catch (IOException e) {
-            LanternGame.log().warn("An error occurred while retrieving game profile data.", e);
+            Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);
         } catch (ProfileNotFoundException ignored) {
         }
         return Optional.empty();

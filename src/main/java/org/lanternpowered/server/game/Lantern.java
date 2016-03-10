@@ -23,26 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.gen.debug;
+package org.lanternpowered.server.game;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.world.gen.LanternGeneratorType;
-import org.lanternpowered.server.world.gen.LanternWorldGenerator;
-import org.lanternpowered.server.world.gen.SingleBiomeGenerator;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.gen.WorldGenerator;
+import org.slf4j.Logger;
+import org.spongepowered.api.plugin.PluginContainer;
 
-public final class DebugGeneratorType extends LanternGeneratorType {
+public class Lantern {
 
-    public DebugGeneratorType(String pluginId, String name) {
-        super(pluginId, name);
+    public static Logger getLogger() {
+        return LanternGame.game.getLogger();
     }
 
-    @Override
-    public WorldGenerator createGenerator(World world) {
-        return new LanternWorldGenerator(new DebugGenerationPopulator(Lantern.getGame().getRegistry()),
-                new SingleBiomeGenerator(BiomeTypes.PLAINS));
+    public static PluginContainer getMinecraftPlugin() {
+        return LanternGame.game.getMinecraftPlugin();
+    }
+
+    public static PluginContainer getApiPlugin() {
+        return LanternGame.game.getApiPlugin();
+    }
+
+    public static PluginContainer getImplementationPlugin() {
+        return LanternGame.game.getImplementationPlugin();
+    }
+
+    public static LanternGame getGame() {
+        return LanternGame.game;
+    }
+
+    private Lantern() {
     }
 
 }

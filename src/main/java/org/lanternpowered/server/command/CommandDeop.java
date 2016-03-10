@@ -29,7 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.config.user.OpsEntry;
 import org.lanternpowered.server.config.user.UserConfig;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -63,7 +63,7 @@ public final class CommandDeop {
                             @Override
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                                 final String prefix = args.nextIfPresent().orElse("");
-                                final UserConfig<OpsEntry> config = LanternGame.get().getOpsConfig();
+                                final UserConfig<OpsEntry> config = Lantern.getGame().getOpsConfig();
                                 return config.getEntries().stream()
                                         .filter(e -> e.getProfile().getName().isPresent())
                                         .map(e -> e.getProfile().getName().get())
@@ -73,7 +73,7 @@ public final class CommandDeop {
                         })
                 .executor((src, args) -> {
                     String playerName = args.<String>getOne("player").get();
-                    UserConfig<OpsEntry> config = LanternGame.get().getOpsConfig();
+                    UserConfig<OpsEntry> config = Lantern.getGame().getOpsConfig();
                     Optional<OpsEntry> entry = config.getEntryByName(playerName);
                     if (entry.isPresent()) {
                         config.removeEntry(entry.get().getProfile().getUniqueId());

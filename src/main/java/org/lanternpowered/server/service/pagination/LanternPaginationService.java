@@ -31,14 +31,8 @@ import static org.spongepowered.api.command.args.GenericArguments.integer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.MapMaker;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageReceiver;
-import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -46,6 +40,12 @@ import org.spongepowered.api.command.args.CommandArgs;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.service.pagination.PaginationList;
+import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageReceiver;
+import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.List;
 import java.util.Map;
@@ -88,7 +88,7 @@ public class LanternPaginationService implements PaginationService {
 
     void registerCommandOnce() {
         if (this.commandRegistered.compareAndSet(false, true)) {
-            Sponge.getGame().getCommandManager().register(LanternGame.plugin(), CommandSpec.builder()
+            Sponge.getGame().getCommandManager().register(Lantern.getMinecraftPlugin(), CommandSpec.builder()
                     .description(t("Helper command for paginations occurring"))
                     .arguments(new ActivePaginationCommandElement(t("pagination-id")))
                     .child(CommandSpec.builder()

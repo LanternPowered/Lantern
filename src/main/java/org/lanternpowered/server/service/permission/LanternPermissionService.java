@@ -30,12 +30,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.console.LanternConsoleSource;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.rcon.RconSource;
 import org.lanternpowered.server.service.permission.base.FixedParentMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.ContextCalculator;
@@ -84,10 +84,10 @@ public class LanternPermissionService implements PermissionService {
                 s -> new FixedParentMemorySubjectData(LanternPermissionService.this, this.getGroupForOpLevel(4)),
                 s -> {
                     if (s.equals(LanternConsoleSource.NAME)) {
-                        return LanternGame.get().getServer().getConsole();
+                        return Sponge.getServer().getConsole();
                     } else if (s.startsWith(RconSource.NAME_PREFIX)) {
                         String hostName = s.substring(RconSource.NAME_FULL_PREFIX.length(), s.length() - RconSource.NAME_POSTFIX.length());
-                        RconService rconService = LanternGame.get().getServiceManager().provideUnchecked(RconService.class);
+                        RconService rconService = Sponge.getServiceManager().provideUnchecked(RconService.class);
                         if (rconService instanceof RconServer) {
                             return ((RconServer) rconService).getByHostName(hostName).orElse(null);
                         }

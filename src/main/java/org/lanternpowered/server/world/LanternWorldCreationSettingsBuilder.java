@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
@@ -192,7 +192,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
     public LanternWorldCreationSettingsBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
         Set<WorldGeneratorModifier> entries = Sets.newHashSet();
-        GeneratorModifierRegistryModule registry = LanternGame.get().getRegistry().getWorldGeneratorModifierRegistry();
+        GeneratorModifierRegistryModule registry = Lantern.getGame().getRegistry().getWorldGeneratorModifierRegistry();
         for (WorldGeneratorModifier modifier : modifiers) {
             checkNotNull(modifier, "modifier");
             checkState(registry.getById(modifier.getId()).isPresent(), "Modifier not registered: " + modifier.getId()

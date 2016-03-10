@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -41,7 +41,7 @@ public enum LanternSandType implements SandType, SimpleCatalogType, InternalCata
     private final Translation translation;
 
     LanternSandType(String identifier, String translationPart) {
-        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
                 "tile.sand." + translationPart + ".name");
         this.identifier = identifier;
     }

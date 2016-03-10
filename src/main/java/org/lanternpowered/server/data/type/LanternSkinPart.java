@@ -29,7 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -49,7 +49,7 @@ public final class LanternSkinPart extends SimpleLanternCatalogType implements S
         super(identifier);
         this.mask = index << 1;
         this.index = index;
-        this.translation =  LanternGame.get().getRegistry().getTranslationManager().get(
+        this.translation =  Lantern.getGame().getRegistry().getTranslationManager().get(
                 "options.modelPart." + identifier);
         // Add to the lookup
         // TODO: Should this be moved to the registry?

@@ -30,7 +30,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -152,14 +153,14 @@ public class LanternLoadingTicketIO {
         for (DataView ticketHolder : ticketHolders) {
             String holderName = ticketHolder.getString(HOLDER_NAME).get();
 
-            if (!LanternGame.get().getPluginManager().isLoaded(holderName)) {
-                LanternGame.log().warn("Found chunk loading data for plugin {} which is currently not available or active"
+            if (!Sponge.getPluginManager().isLoaded(holderName)) {
+                Lantern.getLogger().warn("Found chunk loading data for plugin {} which is currently not available or active"
                         + " - it will be removed from the world save", holderName);
                 continue;
             }
 
             if (!callbacks.contains(holderName)) {
-                LanternGame.log().warn("The plugin {} has registered persistent chunk loading data but doesn't seem"
+                Lantern.getLogger().warn("The plugin {} has registered persistent chunk loading data but doesn't seem"
                         + " to want to be called back with it - it will be removed from the world save", holderName);
                 continue;
             }
@@ -205,7 +206,7 @@ public class LanternLoadingTicketIO {
                     ticket0.setEntityReference(new EntityReference(chunkCoords, uuid));
                     ticket = ticket0;
                 } else {
-                    LanternGame.log().warn("Unknown ticket entry type {} for {}, skipping...", type, holderName);
+                    Lantern.getLogger().warn("Unknown ticket entry type {} for {}, skipping...", type, holderName);
                     continue;
                 }
                 if (ticketEntry.contains(MOD_DATA)) {

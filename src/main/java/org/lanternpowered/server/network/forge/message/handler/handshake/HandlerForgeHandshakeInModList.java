@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.forge.message.handler.handshake;
 
 import com.google.common.collect.Maps;
 import io.netty.util.Attribute;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
@@ -50,6 +50,6 @@ public final class HandlerForgeHandshakeInModList implements Handler<MessageForg
         // Just use a empty map for now
         session.send(new MessageForgeHandshakeInOutModList(Maps.newHashMap()));
         phase.set(ForgeServerHandshakePhase.WAITING_ACK);
-        LanternGame.log().info("{}: Forge handshake -> Received modList message.", session.getGameProfile().getName());
+        Lantern.getLogger().info("{}: Forge handshake -> Received modList message.", session.getGameProfile().getName());
     }
 }

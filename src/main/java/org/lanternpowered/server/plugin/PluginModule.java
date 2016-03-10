@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.plugin;
 
+import static com.google.inject.name.Names.named;
+
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -35,9 +37,14 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.lanternpowered.server.game.LanternGame;
 import org.slf4j.Logger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.GameRegistry;
+import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
+import org.spongepowered.api.event.EventManager;
+import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.AsynchronousExecutor;
@@ -65,34 +72,54 @@ public final class PluginModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        ConfigDir sharedRootDir = new ConfigDirAnnotation(true);
         ConfigDir privateConfigDir = new ConfigDirAnnotation(false);
         DefaultConfig sharedConfigFile = new ConfigFileAnnotation(true);
         DefaultConfig privateConfigFile = new ConfigFileAnnotation(false);
 
+        PluginContainer pluginContainer = this.game.getImplementationPlugin();
+        this.bind(PluginContainer.class).annotatedWith(named(pluginContainer.getId())).toInstance(pluginContainer);
+        pluginContainer = this.game.getApiPlugin();
+        this.bind(PluginContainer.class).annotatedWith(named(pluginContainer.getId())).toInstance(pluginContainer);
+        pluginContainer = this.game.getMinecraftPlugin();
+        this.bind(PluginContainer.class).annotatedWith(named(pluginContainer.getId())).toInstance(pluginContainer);
+
         this.bind(this.pluginClass).in(Scopes.SINGLETON);
         this.bind(PluginContainer.class).toInstance(this.container);
         this.bind(Logger.class).toInstance(this.container.getLogger());
-        this.bind(LanternGame.class).toInstance(this.game);
         this.bind(Game.class).toInstance(this.game);
+        this.bind(GameRegistry.class).toInstance(this.game.getRegistry());
         this.bind(ServiceManager.class).toInstance(this.game.getServiceManager());
         this.bind(PluginManager.class).toInstance(this.game.getPluginManager());
+        this.bind(AssetManager.class).toInstance(this.game.getAssetManager());
+        this.bind(EventManager.class).toInstance(this.game.getEventManager());
         this.bind(Platform.class).toInstance(this.game.getPlatform());
+        this.bind(MinecraftVersion.class).toInstance(this.game.getPlatform().getMinecraftVersion());
+        this.bind(ChannelRegistrar.class).toInstance(this.game.getChannelRegistrar());
+        // TODO: TeleportHelper
 
-        // Plugin-private config directory (shared dir is in the global guice module)
+        this.bind(Path.class).annotatedWith(sharedRootDir).toInstance(this.game.getConfigDir());
+        this.bind(File.class).annotatedWith(sharedRootDir).toInstance(this.game.getConfigDir().toFile());
         this.bind(Path.class).annotatedWith(privateConfigDir).toProvider(PrivateConfigDirProvider.class);
         this.bind(File.class).annotatedWith(privateConfigDir).toProvider(FilePrivateConfigDirProvider.class);
-        this.bind(Path.class).annotatedWith(sharedConfigFile).toProvider(SharedConfigFileProvider.class); // Shared-directory config file
+        // Shared-directory config file
+        this.bind(Path.class).annotatedWith(sharedConfigFile).toProvider(SharedConfigFileProvider.class);
         this.bind(File.class).annotatedWith(sharedConfigFile).toProvider(FileSharedConfigFileProvider.class);
-        this.bind(Path.class).annotatedWith(privateConfigFile).toProvider(PrivateConfigFileProvider.class); // Plugin-private directory config file
+        // Plugin-private directory config file
+        this.bind(Path.class).annotatedWith(privateConfigFile).toProvider(PrivateConfigFileProvider.class);
         this.bind(File.class).annotatedWith(privateConfigFile).toProvider(FilePrivateConfigFileProvider.class);
 
-        this.bind(new TypeLiteral<ConfigurationLoader<CommentedConfigurationNode>>() {
-        }).annotatedWith(sharedConfigFile).toProvider(SharedHoconConfigProvider.class); // Loader for shared-directory config file
-        this.bind(new TypeLiteral<ConfigurationLoader<CommentedConfigurationNode>>() {
-        }).annotatedWith(privateConfigFile).toProvider(PrivateHoconConfigProvider.class); // Loader for plugin-private directory config file
+        // Loader for shared-directory config file
+        this.bind(new TypeLiteral<ConfigurationLoader<CommentedConfigurationNode>>() {})
+                .annotatedWith(sharedConfigFile).toProvider(SharedHoconConfigProvider.class);
+        // Loader for plugin-private directory config file
+        this.bind(new TypeLiteral<ConfigurationLoader<CommentedConfigurationNode>>() {})
+                .annotatedWith(privateConfigFile).toProvider(PrivateHoconConfigProvider.class);
 
-        this.bind(SpongeExecutorService.class).annotatedWith(SynchronousExecutor.class).toProvider(SynchronousExecutorProvider.class);
-        this.bind(SpongeExecutorService.class).annotatedWith(AsynchronousExecutor.class).toProvider(AsynchronousExecutorProvider.class);
+        this.bind(SpongeExecutorService.class).annotatedWith(SynchronousExecutor.class)
+                .toProvider(SynchronousExecutorProvider.class);
+        this.bind(SpongeExecutorService.class).annotatedWith(AsynchronousExecutor.class)
+                .toProvider(AsynchronousExecutorProvider.class);
     }
 
     private static class PrivateConfigDirProvider implements Provider<Path> {

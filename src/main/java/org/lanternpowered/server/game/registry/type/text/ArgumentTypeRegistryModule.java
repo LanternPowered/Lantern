@@ -27,7 +27,7 @@ package org.lanternpowered.server.game.registry.type.text;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.text.selector.LanternArgumentHolder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.spongepowered.api.entity.EntityType;
@@ -50,7 +50,7 @@ public final class ArgumentTypeRegistryModule implements RegistryModule {
 
     @Override
     public void registerDefaults() {
-        final LanternSelectorFactory factory = LanternGame.get().getRegistry().getSelectorFactory();
+        final LanternSelectorFactory factory = Lantern.getGame().getRegistry().getSelectorFactory();
 
         // POSITION
         ArgumentType<Integer> x = factory.createArgumentType("x", Integer.class);

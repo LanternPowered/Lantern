@@ -29,7 +29,7 @@ import static org.lanternpowered.server.util.ReflectionHelper.createUnsafeInstan
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -86,7 +86,7 @@ public final class ImmutableDataCachingUtil {
                 try {
                     return createUnsafeInstance(immutableClass, args);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    LanternGame.log().error("Could not construct an ImmutableDataManipulator: " + immutableClass.getCanonicalName() +
+                    Lantern.getLogger().error("Could not construct an ImmutableDataManipulator: " + immutableClass.getCanonicalName() +
                             " with the args: " + Arrays.toString(args), e);
                 }
                 throw new UnsupportedOperationException("Could not construct the ImmutableDataManipulator: " + immutableClass.getName() +
@@ -110,7 +110,7 @@ public final class ImmutableDataCachingUtil {
                         return createUnsafeInstance(valueClass, usedKey, defaultArg, arg, extraArgs);
                     }
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                    LanternGame.log().error("Could not construct an ImmutableValue: " + valueClass.getCanonicalName(), e);
+                    Lantern.getLogger().error("Could not construct an ImmutableValue: " + valueClass.getCanonicalName(), e);
                 }
                 throw new UnsupportedOperationException("Could not construct the ImmutableValue: " + valueClass.getName());
             });

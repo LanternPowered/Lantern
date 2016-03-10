@@ -31,9 +31,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.text.LanternTextHelper;
 import org.lanternpowered.server.text.LanternTextHelper.RawAction;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.ClickAction;
 import org.spongepowered.api.text.action.HoverAction;
@@ -57,7 +57,7 @@ abstract class JsonTextBaseSerializer {
     public void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context, @Nullable JsonArray children)
             throws JsonParseException {
         if (json.has("color")) {
-            TextColor color = LanternGame.get().getRegistry().getType(TextColor.class, json.get("color").getAsString()).orElse(null);
+            TextColor color = Sponge.getRegistry().getType(TextColor.class, json.get("color").getAsString()).orElse(null);
             if (color != null) {
                 builder.color(color);
             }

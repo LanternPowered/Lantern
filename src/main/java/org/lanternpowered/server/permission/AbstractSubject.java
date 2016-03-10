@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.permission;
 
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.service.LanternServiceListeners;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -57,7 +57,7 @@ public interface AbstractSubject extends Subject {
     }
 
     default void findPermissionSubject() {
-        Optional<PermissionService> service = LanternGame.get().getServiceManager().provide(PermissionService.class);
+        Optional<PermissionService> service = Sponge.getServiceManager().provide(PermissionService.class);
         if (service.isPresent()) {
             new SubjectSettingCallback(this).test(service.get());
         }

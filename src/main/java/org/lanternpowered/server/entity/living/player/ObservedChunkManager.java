@@ -35,7 +35,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import gnu.trove.map.TShortShortMap;
 import gnu.trove.map.hash.TShortShortHashMap;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
@@ -75,7 +75,7 @@ public final class ObservedChunkManager {
     private final Map<Vector2i, ObservedChunk> observedChunks = Maps.newConcurrentMap();
 
     public ObservedChunkManager(LanternWorld world) {
-        Sponge.getEventManager().registerListeners(LanternGame.plugin(), new Listeners());
+        Sponge.getEventManager().registerListeners(Lantern.getMinecraftPlugin(), new Listeners());
         this.world = world;
     }
 

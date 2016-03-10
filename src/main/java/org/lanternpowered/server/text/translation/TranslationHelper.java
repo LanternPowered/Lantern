@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.Text;
 
 public final class TranslationHelper {
@@ -38,7 +38,7 @@ public final class TranslationHelper {
      * @return The translatable text
      */
     public static Text t(String key, Object... args) {
-        return Text.of(LanternGame.get().getRegistry().getTranslationManager().get(key), args);
+        return Text.of(Lantern.getGame().getRegistry().getTranslationManager().get(key), args);
     }
 
     private TranslationHelper() {

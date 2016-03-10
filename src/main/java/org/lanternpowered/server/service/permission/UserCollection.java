@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.service.permission;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -61,13 +62,13 @@ public class UserCollection extends LanternSubjectCollection {
     }
 
     private GameProfile uuidToGameProfile(UUID uuid) {
-        return (GameProfile) LanternGame.get().getGameProfileManager().get(uuid, true);
+        return (GameProfile) Lantern.getGame().getGameProfileManager().get(uuid, true);
     }
 
     @Override
     public boolean hasRegistered(String identifier) {
         UUID uuid = identifierToUUID(identifier);
-        return uuid != null && LanternGame.get().getOpsConfig().getEntryByUUID(uuid).isPresent();
+        return uuid != null && Lantern.getGame().getOpsConfig().getEntryByUUID(uuid).isPresent();
     }
 
     @Nullable
@@ -82,7 +83,7 @@ public class UserCollection extends LanternSubjectCollection {
     @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public Iterable<Subject> getAllSubjects() {
-        return (Iterable) LanternGame.get().getServer().getOnlinePlayers();
+        return (Iterable) Sponge.getServer().getOnlinePlayers();
         /*return ImmutableSet.copyOf(Iterables.concat(
                 Iterables.<Object, Subject>transform(SpongePermissionService.getOps().getValues().values(),
                         new Function<Object, Subject>() {

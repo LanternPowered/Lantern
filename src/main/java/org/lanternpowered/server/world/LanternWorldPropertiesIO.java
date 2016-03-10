@@ -32,7 +32,7 @@ import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.world.LanternWorldProperties.OverriddenWorldProperties;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -41,6 +41,7 @@ import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -176,7 +177,7 @@ public final class LanternWorldPropertiesIO {
             try {
                 spongeRootContainer = NbtStreamUtils.read(Files.newInputStream(spongeLevelFile), true);
             } catch (IOException e) {
-                LanternGame.log().error("Unable to access {}, ignoring...", SPONGE_LEVEL_DATA, e);
+                Lantern.getLogger().error("Unable to access {}, ignoring...", SPONGE_LEVEL_DATA, e);
             }
             spongeContainer = spongeRootContainer.getView(DataQueries.SPONGE_DATA).orElse(null);
             if (spongeContainer != null) {
@@ -236,7 +237,7 @@ public final class LanternWorldPropertiesIO {
         properties.initialized = dataView.getInt(INITIALIZED).get() > 0;
         byte gameModeId = dataView.getInt(GAME_MODE).get().byteValue();
         GameMode gameMode = GameModes.SURVIVAL;
-        for (GameMode gameMode0 : LanternGame.get().getRegistry().getAllOf(GameMode.class)) {
+        for (GameMode gameMode0 : Sponge.getRegistry().getAllOf(GameMode.class)) {
             if (((LanternGameMode) gameMode0).getInternalId() == gameModeId) {
                 gameMode = gameMode0;
                 break;
@@ -244,7 +245,7 @@ public final class LanternWorldPropertiesIO {
         }
         byte difficultyId = dataView.getInt(DIFFICULTY).get().byteValue();
         Difficulty difficulty = Difficulties.NORMAL;
-        for (Difficulty difficulty0 : LanternGame.get().getRegistry().getAllOf(Difficulty.class)) {
+        for (Difficulty difficulty0 : Sponge.getRegistry().getAllOf(Difficulty.class)) {
             if (((LanternDifficulty) difficulty0).getInternalId() == difficultyId) {
                 difficulty = difficulty0;
                 break;
@@ -287,7 +288,7 @@ public final class LanternWorldPropertiesIO {
             if (genName.indexOf(':') == -1) {
                 genName = "minecraft:" + genName;
             }
-            properties.generatorType = (LanternGeneratorType) LanternGame.get().getRegistry()
+            properties.generatorType = (LanternGeneratorType) Sponge.getRegistry()
                     .getType(GeneratorType.class, genName).orElse(null);
             if (properties.generatorType != null && dataView.contains(GENERATOR_OPTIONS)) {
                 String options = dataView.getString(GENERATOR_OPTIONS).get();
@@ -307,7 +308,7 @@ public final class LanternWorldPropertiesIO {
                         JsonObject json = GSON.fromJson(options, JsonObject.class);
                         properties.generatorSettings = JsonTranslator.instance().translateFrom(json).copy();
                     } catch (Exception e) {
-                        LanternGame.log().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",
+                        Lantern.getLogger().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",
                                 options, genName);
                         e.printStackTrace();
                     }
@@ -337,7 +338,7 @@ public final class LanternWorldPropertiesIO {
                             .getOrCreateRule(RuleType.getOrCreate(en.getKey().toString(), RuleDataTypes.STRING, ""))
                             .setRawValue((String) en.getValue());
                 } catch (IllegalArgumentException e) {
-                    LanternGame.log().warn("An error occurred while loading a game rule (" + en.getKey().toString() +
+                    Lantern.getLogger().warn("An error occurred while loading a game rule (" + en.getKey().toString() +
                             ") this one will be skipped", e);
                 }
             }
@@ -375,7 +376,7 @@ public final class LanternWorldPropertiesIO {
             } else if (dimensionType.equalsIgnoreCase(END)) {
                 properties.dimensionType = (LanternDimensionType<?>) DimensionTypes.THE_END;
             } else {
-                properties.dimensionType = (LanternDimensionType<?>) LanternGame.get().getRegistry()
+                properties.dimensionType = (LanternDimensionType<?>) Sponge.getRegistry()
                         .getType(DimensionType.class, dimensionType).orElse(null);
             }
 

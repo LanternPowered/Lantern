@@ -27,8 +27,9 @@ package org.lanternpowered.server.world.rules;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.world.ChangeWorldGameRuleEvent;
@@ -112,11 +113,11 @@ public final class Rule<T> {
                 newRawValue = this.ruleType.getDataType().serialize(newValue);
             }
             if (cause == null) {
-                cause = Cause.source(LanternGame.plugin()).owner(world).build();
+                cause = Cause.source(Lantern.getMinecraftPlugin()).owner(world).build();
             }
             ChangeWorldGameRuleEvent event = SpongeEventFactory.createChangeWorldGameRuleEvent(
                     cause, this.getRawValue(), newRawValue, this.ruleType.getName(), world);
-            if (LanternGame.get().getEventManager().post(event)) {
+            if (Sponge.getEventManager().post(event)) {
                 return;
             }
         }

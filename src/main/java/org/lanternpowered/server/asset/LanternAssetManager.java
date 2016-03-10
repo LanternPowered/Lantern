@@ -28,12 +28,13 @@ package org.lanternpowered.server.asset;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.io.File;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,8 +51,9 @@ public final class LanternAssetManager implements AssetManager {
         checkNotNull(name, "name");
         checkArgument(!name.isEmpty(), "name cannot be empty");
         PluginContainer plugin = Sponge.getPluginManager().fromInstance(instance).get();
-        Path assetDir = plugin.getAssetDirectory().orElse(Paths.get(DEFAULT_ASSET_DIR).resolve(plugin.getId().replace('.', '/')));
-        URL url = CLASS_LOADER.getResource(assetDir.resolve(name).toString());
+        Path assetDir = plugin.getAssetDirectory().orElse(Paths.get(DEFAULT_ASSET_DIR)
+                .resolve(plugin.getId().replace('.', '/')));
+        URL url = CLASS_LOADER.getResource(assetDir.resolve(name).toString().replace(File.separatorChar, '/'));
         if (url == null) {
             return Optional.empty();
         }
@@ -60,7 +62,7 @@ public final class LanternAssetManager implements AssetManager {
 
     @Override
     public Optional<Asset> getAsset(String name) {
-        return this.getAsset(LanternGame.plugin(), name);
+        return this.getAsset(Lantern.getMinecraftPlugin(), name);
     }
 
 }

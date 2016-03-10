@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.forge.message.handler.handshake;
 
 import com.google.common.collect.Sets;
 import io.netty.util.Attribute;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.handshake.ForgeHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
@@ -38,6 +38,7 @@ import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
 
 import java.util.Set;
 
@@ -53,7 +54,7 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         }
         boolean fml = session.getChannel().attr(Session.FML_MARKER).get();
 
-        Set<String> channels = Sets.newHashSet(LanternGame.get().getChannelRegistrar()
+        Set<String> channels = Sets.newHashSet(Sponge.getChannelRegistrar()
                 .getRegisteredChannels(Platform.Type.SERVER));
         if (fml) {
             channels.add("FML");
@@ -66,9 +67,9 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         if (fml) {
             phase.set(ForgeServerHandshakePhase.HELLO);
             session.send(new MessageForgeHandshakeInOutHello());
-            LanternGame.log().info("{}: Start forge handshake.", session.getGameProfile().getName().get());
+            Lantern.getLogger().info("{}: Start forge handshake.", session.getGameProfile().getName().get());
         } else {
-            LanternGame.log().info("{}: Skip forge handshake.", session.getGameProfile().getName().get());
+            Lantern.getLogger().info("{}: Skip forge handshake.", session.getGameProfile().getName().get());
             phase.set(ForgeServerHandshakePhase.DONE);
             session.setProtocolState(ProtocolState.PLAY);
             session.spawnPlayer();

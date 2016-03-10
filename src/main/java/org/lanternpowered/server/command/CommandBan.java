@@ -28,7 +28,6 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.command.element.RemainingTextElement;
-import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -73,7 +72,7 @@ public final class CommandBan {
                         // Try as ip address first
                         try {
                             InetAddress address = InetAddress.getByName(target);
-                            banService.addBan(LanternGame.get().getRegistry().createBuilder(Ban.Builder.class)
+                            banService.addBan(Ban.builder()
                                     .type(BanTypes.IP)
                                     .address(address)
                                     .reason(reason == null ? null : Text.of(reason))
@@ -84,7 +83,7 @@ public final class CommandBan {
                             if (!player.isPresent()) {
                                 throw new CommandException(t("commands.banip.invalid"));
                             }
-                            banService.addBan(Sponge.getRegistry().createBuilder(Ban.Builder.class)
+                            banService.addBan(Ban.builder()
                                     .type(BanTypes.PROFILE)
                                     .profile(player.get().getProfile())
                                     .reason(reason == null ? null : Text.of(reason))

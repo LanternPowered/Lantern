@@ -27,13 +27,12 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorldProperties;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.source.LocatedSource;
-import org.spongepowered.api.world.storage.WorldProperties;
 
 class CommandHelper {
 
@@ -44,7 +43,7 @@ class CommandHelper {
         } else if (src instanceof LocatedSource) {
             world = (LanternWorldProperties) ((LocatedSource) src).getWorld().getProperties();
         } else {
-            world = (LanternWorldProperties) LanternGame.get().getServer().getDefaultWorld().orElse(null);
+            world = (LanternWorldProperties) Sponge.getServer().getDefaultWorld().orElse(null);
             if (world == null) {
                 // Shouldn't happen
                 throw new CommandException(t("Unable to find the default world."));

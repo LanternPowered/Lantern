@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -42,7 +42,7 @@ public enum LanternShrubType implements ShrubType, SimpleCatalogType, InternalCa
     private final Translation translation;
 
     LanternShrubType(String identifier, String translationPart) {
-        this.translation = LanternGame.get().getRegistry().getTranslationManager().get(
+        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
                 "tile.tallgrass." + translationPart + ".name");
         this.identifier = identifier;
     }

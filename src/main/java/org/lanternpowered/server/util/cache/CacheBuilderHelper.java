@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Equivalence;
 import com.google.common.cache.CacheBuilder;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 
 import java.lang.reflect.Method;
 
@@ -60,7 +60,7 @@ public final class CacheBuilderHelper {
         } catch (IllegalStateException | NullPointerException e) {
             throw e;
         } catch (Throwable t) {
-            LanternGame.log().error("Unable to set the keyEquivalence of a CacheBuilder", t);
+            Lantern.getLogger().error("Unable to set the keyEquivalence of a CacheBuilder", t);
         }
         return builder;
     }
@@ -88,7 +88,7 @@ public final class CacheBuilderHelper {
         } catch (IllegalStateException | NullPointerException e) {
             throw e;
         } catch (Throwable t) {
-            LanternGame.log().error("Unable to set the valueEquivalence of a CacheBuilder", t);
+            Lantern.getLogger().error("Unable to set the valueEquivalence of a CacheBuilder", t);
         }
         return builder;
     }

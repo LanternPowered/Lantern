@@ -32,7 +32,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.text.SelectorTypeRegistryModule;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scoreboard.Score;
@@ -74,10 +74,10 @@ public class LanternSelectorFactory implements SelectorFactory {
                 try {
                     return (V) m.invoke(null, input);
                 } catch (IllegalAccessException e) {
-                    LanternGame.log().debug(m + " wasn't public", e);
+                    Lantern.getLogger().debug(m + " wasn't public", e);
                     return null;
                 } catch (IllegalArgumentException e) {
-                    LanternGame.log().debug(m + " failed with paramter " + input, e);
+                    Lantern.getLogger().debug(m + " failed with paramter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
                     throw Throwables.propagate(e.getCause());
@@ -88,10 +88,10 @@ public class LanternSelectorFactory implements SelectorFactory {
                 try {
                     return (V) m.invoke(input);
                 } catch (IllegalAccessException e) {
-                    LanternGame.log().debug(m + " wasn't public", e);
+                    Lantern.getLogger().debug(m + " wasn't public", e);
                     return null;
                 } catch (IllegalArgumentException e) {
-                    LanternGame.log().debug(m + " failed with paramter " + input, e);
+                    Lantern.getLogger().debug(m + " failed with paramter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
                     throw Throwables.propagate(e.getCause());

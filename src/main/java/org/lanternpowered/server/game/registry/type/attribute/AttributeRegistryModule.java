@@ -34,7 +34,7 @@ import org.lanternpowered.server.attribute.AttributeTargets;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributes;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
@@ -89,7 +89,7 @@ public final class AttributeRegistryModule implements AdditionalCatalogRegistryM
 
     private LanternAttribute defaultAttribute(String id, double def, double min, double max, Predicate<DataHolder> targets) {
         return new LanternAttributeBuilder().id(id).defaultValue(def).maximum(max).minimum(min).targets(targets)
-                .name(Text.of(LanternGame.get().getRegistry().getTranslationManager().get("attribute.name." + id)))
+                .name(Text.of(Lantern.getGame().getRegistry().getTranslationManager().get("attribute.name." + id)))
                 .build();
     }
 

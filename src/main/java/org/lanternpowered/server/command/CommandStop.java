@@ -29,7 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.element.RemainingTextElement;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -46,7 +46,7 @@ public final class CommandStop {
                 .permission(PERMISSION)
                 .description(t("commands.stop.description"))
                 .executor((src, args) -> {
-                    final LanternServer server = LanternGame.get().getServer();
+                    final LanternServer server = Lantern.getGame().getServer();
                     if (args.hasAny("kick-message")) {
                         server.shutdown(Text.of(args.<String>getOne("kick-message").get()));
                     } else {

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.game.registry.type.text;
 
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
@@ -54,7 +54,7 @@ public final class TextSerializersRegistryModule implements RegistryModule {
         mappings.put("plain", new PlainTextSerializer());
         mappings.put("legacy_formatting_code", new FormattingCodeTextSerializer(TextConstants.LEGACY_CHAR));
         mappings.put("formatting_code", new FormattingCodeTextSerializer('&'));
-        mappings.put("json", new LanternJsonTextSerializer(LanternGame.get().getRegistry().getRegistryModule(
+        mappings.put("json", new LanternJsonTextSerializer(Lantern.getGame().getRegistry().getRegistryModule(
                 TranslationManagerRegistryModule.class).get().getTranslationManager()));
         mappings.put("text_xml", new XmlTextSerializer());
         RegistryHelper.mapFields(TextSerializers.class, mappings);

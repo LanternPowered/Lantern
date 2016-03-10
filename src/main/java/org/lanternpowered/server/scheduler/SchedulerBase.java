@@ -27,7 +27,7 @@ package org.lanternpowered.server.scheduler;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -180,7 +180,7 @@ abstract class SchedulerBase {
             try {
                 task.getConsumer().accept(task);
             } catch (Throwable t) {
-                LanternGame.log().error("The Scheduler tried to run the task {} owned by {}, but an error occured.",
+                Lantern.getLogger().error("The Scheduler tried to run the task {} owned by {}, but an error occured.",
                         task.getName(), task.getOwner(), t);
             }
         });

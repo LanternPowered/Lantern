@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.util;
 
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.Lantern;
 
 import java.util.Map;
 
@@ -49,12 +49,12 @@ public class ShutdownMonitorThread extends Thread {
         try {
             Thread.sleep(DELAY);
         } catch (InterruptedException e) {
-            LanternGame.log().error("Shutdown monitor interrupted", e);
+            Lantern.getLogger().error("Shutdown monitor interrupted", e);
             System.exit(0);
             return;
         }
 
-        LanternGame.log().warn("Still running after shutdown, finding rogue threads...");
+        Lantern.getLogger().warn("Still running after shutdown, finding rogue threads...");
 
         final Map<Thread, StackTraceElement[]> traces = Thread.getAllStackTraces();
         for (Map.Entry<Thread, StackTraceElement[]> entry : traces.entrySet()) {
@@ -66,9 +66,9 @@ public class ShutdownMonitorThread extends Thread {
                 continue;
             }
 
-            LanternGame.log().warn("Rogue thread: " + thread);
+            Lantern.getLogger().warn("Rogue thread: " + thread);
             for (StackTraceElement trace : stack) {
-                LanternGame.log().warn("    at " + trace);
+                Lantern.getLogger().warn("    at " + trace);
             }
 
             // ask nicely to kill them
@@ -78,7 +78,7 @@ public class ShutdownMonitorThread extends Thread {
                 try {
                     thread.join(1000);
                 } catch (InterruptedException ex) {
-                    LanternGame.log().error("Shutdown monitor interrupted", ex);
+                    Lantern.getLogger().error("Shutdown monitor interrupted", ex);
                     System.exit(0);
                     return;
                 }

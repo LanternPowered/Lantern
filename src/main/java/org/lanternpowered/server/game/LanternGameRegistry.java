@@ -285,7 +285,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(ColoredParticle.Builder.class, LanternParticleEffectBuilder.Colorable::new)
                 .registerBuilderSupplier(ItemParticle.Builder.class, LanternParticleEffectBuilder.Item::new)
                 .registerBuilderSupplier(BlockParticle.Builder.class, LanternParticleEffectBuilder.Block::new)
-                .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(LanternGame.get().getScheduler()))
+                .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(Lantern.getGame().getScheduler()))
                 .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
                 .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)
                 ;
@@ -302,7 +302,7 @@ public class LanternGameRegistry implements GameRegistry {
                 registry.initialize();
             }
         } catch (Exception e) {
-            LanternGame.log().error("Could not initialize a factory!", e);
+            this.game.getLogger().error("Could not initialize a factory!", e);
         }
     }
 
@@ -496,7 +496,8 @@ public class LanternGameRegistry implements GameRegistry {
                         checkState(!mappings.isEmpty(), "The registered module: " + module.getClass().getSimpleName()
                                 + " cannot have an empty mapping during registration!");
                     } catch (Exception e) {
-                        LanternGame.log().error("Failed to retrieve a registry field from module: " + module.getClass().getCanonicalName());
+                        this.game.getLogger().error("Failed to retrieve a registry field from module: " +
+                                module.getClass().getCanonicalName());
                     }
                 }
                 return new CatalogMapData(annotation.value(), mappings);
@@ -509,7 +510,7 @@ public class LanternGameRegistry implements GameRegistry {
         try {
             method.invoke(module);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            LanternGame.log().error("Error when calling custom catalog registration for module: "
+            this.game.getLogger().error("Error when calling custom catalog registration for module: "
                     + module.getClass().getCanonicalName(), e);
         }
     }

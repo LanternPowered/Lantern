@@ -26,6 +26,7 @@
 package org.lanternpowered.server.plugin;
 
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternPlatform;
 
@@ -50,7 +51,7 @@ public final class LanternServerContainer extends AbstractPluginContainer {
 
     @Override
     public Optional<LanternServer> getInstance() {
-        return Optional.of(LanternGame.get().getServer());
+        return Optional.of(Lantern.getGame().getServer());
     }
 
 }

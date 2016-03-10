@@ -29,15 +29,15 @@ import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
 
 public final class CatalogTypeSerializer implements TypeSerializer<CatalogType> {
 
     @SuppressWarnings("unchecked")
     @Override
     public CatalogType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return LanternGame.get().getRegistry().getType((Class<CatalogType>) type.getRawType(), value.getString())
+        return Sponge.getRegistry().getType((Class<CatalogType>) type.getRawType(), value.getString())
                 .orElseThrow(() -> new ObjectMappingException("The catalog type is missing: " + value.getString()));
     }
 

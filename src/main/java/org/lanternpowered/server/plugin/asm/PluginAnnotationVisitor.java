@@ -30,8 +30,10 @@ import static org.objectweb.asm.Opcodes.ASM5;
 
 import com.google.common.base.Preconditions;
 import org.lanternpowered.server.plugin.InvalidPluginException;
+import org.lanternpowered.server.plugin.PluginCandidate;
 import org.objectweb.asm.AnnotationVisitor;
 import org.spongepowered.plugin.meta.PluginMetadata;
+import org.spongepowered.plugin.meta.SpongeExtension;
 
 final class PluginAnnotationVisitor extends WarningAnnotationVisitor {
 
@@ -40,6 +42,7 @@ final class PluginAnnotationVisitor extends WarningAnnotationVisitor {
     }
 
     private final PluginMetadata metadata;
+    private SpongeExtension spongeExtension;
 
     private State state = State.DEFAULT;
     private boolean hasId;
@@ -60,6 +63,14 @@ final class PluginAnnotationVisitor extends WarningAnnotationVisitor {
 
     private void checkState(State state) {
         Preconditions.checkState(this.state == state, "Expected state %s, but is %s", state, this.state);
+    }
+
+    private SpongeExtension getOrCreateSpongeExtension() {
+        if (this.spongeExtension == null) {
+            this.spongeExtension = new SpongeExtension();
+            this.metadata.setExtension(PluginCandidate.SPONGE_META_EXTENSION, this.spongeExtension);
+        }
+        return this.spongeExtension;
     }
 
     @Override
@@ -87,6 +98,9 @@ final class PluginAnnotationVisitor extends WarningAnnotationVisitor {
                 return;
             case "url":
                 this.metadata.setUrl((String) value);
+                return;
+            case "assets":
+                this.getOrCreateSpongeExtension().setAssetDirectory((String) value);
                 return;
             default:
                 super.visit(name, value);

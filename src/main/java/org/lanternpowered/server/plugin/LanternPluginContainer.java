@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -50,15 +51,18 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
     private final ImmutableList<String> authors;
 
     private final Optional<Path> source;
+    private final Optional<Path> assetDirectory;
 
     private final Optional<?> instance;
     private final Logger logger;
 
     private final Injector injector;
 
-    LanternPluginContainer(String id, Class<?> pluginClass, @Nullable String name, @Nullable String version, @Nullable String description,
-            @Nullable String url, List<String> authors, Optional<Path> source) {
+    LanternPluginContainer(String id, Class<?> pluginClass, @Nullable String name, @Nullable String version,
+            @Nullable String description, @Nullable String url, @Nullable String assetDir, List<String> authors,
+            Optional<Path> source) {
         this.id = id;
+        this.assetDirectory = assetDir == null ? Optional.empty() : Optional.of(Paths.get(assetDir));
         this.unqualifiedId = getUnqualifiedId(id);
         this.name = Optional.ofNullable(name);
         this.version = Optional.ofNullable(version);
@@ -70,6 +74,11 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
 
         this.injector = Guice.createInjector(new PluginModule(this, pluginClass, Lantern.getGame()));
         this.instance = Optional.of(this.injector.getInstance(pluginClass));
+    }
+
+    @Override
+    public Optional<Path> getAssetDirectory() {
+        return this.assetDirectory;
     }
 
     @Override

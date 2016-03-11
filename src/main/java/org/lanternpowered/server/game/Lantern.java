@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.game;
 
+import org.lanternpowered.server.LanternServer;
 import org.slf4j.Logger;
 import org.spongepowered.api.plugin.PluginContainer;
 
@@ -48,6 +49,14 @@ public class Lantern {
 
     public static LanternGame getGame() {
         return LanternGame.game;
+    }
+
+    public static LanternGameRegistry getRegistry() {
+        return LanternGame.game.getRegistry();
+    }
+
+    public static LanternServer getServer() {
+        return LanternGame.game.getServer();
     }
 
     private Lantern() {

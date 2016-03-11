@@ -221,6 +221,14 @@ public class LanternGameProfileCache implements GameProfileCache {
     }
 
     @Override
+    public Map<UUID, Optional<GameProfile>> lookupByIds(Iterable<UUID> uniqueIds) {
+        checkNotNull(uniqueIds, "uniqueIds");
+        ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
+        uniqueIds.forEach(uniqueId -> builder.put(uniqueId, this.lookupById(uniqueId)));
+        return builder.build();
+    }
+
+    @Override
     public Optional<GameProfile> getOrLookupById(UUID uniqueId) {
         Optional<GameProfile> gameProfile = this.getById(checkNotNull(uniqueId, "uniqueId"));
         if (!gameProfile.isPresent()) {

@@ -48,7 +48,6 @@ public abstract class SubtypeFilterDelegate implements FilterDelegate {
 
     @Override
     public int write(String name, ClassWriter cw, MethodVisitor mv, Method method, int locals) {
-
         mv.visitVarInsn(ALOAD, 0);
         mv.visitFieldInsn(GETFIELD, name, "classes", "Ljava/util/Set;");
         mv.visitVarInsn(ALOAD, 1);

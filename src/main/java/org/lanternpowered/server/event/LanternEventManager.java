@@ -63,15 +63,15 @@ import javax.inject.Singleton;
 public class LanternEventManager implements EventManager {
 
     private final Object lock = new Object();
-    private final DefineableClassLoader classLoader = new DefineableClassLoader(getClass().getClassLoader());
-    private final AnnotatedEventListener.Factory handlerFactory = new ClassEventListenerFactory("org.slanternpowered.server.event.listener",
-            new FilterFactory("org.lanternpowered.server.event.filters", this.classLoader), this.classLoader);
-    private final Multimap<Class<?>, RegisteredListener<?>> handlersByEvent = HashMultimap.create();
+    private final DefineableClassLoader classLoader = new DefineableClassLoader(this.getClass().getClassLoader());
+    private final AnnotatedEventListener.Factory listenerFactory = new ClassEventListenerFactory("org.lanternpowered.server.event.listener",
+                    new FilterFactory("org.lanternpowered.server.event.filters", this.classLoader), this.classLoader);
+    private final Multimap<Class<?>, RegisteredListener<?>> listenersByEvent = HashMultimap.create();
 
     /**
      * A cache of all the handlers for an event type for quick event posting.
      */
-    private final LoadingCache<Class<? extends Event>, List<RegisteredListener<?>>> handlersCache =
+    private final LoadingCache<Class<? extends Event>, List<RegisteredListener<?>>> listenersCache =
             CacheBuilder.newBuilder().build(new CacheLoader<Class<? extends Event>, List<RegisteredListener<?>>>() {
                 @Override
                 public List<RegisteredListener<?>> load(Class<? extends Event> eventClass) throws Exception {
@@ -85,7 +85,7 @@ public class LanternEventManager implements EventManager {
         Set<Class<?>> types = (Set) TypeToken.of(rootEvent).getTypes().rawTypes();
 
         synchronized (this.lock) {
-            types.stream().filter(Event.class::isAssignableFrom).forEach(type -> handlers.addAll(this.handlersByEvent.get(type)));
+            types.stream().filter(Event.class::isAssignableFrom).forEach(type -> handlers.addAll(this.listenersByEvent.get(type)));
         }
 
         Collections.sort(handlers);
@@ -106,23 +106,23 @@ public class LanternEventManager implements EventManager {
         return parameters.length >= 1 && Event.class.isAssignableFrom(parameters[0]);
     }
 
-    private void register(RegisteredListener<?> handler) {
-        register(Collections.<RegisteredListener<?>>singletonList(handler));
+    private void register(RegisteredListener<?> listener) {
+        this.register(Collections.<RegisteredListener<?>>singletonList(listener));
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    private void register(List<RegisteredListener<?>> handlers) {
+    private void register(List<RegisteredListener<?>> listeners) {
         synchronized (this.lock) {
             Set<Class<?>> types = Sets.newHashSet();
 
-            for (RegisteredListener handler : handlers) {
-                if (this.handlersByEvent.put(handler.getEventClass(), handler)) {
-                    types.addAll(TypeToken.of(handler.getEventClass()).getTypes().rawTypes());
+            for (RegisteredListener listener : listeners) {
+                if (this.listenersByEvent.put(listener.getEventClass(), listener)) {
+                    types.addAll(TypeToken.of(listener.getEventClass()).getTypes().rawTypes());
                 }
             }
 
             if (!types.isEmpty()) {
-                this.handlersCache.invalidateAll(types);
+                this.listenersCache.invalidateAll(types);
             }
         }
     }
@@ -143,9 +143,9 @@ public class LanternEventManager implements EventManager {
                     AnnotatedEventListener handler;
 
                     try {
-                        handler = this.handlerFactory.create(listener, method);
+                        handler = this.listenerFactory.create(listener, method);
                     } catch (Exception e) {
-                        Lantern.getLogger().error("Failed to create handler for {} on {}", method, handle, e);
+                        Lantern.getLogger().error("Failed to create listener for {} on {}", method, handle, e);
                         continue;
                     }
 
@@ -161,13 +161,13 @@ public class LanternEventManager implements EventManager {
     }
 
     private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
-            Listener subscribe, EventListener<? super T> handler) {
-        return createRegistration(plugin, eventClass, subscribe.order(), handler);
+            Listener subscribe, EventListener<? super T> listener) {
+        return createRegistration(plugin, eventClass, subscribe.order(), listener);
     }
 
     private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
-            Order order, EventListener<? super T> handler) {
-        return new RegisteredListener<>(plugin, eventClass, order, handler);
+            Order order, EventListener<? super T> listener) {
+        return new RegisteredListener<>(plugin, eventClass, order, listener);
     }
 
     @Override
@@ -189,28 +189,28 @@ public class LanternEventManager implements EventManager {
 
     @Override
     public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, EventListener<? super T> listener) {
-        checkPlugin(plugin, "plugin");
+        PluginContainer container = checkPlugin(plugin, "plugin");
         checkNotNull(eventClass, "eventClass");
         checkNotNull(order, "order");
         checkNotNull(listener, "listener");
-        this.register(createRegistration(checkPlugin(plugin, "plugin"), eventClass, order, listener));
+        this.register(createRegistration(container, eventClass, order, listener));
     }
 
     private void unregister(Predicate<RegisteredListener<?>> unregister) {
         synchronized (this.lock) {
             Set<Class<?>> types = Sets.newHashSet();
-            Iterator<RegisteredListener<?>> it = this.handlersByEvent.values().iterator();
+            Iterator<RegisteredListener<?>> it = this.listenersByEvent.values().iterator();
 
             while (it.hasNext()) {
-                RegisteredListener<?> handler = it.next();
-                if (unregister.apply(handler)) {
-                    types.addAll(TypeToken.of(handler.getEventClass()).getTypes().rawTypes());
+                RegisteredListener<?> listener = it.next();
+                if (unregister.apply(listener)) {
+                    types.addAll(TypeToken.of(listener.getEventClass()).getTypes().rawTypes());
                     it.remove();
                 }
             }
 
             if (!types.isEmpty()) {
-                this.handlersCache.invalidateAll(types);
+                this.listenersCache.invalidateAll(types);
             }
         }
     }
@@ -228,17 +228,17 @@ public class LanternEventManager implements EventManager {
     }
 
     protected List<RegisteredListener<?>> getHandlerCache(Event event) {
-        return this.handlersCache.getUnchecked(checkNotNull(event, "event").getClass());
+        return this.listenersCache.getUnchecked(checkNotNull(event, "event").getClass());
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected boolean post(Event event, List<RegisteredListener<?>> handlers) {
-        for (RegisteredListener handler : handlers) {
+    protected boolean post(Event event, List<RegisteredListener<?>> listeners) {
+        for (RegisteredListener listener : listeners) {
             try {
-                handler.handle(event);
+                listener.handle(event);
             } catch (Throwable e) {
                 Lantern.getLogger().error("Could not pass {} to {}", event.getClass().getSimpleName(),
-                        handler.getPlugin(), e);
+                        listener.getPlugin(), e);
             }
         }
         return event instanceof Cancellable && ((Cancellable) event).isCancelled();

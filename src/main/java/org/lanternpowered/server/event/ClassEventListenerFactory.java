@@ -60,6 +60,7 @@ import org.apache.logging.log4j.Logger;
 import org.lanternpowered.server.event.filter.EventFilter;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.event.gen.DefineableClassLoader;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
@@ -168,7 +169,7 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
             mv.visitLabel(l2);
             mv.visitFrame(F_SAME1, 0, null, 1, new Object[] {"java/lang/Exception"});
             mv.visitVarInsn(ASTORE, 0);
-            mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(LanternGame.class), "log", "()" + Type.getDescriptor(Logger.class), false);
+            mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(Lantern.class), "getLogger", "()" + Type.getDescriptor(Logger.class), false);
             mv.visitLdcInsn("Error initializing event filter");
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKEINTERFACE, Type.getInternalName(Logger.class), "error", "(Ljava/lang/String;Ljava/lang/Throwable;)V", true);

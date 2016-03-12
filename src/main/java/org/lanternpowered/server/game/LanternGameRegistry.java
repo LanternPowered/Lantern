@@ -71,6 +71,10 @@ import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistry
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistryModule;
+import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
+import org.lanternpowered.server.game.registry.type.scoreboard.ObjectiveDisplayModeRegistryModule;
+import org.lanternpowered.server.game.registry.type.scoreboard.VisibilityRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
@@ -93,7 +97,10 @@ import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryMod
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
+import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
+import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder;
 import org.lanternpowered.server.status.LanternFavicon;
+import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.lanternpowered.server.util.LanguageUtil;
@@ -155,7 +162,12 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.scoreboard.Visibility;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
+import org.spongepowered.api.scoreboard.objective.Objective;
+import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
 import org.spongepowered.api.statistic.BlockStatistic;
 import org.spongepowered.api.statistic.EntityStatistic;
@@ -163,10 +175,12 @@ import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.statistic.TeamStatistic;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextStyle;
+import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.translation.Translation;
@@ -256,6 +270,10 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
                 .registerModule(GameMode.class, new GameModeRegistryModule())
                 .registerModule(ItemType.class, new ItemRegistryModule())
+                .registerModule(Criterion.class, new CriterionRegistryModule())
+                .registerModule(DisplaySlot.class, new DisplaySlotRegistryModule())
+                .registerModule(ObjectiveDisplayMode.class, new ObjectiveDisplayModeRegistryModule())
+                .registerModule(Visibility.class, new VisibilityRegistryModule())
                 .registerModule(new ArgumentTypeRegistryModule())
                 .registerModule(ChatType.class, new ChatTypeRegistryModule())
                 .registerModule(ChatVisibility.class, new ChatVisibilityRegistryModule())
@@ -288,6 +306,9 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(Lantern.getGame().getScheduler()))
                 .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
                 .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)
+                .registerBuilderSupplier(Selector.Builder.class, LanternSelectorBuilder::new)
+                .registerBuilderSupplier(Objective.Builder.class, LanternObjectiveBuilder::new)
+                .registerBuilderSupplier(Scoreboard.Builder.class, LanternScoreboardBuilder::new)
                 ;
         this.registerFactories();
     }

@@ -31,14 +31,16 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardDisplayObjective;
+import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 
 public final class CodecPlayOutScoreboardDisplayObjective implements Codec<MessagePlayOutScoreboardDisplayObjective> {
 
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutScoreboardDisplayObjective message) throws CodecException {
         ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeByte(message.getPosition().ordinal());
-        context.write(buf, Types.STRING, message.getObjectiveName());
+        buf.writeByte(((LanternDisplaySlot) message.getDisplaySlot()).getInternalId());
+        String objectiveName = message.getObjectiveName();
+        context.write(buf, Types.STRING, objectiveName == null ? "" : objectiveName);
         return buf;
     }
 }

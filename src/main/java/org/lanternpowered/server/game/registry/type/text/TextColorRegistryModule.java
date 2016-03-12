@@ -70,6 +70,7 @@ public final class TextColorRegistryModule implements CatalogRegistryModule<Text
         types.add(new LanternTextColor("reset", Color.WHITE));
         types.add(TextColors.NONE);
         types.forEach(type -> this.chatColors.put(type.getId(), type));
+        System.out.println("DEBUG B");
     }
 
     @Override

@@ -23,33 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player.gamemode;
+package org.lanternpowered.server.text;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
-@NonnullByDefault
-public class LanternGameMode extends SimpleLanternCatalogType implements GameMode {
+public class LanternTexts {
 
-    private final Translation translation;
-    private final byte internalId;
-
-    public LanternGameMode(String identifier, int internalId) {
-        super(identifier);
-        this.internalId = (byte) internalId;
-        this.translation = Lantern.getRegistry().getTranslationManager().get("gameMode." + identifier);
+    public static String toLegacy(Text text) {
+        return TextSerializers.LEGACY_FORMATTING_CODE.serialize(text);
     }
 
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public static Text fromLegacy(String text) {
+        return TextSerializers.LEGACY_FORMATTING_CODE.deserialize(text);
     }
-
-    public byte getInternalId() {
-        return this.internalId;
-    }
-
 }

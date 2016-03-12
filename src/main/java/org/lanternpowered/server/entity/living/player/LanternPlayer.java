@@ -52,6 +52,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
@@ -128,6 +129,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     // The visible skin parts
     private Set<SkinPart> skinParts = Sets.newHashSet(SkinParts.CAPE, SkinParts.HAT, SkinParts.JACKET, SkinParts.LEFT_SLEEVE,
             SkinParts.LEFT_PANTS_LEG, SkinParts.RIGHT_SLEEVE, SkinParts.RIGHT_PANTS_LEG);
+
+    private LanternScoreboard scoreboard;
 
     // Whether you should ignore this player when checking for sleeping players to reset the time
     private boolean sleepingIgnored;
@@ -208,6 +211,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                     // The client only creates a new world instance on the client if a
                     // different dimension is used, that is why we will send two respawn
                     // messages to trick the client to do it anyway
+                    // This is also needed to avoid weird client bugs
                     if (oldDimensionType == dimensionType) {
                         oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ? DimensionTypes.NETHER :
                                 DimensionTypes.OVERWORLD);
@@ -558,14 +562,17 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public Scoreboard getScoreboard() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.scoreboard;
     }
 
     @Override
     public void setScoreboard(Scoreboard scoreboard) {
-        // TODO Auto-generated method stub
-        
+        checkNotNull(scoreboard, "scoreboard");
+        if (this.scoreboard != null && scoreboard != this.scoreboard) {
+            this.scoreboard.removePlayer(this);
+        }
+        this.scoreboard = (LanternScoreboard) scoreboard;
+        this.scoreboard.addPlayer(this);
     }
 
     @Override

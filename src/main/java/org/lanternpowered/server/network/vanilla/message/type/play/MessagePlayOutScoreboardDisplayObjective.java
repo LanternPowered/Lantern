@@ -26,28 +26,26 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
+
+import javax.annotation.Nullable;
 
 public final class MessagePlayOutScoreboardDisplayObjective implements Message {
 
-    private final String objectiveName;
-    private final DisplayPosition position;
+    @Nullable private final String objectiveName;
+    private final DisplaySlot displaySlot;
 
-    public MessagePlayOutScoreboardDisplayObjective(String objectiveName, DisplayPosition position) {
+    public MessagePlayOutScoreboardDisplayObjective(@Nullable String objectiveName, DisplaySlot displaySlot) {
         this.objectiveName = objectiveName;
-        this.position = position;
+        this.displaySlot = displaySlot;
     }
 
+    @Nullable
     public String getObjectiveName() {
         return this.objectiveName;
     }
 
-    public DisplayPosition getPosition() {
-        return this.position;
-    }
-
-    public enum DisplayPosition {
-        LIST,
-        SIDE_BAR,
-        BELOW_NAME,
+    public DisplaySlot getDisplaySlot() {
+        return this.displaySlot;
     }
 }

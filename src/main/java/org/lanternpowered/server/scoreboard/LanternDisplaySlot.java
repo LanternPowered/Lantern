@@ -23,33 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player.gamemode;
+package org.lanternpowered.server.scoreboard;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
+import org.spongepowered.api.text.format.TextColor;
 
-@NonnullByDefault
-public class LanternGameMode extends SimpleLanternCatalogType implements GameMode {
+import java.util.Optional;
 
-    private final Translation translation;
-    private final byte internalId;
+import javax.annotation.Nullable;
 
-    public LanternGameMode(String identifier, int internalId) {
+public class LanternDisplaySlot extends SimpleLanternCatalogType implements DisplaySlot {
+
+    private final Optional<TextColor> teamColor;
+    private final int internalId;
+
+    public LanternDisplaySlot(String identifier, @Nullable TextColor teamColor, int internalId) {
         super(identifier);
-        this.internalId = (byte) internalId;
-        this.translation = Lantern.getRegistry().getTranslationManager().get("gameMode." + identifier);
+        this.teamColor = Optional.ofNullable(teamColor);
+        this.internalId = internalId;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public Optional<TextColor> getTeamColor() {
+        return this.teamColor;
     }
 
-    public byte getInternalId() {
+    public int getInternalId() {
         return this.internalId;
     }
-
 }

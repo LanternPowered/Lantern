@@ -87,6 +87,7 @@ public final class PluginModule extends AbstractModule {
         this.bind(this.pluginClass).in(Scopes.SINGLETON);
         this.bind(PluginContainer.class).toInstance(this.container);
         this.bind(Logger.class).toInstance(this.container.getLogger());
+        this.bind(LanternGame.class).toInstance(this.game);
         this.bind(Game.class).toInstance(this.game);
         this.bind(GameRegistry.class).toInstance(this.game.getRegistry());
         this.bind(ServiceManager.class).toInstance(this.game.getServiceManager());

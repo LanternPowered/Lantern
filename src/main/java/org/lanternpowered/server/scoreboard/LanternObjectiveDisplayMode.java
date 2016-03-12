@@ -23,33 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player.gamemode;
+package org.lanternpowered.server.scoreboard;
 
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 
-@NonnullByDefault
-public class LanternGameMode extends SimpleLanternCatalogType implements GameMode {
+public class LanternObjectiveDisplayMode extends SimpleLanternCatalogType implements ObjectiveDisplayMode {
 
-    private final Translation translation;
-    private final byte internalId;
-
-    public LanternGameMode(String identifier, int internalId) {
+    public LanternObjectiveDisplayMode(String identifier) {
         super(identifier);
-        this.internalId = (byte) internalId;
-        this.translation = Lantern.getRegistry().getTranslationManager().get("gameMode." + identifier);
     }
-
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
-    }
-
-    public byte getInternalId() {
-        return this.internalId;
-    }
-
 }

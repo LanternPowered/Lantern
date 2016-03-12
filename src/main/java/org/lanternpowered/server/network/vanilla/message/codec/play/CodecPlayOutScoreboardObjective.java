@@ -31,6 +31,7 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
+import org.lanternpowered.server.text.LanternTexts;
 
 public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayOutScoreboardObjective> {
 
@@ -41,8 +42,8 @@ public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayO
         if (message instanceof MessagePlayOutScoreboardObjective.CreateOrUpdate) {
             buf.writeByte(message instanceof MessagePlayOutScoreboardObjective.Create ? 0 : 2);
             MessagePlayOutScoreboardObjective.CreateOrUpdate message0 = (MessagePlayOutScoreboardObjective.CreateOrUpdate) message;
-            context.write(buf, Types.STRING, message0.getDisplayName());
-            context.write(buf, Types.STRING, message0.getType().toString().toLowerCase());
+            context.write(buf, Types.STRING, LanternTexts.toLegacy(message0.getDisplayName()));
+            context.write(buf, Types.STRING, message0.getDisplayMode().getId());
         } else {
             buf.writeByte(1);
         }

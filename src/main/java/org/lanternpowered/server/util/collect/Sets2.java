@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.util.collect;
 
 import com.google.common.collect.Maps;
 import org.spongepowered.api.util.annotation.NonnullByDefault;

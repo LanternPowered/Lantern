@@ -33,19 +33,9 @@ import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 
-import java.util.EnumMap;
 import java.util.List;
 
 public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
-
-    private final EnumMap<MessagePlayOutTeams.Visibility, String> visibilities = new EnumMap<>(MessagePlayOutTeams.Visibility.class);
-
-    {
-        this.visibilities.put(MessagePlayOutTeams.Visibility.ALWAYS, "always");
-        this.visibilities.put(MessagePlayOutTeams.Visibility.NEVER, "never");
-        this.visibilities.put(MessagePlayOutTeams.Visibility.HIDE_FOR_OTHER_TEAMS, "hideForOtherTeams");
-        this.visibilities.put(MessagePlayOutTeams.Visibility.HIDE_FOR_OWN_TEAM, "hideForOwnTeam");
-    }
 
     @Override
     public ByteBuf encode(CodecContext context, MessagePlayOutTeams message) throws CodecException {
@@ -67,8 +57,8 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
                 flags |= 0x02;
             }
             buf.writeByte(flags);
-            context.write(buf, Types.STRING, this.visibilities.get(message1.getNameTagVisibility()));
-            context.write(buf, Types.STRING, this.visibilities.get(message1.getCollisionRule()));
+            context.write(buf, Types.STRING, message1.getNameTagVisibility().getId());
+            context.write(buf, Types.STRING, message1.getCollisionRule().getId());
             buf.writeByte(FormattingCodeTextSerializer.FORMATS.get(message1.getColor()));
         } else {
             buf.writeByte(message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4);

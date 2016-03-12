@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.scoreboard.Visibility;
 import org.spongepowered.api.text.format.TextColor;
 
 import java.util.List;
@@ -122,14 +123,14 @@ public abstract class MessagePlayOutTeams implements Message {
         }
     }
 
-    public static abstract class AddPlayers extends AddOrRemovePlayers {
+    public static final class AddPlayers extends AddOrRemovePlayers {
 
         public AddPlayers(String teamName, List<String> players) {
             super(teamName, players);
         }
     }
 
-    public static abstract class RemovePlayers extends AddOrRemovePlayers {
+    public static final class RemovePlayers extends AddOrRemovePlayers {
 
         public RemovePlayers(String teamName, List<String> players) {
             super(teamName, players);
@@ -148,12 +149,5 @@ public abstract class MessagePlayOutTeams implements Message {
         public List<String> getPlayers() {
             return this.players;
         }
-    }
-
-    public enum Visibility {
-        ALWAYS,
-        NEVER,
-        HIDE_FOR_OTHER_TEAMS,
-        HIDE_FOR_OWN_TEAM,
     }
 }

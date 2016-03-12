@@ -40,6 +40,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardDisplayObjective;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -65,6 +66,7 @@ public class LanternScoreboard implements Scoreboard {
     private final Map<String, Objective> objectives = Maps.newHashMap();
     private final Multimap<Criterion, Objective> objectivesByCriterion = HashMultimap.create();
     private final Map<DisplaySlot, Objective> objectivesInSlot = Maps.newHashMap();
+    private final Map<String, Team> teams = Maps.newHashMap();
 
     void sendToPlayers(Supplier<List<Message>> messageSupplier) {
         if (!this.players.isEmpty()) {
@@ -78,6 +80,9 @@ public class LanternScoreboard implements Scoreboard {
         for (Objective objective : this.objectives.values()) {
             player.getConnection().send(new MessagePlayOutScoreboardObjective.Remove(objective.getName()));
         }
+        for (Team team : this.teams.values()) {
+            player.getConnection().send(new MessagePlayOutTeams.Remove(team.getName()));
+        }
     }
 
     public void addPlayer(LanternPlayer player) {
@@ -87,6 +92,9 @@ public class LanternScoreboard implements Scoreboard {
         }
         for (Map.Entry<DisplaySlot, Objective> entry : this.objectivesInSlot.entrySet()) {
             player.getConnection().send(new MessagePlayOutScoreboardDisplayObjective(entry.getValue().getName(), entry.getKey()));
+        }
+        for (Team team : this.teams.values()) {
+            player.getConnection().send(((LanternTeam) team).toCreateOrUpdateMessage(true));
         }
     }
 
@@ -199,21 +207,37 @@ public class LanternScoreboard implements Scoreboard {
 
     @Override
     public Optional<Team> getTeam(String teamName) {
-        return Optional.empty();
+        return Optional.ofNullable(this.teams.get(checkNotNull(teamName, "teamName")));
     }
 
     @Override
     public void registerTeam(Team team) throws IllegalArgumentException {
-
+        checkNotNull(team, "team");
+        checkArgument(!this.teams.containsKey(team.getName()), "A team with the name %s already exists!",
+                team.getName());
+        checkArgument(!team.getScoreboard().isPresent(), "The team is already attached to a scoreboard.");
+        this.teams.put(team.getName(), team);
+        ((LanternTeam) team).setScoreboard(this);
+        this.sendToPlayers(() -> Collections.singletonList(((LanternTeam) team).toCreateOrUpdateMessage(true)));
     }
 
     @Override
     public Set<Team> getTeams() {
-        return ImmutableSet.of();
+        return ImmutableSet.copyOf(this.teams.values());
     }
 
     @Override
     public Optional<Team> getMemberTeam(Text member) {
+        checkNotNull(member, "member");
+        for (Team team : this.teams.values()) {
+            if (((LanternTeam) team).members.contains(member)) {
+                return Optional.of(team);
+            }
+        }
         return Optional.empty();
+    }
+
+    void removeTeam(Team team) {
+        this.teams.remove(team.getName());
     }
 }

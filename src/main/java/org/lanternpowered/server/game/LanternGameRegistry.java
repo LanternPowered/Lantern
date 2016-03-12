@@ -99,6 +99,7 @@ import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder;
+import org.lanternpowered.server.scoreboard.LanternTeamBuilder;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
@@ -163,6 +164,7 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.Visibility;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
@@ -309,6 +311,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(Selector.Builder.class, LanternSelectorBuilder::new)
                 .registerBuilderSupplier(Objective.Builder.class, LanternObjectiveBuilder::new)
                 .registerBuilderSupplier(Scoreboard.Builder.class, LanternScoreboardBuilder::new)
+                .registerBuilderSupplier(Team.Builder.class, LanternTeamBuilder::new)
                 ;
         this.registerFactories();
     }

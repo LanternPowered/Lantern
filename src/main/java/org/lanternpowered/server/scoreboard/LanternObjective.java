@@ -135,6 +135,10 @@ public class LanternObjective implements Objective {
         }
         this.scores.put(score.getName(), score);
         ((LanternScore) score).addObjective(this);
+        this.sendScoreToClient(score);
+    }
+
+    private void sendScoreToClient(Score score) {
         if (!this.scoreboards.isEmpty()) {
             List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardScore.CreateOrUpdate(this.getName(),
                     LanternTexts.toLegacy(score.getName()), score.getScore()));
@@ -149,6 +153,7 @@ public class LanternObjective implements Objective {
         return this.scores.computeIfAbsent(name, name1 -> {
             LanternScore score = new LanternScore(name1);
             score.addObjective(this);
+            this.sendScoreToClient(score);
             return score;
         });
     }

@@ -86,11 +86,11 @@ public class LanternTeam implements Team {
 
     MessagePlayOutTeams.CreateOrUpdate toCreateOrUpdateMessage(boolean create) {
         return create ?
-                new MessagePlayOutTeams.Create(this.name, LanternTexts.toLegacy(this.displayName),
-                        LanternTexts.toLegacy(this.prefix), LanternTexts.toLegacy(this.suffix), this.nameTagVisibility,
+                new MessagePlayOutTeams.Create(this.name, this.legacyDisplayName,
+                        this.legacyPrefix, this.legacySuffix, this.nameTagVisibility,
                         this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles) :
-                new MessagePlayOutTeams.Update(this.name, LanternTexts.toLegacy(this.displayName),
-                        LanternTexts.toLegacy(this.prefix), LanternTexts.toLegacy(this.suffix), this.nameTagVisibility,
+                new MessagePlayOutTeams.Update(this.name, this.legacyDisplayName,
+                        this.legacyPrefix, this.legacySuffix, this.nameTagVisibility,
                         this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles);
     }
 
@@ -113,7 +113,7 @@ public class LanternTeam implements Team {
     @Override
     public void setDisplayName(Text displayName) throws IllegalArgumentException {
         String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
-        checkArgument(legacyDisplayName.length() > 32, "Display name is %s characters long! It must be at most 32.",
+        checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
                 legacyDisplayName.length());
         boolean update = !this.legacyDisplayName.equals(legacyDisplayName);
         this.legacyDisplayName = legacyDisplayName;
@@ -145,7 +145,7 @@ public class LanternTeam implements Team {
     @Override
     public void setPrefix(Text prefix) throws IllegalArgumentException {
         String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
-        checkArgument(legacyPrefix.length() > 16, "Prefix is %s characters long! It must be at most 16.",
+        checkArgument(legacyPrefix.length() <= 16, "Prefix is %s characters long! It must be at most 16.",
                 legacyPrefix.length());
         boolean update = !this.legacyPrefix.equals(legacyPrefix);
         this.legacyPrefix = legacyPrefix;
@@ -163,7 +163,7 @@ public class LanternTeam implements Team {
     @Override
     public void setSuffix(Text suffix) throws IllegalArgumentException {
         String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
-        checkArgument(legacySuffix.length() > 16, "Suffix is %s characters long! It must be at most 16.",
+        checkArgument(legacySuffix.length() <= 16, "Suffix is %s characters long! It must be at most 16.",
                 legacySuffix.length());
         boolean update = !this.legacySuffix.equals(legacySuffix);
         this.legacySuffix = legacySuffix;

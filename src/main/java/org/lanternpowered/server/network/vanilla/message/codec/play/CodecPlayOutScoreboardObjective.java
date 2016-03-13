@@ -42,7 +42,7 @@ public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayO
         if (message instanceof MessagePlayOutScoreboardObjective.CreateOrUpdate) {
             buf.writeByte(message instanceof MessagePlayOutScoreboardObjective.Create ? 0 : 2);
             MessagePlayOutScoreboardObjective.CreateOrUpdate message0 = (MessagePlayOutScoreboardObjective.CreateOrUpdate) message;
-            context.write(buf, Types.STRING, LanternTexts.toLegacy(message0.getDisplayName()));
+            context.write(buf, Types.STRING, message0.getDisplayName());
             context.write(buf, Types.STRING, message0.getDisplayMode().getId());
         } else {
             buf.writeByte(1);

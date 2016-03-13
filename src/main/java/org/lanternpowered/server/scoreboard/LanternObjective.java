@@ -41,7 +41,6 @@ import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
-import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayModes;
 import org.spongepowered.api.text.Text;
 
 import java.util.Collections;
@@ -57,8 +56,10 @@ public class LanternObjective implements Objective {
     final Set<Scoreboard> scoreboards = Sets.newHashSet();
     private ObjectiveDisplayMode displayMode;
     private Text displayName;
+    String legacyDisplayName;
 
     LanternObjective(String name, Criterion criterion, ObjectiveDisplayMode displayMode, Text displayName) {
+        this.legacyDisplayName = LanternTexts.toLegacy(displayName);
         this.displayName = displayName;
         this.displayMode = displayMode;
         this.criterion = criterion;
@@ -85,16 +86,21 @@ public class LanternObjective implements Objective {
 
     @Override
     public void setDisplayName(Text displayName) throws IllegalArgumentException {
-        String legacy = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
-        checkArgument(legacy.length() <= 32, "displayName may not be longer then 32 characters (in legacy format)");
+        String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
+        checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
+                legacyDisplayName.length());
+        boolean update = !legacyDisplayName.equals(this.legacyDisplayName);
+        this.legacyDisplayName = legacyDisplayName;
         this.displayName = displayName;
-        this.sendObjectiveUpdate();
+        if (update) {
+            this.sendObjectiveUpdate();
+        }
     }
 
     private void sendObjectiveUpdate() {
         if (!this.scoreboards.isEmpty()) {
             List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardObjective.Update(this.name,
-                    this.displayName, this.displayMode));
+                    this.legacyDisplayName, this.displayMode));
             for (Scoreboard scoreboard : this.scoreboards) {
                 ((LanternScoreboard) scoreboard).sendToPlayers(() -> message);
             }
@@ -113,8 +119,11 @@ public class LanternObjective implements Objective {
 
     @Override
     public void setDisplayMode(ObjectiveDisplayMode displayMode) {
-        this.displayMode = checkNotNull(displayMode, "displayMode");
-        this.sendObjectiveUpdate();
+        boolean update = !checkNotNull(displayMode, "displayMode").equals(this.displayMode);
+        this.displayMode = displayMode;
+        if (update) {
+            this.sendObjectiveUpdate();
+        }
     }
 
     @Override
@@ -131,7 +140,7 @@ public class LanternObjective implements Objective {
     public void addScore(Score score) throws IllegalArgumentException {
         if (this.scores.containsKey(checkNotNull(score, "score").getName())) {
             throw new IllegalArgumentException(String.format("A score with the name %s already exists!",
-                    LanternTexts.toLegacy(score.getName())));
+                    ((LanternScore) score).legacyName));
         }
         this.scores.put(score.getName(), score);
         ((LanternScore) score).addObjective(this);
@@ -173,7 +182,7 @@ public class LanternObjective implements Objective {
         for (Scoreboard scoreboard : this.scoreboards) {
             ((LanternScoreboard) scoreboard).sendToPlayers(() -> Collections.singletonList(
                     messages.computeIfAbsent(this, obj -> new MessagePlayOutScoreboardScore.Remove(
-                            this.getName(), LanternTexts.toLegacy(score.getName())))));
+                            this.getName(), ((LanternScore) score).legacyName))));
         }
     }
 

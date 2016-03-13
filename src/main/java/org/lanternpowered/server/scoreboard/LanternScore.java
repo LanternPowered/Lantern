@@ -46,9 +46,11 @@ public class LanternScore implements Score {
 
     private final Set<Objective> objectives = new HashSet<>();
     private final Text name;
+    final String legacyName;
     private int score;
 
     public LanternScore(Text name) {
+        this.legacyName = LanternTexts.toLegacy(name);
         this.name = name;
     }
 
@@ -79,7 +81,7 @@ public class LanternScore implements Score {
             for (Map.Entry<Scoreboard, Objective> entry : scoreboards.entries()) {
                 ((LanternScoreboard) entry.getKey()).sendToPlayers(() -> Collections.singletonList(
                         messages.computeIfAbsent(entry.getValue(), obj -> new MessagePlayOutScoreboardScore.CreateOrUpdate(
-                                obj.getName(), LanternTexts.toLegacy(this.name), score))));
+                                obj.getName(), this.legacyName, score))));
             }
         }
     }

@@ -47,6 +47,7 @@ import org.lanternpowered.server.game.registry.type.attribute.AttributeOperation
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
@@ -248,6 +249,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(LanternAttribute.class, new AttributeRegistryModule())
                 .registerModule(new AttributeTargetRegistryModule())
                 .registerModule(BlockType.class, new BlockRegistryModule())
+                .registerModule(BlockState.class, new BlockStateRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
                 .registerModule(BrickType.class, new BrickTypeRegistryModule())
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())

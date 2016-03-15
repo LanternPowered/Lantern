@@ -28,7 +28,7 @@ package org.lanternpowered.server.game.registry.type.block;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TObjectShortMap;
 import gnu.trove.map.TShortObjectMap;
@@ -42,6 +42,7 @@ import org.lanternpowered.server.block.type.BlockGrass;
 import org.lanternpowered.server.block.type.BlockStone;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternStoneType;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -121,6 +122,9 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
                 this.blockStateByPackedType.put((short) (internalStateId | b & 0xf), state);
             }
         }
+        BlockStateRegistryModule blockStateRegistryModule = Lantern.getRegistry()
+                .getRegistryModule(BlockStateRegistryModule.class).get();
+        blockType.getAllStates().forEach(blockStateRegistryModule::put);
     }
 
     @Override
@@ -205,7 +209,7 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
 
     @Override
     public Collection<BlockType> getAll() {
-        return ImmutableList.copyOf(this.blockTypes.values());
+        return ImmutableSet.copyOf(this.blockTypes.values());
     }
 
     @Override

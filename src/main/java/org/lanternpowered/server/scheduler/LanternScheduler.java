@@ -37,16 +37,15 @@ import org.spongepowered.api.scheduler.Scheduler;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Functional;
+import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @NonnullByDefault
@@ -83,17 +82,9 @@ public class LanternScheduler implements Scheduler {
     @Override
     public Set<Task> getTasksByName(String pattern) {
         Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
-        Set<Task> matchingTasks = this.getScheduledTasks();
-
-        Iterator<Task> it = matchingTasks.iterator();
-        while (it.hasNext()) {
-            Matcher matcher = searchPattern.matcher(it.next().getName());
-            if (!matcher.matches()) {
-                it.remove();
-            }
-        }
-
-        return matchingTasks;
+        return this.getScheduledTasks().stream()
+                .filter(task -> searchPattern.matcher(task.getName()).matches())
+                .collect(GuavaCollectors.toImmutableSet());
     }
 
     @Override
@@ -115,19 +106,10 @@ public class LanternScheduler implements Scheduler {
 
     @Override
     public Set<Task> getScheduledTasks(Object plugin) {
-        String testOwnerId = checkPlugin(plugin, "plugin").getId();
-
-        Set<Task> allTasks = this.getScheduledTasks();
-        Iterator<Task> it = allTasks.iterator();
-
-        while (it.hasNext()) {
-            String taskOwnerId = it.next().getOwner().getId();
-            if (!testOwnerId.equals(taskOwnerId)) {
-                it.remove();
-            }
-        }
-
-        return allTasks;
+        PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+        return this.getScheduledTasks().stream()
+                .filter(task -> task.getOwner().equals(pluginContainer))
+                .collect(GuavaCollectors.toImmutableSet());
     }
 
     @Override

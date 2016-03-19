@@ -29,6 +29,7 @@ import static org.spongepowered.api.command.args.GenericArguments.optional;
 import static org.spongepowered.api.command.args.GenericArguments.string;
 
 import com.google.common.collect.Collections2;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandException;
@@ -79,26 +80,30 @@ public final class CommandHelp {
                         throw new CommandException(Text.of("No such command: ", command.get()));
                     }
 
-                    TreeSet<CommandMapping> commands = new TreeSet<>(comparator);
-                    commands.addAll(Collections2.filter(Sponge.getCommandManager().getAll().values(),
-                            input -> input.getCallable().testPermission(src)));
+                    Lantern.getGame().getScheduler().submitAsyncTask(() -> {
+                        TreeSet<CommandMapping> commands = new TreeSet<>(comparator);
+                        commands.addAll(Collections2.filter(Sponge.getCommandManager().getAll().values(),
+                                input -> input.getCallable().testPermission(src)));
 
-                    // Console sources cannot see/use the pagination
-                    boolean paginate = !(src instanceof ConsoleSource);
+                        // Console sources cannot see/use the pagination
+                        boolean paginate = !(src instanceof ConsoleSource);
 
-                    Text title = Text.builder("Available commands:").color(TextColors.DARK_GREEN).build();
-                    Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
+                        Text title = Text.builder("Available commands:").color(TextColors.DARK_GREEN).build();
+                        Collection<Text> lines = Collections2.transform(commands, input -> getDescription(src, input));
 
-                    if (paginate) {
-                        PaginationList.Builder builder = Sponge.getGame().getServiceManager()
-                                .provide(PaginationService.class).get().builder();
-                        builder.title(title);
-                        builder.contents(lines);
-                        builder.sendTo(src);
-                    } else {
-                        src.sendMessage(title);
-                        src.sendMessages(lines);
-                    }
+                        if (paginate) {
+                            PaginationList.Builder builder = Sponge.getGame().getServiceManager()
+                                    .provide(PaginationService.class).get().builder();
+                            builder.title(title);
+                            builder.contents(lines);
+                            builder.sendTo(src);
+                        } else {
+                            src.sendMessage(title);
+                            src.sendMessages(lines);
+                        }
+                        return null;
+                    });
+
                     return CommandResult.success();
                 }).build();
     }

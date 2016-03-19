@@ -28,6 +28,7 @@ package org.lanternpowered.server.game;
 import org.lanternpowered.server.LanternServer;
 import org.slf4j.Logger;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 
 public class Lantern {
 
@@ -57,6 +58,10 @@ public class Lantern {
 
     public static LanternServer getServer() {
         return LanternGame.game.getServer();
+    }
+
+    public static SpongeExecutorService getSyncExecutorService() {
+        return LanternGame.game.getSyncExecutorService();
     }
 
     private Lantern() {

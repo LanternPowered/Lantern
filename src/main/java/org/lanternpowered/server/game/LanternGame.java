@@ -90,6 +90,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
+import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.service.ServiceManager;
 import org.spongepowered.api.service.SimpleServiceManager;
 import org.spongepowered.api.service.ban.BanService;
@@ -207,6 +208,9 @@ public class LanternGame implements Game {
     // The scheduler
     private LanternScheduler scheduler;
 
+    // The sync scheduler service
+    private SpongeExecutorService syncExecutorService;
+
     // The chunk load service
     private LanternChunkTicketManager chunkTicketManager;
 
@@ -320,6 +324,7 @@ public class LanternGame implements Game {
 
         // Create the scheduler
         this.scheduler = new LanternScheduler();
+        this.syncExecutorService = this.scheduler.createSyncExecutor(this.minecraft);
 
         // Create the chunk load service
         this.chunkTicketManager = new LanternChunkTicketManager(this.globalConfig);
@@ -646,4 +651,7 @@ public class LanternGame implements Game {
         return this.configFolder;
     }
 
+    public SpongeExecutorService getSyncExecutorService() {
+        return this.syncExecutorService;
+    }
 }

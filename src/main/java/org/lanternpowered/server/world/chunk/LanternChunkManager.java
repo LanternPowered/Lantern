@@ -115,7 +115,7 @@ import javax.annotation.Nullable;
 public final class LanternChunkManager {
 
     // The maximum amount of threads that can load chunks asynchronously
-    private static final int CHUNK_LOADING_MAX_POOL_SIZE = Integer.MAX_VALUE;
+    private static final int CHUNK_LOADING_MAX_POOL_SIZE = 10;
 
     // The core amount of threads that can load chunks asynchronously
     private static final int CHUNK_LOADING_CORE_POOL_SIZE = 4;

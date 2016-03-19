@@ -134,6 +134,9 @@ public final class ObservedChunkManager {
         final ObservedChunk observedChunk = this.observedChunks.get(coords);
         if (observedChunk != null) {
             observedChunk.removeObserver(observer, updateClient);
+            if (observedChunk.observers.isEmpty()) {
+                this.observedChunks.remove(coords);
+            }
         }
     }
 

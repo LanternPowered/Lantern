@@ -73,7 +73,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
             return;
         }
         if (message1.startsWith("/")) {
-            Sponge.getCommandManager().process(player, message1.substring(1));
+            Lantern.getSyncExecutorService().submit(() -> Sponge.getCommandManager().process(player, message1.substring(1)));
         } else {
             Text nameText = Text.of(player.getName()); // TODO: player.getDisplayNameData().displayName().get();
             Text rawMessageText = Text.of(message0);

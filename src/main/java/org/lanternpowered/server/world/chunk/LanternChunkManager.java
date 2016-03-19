@@ -105,6 +105,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -169,7 +170,7 @@ public final class LanternChunkManager {
 
     // The chunk load executor
     private final ThreadPoolExecutor chunkTaskExecutor = new ThreadPoolExecutor(
-            CHUNK_LOADING_CORE_POOL_SIZE, CHUNK_LOADING_MAX_POOL_SIZE, 60L, TimeUnit.SECONDS, new SynchronousQueue<>());
+            CHUNK_LOADING_CORE_POOL_SIZE, CHUNK_LOADING_MAX_POOL_SIZE, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
 
     // Some objects that can be used in {@link Chunk} population.
     private class PopulationData {

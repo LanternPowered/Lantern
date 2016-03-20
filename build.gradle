@@ -140,14 +140,14 @@ idea.workspace.iws.withXml { provider ->
         customNode.@default = 'false'
         customNode.@name = appName
         customNode.each {
-            if (it.name == 'option' && it.@name != null) {
+            if (it.name() == 'option' && it.@name != null) {
                 switch (it.@name) {
                     case 'MAIN_CLASS_NAME':   it.@value = 'org.lanternpowered.launch.Launch'; break
                     case 'VM_PARAMETERS':     it.@value = '-Dlog4j.full-location=true';       break
                     case 'WORKING_DIRECTORY': it.@value = 'file://$PROJECT_DIR$/run';         break
                 }
-            } else if (it.name == 'module') {
-                entry.@name = project.name
+            } else if (it.name() == 'module') {
+                it.@name = project.name
             }
         }
         node.append customNode

@@ -130,7 +130,8 @@ public class RegionFileCache {
         final long coords = (regionZ & 0xffffffffL) << 32 | regionX & 0xffffffffL;
 
         try {
-            return cache.get(coords, () -> new RegionFile(this.regionDir.resolve("r." + regionX + "." + regionZ + "." + this.extension)));
+            return cache.get(coords, () -> new RegionFile(this.regionDir.resolve("r." + regionX + "." + regionZ + "." + this.extension),
+                    regionX, regionZ));
         } catch (ExecutionException e) {
             throw new IOException("Unable to load region file (" + regionX + ";" + regionZ + ")");
         }

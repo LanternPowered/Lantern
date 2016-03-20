@@ -106,7 +106,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -199,9 +198,6 @@ public final class LanternChunkManager {
         }
 
         public void setFuture(Future<Void> future) {
-            if (this.future != null) {
-                throw new IllegalStateException();
-            }
             this.future = future;
             synchronized (this) {
                 this.notifyAll();
@@ -213,11 +209,13 @@ public final class LanternChunkManager {
             // Wait for the future to be set, in case it's getting directly executed
             synchronized (this) {
                 while (this.future == null) {
-                    this.wait();
+                    try {
+                        this.wait();
+                    } catch (InterruptedException e) {
+                    }
                 }
             }
             this.runnable.run();
-            this.future = null;
             return null;
         }
 
@@ -1394,6 +1392,7 @@ public final class LanternChunkManager {
         // Cleanup
         this.loadedChunks.clear();
         this.reusableChunks.clear();
+        this.chunkTaskExecutor.shutdown();
     }
 
     /**

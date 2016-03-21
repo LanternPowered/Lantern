@@ -34,44 +34,95 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.lanternpowered.server.scoreboard.LanternScore;
+import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.text.ScoreText;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.spongepowered.api.text.Text;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
 
 public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<ScoreText>, JsonDeserializer<ScoreText> {
 
     @Override
     public ScoreText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json0 = json.getAsJsonObject();
-        // TODO: Wait for sponge to figure out the format and scoreboard implementation
-        return null;
+        Text name = LanternTexts.fromLegacy(json0.get("name").getAsString());
+        // Try to parse the value
+        int value;
+        try {
+            value = Integer.parseInt(json0.get("value").getAsString());
+        } catch (NumberFormatException e) {
+            value = 0;
+        }
+        String baseObjective = json0.get("objective").getAsString();
+        Set<Objective> objectives = new HashSet<>();
+        if (!baseObjective.isEmpty()) {
+            this.tryAddObjective(baseObjective, objectives);
+        }
+        if (json0.has("extraObjectives")) {
+            JsonArray array = json0.getAsJsonArray("extraObjectives");
+            for (JsonElement jsonElement : array) {
+                this.tryAddObjective(jsonElement.getAsString(), objectives);
+            }
+        }
+        String override = null;
+        if (json0.has("override")) {
+            override = json0.get("override").getAsString();
+        }
+
+        Score score = new LanternScore(name);
+        // TODO: How to handle the objectives?
+        // We cannot add them to the score without attaching the
+        // score to the objective
+        score.setScore(value);
+
+        return Text.builder(score).override(override).build();
+    }
+
+    private void tryAddObjective(String objectiveName, Set<Objective> objectives) {
+        // TODO: Search all the world scoreboards for objectives
     }
 
     @Override
     public JsonElement serialize(ScoreText src, Type typeOfSrc, JsonSerializationContext context) {
-        // TODO: Verify and modify once we know how sponge will handle it
+        // There are here some extra fields to represent the (lantern/sponge) score text object,
+        // while they are not supported by sponge itself, it seems worth it to provide this
+        // This will still remain compatible with vanilla.
         JsonObject json = new JsonObject();
         Score score = src.getScore();
-        json.addProperty("name", TextSerializers.PLAIN.serialize(score.getName()));
+        json.addProperty("name", LanternTexts.toLegacy(score.getName()));
         Iterator<Objective> it = score.getObjectives().iterator();
-        json.addProperty("objective", it.next().getName());
         if (it.hasNext()) {
-            JsonArray json0 = new JsonArray();
-            while (it.hasNext()) {
-                json0.add(new JsonPrimitive(it.next().getName()));
+            json.addProperty("objective", it.next().getName());
+            // Lantern:
+            // Provide a list with all the extra objectives that
+            // are attached to the score.
+            if (it.hasNext()) {
+                JsonArray json0 = new JsonArray();
+                while (it.hasNext()) {
+                    json0.add(new JsonPrimitive(it.next().getName()));
+                }
+                json.add("extraObjectives", json0);
             }
-            json.add("extraObjectives", json0);
+        } else {
+            // This field must always be specified to be valid score json,
+            // making it empty will prevent issues
+            json.addProperty("objective", "");
         }
+        // Lantern:
+        // This is a field added by sponge to be able to override
+        // the text provided by this component.
         Optional<String> override = src.getOverride();
         if (override.isPresent()) {
             json.addProperty("override", override.get());
         }
-        json.addProperty("score", Integer.toString(score.getScore()));
+        json.addProperty("value", Integer.toString(score.getScore()));
         return json;
     }
 

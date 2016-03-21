@@ -52,7 +52,7 @@ public final class ConsoleManager {
 
         // Start the command reader thread
         Thread thread = new Thread(this::commandReaderTask);
-        thread.setName("ConsoleCommandThread");
+        thread.setName("console");
         thread.setDaemon(true);
         thread.start();
     }

@@ -97,7 +97,7 @@ public class LanternChunkTicketManager implements ChunkTicketManager {
 
     @Override
     public int getMaxTickets(Object plugin) {
-        return this.getMaxTickets(checkPlugin(plugin, "plugin").getId());
+        return this.getMaxTicketsById(checkPlugin(plugin, "plugin").getId());
     }
 
     public int getMaxTicketsById(String plugin) {

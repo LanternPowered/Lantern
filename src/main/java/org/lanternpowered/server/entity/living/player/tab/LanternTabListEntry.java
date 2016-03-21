@@ -77,8 +77,10 @@ public final class LanternTabListEntry implements TabListEntry {
     @Override
     public LanternTabListEntry setDisplayName(@Nullable Text displayName) {
         this.displayName = Optional.ofNullable(displayName);
-        this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(this.gameProfile, displayName))));
+        if (this.attached) {
+            this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
+                    new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(this.gameProfile, displayName))));
+        }
         return this;
     }
 

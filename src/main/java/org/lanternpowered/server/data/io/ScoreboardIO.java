@@ -185,15 +185,15 @@ public class ScoreboardIO {
             })));
             entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent(value -> builder.deathTextVisibility(Sponge.getRegistry().getType(
                     Visibility.class, value).orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a name tag visibility with id: {}, default to always.",
-                        entry.getString(NAME_TAG_VISIBILITY).get());
+                Lantern.getLogger().warn("Unable to find a death message visibility with id: {}, default to always.",
+                        entry.getString(DEATH_MESSAGE_VISIBILITY).get());
                 return Visibilities.ALL;
             })));
             // TODO: Use the api class once available
             entry.getString(COLLISION_RULE).ifPresent(value -> ((LanternTeamBuilder) builder).collisionRule(Sponge.getRegistry().getType(
                     LanternCollisionRule.class, value).orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a name tag visibility with id: {}, default to always.",
-                        entry.getString(NAME_TAG_VISIBILITY).get());
+                Lantern.getLogger().warn("Unable to find a collision rule with id: {}, default to always.",
+                        entry.getString(COLLISION_RULE).get());
                 return Sponge.getRegistry().getType(LanternCollisionRule.class, "always").get();
             })));
             entry.getString(TEAM_COLOR).ifPresent(color -> builder.color(Sponge.getRegistry().getType(TextColor.class, color).orElseGet(() -> {
@@ -284,7 +284,6 @@ public class ScoreboardIO {
             }
             Set<Text> members = team.getMembers();
             container.set(MEMBERS, members.stream().map(LanternTexts::toLegacy).collect(Collectors.toList()));
-            // TODO: Collision rule
         }
 
         DataContainer dataContainer = new MemoryDataContainer();

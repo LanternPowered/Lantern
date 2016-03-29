@@ -76,6 +76,15 @@ public abstract class BanEntry implements Ban {
         this.reason = reason;
     }
 
+    /**
+     * Gets whether this ban entry is expired.
+     *
+     * @return Is expired
+     */
+    public boolean isExpired() {
+        return this.expirationDate != null && Instant.now().compareTo(this.expirationDate) > 0;
+    }
+
     @Override
     public BanType getType() {
         return this instanceof Ban.Ip ? BanTypes.IP : BanTypes.PROFILE;

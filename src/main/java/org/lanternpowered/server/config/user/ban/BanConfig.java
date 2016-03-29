@@ -44,7 +44,6 @@ import org.spongepowered.api.util.ban.Ban.Ip;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -74,10 +73,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     private List<BanEntry> entries = Lists.newArrayList();
 
     // A version of the entries list that allows concurrent operations
-    private final List<BanEntry> entries0 = Collections.synchronizedList(Lists2.createExpirableValueListWithPredicate(entry -> {
-        final Optional<Instant> optExpirationDate = entry.getExpirationDate();
-        return optExpirationDate.isPresent() && Instant.now().compareTo(optExpirationDate.get()) > 0;
-    }));
+    private final List<BanEntry> entries0 = Collections.synchronizedList(Lists2.createExpirableValueListWithPredicate(BanEntry::isExpired));
 
     public BanConfig(Path path) throws IOException {
         super(path, OPTIONS, false);
@@ -123,6 +119,12 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
         return this.getEntryByUUID(gameProfile.getUniqueId());
     }
 
+    public Optional<BanEntry> getEntryByIp(InetAddress address) {
+        final String address0 = address.getHostAddress();
+        return (Optional) this.entries0.stream().filter(e -> e instanceof BanEntry.Ip &&
+                ((BanEntry.Ip) e).getAddress().getHostAddress().equalsIgnoreCase(address0)).findFirst();
+    }
+
     @Override
     public void addEntry(BanEntry entry) {
         this.addBan(entry);
@@ -159,9 +161,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public Optional<Ip> getBanFor(InetAddress address) {
-        final String address0 = address.getHostAddress();
-        return (Optional) this.entries0.stream().filter(e -> e instanceof BanEntry.Ip &&
-                ((BanEntry.Ip) e).getAddress().getHostAddress().equalsIgnoreCase(address0)).findFirst();
+        return (Optional) this.getEntryByIp(address);
     }
 
     @Override

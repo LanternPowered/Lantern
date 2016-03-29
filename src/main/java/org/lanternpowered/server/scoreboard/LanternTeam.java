@@ -60,11 +60,11 @@ public class LanternTeam implements Team {
     private boolean canSeeFriendlyInvisibles;
     private Visibility nameTagVisibility;
     private Visibility deathMessageVisibility;
-    private Visibility collisionRule;
+    private LanternCollisionRule collisionRule;
 
     LanternTeam(String name, TextColor color, Text displayName, Text prefix, Text suffix,
                 boolean allowFriendlyFire, boolean canSeeFriendlyInvisibles, Visibility nameTagVisibility,
-                Visibility deathMessageVisibility, Visibility collisionRule) {
+                Visibility deathMessageVisibility, LanternCollisionRule collisionRule) {
         this.displayName = displayName;
         this.legacyDisplayName = LanternTexts.toLegacy(displayName);
         this.prefix = prefix;
@@ -100,6 +100,10 @@ public class LanternTeam implements Team {
         }
     }
 
+    public LanternCollisionRule getCollisionRule() {
+        return this.collisionRule;
+    }
+
     @Override
     public String getName() {
         return this.name;
@@ -108,6 +112,10 @@ public class LanternTeam implements Team {
     @Override
     public Text getDisplayName() {
         return this.displayName;
+    }
+
+    public String getLegacyDisplayName() {
+        return this.legacyDisplayName;
     }
 
     @Override
@@ -137,6 +145,10 @@ public class LanternTeam implements Team {
         }
     }
 
+    public String getLegacyPrefix() {
+        return this.legacyPrefix;
+    }
+
     @Override
     public Text getPrefix() {
         return this.prefix;
@@ -153,6 +165,10 @@ public class LanternTeam implements Team {
         if (update) {
             this.sendUpdate();
         }
+    }
+
+    public String getLegacySuffix() {
+        return this.legacySuffix;
     }
 
     @Override

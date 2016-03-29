@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.text.LanternTexts;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.Visibilities;
 import org.spongepowered.api.scoreboard.Visibility;
@@ -51,10 +52,16 @@ public class LanternTeamBuilder implements Team.Builder {
     private boolean showFriendlyInvisibles;
     private Visibility nameTagVisibility;
     private Visibility deathMessageVisibility;
+    private LanternCollisionRule collisionRule;
     private Set<Text> members;
 
     public LanternTeamBuilder() {
         this.reset();
+    }
+
+    public LanternTeamBuilder collisionRule(LanternCollisionRule collisionRule) {
+        this.collisionRule = checkNotNull(collisionRule, "collisionRule");
+        return this;
     }
 
     @Override
@@ -159,6 +166,8 @@ public class LanternTeamBuilder implements Team.Builder {
         this.showFriendlyInvisibles = false;
         this.nameTagVisibility = Visibilities.ALL;
         this.deathMessageVisibility = Visibilities.ALL;
+        // TODO: Use the static field once the api class is available
+        this.collisionRule = Sponge.getRegistry().getType(LanternCollisionRule.class, "always").get();
         this.members = new HashSet<>();
         return this;
     }
@@ -170,7 +179,7 @@ public class LanternTeamBuilder implements Team.Builder {
 
         LanternTeam team = new LanternTeam(this.name, this.color, this.displayName, this.prefix, this.suffix,
                 this.allowFriendlyFire, this.showFriendlyInvisibles, this.nameTagVisibility, this.deathMessageVisibility,
-                Visibilities.ALL);
+                this.collisionRule);
         this.members.forEach(team::addMember);
         return team;
     }

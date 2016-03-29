@@ -32,11 +32,14 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.WorldConfig;
+import org.lanternpowered.server.data.io.ScoreboardIO;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.DimensionTypes;
@@ -274,6 +277,11 @@ public final class LanternWorldManager {
         entry.world = null;
         // Save the world properties
         this.saveWorldProperties(properties);
+        try {
+            ScoreboardIO.write(entry.folder, world0.getScoreboard());
+        } catch (IOException e) {
+            Lantern.getLogger().warn("An error occurred while saving the scoreboard data.", e);
+        }
         return true;
     }
 
@@ -582,8 +590,15 @@ public final class LanternWorldManager {
             this.game.getLogger().error("Unable to read the world config, please fix this issue before loading the world.", e);
             return Optional.empty();
         }
+        Scoreboard scoreboard;
+        try {
+            scoreboard = ScoreboardIO.read(worldEntry.folder);
+        } catch (IOException e) {
+            this.game.getLogger().error("Unable to read the scoreboard data.", e);
+            scoreboard = Scoreboard.builder().build();
+        }
         // Create the world instance
-        final LanternWorld world = new LanternWorld(this.game, result.config, worldEntry.folder, worldEntry.properties);
+        final LanternWorld world = new LanternWorld(this.game, result.config, worldEntry.folder, scoreboard, worldEntry.properties);
         // Share the world instance
         worldEntry.world = world;
         worldEntry.properties.setWorld(world);

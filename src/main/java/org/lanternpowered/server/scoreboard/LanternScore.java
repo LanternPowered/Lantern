@@ -46,12 +46,16 @@ public class LanternScore implements Score {
 
     private final Set<Objective> objectives = new HashSet<>();
     private final Text name;
-    final String legacyName;
+    private final String legacyName;
     private int score;
 
     public LanternScore(Text name) {
         this.legacyName = LanternTexts.toLegacy(name);
         this.name = name;
+    }
+
+    public String getLegacyName() {
+        return this.legacyName;
     }
 
     @Override

@@ -28,6 +28,7 @@ package org.lanternpowered.server.world;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import org.lanternpowered.server.data.io.IOHelper;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.data.util.DataQueries;
@@ -72,11 +73,7 @@ public final class LanternWorldPropertiesIO {
     private final static Gson GSON = new Gson();
 
     private final static String LEVEL_DATA = "level.dat";
-    private final static String LEVEL_DATA_OLD = "level.dat_old";
-    private final static String LEVEL_DATA_NEW = "level.dat_new";
     private final static String SPONGE_LEVEL_DATA = "level_sponge.dat";
-    private final static String SPONGE_LEVEL_DATA_OLD = "level_sponge.dat_old";
-    private final static String SPONGE_LEVEL_DATA_NEW = "level_sponge.dat_new";
     // private final static String BUKKIT_UUID_DATA = "uid.dat";
 
     // The current version of the worlds
@@ -151,37 +148,17 @@ public final class LanternWorldPropertiesIO {
     }
 
     static LevelData read(Path folder, @Nullable String worldName) throws IOException {
-        Path levelFile = folder.resolve(LEVEL_DATA);
-        if (!Files.exists(levelFile)) {
-            levelFile = folder.resolve(LEVEL_DATA_OLD);
-        }
-        if (!Files.exists(levelFile)) {
-            throw new FileNotFoundException("Unable to find " + LEVEL_DATA + " or " + LEVEL_DATA_OLD + "!");
-        }
-        DataView rootDataView;
-        try {
-            rootDataView = NbtStreamUtils.read(Files.newInputStream(levelFile), true);
-        } catch (IOException e) {
-            throw new IOException("Unable to access " + LEVEL_DATA + "!", e);
-        }
+        DataView rootDataView = IOHelper.read(folder.resolve(LEVEL_DATA), file -> NbtStreamUtils.read(Files.newInputStream(file), true))
+                .orElseThrow(() -> new FileNotFoundException("Unable to find " + LEVEL_DATA + "!"));
         DataView dataView = rootDataView.getView(DATA).get();
 
-        DataContainer spongeRootContainer = null;
+        DataView spongeRootDataView = IOHelper.read(folder.resolve(SPONGE_LEVEL_DATA),
+                file -> NbtStreamUtils.read(Files.newInputStream(file), true)).orElse(null);
         DataView spongeContainer = null;
-
-        Path spongeLevelFile = folder.resolve(SPONGE_LEVEL_DATA);
-        if (!Files.exists(spongeLevelFile)) {
-            spongeLevelFile = folder.resolve(SPONGE_LEVEL_DATA_OLD);
-        }
-        if (Files.exists(spongeLevelFile)) {
-            try {
-                spongeRootContainer = NbtStreamUtils.read(Files.newInputStream(spongeLevelFile), true);
-            } catch (IOException e) {
-                Lantern.getLogger().error("Unable to access {}, ignoring...", SPONGE_LEVEL_DATA, e);
-            }
-            spongeContainer = spongeRootContainer.getView(DataQueries.SPONGE_DATA).orElse(null);
+        if (spongeRootDataView != null) {
+            spongeContainer = spongeRootDataView.getView(DataQueries.SPONGE_DATA).orElse(null);
             if (spongeContainer != null) {
-                spongeRootContainer.remove(DataQueries.SPONGE_DATA);
+                spongeRootDataView.remove(DataQueries.SPONGE_DATA);
             }
         }
 
@@ -353,7 +330,7 @@ public final class LanternWorldPropertiesIO {
 
         // Get the sponge properties
         if (spongeContainer != null) {
-            properties.properties = spongeRootContainer.copy().remove(DataQueries.SPONGE_DATA);
+            properties.properties = spongeRootDataView.copy().remove(DataQueries.SPONGE_DATA);
             if (spongeContainer.contains(ENABLED)) {
                 enabled = spongeContainer.getInt(ENABLED).get() > 0;
             }
@@ -501,20 +478,10 @@ public final class LanternWorldPropertiesIO {
             }
             dimensionData.set(DIMENSION_ARRAY, data);
         }
-        Path levelFileNew = folder.resolve(LEVEL_DATA_NEW);
-        Path levelFileOld = folder.resolve(LEVEL_DATA_OLD);
-        Path levelFile = folder.resolve(LEVEL_DATA);
-        NbtStreamUtils.write(container, Files.newOutputStream(levelFileNew), true);
-        if (Files.exists(levelFileOld)) {
-            Files.delete(levelFileOld);
-        }
-        if (Files.exists(levelFile)) {
-            Files.move(levelFile, levelFileOld);
-        }
-        Files.move(levelFileNew, levelFile);
-        if (Files.exists(levelFileNew)) {
-            Files.delete(levelFileNew);
-        }
+        IOHelper.write(folder.resolve(LEVEL_DATA), file -> {
+            NbtStreamUtils.write(container, Files.newOutputStream(file), true);
+            return true;
+        });
         final DataContainer spongeRootContainer = properties.properties.copy();
         final DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
         spongeContainer.set(NAME, properties.getWorldName());
@@ -532,20 +499,10 @@ public final class LanternWorldPropertiesIO {
                             .set(UUID_MOST, uuid.getMostSignificantBits())
                             .set(UUID_LEAST, uuid.getLeastSignificantBits()))
                 .collect(Collectors.toList()));
-        levelFileNew = folder.resolve(SPONGE_LEVEL_DATA_NEW);
-        levelFileOld = folder.resolve(SPONGE_LEVEL_DATA_OLD);
-        levelFile = folder.resolve(SPONGE_LEVEL_DATA);
-        NbtStreamUtils.write(spongeRootContainer, Files.newOutputStream(levelFileNew), true);
-        if (Files.exists(levelFileOld)) {
-            Files.delete(levelFileOld);
-        }
-        if (Files.exists(levelFile)) {
-            Files.move(levelFile, levelFileOld);
-        }
-        Files.move(levelFileNew, levelFile);
-        if (Files.exists(levelFileNew)) {
-            Files.delete(levelFileNew);
-        }
+        IOHelper.write(folder.resolve(SPONGE_LEVEL_DATA), file -> {
+            NbtStreamUtils.write(spongeRootContainer, Files.newOutputStream(file), true);
+            return true;
+        });
     }
 
     public static class LevelData {

@@ -72,6 +72,7 @@ import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistry
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.scoreboard.CollisionRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.ObjectiveDisplayModeRegistryModule;
@@ -101,6 +102,7 @@ import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder;
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder;
+import org.lanternpowered.server.scoreboard.LanternCollisionRule;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
@@ -178,7 +180,6 @@ import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.statistic.TeamStatistic;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.format.TextColor;
@@ -274,6 +275,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
                 .registerModule(GameMode.class, new GameModeRegistryModule())
                 .registerModule(ItemType.class, new ItemRegistryModule())
+                .registerModule(LanternCollisionRule.class, new CollisionRuleRegistryModule()) // TODO: Use the api class once available
                 .registerModule(Criterion.class, new CriterionRegistryModule())
                 .registerModule(DisplaySlot.class, new DisplaySlotRegistryModule())
                 .registerModule(ObjectiveDisplayMode.class, new ObjectiveDisplayModeRegistryModule())

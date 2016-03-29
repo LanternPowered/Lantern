@@ -30,6 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lanternpowered.server.game.registry.type.text.TextColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.TextSerializersRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
@@ -47,6 +49,7 @@ import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -56,22 +59,27 @@ public final class DisplaySlotRegistryModule implements CatalogRegistryModule<Di
     @RegisterCatalog(DisplaySlots.class)
     private final Map<String, DisplaySlot> objectiveDisplayModes = Maps.newHashMap();
 
+    private final TIntObjectMap<DisplaySlot> displaySlotByInternalIds = new TIntObjectHashMap<>();
+
     @Override
     public void registerDefaults() {
-        List<DisplaySlot> types = Lists.newArrayList();
-        types.add(new LanternDisplaySlot("list", null, 0));
-        types.add(new LanternDisplaySlot("sidebar", null, 1));
-        types.add(new LanternDisplaySlot("belowName", null, 2));
+        Map<String, DisplaySlot> types = new HashMap<>();
+        types.put("list", new LanternDisplaySlot("list", null, 0));
+        types.put("sidebar", new LanternDisplaySlot("sidebar", null, 1));
+        types.put("below_name", new LanternDisplaySlot("belowName", null, 2));
         for (TextColor textColor : Sponge.getRegistry().getAllOf(TextColor.class)) {
             // There is not mapping for "none"
             if (textColor == TextColors.NONE) {
                 continue;
             }
             Character character = FormattingCodeTextSerializer.FORMATS.get(textColor);
-            types.add(new LanternDisplaySlot("sidebar.team." + textColor.getId(), textColor,
-                    3 + character.charValue()));
+            types.put("below_name_" + textColor.getId(), new LanternDisplaySlot("sidebar.team." + textColor.getId(), textColor, 3 + character));
         }
-        types.forEach(type -> this.objectiveDisplayModes.put(type.getId(), type));
+        types.entrySet().forEach(entry -> {
+            this.objectiveDisplayModes.put(entry.getKey(), entry.getValue());
+            this.objectiveDisplayModes.put(entry.getValue().getId(), entry.getValue());
+            this.displaySlotByInternalIds.put(((LanternDisplaySlot) entry.getValue()).getInternalId(), entry.getValue());
+        });
     }
 
     @Override
@@ -82,6 +90,10 @@ public final class DisplaySlotRegistryModule implements CatalogRegistryModule<Di
     @Override
     public Collection<DisplaySlot> getAll() {
         return ImmutableSet.copyOf(this.objectiveDisplayModes.values());
+    }
+
+    public Optional<DisplaySlot> getByInternalId(int internalId) {
+        return Optional.ofNullable(this.displaySlotByInternalIds.get(internalId));
     }
 
 }

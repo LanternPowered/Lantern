@@ -56,7 +56,7 @@ public class LanternObjective implements Objective {
     final Set<Scoreboard> scoreboards = Sets.newHashSet();
     private ObjectiveDisplayMode displayMode;
     private Text displayName;
-    String legacyDisplayName;
+    private String legacyDisplayName;
 
     LanternObjective(String name, Criterion criterion, ObjectiveDisplayMode displayMode, Text displayName) {
         this.legacyDisplayName = LanternTexts.toLegacy(displayName);
@@ -72,6 +72,10 @@ public class LanternObjective implements Objective {
 
     void removeScoreboard(Scoreboard scoreboard) {
         this.scoreboards.remove(scoreboard);
+    }
+
+    public String getLegacyDisplayName() {
+        return this.legacyDisplayName;
     }
 
     @Override
@@ -140,7 +144,7 @@ public class LanternObjective implements Objective {
     public void addScore(Score score) throws IllegalArgumentException {
         if (this.scores.containsKey(checkNotNull(score, "score").getName())) {
             throw new IllegalArgumentException(String.format("A score with the name %s already exists!",
-                    ((LanternScore) score).legacyName));
+                    ((LanternScore) score).getLegacyName()));
         }
         this.scores.put(score.getName(), score);
         ((LanternScore) score).addObjective(this);
@@ -182,7 +186,7 @@ public class LanternObjective implements Objective {
         for (Scoreboard scoreboard : this.scoreboards) {
             ((LanternScoreboard) scoreboard).sendToPlayers(() -> Collections.singletonList(
                     messages.computeIfAbsent(this, obj -> new MessagePlayOutScoreboardScore.Remove(
-                            this.getName(), ((LanternScore) score).legacyName))));
+                            this.getName(), ((LanternScore) score).getLegacyName()))));
         }
     }
 

@@ -342,6 +342,10 @@ public final class LanternChunkManager {
         this.game = game;
     }
 
+    public ChunkIOService getChunkIOService() {
+        return this.chunkIOService;
+    }
+
     /**
      * Sets the generator of the world (chunk manager).
      * 

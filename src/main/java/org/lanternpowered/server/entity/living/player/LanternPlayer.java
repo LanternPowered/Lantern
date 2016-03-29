@@ -232,6 +232,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             world.getWeatherUniverse().ifPresent(u -> this.session.send(u.createSkyUpdateMessage()));
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(),
                     (float) rotation.getY(), (float) rotation.getX(), 0, 0));
+            this.setScoreboard(world.getScoreboard());
         } else {
             this.session.getServer().removePlayer(this);
             // Remove this player from all the tab lists

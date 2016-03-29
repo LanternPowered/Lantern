@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -98,6 +99,10 @@ public class LanternScoreboard implements Scoreboard {
         }
     }
 
+    public Map<DisplaySlot, Objective> getObjectivesInSlot() {
+        return ImmutableMap.copyOf(this.objectivesInSlot);
+    }
+
     @Override
     public Optional<Objective> getObjective(String name) {
         return Optional.ofNullable(this.objectives.get(checkNotNull(name, "name")));
@@ -123,7 +128,7 @@ public class LanternScoreboard implements Scoreboard {
     private List<Message> createObjectiveInitMessages(Objective objective) {
         List<Message> messages = Lists.newArrayList();
         messages.add(new MessagePlayOutScoreboardObjective.Create(
-                objective.getName(), ((LanternObjective) objective).legacyDisplayName, objective.getDisplayMode()));
+                objective.getName(), ((LanternObjective) objective).getLegacyDisplayName(), objective.getDisplayMode()));
         for (Score score : ((LanternObjective) objective).scores.values()) {
             messages.add(new MessagePlayOutScoreboardScore.CreateOrUpdate(objective.getName(),
                     LanternTexts.toLegacy(score.getName()), score.getScore()));

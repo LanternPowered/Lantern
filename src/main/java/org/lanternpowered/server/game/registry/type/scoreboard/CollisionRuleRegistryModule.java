@@ -29,42 +29,39 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import org.lanternpowered.server.scoreboard.LanternVisibility;
+import org.lanternpowered.server.scoreboard.LanternCollisionRule;
 import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.scoreboard.Visibilities;
-import org.spongepowered.api.scoreboard.Visibility;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-public final class VisibilityRegistryModule implements CatalogRegistryModule<Visibility> {
+// TODO: Use the api class once available
+public final class CollisionRuleRegistryModule implements CatalogRegistryModule<LanternCollisionRule> {
 
-    @RegisterCatalog(Visibilities.class)
-    private final Map<String, Visibility> visibilities = Maps.newHashMap();
+    private final Map<String, LanternCollisionRule> collisionRules = Maps.newHashMap();
 
     @Override
     public void registerDefaults() {
-        Map<String, Visibility> types = Maps.newHashMap();
-        types.put("all", new LanternVisibility("always"));
-        types.put("own_team", new LanternVisibility("hideForOwnTeam"));
-        types.put("other_teams", new LanternVisibility("hideForOtherTeams"));
-        types.put("none", new LanternVisibility("never"));
+        Map<String, LanternCollisionRule> types = Maps.newHashMap();
+        types.put("always", new LanternCollisionRule("always"));
+        types.put("push_own_team", new LanternCollisionRule("pushOwnTeam"));
+        types.put("push_other_teams", new LanternCollisionRule("pushOtherTeams"));
+        types.put("never", new LanternCollisionRule("never"));
         types.entrySet().forEach(entry -> {
-            this.visibilities.put(entry.getValue().getId(), entry.getValue());
-            this.visibilities.put(entry.getKey(), entry.getValue());
+            this.collisionRules.put(entry.getValue().getId(), entry.getValue());
+            this.collisionRules.put(entry.getKey(), entry.getValue());
         });
     }
 
     @Override
-    public Optional<Visibility> getById(String id) {
-        return Optional.ofNullable(this.visibilities.get(checkNotNull(id).toLowerCase()));
+    public Optional<LanternCollisionRule> getById(String id) {
+        return Optional.ofNullable(this.collisionRules.get(checkNotNull(id).toLowerCase()));
     }
 
     @Override
-    public Collection<Visibility> getAll() {
-        return ImmutableSet.copyOf(this.visibilities.values());
+    public Collection<LanternCollisionRule> getAll() {
+        return ImmutableSet.copyOf(this.collisionRules.values());
     }
 
 }

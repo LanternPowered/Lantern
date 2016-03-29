@@ -90,6 +90,7 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
@@ -168,6 +169,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
      */
     private final ObservedChunkManager observedChunkManager = new ObservedChunkManager(this);
 
+    /**
+     * The {@link Scoreboard} that is attached to this {@link World}.
+     */
+    private final Scoreboard scoreboard;
+
     // The dimension instance attached to this world
     private final Dimension dimension;
 
@@ -183,8 +189,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     private volatile Context worldContext;
 
     public LanternWorld(LanternGame game, WorldConfig worldConfig, Path worldFolder,
-            LanternWorldProperties properties) {
+            Scoreboard scoreboard, LanternWorldProperties properties) {
         this.worldConfig = worldConfig;
+        this.scoreboard = scoreboard;
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
@@ -224,6 +231,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             return;
         }
         this.properties.setInitialized();
+    }
+
+
+    /**
+     * Gets the {@link Scoreboard} of this world.
+     *
+     * @return The scoreboard
+     */
+    public Scoreboard getScoreboard() {
+        return this.scoreboard;
     }
 
     /**
@@ -918,8 +935,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public WorldStorage getWorldStorage() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.chunkManager.getChunkIOService();
     }
 
     @Override

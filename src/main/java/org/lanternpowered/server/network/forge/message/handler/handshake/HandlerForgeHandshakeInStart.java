@@ -72,7 +72,7 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
             Lantern.getLogger().info("{}: Skip forge handshake.", session.getGameProfile().getName().get());
             phase.set(ForgeServerHandshakePhase.DONE);
             session.setProtocolState(ProtocolState.PLAY);
-            session.spawnPlayer();
+            session.initPlayer();
         }
     }
 }

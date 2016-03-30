@@ -49,6 +49,7 @@ package org.lanternpowered.server.network.session;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Sets;
@@ -59,6 +60,8 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.util.AttributeKey;
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.config.user.ban.BanConfig;
+import org.lanternpowered.server.config.user.ban.BanEntry;
 import org.lanternpowered.server.entity.EntityIdAllocator;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
@@ -80,13 +83,24 @@ import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageH
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.util.ban.Ban;
+import org.spongepowered.api.world.World;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayDeque;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -455,43 +469,130 @@ public class Session implements PlayerConnection {
                 handle.getClass().getSimpleName() + ")", throwable);
     }
 
-    public void setPlayer(LanternGameProfile profile) {
+    /**
+     * Sets the {@link LanternGameProfile} of the player that uses this session.
+     *
+     * @param profile The profile
+     */
+    public void setProfile(LanternGameProfile profile) {
         this.gameProfile = profile;
     }
 
-    public void spawnPlayer() {
+    private final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd 'at' HH:mm:ss z");
+
+    /**
+     * Initializes the {@link LanternPlayer} to be ready to be added to the server.
+     */
+    public void initPlayer() {
         this.player = new LanternPlayer(this.gameProfile, this);
         this.player.setEntityId(EntityIdAllocator.get().poll());
         // TODO: Which world?
         LanternWorld world = (LanternWorld) Sponge.getServer().getWorlds().iterator().next();
         // TODO: Read player data
         // TODO: User the proper location
-        this.player.setLocation(new Location<>(world, new Vector3d(0, 100, 0)));
-    }
+        // Use the raw method to avoid triggering any network messages
+        this.player.setRawWorld(world);
+        this.player.setRawPosition(new Vector3d(0, 100, 0));
 
-    public void onDisconnect() {
-        Lantern.getLogger().info("Connection for " + (this.gameProfile == null ? this.channel.remoteAddress().toString()
-                : this.gameProfile.getName()) + " disconnected from the server.");
-        if (this.player != null) {
-            this.player.setWorld(null);
+        // The kick reason
+        Text kickReason = null;
+
+        final BanConfig banConfig = Lantern.getGame().getBanConfig();
+        // Check whether the player is banned and kick if necessary
+        Optional<BanEntry> optBanEntry = banConfig.getEntryByProfile(gameProfile);
+        if (!optBanEntry.isPresent()) {
+            SocketAddress address = this.getChannel().remoteAddress();
+            if (address instanceof InetSocketAddress) {
+                optBanEntry = banConfig.getEntryByIp(((InetSocketAddress) address).getAddress());
+            }
+        }
+        if (optBanEntry.isPresent()) {
+            BanEntry banEntry = optBanEntry.get();
+            Optional<Instant> optExpirationDate = banEntry.getExpirationDate();
+            Optional<Text> optReason = banEntry.getReason();
+
+            // Generate the kick message
+            Text.Builder builder = Text.builder();
+            if (banEntry instanceof Ban.Profile) {
+                builder.append(Text.of("You are banned from this server!"));
+            } else {
+                builder.append(Text.of("Your IP address is banned from this server!"));
+            }
+            // There is optionally a reason
+            optReason.ifPresent(reason -> builder.append(Text.of("\nReason: ", reason)));
+            // And a expiration date if present
+            optExpirationDate.ifPresent(expirationDate ->
+                    builder.append(Text.of("\nYour ban will be removed on ", this.timeFormatter.format(expirationDate))));
+
+            kickReason = builder.build();
+        // Check for white-list
+        } else if (Lantern.getGame().getGlobalConfig().isWhitelistEnabled() &&
+                !Lantern.getGame().getWhitelistConfig().isWhitelisted(this.gameProfile) &&
+                !Lantern.getGame().getOpsConfig().getEntryByProfile(this.gameProfile).isPresent()) {
+            kickReason = Text.of("You are not white-listed on this server!");
+        // Check whether the server is full
+        } else if (Lantern.getServer().getOnlinePlayers().size() >= Lantern.getServer().getMaxPlayers()) {
+            kickReason = Text.of("The server is full!");
+        }
+
+        MessageEvent.MessageFormatter messageFormatter = new MessageEvent.MessageFormatter(
+                kickReason != null ? kickReason : Text.of("You are not allowed to log in to this server."));
+
+        Cause cause = Cause.source(this.player).build();
+        Transform<World> fromTransform = this.player.getTransform().setExtent(world);
+        ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
+                fromTransform, fromTransform, this, messageFormatter, this.gameProfile, this.player, false);
+
+        if (kickReason != null) {
+            loginEvent.setCancelled(true);
+        }
+
+        Sponge.getEventManager().post(loginEvent);
+        if (loginEvent.isCancelled()) {
+            this.disconnect(loginEvent.isMessageCancelled() ? t("disconnect.disconnected") : loginEvent.getMessage());
+            return;
+        }
+
+        Transform<World> toTransform = loginEvent.getToTransform();
+        // Reset the raw world
+        this.player.setRawWorld(null);
+        // Set the transform, this will trigger the initial
+        // network messages to be send
+        this.player.setTransform(toTransform);
+
+        MessageChannel messageChannel = this.player.getMessageChannel();
+        Text joinMessage = t("multiplayer.player.joined", this.player.getName());
+
+        ClientConnectionEvent.Join joinEvent = SpongeEventFactory.createClientConnectionEventJoin(cause, messageChannel,
+                Optional.of(messageChannel), new MessageEvent.MessageFormatter(joinMessage), this.player, false);
+
+        Sponge.getEventManager().post(joinEvent);
+        if (!joinEvent.isMessageCancelled()) {
+            joinEvent.getChannel().ifPresent(channel -> channel.send(this.player, joinEvent.getMessage()));
         }
     }
 
-    /**
-     * public void onDisconnect() { if (player != null) { player.remove();
-     * Message userListMessage =
-     * UserListItemMessage.removeOne(player.getUniqueId()); for (GlowPlayer
-     * player : server.getOnlinePlayers()) {
-     * player.getSession().send(userListMessage); }
-     * 
-     * String message = player.getName() + " [" + address + "] disconnected"; if
-     * (quitReason != null) { message += ": " + quitReason; }
-     * GlowServer.logger.info(message);
-     * 
-     * String text = EventFactory.onPlayerQuit(player).getQuitMessage(); if
-     * (text != null) { server.broadcastMessage(text); } player = null; // in
-     * case we are disposed twice } }
-     */
+    public void onDisconnect() {
+        if (this.player != null) {
+            LanternWorld world = this.player.getWorld();
+            this.player.setWorld(null);
+            if (world != null) {
+                MessageChannel messageChannel = this.player.getMessageChannel();
+                Text quitMessage = t("multiplayer.player.left", this.player.getName());
+
+                ClientConnectionEvent.Disconnect event = SpongeEventFactory.createClientConnectionEventDisconnect(Cause.source(this.player).build(),
+                        messageChannel, Optional.of(messageChannel), new MessageEvent.MessageFormatter(quitMessage), this.player, false);
+
+                Sponge.getEventManager().post(event);
+                if (!event.isMessageCancelled()) {
+                    event.getChannel().ifPresent(channel -> channel.send(this.player, event.getMessage()));
+                }
+            }
+            Lantern.getLogger().info(this.player.getName() + " lost connection.");
+        } else {
+            Lantern.getLogger().info(this.channel.remoteAddress().toString() + " lost connection.");
+        }
+    }
 
     /**
      * Get the randomly-generated verify token for this session.

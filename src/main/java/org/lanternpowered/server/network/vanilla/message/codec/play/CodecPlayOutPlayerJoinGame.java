@@ -47,7 +47,7 @@ public final class CodecPlayOutPlayerJoinGame implements Codec<MessagePlayOutPla
             gameMode |= 0x8;
         }
         buf.writeByte(gameMode);
-        buf.writeByte(message.getDimensionType().getInternalId());
+        buf.writeInt(message.getDimensionType().getInternalId());
         buf.writeByte(message.getDifficulty().getInternalId());
         buf.writeByte(Math.min(message.getPlayerListSize(), 255));
         context.write(buf, Types.STRING, "default"); // Not used

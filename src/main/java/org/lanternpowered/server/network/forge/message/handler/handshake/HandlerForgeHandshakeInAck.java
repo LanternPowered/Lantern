@@ -84,7 +84,7 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
                         Lantern.getLogger().info("{}: Forge handshake -> Received ack (pendingComplete) message.", session.getGameProfile().getName());
                     } else {
                         session.setProtocolState(ProtocolState.PLAY);
-                        session.spawnPlayer();
+                        session.initPlayer();
                         Lantern.getLogger().info("{}: Forge handshake -> Received ack (complete) message.", session.getGameProfile().getName());
                     }
                 }

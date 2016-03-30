@@ -254,7 +254,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public void setTransform(Transform<World> transform) {
+        checkNotNull(transform, "transform");
         this.setLocationAndRotation(transform.getLocation(), transform.getRotation());
+        this.setScale(transform.getScale());
     }
 
     @Override

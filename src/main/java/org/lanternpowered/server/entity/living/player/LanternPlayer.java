@@ -159,6 +159,16 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         return this.gameProfile.getName().get();
     }
 
+    /**
+     * Sets the {@link LanternWorld} without triggering
+     * any changes for this player.
+     *
+     * @param world The world
+     */
+    public void setRawWorld(@Nullable LanternWorld world) {
+        super.setWorld(world);
+    }
+
     @Override
     public void setWorld(@Nullable LanternWorld world) {
         LanternWorld oldWorld = this.getWorld();
@@ -256,7 +266,13 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         // TODO: Update client position
     }
 
-    public void setServerPosition(Vector3d position) {
+    /**
+     * Sets the position without triggering any changes
+     * for the player. Like client messages.
+     *
+     * @param position The position
+     */
+    public void setRawPosition(Vector3d position) {
         super.setPosition(position);
     }
 

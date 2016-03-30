@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.game;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.LanternAssetManager;
@@ -86,8 +88,13 @@ import org.spongepowered.api.command.CommandManager;
 import org.spongepowered.api.config.ConfigManager;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.event.EventManager;
-import org.spongepowered.api.event.SpongeEventFactory;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.SpongeEventFactoryUtils;
+import org.spongepowered.api.event.game.state.GameConstructionEvent;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameLoadCompleteEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStateEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
@@ -123,7 +130,7 @@ public class LanternGame implements Game {
 
     public static final String MINECRAFT_ID = "minecraft";
     public static final String MINECRAFT_NAME = "Minecraft";
-    public static final String MINECRAFT_VERSION = "1.9";
+    public static final String MINECRAFT_VERSION = "1.9.2";
 
     // The name of the config folder
     public static final String CONFIG_FOLDER = "config";
@@ -369,8 +376,7 @@ public class LanternGame implements Game {
         this.teleportHelper = new LanternTeleportHelper();
 
         // Call the construction events
-        this.eventManager.post(SpongeEventFactory.createGameConstructionEvent(Cause.source(this).build(),
-                GameState.CONSTRUCTION));
+        this.postGameStateChange(GameState.CONSTRUCTION, GameConstructionEvent.class);
 
         // Load the plugin instances
         try {
@@ -389,9 +395,7 @@ public class LanternGame implements Game {
                 });
 
         // Pre-init phase
-        this.setGameState(GameState.PRE_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePreInitializationEvent(Cause.source(this).build(),
-                GameState.PRE_INITIALIZATION));
+        this.postGameStateChange(GameState.PRE_INITIALIZATION, GamePreInitializationEvent.class);
 
         // Create the default sql service
         this.registerService(SqlService.class, new LanternSqlService());
@@ -437,30 +441,25 @@ public class LanternGame implements Game {
         }
 
         // Init phase
-        this.setGameState(GameState.INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGameInitializationEvent(Cause.source(this).build(),
-                GameState.INITIALIZATION));
+        this.postGameStateChange(GameState.INITIALIZATION, GameInitializationEvent.class);
 
         // Call post init phase for registry
         this.gameRegistry.postInit();
 
         // Post-init phase
-        this.setGameState(GameState.POST_INITIALIZATION);
-        this.eventManager.post(SpongeEventFactory.createGamePostInitializationEvent(Cause.source(this).build(),
-                GameState.POST_INITIALIZATION));
+        this.postGameStateChange(GameState.POST_INITIALIZATION, GamePostInitializationEvent.class);
 
         // Load-complete phase
-        this.setGameState(GameState.LOAD_COMPLETE);
-        this.eventManager.post(SpongeEventFactory.createGameLoadCompleteEvent(Cause.source(this).build(),
-                GameState.LOAD_COMPLETE));
+        this.postGameStateChange(GameState.LOAD_COMPLETE, GameLoadCompleteEvent.class);
+    }
+
+    public <T extends GameStateEvent> void postGameStateChange(GameState gameState, Class<T> eventClass) {
+        this.gameState = checkNotNull(gameState, "gameState");
+        this.eventManager.post(SpongeEventFactoryUtils.createState(eventClass, this));
     }
 
     private <T> void registerService(Class<T> serviceClass, T serviceImpl) {
         this.serviceManager.setProvider(this.minecraft, serviceClass, serviceImpl);
-    }
-
-    public void setGameState(GameState gameState) {
-        this.gameState = gameState;
     }
 
     /**

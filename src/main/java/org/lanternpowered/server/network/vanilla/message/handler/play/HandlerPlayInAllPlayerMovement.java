@@ -35,7 +35,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class HandlerPlayInAllPlayerMovement {
 
     private void handlePosition(NetworkContext context, Vector3d position) {
-        context.getSession().getPlayer().setServerPosition(position);
+        context.getSession().getPlayer().setRawPosition(position);
     }
 
     public class HandlerPlayInPlayerMovement implements Handler<MessagePlayInPlayerMovement> {

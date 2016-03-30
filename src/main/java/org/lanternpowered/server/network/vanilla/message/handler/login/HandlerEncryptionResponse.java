@@ -47,6 +47,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
@@ -61,8 +63,15 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternProfileProperty;
+import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.UUIDHelper;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.message.MessageEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.profile.property.ProfileProperty;
+import org.spongepowered.api.text.Text;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -82,6 +91,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public final class HandlerEncryptionResponse implements Handler<MessageLoginInEncryptionResponse> {
 
+    private final String authBaseUrl = "https://sessionserver.mojang.com/session/minecraft/hasJoined";
     private final Gson gson = new Gson();
 
     @Override
@@ -148,82 +158,77 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             return;
         }
 
-        // Start auth thread
-        Thread clientAuthThread = new Thread(new ClientAuthRunnable(session, session.getVerifyUsername(), hash));
-        clientAuthThread.setName("auth{" + session.getVerifyUsername() + "}");
-        clientAuthThread.start();
+        LanternScheduler.getInstance().submitAsyncTask(() -> {
+            performAuth(session, session.getVerifyUsername(), hash);
+            return null;
+        });
     }
 
-    private class ClientAuthRunnable implements Runnable {
+    private void performAuth(Session session, String username, String hash) {
+        final String postUrl = this.authBaseUrl + "?username=" + username + "&serverId=" + hash;
+        try {
+            // Authenticate
+            URLConnection connection = new URL(postUrl).openConnection();
 
-        private static final String BASE_URL = "https://sessionserver.mojang.com/session/minecraft/hasJoined";
-
-        private final Session session;
-        private final String username;
-        private final String postURL;
-
-        private ClientAuthRunnable(Session session, String username, String hash) {
-            this.postURL = BASE_URL + "?username=" + username + "&serverId=" + hash;
-            this.session = session;
-            this.username = username;
-        }
-
-        @Override
-        public void run() {
-            try {
-                // Authenticate
-                URLConnection connection = new URL(this.postURL).openConnection();
-
-                JsonObject json;
-                try (InputStream is = connection.getInputStream()) {
-                    if (is.available() == 0) {
-                        this.session.disconnect("Invalid username or session id!");
-                        return;
-                    }
-                    try {
-                        json = gson.fromJson(new InputStreamReader(is), JsonObject.class);
-                    } catch (Exception e) {
-                        Lantern.getLogger().warn("Username \"" + this.username + "\" failed to authenticate!");
-                        this.session.disconnect("Failed to verify username!");
-                        return;
-                    }
-                }
-
-                String name = json.get("name").getAsString();
-                String id = json.get("id").getAsString();
-
-                // Parse UUID
-                UUID uuid;
-
-                try {
-                    uuid = UUIDHelper.fromFlatString(id);
-                } catch (IllegalArgumentException e) {
-                    Lantern.getLogger().error("Returned authentication UUID invalid: " + id, e);
-                    this.session.disconnect("Invalid UUID.");
+            JsonObject json;
+            try (InputStream is = connection.getInputStream()) {
+                if (is.available() == 0) {
+                    session.disconnect("Invalid username or session id!");
                     return;
                 }
-
-                JsonArray propsArray = json.getAsJsonArray("properties");
-
-                // Parse properties
-                Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
-                for (JsonElement element : propsArray) {
-                    JsonObject json0 = element.getAsJsonObject();
-                    String propName = json0.get("name").getAsString();
-                    String value = json0.get("value").getAsString();
-                    String signature = json0.has("signature") ? json0.get("signature").getAsString() : null;
-                    properties.put(propName, new LanternProfileProperty(propName, value, signature));
+                try {
+                    json = this.gson.fromJson(new InputStreamReader(is), JsonObject.class);
+                } catch (Exception e) {
+                    Lantern.getLogger().warn("Username \"" + username + "\" failed to authenticate!");
+                    session.disconnect("Failed to verify username!");
+                    return;
                 }
-
-                LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
-
-                Lantern.getLogger().info("Finished authenticating.");
-                Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
-                this.session.messageReceived(new MessageLoginInFinish(gameProfile));
-            } catch (Exception e) {
-                Lantern.getLogger().error("Error in authentication thread", e);
-                this.session.disconnect("Internal error during authentication.", true);
             }
+
+            String name = json.get("name").getAsString();
+            String id = json.get("id").getAsString();
+
+            // Parse UUID
+            UUID uuid;
+
+            try {
+                uuid = UUIDHelper.fromFlatString(id);
+            } catch (IllegalArgumentException e) {
+                Lantern.getLogger().error("Returned authentication UUID invalid: " + id, e);
+                session.disconnect("Invalid UUID.");
+                return;
+            }
+
+            JsonArray propsArray = json.getAsJsonArray("properties");
+
+            // Parse properties
+            Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
+            for (JsonElement element : propsArray) {
+                JsonObject json0 = element.getAsJsonObject();
+                String propName = json0.get("name").getAsString();
+                String value = json0.get("value").getAsString();
+                String signature = json0.has("signature") ? json0.get("signature").getAsString() : null;
+                properties.put(propName, new LanternProfileProperty(propName, value, signature));
+            }
+
+            LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
+
+            Lantern.getLogger().info("Finished authenticating.");
+            Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
+
+            Text disconnectMessage = Text.of("You are not allowed to log in to this server.");
+            ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(Cause.source(gameProfile).build(), session,
+                    new MessageEvent.MessageFormatter(disconnectMessage), gameProfile, false);
+
+            Sponge.getEventManager().post(event);
+            if (event.isCancelled()) {
+                session.disconnect(event.isMessageCancelled() ? t("disconnect.disconnected") : event.getMessage());
+            } else {
+                session.messageReceived(new MessageLoginInFinish(gameProfile));
+            }
+        } catch (Exception e) {
+            Lantern.getLogger().error("Error in authentication thread", e);
+            session.disconnect("Internal error during authentication.");
         }
     }
 }

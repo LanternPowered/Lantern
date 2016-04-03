@@ -27,24 +27,25 @@ package org.lanternpowered.server.console;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.command.AbstractCommandSource;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.permission.AbstractSubjectBase;
+import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextElement;
+import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public final class LanternConsoleSource extends AbstractSubjectBase implements AbstractCommandSource, ConsoleSource {
+public final class LanternConsoleSource extends AbstractSubjectBase implements ConsoleSource {
 
     public static final String NAME = "Server";
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
@@ -60,10 +61,29 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements A
         return NAME;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void sendMessage(Text message) {
-        Lantern.getLogger().info(TextSerializers.LEGACY_FORMATTING_CODE.serialize(message));
+        System.out.println(LanternTexts.toLegacy(message));
+    }
+
+    @Override
+    public void sendMessages(Text... messages) {
+        ConsoleSource.super.sendMessages(messages);
+    }
+
+    @Override
+    public void sendMessages(Iterable<Text> messages) {
+        ConsoleSource.super.sendMessages(messages);
+    }
+
+    @Override
+    public void sendMessage(TextTemplate template) {
+        ConsoleSource.super.sendMessage(template);
+    }
+
+    @Override
+    public void sendMessage(TextTemplate template, Map<String, TextElement> params) {
+        ConsoleSource.super.sendMessage(template, params);
     }
 
     @Override

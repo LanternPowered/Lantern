@@ -31,6 +31,7 @@ import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
 import org.apache.logging.log4j.util.PropertiesUtil;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 
 @ConverterKeys({ "fqcn", "loc" })
@@ -63,7 +64,7 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
         final String name = event.getLoggerName();
         final StackTraceElement element;
         if (ConsoleLaunch.isInitialized() && (ConsoleLaunch.REDIRECT_ERR.equals(name) || ConsoleLaunch.REDIRECT_OUT.equals(name))) {
-            element = calculateLocation(ConsoleLaunch.REDIRECT_FQCN);
+            element = calculateLocation(ConsoleLaunch.REDIRECT_FQCNS);
         } else {
             element = event.getSource();
         }
@@ -73,13 +74,13 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
         }
     }
 
-    private static StackTraceElement calculateLocation(String fqcn) {
+    private static StackTraceElement calculateLocation(Set<String> fqcns) {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         StackTraceElement last = null;
 
         for (int i = stackTrace.length - 1; i > 0; i--) {
             String className = stackTrace[i].getClassName();
-            if (fqcn.equals(className)) {
+            if (fqcns.contains(className)) {
                 return last;
             }
 

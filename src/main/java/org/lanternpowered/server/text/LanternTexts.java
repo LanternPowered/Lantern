@@ -34,6 +34,10 @@ public class LanternTexts {
         return TextSerializers.LEGACY_FORMATTING_CODE.serialize(text);
     }
 
+    public static String toPlain(Text text) {
+        return TextSerializers.PLAIN.serialize(text);
+    }
+
     public static Text fromLegacy(String text) {
         return TextSerializers.LEGACY_FORMATTING_CODE.deserialize(text);
     }

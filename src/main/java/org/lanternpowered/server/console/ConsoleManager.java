@@ -43,6 +43,9 @@ public final class ConsoleManager {
         // Set the colored console formatter
         ConsoleLaunch.setFormatter(new ColoredConsoleFormatter());
 
+        // Register the fqcn for the console source
+        ConsoleLaunch.addFqcn(LanternConsoleSource.class.getName());
+
         // Add the command completer
         final ConsoleReader reader = ConsoleLaunch.getReader();
         if (reader == null) {

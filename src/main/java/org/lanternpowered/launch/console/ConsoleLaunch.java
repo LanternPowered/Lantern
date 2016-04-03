@@ -25,8 +25,10 @@
  */
 package org.lanternpowered.launch.console;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static jline.TerminalFactory.OFF;
 
+import com.google.common.collect.Sets;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.CursorBuffer;
@@ -41,6 +43,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
@@ -52,7 +55,7 @@ import javax.annotation.Nullable;
 public final class ConsoleLaunch {
 
     // The fqcn of the stream that we use to redirect stream messages through a logger
-    static final String REDIRECT_FQCN = LoggingPrintStream.class.getName();
+    static final Set<String> REDIRECT_FQCNS = Sets.newHashSet(LoggingPrintStream.class.getName());
 
     static final String REDIRECT_ERR = "STDERR";
     static final String REDIRECT_OUT = "STDOUT";
@@ -71,6 +74,10 @@ public final class ConsoleLaunch {
 
     // Whether advanced jline is used
     private static boolean advancedJline;
+
+    public static void addFqcn(String fqcn) {
+        REDIRECT_FQCNS.add(checkNotNull(fqcn, "fqcn"));
+    }
 
     /**
      * Gets the {@link ConsoleReader} instance.

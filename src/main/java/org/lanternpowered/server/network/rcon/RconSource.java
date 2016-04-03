@@ -25,20 +25,19 @@
  */
 package org.lanternpowered.server.network.rcon;
 
-import org.lanternpowered.server.command.AbstractCommandSource;
 import org.lanternpowered.server.permission.AbstractSubjectBase;
+import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 
 @NonnullByDefault
-public final class RconSource extends AbstractSubjectBase implements AbstractCommandSource, org.spongepowered.api.command.source.RconSource {
+public final class RconSource extends AbstractSubjectBase implements org.spongepowered.api.command.source.RconSource {
 
     public static final String NAME_PREFIX = "Rcon";
     public static final String NAME_FULL_PREFIX = NAME_PREFIX + "{";
@@ -62,7 +61,7 @@ public final class RconSource extends AbstractSubjectBase implements AbstractCom
 
     @Override
     public void sendMessage(Text message) {
-        this.buffer.append(TextSerializers.PLAIN.serialize(message)).append('\n');
+        this.buffer.append(LanternTexts.toPlain(message)).append('\n');
     }
 
     @Override

@@ -75,6 +75,7 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
@@ -472,6 +473,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Override
     public void sendTitle(Title title) {
         this.session.sendAll(LanternTitles.getMessages(checkNotNull(title, "title")));
+    }
+
+    @Override
+    public void sendBookView(BookView bookView) {
+
     }
 
     @Override

@@ -92,6 +92,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.title.Title;
@@ -387,6 +388,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public MutableBlockVolumeWorker<? extends World> getBlockWorker() {
         return new LanternMutableBlockVolumeWorker<>(this);
+    }
+
+    @Override
+    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+        return false;
     }
 
     @Override
@@ -814,6 +820,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             List<Message> networkMessages = LanternTitles.getMessages(title);
             this.players.forEach(player -> player.getConnection().sendAll(networkMessages));
         }
+    }
+
+    @Override
+    public void sendBookView(BookView bookView) {
+
     }
 
     @Override

@@ -59,6 +59,7 @@ import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
@@ -477,6 +478,16 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public void sendBookView(BookView bookView) {
+
+    }
+
+    @Override
+    public void sendBlockChange(int x, int y, int z, BlockState state) {
+
+    }
+
+    @Override
+    public void resetBlockChange(int x, int y, int z) {
 
     }
 

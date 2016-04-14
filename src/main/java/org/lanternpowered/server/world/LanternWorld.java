@@ -828,6 +828,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public void sendBlockChange(int x, int y, int z, BlockState state) {
+
+    }
+
+    @Override
+    public void resetBlockChange(int x, int y, int z) {
+
+    }
+
+    @Override
     public Context getContext() {
         if (this.worldContext == null) {
             this.worldContext = new Context(Context.WORLD_KEY, this.getName());

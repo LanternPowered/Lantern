@@ -33,22 +33,18 @@ import static org.objectweb.asm.Opcodes.ACC_PRIVATE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.ACC_SUPER;
-import static org.objectweb.asm.Opcodes.ACONST_NULL;
 import static org.objectweb.asm.Opcodes.ALOAD;
 import static org.objectweb.asm.Opcodes.ASTORE;
 import static org.objectweb.asm.Opcodes.BIPUSH;
 import static org.objectweb.asm.Opcodes.CHECKCAST;
-import static org.objectweb.asm.Opcodes.F_APPEND;
-import static org.objectweb.asm.Opcodes.F_SAME;
-import static org.objectweb.asm.Opcodes.F_SAME1;
+import static org.objectweb.asm.Opcodes.DUP;
 import static org.objectweb.asm.Opcodes.GETFIELD;
 import static org.objectweb.asm.Opcodes.GETSTATIC;
-import static org.objectweb.asm.Opcodes.GOTO;
 import static org.objectweb.asm.Opcodes.IFNULL;
 import static org.objectweb.asm.Opcodes.INVOKEINTERFACE;
 import static org.objectweb.asm.Opcodes.INVOKESPECIAL;
-import static org.objectweb.asm.Opcodes.INVOKESTATIC;
 import static org.objectweb.asm.Opcodes.INVOKEVIRTUAL;
+import static org.objectweb.asm.Opcodes.NEW;
 import static org.objectweb.asm.Opcodes.PUTSTATIC;
 import static org.objectweb.asm.Opcodes.RETURN;
 import static org.objectweb.asm.Opcodes.V1_6;
@@ -56,24 +52,19 @@ import static org.objectweb.asm.Opcodes.V1_6;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import org.apache.logging.log4j.Logger;
 import org.lanternpowered.server.event.filter.EventFilter;
 import org.lanternpowered.server.event.filter.FilterFactory;
 import org.lanternpowered.server.event.gen.DefineableClassLoader;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.spongepowered.api.event.Event;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@NonnullByDefault
 public final class ClassEventListenerFactory implements AnnotatedEventListener.Factory {
 
     private final AtomicInteger id = new AtomicInteger();
@@ -110,8 +101,7 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
     private Class<? extends AnnotatedEventListener> createClass(Method method) throws Exception {
         Class<?> handle = method.getDeclaringClass();
         Class<?> eventClass = method.getParameterTypes()[0];
-        String name = this.targetPackage
-                + eventClass.getSimpleName() + "Listener_" + handle.getSimpleName() + '_' + method.getName()
+        String name = this.targetPackage + eventClass.getSimpleName() + "Listener_" + handle.getSimpleName() + '_' + method.getName()
                 + this.id.incrementAndGet();
         Class<? extends EventFilter> filter = this.filterFactory.createFilter(method);
 
@@ -122,9 +112,8 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
         if (filter != null) {
             filter.newInstance();
             return this.classLoader.defineClass(name, generateClass(name, handle, method, eventClass, filter));
-        } else {
-            return this.classLoader.defineClass(name, generateClass(name, handle, method, eventClass));
         }
+        return this.classLoader.defineClass(name, generateClass(name, handle, method, eventClass));
     }
 
     private static final String BASE_HANDLER = Type.getInternalName(AnnotatedEventListener.class);
@@ -142,7 +131,7 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
         }
         eventDescriptor += ")V";
 
-        ClassWriter cw = new ClassWriter(0);
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         MethodVisitor mv;
         FieldVisitor fv;
 
@@ -154,34 +143,12 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
         {
             mv = cw.visitMethod(ACC_STATIC, "<clinit>", "()V", null, null);
             mv.visitCode();
-            Label l0 = new Label();
-            Label l1 = new Label();
-            Label l2 = new Label();
-            mv.visitTryCatchBlock(l0, l1, l2, "java/lang/Exception");
-            mv.visitLabel(l0);
-            mv.visitLdcInsn(Type.getType(filter));
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "newInstance", "()Ljava/lang/Object;", false);
-            mv.visitTypeInsn(CHECKCAST, filterName);
+            mv.visitTypeInsn(NEW, filterName);
+            mv.visitInsn(DUP);
+            mv.visitMethodInsn(INVOKESPECIAL, filterName, "<init>", "()V", false);
             mv.visitFieldInsn(PUTSTATIC, name, "FILTER", "L" + filterName + ";");
-            mv.visitLabel(l1);
-            Label l3 = new Label();
-            mv.visitJumpInsn(GOTO, l3);
-            mv.visitLabel(l2);
-            mv.visitFrame(F_SAME1, 0, null, 1, new Object[] {"java/lang/Exception"});
-            mv.visitVarInsn(ASTORE, 0);
-            mv.visitMethodInsn(INVOKESTATIC, Type.getInternalName(Lantern.class), "getLogger", "()" + Type.getDescriptor(Logger.class), false);
-            mv.visitLdcInsn("Error initializing event filter");
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEINTERFACE, Type.getInternalName(Logger.class), "error", "(Ljava/lang/String;Ljava/lang/Throwable;)V", true);
-            Label l5 = new Label();
-            mv.visitLabel(l5);
-            mv.visitLineNumber(220, l5);
-            mv.visitInsn(ACONST_NULL);
-            mv.visitFieldInsn(PUTSTATIC, name, "FILTER", "L" + filterName + ";");
-            mv.visitLabel(l3);
-            mv.visitFrame(F_SAME, 0, null, 0, null);
             mv.visitInsn(RETURN);
-            mv.visitMaxs(3, 1);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
         {
@@ -191,11 +158,11 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
             mv.visitVarInsn(ALOAD, 1);
             mv.visitMethodInsn(INVOKESPECIAL, BASE_HANDLER, "<init>", "(Ljava/lang/Object;)V", false);
             mv.visitInsn(RETURN);
-            mv.visitMaxs(2, 2);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC, "handle", HANDLE_METHOD_DESCRIPTOR, null, new String[] {"java/lang/Exception"});
+            mv = cw.visitMethod(ACC_PUBLIC, "handle", HANDLE_METHOD_DESCRIPTOR, null, new String[] { "java/lang/Exception" });
             mv.visitCode();
             mv.visitFieldInsn(GETSTATIC, name, "FILTER", "L" + filterName + ";");
             mv.visitVarInsn(ALOAD, 1);
@@ -215,9 +182,8 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
             }
             mv.visitMethodInsn(INVOKEVIRTUAL, handleName, method.getName(), eventDescriptor, false);
             mv.visitLabel(l2);
-            mv.visitFrame(F_APPEND, 1, new Object[] {"[Ljava/lang/Object;"}, 0, null);
             mv.visitInsn(RETURN);
-            mv.visitMaxs(4, 3);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
         cw.visitEnd();
@@ -231,7 +197,7 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
         final String handleDescriptor = Type.getDescriptor(handle);
         final String eventName = Type.getInternalName(eventClass);
 
-        ClassWriter cw = new ClassWriter(0);
+        ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         MethodVisitor mv;
 
         cw.visit(V1_6, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, name, null, BASE_HANDLER, null);
@@ -243,7 +209,7 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
             mv.visitVarInsn(ALOAD, 1);
             mv.visitMethodInsn(INVOKESPECIAL, BASE_HANDLER, "<init>", "(Ljava/lang/Object;)V", false);
             mv.visitInsn(RETURN);
-            mv.visitMaxs(2, 2);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
         {
@@ -256,7 +222,7 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
             mv.visitTypeInsn(CHECKCAST, eventName);
             mv.visitMethodInsn(INVOKEVIRTUAL, handleName, method.getName(), "(L" + eventName + ";)V", false);
             mv.visitInsn(RETURN);
-            mv.visitMaxs(2, 2);
+            mv.visitMaxs(0, 0);
             mv.visitEnd();
         }
         cw.visitEnd();

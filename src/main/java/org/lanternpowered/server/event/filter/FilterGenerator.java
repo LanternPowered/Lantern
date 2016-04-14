@@ -60,6 +60,7 @@ import org.lanternpowered.server.event.filter.delegate.SupportsDataFilterDelegat
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.filter.IsCancelled;
 import org.spongepowered.api.event.filter.cause.After;
@@ -73,6 +74,7 @@ import org.spongepowered.api.event.filter.data.Has;
 import org.spongepowered.api.event.filter.data.Supports;
 import org.spongepowered.api.event.filter.type.Exclude;
 import org.spongepowered.api.event.filter.type.Include;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.Tuple;
 
 import java.io.File;
@@ -101,11 +103,11 @@ public class FilterGenerator {
         ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
         MethodVisitor mv;
 
-        cw.visit(V1_6, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, name, null, "java/lang/Object",
-                new String[] {Type.getInternalName(EventFilter.class)});
+        cw.visit(V1_6, ACC_PUBLIC + ACC_FINAL + ACC_SUPER, name, null, "java/lang/Object", new String[] { Type.getInternalName(EventFilter.class) });
 
         SubtypeFilterDelegate sfilter = null;
         List<FilterDelegate> additional = Lists.newArrayList();
+        boolean cancellation = false;
         for (Annotation anno : method.getAnnotations()) {
             Object obj = filterFromAnnotation(anno.annotationType());
             if (obj == null) {
@@ -117,8 +119,15 @@ public class FilterGenerator {
                 }
                 sfilter = ((SubtypeFilter) obj).getDelegate(anno);
             } else if (obj instanceof EventTypeFilter) {
-                additional.add(((EventTypeFilter) obj).getDelegate(anno));
+                EventTypeFilter etf = (EventTypeFilter) obj;
+                additional.add(etf.getDelegate(anno));
+                if (etf == EventTypeFilter.CANCELLATION) {
+                    cancellation = true;
+                }
             }
+        }
+        if (!cancellation && Cancellable.class.isAssignableFrom(method.getParameterTypes()[0])) {
+            additional.add(new CancellationEventFilterDelegate(Tristate.FALSE));
         }
 
         if (sfilter != null) {
@@ -137,8 +146,7 @@ public class FilterGenerator {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC, "filter", "(" + Type.getDescriptor(Event.class) + ")[Ljava/lang/Object;", null,
-                    null);
+            mv = cw.visitMethod(ACC_PUBLIC, "filter", "(" + Type.getDescriptor(Event.class) + ")[Ljava/lang/Object;", null, null);
             mv.visitCode();
             // index of the next available local variable
             int local = 2;
@@ -243,7 +251,8 @@ public class FilterGenerator {
 
     private enum SubtypeFilter {
         INCLUDE(Include.class),
-        EXCLUDE(Exclude.class),;
+        EXCLUDE(Exclude.class),
+        ;
 
         private final Class<? extends Annotation> cls;
 
@@ -271,7 +280,8 @@ public class FilterGenerator {
     }
 
     private enum EventTypeFilter {
-        CANCELLATION(IsCancelled.class),;
+        CANCELLATION(IsCancelled.class),
+        ;
 
         private final Class<? extends Annotation> cls;
 
@@ -281,7 +291,7 @@ public class FilterGenerator {
 
         public FilterDelegate getDelegate(Annotation anno) {
             if (this == CANCELLATION) {
-                return new CancellationEventFilterDelegate((IsCancelled) anno);
+                return new CancellationEventFilterDelegate(((IsCancelled) anno).value());
             }
             throw new UnsupportedOperationException();
         }
@@ -303,7 +313,8 @@ public class FilterGenerator {
         CAUSE_AFTER(After.class),
         CAUSE_ALL(All.class),
         CAUSE_ROOT(Root.class),
-        CAUSE_NAMED(Named.class);
+        CAUSE_NAMED(Named.class),
+        ;
 
         private final Class<? extends Annotation> cls;
 
@@ -348,7 +359,8 @@ public class FilterGenerator {
 
     private enum ParameterFilter {
         SUPPORTS(Supports.class),
-        HAS(Has.class),;
+        HAS(Has.class),
+        ;
 
         private final Class<? extends Annotation> cls;
 
@@ -378,7 +390,7 @@ public class FilterGenerator {
 
     private static final class Holder {
 
-        private static final FilterGenerator INSTANCE = new FilterGenerator();
+        static final FilterGenerator INSTANCE = new FilterGenerator();
     }
 
 }

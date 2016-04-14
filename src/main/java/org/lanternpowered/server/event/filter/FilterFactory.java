@@ -64,10 +64,6 @@ public class FilterFactory {
 
     @Nullable
     public Class<? extends EventFilter> createFilter(Method method) throws Exception {
-        if (method.getParameterCount() == 1 && method.getDeclaredAnnotations().length == 1
-                && method.getDeclaredAnnotations()[0].annotationType().equals(Listener.class)) {
-            return null;
-        }
         return this.cache.get(method);
     }
 

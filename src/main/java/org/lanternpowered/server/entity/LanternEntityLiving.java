@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.entity;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.mutable.entity.HealthData;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -36,6 +36,8 @@ import java.util.UUID;
 
 @NonnullByDefault
 public class LanternEntityLiving extends LanternEntity implements Living {
+
+    private Vector3d headRotation = Vector3d.ZERO;
 
     public LanternEntityLiving(UUID uniqueId) {
         super(uniqueId);
@@ -46,28 +48,17 @@ public class LanternEntityLiving extends LanternEntity implements Living {
     }
 
     @Override
-    public HealthData getHealthData() {
-        return this.get(HealthData.class).get();
-    }
-
-    @Override
-    public DamageableData getMortalData() {
-        return this.get(DamageableData.class).get();
-    }
-
-    @Override
     public Vector3d getHeadRotation() {
-        return null;
+        return this.headRotation;
     }
 
     @Override
     public void setHeadRotation(Vector3d rotation) {
-
+        this.headRotation = checkNotNull(rotation, "rotation");
     }
 
     @Override
     public Text getTeamRepresentation() {
-        // TODO Auto-generated method stub
-        return null;
+        return Text.of(this.getUniqueId().toString());
     }
 }

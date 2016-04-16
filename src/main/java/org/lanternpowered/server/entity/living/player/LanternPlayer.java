@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
@@ -39,9 +40,11 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.game.registry.Registries;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
@@ -482,13 +485,30 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public void sendBlockChange(int x, int y, int z, BlockState state) {
+    public void sendBlockChange(Vector3i position, BlockState state) {
+        checkNotNull(state, "state");
+        checkNotNull(position, "position");
+        this.session.send(new MessagePlayOutBlockChange(position, Registries.getBlockRegistry().getStateInternalIdAndData(state)));
+    }
 
+    @Override
+    public void sendBlockChange(int x, int y, int z, BlockState state) {
+        this.sendBlockChange(new Vector3i(x, y, z), state);
+    }
+
+    @Override
+    public void resetBlockChange(Vector3i position) {
+        checkNotNull(position, "position");
+        LanternWorld world = this.getWorld();
+        if (world == null) {
+            return;
+        }
+        this.session.send(new MessagePlayOutBlockChange(position, Registries.getBlockRegistry().getStateInternalIdAndData(world.getBlock(position))));
     }
 
     @Override
     public void resetBlockChange(int x, int y, int z) {
-
+        this.resetBlockChange(new Vector3i(x, y, z));
     }
 
     @Override
@@ -605,6 +625,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         }
         this.scoreboard = (LanternScoreboard) scoreboard;
         this.scoreboard.addPlayer(this);
+    }
+
+    @Override
+    public Text getTeamRepresentation() {
+        return Text.of(this.getName());
     }
 
     @Override

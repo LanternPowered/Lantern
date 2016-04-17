@@ -34,9 +34,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.text.translation.MinecraftTranslation;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -104,7 +106,24 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
         JsonObject json = new JsonObject();
         Translation translation = src.getTranslation();
         if (this.translateNonMinecraft && !(translation instanceof MinecraftTranslation)) {
-            return new JsonPrimitive(src.getTranslation().get(currentLocale.get(), src.getArguments().toArray()));
+            Object[] rawArguments = src.getArguments().toArray();
+            String[] legacyArguments = new String[rawArguments.length];
+            for (int i = 0; i < rawArguments.length; i++) {
+                Object object = rawArguments[i];
+                if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
+                    if (object instanceof Text) {
+                        // Ignore
+                    } else if (object instanceof Text.Builder) {
+                        object = ((Text.Builder) object).build();
+                    } else {
+                        object = ((TextRepresentable) object).toText();
+                    }
+                    legacyArguments[i] = LanternTexts.toLegacy((Text) object);
+                } else {
+                    legacyArguments[i] = object.toString();
+                }
+            }
+            return new JsonPrimitive(src.getTranslation().get(currentLocale.get(), legacyArguments));
         }
         json.addProperty("translate", src.getTranslation().getId());
         ImmutableList<Object> arguments = src.getArguments();

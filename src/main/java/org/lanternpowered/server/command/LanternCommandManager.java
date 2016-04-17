@@ -33,6 +33,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
+import org.lanternpowered.server.text.LanternTexts;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
@@ -53,7 +54,6 @@ import org.spongepowered.api.event.command.TabCompleteEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.TextMessageException;
 
 import java.io.PrintWriter;
@@ -286,7 +286,7 @@ public class LanternCommandManager implements CommandManager {
                 if (ex.shouldIncludeUsage()) {
                     final Optional<CommandMapping> mapping = this.dispatcher.get(argSplit[0], source);
                     if (mapping.isPresent()) {
-                        source.sendMessage(error(t("Usage: /%s %s", argSplit[0], mapping.get().getCallable().getUsage(source))));
+                        source.sendMessage(error(Text.of("Usage: ", argSplit[0], " ", mapping.get().getCallable().getUsage(source))));
                     }
                 }
             }
@@ -296,7 +296,7 @@ public class LanternCommandManager implements CommandManager {
                 Text text = ((TextMessageException) thr).getText();
                 excBuilder = text == null ? Text.builder("null") : Text.builder();
             } else {
-                excBuilder = Text.builder(String.valueOf(thr.getMessage()));
+                excBuilder = Text.builder(thr.getMessage());
             }
             if (source.hasPermission("sponge.debug.hover-stacktrace")) {
                 final StringWriter writer = new StringWriter();
@@ -307,8 +307,8 @@ public class LanternCommandManager implements CommandManager {
                         .replace("\r", "\n")))); // I mean I guess somebody could be running this on like OS 9?
             }
             source.sendMessage(error(t("Error occurred while executing command: %s", excBuilder.build())));
-            this.log.error(TextSerializers.PLAIN.serialize(t("Error occurred while executing command '%s' for source %s: %s", commandLine, source.toString(), String
-                    .valueOf(thr.getMessage()))), thr);
+            this.log.error(LanternTexts.toLegacy(t("Error occurred while executing command '%s' for source %s: %s", commandLine, source.toString(),
+                    thr.getMessage())), thr);
         }
         return CommandResult.empty();
     }

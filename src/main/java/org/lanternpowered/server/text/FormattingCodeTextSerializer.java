@@ -35,6 +35,7 @@ import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
@@ -245,9 +246,13 @@ public class FormattingCodeTextSerializer implements org.spongepowered.api.text.
             Object[] args0 = new Object[args.size()];
             for (int i = 0; i < args0.length; i++) {
                 Object object = args.get(i);
-                if (object instanceof Text || object instanceof Text.Builder) {
-                    if (object instanceof Text.Builder) {
+                if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
+                    if (object instanceof Text) {
+                        // Ignore
+                    } else if (object instanceof Text.Builder) {
                         object = ((Text.Builder) object).build();
+                    } else {
+                        object = ((TextRepresentable) object).toText();
                     }
                     args0[i] = to((Text) object, locale, new StringBuilder(), colorCode).toString();
                 } else {

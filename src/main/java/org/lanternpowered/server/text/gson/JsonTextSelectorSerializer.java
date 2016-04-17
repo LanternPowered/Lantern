@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.text.gson;
 
+import static org.lanternpowered.server.text.gson.TextConstants.*;
+
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -43,7 +45,7 @@ public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer imp
     @Override
     public SelectorText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json0 = json.getAsJsonObject();
-        Selector selector = Selector.parse(json0.get("selector").getAsString());
+        Selector selector = Selector.parse(json0.get(SELECTOR).getAsString());
         SelectorText.Builder builder = SelectorText.builder(selector);
         this.deserialize(json0, builder, context);
         return builder.build();
@@ -52,7 +54,7 @@ public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer imp
     @Override
     public JsonElement serialize(SelectorText src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject json = new JsonObject();
-        json.addProperty("selector", src.getSelector().toPlain());
+        json.addProperty(SELECTOR, src.getSelector().toPlain());
         this.serialize(json, src, context);
         return json;
     }

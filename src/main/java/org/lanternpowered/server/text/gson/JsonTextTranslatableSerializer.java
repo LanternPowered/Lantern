@@ -25,6 +25,10 @@
  */
 package org.lanternpowered.server.text.gson;
 
+import static org.lanternpowered.server.text.gson.TextConstants.TEXT;
+import static org.lanternpowered.server.text.gson.TextConstants.TRANSLATABLE;
+import static org.lanternpowered.server.text.gson.TextConstants.TRANSLATABLE_ARGS;
+
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
@@ -35,12 +39,13 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
-import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.text.LanternTextSerializer;
 import org.lanternpowered.server.text.translation.MinecraftTranslation;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.TranslatableText;
+import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.reflect.Type;
@@ -53,7 +58,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
 
     /**
      * Sets the current locale that should be used to translate all
-     * the text components if {@link #translateNonMinecraft} is set to true.
+     * the text components if {@link #networkingFormat} is set to true.
      * 
      * <p>This will only be applied to the current thread, so this will
      * can be used in concurrent environments.</p>
@@ -77,21 +82,21 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
     }
 
     private final TranslationManager translationManager;
-    private final boolean translateNonMinecraft;
+    private final boolean networkingFormat;
 
-    public JsonTextTranslatableSerializer(TranslationManager translationManager, boolean translateNonMinecraft) {
-        this.translateNonMinecraft = translateNonMinecraft;
+    public JsonTextTranslatableSerializer(TranslationManager translationManager, boolean networkingFormat) {
         this.translationManager = translationManager;
+        this.networkingFormat = networkingFormat;
     }
 
     @Override
     public TranslatableText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json0 = json.getAsJsonObject();
-        String name = json0.get("translate").getAsString();
+        String name = json0.get(TRANSLATABLE).getAsString();
         Translation translation = this.translationManager.get(name);
         Object[] arguments;
-        if (json0.has("with")) {
-            Text[] with = context.deserialize(json0.get("with"), Text[].class);
+        if (json0.has(TRANSLATABLE_ARGS)) {
+            Text[] with = context.deserialize(json0.get(TRANSLATABLE_ARGS), Text[].class);
             arguments = new Object[with.length];
             System.arraycopy(with, 0, arguments, 0, with.length);
         } else {
@@ -104,11 +109,11 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
 
     @Override
     public JsonElement serialize(TranslatableText src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
         Translation translation = src.getTranslation();
-        if (this.translateNonMinecraft && !(translation instanceof MinecraftTranslation)) {
+        if (this.networkingFormat && !(translation instanceof MinecraftTranslation)) {
             Object[] rawArguments = src.getArguments().toArray();
             String[] legacyArguments = new String[rawArguments.length];
+            Locale locale = currentLocale.get();
             for (int i = 0; i < rawArguments.length; i++) {
                 Object object = rawArguments[i];
                 if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
@@ -119,14 +124,26 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
                     } else {
                         object = ((TextRepresentable) object).toText();
                     }
-                    legacyArguments[i] = LanternTexts.toLegacy((Text) object);
+                    legacyArguments[i] = ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE).serialize((Text) object, locale);
                 } else {
                     legacyArguments[i] = object.toString();
                 }
             }
-            return new JsonPrimitive(src.getTranslation().get(currentLocale.get(), legacyArguments));
+            String content = src.getTranslation().get(locale, legacyArguments);
+            // Check if there are no styles/events applied to the text object
+            // and then send use the plain string
+            if (JsonTextSerializer.isAlmostEmpty(src)) {
+                return new JsonPrimitive(content);
+            // There were styles/events found, serialize as a literal text object
+            } else {
+                JsonObject json = new JsonObject();
+                json.addProperty(TEXT, content);
+                this.serialize(json, src, context);
+                return json;
+            }
         }
-        json.addProperty("translate", src.getTranslation().getId());
+        JsonObject json = new JsonObject();
+        json.addProperty(TRANSLATABLE, src.getTranslation().getId());
         ImmutableList<Object> arguments = src.getArguments();
         if (!arguments.isEmpty()) {
             JsonArray argumentsArray = new JsonArray();
@@ -146,7 +163,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
                     argumentsArray.add(new JsonPrimitive(object.toString()));
                 }
             }
-            json.add("with", argumentsArray);
+            json.add(TRANSLATABLE_ARGS, argumentsArray);
         }
         this.serialize(json, src, context);
         return json;

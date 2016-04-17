@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.text.gson;
 
+import static org.lanternpowered.server.text.gson.TextConstants.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -49,31 +51,37 @@ import java.util.Set;
 
 public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<ScoreText>, JsonDeserializer<ScoreText> {
 
+    private final boolean networkingFormat;
+
+    public JsonTextScoreSerializer(boolean networkingFormat) {
+        this.networkingFormat = networkingFormat;
+    }
+
     @Override
     public ScoreText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         JsonObject json0 = json.getAsJsonObject();
-        Text name = LanternTexts.fromLegacy(json0.get("name").getAsString());
+        Text name = LanternTexts.fromLegacy(json0.get(SCORE_NAME).getAsString());
         // Try to parse the value
         int value;
         try {
-            value = Integer.parseInt(json0.get("value").getAsString());
+            value = Integer.parseInt(json0.get(SCORE_VALUE).getAsString());
         } catch (NumberFormatException e) {
             value = 0;
         }
-        String baseObjective = json0.get("objective").getAsString();
+        String baseObjective = json0.get(SCORE_MAIN_OBJECTIVE).getAsString();
         Set<Objective> objectives = new HashSet<>();
         if (!baseObjective.isEmpty()) {
             this.tryAddObjective(baseObjective, objectives);
         }
-        if (json0.has("extraObjectives")) {
-            JsonArray array = json0.getAsJsonArray("extraObjectives");
+        if (json0.has(SCORE_EXTRA_OBJECTIVES)) {
+            JsonArray array = json0.getAsJsonArray(SCORE_EXTRA_OBJECTIVES);
             for (JsonElement jsonElement : array) {
                 this.tryAddObjective(jsonElement.getAsString(), objectives);
             }
         }
         String override = null;
-        if (json0.has("override")) {
-            override = json0.get("override").getAsString();
+        if (json0.has(SCORE_OVERRIDE)) {
+            override = json0.get(SCORE_OVERRIDE).getAsString();
         }
 
         Score score = new LanternScore(name);
@@ -91,38 +99,44 @@ public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implem
 
     @Override
     public JsonElement serialize(ScoreText src, Type typeOfSrc, JsonSerializationContext context) {
+        // Lantern:
+        // This is a field added by sponge to be able to override
+        // the text provided by this component.
+        Optional<String> override = src.getOverride();
+        // If we are using the networking format and there is an override present, just use
+        // the override as a literal text object
+        if (this.networkingFormat && override.isPresent()) {
+            return new JsonPrimitive(override.get());
+        }
         // There are here some extra fields to represent the (lantern/sponge) score text object,
         // while they are not supported by sponge itself, it seems worth it to provide this
         // This will still remain compatible with vanilla.
         JsonObject json = new JsonObject();
         Score score = src.getScore();
-        json.addProperty("name", LanternTexts.toLegacy(score.getName()));
+        json.addProperty(SCORE_NAME, LanternTexts.toLegacy(score.getName()));
         Iterator<Objective> it = score.getObjectives().iterator();
         if (it.hasNext()) {
-            json.addProperty("objective", it.next().getName());
+            json.addProperty(SCORE_MAIN_OBJECTIVE, it.next().getName());
             // Lantern:
             // Provide a list with all the extra objectives that
             // are attached to the score.
-            if (it.hasNext()) {
-                JsonArray json0 = new JsonArray();
-                while (it.hasNext()) {
-                    json0.add(new JsonPrimitive(it.next().getName()));
+            // There is no need to send this to the client.
+            if (!this.networkingFormat) {
+                if (it.hasNext()) {
+                    JsonArray json0 = new JsonArray();
+                    while (it.hasNext()) {
+                        json0.add(new JsonPrimitive(it.next().getName()));
+                    }
+                    json.add(SCORE_EXTRA_OBJECTIVES, json0);
                 }
-                json.add("extraObjectives", json0);
             }
         } else {
             // This field must always be specified to be valid score json,
             // making it empty will prevent issues
-            json.addProperty("objective", "");
+            json.addProperty(SCORE_MAIN_OBJECTIVE, "");
         }
-        // Lantern:
-        // This is a field added by sponge to be able to override
-        // the text provided by this component.
-        Optional<String> override = src.getOverride();
-        if (override.isPresent()) {
-            json.addProperty("override", override.get());
-        }
-        json.addProperty("value", Integer.toString(score.getScore()));
+        override.ifPresent(v -> json.addProperty(SCORE_OVERRIDE, override.get()));
+        json.addProperty(SCORE_VALUE, Integer.toString(score.getScore()));
         return json;
     }
 

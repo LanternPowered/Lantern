@@ -35,9 +35,10 @@ import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.lang.reflect.Type;
+
+import static org.lanternpowered.server.text.gson.TextConstants.*;
 
 public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<LiteralText>, JsonDeserializer<LiteralText> {
 
@@ -47,19 +48,18 @@ public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer impl
             return Text.of(json.getAsString());
         }
         JsonObject json0 = json.getAsJsonObject();
-        LiteralText.Builder builder = Text.builder(json0.get("text").getAsString());
+        LiteralText.Builder builder = Text.builder(json0.get(TEXT).getAsString());
         this.deserialize(json0, builder, context);
         return builder.build();
     }
 
     @Override
     public JsonElement serialize(LiteralText src, Type typeOfSrc, JsonSerializationContext context) {
-        if (!src.getHoverAction().isPresent() && !src.getClickAction().isPresent() &&
-                src.getStyle().isEmpty() && src.getColor().equals(TextColors.NONE) && src.getChildren().isEmpty()) {
+        if (JsonTextSerializer.isAlmostEmpty(src)) {
             return new JsonPrimitive(src.getContent());
         }
         JsonObject json = new JsonObject();
-        json.addProperty("text", src.getContent());
+        json.addProperty(TEXT, src.getContent());
         this.serialize(json, src, context);
         return json;
     }

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.text.gson;
 
+import static org.lanternpowered.server.text.gson.TextConstants.*;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
@@ -44,49 +46,45 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyle;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Nullable;
 
 abstract class JsonTextBaseSerializer {
 
     public void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
-        this.deserialize(json, builder, context, json.has("extra") ? json.getAsJsonArray("extra") : null);
+        this.deserialize(json, builder, context, json.has(CHILDREN) ? json.getAsJsonArray(CHILDREN) : null);
     }
 
     public void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context, @Nullable JsonArray children)
             throws JsonParseException {
-        if (json.has("color")) {
-            TextColor color = Sponge.getRegistry().getType(TextColor.class, json.get("color").getAsString()).orElse(null);
-            if (color != null) {
-                builder.color(color);
-            }
+        if (json.has(COLOR)) {
+            Sponge.getRegistry().getType(TextColor.class, json.get(COLOR).getAsString()).ifPresent(builder::color);
         }
         TextStyle style = builder.getStyle();
-        if (json.has("bold")) {
-            style = style.bold(json.get("bold").getAsBoolean());
+        if (json.has(BOLD)) {
+            style = style.bold(json.get(BOLD).getAsBoolean());
         }
-        if (json.has("italic")) {
-            style = style.italic(json.get("italic").getAsBoolean());
+        if (json.has(ITALIC)) {
+            style = style.italic(json.get(ITALIC).getAsBoolean());
         }
-        if (json.has("underlined")) {
-            style = style.underline(json.get("underlined").getAsBoolean());
+        if (json.has(UNDERLINE)) {
+            style = style.underline(json.get(UNDERLINE).getAsBoolean());
         }
-        if (json.has("strikethrough")) {
-            style = style.strikethrough(json.get("strikethrough").getAsBoolean());
+        if (json.has(STRIKETHROUGH)) {
+            style = style.strikethrough(json.get(STRIKETHROUGH).getAsBoolean());
         }
-        if (json.has("obfuscated")) {
-            style = style.obfuscated(json.get("obfuscated").getAsBoolean());
+        if (json.has(OBFUSCATED)) {
+            style = style.obfuscated(json.get(OBFUSCATED).getAsBoolean());
         }
         builder.style(style);
         if (children != null) {
             builder.append((Text[]) context.deserialize(children, Text[].class));
         }
-        if (json.has("clickEvent")) {
-            JsonObject json0 = json.getAsJsonObject("clickEvent");
+        if (json.has(CLICK_EVENT)) {
+            JsonObject json0 = json.getAsJsonObject(CLICK_EVENT);
             if (json0 != null) {
-                JsonPrimitive json1 = json0.getAsJsonPrimitive("action");
-                JsonPrimitive json2 = json0.getAsJsonPrimitive("value");
+                JsonPrimitive json1 = json0.getAsJsonPrimitive(EVENT_ACTION);
+                JsonPrimitive json2 = json0.getAsJsonPrimitive(EVENT_VALUE);
                 if (json1 != null && json2 != null) {
                     String action = json1.getAsString();
                     String value = json2.getAsString();
@@ -98,11 +96,11 @@ abstract class JsonTextBaseSerializer {
                 }
             }
         }
-        if (json.has("hoverEvent")) {
-            JsonObject json0 = json.getAsJsonObject("hoverEvent");
+        if (json.has(HOVER_EVENT)) {
+            JsonObject json0 = json.getAsJsonObject(HOVER_EVENT);
             if (json0 != null) {
-                JsonPrimitive json1 = json0.getAsJsonPrimitive("action");
-                JsonPrimitive json2 = json0.getAsJsonPrimitive("value");
+                JsonPrimitive json1 = json0.getAsJsonPrimitive(EVENT_ACTION);
+                JsonPrimitive json2 = json0.getAsJsonPrimitive(EVENT_VALUE);
                 if (json1 != null && json2 != null) {
                     String action = json1.getAsString();
                     String value = json2.getAsString();
@@ -114,7 +112,7 @@ abstract class JsonTextBaseSerializer {
                 }
             }
         }
-        if (json.has("insertion")) {
+        if (json.has(INSERTION)) {
             builder.onShiftClick(TextActions.insertText(json.getAsString()));
         }
     }
@@ -126,56 +124,40 @@ abstract class JsonTextBaseSerializer {
     public void serialize(JsonObject json, Text text, JsonSerializationContext context, List<Text> children) {
         TextColor color = text.getColor();
         if (color != TextColors.NONE) {
-            json.addProperty("color", color.getId());
+            json.addProperty(COLOR, color.getId());
         }
         TextStyle style = text.getStyle();
-        Optional<Boolean> bold = style.isBold();
-        if (bold.isPresent()) {
-            json.addProperty("bold", bold.get());
-        }
-        Optional<Boolean> italic = style.isItalic();
-        if (italic.isPresent()) {
-            json.addProperty("italic", italic.get());
-        }
-        Optional<Boolean> underlined = style.hasUnderline();
-        if (underlined.isPresent()) {
-            json.addProperty("underlined", underlined.get());
-        }
-        Optional<Boolean> strikethrough = style.hasStrikethrough();
-        if (strikethrough.isPresent()) {
-            json.addProperty("strikethrough", strikethrough.get());
-        }
-        Optional<Boolean> obfuscated = style.isObfuscated();
-        if (obfuscated.isPresent()) {
-            json.addProperty("obfuscated", obfuscated.get());
-        }
+        style.isBold().ifPresent(v -> json.addProperty(BOLD, v));
+        style.isItalic().ifPresent(v -> json.addProperty(ITALIC, v));
+        style.hasUnderline().ifPresent(v -> json.addProperty(UNDERLINE, v));
+        style.hasStrikethrough().ifPresent(v -> json.addProperty(STRIKETHROUGH, v));
+        style.isObfuscated().ifPresent(v -> json.addProperty(OBFUSCATED, v));
         if (!children.isEmpty()) {
-            json.add("extra", context.serialize(children.toArray(new Text[children.size()]), Text[].class));
+            json.add(CHILDREN, context.serialize(children.toArray(new Text[children.size()]), Text[].class));
         }
-        ClickAction<?> clickAction = text.getClickAction().orElse(null);
-        if (clickAction != null) {
+        text.getClickAction().ifPresent(clickAction -> {
             RawAction raw = LanternTextHelper.raw(clickAction);
 
             JsonObject json0 = new JsonObject();
-            json0.addProperty("action", raw.getAction());
-            json0.addProperty("value", raw.getValueAsString());
+            json0.addProperty(EVENT_ACTION, raw.getAction());
+            json0.addProperty(EVENT_VALUE, raw.getValueAsString());
 
-            json.add("clickEvent", json0);
-        }
-        HoverAction<?> hoverAction = text.getHoverAction().orElse(null);
-        if (hoverAction != null) {
-            RawAction raw = LanternTextHelper.raw(hoverAction);
+            json.add(CLICK_EVENT, json0);
+        });
+        text.getHoverAction().ifPresent(clickAction -> {
+            RawAction raw = LanternTextHelper.raw(clickAction);
 
             JsonObject json0 = new JsonObject();
-            json0.addProperty("action", raw.getAction());
-            json0.addProperty("value", raw.getValueAsString());
+            json0.addProperty(EVENT_ACTION, raw.getAction());
+            json0.addProperty(EVENT_VALUE, raw.getValueAsString());
 
-            json.add("hoverEvent", json0);
-        }
-        ShiftClickAction<?> shiftClickAction = text.getShiftClickAction().orElse(null);
-        if (shiftClickAction != null && shiftClickAction instanceof ShiftClickAction.InsertText) {
-            json.addProperty("insertion", ((ShiftClickAction.InsertText) shiftClickAction).getResult());
-        }
+            json.add(HOVER_EVENT, json0);
+        });
+        text.getShiftClickAction().ifPresent(shiftClickAction -> {
+            if (shiftClickAction instanceof ShiftClickAction.InsertText) {
+                json.addProperty(INSERTION, ((ShiftClickAction.InsertText) shiftClickAction).getResult());
+            }
+        });
     }
 
 }

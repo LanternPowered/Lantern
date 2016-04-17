@@ -26,6 +26,7 @@
 package org.lanternpowered.server.text.gson;
 
 import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
@@ -128,7 +129,24 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
         json.addProperty("translate", src.getTranslation().getId());
         ImmutableList<Object> arguments = src.getArguments();
         if (!arguments.isEmpty()) {
-            json.add("with", context.serialize(arguments));
+            JsonArray argumentsArray = new JsonArray();
+            for (Object object : arguments) {
+                // Only primitive strings and text json is allowed,
+                // so we need to convert the objects if possible
+                if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
+                    if (object instanceof Text) {
+                        // Ignore
+                    } else if (object instanceof Text.Builder) {
+                        object = ((Text.Builder) object).build();
+                    } else {
+                        object = ((TextRepresentable) object).toText();
+                    }
+                    argumentsArray.add(context.serialize(object, Text.class));
+                } else {
+                    argumentsArray.add(new JsonPrimitive(object.toString()));
+                }
+            }
+            json.add("with", argumentsArray);
         }
         this.serialize(json, src, context);
         return json;

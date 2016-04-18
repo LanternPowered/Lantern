@@ -25,77 +25,53 @@
  */
 package org.lanternpowered.server.status;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.collect.Lists2;
-import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
-import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
+public class LanternStatusHelper {
 
-public class LanternStatusResponse implements ClientPingServerEvent.Response {
+    /**
+     * The maximum amount of players that are by default displayed in the status ping.
+     */
+    private static final int DEFAULT_MAX_PLAYERS_DISPLAYED = 12;
 
-    private final MinecraftVersion version;
+    public static ClientPingServerEvent.Response.Players createPlayers(Server server) {
+        // Get the online players
+        Collection<Player> players = server.getOnlinePlayers();
 
-    private Optional<Favicon> favicon;
-    private Text description;
-    private Players players;
+        int online = players.size();
+        int max = server.getMaxPlayers();
 
-    private boolean hidePlayers;
+        // Create a list with the players
+        List<Player> playersList = new ArrayList<>(players);
 
-    public LanternStatusResponse(MinecraftVersion version, Optional<Favicon> favicon, Text description, Players players) {
-        this.description = checkNotNull(description, "description");
-        this.favicon = checkNotNull(favicon, "favicon");
-        this.version = checkNotNull(version, "version");
-        this.players = checkNotNull(players, "players");
+        // Randomize the players list
+        Collections.shuffle(playersList);
+
+        // Limit the maximum amount of displayed players
+        if (playersList.size() > DEFAULT_MAX_PLAYERS_DISPLAYED) {
+            playersList = playersList.subList(0, DEFAULT_MAX_PLAYERS_DISPLAYED);
+        }
+
+        // Get all the game profiles and create a copy
+        List<GameProfile> gameProfiles = Lists2.nonNullOf(playersList.stream()
+                .map(player -> ((LanternGameProfile) player.getProfile()).copy())
+                .collect(Collectors.toList()));
+
+        return SpongeEventFactory.createClientPingServerEventResponsePlayers(gameProfiles, max, online);
     }
 
-    @Override
-    public Text getDescription() {
-        return this.description;
+    private LanternStatusHelper() {
     }
-
-    @Override
-    public MinecraftVersion getVersion() {
-        return this.version;
-    }
-
-    @Override
-    public Optional<Favicon> getFavicon() {
-        return this.favicon;
-    }
-
-    @Override
-    public void setDescription(Text description) {
-        this.description = checkNotNull(description, "description");
-    }
-
-    @Override
-    public void setHidePlayers(boolean hide) {
-        this.hidePlayers = hide;
-    }
-
-    @Override
-    public void setFavicon(@Nullable Favicon favicon) {
-        this.favicon = Optional.ofNullable(favicon);
-    }
-
-    @Override
-    public Optional<Players> getPlayers() {
-        return this.hidePlayers ? Optional.empty() : Optional.of(this.players);
-    }
-
 }

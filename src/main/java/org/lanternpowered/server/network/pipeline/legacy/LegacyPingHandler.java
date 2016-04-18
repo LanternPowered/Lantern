@@ -34,11 +34,10 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.status.LanternStatusClient;
+import org.lanternpowered.server.status.LanternStatusHelper;
 import org.lanternpowered.server.status.LanternStatusResponse;
-import org.lanternpowered.server.status.LanternStatusResponsePlayers;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
@@ -47,7 +46,6 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
-import java.util.stream.Collectors;
 
 @SuppressWarnings("deprecation")
 public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
@@ -150,16 +148,12 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
             legacy = true;
 
             MinecraftVersion version0 = Lantern.getGame().getPlatform().getMinecraftVersion();
-            Text motd = server.getMotd();
-
-            int online = server.getOnlinePlayers().size();
-            int max = server.getMaxPlayers();
+            Text description = server.getMotd();
 
             InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
             LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
-            LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(server.getOnlinePlayers()
-                    .stream().map(User::getProfile).collect(Collectors.toList()), online, max);
-            LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
+            ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
+            LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon(), description, players);
 
             ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
             Sponge.getEventManager().post(event);
@@ -170,9 +164,9 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
 
-            motd = response.getDescription();
-            online = players.getOnline();
-            max = players.getMax();
+            description = response.getDescription();
+            int online = players.getOnline();
+            int max = players.getMax();
 
             // The players should be hidden, this will replace the player count
             // with ???
@@ -180,11 +174,11 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                 online = -1;
             }
 
-            StringBuilder builder = new StringBuilder();
+            StringBuilder dataBuilder = new StringBuilder();
 
             if (full) {
-                String motd0 = TextSerializers.LEGACY_FORMATTING_CODE.serialize(motd);
-                builder
+                String description0 = TextSerializers.LEGACY_FORMATTING_CODE.serialize(description);
+                dataBuilder
                         .append('\u00A7')
                         // This value is always 1.
                         .append(1)
@@ -194,25 +188,25 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                         .append(127)
                         .append('\u0000')
                         // The version/name string of the server.
-                        .append(Lantern.getGame().getPlatform().getImplementation().getName())
+                        .append(Lantern.getGame().getPlatform().getMinecraftVersion().getName())
                         .append('\u0000')
                         // The motd of the server. In legacy format.
-                        .append(motd0)
+                        .append(description0)
                         .append('\u0000')
                         .append(online)
                         .append('\u0000')
                         .append(max);
             } else {
-                String motd0 = TextSerializers.PLAIN.serialize(motd);
-                builder
-                        .append(motd0)
+                String description0 = TextSerializers.PLAIN.serialize(description);
+                dataBuilder
+                        .append(description0)
                         .append('\u00A7')
                         .append(online)
                         .append('\u00A7')
                         .append(max);
             }
 
-            byte[] data = builder.toString().getBytes(StandardCharsets.UTF_16BE);
+            byte[] data = dataBuilder.toString().getBytes(StandardCharsets.UTF_16BE);
 
             ByteBuf output = ctx.alloc().buffer();
             output.writeByte(0xff);

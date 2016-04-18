@@ -71,6 +71,7 @@ public final class LanternGameProfile implements GameProfile {
         this(uniqueId, name, LinkedHashMultimap.create());
     }
 
+    @SuppressWarnings("unchecked")
     public LanternGameProfile(UUID uniqueId, @Nullable String name, Multimap<String, ProfileProperty> properties) {
         this.properties = (Multimap) checkNotNull(properties, "properties");
         this.uniqueId = checkNotNull(uniqueId, "uniqueId");
@@ -78,9 +79,27 @@ public final class LanternGameProfile implements GameProfile {
     }
 
     /**
+     * Creates a copy of this game profile.
+     *
+     * @return The copy
+     */
+    public LanternGameProfile copy() {
+        return new LanternGameProfile(this.uniqueId, this.name, LinkedHashMultimap.create(this.properties));
+    }
+
+    /**
+     * Creates a copy of this game profile without all the properties.
+     *
+     * @return The copy
+     */
+    public LanternGameProfile copyWithoutProperties() {
+        return new LanternGameProfile(this.uniqueId, this.name);
+    }
+
+    /**
      * Creates a new game profile without all the properties.
      * 
-     * @return the new game profile
+     * @return The new game profile
      */
     public LanternGameProfile withoutProperties() {
         if (this.properties.isEmpty()) {
@@ -132,6 +151,7 @@ public final class LanternGameProfile implements GameProfile {
         this.name = name;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Multimap<String, ProfileProperty> getPropertyMap() {
         return (Multimap) this.properties;

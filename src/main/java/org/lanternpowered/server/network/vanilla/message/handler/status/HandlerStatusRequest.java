@@ -38,11 +38,10 @@ import org.lanternpowered.server.network.vanilla.message.type.status.MessageStat
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.status.LanternStatusClient;
+import org.lanternpowered.server.status.LanternStatusHelper;
 import org.lanternpowered.server.status.LanternStatusResponse;
-import org.lanternpowered.server.status.LanternStatusResponsePlayers;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.spongepowered.api.MinecraftVersion;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
@@ -54,7 +53,6 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public final class HandlerStatusRequest implements Handler<MessageStatusInRequest> {
 
@@ -65,10 +63,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         Gson gson = new Gson();
 
         MinecraftVersion version0 = Lantern.getGame().getPlatform().getMinecraftVersion();
-        Text motd = server.getMotd();
-
-        int online = server.getOnlinePlayers().size();
-        int max = server.getMaxPlayers();
+        Text description = server.getMotd();
 
         InetSocketAddress address = session.getAddress();
         InetSocketAddress virtualAddress = session.getVirtualHost();
@@ -77,9 +72,8 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
 
         LanternMinecraftVersion version = new LanternMinecraftVersion(String.valueOf(protocol), protocol, false);
         LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
-        LanternStatusResponsePlayers players = new LanternStatusResponsePlayers(server.getOnlinePlayers()
-        		.stream().map(User::getProfile).collect(Collectors.toList()), online, max);
-        LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon().orElse(null), motd, players);
+        ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
+        LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon(), description, players);
 
         ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
 
@@ -88,14 +82,14 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
             return;
         }
 
-        motd = response.getDescription();
-        online = players.getOnline();
-        max = players.getMax();
+        description = response.getDescription();
+        int online = players.getOnline();
+        int max = players.getMax();
 
         JsonObject rootObject = new JsonObject();
         JsonObject versionObject = new JsonObject();
 
-        versionObject.addProperty("name", Lantern.getGame().getPlatform().getImplementation().getName());
+        versionObject.addProperty("name", Lantern.getGame().getPlatform().getMinecraftVersion().getName());
         versionObject.addProperty("protocol", ((LanternMinecraftVersion) version0).getProtocol());
 
         if (response.getPlayers().isPresent()) {
@@ -122,7 +116,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         }
 
         rootObject.add("version", versionObject);
-        rootObject.add("description", ((LanternJsonTextSerializer) TextSerializers.JSON).getGson().toJsonTree(motd));
+        rootObject.add("description", ((LanternJsonTextSerializer) TextSerializers.JSON).getGson().toJsonTree(description));
 
         Optional<Favicon> icon = response.getFavicon();
         if (icon.isPresent()) {

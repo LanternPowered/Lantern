@@ -40,8 +40,8 @@ import javax.annotation.Nullable;
 
 public final class LanternTabListEntry implements TabListEntry {
 
+    private final GlobalTabListEntry globalEntry;
     private final LanternTabList tabList;
-    private final GameProfile gameProfile;
 
     private Optional<Text> displayName;
     private GameMode gameMode;
@@ -50,13 +50,21 @@ public final class LanternTabListEntry implements TabListEntry {
     // Whether this tab list entry is attached to the tab list
     boolean attached;
 
-    LanternTabListEntry(LanternTabList tabList, GameProfile gameProfile, GameMode gameMode, int latency,
-            @Nullable Text displayName) {
+    LanternTabListEntry(GlobalTabListEntry globalEntry, LanternTabList tabList, GameMode gameMode, int latency, @Nullable Text displayName) {
         this.displayName = Optional.ofNullable(displayName);
-        this.gameProfile = gameProfile;
+        this.globalEntry = globalEntry;
         this.gameMode = gameMode;
         this.tabList = tabList;
         this.latency = latency;
+    }
+
+    /**
+     * Gets the {@link GlobalTabListEntry} of this entry.
+     *
+     * @return The global tab list entry
+     */
+    public GlobalTabListEntry getGlobalEntry() {
+        return this.globalEntry;
     }
 
     @Override
@@ -66,7 +74,7 @@ public final class LanternTabListEntry implements TabListEntry {
 
     @Override
     public GameProfile getProfile() {
-        return this.gameProfile;
+        return this.globalEntry.getProfile();
     }
 
     @Override
@@ -74,12 +82,21 @@ public final class LanternTabListEntry implements TabListEntry {
         return this.displayName;
     }
 
+    /**
+     * Sets the display name without triggering any updates.
+     *
+     * @param displayName The display name
+     */
+    void setRawDisplayName(@Nullable Text displayName) {
+        this.displayName = Optional.ofNullable(displayName);
+    }
+
     @Override
     public LanternTabListEntry setDisplayName(@Nullable Text displayName) {
-        this.displayName = Optional.ofNullable(displayName);
+        this.setRawDisplayName(displayName);
         if (this.attached) {
             this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(this.gameProfile, displayName))));
+                    new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(this.getProfile(), displayName))));
         }
         return this;
     }
@@ -89,12 +106,21 @@ public final class LanternTabListEntry implements TabListEntry {
         return this.latency;
     }
 
+    /**
+     * Sets the latency without triggering any updates.
+     *
+     * @param latency The latency
+     */
+    void setRawLatency(int latency) {
+        this.latency = latency;
+    }
+
     @Override
     public LanternTabListEntry setLatency(int latency) {
-        this.latency = latency;
+        this.setRawLatency(latency);
         if (this.attached) {
             this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.UpdateLatency(this.gameProfile, latency))));
+                    new MessagePlayOutTabListEntries.Entry.UpdateLatency(this.getProfile(), latency))));
         }
         return this;
     }
@@ -104,12 +130,21 @@ public final class LanternTabListEntry implements TabListEntry {
         return this.gameMode;
     }
 
+    /**
+     * Sets the game mode without triggering any updates.
+     *
+     * @param gameMode The game mode
+     */
+    void setRawGameMode(GameMode gameMode) {
+        this.gameMode = checkNotNull(gameMode, "gameMode");
+    }
+
     @Override
     public LanternTabListEntry setGameMode(GameMode gameMode) {
-        this.gameMode = checkNotNull(gameMode, "gameMode");
+        this.setRawGameMode(gameMode);
         if (this.attached) {
             this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.UpdateGameMode(this.gameProfile, gameMode))));
+                    new MessagePlayOutTabListEntries.Entry.UpdateGameMode(this.getProfile(), gameMode))));
         }
         return this;
     }

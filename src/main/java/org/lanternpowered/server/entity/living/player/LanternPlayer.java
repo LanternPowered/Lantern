@@ -35,6 +35,7 @@ import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
@@ -87,13 +88,17 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.DimensionTypes;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -244,7 +249,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             this.session.send(world.getProperties().createWorldBorderMessage());
             world.getWeatherUniverse().ifPresent(u -> this.session.send(u.createSkyUpdateMessage()));
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(),
-                    (float) rotation.getY(), (float) rotation.getX(), 0, 0));
+                    (float) rotation.getY(), (float) rotation.getX(), Collections.emptySet(), 0));
             this.setScoreboard(world.getScoreboard());
         } else {
             this.session.getServer().removePlayer(this);
@@ -252,6 +257,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             for (Player player : Sponge.getServer().getOnlinePlayers()) {
                 player.getTabList().removeEntry(this.getProfile().getUniqueId());
             }
+            this.tabList.clear();
+            GlobalTabList.getInstance().remove(this.gameProfile);
         }
     }
 
@@ -263,20 +270,69 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                 .latency(player.getConnection().getLatency());
     }
 
+    private static final Set<RelativePositions> RELATIVE_ROTATION = Sets.immutableEnumSet(
+            RelativePositions.PITCH, RelativePositions.YAW);
+    private static final Set<RelativePositions> RELATIVE_POSITION = Sets.immutableEnumSet(
+            RelativePositions.X, RelativePositions.Y, RelativePositions.Z);
+
+    @Override
+    public void setPositionAndWorld(World world, Vector3d position) {
+        LanternWorld oldWorld = this.getWorld();
+        super.setPositionAndWorld(world, position);
+        if (world == oldWorld) {
+            this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
+        }
+    }
+
     @Override
     public void setPosition(Vector3d position) {
         super.setPosition(position);
-        // TODO: Update client position
+        LanternWorld world = this.getWorld();
+        if (world != null) {
+            this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
+        }
     }
 
-    /**
-     * Sets the position without triggering any changes
-     * for the player. Like client messages.
-     *
-     * @param position The position
-     */
+    @Override
+    public void setRotation(Vector3d rotation) {
+        super.setRotation(rotation);
+        LanternWorld world = this.getWorld();
+        if (world != null) {
+            this.session.send(new MessagePlayOutPlayerPositionAndLook(0, 0, 0, (float) rotation.getX(), (float) rotation.getY(),
+                    RELATIVE_POSITION, 0));
+        }
+    }
+
+    @Override
+    public void setLocationAndRotation(Location<World> location, Vector3d rotation) {
+        World oldWorld = this.getWorld();
+        super.setLocationAndRotation(location, rotation);
+        World world = location.getExtent();
+        // Only send this if the world isn't changed, otherwise will the position be resend anyway
+        if (oldWorld == world) {
+            Vector3d pos = location.getPosition();
+            MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
+                    (float) rotation.getX(), (float) rotation.getY(), Collections.emptySet(), 0);
+            this.session.send(message);
+        }
+    }
+
+    @Override
+    public void setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+        World oldWorld = this.getWorld();
+        super.setLocationAndRotation(location, rotation, relativePositions);
+        World world = location.getExtent();
+        // Only send this if the world isn't changed, otherwise will the position be resend anyway
+        if (oldWorld == world) {
+            Vector3d pos = location.getPosition();
+            MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
+                    (float) rotation.getX(), (float) rotation.getY(), Sets.immutableEnumSet(relativePositions), 0);
+            this.session.send(message);
+        }
+    }
+
     public void setRawPosition(Vector3d position) {
-        super.setPosition(position);
+        super.setRawPosition(position);
     }
 
     @Override

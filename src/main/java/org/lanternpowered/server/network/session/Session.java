@@ -64,6 +64,7 @@ import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.config.user.ban.BanEntry;
 import org.lanternpowered.server.entity.EntityIdAllocator;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.AsyncHelper;
@@ -184,13 +185,13 @@ public class Session implements PlayerConnection {
 
     // The id of the last ping message sent, used to ensure the client responded
     // correctly
-    private int pingMessageId;
+    private int latencyMessageId;
 
     // The current ping of the channel
-    private volatile int ping;
+    private volatile int latency;
 
     // The last ping time
-    private long pingTimeStart;
+    private long latencyTimeStart;
 
     @Nullable
     private ProxyData proxyData;
@@ -410,12 +411,12 @@ public class Session implements PlayerConnection {
      * Notify that the session is currently idle.
      */
     public void idle() {
-        if (this.pingMessageId == 0 && this.getProtocolState().equals(ProtocolState.PLAY)) {
-            this.pingMessageId = this.random.nextInt();
-            if (this.pingMessageId == 0) {
-                this.pingMessageId++;
+        if (this.latencyMessageId == 0 && this.getProtocolState().equals(ProtocolState.PLAY)) {
+            this.latencyMessageId = this.random.nextInt();
+            if (this.latencyMessageId == 0) {
+                this.latencyMessageId++;
             }
-            this.send(new MessageInOutPing(this.pingMessageId));
+            this.send(new MessageInOutPing(this.latencyMessageId));
         } else {
             this.disconnect("Timed out.");
         }
@@ -637,13 +638,15 @@ public class Session implements PlayerConnection {
      * @param id the ping id to check for validity
      */
     public void pong(int id) {
-        if (this.pingMessageId == id) {
-            this.pingMessageId = 0;
+        if (this.latencyMessageId == id) {
+            this.latencyMessageId = 0;
 
             long time = System.nanoTime() / 1000000L;
-            long timed = time - this.pingTimeStart;
+            long timed = time - this.latencyTimeStart;
 
-            this.ping = (int) ((this.ping * 3 + timed) / 4);
+            int latency = (int) ((this.latency * 3 + timed) / 4);
+            GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(latency));
+            this.latency = latency;
         }
     }
 
@@ -726,7 +729,7 @@ public class Session implements PlayerConnection {
 
     @Override
     public int getLatency() {
-        return this.ping;
+        return this.latency;
     }
 
     @Override

@@ -23,60 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
+package org.lanternpowered.server.entity.living.player.tab;
 
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.util.RelativePositions;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Set;
+import org.spongepowered.api.profile.GameProfile;
 
-public final class MessagePlayOutPlayerPositionAndLook implements Message {
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-    private final double x;
-    private final double y;
-    private final double z;
-    private final float yaw;
-    private final float pitch;
-    private final int teleportId;
-    private final Set<RelativePositions> relativePositions;
+public class GlobalTabList {
 
-    public MessagePlayOutPlayerPositionAndLook(double x, double y, double z, float yaw, float pitch, Set<RelativePositions> relativePositions,
-            int teleportId) {
-        this.relativePositions = relativePositions;
-        this.teleportId = teleportId;
-        this.pitch = pitch;
-        this.yaw = yaw;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    private static final GlobalTabList instance = new GlobalTabList();
+
+    public static GlobalTabList getInstance() {
+        return instance;
     }
 
-    public double getY() {
-        return this.y;
+    private final Map<UUID, GlobalTabListEntry> tabListEntries = new ConcurrentHashMap<>();
+
+    void addEntry(GlobalTabListEntry tabListEntry) {
+        this.tabListEntries.put(tabListEntry.getProfile().getUniqueId(), tabListEntry);
     }
 
-    public double getX() {
-        return this.x;
+    public Optional<GlobalTabListEntry> get(GameProfile gameProfile) {
+        return Optional.ofNullable(this.tabListEntries.get(checkNotNull(gameProfile, "gameProfile").getUniqueId()));
     }
 
-    public double getZ() {
-        return this.z;
+    public GlobalTabListEntry getOrCreate(GameProfile gameProfile) {
+        return this.tabListEntries.computeIfAbsent(checkNotNull(gameProfile, "gameProfile").getUniqueId(),
+                uuid -> new GlobalTabListEntry(this, gameProfile));
     }
 
-    public float getYaw() {
-        return this.yaw;
+    public GlobalTabListEntry remove(GameProfile gameProfile) {
+        return this.tabListEntries.remove(checkNotNull(gameProfile, "gameProfile").getUniqueId());
     }
-
-    public float getPitch() {
-        return this.pitch;
-    }
-
-    public Set<RelativePositions> getRelativePositions() {
-        return this.relativePositions;
-    }
-
-    public int getTeleportId() {
-        return this.teleportId;
-    }
-
 }

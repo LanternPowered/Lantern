@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.status;
 
+import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.util.collect.Lists2;
-import org.spongepowered.api.Server;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.profile.GameProfile;
@@ -46,15 +46,15 @@ public class LanternStatusHelper {
      */
     private static final int DEFAULT_MAX_PLAYERS_DISPLAYED = 12;
 
-    public static ClientPingServerEvent.Response.Players createPlayers(Server server) {
+    public static ClientPingServerEvent.Response.Players createPlayers(LanternServer server) {
         // Get the online players
-        Collection<Player> players = server.getOnlinePlayers();
+        Collection<LanternPlayer> players = server.getRawOnlinePlayers();
 
         int online = players.size();
         int max = server.getMaxPlayers();
 
         // Create a list with the players
-        List<Player> playersList = new ArrayList<>(players);
+        List<LanternPlayer> playersList = new ArrayList<>(players);
 
         // Randomize the players list
         Collections.shuffle(playersList);

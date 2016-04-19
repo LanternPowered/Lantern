@@ -79,7 +79,8 @@ public final class LanternTabListEntryBuilder implements TabListEntry.Builder {
         checkState(this.list != null, "list must be set");
         checkState(this.profile != null, "profile must be set");
         checkState(this.gameMode != null, "game mode must be set");
-        return new LanternTabListEntry(this.list, this.profile, this.gameMode, this.latency, this.displayName);
+        return new LanternTabListEntry(GlobalTabList.getInstance().getOrCreate(this.profile), this.list, this.gameMode,
+                this.latency, this.displayName);
     }
 
     @Override

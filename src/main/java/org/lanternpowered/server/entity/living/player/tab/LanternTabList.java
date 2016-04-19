@@ -86,6 +86,10 @@ public class LanternTabList implements TabList {
         this.player.getConnection().send(new MessagePlayOutTabListHeaderAndFooter(this.header.orElse(null), this.footer.orElse(null)));
     }
 
+    public void clear() {
+        this.tabListEntries.values().forEach(entry -> entry.getGlobalEntry().removeEntry(entry));
+    }
+
     @Override
     public LanternPlayer getPlayer() {
         return this.player;
@@ -144,7 +148,9 @@ public class LanternTabList implements TabList {
         this.tabListEntries.put(uniqueId, (LanternTabListEntry) entry);
         this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(new MessagePlayOutTabListEntries.Entry.Add(
                 entry.getProfile(), entry.getGameMode(), entry.getDisplayName().orElse(null), entry.getLatency()))));
-        ((LanternTabListEntry) entry).attached = true;
+        LanternTabListEntry entry0 = (LanternTabListEntry) entry;
+        entry0.attached = true;
+        entry0.getGlobalEntry().addEntry(entry0);
         return this;
     }
 
@@ -153,6 +159,7 @@ public class LanternTabList implements TabList {
         LanternTabListEntry entry = this.tabListEntries.remove(checkNotNull(uniqueId, "uniqueId"));
         if (entry != null) {
             entry.attached = false;
+            entry.getGlobalEntry().removeEntry(entry);
             return Optional.of(entry);
         }
         return Optional.empty();

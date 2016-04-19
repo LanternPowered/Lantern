@@ -385,7 +385,7 @@ public class LanternServer implements Server {
     /**
      * Adds a {@link Player} to the online players lookups.
      *
-     * @param player the player
+     * @param player The player
      */
     public void addPlayer(LanternPlayer player) {
         this.playersByName.put(player.getName(), player);
@@ -395,11 +395,20 @@ public class LanternServer implements Server {
     /**
      * Removes a {@link Player} from the online players lookups.
      *
-     * @param player the player
+     * @param player The player
      */
     public void removePlayer(LanternPlayer player) {
         this.playersByName.remove(player.getName());
         this.playersByUUID.remove(player.getUniqueId());
+    }
+
+    /**
+     * Gets a raw collection with all the players. DO NOT MODIFY IT!
+     *
+     * @return The players
+     */
+    public Collection<LanternPlayer> getRawOnlinePlayers() {
+        return this.playersByName.values();
     }
 
     @Override

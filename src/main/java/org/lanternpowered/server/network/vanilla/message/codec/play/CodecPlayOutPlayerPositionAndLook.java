@@ -30,6 +30,10 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
+import org.spongepowered.api.util.RelativePositions;
+
+import java.util.EnumSet;
+import java.util.Set;
 
 public final class CodecPlayOutPlayerPositionAndLook implements Codec<MessagePlayOutPlayerPositionAndLook> {
 
@@ -41,7 +45,24 @@ public final class CodecPlayOutPlayerPositionAndLook implements Codec<MessagePla
         buf.writeDouble(message.getZ());
         buf.writeFloat(message.getYaw());
         buf.writeFloat(message.getPitch());
-        buf.writeByte(message.getFlags());
+        Set<RelativePositions> relativePositions = message.getRelativePositions();
+        byte flags = 0;
+        if (relativePositions.contains(RelativePositions.X)) {
+            flags |= 0x01;
+        }
+        if (relativePositions.contains(RelativePositions.Y)) {
+            flags |= 0x02;
+        }
+        if (relativePositions.contains(RelativePositions.Z)) {
+            flags |= 0x04;
+        }
+        if (relativePositions.contains(RelativePositions.PITCH)) {
+            flags |= 0x08;
+        }
+        if (relativePositions.contains(RelativePositions.YAW)) {
+            flags |= 0x10;
+        }
+        buf.writeByte(flags);
         context.writeVarInt(buf, message.getTeleportId());
         return buf;
     }

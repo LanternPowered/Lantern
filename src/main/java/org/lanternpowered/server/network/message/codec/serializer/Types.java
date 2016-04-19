@@ -26,8 +26,10 @@
 package org.lanternpowered.server.network.message.codec.serializer;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.objects.Parameter;
+import org.lanternpowered.server.network.objects.RawItemStack;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -85,7 +87,12 @@ public final class Types {
     /**
      * A parameter list.
      */
-    public static final Type<List<Parameter<?>>> PARAMETERS = (Type) Type.create(List.class);
+    public static final Type<List<Parameter<?>>> PARAMETERS = Type.create(new TypeToken<List<Parameter<?>>>() {});
+
+    /**
+     * A raw item stack.
+     */
+    public static final Type<RawItemStack> RAW_ITEM_STACK = Type.create(RawItemStack.class);
 
     private Types() {
     }

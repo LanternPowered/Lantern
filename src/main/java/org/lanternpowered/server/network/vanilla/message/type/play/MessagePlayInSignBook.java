@@ -23,21 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.processor.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.processor.Processor;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenCredits;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
 
 import java.util.List;
 
-public final class ProcessorPlayOutOpenCredits implements Processor<MessagePlayOutOpenCredits> {
+public final class MessagePlayInSignBook implements Message {
 
-    @Override
-    public void process(CodecContext context, MessagePlayOutOpenCredits message, List<Message> output) throws CodecException {
-        output.add(new MessagePlayOutChangeGameState(4, 0f));
+    private final String author;
+    private final String title;
+    private final List<String> pages;
+
+    public MessagePlayInSignBook(String author, String title, List<String> pages) {
+        this.author = checkNotNull(author, "author");
+        this.title = checkNotNull(title, "title");
+        this.pages = checkNotNull(pages, "pages");
+    }
+
+    public String getAuthor() {
+        return this.author;
+    }
+
+    public String getTitle() {
+        return this.title;
+    }
+
+    public List<String> getPages() {
+        return this.pages;
     }
 }

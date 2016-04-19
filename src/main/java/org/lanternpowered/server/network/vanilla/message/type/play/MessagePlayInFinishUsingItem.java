@@ -26,10 +26,13 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 /**
- * This message opens the credits gui.
+ * When a {@link Player} stops using a {@link ItemStack}, this will only be send
+ * for items that have a action that takes some time, like drawing a bow, eating food.
  */
-public final class MessagePlayOutOpenCredits implements Message {
+public final class MessagePlayInFinishUsingItem implements Message {
 
 }

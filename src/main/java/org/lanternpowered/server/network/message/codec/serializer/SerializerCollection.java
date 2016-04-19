@@ -33,6 +33,7 @@ import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lanternpowered.server.network.message.codec.serializer.defaults.SerializerDataView;
 import org.lanternpowered.server.network.message.codec.serializer.defaults.SerializerLocalizedText;
 import org.lanternpowered.server.network.message.codec.serializer.defaults.SerializerParameters;
+import org.lanternpowered.server.network.message.codec.serializer.defaults.SerializerRawItemStack;
 import org.lanternpowered.server.network.message.codec.serializer.defaults.SerializerString;
 import org.lanternpowered.server.network.message.codec.serializer.defaults.SerializerText;
 import org.lanternpowered.server.network.message.codec.serializer.defaults.SerializerUUID;
@@ -53,7 +54,8 @@ public final class SerializerCollection {
             .bind(Types.STRING, new SerializerString())
             .bind(Types.UNIQUE_ID, new SerializerUUID())
             .bind(Types.LOCALIZED_TEXT, new SerializerLocalizedText())
-            .bind(Types.PARAMETERS, new SerializerParameters());
+            .bind(Types.PARAMETERS, new SerializerParameters())
+            .bind(Types.RAW_ITEM_STACK, new SerializerRawItemStack());
 
     private final TIntObjectMap<ValueSerializer<?>> valueSerializers = new TIntObjectHashMap<>();
 
@@ -80,6 +82,7 @@ public final class SerializerCollection {
      * @param <V> the value type
      * @return the value serializer
      */
+    @SuppressWarnings("unchecked")
     public <V> Optional<ValueSerializer<V>> get(Type<V> type) {
         return Optional.ofNullable((ValueSerializer) this.valueSerializers.get(type.index));
     }

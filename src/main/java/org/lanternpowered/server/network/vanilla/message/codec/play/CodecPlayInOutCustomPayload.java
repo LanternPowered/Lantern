@@ -33,14 +33,26 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeCommand;
+import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditCommandBlock;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+
+import java.util.List;
 
 public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCustomPayload {
+
+    // TODO: Move these constants?
+    private final static DataQuery PAGES = DataQuery.of("pages");
+    private final static DataQuery AUTHOR = DataQuery.of("author");
+    private final static DataQuery TITLE = DataQuery.of("title");
 
     private final static ByteBuf EMPTY = Unpooled.buffer(0);
 
@@ -86,17 +98,45 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             boolean shouldTrackOutput = content.readBoolean();
 
             if (pos != null) {
-                return new MessagePlayInChangeCommand.Block(pos, command, shouldTrackOutput);
+                return new MessagePlayInEditCommandBlock.Block(pos, command, shouldTrackOutput);
             } else {
-                return new MessagePlayInChangeCommand.Entity(entityId, command, shouldTrackOutput);
+                return new MessagePlayInEditCommandBlock.Entity(entityId, command, shouldTrackOutput);
             }
         } else if ("MC|AutoCmd".equals(channel)) {
-            // New channel in 1.9
-            // TODO
+            int x = content.readInt();
+            int y = content.readInt();
+            int z = content.readInt();
+            String command = context.read(content, Types.STRING);
+            boolean shouldTrackOutput = content.readBoolean();
+            MessagePlayInEditCommandBlock.AdvancedBlock.Mode mode = MessagePlayInEditCommandBlock.AdvancedBlock.Mode.valueOf(
+                    context.read(content, Types.STRING));
+            boolean conditional = content.readBoolean();
+            boolean automatic = content.readBoolean();
+            return new MessagePlayInEditCommandBlock.AdvancedBlock(new Vector3i(x, y, z), command, shouldTrackOutput, mode, conditional, automatic);
         } else if ("MC|BSign".equals(channel)) {
-            // TODO
+            RawItemStack rawItemStack = context.read(content, Types.RAW_ITEM_STACK);
+            if (rawItemStack == null) {
+                throw new CodecException("Signed book may not be null!");
+            }
+            DataView dataView = rawItemStack.getDataView();
+            if (dataView == null) {
+                throw new CodecException("Signed book data view (nbt tag) may not be null!");
+            }
+            String author = dataView.getString(AUTHOR).orElseThrow(() -> new CodecException("Signed book author missing!"));
+            String title = dataView.getString(TITLE).orElseThrow(() -> new CodecException("Signed book author missing!"));
+            List<String> pages = dataView.getStringList(PAGES).orElseThrow(() -> new CodecException("Edited book pages missing!"));
+            return new MessagePlayInSignBook(author, title, pages);
         } else if ("MC|BEdit".equals(channel)) {
-            // TODO
+            RawItemStack rawItemStack = context.read(content, Types.RAW_ITEM_STACK);
+            if (rawItemStack == null) {
+                throw new CodecException("Edited book may not be null!");
+            }
+            DataView dataView = rawItemStack.getDataView();
+            if (dataView == null) {
+                throw new CodecException("Edited book data view (nbt tag) may not be null!");
+            }
+            List<String> pages = dataView.getStringList(PAGES).orElseThrow(() -> new CodecException("Edited book pages missing!"));
+            return new MessagePlayInEditBook(pages);
         } else if ("MC|Struct".equals(channel)) {
             // Something related to structure placing in minecraft 1.9,
             // seems like it's something mojang doesn't want to share with use,

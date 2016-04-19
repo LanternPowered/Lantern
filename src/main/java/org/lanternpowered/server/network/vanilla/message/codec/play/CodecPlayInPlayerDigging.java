@@ -32,12 +32,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
 
 public final class CodecPlayInPlayerDigging implements Codec<Message> {
 
@@ -56,11 +57,9 @@ public final class CodecPlayInPlayerDigging implements Codec<Message> {
             case 4:
                 return new MessagePlayInDropHeldItem(action == 3);
             case 5:
-                // TODO: Shoot arrow / finish eating
-                return NullMessage.INSTANCE;
+                return new MessagePlayInFinishUsingItem();
             case 6:
-                // TODO: Swap item in hand
-                return NullMessage.INSTANCE;
+                return new MessagePlayInSwapHandItems();
             default:
                 throw new DecoderException("Unknown player digging message action: " + action);
         }

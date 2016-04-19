@@ -109,19 +109,21 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
-import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutOpenCredits;
+import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutTheEnd;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeCommand;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditCommandBlock;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInFinishUsingItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInLeaveBed;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOpenInventory;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
@@ -145,7 +147,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleMovement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSpectate;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
@@ -165,7 +169,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenCredits;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTheEnd;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerHealthUpdate;
@@ -210,7 +214,7 @@ public final class ProtocolPlay extends ProtocolBase {
         MessageRegistry outbound = this.outbound();
 
         // Register the processors
-        outbound.bindProcessor(MessagePlayOutOpenCredits.class, new ProcessorPlayOutOpenCredits());
+        outbound.bindProcessor(MessagePlayOutTheEnd.class, new ProcessorPlayOutTheEnd());
         outbound.bindProcessor(MessagePlayOutParticleEffect.class, new ProcessorPlayOutParticleEffect());
         outbound.bindProcessor(MessagePlayOutSetGameMode.class, new ProcessorPlayOutSetGameMode());
         outbound.bindProcessor(MessagePlayOutWorldSky.class, new ProcessorPlayOutWorldSky());
@@ -258,8 +262,11 @@ public final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInOutBrand.class); // TODO: Handler
         inbound.bind(MessagePlayInChangeItemName.class); // TODO: Handler
         inbound.bind(MessagePlayInChangeOffer.class); // TODO: Handler
-        inbound.bind(MessagePlayInChangeCommand.Block.class); // TODO: Handler
-        inbound.bind(MessagePlayInChangeCommand.Entity.class); // TODO: Handler
+        inbound.bind(MessagePlayInEditCommandBlock.Block.class); // TODO: Handler
+        inbound.bind(MessagePlayInEditCommandBlock.AdvancedBlock.class); // TODO: Handler
+        inbound.bind(MessagePlayInEditCommandBlock.Entity.class); // TODO: Handler
+        inbound.bind(MessagePlayInEditBook.class); // TODO: Handler
+        inbound.bind(MessagePlayInSignBook.class); // TODO: Handler
         inbound.bind(MessagePlayInOutChannelPayload.class).bindHandler(new HandlerPlayInChannelPayload());
         inbound.bind(MessagePlayInOutRegisterChannels.class).bindHandler(new HandlerPlayInRegisterChannels());
         inbound.bind(MessagePlayInOutUnregisterChannels.class).bindHandler(new HandlerPlayInUnregisterChannels());
@@ -269,6 +276,8 @@ public final class ProtocolPlay extends ProtocolBase {
         // Provided by CodecPlayInPlayerDigging
         inbound.bind(MessagePlayInPlayerDigging.class); // TODO: Handler
         inbound.bind(MessagePlayInDropHeldItem.class); // TODO: Handler
+        inbound.bind(MessagePlayInFinishUsingItem.class); // TODO: Handler
+        inbound.bind(MessagePlayInSwapHandItems.class); // TODO: Handler
         // Provided by CodecPlayInClientStatus
         inbound.bind(MessagePlayInOpenInventory.class); // TODO: Handler
         inbound.bind(MessagePlayInPerformRespawn.class); // TODO: Handler

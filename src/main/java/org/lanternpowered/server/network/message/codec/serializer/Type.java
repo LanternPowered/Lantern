@@ -25,27 +25,40 @@
  */
 package org.lanternpowered.server.network.message.codec.serializer;
 
+import com.google.common.reflect.TypeToken;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
 public final class Type<V> {
 
     /**
+     * Tries to create a new {@link Type} with the specified {@link TypeToken} as value type.
+     *
+     * @param typeToken The value type token
+     * @param <V> The value type
+     * @return The type
+     */
+    public static <V> Type<V> create(TypeToken<V> typeToken) {
+        return new Type<>(typeToken);
+    }
+
+    /**
      * Tries to create a new {@link Type<V>} with the specified class.
      *
-     * @param clazz the class
-     * @param <V> the clazz type
+     * @param clazz The value class
+     * @param <V> The value type
      * @return the type
      */
     public static <V> Type<V> create(Class<V> clazz) {
-        return new Type<>(clazz);
+        return new Type<>(TypeToken.of(clazz));
     }
 
     private static final AtomicInteger indexCounter = new AtomicInteger();
 
     final int index;
-    private final Class<V> valueType;
+    private final TypeToken<V> valueType;
 
-    private Type(Class<V> valueType) {
+    private Type(TypeToken<V> valueType) {
         this.index = indexCounter.getAndIncrement();
         this.valueType = valueType;
     }
@@ -55,7 +68,7 @@ public final class Type<V> {
      *
      * @return the type class
      */
-    public Class<V> getValueType() {
+    public TypeToken<V> getValueType() {
         return this.valueType;
     }
 

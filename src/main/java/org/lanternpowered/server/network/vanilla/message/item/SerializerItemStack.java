@@ -31,6 +31,7 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.message.codec.serializer.ValueSerializer;
+import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -53,7 +54,7 @@ public class SerializerItemStack implements ValueSerializer<ItemStack> {
     @Override
     public void write(SerializerContext context, ByteBuf buf, ItemStack object) throws CodecException {
         if (object == null) {
-            buf.writeShort(-1);
+            context.write(buf, Types.RAW_ITEM_STACK, null);
             return;
         }
 
@@ -99,21 +100,15 @@ public class SerializerItemStack implements ValueSerializer<ItemStack> {
 
         tag.set(DataQuery.of("HideFlags"), (byte) 63);
 
-        buf.writeShort(id);
-        buf.writeByte(amount);
-        buf.writeShort(data);
-        context.write(buf, Types.DATA_VIEW, tag);
+        context.write(buf, Types.RAW_ITEM_STACK, new RawItemStack(id, data, amount, tag));
     }
 
     @Override
     public ItemStack read(SerializerContext context, ByteBuf buf) throws CodecException {
-        short id = buf.readShort();
-        if (id == -1) {
+        RawItemStack rawItemStack = context.read(buf, Types.RAW_ITEM_STACK);
+        if (rawItemStack == null) {
             return null;
         }
-        int amount = buf.readByte();
-        int data = buf.readShort();
-        DataView tag = context.read(buf, Types.DATA_VIEW);
         //Locale locale = CodecUtils.getLocale(context);
 
         return null;

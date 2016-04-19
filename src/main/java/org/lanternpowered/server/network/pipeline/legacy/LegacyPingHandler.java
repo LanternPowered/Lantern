@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.pipeline.legacy;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -36,6 +38,7 @@ import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusHelper;
 import org.lanternpowered.server.status.LanternStatusResponse;
+import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -83,7 +86,8 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                     return;
                 }
                 legacy = true;
-                ctx.channel().close();
+                sendDisconnectMessage(ctx, LanternTexts.toPlain(t("handshake.outdated.client",
+                        Lantern.getGame().getPlatform().getMinecraftVersion().getName())));
                 return;
             }
 
@@ -177,7 +181,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
             StringBuilder dataBuilder = new StringBuilder();
 
             if (full) {
-                String description0 = TextSerializers.LEGACY_FORMATTING_CODE.serialize(description);
+                String description0 = getFirstLine(TextSerializers.LEGACY_FORMATTING_CODE.serialize(description));
                 dataBuilder
                         .append('\u00A7')
                         // This value is always 1.
@@ -197,7 +201,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                         .append('\u0000')
                         .append(max);
             } else {
-                String description0 = TextSerializers.PLAIN.serialize(description);
+                String description0 = getFirstLine(TextSerializers.PLAIN.serialize(description));
                 dataBuilder
                         .append(description0)
                         .append('\u00A7')
@@ -206,14 +210,7 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                         .append(max);
             }
 
-            byte[] data = dataBuilder.toString().getBytes(StandardCharsets.UTF_16BE);
-
-            ByteBuf output = ctx.alloc().buffer();
-            output.writeByte(0xff);
-            output.writeShort(data.length >> 1);
-            output.writeBytes(data);
-
-            ctx.channel().pipeline().firstContext().writeAndFlush(output).addListener(ChannelFutureListener.CLOSE);
+            sendDisconnectMessage(ctx, dataBuilder.toString());
         } catch (Exception ignore) {
         } finally {
             if (legacy) {
@@ -224,6 +221,28 @@ public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
                 ctx.fireChannelRead(buf);
             }
         }
+    }
+
+    /**
+     * Sends a disconnect message to a legacy client and closes the connection.
+     *
+     * @param ctx The channel handler context
+     * @param message The message
+     */
+    private static void sendDisconnectMessage(ChannelHandlerContext ctx, String message) {
+        byte[] data = message.getBytes(StandardCharsets.UTF_16BE);
+
+        ByteBuf output = ctx.alloc().buffer();
+        output.writeByte(0xff);
+        output.writeShort(data.length >> 1);
+        output.writeBytes(data);
+
+        ctx.channel().pipeline().firstContext().writeAndFlush(output).addListener(ChannelFutureListener.CLOSE);
+    }
+
+    private static String getFirstLine(String value) {
+        int i = value.indexOf('\n');
+        return i == -1 ? value : value.substring(0, i);
     }
 
 }

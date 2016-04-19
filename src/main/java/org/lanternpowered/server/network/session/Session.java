@@ -81,6 +81,7 @@ import org.lanternpowered.server.network.vanilla.message.type.connection.Message
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
@@ -703,9 +704,9 @@ public class Session implements PlayerConnection {
 
         // Log that the player was kicked/disconnected.
         if (this.player != null) {
-            Lantern.getLogger().info("{} kicked: {}", this.player.getName(), reason);
+            Lantern.getLogger().info("{} kicked: {}", this.player.getName(), LanternTexts.toLegacy(reason));
         } else {
-            Lantern.getLogger().info("[{}] kicked: {}", this.address, reason);
+            Lantern.getLogger().info("[{}] kicked: {}", this.address, LanternTexts.toLegacy(reason));
         }
 
         ProtocolState current = this.getProtocolState();

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.handshake;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkContext;
@@ -61,9 +63,9 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
             int protocol = ((LanternMinecraftVersion) Lantern.getGame().getPlatform().getMinecraftVersion()).getProtocol();
 
             if (message.getProtocolVersion() < protocol) {
-                session.disconnect("Outdated client! I'm running " + Lantern.getGame().getPlatform().getMinecraftVersion().getName());
+                session.disconnect(t("handshake.outdated.client", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
             } else if (message.getProtocolVersion() > protocol) {
-                session.disconnect("Outdated server! I'm running " + Lantern.getGame().getPlatform().getMinecraftVersion().getName());
+                session.disconnect(t("handshake.outdated.server", Lantern.getGame().getPlatform().getMinecraftVersion().getName()));
             }
         }
     }

@@ -27,22 +27,12 @@ package org.lanternpowered.server.status;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.profile.LanternGameProfile;
-import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.MinecraftVersion;
-import org.spongepowered.api.Server;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 
-import java.util.Collection;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 

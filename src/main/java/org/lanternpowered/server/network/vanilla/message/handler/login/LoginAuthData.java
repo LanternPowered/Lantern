@@ -23,48 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.session;
+package org.lanternpowered.server.network.vanilla.message.handler.login;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+class LoginAuthData {
 
-import com.google.common.collect.Sets;
+    private final String username;
+    private final String sessionId;
+    private final byte[] verifyToken;
 
-import java.util.Set;
-
-/**
- * A list of all the sessions which provides a convenient {@link #pulse()}
- * method to pulse every session in one operation.
- */
-public class SessionRegistry {
-
-    private final Set<Session> sessions = Sets.newConcurrentHashSet();
-
-    /**
-     * Pulses all the sessions.
-     */
-    public void pulse() {
-        for (Session session : this.sessions) {
-            session.pulse();
-        }
+    public LoginAuthData(String username, String sessionId, byte[] verifyToken) {
+        this.verifyToken = verifyToken;
+        this.sessionId = sessionId;
+        this.username = username;
     }
 
-    /**
-     * Adds a new session to the registry.
-     * 
-     * @param session the session to add
-     */
-    public void add(Session session) {
-        checkNotNull(session, "session");
-        this.sessions.add(session);
+    public String getUsername() {
+        return this.username;
     }
 
-    /**
-     * Removes a session from the registry.
-     * 
-     * @param session the session to remove
-     */
-    public void remove(Session session) {
-        checkNotNull(session, "session");
-        this.sessions.remove(session);
+    public String getSessionId() {
+        return this.sessionId;
+    }
+
+    public byte[] getVerifyToken() {
+        return this.verifyToken;
     }
 }

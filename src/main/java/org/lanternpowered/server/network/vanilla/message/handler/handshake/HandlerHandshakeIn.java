@@ -44,13 +44,13 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
         ProtocolState next = ProtocolState.fromId(message.getNextState());
         Session session = context.getSession();
         if (next == null) {
-            session.disconnect("Unknown protocol state! (" + message.getNextState() + ")");
+            session.disconnect(t("Unknown protocol state! (%s)", message.getNextState()));
             return;
         }
 
         session.setProtocolState(next);
         if (!next.equals(ProtocolState.LOGIN) && !next.equals(ProtocolState.STATUS)) {
-            session.disconnect("Received a unexpected handshake message! (" + next + ")");
+            session.disconnect(t("Received a unexpected handshake message! (%s)", next));
             return;
         }
 

@@ -69,7 +69,7 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         String message0 = message.getMessage();
         String message1 = StringUtils.normalizeSpace(message0);
         if (!isAllowedString(message0)) {
-            session.disconnect("Illegal characters in chat!");
+            session.disconnect(t("disconnect.invalidChatCharacters"));
             return;
         }
         if (message1.startsWith("/")) {

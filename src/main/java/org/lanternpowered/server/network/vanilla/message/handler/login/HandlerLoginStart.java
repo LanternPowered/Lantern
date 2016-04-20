@@ -66,8 +66,8 @@ import java.util.UUID;
 @Async
 public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
 
-    // The session id that will be used for authentication.
-    static final AttributeKey<String> SESSION_ID = AttributeKey.valueOf("login-session-id");
+    // The data that will be used for authentication.
+    static final AttributeKey<LoginAuthData> AUTH_DATA = AttributeKey.valueOf("login-auth-data");
 
     // The random used to generate the session ids
     private static final Random random = new Random();
@@ -78,17 +78,13 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
         String username = message.getUsername();
 
         if (session.getServer().getOnlineMode()) {
-            byte[] publicKey = SecurityHelper.generateX509Key(session.getServer().getKeyPair()
-                    .getPublic()).getEncoded(); // Convert to X509 format
-            byte[] verifyToken = SecurityHelper.generateVerifyToken();
-
+            // Convert to X509 format
+            final byte[] publicKey = SecurityHelper.generateX509Key(session.getServer().getKeyPair().getPublic()).getEncoded();
+            final byte[] verifyToken = SecurityHelper.generateVerifyToken();
             final String sessionId = Long.toString(random.nextLong(), 16).trim();
-            context.getChannel().attr(SESSION_ID).set(sessionId);
 
-            // Set verify data on session for use in the response handler
-            session.setVerifyToken(verifyToken);
-            session.setVerifyUsername(username);
-
+            // Store the auth data
+            context.getChannel().attr(AUTH_DATA).set(new LoginAuthData(username, sessionId, verifyToken));
             // Send created request message and wait for the response
             session.send(new MessageLoginOutEncryptionRequest(sessionId, publicKey, verifyToken));
         } else {

@@ -29,6 +29,7 @@ import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
+import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 
@@ -87,6 +88,10 @@ public final class PlayerInteractionHandler {
      * custom break times? Only allowed by faster breaking.
      */
     private void sendBreakUpdate(int breakState) {
+        LanternWorld world = this.player.getWorld();
+        if (world == null) {
+            return;
+        }
         Set<LanternPlayer> players = this.player.getWorld().getPlayers();
         // Update for all the players except the breaker
         if (players.size() - 1 <= 0) {

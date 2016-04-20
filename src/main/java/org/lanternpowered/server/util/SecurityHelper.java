@@ -35,8 +35,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.X509EncodedKeySpec;
 
-import javax.annotation.Nullable;
-
 @NonnullByDefault
 public final class SecurityHelper {
 
@@ -45,7 +43,6 @@ public final class SecurityHelper {
     private SecurityHelper() {
     }
 
-    @Nullable
     public static KeyPair generateKeyPair() {
         try {
             final KeyPairGenerator generator = KeyPairGenerator.getInstance("RSA");
@@ -62,11 +59,10 @@ public final class SecurityHelper {
         return token;
     }
 
-    @Nullable
     public static Key generateX509Key(Key base) {
         try {
             final X509EncodedKeySpec encodedKeySpec = new X509EncodedKeySpec(base.getEncoded());
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            final KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             return keyFactory.generatePublic(encodedKeySpec);
         } catch (Exception e) {
             throw new IllegalStateException("Unable to generate X509 encoded key", e);

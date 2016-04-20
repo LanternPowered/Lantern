@@ -167,12 +167,6 @@ public class Session implements PlayerConnection {
     // that was used to join the server
     private InetSocketAddress virtualAddress;
 
-    // The verify token used in authentication
-    private byte[] verifyToken;
-
-    // The verify user name used in authentication
-    private String verifyUsername;
-
     // A message describing under what circumstances the connection ended
     private Text quitReason;
 
@@ -419,7 +413,7 @@ public class Session implements PlayerConnection {
             this.latencyTimeStart = System.nanoTime();
             this.send(new MessageInOutPing(this.latencyMessageId));
         } else {
-            this.disconnect("Timed out.");
+            this.disconnect(t("disconnect.timeout"));
         }
     }
 
@@ -539,7 +533,7 @@ public class Session implements PlayerConnection {
         }
 
         MessageEvent.MessageFormatter messageFormatter = new MessageEvent.MessageFormatter(
-                kickReason != null ? kickReason : Text.of("You are not allowed to log in to this server."));
+                kickReason != null ? kickReason : t("disconnect.notAllowedToJoin"));
 
         Cause cause = Cause.source(this.player).build();
         Transform<World> fromTransform = this.player.getTransform().setExtent(world);
@@ -598,42 +592,6 @@ public class Session implements PlayerConnection {
     }
 
     /**
-     * Get the randomly-generated verify token for this session.
-     * 
-     * @return the verify token
-     */
-    public byte[] getVerifyToken() {
-        return verifyToken;
-    }
-
-    /**
-     * Sets the verify token of this session.
-     * 
-     * @param token the verify token
-     */
-    public void setVerifyToken(byte[] token) {
-        this.verifyToken = token;
-    }
-
-    /**
-     * Gets the verify username for this session.
-     * 
-     * @return the verify username
-     */
-    public String getVerifyUsername() {
-        return this.verifyUsername;
-    }
-
-    /**
-     * Sets the verify username for this session.
-     * 
-     * @param username the verify username
-     */
-    public void setVerifyUsername(String username) {
-        this.verifyUsername = username;
-    }
-
-    /**
      * Note that the client has responded to a keep-alive.
      * 
      * @param id the ping id to check for validity
@@ -651,7 +609,7 @@ public class Session implements PlayerConnection {
     /**
      * Pulses the session.
      */
-    protected void pulse() {
+    public void pulse() {
         HandlerMessage entry;
         while ((entry = this.messageQueue.poll()) != null) {
             this.handleMessage(entry.getHandler(), entry.getMessage());
@@ -670,11 +628,11 @@ public class Session implements PlayerConnection {
      * Disconnects the session with the specified reason. This causes a
      * KickMessage to be sent. When it has been delivered, the channel is
      * closed.
-     * 
+     *
      * @param objects The reason for disconnection.
      */
     public void disconnect(Object... objects) {
-        this.disconnect(Text.of(objects), false);
+        this.disconnect(Text.of(objects));
     }
 
     /**

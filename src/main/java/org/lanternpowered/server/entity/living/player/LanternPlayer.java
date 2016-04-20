@@ -184,6 +184,9 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Override
     public void setWorld(@Nullable LanternWorld world) {
         LanternWorld oldWorld = this.getWorld();
+        if (oldWorld != world) {
+            this.interactionHandler.reset();
+        }
         super.setWorld(world);
         if (world == oldWorld) {
             return;
@@ -203,7 +206,6 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             this.lastChunkPos = null;
             // Remove the player from the world
             oldWorld.removePlayer(this);
-            this.interactionHandler.reset();
         }
         if (world != null) {
             LanternGameMode gameMode = (LanternGameMode) GameModes.CREATIVE; // TODO

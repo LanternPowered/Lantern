@@ -345,7 +345,7 @@ public class LanternServer implements Server {
     private void pulse() {
         this.runningTimeTicks.incrementAndGet();
         // Pulse the network sessions
-        this.networkManager.getSessionRegistry().pulse();
+        this.networkManager.pulseSessions();
         // Pulse the sync scheduler tasks
         this.game.getScheduler().pulseSyncScheduler();
         // Pulse the world threads

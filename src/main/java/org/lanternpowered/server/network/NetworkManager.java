@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network;
 
+import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -35,9 +36,9 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.network.pipeline.MessageChannelInitializer;
 import org.lanternpowered.server.network.session.Session;
-import org.lanternpowered.server.network.session.SessionRegistry;
 
 import java.net.SocketAddress;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
@@ -52,7 +53,7 @@ public final class NetworkManager {
     private final EventLoopGroup workerGroup = new NioEventLoopGroup(0,
             runnable -> new Thread(runnable, "netty-" + this.counter.getAndIncrement()));
 
-    private final SessionRegistry sessionRegistry = new SessionRegistry();
+    private final Set<Session> sessions = Sets.newConcurrentHashSet();
     private final LanternServer server;
 
     private SocketAddress socketAddress;
@@ -81,12 +82,10 @@ public final class NetworkManager {
     }
 
     /**
-     * Gets the session registry.
-     * 
-     * @return the session registry
+     * Pulses all the sessions.
      */
-    public SessionRegistry getSessionRegistry() {
-        return this.sessionRegistry;
+    public void pulseSessions() {
+        this.sessions.forEach(Session::pulse);
     }
 
     /**
@@ -106,7 +105,7 @@ public final class NetworkManager {
      * @param session the session
      */
     public void onChannelActive(Channel channel, Session session) {
-        this.sessionRegistry.add(session);
+        this.sessions.add(session);
     }
 
     /**
@@ -116,7 +115,7 @@ public final class NetworkManager {
      * @param session the session
      */
     public void onChannelInactive(Channel channel, Session session) {
-        this.sessionRegistry.remove(session);
+        this.sessions.remove(session);
     }
 
     /**

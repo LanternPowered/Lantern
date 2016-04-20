@@ -73,6 +73,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;
@@ -131,8 +132,10 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             return;
         }
 
+        LoginAuthData authData = context.getChannel().attr(HandlerLoginStart.AUTH_DATA).getAndRemove();
+
         // Check verify token
-        if (!Arrays.equals(verifyToken, session.getVerifyToken())) {
+        if (!Arrays.equals(verifyToken, authData.getVerifyToken())) {
             session.disconnect("Invalid verify token.");
             return;
         }
@@ -144,9 +147,8 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
         String hash;
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-1");
-            String sessionId = context.getChannel().attr(HandlerLoginStart.SESSION_ID).getAndRemove();
 
-            digest.update(sessionId.getBytes());
+            digest.update(authData.getSessionId().getBytes());
             digest.update(sharedSecret.getEncoded());
             digest.update(session.getServer().getKeyPair().getPublic().getEncoded());
 
@@ -159,7 +161,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
         }
 
         LanternScheduler.getInstance().submitAsyncTask(() -> {
-            performAuth(session, session.getVerifyUsername(), hash);
+            performAuth(session, authData.getUsername(), hash);
             return null;
         });
     }
@@ -179,7 +181,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 try {
                     json = this.gson.fromJson(new InputStreamReader(is), JsonObject.class);
                 } catch (Exception e) {
-                    Lantern.getLogger().warn("Username \"" + username + "\" failed to authenticate!");
+                    Lantern.getLogger().warn("Username \"{}\" failed to authenticate!", username);
                     session.disconnect("Failed to verify username!");
                     return;
                 }
@@ -194,7 +196,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             try {
                 uuid = UUIDHelper.fromFlatString(id);
             } catch (IllegalArgumentException e) {
-                Lantern.getLogger().error("Returned authentication UUID invalid: " + id, e);
+                Lantern.getLogger().error("Returned authentication UUID invalid: {}", id, e);
                 session.disconnect("Invalid UUID.");
                 return;
             }
@@ -216,9 +218,8 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             Lantern.getLogger().info("Finished authenticating.");
             Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
 
-            Text disconnectMessage = Text.of("You are not allowed to log in to this server.");
             ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(Cause.source(gameProfile).build(), session,
-                    new MessageEvent.MessageFormatter(disconnectMessage), gameProfile, false);
+                    new MessageEvent.MessageFormatter(t("disconnect.notAllowedToJoin")), gameProfile, false);
 
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {

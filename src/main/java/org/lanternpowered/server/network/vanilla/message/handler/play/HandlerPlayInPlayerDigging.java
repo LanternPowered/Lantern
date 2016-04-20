@@ -23,55 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 
-public final class EntityIdAllocator {
+public final class HandlerPlayInPlayerDigging implements Handler<MessagePlayInPlayerDigging> {
 
-    private static final EntityIdAllocator INSTANCE = new EntityIdAllocator();
-
-    public static EntityIdAllocator get() {
-        return INSTANCE;
-    }
-
-    private final Queue<Integer> reusableIds = new LinkedBlockingQueue<>();
-    private final AtomicInteger idCounter = new AtomicInteger();
-
-    /**
-     * Polls a new id from the allocator.
-     *
-     * @return the id
-     */
-    public int poll() {
-        Integer id = this.reusableIds.poll();
-        if (id != null) {
-            return id;
-        }
-        return this.idCounter.getAndIncrement();
-    }
-
-    public int[] poll(int count) {
-        return this.poll(new int[count]);
-    }
-
-    public int[] poll(int[] array) {
-        for (int i = 0; i < array.length; i++) {
-            array[i] = this.poll();
-        }
-        return array;
-    }
-
-    /**
-     * Pushes a id back to be reused.
-     *
-     * <p>WARNING: Do not push ids back twice or
-     * when they are still in use, it may cause
-     * some unforeseen issues.</p>
-     */
-    public void push(int id) {
-        this.reusableIds.offer(id);
+    @Override
+    public void handle(NetworkContext context, MessagePlayInPlayerDigging message) {
+        context.getSession().getPlayer().getInteractionHandler().handleDigging(message);
     }
 }

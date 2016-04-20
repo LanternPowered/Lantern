@@ -62,7 +62,7 @@ import io.netty.util.AttributeKey;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.config.user.ban.BanEntry;
-import org.lanternpowered.server.entity.EntityIdAllocator;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
@@ -416,6 +416,7 @@ public class Session implements PlayerConnection {
             if (this.latencyMessageId == 0) {
                 this.latencyMessageId++;
             }
+            this.latencyTimeStart = System.nanoTime();
             this.send(new MessageInOutPing(this.latencyMessageId));
         } else {
             this.disconnect("Timed out.");
@@ -487,7 +488,7 @@ public class Session implements PlayerConnection {
      */
     public void initPlayer() {
         this.player = new LanternPlayer(this.gameProfile, this);
-        this.player.setEntityId(EntityIdAllocator.get().poll());
+        this.player.setEntityId(LanternEntity.getIdAllocator().poll());
         // TODO: Which world?
         LanternWorld world = (LanternWorld) Sponge.getServer().getWorlds().iterator().next();
         // TODO: Read player data
@@ -641,10 +642,7 @@ public class Session implements PlayerConnection {
         if (this.latencyMessageId == id) {
             this.latencyMessageId = 0;
 
-            long time = System.nanoTime() / 1000000L;
-            long timed = time - this.latencyTimeStart;
-
-            int latency = (int) ((this.latency * 3 + timed) / 4);
+            int latency = (int) ((this.latency * 3 + (this.latencyTimeStart - System.nanoTime()) / 1000000L) / 4);
             GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(latency));
             this.latency = latency;
         }

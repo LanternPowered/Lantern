@@ -1212,7 +1212,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean containsBlock(int x, int y, int z) {
-        return VecHelper.inBounds(x, y, z, Vector3i.ZERO, CHUNK_MASK);
+        return VecHelper.inBounds(x, y, z, this.min, this.max);
     }
 
     @Override

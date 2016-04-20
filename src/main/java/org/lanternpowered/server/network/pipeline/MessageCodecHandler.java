@@ -100,7 +100,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         if (registration == null) {
             if (warnedMissingOpcodes.add(opcode)) {
-                Lantern.getLogger().warn("Failed to find a message registration with opcode {} in state {}!", Integer.toHexString(opcode), state);
+                Lantern.getLogger().warn("Failed to find a message registration with opcode 0x{} in state {}!", Integer.toHexString(opcode), state);
             }
             return;
         }

@@ -123,8 +123,8 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
                 throw new CodecException("Signed book data view (nbt tag) may not be null!");
             }
             String author = dataView.getString(AUTHOR).orElseThrow(() -> new CodecException("Signed book author missing!"));
-            String title = dataView.getString(TITLE).orElseThrow(() -> new CodecException("Signed book author missing!"));
-            List<String> pages = dataView.getStringList(PAGES).orElseThrow(() -> new CodecException("Edited book pages missing!"));
+            String title = dataView.getString(TITLE).orElseThrow(() -> new CodecException("Signed book title missing!"));
+            List<String> pages = dataView.getStringList(PAGES).orElseThrow(() -> new CodecException("Signed book pages missing!"));
             return new MessagePlayInSignBook(author, title, pages);
         } else if ("MC|BEdit".equals(channel)) {
             RawItemStack rawItemStack = context.read(content, Types.RAW_ITEM_STACK);

@@ -33,6 +33,7 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.util.IdAllocator;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -69,6 +70,12 @@ import javax.annotation.Nullable;
 
 @NonnullByDefault
 public class LanternEntity extends BaseComponentHolder implements Entity, AbstractPropertyHolder {
+
+    private static final IdAllocator idAllocator = new IdAllocator();
+
+    public static IdAllocator getIdAllocator() {
+        return idAllocator;
+    }
 
     protected final static float EPSILON = 1.0e-004f;
 

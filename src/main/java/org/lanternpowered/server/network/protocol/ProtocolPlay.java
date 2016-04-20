@@ -37,6 +37,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInC
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCloseWindow;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCustomPayload;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutHeldItemChange;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerAction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInPlayerDigging;
@@ -105,6 +106,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClientSettings;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInTabComplete;
@@ -133,6 +135,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPerformRespawn;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
@@ -244,6 +247,7 @@ public final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(playerMovementHandler.new HandlerPlayInPlayerLook());
         inbound.bind(0x0f, CodecPlayInPlayerOnGroundState.class, MessagePlayInPlayerOnGroundState.class);
         // ...
+        inbound.bind(0x12, CodecPlayInPlayerAbilities.class, MessagePlayInPlayerAbilities.class); // TODO: Handler
         inbound.bind(0x13, CodecPlayInPlayerDigging.class);
         inbound.bind(0x14, CodecPlayInPlayerAction.class);
         inbound.bind(0x15, CodecPlayInPlayerVehicleControls.class);
@@ -274,7 +278,7 @@ public final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInUseEntity.Attack.class); // TODO: Handler
         inbound.bind(MessagePlayInUseEntity.Interact.class); // TODO: Handler
         // Provided by CodecPlayInPlayerDigging
-        inbound.bind(MessagePlayInPlayerDigging.class); // TODO: Handler
+        inbound.bind(MessagePlayInPlayerDigging.class).bindHandler(new HandlerPlayInPlayerDigging());
         inbound.bind(MessagePlayInDropHeldItem.class); // TODO: Handler
         inbound.bind(MessagePlayInFinishUsingItem.class); // TODO: Handler
         inbound.bind(MessagePlayInSwapHandItems.class); // TODO: Handler

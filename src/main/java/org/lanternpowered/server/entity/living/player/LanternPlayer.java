@@ -146,6 +146,9 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     // The chunks the client knowns about
     private final Set<Vector2i> knownChunks = new HashSet<>();
 
+    // The interaction handler
+    private final PlayerInteractionHandler interactionHandler;
+
     // The chunk position since the last #pulseChunkChanges call
     private Vector2i lastChunkPos = null;
 
@@ -154,6 +157,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     public LanternPlayer(LanternGameProfile gameProfile, Session session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
+        this.interactionHandler = new PlayerInteractionHandler(this);
         this.session = session;
         this.gameProfile = gameProfile;
         // Get or create the user object
@@ -199,6 +203,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             this.lastChunkPos = null;
             // Remove the player from the world
             oldWorld.removePlayer(this);
+            this.interactionHandler.reset();
         }
         if (world != null) {
             LanternGameMode gameMode = (LanternGameMode) GameModes.CREATIVE; // TODO
@@ -341,6 +346,9 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
         // TODO: Maybe async?
         this.pulseChunkChanges();
+
+        // Pulse the interaction handler
+        this.interactionHandler.pulse();
     }
 
     /**
@@ -698,4 +706,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.sleepingIgnored = sleepingIgnored;
     }
 
+    public PlayerInteractionHandler getInteractionHandler() {
+        return this.interactionHandler;
+    }
 }

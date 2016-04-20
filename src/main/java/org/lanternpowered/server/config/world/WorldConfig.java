@@ -81,10 +81,10 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "allow-player-respawns", comment = "Enable if the player may respawn in this world.")
     private boolean allowPlayerRespawns = true;
 
-    @Setting(value = "max-build-height", comment = "The maximum buid height of this world.")
+    @Setting(value = "max-build-height", comment = "The maximum build height of this world.")
     private int maxBuildHeight = 255;
 
-    @Setting(value = "difficulty", comment = "The difficulty this world.")
+    @Setting(value = "difficulty", comment = "The difficulty of this world.")
     private Difficulty difficulty = Difficulties.NORMAL;
 
     @Setting(value = "generation", comment = "The generation settings of this world.")

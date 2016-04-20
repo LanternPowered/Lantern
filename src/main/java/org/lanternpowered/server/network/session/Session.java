@@ -642,7 +642,7 @@ public class Session implements PlayerConnection {
         if (this.latencyMessageId == id) {
             this.latencyMessageId = 0;
 
-            int latency = (int) ((this.latency * 3 + (this.latencyTimeStart - System.nanoTime()) / 1000000L) / 4);
+            int latency = (int) ((this.latency * 3 + (System.nanoTime() - this.latencyTimeStart) / 1000000L) / 4);
             GlobalTabList.getInstance().get(this.gameProfile).ifPresent(entry -> entry.setLatency(latency));
             this.latency = latency;
         }

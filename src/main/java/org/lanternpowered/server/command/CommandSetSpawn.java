@@ -33,9 +33,9 @@ import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
-import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 public final class CommandSetSpawn {
@@ -53,8 +53,8 @@ public final class CommandSetSpawn {
                     Vector3d position;
                     if (args.hasAny("coordinates")) {
                         position = args.<Vector3d>getOne("coordinates").get();
-                    } else if (src instanceof LocatedSource) {
-                        position = ((LocatedSource) src).getLocation().getPosition();
+                    } else if (src instanceof Locatable) {
+                        position = ((Locatable) src).getLocation().getPosition();
                     } else {
                         throw new CommandException(t("Non-located sources must specify coordinates."));
                     }

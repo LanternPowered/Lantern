@@ -69,13 +69,11 @@ import java.util.Set;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
-import javax.inject.Inject;
 
 /**
  * A simple implementation of {@link CommandManager}.
  * This service calls the appropriate events for a command.
  */
-
 public class LanternCommandManager implements CommandManager {
 
     private final Logger log;
@@ -88,7 +86,6 @@ public class LanternCommandManager implements CommandManager {
      *
      * @param logger The logger to log error messages to
      */
-    @Inject
     public LanternCommandManager(Logger logger) {
         this(logger, SimpleDispatcher.FIRST_DISAMBIGUATOR);
     }

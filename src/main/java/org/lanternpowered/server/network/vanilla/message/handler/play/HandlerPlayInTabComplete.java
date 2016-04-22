@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import com.google.common.collect.ImmutableList;
+import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
@@ -44,23 +45,38 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
 
     @Override
     public void handle(NetworkContext context, MessagePlayInTabComplete message) {
-        String text = message.getText().trim();
-        boolean prefix = text.startsWith("/");
-        if (prefix || message.getAssumeCommand()) {
-            if (prefix) {
-                text = text.substring(1);
+        final String text = message.getText();
+        // The content with normalized spaces, the spaces are trimmed
+        // from the ends and there are never two spaces directly after eachother
+        final String textNormalized = StringUtils.normalizeSpace(text);
+
+        boolean hasPrefix = textNormalized.startsWith("/");
+        if (hasPrefix || message.getAssumeCommand()) {
+            String command = textNormalized;
+
+            // Don't include the '/'
+            if (hasPrefix) {
+                command = command.substring(1);
             }
-            List<String> suggestions = Sponge.getCommandManager().getSuggestions(context.getSession().getPlayer(), text);
-            if (!prefix) {
+
+            // Keep the last space, it must be there!
+            if (text.endsWith(" ")) {
+                command = textNormalized + " ";
+            }
+
+            // Get the suggestions
+            List<String> suggestions = Sponge.getCommandManager().getSuggestions(context.getSession().getPlayer(), command);
+            // TODO: For some weird reason is the tab completation not working
+            // when using a empty argument, like '/weather '
+            // This is working with SpongeForge...
+
+            // If the suggestions are for the command and there was a prefix, then append the prefix
+            if (hasPrefix && command.split(" ").length == 1) {
                 suggestions = suggestions.stream()
-                        .map(s -> s.charAt(0) == '/' ? s.substring(1) : s)
-                        .collect(GuavaCollectors.toImmutableList());
-            // Make the command name start with '/'
-            } else if (text.split(" ").length == 1) {
-                suggestions = suggestions.stream()
-                        .map(s -> s.charAt(0) == '/' ? s : '/' + s)
+                        .map(suggestion -> '/' + suggestion)
                         .collect(GuavaCollectors.toImmutableList());
             }
+
             context.getSession().send(new MessagePlayOutTabComplete(suggestions));
         } else {
             // Vanilla mc will complete user names if

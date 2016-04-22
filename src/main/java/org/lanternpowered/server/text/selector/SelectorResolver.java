@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.LocatedSource;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExperienceHolderData;
 import org.spongepowered.api.data.manipulator.mutable.entity.GameModeData;
@@ -54,6 +53,7 @@ import org.spongepowered.api.text.selector.Selector;
 import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.selector.SelectorTypes;
 import org.spongepowered.api.util.Functional;
+import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
@@ -92,15 +92,15 @@ public class SelectorResolver {
     }
 
     private static Extent extentFromSource(CommandSource origin) {
-        if (origin instanceof LocatedSource) {
-            return ((LocatedSource) origin).getWorld();
+        if (origin instanceof Locatable) {
+            return ((Locatable) origin).getWorld();
         }
         return null;
     }
 
     private static Vector3d positionFromSource(CommandSource origin) {
-        if (origin instanceof LocatedSource) {
-            return ((LocatedSource) origin).getLocation().getPosition();
+        if (origin instanceof Locatable) {
+            return ((Locatable) origin).getLocation().getPosition();
         }
         return null;
     }

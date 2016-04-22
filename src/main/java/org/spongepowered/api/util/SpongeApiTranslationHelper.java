@@ -23,32 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command;
+package org.spongepowered.api.util;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import org.lanternpowered.server.text.translation.TranslationHelper;
+import org.lanternpowered.server.text.translation.TranslationManager;
+import org.spongepowered.api.text.Text;
 
-import org.lanternpowered.server.world.LanternWorldProperties;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandException;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.world.Locatable;
+/**
+ * This class will override the default sponge one and delegates all
+ * the translations through our {@link TranslationHelper}, so also
+ * through the {@link TranslationManager}s.
+ */
+public class SpongeApiTranslationHelper {
 
-class CommandHelper {
-
-    public static LanternWorldProperties getWorld(CommandSource src, CommandContext args) throws CommandException {
-        LanternWorldProperties world;
-        if (args.hasAny("world")) {
-            world = args.<LanternWorldProperties>getOne("world").get();
-        } else if (src instanceof Locatable) {
-            world = (LanternWorldProperties) ((Locatable) src).getWorld().getProperties();
-        } else {
-            world = (LanternWorldProperties) Sponge.getServer().getDefaultWorld().orElse(null);
-            if (world == null) {
-                // Shouldn't happen
-                throw new CommandException(t("Unable to find the default world."));
-            }
-        }
-        return world;
+    private SpongeApiTranslationHelper() {
+        // Prevent instance creation
     }
+
+    /**
+     * Get the translated text for a given string.
+     *
+     * @param key The translation key
+     * @param args Translation parameters
+     * @return The translatable text
+     */
+    public static Text t(String key, Object... args) {
+        return TranslationHelper.t(key, args);
+    }
+
 }

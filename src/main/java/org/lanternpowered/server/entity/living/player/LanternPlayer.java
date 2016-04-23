@@ -31,6 +31,7 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.command.targeted.AbstractTargetingCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
@@ -108,7 +109,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer {
+public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, AbstractTargetingCommandSource {
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;

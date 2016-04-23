@@ -25,8 +25,11 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.lanternpowered.server.command.targeted.TargetedBlockHelper;
+import org.lanternpowered.server.command.targeted.TargetingCommandSource;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
@@ -64,8 +67,12 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                 command = command + " ";
             }
 
+            TargetingCommandSource commandSource = context.getSession().getPlayer();
+            // Set the target block position
+            TargetedBlockHelper.setPosition(commandSource, message.getBlockPosition().orElse(null));
+
             // Get the suggestions
-            List<String> suggestions = Sponge.getCommandManager().getSuggestions(context.getSession().getPlayer(), command);
+            List<String> suggestions = Sponge.getCommandManager().getSuggestions(commandSource, command);
 
             // If the suggestions are for the command and there was a prefix, then append the prefix
             if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
@@ -73,6 +80,9 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                         .map(suggestion -> '/' + suggestion)
                         .collect(GuavaCollectors.toImmutableList());
             }
+
+            // Reset the target block position
+            TargetedBlockHelper.setPosition(commandSource, null);
 
             context.getSession().send(new MessagePlayOutTabComplete(suggestions));
         } else {

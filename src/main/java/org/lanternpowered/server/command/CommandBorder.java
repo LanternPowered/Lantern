@@ -56,7 +56,7 @@ public final class CommandBorder {
                             WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
                             double oldDiameter = border.getDiameter();
                             double diameter = oldDiameter + args.<Double>getOne("distance").get();
-                            int time = args.<Integer>getOne("value").orElse(0);
+                            int time = args.<Integer>getOne("time").orElse(0);
                             border.setDiameter(diameter, time);
                             if (time > 0) {
                                 if (diameter < oldDiameter) {
@@ -83,7 +83,7 @@ public final class CommandBorder {
                             WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
                             double oldDiameter = border.getDiameter();
                             double diameter = args.<Double>getOne("distance").get();
-                            int time = args.<Integer>getOne("value").orElse(0);
+                            int time = args.<Integer>getOne("time").orElse(0);
                             border.setDiameter(diameter, time);
                             if (time > 0) {
                                 if (diameter < oldDiameter) {

@@ -25,9 +25,6 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.spongepowered.api.command.args.GenericArguments.optional;
-import static org.spongepowered.api.command.args.GenericArguments.string;
-
 import com.google.common.collect.Collections2;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
@@ -36,6 +33,11 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.ArgumentParseException;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.CommandElement;
+import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.service.pagination.PaginationList;
@@ -44,11 +46,17 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
+import org.spongepowered.api.util.StartsWithPredicate;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
 
 public final class CommandHelp {
 
@@ -59,7 +67,22 @@ public final class CommandHelp {
         return CommandSpec
                 .builder()
                 .permission(PERMISSION)
-                .arguments(optional(string(Text.of("command"))))
+                .arguments(GenericArguments.optional(new CommandElement(Text.of("command")) {
+
+                    @Nullable
+                    @Override
+                    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+                        return args.next();
+                    }
+
+                    @Override
+                    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+                        final String nextArg = args.nextIfPresent().orElse("");
+                        return Lantern.getGame().getCommandManager().getAliases().stream()
+                                    .filter(new StartsWithPredicate(nextArg))
+                                    .collect(Collectors.toList());
+                    }
+                }))
                 .description(Text.of("View a list of all commands"))
                 .extendedDescription(Text.of("View a list of all commands. Hover over\n" + " a command to view its description."
                         + " Click\n a command to insert it into your chat bar."))

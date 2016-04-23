@@ -645,14 +645,28 @@ public final class LanternWorldProperties implements WorldProperties {
         if (this.borderTimeStart == -1) {
             this.updateCurrentBorderTime();
         }
-        if (this.borderDiameterStart != this.borderDiameterEnd) {
-            double d = Math.max(this.borderTimeEnd - System.currentTimeMillis(), 0) / (this.borderTimeEnd - this.borderTimeStart);
 
-            if (d == 0d) {
+        if (this.borderDiameterStart != this.borderDiameterEnd) {
+            long lerpTime = this.borderTimeEnd - this.borderTimeStart;
+            if (lerpTime == 0) {
                 return this.borderDiameterStart;
-            } else {
-                return this.borderDiameterStart + (this.borderDiameterEnd - this.borderDiameterStart) * d;
             }
+
+            long elapsedTime = System.currentTimeMillis() - this.borderTimeStart;
+            elapsedTime = elapsedTime > lerpTime ? lerpTime : elapsedTime < 0 ? 0 : elapsedTime;
+
+            double d = elapsedTime / lerpTime;
+            double diameter;
+
+            if (d == 0.0) {
+                diameter = this.borderDiameterStart;
+            } else {
+                diameter = this.borderDiameterStart + (this.borderDiameterEnd - this.borderDiameterStart) * d;
+            }
+
+            this.borderDiameterStart = diameter;
+            this.setCurrentBorderTime(lerpTime - elapsedTime);
+            return diameter;
         } else {
             return this.borderDiameterStart;
         }

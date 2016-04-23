@@ -26,9 +26,11 @@
 package org.lanternpowered.server.console;
 
 import jline.console.completer.Completer;
+import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -39,38 +41,43 @@ public class ConsoleCommandCompleter implements Completer {
     @Override
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {
         int len = buffer.length();
-        buffer = buffer.trim();
-        if (buffer.isEmpty()) {
-            return cursor;
+
+        // The content with normalized spaces, the spaces are trimmed
+        // from the ends and there are never two spaces directly after eachother
+        String command = StringUtils.normalizeSpace(buffer);
+
+        boolean hasPrefix = command.startsWith("/");
+        // Don't include the '/'
+        if (hasPrefix) {
+            command = command.substring(1);
         }
 
-        boolean prefix;
-        if (buffer.charAt(0) != '/') {
-            buffer = '/' + buffer;
-            prefix = false;
-        } else {
-            prefix = true;
+        // Keep the last space, it must be there!
+        if (buffer.endsWith(" ")) {
+            command = command + " ";
         }
 
-        final String input = buffer;
+        final String command0 = command;
         Future<List<String>> tabComplete = ((LanternScheduler) Sponge.getScheduler()).callSync(() ->
-                Sponge.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, input));
+                Sponge.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, command0));
 
         try {
-            List<String> completions = tabComplete.get();
-            if (prefix) {
-                candidates.addAll(completions);
+            // Get the suggestions
+            List<String> suggestions = tabComplete.get();
+            // If the suggestions are for the command and there was a prefix, then append the prefix
+            if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
+                candidates.addAll(suggestions.stream()
+                        .map(suggestion -> '/' + suggestion)
+                        .collect(GuavaCollectors.toImmutableList()));
             } else {
-                for (String completion : completions) {
-                    candidates.add(completion.charAt(0) == '/' ? completion.substring(1) : completion);
-                }
+                candidates.addAll(suggestions);
             }
 
             int pos = buffer.lastIndexOf(' ');
             if (pos == -1) {
                 return cursor - len;
             } else {
-                return cursor - len + pos;
+                return cursor - len + pos + 1;
             }
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

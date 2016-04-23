@@ -85,15 +85,6 @@ public class LanternCommandManager implements CommandManager {
      * Construct a simple {@link CommandManager}.
      *
      * @param logger The logger to log error messages to
-     */
-    public LanternCommandManager(Logger logger) {
-        this(logger, SimpleDispatcher.FIRST_DISAMBIGUATOR);
-    }
-
-    /**
-     * Construct a simple {@link CommandManager}.
-     *
-     * @param logger The logger to log error messages to
      * @param disambiguator The function to resolve a single command when multiple options are available
      */
     public LanternCommandManager(Logger logger, Disambiguator disambiguator) {
@@ -315,7 +306,8 @@ public class LanternCommandManager implements CommandManager {
         try {
             final List<String> suggestions;
             final String[] argSplit = arguments.split(" ", 2);
-            // TODO: Fix this in the SimpleDispatcher -> add after 'argSplit.length == 1' the check '&& !arguments.endsWith(" ")'
+            // TODO: Fix this in the SimpleDispatcher -> in 'getSuggestions' add after
+            // 'argSplit.length == 1' the check '&& !arguments.endsWith(" ")'
             if (argSplit.length == 1 && !arguments.endsWith(" ")) {
                 suggestions = this.dispatcher.getSuggestions(source, arguments);
             } else {

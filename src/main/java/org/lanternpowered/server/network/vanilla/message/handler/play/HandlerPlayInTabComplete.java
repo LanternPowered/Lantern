@@ -61,17 +61,14 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
 
             // Keep the last space, it must be there!
             if (text.endsWith(" ")) {
-                command = textNormalized + " ";
+                command = command + " ";
             }
 
             // Get the suggestions
             List<String> suggestions = Sponge.getCommandManager().getSuggestions(context.getSession().getPlayer(), command);
-            // TODO: For some weird reason is the tab completation not working
-            // when using a empty argument, like '/weather '
-            // This is working with SpongeForge...
 
             // If the suggestions are for the command and there was a prefix, then append the prefix
-            if (hasPrefix && command.split(" ").length == 1) {
+            if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
                 suggestions = suggestions.stream()
                         .map(suggestion -> '/' + suggestion)
                         .collect(GuavaCollectors.toImmutableList());

@@ -311,12 +311,24 @@ public class LanternCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(CommandSource src, String arguments) {
+    public List<String> getSuggestions(CommandSource source, String arguments) {
         try {
+            final List<String> suggestions;
             final String[] argSplit = arguments.split(" ", 2);
-            List<String> suggestions = new ArrayList<>(this.dispatcher.getSuggestions(src, arguments));
-            final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.source(src).build(),
-                    ImmutableList.copyOf(suggestions), suggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0], arguments);
+            // TODO: Fix this in the SimpleDispatcher -> add after 'argSplit.length == 1' the check '&& !arguments.endsWith(" ")'
+            if (argSplit.length == 1 && !arguments.endsWith(" ")) {
+                suggestions = this.dispatcher.getSuggestions(source, arguments);
+            } else {
+                Optional<? extends CommandMapping> cmdOptional = this.dispatcher.get(argSplit[0], source);
+                if (!cmdOptional.isPresent()) {
+                    suggestions = ImmutableList.of();
+                } else {
+                    suggestions = cmdOptional.get().getCallable().getSuggestions(source, argSplit[1]);
+                }
+            }
+            final List<String> rawSuggestions = new ArrayList<>(suggestions);
+            final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.source(source).build(),
+                    ImmutableList.copyOf(suggestions), rawSuggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0], arguments);
             Sponge.getGame().getEventManager().post(event);
             if (event.isCancelled()) {
                 return ImmutableList.of();
@@ -324,7 +336,7 @@ public class LanternCommandManager implements CommandManager {
                 return ImmutableList.copyOf(event.getTabCompletions());
             }
         } catch (CommandException e) {
-            src.sendMessage(error(t("Error getting suggestions: %s", e.getText())));
+            source.sendMessage(error(t("Error getting suggestions: %s", e.getText())));
             return Collections.emptyList();
         }
     }

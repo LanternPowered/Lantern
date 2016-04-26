@@ -250,7 +250,7 @@ public final class LanternWorldManager {
      * is still enabled according to {@link WorldProperties#isEnabled()} then it
      * will be loaded again if the server is restarted or an attempt is made by
      * a plugin to transfer an entity to the world using
-     * {@link org.spongepowered.api.entity.Entity#transferToWorld(String, Vector3d)}.</p>
+     * {@link org.spongepowered.api.entity.Entity#transferToWorld(World, Vector3d)}.</p>
      *
      * @param world the world to unload
      * @return whether the operation was successful
@@ -483,10 +483,11 @@ public final class LanternWorldManager {
      * @param settings the settings for creation
      * @return the new or existing world properties, if creation was successful
      */
-    public Optional<WorldProperties> createWorld(WorldCreationSettings settings) {
+    public WorldProperties createWorldProperties(WorldCreationSettings settings) {
         checkNotNull(settings, "settings");
-        if (this.worldByName.containsKey(settings.getWorldName())) {
-            return Optional.empty();
+        WorldLookupEntry entry = this.worldByName.get(settings.getWorldName());
+        if (entry != null) {
+            return entry.properties;
         }
         // Get the next dimension id
         final int dimensionId = this.getNextFreeDimensionId();
@@ -501,10 +502,11 @@ public final class LanternWorldManager {
      * @param dimensionId the dimension id
      * @return the new or existing world properties, if creation was successful
      */
-    Optional<WorldProperties> createWorld(WorldCreationSettings settings, int dimensionId) {
+    WorldProperties createWorld(WorldCreationSettings settings, int dimensionId) {
         final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) checkNotNull(settings, "settings");
-        if (this.worldByName.containsKey(settings0.getWorldName())) {
-            return Optional.empty();
+        WorldLookupEntry entry = this.worldByName.get(settings.getWorldName());
+        if (entry != null) {
+            return entry.properties;
         }
         // Create the world properties
         final LanternWorldProperties worldProperties = new LanternWorldProperties(settings0.getWorldName());
@@ -513,24 +515,22 @@ public final class LanternWorldManager {
             final WorldConfigResult result = this.getOrCreateWorldConfig(worldProperties);
             worldProperties.update(result.config, null, settings0);
         } catch (IOException e) {
-            this.game.getLogger().error("Unable to read/write the world config, please fix this issue before"
+            throw new IllegalStateException("Unable to read/write the world config, please fix this issue before"
                     + " creating the world.", e);
-            return Optional.empty();
         }
         // Get the world folder
         final Path worldFolder = this.getWorldFolder(dimensionId);
         try {
             Files.createDirectories(worldFolder);
         } catch (IOException e) {
-            this.game.getLogger().error("Unable to create the world folders for {}.", settings0.getWorldName(), e);
-            return Optional.empty();
+            throw new IllegalStateException("Unable to create the world folders for " + settings0.getWorldName(), e);
         }
         // Store the new properties
         this.addWorldProperties(worldProperties, worldFolder, dimensionId);
         // Save the world properties to reserve the world folder
         this.saveWorldProperties(worldProperties);
         
-        return Optional.of(worldProperties);
+        return worldProperties;
     }
 
     /**
@@ -850,7 +850,7 @@ public final class LanternWorldManager {
                     .loadsOnStartup(true)
                     .enabled(true)
                     .build();
-            rootWorldProperties = this.createWorld(settings, 0).get();
+            rootWorldProperties = this.createWorld(settings, 0);
         }
 
         // Get all the dimensions (worlds) that should be loaded

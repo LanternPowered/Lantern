@@ -243,6 +243,8 @@ public class LanternGame implements Game {
 
     // The folder where the worlds are saved
     private Path rootWorldFolder;
+    // The game folder
+    private final Path gameFolder;
 
     // The global config
     private GlobalConfig globalConfig;
@@ -257,6 +259,7 @@ public class LanternGame implements Game {
     private GameState gameState = GameState.CONSTRUCTION;
 
     public LanternGame() {
+        this.gameFolder = new File("").toPath();
         if (game != null) {
             throw new IllegalStateException("The game can only be initialized once!");
         }
@@ -597,6 +600,11 @@ public class LanternGame implements Game {
     @Override
     public LanternScheduler getScheduler() {
         return this.scheduler;
+    }
+
+    @Override
+    public Path getGameDirectory() {
+        return this.gameFolder;
     }
 
     @Override

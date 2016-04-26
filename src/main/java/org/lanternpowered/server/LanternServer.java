@@ -81,6 +81,7 @@ import java.net.InetSocketAddress;
 import java.nio.file.Path;
 import java.security.KeyPair;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -204,10 +205,10 @@ public class LanternServer implements Server {
     private final NetworkManager networkManager = new NetworkManager(this);
 
     // The rcon server/service
-    private final RconServer rconServer;
+    @Nullable private final RconServer rconServer;
 
     // The query server
-    private final QueryServer queryServer;
+    @Nullable private final QueryServer queryServer;
 
     // The key pair used for authentication
     private final KeyPair keyPair = SecurityHelper.generateKeyPair();
@@ -229,6 +230,9 @@ public class LanternServer implements Server {
 
     // All the players by their name
     private final Map<String, LanternPlayer> playersByName = Maps.newConcurrentMap();
+
+    // A unmodifiable collection with all the players
+    private final Collection<LanternPlayer> unmodifiablePlayers = Collections.unmodifiableCollection(this.playersByName.values());
 
     // All the players by their uniqueId
     private final Map<UUID, LanternPlayer> playersByUUID = Maps.newConcurrentMap();
@@ -403,12 +407,12 @@ public class LanternServer implements Server {
     }
 
     /**
-     * Gets a raw collection with all the players. DO NOT MODIFY IT!
+     * Gets a raw collection with all the players.
      *
      * @return The players
      */
     public Collection<LanternPlayer> getRawOnlinePlayers() {
-        return this.playersByName.values();
+        return this.unmodifiablePlayers;
     }
 
     @Override
@@ -633,7 +637,7 @@ public class LanternServer implements Server {
         try {
             this.game.getWhitelistConfig().save();
         } catch (IOException e) {
-            Lantern.getLogger().error("A error occurred while saving the whitelist config.", e);
+            Lantern.getLogger().error("A error occurred while saving the white-list config.", e);
         }
         try {
             this.game.getBanConfig().save();
@@ -675,8 +679,8 @@ public class LanternServer implements Server {
     }
 
     @Override
-    public Optional<WorldProperties> createWorldProperties(WorldCreationSettings settings) {
-        return this.worldManager.createWorld(settings);
+    public WorldProperties createWorldProperties(WorldCreationSettings settings) {
+        return this.worldManager.createWorldProperties(settings);
     }
 
 }

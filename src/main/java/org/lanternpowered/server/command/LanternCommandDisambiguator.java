@@ -64,15 +64,15 @@ public final class LanternCommandDisambiguator implements Disambiguator {
             if (chosenPlugin != null) {
                 Optional<PluginContainer> container = this.game.getPluginManager().getPlugin(chosenPlugin);
                 if (!container.isPresent()) {
-                    this.game.getServer().getConsole().sendMessage(t("Unable to find plugin '" + chosenPlugin +
-                            "' for command '" + aliasUsed + "', falling back to default"));
+                    this.game.getServer().getConsole().sendMessage(t("Unable to find plugin '%s' for command '%s', falling back to default",
+                            chosenPlugin, aliasUsed));
                 } else {
                     final Set<CommandMapping> ownedCommands = this.game.getCommandManager().getOwnedBy(container.get());
                     final List<CommandMapping> ownedMatchingCommands = ImmutableList.copyOf(Iterables.filter(availableOptions,
                             Predicates.in(ownedCommands)));
                     if (ownedMatchingCommands.isEmpty()) {
-                        this.game.getServer().getConsole().sendMessage(t("Plugin " + container.get().getName() + " was specified as the "
-                                + "preferred owner for " + aliasUsed + ", but does not have any such command!"));
+                        this.game.getServer().getConsole().sendMessage(t("Plugin %s was specified as the preferred owner for %s, "
+                                + "but does not have any such command!", container.get().getName(), aliasUsed));
                     } else if (ownedMatchingCommands.size() > 1) {
                         throw new IllegalStateException("Plugin " + container.get().getName() + " seems to have multiple commands registered as "
                                 + aliasUsed + "! This is a programming error!");

@@ -35,7 +35,6 @@ import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.util.IdAllocator;
 import org.lanternpowered.server.world.LanternWorld;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -62,7 +61,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -204,39 +202,8 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public boolean setLocationSafely(Location<World> location) {
-        this.setLocation(location);
-        // TODO: Will be removed in the future
-        // TODO: Check whether the location safe is
-        return true;
-    }
-
-    @Override
-    public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation) {
-        this.setLocationAndRotation(location, rotation);
-        // TODO: Will be removed in the future
-        // TODO: Check whether the location safe is
-        return true;
-    }
-
-    @Override
-    public boolean transferToWorld(String worldName, Vector3d position) {
-        final Optional<World> world = Sponge.getServer().getWorld(checkNotNull(worldName, "worldName"));
-        if (!world.isPresent()) {
-            return false;
-        }
-        this.setPositionAndWorld(world.get(), position);
-        return true;
-    }
-
-    @Override
-    public boolean transferToWorld(UUID uuid, Vector3d position) {
-        final Optional<World> world = Sponge.getServer().getWorld(checkNotNull(uuid, "uuid"));
-        if (!world.isPresent()) {
-            return false;
-        }
-        this.setPositionAndWorld(world.get(), position);
-        return true;
+    public void transferToWorld(World world, Vector3d position) {
+        this.setPositionAndWorld(checkNotNull(world, "world"), position);
     }
 
     @Override
@@ -317,13 +284,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         this.setWorld((LanternWorld) world);
         this.setRawPosition(new Vector3d(x, y, z));
         this.setRawRotation(new Vector3d(pitch, yaw, roll));
-    }
-
-    @Override
-    public boolean setLocationAndRotationSafely(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
-        this.setLocationAndRotation(location, rotation, relativePositions);
-        // TODO: Check whether the location safe is
-        return true;
     }
 
     @Override

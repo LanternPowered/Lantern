@@ -187,7 +187,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     private final TeleporterAgent teleporterAgent = null;
 
     // The context of this world
-    private volatile Context worldContext;
+    private final Context worldContext;
 
     public LanternWorld(LanternGame game, WorldConfig worldConfig, Path worldFolder,
             Scoreboard scoreboard, LanternWorldProperties properties) {
@@ -216,6 +216,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Finally, create the chunk manager
         this.chunkManager = new LanternChunkManager(this.game, this, this.worldConfig, chunkLoadService,
                 chunkIOService, worldGenerator, worldFolder);
+        this.worldContext = new Context(Context.WORLD_KEY, this.getName());
     }
 
     public Optional<LanternWeatherUniverse> getWeatherUniverse() {
@@ -839,9 +840,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Context getContext() {
-        if (this.worldContext == null) {
-            this.worldContext = new Context(Context.WORLD_KEY, this.getName());
-        }
         return this.worldContext;
     }
 

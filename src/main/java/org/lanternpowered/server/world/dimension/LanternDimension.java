@@ -31,33 +31,19 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 
-import javax.annotation.Nullable;
-
 public abstract class LanternDimension implements Dimension {
 
-    private final String name;
     private final LanternDimensionType<?> dimensionType;
     private final LanternWorld world;
 
-    @Nullable private volatile Context dimContext;
-
-    public LanternDimension(LanternWorld world, String name, LanternDimensionType<?> dimensionType) {
+    public LanternDimension(LanternWorld world, LanternDimensionType<?> dimensionType) {
         this.dimensionType = dimensionType;
         this.world = world;
-        this.name = name;
     }
 
     @Override
     public Context getContext() {
-        if (this.dimContext == null) {
-            this.dimContext = new Context(Context.DIMENSION_KEY, this.getName());
-        }
-        return this.dimContext;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
+        return this.dimensionType.getDimensionContext();
     }
 
     @Override

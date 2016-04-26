@@ -64,11 +64,11 @@ public class DimensionTypeRegistryModule implements AlternateCatalogRegistryModu
     public void registerDefaults() {
         List<DimensionType> types = Lists.newArrayList();
         types.add(new LanternDimensionType<>("minecraft", "the_end", -1, LanternDimensionEnd.class, GeneratorTypes.THE_END, true, false,
-                false, false, (world, type) -> new LanternDimensionEnd(world, type.getName(), type)));
+                false, false, LanternDimensionEnd::new));
         types.add(new LanternDimensionType<>("minecraft", "overworld", 0, LanternDimensionOverworld.class, GeneratorTypes.OVERWORLD, true, false,
-                true, true, (world, type) -> new LanternDimensionOverworld(world, type.getName(), type)));
+                true, true, LanternDimensionOverworld::new));
         types.add(new LanternDimensionType<>("minecraft", "nether", 1, LanternDimensionNether.class, GeneratorTypes.NETHER, true, true,
-                false, false, (world, type) -> new LanternDimensionNether(world, type.getName(), type)));
+                false, false, LanternDimensionNether::new));
 
         for (DimensionType type : types) {
             this.dimensionTypes.put(type.getId(), type);

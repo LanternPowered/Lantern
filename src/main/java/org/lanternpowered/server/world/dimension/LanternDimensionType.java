@@ -27,6 +27,7 @@ package org.lanternpowered.server.world.dimension;
 
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
@@ -43,11 +44,13 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
     private final boolean allowsPlayerRespawns;
     private final boolean hasSky;
     private final int internalId;
+    private final Context dimContext;
 
     public LanternDimensionType(String pluginId, String name, int internalId, Class<T> dimensionClass,
             GeneratorType defaultGeneratorType, boolean keepSpawnLoaded, boolean waterEvaporates,
             boolean hasSky, boolean allowsPlayerRespawns, BiFunction<LanternWorld, LanternDimensionType<T>, T> supplier) {
         super(pluginId, name);
+        this.dimContext = new Context(Context.DIMENSION_KEY, this.getId());
         this.defaultGeneratorType = defaultGeneratorType;
         this.allowsPlayerRespawns = allowsPlayerRespawns;
         this.keepSpawnLoaded = keepSpawnLoaded;
@@ -56,6 +59,16 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
         this.internalId = internalId;
         this.supplier = supplier;
         this.hasSky = hasSky;
+    }
+
+
+    /**
+     * Gets the shared {@link Context} for all the {@link Dimension}s of this type.
+     *
+     * @return The dimension context
+     */
+    Context getDimensionContext() {
+        return this.dimContext;
     }
 
     /**
@@ -78,7 +91,6 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
         return this.supplier.apply(world, this);
     }
 
-    @Override
     public boolean doesKeepSpawnLoaded() {
         return this.keepSpawnLoaded;
     }
@@ -103,5 +115,4 @@ public final class LanternDimensionType<T extends LanternDimension> extends Lant
     public int getInternalId() {
         return this.internalId;
     }
-
 }

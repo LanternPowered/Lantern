@@ -37,6 +37,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.type.NotePitch;
@@ -51,6 +52,7 @@ import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -61,6 +63,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+@NonnullByDefault
 public final class ProcessorPlayOutParticleEffect implements Processor<MessagePlayOutParticleEffect> {
 
     /**
@@ -218,8 +221,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
 
             if (cached.offset == null) {
                 for (MessagePlayOutSpawnParticle message0 : cached.messages) {
-                    output.add(new MessagePlayOutSpawnParticle(message0.particleId, position, message0.offset,
-                            message0.data, message0.count, message0.extra));
+                    output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), position, message0.getOffset(),
+                            message0.getData(), message0.getCount(), message0.getExtra()));
                 }
             } else {
                 Random random = new Random();
@@ -233,12 +236,12 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 float oz = cached.offset.getZ();
 
                 for (MessagePlayOutSpawnParticle message0 : cached.messages) {
-                    double px0 = (px + (random.nextFloat() * 2f - 1f) * ox);
-                    double py0 = (py + (random.nextFloat() * 2f - 1f) * oy);
-                    double pz0 = (pz + (random.nextFloat() * 2f - 1f) * oz);
+                    double px0 = px + (random.nextFloat() * 2f - 1f) * ox;
+                    double py0 = py + (random.nextFloat() * 2f - 1f) * oy;
+                    double pz0 = pz + (random.nextFloat() * 2f - 1f) * oz;
 
-                    output.add(new MessagePlayOutSpawnParticle(message0.particleId, new Vector3f(px0, py0, pz0), message0.offset,
-                            message0.data, message0.count, message0.extra));
+                    output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), new Vector3f(px0, py0, pz0), message0.getOffset(),
+                            message0.getData(), message0.getCount(), message0.getExtra()));
                 }
             }
         } catch (ExecutionException e) {
@@ -269,56 +272,4 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             this.offset = offset;
         }
     }
-
-    /**
-     * A internal message type that is indirectly used to spawn particles, because of the strange way
-     * that this message is processed on the client do we have to apply our own logic.
-     */
-    public static final class MessagePlayOutSpawnParticle implements Message {
-
-        private final int particleId;
-
-        private final Vector3f position;
-        private final Vector3f offset;
-
-        private final float data;
-        private final int count;
-        private final int[] extra;
-
-        public MessagePlayOutSpawnParticle(int particleId, Vector3f position, Vector3f offset, float data,
-                int count, int[] extra) {
-            this.particleId = particleId;
-            this.position = position;
-            this.offset = offset;
-            this.count = count;
-            this.extra = extra;
-            this.data = data;
-        }
-
-        public int getParticleId() {
-            return this.particleId;
-        }
-
-        public Vector3f getPosition() {
-            return this.position;
-        }
-
-        public Vector3f getOffset() {
-            return this.offset;
-        }
-
-        public float getData() {
-            return this.data;
-        }
-
-        public int getCount() {
-            return this.count;
-        }
-
-        public int[] getExtra() {
-            return this.extra;
-        }
-
-    }
-
 }

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.effect.particle;
 
+import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.NotePitch;
@@ -34,11 +36,17 @@ import org.spongepowered.api.util.Color;
 
 public class LanternParticleType extends SimpleLanternCatalogType implements ParticleType {
 
+    private final String vanillaId;
     private final boolean hasMotion;
     private final int internalId;
 
     public LanternParticleType(int internalId, String identifier, boolean hasMotion) {
+        this(internalId, identifier, identifier, hasMotion);
+    }
+
+    public LanternParticleType(int internalId, String identifier, String vanillaId, boolean hasMotion) {
         super(identifier);
+        this.vanillaId = checkNotNullOrEmpty(vanillaId, "vanillaId");
         this.internalId = internalId;
         this.hasMotion = hasMotion;
     }
@@ -48,8 +56,22 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         return this.hasMotion;
     }
 
+    /**
+     * Gets the internal id of the particle type used in networking.
+     *
+     * @return The internal id
+     */
     public int getInternalId() {
         return this.internalId;
+    }
+
+    /**
+     * Gets the id of the particle type used in the vanilla game.
+     *
+     * @return The vanilla id
+     */
+    public String getVanillaId() {
+        return this.vanillaId;
     }
 
     public static class Item extends LanternParticleType implements ParticleType.Item {
@@ -57,7 +79,11 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         private final ItemStack defaultItem;
 
         public Item(int internalId, String name, boolean hasMotion, ItemStack defaultItem) {
-            super(internalId, name, hasMotion);
+            this(internalId, name, name, hasMotion, defaultItem);
+        }
+
+        public Item(int internalId, String name, String vanillaId, boolean hasMotion, ItemStack defaultItem) {
+            super(internalId, name, vanillaId, hasMotion);
             this.defaultItem = defaultItem;
         }
 
@@ -73,7 +99,11 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         private final BlockState defaultBlockState;
 
         public Block(int internalId, String name, boolean hasMotion, BlockState defaultBlockState) {
-            super(internalId, name, hasMotion);
+            this(internalId, name, name, hasMotion, defaultBlockState);
+        }
+
+        public Block(int internalId, String name, String vanillaId, boolean hasMotion, BlockState defaultBlockState) {
+            super(internalId, name, vanillaId, hasMotion);
             this.defaultBlockState = defaultBlockState;
         }
 
@@ -89,7 +119,11 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         private final Color defaultColor;
 
         public Colorable(int internalId, String name, boolean hasMotion, Color defaultColor) {
-            super(internalId, name, hasMotion);
+            this(internalId, name, name, hasMotion, defaultColor);
+        }
+
+        public Colorable(int internalId, String name, String vanillaId, boolean hasMotion, Color defaultColor) {
+            super(internalId, name, vanillaId, hasMotion);
             this.defaultColor = defaultColor;
         }
 
@@ -105,7 +139,11 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         private final float defaultSize;
 
         public Resizable(int internalId, String name, boolean hasMotion, float defaultSize) {
-            super(internalId, name, hasMotion);
+            this(internalId, name, name, hasMotion, defaultSize);
+        }
+
+        public Resizable(int internalId, String name, String vanillaId, boolean hasMotion, float defaultSize) {
+            super(internalId, name, vanillaId, hasMotion);
             this.defaultSize = defaultSize;
         }
 
@@ -121,7 +159,11 @@ public class LanternParticleType extends SimpleLanternCatalogType implements Par
         private final NotePitch defaultNote;
 
         public Note(int internalId, String name, boolean hasMotion, NotePitch defaultNote) {
-            super(internalId, name, hasMotion);
+            this(internalId, name, name, hasMotion, defaultNote);
+        }
+
+        public Note(int internalId, String name, String vanillaId, boolean hasMotion, NotePitch defaultNote) {
+            super(internalId, name, vanillaId, hasMotion);
             this.defaultNote = defaultNote;
         }
 

@@ -30,18 +30,18 @@ import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
 
-public final class CodecPlayOutSpawnParticle implements Codec<ProcessorPlayOutParticleEffect.MessagePlayOutSpawnParticle> {
+public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpawnParticle> {
 
     @Override
-    public ByteBuf encode(CodecContext context, ProcessorPlayOutParticleEffect.MessagePlayOutSpawnParticle message) throws CodecException {
+    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnParticle message) throws CodecException {
         Vector3f position = message.getPosition();
         Vector3f offset = message.getOffset();
         int[] extra = message.getExtra();
         ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getParticleId());
-        buf.writeBoolean(true);
+        buf.writeInt(message.getParticleId());
+        buf.writeBoolean(message.isLongDistance());
         buf.writeFloat(position.getX());
         buf.writeFloat(position.getY());
         buf.writeFloat(position.getZ());

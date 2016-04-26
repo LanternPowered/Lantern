@@ -37,6 +37,8 @@ import org.lanternpowered.server.command.CommandDifficulty;
 import org.lanternpowered.server.command.CommandGameRule;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandOp;
+import org.lanternpowered.server.command.CommandParticle;
+import org.lanternpowered.server.command.CommandPlaySound;
 import org.lanternpowered.server.command.CommandSay;
 import org.lanternpowered.server.command.CommandSeed;
 import org.lanternpowered.server.command.CommandSetSpawn;
@@ -371,6 +373,8 @@ public class LanternGame implements Game {
         this.commandManager.register(this.minecraft, CommandOp.create(), "op");
         this.commandManager.register(this.minecraft, CommandDeop.create(), "deop");
         this.commandManager.register(this.minecraft, CommandWeather.create(), "weather");
+        this.commandManager.register(this.minecraft, CommandParticle.create(), "particle");
+        this.commandManager.register(this.minecraft, CommandPlaySound.create(), "playsound");
         this.commandManager.register(this.implContainer, CommandVersion.create(), "version");
         this.commandManager.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
                 LanternCallbackHolder.CALLBACK_COMMAND);
@@ -428,6 +432,8 @@ public class LanternGame implements Game {
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandTime.PERMISSION, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBorder.PERMISSION, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandWeather.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandParticle.PERMISSION, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandPlaySound.PERMISSION, Tristate.TRUE);
             // Group level 3 permissions
             subjectData = service.getGroupForOpLevel(3).getSubjectData();
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN, Tristate.TRUE);

@@ -172,6 +172,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTheEnd;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -337,7 +338,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x1f, CodecInOutPing.class, MessageInOutPing.class);
         outbound.bind(0x20, CodecPlayOutChunkData.class, MessagePlayOutChunkData.class);
         // 0x21
-        outbound.bind(0x22, CodecPlayOutSpawnParticle.class, ProcessorPlayOutParticleEffect.MessagePlayOutSpawnParticle.class);
+        outbound.bind(0x22, CodecPlayOutSpawnParticle.class, MessagePlayOutSpawnParticle.class);
         outbound.bind(0x23, CodecPlayOutPlayerJoinGame.class, MessagePlayOutPlayerJoinGame.class);
         // 0x24
         outbound.bind(0x25, CodecPlayOutEntityRelativeMove.class, MessagePlayOutEntityRelativeMove.class);

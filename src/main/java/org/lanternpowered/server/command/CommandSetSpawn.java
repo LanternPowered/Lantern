@@ -30,6 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -45,7 +46,7 @@ public final class CommandSetSpawn {
     public static CommandSpec create() {
         return CommandSpec.builder()
                 .arguments(
-                        GenericArguments.optional(GenericArguments.vector3d(Text.of("coordinates"))),
+                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("coordinates"))),
                         GenericArguments.optional(GenericArguments.world(Text.of("world"))))
                 .permission(PERMISSION)
                 .executor((src, args) -> {

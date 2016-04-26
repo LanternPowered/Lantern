@@ -84,7 +84,9 @@ public class TargetedVector3dElement extends CommandElement {
         }
         // Reset the state to get the arg
         args.setState(state);
-        args.nextIfPresent();
+        if (!args.nextIfPresent().isPresent()) {
+            return result;
+        }
         if (args.nextIfPresent().isPresent()) {
             if (args.nextIfPresent().isPresent()) {
                 // Store the current state

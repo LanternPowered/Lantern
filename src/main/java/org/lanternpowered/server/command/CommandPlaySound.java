@@ -27,6 +27,7 @@ package org.lanternpowered.server.command;
 
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -46,7 +47,7 @@ public final class CommandPlaySound {
                         GenericArguments.catalogedElement(Text.of("sound"), SoundType.class),
                         GenericArguments.catalogedElement(Text.of("category"), SoundCategory.class),
                         GenericArguments.player(Text.of("player")),
-                        GenericArguments.optional(GenericArguments.vector3d(Text.of("position"))),
+                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("position"))),
                         GenericArguments.optional(GenericArguments.doubleNum(Text.of("volume"))),
                         GenericArguments.optional(GenericArguments.doubleNum(Text.of("pitch"))),
                         GenericArguments.optional(GenericArguments.doubleNum(Text.of("minimumVolume"))))
@@ -68,7 +69,7 @@ public final class CommandPlaySound {
                     // The sound is played outside of the default volume and there
                     // is a minimum volume specified
                     if (minVolume > 0.0 && playerPos != position && position.distanceSquared(playerPos) > soundDistance * soundDistance) {
-                        position = position.sub(playerPos).normalize().mul(FOUR).add(position);
+                        position = position.sub(playerPos).normalize().mul(FOUR).add(playerPos);
                         volume = minVolume;
                     }
 

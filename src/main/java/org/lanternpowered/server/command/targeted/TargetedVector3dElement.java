@@ -26,87 +26,38 @@
 package org.lanternpowered.server.command.targeted;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.command.element.DelegateCompleterElement;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.ArgumentParseException;
-import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.text.Text;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class TargetedVector3dElement extends CommandElement {
+public class TargetedVector3dElement {
 
-    public static TargetedVector3dElement of(Text key) {
-        return new TargetedVector3dElement(key);
+    public static DelegateCompleterElement of(Text key) {
+        return of(key, null);
     }
 
-    private final CommandElement delegate;
-
-    private TargetedVector3dElement(Text key) {
-        super(key);
-        this.delegate = GenericArguments.vector3d(key);
+    public static DelegateCompleterElement of(Text key, @Nullable Integer defaultValue) {
+        return of(key, defaultValue, defaultValue, defaultValue);
     }
 
-    @Override
-    public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
-        this.delegate.parse(source, args, context);
+    public static DelegateCompleterElement of(Text key, @Nullable Integer defaultXValue,
+            @Nullable Integer defaultYValue, @Nullable Integer defaultZValue) {
+        return DelegateCompleterElement.vector3d(GenericArguments.vector3d(key),
+                (src, args, context) -> apply(src, Vector3i::getX, defaultXValue),
+                (src, args, context) -> apply(src, Vector3i::getY, defaultYValue),
+                (src, args, context) -> apply(src, Vector3i::getZ, defaultZValue));
     }
 
-    @Nullable
-    @Override
-    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-        // Shouldn't be called
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-        // The state of the args before we call the delegate
-        Object state = args.getState();
-        List<String> result = this.delegate.complete(src, args, context);
-        // Return if there already a result is or if the source does not use targeted blocks
-        // TODO: Why is there a empty string in the vector3d tab completation?
-        if ((!result.isEmpty() && result.size() != 1 && !result.get(0).isEmpty()) || !(src instanceof TargetingCommandSource)) {
-            return result;
-        }
-        TargetingCommandSource source = (TargetingCommandSource) src;
-        Optional<Vector3i> position = source.getTargetBlock();
-        // No position found
-        if (!position.isPresent()) {
-            return result;
-        }
-        // Reset the state to get the arg
-        args.setState(state);
-        if (!args.nextIfPresent().isPresent()) {
-            return result;
-        }
-        if (args.nextIfPresent().isPresent()) {
-            if (args.nextIfPresent().isPresent()) {
-                // Store the current state
-                state = args.getState();
-                if (args.nextIfPresent().isPresent()) {
-                    // We finished the vector3d, reset before the last arg
-                    args.setState(state);
-                    Lantern.getLogger().warn("Attempted to complete to many args, vector3d has only 3 components.");
-                } else {
-                    // The z is being completed
-                    return Collections.singletonList(position.get().getZ() + "");
-                }
-            } else {
-                // The y is being completed
-                return Collections.singletonList(position.get().getY() + "");
-            }
-        } else {
-            // The x is being completed
-            return Collections.singletonList(position.get().getX() + "");
-        }
-        return result;
+    private static List<String> apply(CommandSource src, Function<Vector3i, Integer> mapper, @Nullable Integer defaultValue) {
+        Integer value = src instanceof TargetingCommandSource ? ((TargetingCommandSource) src).getTargetBlock()
+                .map(mapper).orElse(defaultValue) : defaultValue;
+        return value == null ? Collections.emptyList() : Collections.singletonList(value.toString());
     }
 }

@@ -30,6 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3f;
+import org.lanternpowered.server.command.element.DelegateCompleterElement;
 import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -54,6 +55,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -66,10 +68,11 @@ public final class CommandParticle {
         return CommandSpec.builder()
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("type"), ParticleType.class),
-                        TargetedVector3dElement.of(Text.of("position")),
-                        GenericArguments.vector3d(Text.of("offset")),
-                        GenericArguments.doubleNum(Text.of("speed")),
-                        GenericArguments.optional(GenericArguments.integer(Text.of("count"))),
+                        TargetedVector3dElement.of(Text.of("position"), 0),
+                        // The default value should be 0 for x, y and z
+                        DelegateCompleterElement.defaultValues(GenericArguments.vector3d(Text.of("offset")), false, 0),
+                        DelegateCompleterElement.defaultValues(GenericArguments.doubleNum(Text.of("speed")), false, 1),
+                        GenericArguments.optional(DelegateCompleterElement.defaultValues(GenericArguments.integer(Text.of("count")), false, 1)),
                         GenericArguments.optional(new CommandElement(Text.of("mode")) {
                             @Nullable
                             @Override
@@ -79,8 +82,13 @@ public final class CommandParticle {
 
                             @Override
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-                                String arg = args.nextIfPresent().orElse("");
-                                return Arrays.asList("normal", "force").stream().filter(new StartsWithPredicate(arg)).collect(Collectors.toList());
+                                Optional<String> arg = args.nextIfPresent();
+                                if (arg.isPresent()) {
+                                    return Arrays.asList("normal", "force").stream()
+                                            .filter(new StartsWithPredicate(arg.get()))
+                                            .collect(Collectors.toList());
+                                }
+                                return Collections.emptyList();
                             }
                         }),
                         GenericArguments.optional(GenericArguments.player(Text.of("player"))),

@@ -27,6 +27,7 @@ package org.lanternpowered.server.command;
 
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.command.element.DelegateCompleterElement;
 import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.command.CommandResult;
@@ -47,10 +48,13 @@ public final class CommandPlaySound {
                         GenericArguments.catalogedElement(Text.of("sound"), SoundType.class),
                         GenericArguments.catalogedElement(Text.of("category"), SoundCategory.class),
                         GenericArguments.player(Text.of("player")),
-                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("position"))),
-                        GenericArguments.optional(GenericArguments.doubleNum(Text.of("volume"))),
-                        GenericArguments.optional(GenericArguments.doubleNum(Text.of("pitch"))),
-                        GenericArguments.optional(GenericArguments.doubleNum(Text.of("minimumVolume"))))
+                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("position"), 0)),
+                        GenericArguments.optional(DelegateCompleterElement.defaultValues(
+                                GenericArguments.doubleNum(Text.of("volume")), false, 1)),
+                        GenericArguments.optional(DelegateCompleterElement.defaultValues(
+                                GenericArguments.doubleNum(Text.of("pitch")), false, 1)),
+                        GenericArguments.optional(DelegateCompleterElement.defaultValues(
+                                GenericArguments.doubleNum(Text.of("minimumVolume")), false, 0)))
                 .permission(PERMISSION)
                 .executor((src, args) -> {
                     SoundType soundType = args.<SoundType>getOne("sound").get();

@@ -54,6 +54,13 @@ public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<
         @Nullable private Color color;
 
         @Override
+        public LanternParticleEffectBuilder.Colorable reset() {
+            this.color = null;
+            super.reset();
+            return this;
+        }
+
+        @Override
         public LanternParticleEffectBuilder.Colorable color(Color color) {
             this.color = checkNotNull(color, "color");
             return this;

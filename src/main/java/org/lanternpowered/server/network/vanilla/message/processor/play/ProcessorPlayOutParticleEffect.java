@@ -201,13 +201,13 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         final List<MessagePlayOutSpawnParticle> messages = new ArrayList<>(count);
         if (offset.equals(Vector3f.ZERO)) {
             for (int i = 0; i < count; i++) {
-                messages.add(new MessagePlayOutSpawnParticle(count, Vector3f.ZERO, offset, 1f, 0, extra));
+                messages.add(new MessagePlayOutSpawnParticle(type.getInternalId(), Vector3f.ZERO, offset, 1f, 0, extra));
             }
             return new CachedParticleEffect(messages, null);
         } else {
             final Vector3f value = new Vector3f(f0, f1, f2);
             for (int i = 0; i < count; i++) {
-                messages.add(new MessagePlayOutSpawnParticle(count, Vector3f.ZERO, value, 1f, 0, extra));
+                messages.add(new MessagePlayOutSpawnParticle(type.getInternalId(), Vector3f.ZERO, value, 1f, 0, extra));
             }
             return new CachedParticleEffect(messages, offset);
         }

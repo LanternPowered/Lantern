@@ -34,6 +34,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
@@ -274,7 +275,8 @@ public class LanternCommandManager implements CommandManager {
                 if (ex.shouldIncludeUsage()) {
                     final Optional<CommandMapping> mapping = this.dispatcher.get(argSplit[0], source);
                     if (mapping.isPresent()) {
-                        source.sendMessage(error(Text.of("Usage: ", argSplit[0], " ", mapping.get().getCallable().getUsage(source))));
+                        source.sendMessage(error(t("commands.generic.usage",
+                                t("/%s %s", argSplit[0], mapping.get().getCallable().getUsage(source)))));
                     }
                 }
             }

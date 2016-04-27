@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.command;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import com.google.common.collect.Collections2;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
@@ -48,8 +50,8 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.StartsWithPredicate;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +63,17 @@ import javax.annotation.Nullable;
 public final class CommandHelp {
 
     public static final String PERMISSION = "minecraft.commands.help";
+
+    private static final Field extendedDescriptionField;
+
+    static {
+        try {
+            extendedDescriptionField = CommandSpec.class.getDeclaredField("extendedDescription");
+            extendedDescriptionField.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static CommandSpec create() {
         final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
@@ -79,8 +92,8 @@ public final class CommandHelp {
                     public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                         final String nextArg = args.nextIfPresent().orElse("");
                         return Lantern.getGame().getCommandManager().getAliases().stream()
-                                    .filter(new StartsWithPredicate(nextArg))
-                                    .collect(Collectors.toList());
+                                .filter(new StartsWithPredicate(nextArg))
+                                .collect(Collectors.toList());
                     }
                 }))
                 .description(Text.of("View a list of all commands"))
@@ -92,11 +105,28 @@ public final class CommandHelp {
                         Optional<? extends CommandMapping> mapping = Sponge.getCommandManager().get(command.get());
                         if (mapping.isPresent()) {
                             CommandCallable callable = mapping.get().getCallable();
-                            Optional<? extends Text> desc = callable.getHelp(src);
-                            if (desc.isPresent()) {
+                            Optional<? extends Text> desc;
+                            // Format the command spec differently, lets include the actual
+                            // command name in the usage message
+                            if (callable instanceof CommandSpec) {
+                                Text.Builder builder = Text.builder();
+                                callable.getShortDescription(src).ifPresent(des -> builder.append(des, Text.NEW_LINE));
+                                builder.append(t("commands.generic.usage", t("/%s %s", command.get(), callable.getUsage(src))));
+                                Text extendedDescription;
+                                try {
+                                    // TODO: Why is there no method :(
+                                    extendedDescription = (Text) extendedDescriptionField.get(callable);
+                                } catch (IllegalAccessException e) {
+                                    throw new RuntimeException(e);
+                                }
+                                if (extendedDescription != null) {
+                                    builder.append(Text.NEW_LINE, extendedDescription);
+                                }
+                                src.sendMessage(builder.build());
+                            } else if ((desc = callable.getHelp(src)).isPresent()) {
                                 src.sendMessage(desc.get());
                             } else {
-                                src.sendMessage(Text.of("Usage: /", command.get(), callable.getUsage(src)));
+                                src.sendMessage(t("commands.generic.usage", t("/%s %s", command.get(), callable.getUsage(src))));
                             }
                             return CommandResult.success();
                         }

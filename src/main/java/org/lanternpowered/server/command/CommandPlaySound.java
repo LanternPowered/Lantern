@@ -54,7 +54,7 @@ public final class CommandPlaySound {
                         GenericArguments.optional(DelegateCompleterElement.defaultValues(
                                 GenericArguments.doubleNum(Text.of("pitch")), false, 1)),
                         GenericArguments.optional(DelegateCompleterElement.defaultValues(
-                                GenericArguments.doubleNum(Text.of("minimumVolume")), false, 0)))
+                                GenericArguments.doubleNum(Text.of("minimum-volume")), false, 0)))
                 .permission(PERMISSION)
                 .executor((src, args) -> {
                     SoundType soundType = args.<SoundType>getOne("sound").get();
@@ -65,7 +65,7 @@ public final class CommandPlaySound {
                     // Volume greater then 1 will increase the distance the sound can be heared
                     double soundDistance = volume <= 1.0 ? 16.0 : volume * 16.0;
                     double pitch = GenericMath.clamp(args.<Double>getOne("pitch").orElse(1.0), 0.5, 2.0);
-                    double minVolume = GenericMath.clamp(args.<Double>getOne("minimumVolume").orElse(0.0), 0.0, 1.0);
+                    double minVolume = GenericMath.clamp(args.<Double>getOne("minimum-volume").orElse(0.0), 0.0, 1.0);
 
                     Vector3d playerPos = player.getPosition();
                     Vector3d position = args.<Vector3d>getOne("position").orElse(playerPos);

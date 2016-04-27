@@ -48,8 +48,24 @@ import javax.annotation.Nullable;
  */
 public class DelegateCompleterElement extends CommandElement {
 
-    public static DelegateCompleterElement vector3d(CommandElement element, CommandElementCompleter xCompletor,
-            CommandElementCompleter yCompletor, CommandElementCompleter zCompletor) {
+    public static DelegateCompleterElement vector3d(CommandElement element, @Nullable Double defaultValue) {
+        return vector3d(element, defaultValue, defaultValue, defaultValue);
+    }
+
+    public static DelegateCompleterElement vector3d(CommandElement element, @Nullable Double defaultX,
+            @Nullable Double defaultY, @Nullable Double defaultZ) {
+        return vector3d(element,
+                (src, args, context) -> applyVector3d(defaultX),
+                (src, args, context) -> applyVector3d(defaultY),
+                (src, args, context) -> applyVector3d(defaultZ));
+    }
+
+    private static List<String> applyVector3d(@Nullable Double defaultValue) {
+        return defaultValue == null ? Collections.emptyList() : Collections.singletonList(defaultValue.toString());
+    }
+
+    public static DelegateCompleterElement vector3d(CommandElement element, CommandElementCompleter xCompleter,
+            CommandElementCompleter yCompleter, CommandElementCompleter zCompleter) {
         return new DelegateCompleterElement(element, (src, args, context) -> {
             if (!args.nextIfPresent().isPresent()) {
                 return Collections.emptyList();
@@ -64,15 +80,15 @@ public class DelegateCompleterElement extends CommandElement {
                         Lantern.getLogger().warn("Attempted to complete to many args, vector3d has only 3 components.");
                     } else {
                         // The z is being completed
-                        return zCompletor.complete(src, args, context);
+                        return zCompleter.complete(src, args, context);
                     }
                 } else {
                     // The y is being completed
-                    return yCompletor.complete(src, args, context);
+                    return yCompleter.complete(src, args, context);
                 }
             } else {
                 // The x is being completed
-                return xCompletor.complete(src, args, context);
+                return xCompleter.complete(src, args, context);
             }
             return Collections.emptyList();
         });

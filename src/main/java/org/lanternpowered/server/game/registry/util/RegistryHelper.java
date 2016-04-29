@@ -25,52 +25,62 @@
  */
 package org.lanternpowered.server.game.registry.util;
 
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
-import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 @NonnullByDefault
 public final class RegistryHelper {
 
-    public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping, Collection<String> ignoredFields) {
-        boolean mappingSuccess = true;
-        for (Field field : apiClass.getDeclaredFields()) {
-            if (ignoredFields.contains(field.getName())) {
-                continue;
-            }
-            try {
-                if (!mapping.containsKey(field.getName().toLowerCase())) {
-                    continue;
-                }
-                ReflectionHelper.setField(field, null, mapping.get(field.getName().toLowerCase()));
-            } catch (Exception e) {
-                e.printStackTrace();
-                mappingSuccess = false;
-            }
-        }
-        return mappingSuccess;
+    public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping) {
+        return mapFields(apiClass, mapping, null);
+    }
+
+    public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping, @Nullable Set<String> ignoredFields) {
+        return mapFields(apiClass, fieldName -> mapping.get(fieldName.toLowerCase(Locale.ENGLISH)), ignoredFields, false);
+    }
+
+    public static boolean mapFieldsIgnoreWarning(Class<?> apiClass, Map<String, ?> mapping) {
+        return mapFields(apiClass, fieldname -> mapping.get(fieldname.toLowerCase(Locale.ENGLISH)), null, true);
     }
 
     public static boolean mapFields(Class<?> apiClass, Function<String, ?> mapFunction) {
+        return mapFields(apiClass, mapFunction, null, false);
+    }
+
+    public static boolean mapFields(Class<?> apiClass, Function<String, ?> mapFunction, @Nullable Set<String> ignoredFields) {
+        return mapFields(apiClass, mapFunction, ignoredFields, false);
+    }
+
+    public static boolean mapFields(Class<?> apiClass, Function<String, ?> mapFunction, @Nullable Set<String> ignoredFields, boolean ignore) {
         boolean mappingSuccess = true;
-        for (Field field : apiClass.getDeclaredFields()) {
+        for (Field f : apiClass.getDeclaredFields()) {
+            if (ignoredFields != null && ignoredFields.contains(f.getName())) {
+                continue;
+            }
             try {
-                ReflectionHelper.setField(field, null, mapFunction.apply(field.getName()));
+                Object value = mapFunction.apply(f.getName());
+                if (value == null && !ignore) {
+                    Lantern.getLogger().warn("Skipping {}.{}", f.getDeclaringClass().getName(), f.getName());
+                    continue;
+                }
+                ReflectionHelper.setField(f, null, value);
             } catch (Exception e) {
-                e.printStackTrace();
+                if (!ignore) {
+                    Lantern.getLogger().error("Error while mapping {}.{}", f.getDeclaringClass().getName(), f.getName(), e);
+                }
                 mappingSuccess = false;
             }
         }
         return mappingSuccess;
-    }
-
-    public static boolean mapFields(Class<?> apiClass, Map<String, ?> mapping) {
-        return mapFields(apiClass, mapping, Collections.emptyList());
     }
 
     public static boolean setFactory(Class<?> apiClass, Object factory) {
@@ -78,7 +88,7 @@ public final class RegistryHelper {
             ReflectionHelper.setField(apiClass.getDeclaredField("factory"), null, factory);
             return true;
         } catch (Exception e) {
-            e.printStackTrace();
+            Lantern.getLogger().error("Error while setting factory on {}", apiClass, e);
             return false;
         }
     }

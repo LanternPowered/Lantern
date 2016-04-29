@@ -32,6 +32,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
@@ -489,7 +490,7 @@ public class LanternGameRegistry implements GameRegistry {
                     if (data.mappings.isEmpty()) {
                         return;
                     }
-                    RegistryHelper.mapFields(data.target, data.mappings);
+                    RegistryHelper.mapFields(data.target, data.mappings, data.ignoredFields);
                 }
             }
         } catch (Exception e) {
@@ -501,8 +502,10 @@ public class LanternGameRegistry implements GameRegistry {
 
         private final Map<String, ?> mappings;
         private final Class<?> target;
+        @Nullable private final Set<String> ignoredFields;
 
-        public CatalogMapData(Class<?> target, Map<String, ?> mappings) {
+        public CatalogMapData(Class<?> target, Map<String, ?> mappings, @Nullable Set<String> ignoredFields) {
+            this.ignoredFields = ignoredFields;
             this.mappings = mappings;
             this.target = target;
         }
@@ -528,7 +531,8 @@ public class LanternGameRegistry implements GameRegistry {
                                 module.getClass().getCanonicalName());
                     }
                 }
-                return new CatalogMapData(annotation.value(), mappings);
+                Set<String> ignored = annotation.ignoredFields().length == 0 ? null : Sets.newHashSet(annotation.ignoredFields());
+                return new CatalogMapData(annotation.value(), mappings, ignored);
             }
         }
         return null;

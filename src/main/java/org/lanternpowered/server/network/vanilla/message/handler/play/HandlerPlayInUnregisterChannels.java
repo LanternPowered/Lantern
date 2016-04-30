@@ -28,6 +28,11 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.network.ChannelRegistrationEvent;
 
 import java.util.Set;
 
@@ -35,7 +40,15 @@ public final class HandlerPlayInUnregisterChannels implements Handler<MessagePla
 
     @Override
     public void handle(NetworkContext context, MessagePlayInOutUnregisterChannels message) {
-        Set<String> channels = message.getChannels();
-        context.getSession().getRegisteredChannels().removeAll(channels);
+        final Set<String> channels = message.getChannels();
+        final Set<String> registeredChannels = context.getSession().getRegisteredChannels();
+
+        for (String channel : channels) {
+            if (registeredChannels.remove(channel)) {
+                ChannelRegistrationEvent.Unregister event  = SpongeEventFactory.createChannelRegistrationEventUnregister(
+                        Cause.of(NamedCause.source(context.getSession())), channel);
+                Sponge.getEventManager().post(event);
+            }
+        }
     }
 }

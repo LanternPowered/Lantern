@@ -44,7 +44,9 @@ import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -60,7 +62,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
     private final class IndexedMessageRegistration {
 
         final Class<? extends Message> messageType;
-        @Nullable MessageHandler<? extends Message> handler;
+        final List<MessageHandler<? extends Message>> handlers = new ArrayList<>();
         @Nullable Byte opcode;
 
         IndexedMessageRegistration(Class<? extends Message> messageType) {
@@ -113,25 +115,25 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
 
     private <M extends Message> void applyHandler(RegistrationLookup lookup, Class<M> messageClass, MessageHandler<M> handler) {
         final IndexedMessageRegistration registration = lookup.classToRegistration.computeIfAbsent(messageClass, IndexedMessageRegistration::new);
-        registration.handler = handler;
+        registration.handlers.add(handler);
     }
 
     private <M extends Message> void register(Class<M> messageClass, int messageId, @Nullable Platform.Type side,
             @Nullable MessageHandler<M> handler) {
         checkNotNull(messageClass, "messageClass");
-        checkArgument(messageId >= 0 && messageId <= 255, "messageId (" + messageId + ") must scale between 0 and 255");
+        checkArgument(messageId >= 0 && messageId <= 255, "MessageId (" + messageId + ") must scale between 0 and 255");
         final byte messageId0 = (byte) messageId;
         if (side == null) {
             this.validate(messageClass, messageId0, Platform.Type.CLIENT);
             this.validate(messageClass, messageId0, Platform.Type.SERVER);
         } else {
-            checkArgument(side.isKnown(), "platform side must be known");
+            checkArgument(side.isKnown(), "Platform side must be known");
             this.validate(messageClass, messageId0, side);
         }
         IndexedMessageRegistration registration = new IndexedMessageRegistration(messageClass);
         registration.opcode = messageId0;
         if (handler != null) {
-            registration.handler = handler;
+            registration.handlers.add(handler);
         }
         if (side == null) {
             this.applyRegistration(this.getRegistrations(Platform.Type.CLIENT), messageClass, messageId0, handler);
@@ -147,7 +149,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         lookup.opcodeToRegistration.put(messageId, registration);
         registration.opcode = messageId;
         if (handler != null) {
-            registration.handler = handler;
+            registration.handlers.add(handler);
         }
     }
 
@@ -159,7 +161,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         } catch (SecurityException e) {
             e.printStackTrace();
         }
-        checkState(constructor != null, messageClass.getName() + " is missing a empty public contructor.");
+        checkState(constructor != null, "%s is missing a empty public constructor", messageClass.getName());
         RegistrationLookup registrations = this.getRegistrations(Platform.Type.CLIENT);
         checkState(!registrations.classToRegistration.containsKey(messageClass) ||
                 registrations.classToRegistration.get(messageClass).opcode == null, "MessageClass (" +
@@ -176,11 +178,12 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
     }
 
     private void encode(Message message, ByteBuf buf) {
-        LanternChannelBuf content = new LanternChannelBuf(Unpooled.buffer());
-        message.writeTo(content);
+        IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER).classToRegistration.get(message.getClass());
+        checkArgument(registration != null, "The specified message type %s is not registered", message.getClass().getName());
 
-        buf.writeByte((byte) this.getRegistrations(Platform.Type.SERVER).classToRegistration
-                .get(message.getClass()).opcode);
+        final LanternChannelBuf content = new LanternChannelBuf(Unpooled.buffer());
+        message.writeTo(content);
+        buf.writeByte(registration.opcode);
         buf.writeBytes(content.getDelegate());
     }
 
@@ -215,8 +218,8 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER)
                 .opcodeToRegistration.get(opcode);
         if (registration == null) {
-            Lantern.getLogger().warn("Received unexpected message type with id: " + opcode +
-                    " in the indexed message channel: " + this.name);
+            Lantern.getLogger().warn("Received unexpected message type with id: {}" +
+                    " in the indexed message channel: {}", opcode, this.name);
             return;
         }
 
@@ -224,15 +227,18 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         try {
             message = registration.messageType.newInstance();
         } catch (Exception e) {
-            Lantern.getLogger().error("Failed to instantiate message: " + registration.messageType.getName(), e);
+            Lantern.getLogger().error("Failed to instantiate message: {}", registration.messageType.getName(), e);
             return;
         }
 
         LanternChannelBuf content = new LanternChannelBuf(buf.copy());
-        message.readFrom(content);
-
-        if (registration.handler != null) {
-            ((MessageHandler) registration.handler).handleMessage(message, connection, Platform.Type.SERVER);
+        try {
+            message.readFrom(content);
+        } catch (Exception e) {
+            Lantern.getLogger().error("Failed to deserialize message: {}", registration.messageType.getName(), e);
+            return;
         }
+
+        registration.handlers.forEach(handler -> ((MessageHandler) handler).handleMessage(message, connection, Platform.Type.SERVER));
     }
 }

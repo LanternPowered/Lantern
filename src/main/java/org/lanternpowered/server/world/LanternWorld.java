@@ -38,12 +38,14 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
+import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.data.world.MoonPhase;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
@@ -88,6 +90,7 @@ import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -117,8 +120,10 @@ import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -161,6 +166,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // All the players in this world
     private final Set<LanternPlayer> players = Sets.newConcurrentHashSet();
 
+    // All the players in this world
+    private final Collection<Player> unmodifiablePlayers = Collections.unmodifiableCollection(this.players);
+
     // The chunk manager of this world
     private final LanternChunkManager chunkManager;
 
@@ -189,14 +197,17 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private final Context worldContext;
 
-    public LanternWorld(LanternGame game, WorldConfig worldConfig, Path worldFolder,
+    private final Path directory;
+
+    public LanternWorld(LanternGame game, WorldConfig worldConfig, Path directory,
             Scoreboard scoreboard, LanternWorldProperties properties) {
+        this.directory = directory;
         this.worldConfig = worldConfig;
         this.scoreboard = scoreboard;
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(worldFolder, properties);
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, properties);
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type
@@ -212,10 +223,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Create the new dimension instance
         this.dimension = dimensionType.newDimension(this);
         // Create a new world generator
-        final WorldGenerator worldGenerator = properties.generatorType.createGenerator(this);
+        final WorldGenerator worldGenerator = properties.getGeneratorType().createGenerator(this);
         // Finally, create the chunk manager
         this.chunkManager = new LanternChunkManager(this.game, this, this.worldConfig, chunkLoadService,
-                chunkIOService, worldGenerator, worldFolder);
+                chunkIOService, worldGenerator, directory);
         this.worldContext = new Context(Context.WORLD_KEY, this.getName());
     }
 
@@ -232,9 +243,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         if (this.properties.isInitialized()) {
             return;
         }
-        this.properties.setInitialized();
+        this.properties.setInitialized(true);
     }
-
 
     /**
      * Gets the {@link Scoreboard} of this world.
@@ -298,9 +308,19 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     /**
      * Gets the players that are currently in this world.
      * 
-     * @return the players
+     * @return The players
      */
-    public Set<LanternPlayer> getPlayers() {
+    @Override
+    public Collection<Player> getPlayers() {
+        return this.unmodifiablePlayers;
+    }
+
+    /**
+     * Gets a raw list with all the players that are currently in this world.
+     *
+     * @return The players
+     */
+    public Set<LanternPlayer> getRawPlayers() {
         return this.players;
     }
 
@@ -389,6 +409,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public MutableBlockVolumeWorker<? extends World> getBlockWorker() {
         return new LanternMutableBlockVolumeWorker<>(this);
+    }
+
+    @Override
+    public boolean save() throws IOException {
+        this.chunkManager.save();
+        // Save the scoreboard
+        ScoreboardIO.write(this.directory, this.scoreboard);
+        // Save the world properties
+        Lantern.getServer().getWorldManager().saveWorldProperties(this.properties);
+        return true; // TODO
     }
 
     @Override
@@ -770,14 +800,14 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position) {
         checkNotNull(particleEffect, "particleEffect");
         checkNotNull(position, "position");
-        this.spawnParticles(this.getPlayers().iterator(), particleEffect, position);
+        this.spawnParticles(this.players.iterator(), particleEffect, position);
     }
 
     @Override
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position, int radius) {
         checkNotNull(particleEffect, "particleEffect");
         checkNotNull(position, "position");
-        this.spawnParticles(this.getPlayers().stream().filter(
+        this.spawnParticles(this.players.stream().filter(
                 player -> player.getLocation().getPosition().distanceSquared(position) < radius * radius).iterator(),
                 particleEffect, position);
     }
@@ -969,6 +999,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public Path getDirectory() {
+        return this.directory;
+    }
+
+    @Override
     public Location<World> getSpawnLocation() {
         return new Location<>(this, this.properties.getSpawnPosition());
     }
@@ -1033,7 +1068,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     public void broadcast(Supplier<Message> message, @Nullable Predicate<LanternPlayer> filter) {
-        Set<LanternPlayer> players = this.getPlayers();
+        Set<LanternPlayer> players = this.players;
         if (filter != null) {
             players = players.stream().filter(filter).collect(Collectors.toSet());
         }

@@ -28,6 +28,7 @@ package org.lanternpowered.server.world.extent;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
@@ -294,6 +295,11 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
+    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+        return false;
+    }
+
+    @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         this.checkRange(x, y, z);
         return this.extent.getScheduledUpdates(x, y, z);
@@ -529,6 +535,18 @@ public class ExtentViewDownsize implements AbstractExtent {
     public Optional<Entity> createEntity(EntityType type, Vector3i position) {
         this.checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.createEntity(type, position);
+    }
+
+    @Override
+    public Optional<Entity> getEntity(UUID uuid) {
+        Optional<Entity> optEntity = this.extent.getEntity(uuid);
+        if (optEntity.isPresent()) {
+            Vector3d pos = ((LanternEntity) optEntity.get()).getPosition();
+            if (VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax)) {
+                return optEntity;
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

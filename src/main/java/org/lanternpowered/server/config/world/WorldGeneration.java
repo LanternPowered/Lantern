@@ -28,6 +28,8 @@ package org.lanternpowered.server.config.world;
 import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.GeneratorTypes;
 
 import java.util.List;
 import java.util.Random;
@@ -45,6 +47,9 @@ public final class WorldGeneration {
             "Whether the spawn should be generated when the world loads,\n" +
             "otherwise will the spawn generate when a player joins.")
     private boolean generateSpawnOnLoad = true;
+
+    @Setting(value = "type")
+    private GeneratorType generatorType = GeneratorTypes.OVERWORLD;
 
     @Setting(value = "view-distance")
     private int viewDistance = 10;
@@ -71,5 +76,13 @@ public final class WorldGeneration {
 
     public int getViewDistance() {
         return this.viewDistance;
+    }
+
+    public GeneratorType getGeneratorType() {
+        return this.generatorType;
+    }
+
+    public void setGeneratorType(GeneratorType generatorType) {
+        this.generatorType = generatorType;
     }
 }

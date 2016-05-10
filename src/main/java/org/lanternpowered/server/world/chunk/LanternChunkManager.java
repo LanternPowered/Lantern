@@ -1375,6 +1375,18 @@ public final class LanternChunkManager {
         this.tickets.remove(ticket);
     }
 
+    public void save() {
+        try {
+            LanternLoadingTicketIO.save(this.worldFolder, this.tickets);
+        } catch (IOException e) {
+            this.game.getLogger().warn("An error occurred while saving the chunk loading tickets", e);
+        }
+        for (Entry<Vector2i, LanternChunk> entry : this.loadedChunks.entrySet()) {
+            // Save the chunk
+            this.save(entry.getValue());
+        }
+    }
+
     /**
      * Shuts the chunk manager down, all the chunks will
      * be saved in the process.

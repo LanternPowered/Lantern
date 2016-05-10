@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.game.registry.RegistryModuleHelper.validateIdentifier;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
@@ -39,21 +38,23 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.gen.WorldGeneratorModifiers;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public final class GeneratorModifierRegistryModule implements AdditionalCatalogRegistryModule<WorldGeneratorModifier>,
         AlternateCatalogRegistryModule<WorldGeneratorModifier> {
 
-    @RegisterCatalog(WorldGeneratorModifiers.class) private final Map<String, WorldGeneratorModifier> generatorModifiers = Maps.newHashMap();
+    @RegisterCatalog(WorldGeneratorModifiers.class)
+    private final Map<String, WorldGeneratorModifier> generatorModifiers = new HashMap<>();
 
     @Override
     public Map<String, WorldGeneratorModifier> provideCatalogMap() {
-        Map<String, WorldGeneratorModifier> mappings = Maps.newHashMap();
-        for (WorldGeneratorModifier type : this.generatorModifiers.values()) {
-            mappings.put(type.getName(), type);
+        Map<String, WorldGeneratorModifier> provided = new HashMap<>();
+        for (Map.Entry<String, WorldGeneratorModifier> entry : this.generatorModifiers.entrySet()) {
+            provided.put(entry.getKey().replace("minecraft:", "").replace("sponge:", ""), entry.getValue());
         }
-        return mappings;
+        return provided;
     }
 
     @Override

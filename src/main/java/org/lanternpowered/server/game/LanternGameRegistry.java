@@ -95,7 +95,9 @@ import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModu
 import org.lanternpowered.server.game.registry.type.world.DimensionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.SerializationBehaviorRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.WorldCreationSettingsRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
@@ -196,6 +198,7 @@ import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -274,7 +277,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
-                .registerModule(GameMode.class, new GameModeRegistryModule())
+                .registerModule(GameMode.class, GameModeRegistryModule.getInstance())
                 .registerModule(ItemType.class, new ItemRegistryModule())
                 .registerModule(LanternCollisionRule.class, new CollisionRuleRegistryModule()) // TODO: Use the api class once available
                 .registerModule(Criterion.class, new CriterionRegistryModule())
@@ -295,11 +298,13 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(Rotation.class, new RotationRegistryModule())
                 .registerModule(BiomeType.class, new BiomeRegistryModule())
                 .registerModule(new DefaultGameRulesRegistryModule())
-                .registerModule(Difficulty.class, new DifficultyRegistryModule())
+                .registerModule(Difficulty.class, DifficultyRegistryModule.getInstance())
                 .registerModule(DimensionType.class, new DimensionTypeRegistryModule())
                 .registerModule(WorldGeneratorModifier.class, new GeneratorModifierRegistryModule())
                 .registerModule(GeneratorType.class, new GeneratorTypeRegistryModule())
+                .registerModule(SerializationBehavior.class, new SerializationBehaviorRegistryModule())
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
+                .registerModule(WorldCreationSettings.class, new WorldCreationSettingsRegistryModule())
                 ;
         this.registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)

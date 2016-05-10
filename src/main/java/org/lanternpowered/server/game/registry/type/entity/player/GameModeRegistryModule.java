@@ -30,6 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -38,28 +40,37 @@ import org.spongepowered.api.registry.util.RegisterCatalog;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
 public final class GameModeRegistryModule implements CatalogRegistryModule<GameMode> {
 
+    public static GameModeRegistryModule getInstance() {
+        return Holder.INSTANCE;
+    }
+
     @RegisterCatalog(GameModes.class)
     private final Map<String, GameMode> gameModes = Maps.newHashMap();
+    private final TIntObjectMap<GameMode> gameModesByInternalId = new TIntObjectHashMap<>();
 
     @Override
     public void registerDefaults() {
-        List<GameMode> types = Lists.newArrayList();
+        List<LanternGameMode> types = Lists.newArrayList();
         types.add(new LanternGameMode("not_set", -1));
         types.add(new LanternGameMode("survival", 0));
         types.add(new LanternGameMode("creative", 1));
         types.add(new LanternGameMode("adventure", 2));
         types.add(new LanternGameMode("spectator", 3));
-        types.forEach(type -> this.gameModes.put(type.getId(), type));
+        types.forEach(type -> {
+            this.gameModes.put(type.getId(), type);
+            this.gameModesByInternalId.put(type.getInternalId(), type);
+        });
     }
 
     @Override
     public Optional<GameMode> getById(String id) {
-        return Optional.ofNullable(this.gameModes.get(checkNotNull(id).toLowerCase()));
+        return Optional.ofNullable(this.gameModes.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
     }
 
     @Override
@@ -67,4 +78,11 @@ public final class GameModeRegistryModule implements CatalogRegistryModule<GameM
         return ImmutableSet.copyOf(this.gameModes.values());
     }
 
+    public Optional<GameMode> getByInternalId(int internalId) {
+        return Optional.ofNullable(this.gameModesByInternalId.get(internalId));
+    }
+
+    private static final class Holder {
+        private static final GameModeRegistryModule INSTANCE = new GameModeRegistryModule();
+    }
 }

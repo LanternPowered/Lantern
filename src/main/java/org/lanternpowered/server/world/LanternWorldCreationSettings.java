@@ -29,7 +29,7 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.GeneratorType;
-import org.spongepowered.api.world.TeleporterAgent;
+import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
@@ -38,6 +38,7 @@ import java.util.Collection;
 
 public final class LanternWorldCreationSettings implements WorldCreationSettings {
 
+    private final String id;
     private final String name;
     private final GameMode gameMode;
     private final Difficulty difficulty;
@@ -45,14 +46,14 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     private final GeneratorType generatorType;
     private final Collection<WorldGeneratorModifier> generatorModifiers;
     private final DataContainer generatorSettings;
-    private final TeleporterAgent teleporterAgent;
+    private final SerializationBehavior serializationBehavior;
 
     private final boolean hardcore;
     private final boolean enabled;
     private final boolean loadsOnStartup;
     private final boolean keepsSpawnLoaded;
     private final boolean usesMapFeatures;
-    private final boolean bonusChestEnabled;
+    private final boolean generateBonusChest;
     private final boolean commandsAllowed;
     private final boolean waterEvaporates;
     private final boolean allowPlayerRespawns;
@@ -62,20 +63,20 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     private final int buildHeight;
     private final long seed;
 
-    LanternWorldCreationSettings(String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
-            Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, TeleporterAgent teleporterAgent, 
-            Difficulty difficulty, boolean hardcore, boolean enabled, boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures,
-            boolean pvpEnabled, boolean bonusChestEnabled, boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns,
-            boolean generateSpawnOnLoad, long seed, int buildHeight) {
+    LanternWorldCreationSettings(String id, String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
+            Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, Difficulty difficulty,
+            SerializationBehavior serializationBehavior, boolean hardcore, boolean enabled, boolean loadsOnStartup,
+            boolean keepsSpawnLoaded, boolean usesMapFeatures, boolean pvpEnabled, boolean generateBonusChest, boolean commandsAllowed,
+            boolean waterEvaporates, boolean allowPlayerRespawns, boolean generateSpawnOnLoad, long seed, int buildHeight) {
+        this.serializationBehavior = serializationBehavior;
         this.generateSpawnOnLoad = generateSpawnOnLoad;
         this.allowPlayerRespawns = allowPlayerRespawns;
         this.generatorModifiers = generatorModifiers;
         this.generatorSettings = generatorSettings;
-        this.bonusChestEnabled = bonusChestEnabled;
+        this.generateBonusChest = generateBonusChest;
         this.keepsSpawnLoaded = keepsSpawnLoaded;
         this.usesMapFeatures = usesMapFeatures;
         this.commandsAllowed = commandsAllowed;
-        this.teleporterAgent = teleporterAgent;
         this.waterEvaporates = waterEvaporates;
         this.loadsOnStartup = loadsOnStartup;
         this.dimensionType = dimensionType;
@@ -88,6 +89,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
         this.enabled = enabled;
         this.name = name;
         this.seed = seed;
+        this.id = id;
     }
 
     public Difficulty getDifficulty() {
@@ -95,7 +97,12 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     }
 
     @Override
-    public String getWorldName() {
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getName() {
         return this.name;
     }
 
@@ -150,17 +157,17 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     }
 
     @Override
-    public boolean commandsAllowed() {
+    public boolean areCommandsAllowed() {
         return this.commandsAllowed;
+    }
+
+    @Override
+    public boolean doesGenerateBonusChest() {
+        return this.generateBonusChest;
     }
 
     public boolean waterEvaporates() {
         return this.waterEvaporates;
-    }
-
-    @Override
-    public boolean bonusChestEnabled() {
-        return this.bonusChestEnabled;
     }
 
     @Override
@@ -173,8 +180,9 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
         return this.generatorSettings.copy();
     }
 
-    public TeleporterAgent getTeleporterAgent() {
-        return this.teleporterAgent;
+    @Override
+    public SerializationBehavior getSerializationBehavior() {
+        return this.serializationBehavior;
     }
 
     public int getBuildHeight() {

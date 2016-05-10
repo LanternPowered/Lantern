@@ -30,23 +30,41 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.world.gen.LanternGeneratorTypeNether;
 import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
+import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.CatalogRegistryModule;
+import org.spongepowered.api.registry.util.RegisterCatalog;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.api.world.WorldCreationSettings;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public final class GeneratorTypeRegistryModule implements CatalogRegistryModule<GeneratorType> {
+@RegistrationDependency({ BlockRegistryModule.class, BlockStateRegistryModule.class })
+public final class GeneratorTypeRegistryModule implements CatalogRegistryModule<GeneratorType>, AlternateCatalogRegistryModule<GeneratorType> {
 
+    @RegisterCatalog(GeneratorTypes.class)
     private final Map<String, GeneratorType> generatorTypes = Maps.newHashMap();
+
+    @Override
+    public Map<String, GeneratorType> provideCatalogMap() {
+        Map<String, GeneratorType> provided = new HashMap<>();
+        for (Map.Entry<String, GeneratorType> entry : this.generatorTypes.entrySet()) {
+            provided.put(entry.getKey().replace("minecraft:", "").replace("sponge:", ""), entry.getValue());
+        }
+        return provided;
+    }
 
     @Override
     public void registerDefaults() {
@@ -55,13 +73,13 @@ public final class GeneratorTypeRegistryModule implements CatalogRegistryModule<
         types.add(new FlatGeneratorType("minecraft", "flat"));
         types.add(new DebugGeneratorType("minecraft", "debug"));
         types.add(new SkylandsGeneratorType("sponge", "skylands"));
-
-        Map<String, GeneratorType> mappings = Maps.newHashMap();
-        for (GeneratorType type : types) {
-            this.generatorTypes.put(type.getId(), type);
-            mappings.put(type.getName(), type);
-        }
-        RegistryHelper.mapFields(GeneratorTypes.class, mappings);
+        // TODO: Add the other generator types
+        types.add(new FlatGeneratorType("minecraft", "default"));
+        types.add(new FlatGeneratorType("minecraft", "overworld"));
+        types.add(new FlatGeneratorType("minecraft", "the_end"));
+        types.add(new FlatGeneratorType("minecraft", "large_biomes"));
+        types.add(new FlatGeneratorType("minecraft", "amplified"));
+        types.forEach(type -> this.generatorTypes.put(type.getId(), type));
     }
 
     @Override

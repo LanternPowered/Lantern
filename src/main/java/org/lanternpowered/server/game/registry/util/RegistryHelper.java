@@ -69,7 +69,7 @@ public final class RegistryHelper {
             try {
                 Object value = mapFunction.apply(f.getName());
                 if (value == null && !ignore) {
-                    Lantern.getLogger().warn("Skipping {}.{}", f.getDeclaringClass().getName(), f.getName());
+                    // Lantern.getLogger().warn("Skipping {}.{}", f.getDeclaringClass().getName(), f.getName());
                     continue;
                 }
                 ReflectionHelper.setField(f, null, value);

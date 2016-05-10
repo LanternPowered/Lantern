@@ -92,7 +92,7 @@ public final class PlayerInteractionHandler {
         if (world == null) {
             return;
         }
-        Set<LanternPlayer> players = this.player.getWorld().getPlayers();
+        Set<LanternPlayer> players = this.player.getWorld().getRawPlayers();
         // Update for all the players except the breaker
         if (players.size() - 1 <= 0) {
             MessagePlayOutBlockBreakAnimation message = new MessagePlayOutBlockBreakAnimation(

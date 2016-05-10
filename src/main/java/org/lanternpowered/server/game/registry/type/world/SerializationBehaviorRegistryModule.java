@@ -29,61 +29,40 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import org.lanternpowered.server.world.difficulty.LanternDifficulty;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.lanternpowered.server.world.LanternSerializationBehavior;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.world.difficulty.Difficulties;
-import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.SerializationBehavior;
+import org.spongepowered.api.world.SerializationBehaviors;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public final class DifficultyRegistryModule implements CatalogRegistryModule<Difficulty> {
+public final class SerializationBehaviorRegistryModule implements CatalogRegistryModule<SerializationBehavior> {
 
-    public static DifficultyRegistryModule getInstance() {
-        return Holder.INSTANCE;
-    }
-
-    @RegisterCatalog(Difficulties.class)
-    private final Map<String, Difficulty> difficulties = new HashMap<>();
-    private final TIntObjectMap<Difficulty> difficultiesByInternalId = new TIntObjectHashMap<>();
+    @RegisterCatalog(SerializationBehaviors.class) private final Map<String, SerializationBehavior> serializationBehaviors = new HashMap<>();
 
     @Override
     public void registerDefaults() {
-        List<LanternDifficulty> types = Lists.newArrayList();
-        types.add(new LanternDifficulty("peaceful", 0));
-        types.add(new LanternDifficulty("easy", 1));
-        types.add(new LanternDifficulty("normal", 2));
-        types.add(new LanternDifficulty("hard", 3));
-        types.forEach(type -> {
-            this.difficulties.put(type.getId(), type);
-            this.difficultiesByInternalId.put(type.getInternalId(), type);
-        });
+        List<SerializationBehavior> types = Lists.newArrayList();
+        types.add(new LanternSerializationBehavior("automatic", "Automatic"));
+        types.add(new LanternSerializationBehavior("manual", "Manual"));
+        types.add(new LanternSerializationBehavior("none", "None"));
+        types.forEach(type -> this.serializationBehaviors.put(type.getId(), type));
     }
 
     @Override
-    public Optional<Difficulty> getById(String id) {
-        return Optional.ofNullable(this.difficulties.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
+    public Optional<SerializationBehavior> getById(String id) {
+        return Optional.ofNullable(this.serializationBehaviors.get(checkNotNull(id).toLowerCase()));
     }
 
     @Override
-    public Collection<Difficulty> getAll() {
-        return ImmutableSet.copyOf(this.difficulties.values());
+    public Collection<SerializationBehavior> getAll() {
+        return ImmutableSet.copyOf(this.serializationBehaviors.values());
     }
 
-    public Optional<Difficulty> getByInternalId(int internalId) {
-        return Optional.ofNullable(this.difficultiesByInternalId.get(internalId));
-    }
-
-    private static final class Holder {
-        private static final DifficultyRegistryModule INSTANCE = new DifficultyRegistryModule();
-    }
 }
+

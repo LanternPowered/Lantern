@@ -144,7 +144,7 @@ public final class CommandParticle {
                     if (args.hasAny("player")) {
                         args.<LanternPlayer>getOne("player").get().getConnection().send(message);
                     } else {
-                        for (LanternPlayer player : ((LanternWorldProperties) world).getWorld().get().getPlayers()) {
+                        for (LanternPlayer player : ((LanternWorldProperties) world).getWorld().get().getRawPlayers()) {
                             player.getConnection().send(message);
                         }
                     }

@@ -1019,6 +1019,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
+    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+        return false;
+    }
+
+    @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         this.checkVolumeBounds(x, y, z);
         if (!this.loaded) {

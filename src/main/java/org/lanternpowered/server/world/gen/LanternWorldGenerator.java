@@ -54,8 +54,7 @@ public final class LanternWorldGenerator implements WorldGenerator {
     private volatile GenerationPopulator baseGenerationPopulator;
     private volatile BiomeGenerator biomeGenerator;
 
-    public LanternWorldGenerator(GenerationPopulator baseGenerationPopulator,
-            BiomeGenerator biomeGenerator) {
+    public LanternWorldGenerator(GenerationPopulator baseGenerationPopulator, BiomeGenerator biomeGenerator) {
         this.baseGenerationPopulator = checkNotNull(baseGenerationPopulator, "baseGenerationPopulator");
         this.biomeGenerator = checkNotNull(biomeGenerator, "biomeGenerator");
     }

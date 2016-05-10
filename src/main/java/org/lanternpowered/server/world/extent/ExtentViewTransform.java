@@ -29,6 +29,7 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Preconditions;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
@@ -328,6 +329,11 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
+    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+        return false;
+    }
+
+    @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         return this.extent.getScheduledUpdates(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
             this.inverseTransform.transformZ(x, y, z));
@@ -568,6 +574,18 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
+    public Optional<Entity> getEntity(UUID uuid) {
+        Optional<Entity> optEntity = this.extent.getEntity(uuid);
+        if (optEntity.isPresent()) {
+            Vector3d pos = ((LanternEntity) optEntity.get()).getPosition();
+            if (VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax)) {
+                return optEntity;
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Collection<Entity> getEntities() {
         final Collection<Entity> entities = this.extent.getEntities();
         for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext(); ) {
@@ -606,7 +624,7 @@ public class ExtentViewTransform implements AbstractExtent {
     @Override
     public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
         return new ExtentViewDownsize(this.extent, this.inverseTransform.transform(newMin), this.inverseTransform.transform(newMax))
-            .getExtentView(this.transform);
+                .getExtentView(this.transform);
     }
 
     @Override

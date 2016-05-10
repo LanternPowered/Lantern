@@ -501,6 +501,11 @@ public class LanternServer implements Server {
     }
 
     @Override
+    public WorldProperties createWorldProperties(String folderName, WorldCreationSettings settings) throws IOException {
+        return this.worldManager.createWorldProperties(folderName, settings);
+    }
+
+    @Override
     public CompletableFuture<Optional<WorldProperties>> copyWorld(WorldProperties worldProperties, String copyName) {
         return this.worldManager.copyWorld(worldProperties, copyName);
     }
@@ -678,9 +683,13 @@ public class LanternServer implements Server {
         return this.game.getGameProfileManager();
     }
 
-    @Override
-    public WorldProperties createWorldProperties(WorldCreationSettings settings) {
-        return this.worldManager.createWorldProperties(settings);
+    /**
+     * Gets the {@link LanternWorldManager}.
+     *
+     * @return The world manager
+     */
+    public LanternWorldManager getWorldManager() {
+        return this.worldManager;
     }
 
 }

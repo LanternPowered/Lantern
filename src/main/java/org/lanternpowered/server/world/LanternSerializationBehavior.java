@@ -23,25 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.gen;
+package org.lanternpowered.server.world;
 
-import org.lanternpowered.server.world.gen.flat.FlatGenerationPopulator;
-import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.gen.WorldGenerator;
+import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.spongepowered.api.world.SerializationBehavior;
 
-public class LanternGeneratorTypeNether extends LanternGeneratorType {
+public final class LanternSerializationBehavior extends LanternCatalogType implements SerializationBehavior {
 
-    public LanternGeneratorTypeNether(String pluginId, String name) {
-        super(pluginId, name, 128, 1);
+    public LanternSerializationBehavior(String identifier, String name) {
+        super(identifier, name);
     }
-
-    @Override
-    public WorldGenerator createGenerator(World world) {
-        SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(BiomeTypes.HELL);
-        // TODO
-        return new LanternWorldGenerator(new FlatGenerationPopulator(FlatGeneratorType.getDefaultSettings(), this), biomeGenerator);
-    }
-
 }

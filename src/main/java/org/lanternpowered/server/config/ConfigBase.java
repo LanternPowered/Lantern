@@ -82,6 +82,7 @@ public abstract class ConfigBase {
     private final ConfigurationLoader<ConfigurationNode> loader;
     private final ConfigurationOptions options;
     private final Path path;
+    private final boolean hocon;
 
     private volatile ConfigurationNode root;
 
@@ -103,11 +104,8 @@ public abstract class ConfigBase {
      * @throws IOException 
      */
     public ConfigBase(Path path, ConfigurationOptions options, boolean hocon) throws IOException {
-        if (hocon) {
-            this.loader = (ConfigurationLoader) HoconConfigurationLoader.builder().setPath(path).setDefaultOptions(options).build();
-        } else {
-            this.loader = GsonConfigurationLoader.builder().setPath(path).setDefaultOptions(options).build();
-        }
+        this.hocon = hocon;
+        this.loader = createConfigurationLoader(path, options, hocon);
         try {
             this.configMapper = ObjectMapper.forObject(this);
         } catch (ObjectMappingException e) {
@@ -116,6 +114,14 @@ public abstract class ConfigBase {
         this.root = SimpleCommentedConfigurationNode.root(options);
         this.options = options;
         this.path = path;
+    }
+
+    private static ConfigurationLoader<ConfigurationNode> createConfigurationLoader(Path path, ConfigurationOptions options, boolean hocon) {
+        if (hocon) {
+            return (ConfigurationLoader) HoconConfigurationLoader.builder().setPath(path).setDefaultOptions(options).build();
+        } else {
+            return GsonConfigurationLoader.builder().setPath(path).setDefaultOptions(options).build();
+        }
     }
 
     public Path getPath() {
@@ -132,6 +138,27 @@ public abstract class ConfigBase {
             } catch (ObjectMappingException e) {
                 throw new IOException("An error occurred while serializing the object.", e);
             }
+        }
+    }
+
+    public void loadFrom(Path path) throws IOException {
+        if (Files.exists(path)) {
+            ConfigurationLoader<ConfigurationNode> loader = createConfigurationLoader(path, this.options, this.hocon);
+            this.root = loader.load(this.options);
+            try {
+                this.configMapper.populate(this.root);
+            } catch (ObjectMappingException e) {
+                throw new IOException("An error occurred while serializing the object.", e);
+            }
+        }
+    }
+
+    public void copyFrom(ConfigBase configBase) throws IOException {
+        try {
+            configBase.configMapper.serialize(this.root);
+            this.configMapper.populate(this.root);
+        } catch (ObjectMappingException e) {
+            throw new IOException("An error occurred while mapping the object.", e);
         }
     }
 

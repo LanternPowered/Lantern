@@ -91,6 +91,7 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
         } finally {
             dataBuf.release();
         }
+        buf.writeVarInt(0); // TODO: Send tile entities
 
         return buf;
     }

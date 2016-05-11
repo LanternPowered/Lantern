@@ -23,26 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
-import org.lanternpowered.server.network.objects.LocalizedText;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateSign;
+import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.effect.sound.SoundCategory;
 
-public final class CodecPlayOutUpdateSign implements Codec<MessagePlayOutUpdateSign> {
+import javax.annotation.Nullable;
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutUpdateSign message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.VECTOR_3_I, message.getPosition());
-        LocalizedText[] lines = message.getLines();
-        for (int i = 0; i < 4; i++) {
-            buf.write(Types.LOCALIZED_TEXT, lines[i] == null ? LocalizedText.EMPTY : lines[i]);
-        }
-        return buf;
+public final class MessagePlayOutStopSound implements Message {
+
+    @Nullable private final String sound;
+    @Nullable private final SoundCategory soundCategory;
+
+    public MessagePlayOutStopSound(@Nullable String sound, @Nullable SoundCategory category) {
+        this.soundCategory = category;
+        this.sound = sound;
+    }
+
+    @Nullable
+    public String getSound() {
+        return this.sound;
+    }
+
+    @Nullable
+    public SoundCategory getCategory() {
+        return this.soundCategory;
     }
 }

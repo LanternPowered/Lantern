@@ -96,7 +96,6 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTeams;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUnloadChunk;
-import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutUpdateSign;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWindowSetSlot;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
@@ -174,6 +173,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSound;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTheEnd;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
@@ -206,7 +206,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUpdateSign;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
@@ -329,6 +328,7 @@ public final class ProtocolPlay extends ProtocolBase {
         codecPlayInOutCustomPayload.bind(MessagePlayInOutChannelPayload.class);
         codecPlayInOutCustomPayload.bind(MessagePlayOutOpenBook.class);
         codecPlayInOutCustomPayload.bind(MessagePlayInOutBrand.class);
+        codecPlayInOutCustomPayload.bind(MessagePlayOutStopSound.class);
         outbound.bind(0x19, CodecPlayOutSoundEffect.class, MessagePlayOutNamedSoundEffect.class);
         outbound.bind(0x1a, CodecOutDisconnect.class, MessageOutDisconnect.class);
         CodecRegistration<Message, CodecPlayOutEntityStatus> codecPlayOutEntityStatus = outbound.bind(0x1b, CodecPlayOutEntityStatus.class);
@@ -398,11 +398,10 @@ public final class ProtocolPlay extends ProtocolBase {
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetSubtitle.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetTimes.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetTitle.class);
-        outbound.bind(0x46, CodecPlayOutUpdateSign.class, MessagePlayOutUpdateSign.class);
-        outbound.bind(0x47, CodecPlayOutSoundEffect.class, MessagePlayOutSoundEffect.class);
-        outbound.bind(0x48, CodecPlayOutTabListHeaderAndFooter.class, MessagePlayOutTabListHeaderAndFooter.class);
-        outbound.bind(0x49, CodecPlayOutEntityCollectItem.class, MessagePlayOutEntityCollectItem.class);
-        outbound.bind(0x4a, CodecPlayOutEntityTeleport.class, MessagePlayOutEntityTeleport.class);
+        outbound.bind(0x46, CodecPlayOutSoundEffect.class, MessagePlayOutSoundEffect.class);
+        outbound.bind(0x47, CodecPlayOutTabListHeaderAndFooter.class, MessagePlayOutTabListHeaderAndFooter.class);
+        outbound.bind(0x48, CodecPlayOutEntityCollectItem.class, MessagePlayOutEntityCollectItem.class);
+        outbound.bind(0x49, CodecPlayOutEntityTeleport.class, MessagePlayOutEntityTeleport.class);
         // ...
     }
 }

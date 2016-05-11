@@ -42,6 +42,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSound;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 
@@ -62,6 +63,12 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             return new MessageResult("MC|Brand", context.byteBufAlloc().buffer().writeString(((MessagePlayInOutBrand) message).getBrand()));
         } else if (message instanceof MessagePlayOutOpenBook) {
             return new MessageResult("MC|BOpen", EMPTY);
+        } else if (message instanceof MessagePlayOutStopSound) {
+            MessagePlayOutStopSound message0 = (MessagePlayOutStopSound) message;
+            ByteBuffer buf = context.byteBufAlloc().buffer();
+            buf.writeString(message0.getSound() == null ? "" : message0.getSound());
+            buf.writeString(message0.getCategory() == null ? "" : message0.getCategory().getId());
+            return new MessageResult("MC|StopSound", buf);
         }
         return null;
     }

@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
@@ -34,7 +34,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInPlayerMovement implements Codec<MessagePlayInPlayerMovement> {
 
     @Override
-    public MessagePlayInPlayerMovement decode(CodecContext context, ByteBuf buf) throws CodecException {
+    public MessagePlayInPlayerMovement decode(CodecContext context, ByteBuffer buf) throws CodecException {
         double x = buf.readDouble();
         double y = buf.readDouble();
         double z = buf.readDouble();

@@ -23,38 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.serializer.defaults;
+package org.lanternpowered.server.network.buffer;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
-import org.lanternpowered.server.network.message.codec.serializer.ValueSerializer;
+import io.netty.buffer.Unpooled;
 
-public final class SerializerVarInt implements ValueSerializer<Integer> {
+final class UnpooledByteBufferAllocator implements ByteBufferAllocator {
+
+    static final UnpooledByteBufferAllocator INSTANCE = new UnpooledByteBufferAllocator();
 
     @Override
-    public void write(SerializerContext context, ByteBuf buf, Integer object) throws CodecException {
-        int value = object == null ? 0 : object;
-        while ((value & 0xFFFFFF80) != 0L) {
-            buf.writeByte((value & 0x7F) | 0x80);
-            value >>>= 7;
-        }
-        buf.writeByte(value & 0x7F);
+    public ByteBuffer buffer() {
+        return new LanternByteBuffer(Unpooled.buffer());
     }
 
     @Override
-    public Integer read(SerializerContext context, ByteBuf buf) throws CodecException {
-        int value = 0;
-        int i = 0;
-        int b;
-        while (((b = buf.readByte()) & 0x80) != 0) {
-            value |= (b & 0x7F) << i;
-            i += 7;
-            if (i > 35) {
-                throw new CodecException("Variable length is too long!");
-            }
-        }
-        return value | (b << i);
+    public ByteBuffer buffer(int initialCapacity) {
+        return new LanternByteBuffer(Unpooled.buffer(initialCapacity));
     }
 
+    @Override
+    public ByteBuffer heapBuffer() {
+        throw new UnsupportedOperationException("Heap buffers are not supported by the unpooled allocator.");
+    }
+
+    @Override
+    public ByteBuffer heapBuffer(int initialCapacity) {
+        throw new UnsupportedOperationException("Heap buffers are not supported by the unpooled allocator.");
+    }
+
+    @Override
+    public ByteBuffer directBuffer() {
+        return new LanternByteBuffer(Unpooled.directBuffer());
+    }
+
+    @Override
+    public ByteBuffer directBuffer(int initialCapacity) {
+        return new LanternByteBuffer(Unpooled.directBuffer(initialCapacity));
+    }
+
+    @Override
+    public ByteBuffer wrappedBuffer(byte[] byteArray) {
+        return new LanternByteBuffer(Unpooled.wrappedBuffer(byteArray));
+    }
 }

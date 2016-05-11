@@ -25,13 +25,12 @@
  */
 package org.lanternpowered.server.network.forge.message.codec.handshake;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData.Entry;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
@@ -49,21 +48,19 @@ public final class ProcessorForgeHandshakeOutRegistryData implements Processor<M
         }
         while (it.hasNext()) {
             Entry entry = it.next();
-            ByteBuf buf = context.byteBufAlloc().buffer();
-            buf.writeByte(CodecPlayInOutCustomPayload.FML_HANDSHAKE_REGISTRY_DATA);
+            ByteBuffer buf = context.byteBufAlloc().buffer();
+            buf.writeByte((byte) CodecPlayInOutCustomPayload.FML_HANDSHAKE_REGISTRY_DATA);
             buf.writeBoolean(it.hasNext());
-            context.write(buf, Types.STRING, entry.getName());
+            buf.writeString(entry.getName());
             Map<String, Integer> ids = entry.getIds();
-            context.writeVarInt(buf, ids.size());
+            buf.writeVarInt(ids.size());
             for (Map.Entry<String, Integer> en : ids.entrySet()) {
-                context.write(buf, Types.STRING, en.getKey());
-                context.writeVarInt(buf, en.getValue());
+                buf.writeString(en.getKey());
+                buf.writeVarInt(en.getValue());
             }
             List<String> substitutions = entry.getSubstitutions();
-            context.writeVarInt(buf, substitutions.size());
-            for (String substitution : substitutions) {
-                context.write(buf, Types.STRING, substitution);
-            }
+            buf.writeVarInt(substitutions.size());
+            substitutions.forEach(buf::writeString);
             output.add(new MessagePlayInOutChannelPayload("FML|HS", buf));
         }
     }

@@ -30,6 +30,8 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.LanternByteBuffer;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelBinding;
@@ -76,7 +78,7 @@ public class LanternRawDataChannel extends LanternChannelBinding implements Chan
     @Override
     public void sendTo(Player player, Consumer<ChannelBuf> payload) {
         checkState(this.bound);
-        this.registrar.sendPayloadChannelBuf(player, this.name, payload);
+        this.registrar.sendPayload(player, this.name, payload::accept);
     }
 
     @Override
@@ -88,13 +90,14 @@ public class LanternRawDataChannel extends LanternChannelBinding implements Chan
     @Override
     public void sendToAll(Consumer<ChannelBuf> payload) {
         checkState(this.bound);
-        this.registrar.sendPayloadToAllChannelBuf(this.name, payload);
+        this.registrar.sendPayloadToAll(this.name, payload::accept);
     }
 
     @Override
-    void handlePayload(ByteBuf buf, RemoteConnection connection) {
+    void handlePayload(ByteBuffer buf, RemoteConnection connection) {
+        buf = buf.slice();
         for (RawDataListener listener : this.serverDataListeners) {
-            listener.handlePayload(new LanternChannelBuf(buf.copy()), connection, Platform.Type.SERVER);
+            listener.handlePayload(buf.copy(), connection, Platform.Type.SERVER);
         }
     }
 }

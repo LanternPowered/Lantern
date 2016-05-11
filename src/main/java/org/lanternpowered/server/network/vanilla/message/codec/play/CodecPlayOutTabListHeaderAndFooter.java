@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -40,19 +40,19 @@ public final class CodecPlayOutTabListHeaderAndFooter implements Codec<MessagePl
     private static final String EMPTY_TEXT = "{\"translate\":\"\"}";
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutTabListHeaderAndFooter message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutTabListHeaderAndFooter message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         Text header = message.getHeader();
         Text footer = message.getFooter();
         if (header != null) {
-            context.write(buf, Types.TEXT, header);
+            buf.write(Types.TEXT, header);
         } else {
-            context.write(buf, Types.STRING, EMPTY_TEXT);
+            buf.writeString(EMPTY_TEXT);
         }
         if (footer != null) {
-            context.write(buf, Types.TEXT, footer);
+            buf.write(Types.TEXT, footer);
         } else {
-            context.write(buf, Types.STRING, EMPTY_TEXT);
+            buf.writeString(EMPTY_TEXT);
         }
         return buf;
     }

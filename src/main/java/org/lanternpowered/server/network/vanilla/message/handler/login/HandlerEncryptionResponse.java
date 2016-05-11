@@ -71,9 +71,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.profile.property.ProfileProperty;
-import org.spongepowered.api.text.Text;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigInteger;

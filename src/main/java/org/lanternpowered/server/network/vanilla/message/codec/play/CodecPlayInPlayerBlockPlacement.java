@@ -29,9 +29,9 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.entity.living.player.PlayerHand;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -41,10 +41,10 @@ import org.spongepowered.api.util.Direction;
 public final class CodecPlayInPlayerBlockPlacement implements Codec<MessagePlayInPlayerBlockPlacement> {
 
     @Override
-    public MessagePlayInPlayerBlockPlacement decode(CodecContext context, ByteBuf buf) throws CodecException {
-        Vector3i position = context.read(buf, Types.POSITION);
-        Direction face = fromFace(context.readVarInt(buf));
-        PlayerHand hand = PlayerHand.values()[context.readVarInt(buf)];
+    public MessagePlayInPlayerBlockPlacement decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        Vector3i position = buf.read(Types.VECTOR_3_I);
+        Direction face = fromFace(buf.readVarInt());
+        PlayerHand hand = PlayerHand.values()[buf.readVarInt()];
         double ox = (double) buf.readByte() / 15.0;
         double oy = (double) buf.readByte() / 15.0;
         double oz = (double) buf.readByte() / 15.0;

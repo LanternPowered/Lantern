@@ -28,28 +28,27 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 
 public final class CodecPlayOutSpawnObject implements Codec<MessagePlayOutSpawnObject> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnObject message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
-        context.write(buf, Types.UNIQUE_ID, message.getUniqueId());
-        buf.writeByte(message.getObjectType());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnObject message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
+        buf.writeUniqueId(message.getUniqueId());
+        buf.writeByte((byte) message.getObjectType());
         Vector3d vector = message.getPosition();
         buf.writeDouble(vector.getX());
         buf.writeDouble(vector.getY());
         buf.writeDouble(vector.getZ());
         buf.writeByte(wrapAngle(message.getPitch()));
         buf.writeByte(wrapAngle(message.getYaw()));
-        buf.writeInt(message.getObjectData());
+        buf.writeInteger(message.getObjectData());
         vector = message.getVelocity();
         buf.writeShort((short) Math.min(vector.getX() * 8000.0, Short.MAX_VALUE));
         buf.writeShort((short) Math.min(vector.getY() * 8000.0, Short.MAX_VALUE));

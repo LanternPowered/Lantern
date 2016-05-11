@@ -30,6 +30,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
@@ -37,9 +38,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutEntityTeleport implements Codec<MessagePlayOutEntityTeleport> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutEntityTeleport message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutEntityTeleport message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
         Vector3d position = message.getPosition();
         buf.writeDouble(position.getX());
         buf.writeDouble(position.getY());

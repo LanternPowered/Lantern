@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.login;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
@@ -34,7 +34,7 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 public final class CodecLoginOutSetCompression implements Codec<MessageLoginOutSetCompression> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessageLoginOutSetCompression message) throws CodecException {
-        return context.writeVarInt(context.byteBufAlloc().buffer(), message.getThreshold());
+    public ByteBuffer encode(CodecContext context, MessageLoginOutSetCompression message) throws CodecException {
+        return context.byteBufAlloc().buffer().writeVarInt(message.getThreshold());
     }
 }

@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
@@ -34,10 +34,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutEntityCollectItem implements Codec<MessagePlayOutEntityCollectItem> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutEntityCollectItem message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getCollectedId());
-        context.writeVarInt(buf, message.getCollectorId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutEntityCollectItem message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getCollectedId());
+        buf.writeVarInt(message.getCollectorId());
         return buf;
     }
 }

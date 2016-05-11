@@ -23,28 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.serializer.defaults;
-
-import io.netty.buffer.ByteBuf;
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
-import org.lanternpowered.server.network.message.codec.serializer.ValueSerializer;
-
-import java.util.UUID;
-
-public final class SerializerUUID implements ValueSerializer<UUID> {
-
-    @Override
-    public void write(SerializerContext context, ByteBuf buf, UUID object) throws CodecException {
-        buf.writeLong(object.getMostSignificantBits());
-        buf.writeLong(object.getLeastSignificantBits());
-    }
-
-    @Override
-    public UUID read(SerializerContext context, ByteBuf buf) throws CodecException {
-        long most = buf.readLong();
-        long least = buf.readLong();
-        return new UUID(most, least);
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.network.buffer;

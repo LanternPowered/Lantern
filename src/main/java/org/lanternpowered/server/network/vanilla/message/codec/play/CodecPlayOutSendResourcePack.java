@@ -25,20 +25,19 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 
 public final class CodecPlayOutSendResourcePack implements Codec<MessagePlayOutSendResourcePack> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSendResourcePack message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, Types.STRING, message.getUrl());
-        context.write(buf, Types.STRING, message.getHash());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSendResourcePack message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeString(message.getUrl());
+        buf.writeString(message.getHash());
         return buf;
     }
 }

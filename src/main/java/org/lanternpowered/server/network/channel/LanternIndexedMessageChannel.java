@@ -32,9 +32,9 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TByteObjectMap;
 import gnu.trove.map.hash.TByteObjectHashMap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelBinding;
@@ -177,14 +177,14 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
                 messageClass.getName() + " is not registered on the side: " + side.name().toLowerCase());
     }
 
-    private void encode(Message message, ByteBuf buf) {
+    private void encode(Message message, ByteBuffer buf) {
         IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER).classToRegistration.get(message.getClass());
         checkArgument(registration != null, "The specified message type %s is not registered", message.getClass().getName());
 
-        final LanternChannelBuf content = new LanternChannelBuf(Unpooled.buffer());
+        final ByteBuffer content = ByteBufferAllocator.unpooled().buffer();
         message.writeTo(content);
         buf.writeByte(registration.opcode);
-        buf.writeBytes(content.getDelegate());
+        buf.writeBytes(content);
     }
 
     @Override
@@ -212,7 +212,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
-    void handlePayload(ByteBuf buf, RemoteConnection connection) {
+    void handlePayload(ByteBuffer buf, RemoteConnection connection) {
         byte opcode = buf.readByte();
 
         IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER)
@@ -231,7 +231,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
             return;
         }
 
-        LanternChannelBuf content = new LanternChannelBuf(buf.copy());
+        ByteBuffer content = buf.slice();
         try {
             message.readFrom(content);
         } catch (Exception e) {

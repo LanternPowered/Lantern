@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.network.message.codec;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 
 public interface Codec<M extends Message> {
@@ -40,7 +40,7 @@ public interface Codec<M extends Message> {
      * @param message the message
      * @return the byte buffer
      */
-    default ByteBuf encode(CodecContext context, M message) throws CodecException {
+    default ByteBuffer encode(CodecContext context, M message) throws CodecException {
         throw new EncoderException("Encoding through this codec (" + this.getClass().getName() + ") isn't supported!");
     }
 
@@ -51,7 +51,7 @@ public interface Codec<M extends Message> {
      * @param buf the byte buffer
      * @return the message
      */
-    default M decode(CodecContext context, ByteBuf buf) throws CodecException {
+    default M decode(CodecContext context, ByteBuffer buf) throws CodecException {
         throw new DecoderException("Decoding through this codec (" + this.getClass().getName() + ") isn't supported!");
     }
 

@@ -28,9 +28,9 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import gnu.trove.TCollections;
 import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -64,50 +64,50 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
     }
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutTabListEntries message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutTabListEntries message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         List<Entry> entries = message.getEntries();
         int type = this.typeLookup.get(entries.get(0).getClass());
-        context.writeVarInt(buf, type);
-        context.writeVarInt(buf, entries.size());
+        buf.writeVarInt(type);
+        buf.writeVarInt(entries.size());
         for (Entry entry : entries) {
-            context.write(buf, Types.UNIQUE_ID, entry.getGameProfile().getUniqueId());
+            buf.writeUniqueId(entry.getGameProfile().getUniqueId());
             switch (type) {
                 case ADD:
-                    context.write(buf, Types.STRING, entry.getGameProfile().getName().orElse("unknown"));
+                    buf.writeString(entry.getGameProfile().getName().orElse("unknown"));
                     Collection<ProfileProperty> properties = entry.getGameProfile().getPropertyMap().values();
-                    context.writeVarInt(buf, properties.size());
+                    buf.writeVarInt(properties.size());
                     for (ProfileProperty property : properties) {
-                        context.write(buf, Types.STRING, property.getName());
-                        context.write(buf, Types.STRING, property.getValue());
+                        buf.writeString(property.getName());
+                        buf.writeString(property.getValue());
                         Optional<String> signature = property.getSignature();
                         boolean flag = signature.isPresent();
                         buf.writeBoolean(flag);
                         if (flag) {
-                            context.write(buf, Types.STRING, signature.get());
+                            buf.writeString(signature.get());
                         }
                     }
-                    context.writeVarInt(buf, ((LanternGameMode) entry.getGameMode()).getInternalId());
-                    context.writeVarInt(buf, entry.getPing());
+                    buf.writeVarInt(((LanternGameMode) entry.getGameMode()).getInternalId());
+                    buf.writeVarInt(entry.getPing());
                     Text displayName = entry.getDisplayName();
                     boolean flag = displayName != null;
                     buf.writeBoolean(flag);
                     if (flag) {
-                        context.write(buf, Types.TEXT, displayName);
+                        buf.write(Types.TEXT, displayName);
                     }
                     break;
                 case UPDATE_GAME_MODE:
-                    context.writeVarInt(buf, ((LanternGameMode) entry.getGameMode()).getInternalId());
+                    buf.writeVarInt(((LanternGameMode) entry.getGameMode()).getInternalId());
                     break;
                 case UPDATE_LATENCY:
-                    context.writeVarInt(buf, entry.getPing());
+                    buf.writeVarInt(entry.getPing());
                     break;
                 case UPDATE_DISPLAY_NAME:
                     Text displayName0 = entry.getDisplayName();
                     boolean flag0 = displayName0 != null;
                     buf.writeBoolean(flag0);
                     if (flag0) {
-                        context.write(buf, Types.TEXT, displayName0);
+                        buf.write(Types.TEXT, displayName0);
                     }
                     break;
                 case REMOVE:

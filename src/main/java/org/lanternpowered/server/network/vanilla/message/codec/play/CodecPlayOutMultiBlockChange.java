@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3i;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
@@ -38,17 +38,17 @@ import java.util.Collection;
 public final class CodecPlayOutMultiBlockChange implements Codec<MessagePlayOutMultiBlockChange> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutMultiBlockChange message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeInt(message.getChunkX());
-        buf.writeInt(message.getChunkZ());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutMultiBlockChange message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeInteger(message.getChunkX());
+        buf.writeInteger(message.getChunkZ());
         Collection<MessagePlayOutBlockChange> changes = message.getChanges();
-        context.writeVarInt(buf, changes.size());
+        buf.writeVarInt(changes.size());
         for (MessagePlayOutBlockChange change : changes) {
             Vector3i position = change.getPosition();
-            buf.writeByte((position.getX() & 0xf) << 4 | position.getZ() & 0xf);
-            buf.writeByte(position.getY());
-            context.writeVarInt(buf, change.getBlockState());
+            buf.writeByte((byte) ((position.getX() & 0xf) << 4 | position.getZ() & 0xf));
+            buf.writeByte((byte) position.getY());
+            buf.writeVarInt(change.getBlockState());
         }
         return buf;
     }

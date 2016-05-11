@@ -26,10 +26,10 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.entity.living.player.PlayerHand;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
@@ -37,9 +37,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInUseEntity implements Codec<MessagePlayInUseEntity> {
 
     @Override
-    public MessagePlayInUseEntity decode(CodecContext context, ByteBuf buf) throws CodecException {
-        int entityId = context.readVarInt(buf);
-        int action = context.readVarInt(buf);
+    public MessagePlayInUseEntity decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        int entityId = buf.readVarInt();
+        int action = buf.readVarInt();
         if (action == 1) {
             return new MessagePlayInUseEntity.Attack(entityId);
         } else if (action == 0 || action == 2) {
@@ -50,7 +50,7 @@ public final class CodecPlayInUseEntity implements Codec<MessagePlayInUseEntity>
                 double z = buf.readFloat();
                 position = new Vector3d(x, y, z);
             }
-            PlayerHand hand = PlayerHand.values()[context.readVarInt(buf)];
+            PlayerHand hand = PlayerHand.values()[buf.readVarInt()];
             return new MessagePlayInUseEntity.Interact(entityId, hand, position);
         } else {
             throw new DecoderException("Recieved a UseEntity message with a unknown action: " + action);

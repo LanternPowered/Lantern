@@ -34,8 +34,9 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
@@ -45,7 +46,6 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelBinding.IndexedMessageChannel;
-import org.spongepowered.api.network.ChannelBuf;
 import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.network.ChannelRegistrationException;
 import org.spongepowered.api.network.RemoteConnection;
@@ -116,38 +116,30 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
                 channelName.startsWith("FML") || channelName.equals("REGISTER") || channelName.equals("UNREGISTER"));
     }
 
-    void sendPayloadChannelBuf(Player player, String channel, Consumer<ChannelBuf> payload) {
-        this.sendPayloadToAll(channel, buf -> payload.accept(new LanternChannelBuf(buf)));
-    }
-
-    void sendPayload(Player player, String channel, Consumer<ByteBuf> payload) {
+    void sendPayload(Player player, String channel, Consumer<ByteBuffer> payload) {
         checkNotNull(player, "player");
         checkNotNull(payload, "payload");
         Session session = ((LanternPlayer) player).getConnection();
         if (session.getRegisteredChannels().contains(channel)) {
-            ByteBuf buf = Unpooled.buffer();
+            ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
             session.send(new MessagePlayInOutChannelPayload(channel, buf));
         }
     }
 
-    void sendPayloadToAllChannelBuf(String channel, Consumer<ChannelBuf> payload) {
-        this.sendPayloadToAll(channel, buf -> payload.accept(new LanternChannelBuf(buf)));
-    }
-
-    void sendPayloadToAll(String channel, Consumer<ByteBuf> payload) {
+    void sendPayloadToAll(String channel, Consumer<ByteBuffer> payload) {
         checkNotNull(payload, "payload");
         Iterator<Player> players = this.server.getOnlinePlayers().stream().filter(
                 player -> ((LanternPlayer) player).getConnection().getRegisteredChannels().contains(channel)).iterator();
         if (players.hasNext()) {
-            ByteBuf buf = Unpooled.buffer();
+            ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
             Message msg = new MessagePlayInOutChannelPayload(channel, buf);
             players.forEachRemaining(player -> ((LanternPlayer) player).getConnection().send(msg));
         }
     }
 
-    public void handlePlayload(ByteBuf buf, String channel, RemoteConnection connection) {
+    public void handlePlayload(ByteBuffer buf, String channel, RemoteConnection connection) {
         LanternChannelBinding binding = this.bindings.get(channel);
         if (binding != null) {
             binding.handlePayload(buf, connection);

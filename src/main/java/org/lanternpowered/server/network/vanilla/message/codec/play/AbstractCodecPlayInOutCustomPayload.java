@@ -28,16 +28,15 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutUnregisterChannels;
@@ -51,10 +50,10 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
     public static final AttributeKey<MultiPartMessage> FML_MULTI_PART_MESSAGE = AttributeKey.valueOf("fml-multi-part-message");
 
     @Override
-    public ByteBuf encode(CodecContext context, Message message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, Message message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         String channel;
-        ByteBuf content;
+        ByteBuffer content;
         if (message instanceof MessagePlayInOutChannelPayload) {
             final MessagePlayInOutChannelPayload message1 = (MessagePlayInOutChannelPayload) message;
             content = message1.getContent();
@@ -73,15 +72,15 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             channel = result.channel;
             content = result.byteBuf;
         }
-        context.write(buf, Types.STRING, channel);
+        buf.writeString(channel);
         buf.writeBytes(content);
         return buf;
     }
 
     @Override
-    public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
-        String channel = context.read(buf, Types.STRING);
-        ByteBuf content = context.byteBufAlloc().heapBuffer(buf.readableBytes());
+    public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        String channel = buf.readString();
+        ByteBuffer content = context.byteBufAlloc().heapBuffer(buf.available());
         buf.readBytes(content);
         if ("REGISTER".equals(channel)) {
             Set<String> channels;
@@ -122,19 +121,19 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
                 Attribute<MultiPartMessage> attribute = context.getChannel().attr(FML_MULTI_PART_MESSAGE);
                 MultiPartMessage message0 = attribute.get();
                 if (message0 == null) {
-                    String channel0 = context.read(content, Types.STRING);
-                    int parts = content.readUnsignedByte();
-                    int size = content.readInt();
+                    String channel0 = buf.readString();
+                    int parts = buf.readByte() & 0xff;
+                    int size = content.readInteger();
                     if (size <= 0 || size >= -16797616) {
                         throw new CodecException("Received FML MultiPart packet outside of valid length bounds, Max: -16797616, Received: " + size);
                     }
                     attribute.set(new MultiPartMessage(channel0, context.byteBufAlloc().buffer(size), parts));
                 } else {
-                    int part = content.readUnsignedByte();
+                    int part = buf.readByte() & 0xff;
                     if (part != message0.index) {
                         throw new CodecException("Received FML MultiPart packet out of order, Expected: " + message0.index + ", Got: " + part);
                     }
-                    int len = content.readableBytes() - 1;
+                    int len = content.available() - 1;
                     content.readBytes(message0.buffer, message0.offset, len);
                     message0.offset += len;
                     message0.index++;
@@ -159,7 +158,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
 
     protected abstract MessageResult encode0(CodecContext context, Message message) throws CodecException;
 
-    protected abstract Message decode0(CodecContext context, String channel, ByteBuf content) throws CodecException;
+    protected abstract Message decode0(CodecContext context, String channel, ByteBuffer content) throws CodecException;
 
     /**
      * Decodes the byte buffer into a set of channels.
@@ -167,7 +166,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
      * @param buffer the byte buffer
      * @return the channels
      */
-    static Set<String> decodeChannels(ByteBuf buffer) {
+    static Set<String> decodeChannels(ByteBuffer buffer) {
         return Sets.newHashSet(Splitter.on('\u0000').split(new String(buffer.array(), StandardCharsets.UTF_8)));
     }
 
@@ -177,16 +176,16 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
      * @param channels the channels
      * @return the byte buffer
      */
-    static ByteBuf encodeChannels(Set<String> channels) {
-        return Unpooled.wrappedBuffer(Joiner.on('\u0000').join(channels).getBytes(StandardCharsets.UTF_8));
+    static ByteBuffer encodeChannels(Set<String> channels) {
+        return ByteBufferAllocator.unpooled().wrappedBuffer(Joiner.on('\u0000').join(channels).getBytes(StandardCharsets.UTF_8));
     }
 
     protected static class MessageResult {
 
         private final String channel;
-        private final ByteBuf byteBuf;
+        private final ByteBuffer byteBuf;
 
-        public MessageResult(String channel, ByteBuf byteBuf) {
+        public MessageResult(String channel, ByteBuffer byteBuf) {
             this.byteBuf = byteBuf;
             this.channel = channel;
         }
@@ -195,13 +194,13 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
     protected static class MultiPartMessage {
 
         private final String channel;
-        private final ByteBuf buffer;
+        private final ByteBuffer buffer;
         private final int parts;
 
         private int index;
         private int offset;
 
-        public MultiPartMessage(String channel, ByteBuf buffer, int parts) {
+        public MultiPartMessage(String channel, ByteBuffer buffer, int parts) {
             this.channel = channel;
             this.buffer = buffer;
             this.parts = parts;

@@ -30,11 +30,10 @@ import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.profile.LanternProfileProperty;
@@ -51,11 +50,11 @@ public final class CodecHandshakeIn implements Codec<MessageHandshakeIn> {
     private static final Gson GSON = new Gson();
 
     @Override
-    public MessageHandshakeIn decode(CodecContext context, ByteBuf buf) throws CodecException {
-        int protocol = context.readVarInt(buf);
-        String hostname = context.read(buf, Types.STRING);
+    public MessageHandshakeIn decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        int protocol = buf.readVarInt();
+        String hostname = buf.readString();
         short port = buf.readShort();
-        int state = context.readVarInt(buf);
+        int state = buf.readVarInt();
         ProxyData proxyData = null;
         SocketAddress socketAddress;
         // Check for the fml marker

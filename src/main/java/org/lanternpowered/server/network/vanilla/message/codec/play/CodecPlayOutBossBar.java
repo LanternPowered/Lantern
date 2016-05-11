@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -36,33 +36,33 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutBossBar implements Codec<MessagePlayOutBossBar> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutBossBar message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, Types.UNIQUE_ID, message.getUniqueId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutBossBar message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeUniqueId(message.getUniqueId());
         if (message instanceof MessagePlayOutBossBar.Add) {
             MessagePlayOutBossBar.Add message0 = (MessagePlayOutBossBar.Add) message;
-            context.writeVarInt(buf, 0);
-            context.write(buf, Types.LOCALIZED_TEXT, message0.getTitle());
+            buf.writeVarInt(0);
+            buf.write(Types.LOCALIZED_TEXT, message0.getTitle());
             buf.writeFloat(message0.getHealth());
-            context.writeVarInt(buf, message0.getColor().ordinal());
-            context.writeVarInt(buf, message0.getDivision().ordinal());
+            buf.writeVarInt(message0.getColor().ordinal());
+            buf.writeVarInt(message0.getDivision().ordinal());
             buf.writeByte(toFlags(message0.isDarkenSky(), message0.isEndMusic()));
         } else if (message instanceof MessagePlayOutBossBar.Remove) {
-            context.writeVarInt(buf, 1);
+            buf.writeVarInt(1);
         } else if (message instanceof MessagePlayOutBossBar.UpdateHealth) {
-            context.writeVarInt(buf, 2);
+            buf.writeVarInt(2);
             buf.writeFloat(((MessagePlayOutBossBar.UpdateHealth) message).getHealth());
         } else if (message instanceof MessagePlayOutBossBar.UpdateTitle) {
-            context.writeVarInt(buf, 3);
-            context.write(buf, Types.LOCALIZED_TEXT, ((MessagePlayOutBossBar.UpdateTitle) message).getTitle());
+            buf.writeVarInt(3);
+            buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutBossBar.UpdateTitle) message).getTitle());
         } else if (message instanceof MessagePlayOutBossBar.UpdateStyle) {
             MessagePlayOutBossBar.UpdateStyle message0 = (MessagePlayOutBossBar.UpdateStyle) message;
-            context.writeVarInt(buf, 4);
-            context.writeVarInt(buf, message0.getColor().ordinal());
-            context.writeVarInt(buf, message0.getDivision().ordinal());
+            buf.writeVarInt(4);
+            buf.writeVarInt(message0.getColor().ordinal());
+            buf.writeVarInt(message0.getDivision().ordinal());
         } else if (message instanceof MessagePlayOutBossBar.UpdateMisc) {
             MessagePlayOutBossBar.UpdateMisc message0 = (MessagePlayOutBossBar.UpdateMisc) message;
-            context.writeVarInt(buf, 5);
+            buf.writeVarInt(5);
             buf.writeByte(toFlags(message0.isDarkenSky(), message0.isEndMusic()));
         } else {
             throw new EncoderException("Unsupported message type: " + message.getClass().getName());

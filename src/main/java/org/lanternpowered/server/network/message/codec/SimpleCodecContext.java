@@ -25,26 +25,25 @@
  */
 package org.lanternpowered.server.network.message.codec;
 
-import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.Channel;
-import org.lanternpowered.server.network.message.codec.serializer.SerializerCollection;
-import org.lanternpowered.server.network.message.codec.serializer.SimpleSerializerContext;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.session.Session;
 
-public class SimpleCodecContext extends SimpleSerializerContext implements CodecContext {
+public class SimpleCodecContext implements CodecContext {
 
+    private final ByteBufferAllocator byteBufferAlloc;
     private final Channel channel;
     private final Session session;
 
-    public SimpleCodecContext(ByteBufAllocator byteBufAlloc, SerializerCollection serializers, Channel channel, Session session) {
-        super(byteBufAlloc, serializers);
+    public SimpleCodecContext(ByteBufferAllocator byteBufferAlloc, Channel channel, Session session) {
+        this.byteBufferAlloc = byteBufferAlloc;
         this.channel = channel;
         this.session = session;
     }
 
     @Override
-    public ByteBufAllocator byteBufAlloc() {
-        return this.channel.alloc();
+    public ByteBufferAllocator byteBufAlloc() {
+        return this.byteBufferAlloc;
     }
 
     @Override

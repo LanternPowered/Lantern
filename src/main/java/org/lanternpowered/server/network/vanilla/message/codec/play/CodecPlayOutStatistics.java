@@ -25,11 +25,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics.Entry;
 
@@ -38,13 +37,13 @@ import java.util.Set;
 public final class CodecPlayOutStatistics implements Codec<MessagePlayOutStatistics> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutStatistics message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutStatistics message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         Set<Entry> entries = message.getEntries();
-        context.writeVarInt(buf, entries.size());
+        buf.writeVarInt(entries.size());
         for (Entry entry : entries) {
-            context.write(buf, Types.STRING, entry.getName());
-            context.writeVarInt(buf, entry.getValue());
+            buf.writeString(entry.getName());
+            buf.writeVarInt(entry.getValue());
         }
         return buf;
     }

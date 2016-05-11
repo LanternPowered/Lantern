@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldBorder;
@@ -35,40 +35,40 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutWorldBorder implements Codec<MessagePlayOutWorldBorder> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutWorldBorder message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutWorldBorder message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
 
         if (message instanceof MessagePlayOutWorldBorder.Initialize) {
             MessagePlayOutWorldBorder.Initialize message1 = (MessagePlayOutWorldBorder.Initialize) message;
-            context.writeVarInt(buf, 3);
+            buf.writeVarInt(3);
             buf.writeDouble(message1.getCenterX());
             buf.writeDouble(message1.getCenterZ());
             buf.writeDouble(message1.getOldDiameter());
             buf.writeDouble(message1.getNewDiameter());
-            context.writeVarLong(buf, message1.getLerpTime());
-            context.writeVarInt(buf, message1.getWorldSize());
-            context.writeVarInt(buf, message1.getWarningTime());
-            context.writeVarInt(buf, message1.getWarningDistance());
+            buf.writeVarLong(message1.getLerpTime());
+            buf.writeVarInt(message1.getWorldSize());
+            buf.writeVarInt(message1.getWarningTime());
+            buf.writeVarInt(message1.getWarningDistance());
         } else if (message instanceof MessagePlayOutWorldBorder.UpdateCenter) {
             MessagePlayOutWorldBorder.UpdateCenter message1 = (MessagePlayOutWorldBorder.UpdateCenter) message;
-            context.writeVarInt(buf, 2);
+            buf.writeVarInt(2);
             buf.writeDouble(message1.getX());
             buf.writeDouble(message1.getZ());
         } else if (message instanceof MessagePlayOutWorldBorder.UpdateLerpedDiameter) {
             MessagePlayOutWorldBorder.UpdateLerpedDiameter message1 = (MessagePlayOutWorldBorder.UpdateLerpedDiameter) message;
-            context.writeVarInt(buf, 1);
+            buf.writeVarInt(1);
             buf.writeDouble(message1.getOldDiameter());
             buf.writeDouble(message1.getNewDiameter());
-            context.writeVarLong(buf, message1.getLerpTime());
+            buf.writeVarLong(message1.getLerpTime());
         } else if (message instanceof MessagePlayOutWorldBorder.UpdateDiameter) {
-            context.writeVarInt(buf, 0);
+            buf.writeVarInt(0);
             buf.writeDouble(((MessagePlayOutWorldBorder.UpdateDiameter) message).getDiameter());
         } else if (message instanceof MessagePlayOutWorldBorder.UpdateWarningDistance) {
-            context.writeVarInt(buf, 5);
-            context.writeVarInt(buf, ((MessagePlayOutWorldBorder.UpdateWarningDistance) message).getDistance());
+            buf.writeVarInt(5);
+            buf.writeVarInt(((MessagePlayOutWorldBorder.UpdateWarningDistance) message).getDistance());
         } else if (message instanceof MessagePlayOutWorldBorder.UpdateWarningTime) {
-            context.writeVarInt(buf, 4);
-            context.writeVarInt(buf, ((MessagePlayOutWorldBorder.UpdateWarningTime) message).getTime());
+            buf.writeVarInt(4);
+            buf.writeVarInt(((MessagePlayOutWorldBorder.UpdateWarningTime) message).getTime());
         } else {
             throw new EncoderException("Unsupported message type: " + message.getClass().getName());
         }

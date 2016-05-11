@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCamera;
@@ -34,7 +34,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSetCamera implements Codec<MessagePlayOutSetCamera> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSetCamera message) throws CodecException {
-        return context.writeVarInt(context.byteBufAlloc().buffer(), message.getEntityId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSetCamera message) throws CodecException {
+        return context.byteBufAlloc().buffer().writeVarInt(message.getEntityId());
     }
 }

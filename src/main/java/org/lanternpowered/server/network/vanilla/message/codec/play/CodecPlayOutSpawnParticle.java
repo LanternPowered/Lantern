@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3f;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
@@ -35,12 +35,12 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpawnParticle> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnParticle message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnParticle message) throws CodecException {
         Vector3f position = message.getPosition();
         Vector3f offset = message.getOffset();
         int[] extra = message.getExtra();
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeInt(message.getParticleId());
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeInteger(message.getParticleId());
         buf.writeBoolean(message.isLongDistance());
         buf.writeFloat(position.getX());
         buf.writeFloat(position.getY());
@@ -49,9 +49,9 @@ public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpaw
         buf.writeFloat(offset.getY());
         buf.writeFloat(offset.getZ());
         buf.writeFloat(message.getData());
-        buf.writeInt(message.getCount());
+        buf.writeInteger(message.getCount());
         for (int value : extra) {
-            context.writeVarInt(buf, value);
+            buf.writeVarInt(value);
         }
         return buf;
     }

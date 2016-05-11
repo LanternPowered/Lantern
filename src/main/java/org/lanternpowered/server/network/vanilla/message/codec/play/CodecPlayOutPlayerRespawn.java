@@ -25,22 +25,21 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 
 public final class CodecPlayOutPlayerRespawn implements Codec<MessagePlayOutPlayerRespawn> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutPlayerRespawn message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeInt(message.getDimensionType().getInternalId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerRespawn message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeInteger(message.getDimensionType().getInternalId());
         buf.writeByte(message.getDifficulty().getInternalId());
         buf.writeByte(message.getGameMode().getInternalId());
-        context.write(buf, Types.STRING, "default"); // Not used
+        buf.writeString("default"); // Not used
         return buf;
     }
 }

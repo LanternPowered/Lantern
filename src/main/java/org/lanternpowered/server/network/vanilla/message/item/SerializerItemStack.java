@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.item;
 import com.google.common.collect.Lists;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.message.codec.serializer.ValueSerializer;
@@ -52,9 +53,9 @@ public class SerializerItemStack implements ValueSerializer<ItemStack> {
 
     @SuppressWarnings("deprecation")
     @Override
-    public void write(SerializerContext context, ByteBuf buf, ItemStack object) throws CodecException {
+    public void write(ByteBuffer buf, ItemStack object) throws CodecException {
         if (object == null) {
-            context.write(buf, Types.RAW_ITEM_STACK, null);
+            buf.write(Types.RAW_ITEM_STACK, null);
             return;
         }
 
@@ -100,12 +101,12 @@ public class SerializerItemStack implements ValueSerializer<ItemStack> {
 
         tag.set(DataQuery.of("HideFlags"), (byte) 63);
 
-        context.write(buf, Types.RAW_ITEM_STACK, new RawItemStack(id, data, amount, tag));
+        buf.write(Types.RAW_ITEM_STACK, new RawItemStack(id, data, amount, tag));
     }
 
     @Override
-    public ItemStack read(SerializerContext context, ByteBuf buf) throws CodecException {
-        RawItemStack rawItemStack = context.read(buf, Types.RAW_ITEM_STACK);
+    public ItemStack read(ByteBuffer buf) throws CodecException {
+        RawItemStack rawItemStack = buf.read(Types.RAW_ITEM_STACK);
         if (rawItemStack == null) {
             return null;
         }

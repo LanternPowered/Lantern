@@ -52,9 +52,9 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 import org.lanternpowered.server.network.NetworkManager;
+import org.lanternpowered.server.network.buffer.LanternByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.SimpleCodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.SerializerCollection;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.session.Session;
 
@@ -80,7 +80,7 @@ public final class MessageChannelHandler extends SimpleChannelInboundHandler<Mes
             throw new IllegalStateException("Session may not be set more than once!");
         }
         channel.attr(MessageCodecHandler.CONTEXT).set(new SimpleCodecContext(
-                ctx.alloc(), SerializerCollection.DEFAULT, channel, session));
+                new LanternByteBufferAllocator(ctx.alloc()), channel, session));
         channel.attr(Session.STATE).set(ProtocolState.HANDSHAKE);
 
         this.networkManager.onChannelActive(channel, session);

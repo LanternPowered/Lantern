@@ -28,8 +28,8 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -38,17 +38,17 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSpawnPlayer implements Codec<MessagePlayOutSpawnPlayer> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnPlayer message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
-        context.write(buf, Types.UNIQUE_ID, message.getUniqueId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnPlayer message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
+        buf.writeUniqueId(message.getUniqueId());
         Vector3d vector = message.getPosition();
         buf.writeDouble(vector.getX());
         buf.writeDouble(vector.getY());
         buf.writeDouble(vector.getZ());
         buf.writeByte(wrapAngle(message.getYaw()));
         buf.writeByte(wrapAngle(message.getPitch()));
-        context.write(buf, Types.PARAMETERS, message.getParameters());
+        buf.write(Types.PARAMETERS, message.getParameters());
         return buf;
     }
 }

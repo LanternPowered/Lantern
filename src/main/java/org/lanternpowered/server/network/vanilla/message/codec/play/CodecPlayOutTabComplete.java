@@ -25,11 +25,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabComplete;
 
 import java.util.List;
@@ -37,13 +36,11 @@ import java.util.List;
 public final class CodecPlayOutTabComplete implements Codec<MessagePlayOutTabComplete> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutTabComplete message) throws CodecException {
-        final ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutTabComplete message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         final List<String> matches = message.getMatches();
-        context.writeVarInt(buf, matches.size());
-        for (String match : matches) {
-            context.write(buf, Types.STRING, match);
-        }
+        buf.writeVarInt(matches.size());
+        matches.forEach(buf::writeString);
         return buf;
     }
 }

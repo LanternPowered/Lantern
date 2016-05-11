@@ -28,8 +28,8 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -38,11 +38,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSpawnMob implements Codec<MessagePlayOutSpawnMob> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnMob message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
-        context.write(buf, Types.UNIQUE_ID, message.getUniqueId());
-        buf.writeByte(message.getMobType());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnMob message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
+        buf.writeUniqueId(message.getUniqueId());
+        buf.writeByte((byte) message.getMobType());
         Vector3d vector = message.getPosition();
         buf.writeDouble(vector.getX());
         buf.writeDouble(vector.getY());
@@ -54,7 +54,7 @@ public final class CodecPlayOutSpawnMob implements Codec<MessagePlayOutSpawnMob>
         buf.writeShort((short) Math.min(vector.getX() * 8000.0, Short.MAX_VALUE));
         buf.writeShort((short) Math.min(vector.getY() * 8000.0, Short.MAX_VALUE));
         buf.writeShort((short) Math.min(vector.getZ() * 8000.0, Short.MAX_VALUE));
-        context.write(buf, Types.PARAMETERS, message.getParameters());
+        buf.write(Types.PARAMETERS, message.getParameters());
         return buf;
     }
 }

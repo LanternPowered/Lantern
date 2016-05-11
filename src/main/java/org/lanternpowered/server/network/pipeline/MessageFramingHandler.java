@@ -47,7 +47,8 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import static org.lanternpowered.server.network.message.codec.serializer.SimpleSerializerContext.DEFAULT;
+import static org.lanternpowered.server.network.buffer.LanternByteBuffer.readVarInt;
+import static org.lanternpowered.server.network.buffer.LanternByteBuffer.writeVarInt;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -59,7 +60,7 @@ public final class MessageFramingHandler extends ByteToMessageCodec<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf buf0, ByteBuf output) throws Exception {
-        DEFAULT.writeVarInt(output, buf0.readableBytes());
+        writeVarInt(output, buf0.readableBytes());
         output.writeBytes(buf0);
     }
 
@@ -71,7 +72,7 @@ public final class MessageFramingHandler extends ByteToMessageCodec<ByteBuf> {
             return;
         }
 
-        int length = DEFAULT.readVarInt(buf);
+        int length = readVarInt(buf);
         if (buf.readableBytes() < length) {
             buf.resetReaderIndex();
             return;

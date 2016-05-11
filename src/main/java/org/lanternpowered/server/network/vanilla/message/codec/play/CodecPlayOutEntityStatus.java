@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -36,7 +36,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutEntityStatus implements Codec<Message> {
 
     @Override
-    public ByteBuf encode(CodecContext context, Message message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, Message message) throws CodecException {
         int entityId;
         int action;
         if (message instanceof MessagePlayOutSetReducedDebug) {
@@ -48,6 +48,6 @@ public final class CodecPlayOutEntityStatus implements Codec<Message> {
         } else {
             throw new CodecException("Unsupported message type: " + message.getClass().getName());
         }
-        return context.byteBufAlloc().buffer(9).writeInt(entityId).writeByte(action);
+        return context.byteBufAlloc().buffer(9).writeInteger(entityId).writeByte((byte) action);
     }
 }

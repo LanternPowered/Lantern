@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3i;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -36,12 +36,12 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInChangeSign implements Codec<MessagePlayInChangeSign> {
 
     @Override
-    public MessagePlayInChangeSign decode(CodecContext context, ByteBuf buf) throws CodecException {
-        Vector3i position = context.read(buf, Types.POSITION);
+    public MessagePlayInChangeSign decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        Vector3i position = buf.read(Types.VECTOR_3_I);
         String[] lines = new String[4];
         for (int i = 0; i < lines.length; i++) {
             // TODO: Limit length
-            lines[i] = context.read(buf, Types.STRING);
+            lines[i] = buf.readString();
         }
         return new MessagePlayInChangeSign(position, lines);
     }

@@ -25,6 +25,9 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
+import static org.lanternpowered.server.network.buffer.LanternByteBuffer.readVarInt;
+import static org.lanternpowered.server.network.buffer.LanternByteBuffer.writeVarInt;
+
 import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -34,6 +37,8 @@ import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.util.AttributeKey;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.LanternByteBuffer;
 import org.lanternpowered.server.network.message.BulkMessage;
 import org.lanternpowered.server.network.message.CodecRegistration;
 import org.lanternpowered.server.network.message.HandlerMessage;
@@ -74,13 +79,13 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         // Write the opcode of the message
         CodecContext context = ctx.channel().attr(CONTEXT).get();
-        context.writeVarInt(opcode, codecRegistration.getOpcode());
+        writeVarInt(opcode, codecRegistration.getOpcode());
 
         Codec codec = codecRegistration.getCodec();
-        ByteBuf content = codec.encode(context, message);
+        ByteBuffer content = codec.encode(context, message);
 
         // Add the buffer to the output
-        output.add(Unpooled.wrappedBuffer(opcode, content));
+        output.add(Unpooled.wrappedBuffer(opcode, ((LanternByteBuffer) content).getDelegate()));
     }
 
     private static final Set<Integer> warnedMissingOpcodes = Sets.newConcurrentHashSet();
@@ -92,7 +97,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         }
 
         CodecContext context = ctx.channel().attr(CONTEXT).get();
-        int opcode = context.readVarInt(input);
+        int opcode = readVarInt(input);
 
         final ProtocolState state = ctx.channel().attr(Session.STATE).get();
         final Protocol protocol = state.getProtocol();
@@ -107,8 +112,8 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         // Copy the remaining content of the buffer to a new buffer used by the
         // message decoding
-        ByteBuf content = ctx.alloc().buffer(input.readableBytes());
-        input.readBytes(content, input.readableBytes());
+        ByteBuffer content = context.byteBufAlloc().buffer(input.readableBytes());
+        input.readBytes(((LanternByteBuffer) content).getDelegate(), input.readableBytes());
 
         // Read the content of the message
         Message message;

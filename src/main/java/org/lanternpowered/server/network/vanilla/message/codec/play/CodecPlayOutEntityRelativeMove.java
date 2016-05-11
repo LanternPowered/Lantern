@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityRelativeMove;
@@ -35,13 +35,13 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutEntityRelativeMove implements Codec<MessagePlayOutEntityRelativeMove> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutEntityRelativeMove message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutEntityRelativeMove message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
         Vector3d delta = message.getDelta();
-        buf.writeShort((int) (delta.getX() * 4096.0));
-        buf.writeShort((int) (delta.getY() * 4096.0));
-        buf.writeShort((int) (delta.getZ() * 4096.0));
+        buf.writeShort((short) (delta.getX() * 4096.0));
+        buf.writeShort((short) (delta.getY() * 4096.0));
+        buf.writeShort((short) (delta.getZ() * 4096.0));
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

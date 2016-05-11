@@ -28,11 +28,12 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import io.netty.buffer.ByteBuf;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayInOutChannelPayload implements Message {
 
-    private final ByteBuf content;
+    private final ByteBuffer content;
     private final String channel;
 
     /**
@@ -41,7 +42,7 @@ public final class MessagePlayInOutChannelPayload implements Message {
      * @param channel the channel
      * @param content the content
      */
-    public MessagePlayInOutChannelPayload(String channel, ByteBuf content) {
+    public MessagePlayInOutChannelPayload(String channel, ByteBuffer content) {
         this.channel = checkNotNull(channel, "channel");
         this.content = checkNotNull(content, "content");
     }
@@ -60,7 +61,7 @@ public final class MessagePlayInOutChannelPayload implements Message {
      * 
      * @return the content
      */
-    public ByteBuf getContent() {
+    public ByteBuffer getContent() {
         return this.content;
     }
 

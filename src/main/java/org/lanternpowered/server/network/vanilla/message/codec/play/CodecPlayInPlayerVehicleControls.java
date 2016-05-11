@@ -26,9 +26,9 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.google.common.collect.Lists;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.BulkMessage;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -45,7 +45,7 @@ public final class CodecPlayInPlayerVehicleControls implements Codec<Message> {
     private final static AttributeKey<Boolean> JUMPING = AttributeKey.valueOf("last-jumping-state");
 
     @Override
-    public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
+    public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         float sideways = buf.readFloat();
         float forwards = buf.readFloat();
         byte flags = buf.readByte();

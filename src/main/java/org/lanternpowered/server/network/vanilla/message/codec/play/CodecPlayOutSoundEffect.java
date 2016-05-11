@@ -26,30 +26,29 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.effect.sound.LanternSoundCategory;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
 
 public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundEffectBase> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSoundEffectBase message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSoundEffectBase message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         final Object type = message.getType();
         if (type instanceof Integer) {
-            context.writeVarInt(buf, (Integer) type);
+            buf.writeVarInt((Integer) type);
         } else {
-            context.write(buf, Types.STRING, (String) type);
+            buf.writeString((String) type);
         }
-        context.writeVarInt(buf, ((LanternSoundCategory) message.getCategory()).getInternalId());
+        buf.writeVarInt(((LanternSoundCategory) message.getCategory()).getInternalId());
         Vector3d pos = message.getPosition();
-        buf.writeInt((int) (pos.getX() * 8.0));
-        buf.writeInt((int) (pos.getY() * 8.0));
-        buf.writeInt((int) (pos.getZ() * 8.0));
+        buf.writeInteger((int) (pos.getX() * 8.0));
+        buf.writeInteger((int) (pos.getY() * 8.0));
+        buf.writeInteger((int) (pos.getZ() * 8.0));
         buf.writeFloat(message.getVolume());
         buf.writeByte((byte) Math.max(message.getPitch() * 63.0, Byte.MAX_VALUE));
         return buf;

@@ -27,8 +27,6 @@ package org.lanternpowered.server.network.message.codec.serializer;
 
 import com.google.common.reflect.TypeToken;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 public final class Type<V> {
 
     /**
@@ -38,8 +36,8 @@ public final class Type<V> {
      * @param <V> The value type
      * @return The type
      */
-    public static <V> Type<V> create(TypeToken<V> typeToken) {
-        return new Type<>(typeToken);
+    public static <V> Type<V> create(TypeToken<V> typeToken, ValueSerializer<V> serializer) {
+        return new Type<>(typeToken, serializer);
     }
 
     /**
@@ -49,17 +47,15 @@ public final class Type<V> {
      * @param <V> The value type
      * @return the type
      */
-    public static <V> Type<V> create(Class<V> clazz) {
-        return new Type<>(TypeToken.of(clazz));
+    public static <V> Type<V> create(Class<V> clazz, ValueSerializer<V> serializer) {
+        return new Type<>(TypeToken.of(clazz), serializer);
     }
 
-    private static final AtomicInteger indexCounter = new AtomicInteger();
-
-    final int index;
     private final TypeToken<V> valueType;
+    private final ValueSerializer<V> serializer;
 
-    private Type(TypeToken<V> valueType) {
-        this.index = indexCounter.getAndIncrement();
+    private Type(TypeToken<V> valueType, ValueSerializer<V> serializer) {
+        this.serializer = serializer;
         this.valueType = valueType;
     }
 
@@ -72,14 +68,13 @@ public final class Type<V> {
         return this.valueType;
     }
 
-    @Override
-    public int hashCode() {
-        return this.index;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return !(o == null || o.getClass() != this.getClass()) && ((Type) o).index == this.index;
+    /**
+     * Gets the value serializer.
+     *
+     * @return The value serializer
+     */
+    public ValueSerializer<V> getSerializer() {
+        return this.serializer;
     }
 
 }

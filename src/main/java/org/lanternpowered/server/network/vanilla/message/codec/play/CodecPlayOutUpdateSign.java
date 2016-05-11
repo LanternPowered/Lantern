@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -36,12 +36,12 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutUpdateSign implements Codec<MessagePlayOutUpdateSign> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutUpdateSign message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, Types.POSITION, message.getPosition());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutUpdateSign message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.write(Types.VECTOR_3_I, message.getPosition());
         LocalizedText[] lines = message.getLines();
         for (int i = 0; i < 4; i++) {
-            context.write(buf, Types.LOCALIZED_TEXT, lines[i] == null ? LocalizedText.EMPTY : lines[i]);
+            buf.write(Types.LOCALIZED_TEXT, lines[i] == null ? LocalizedText.EMPTY : lines[i]);
         }
         return buf;
     }

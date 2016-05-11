@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.entity.living.player.PlayerHand;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
@@ -35,7 +35,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInPlayerUseItem implements Codec<MessagePlayInPlayerUseItem> {
 
     @Override
-    public MessagePlayInPlayerUseItem decode(CodecContext context, ByteBuf buf) throws CodecException {
-        return new MessagePlayInPlayerUseItem(PlayerHand.values()[context.readVarInt(buf)]);
+    public MessagePlayInPlayerUseItem decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        return new MessagePlayInPlayerUseItem(PlayerHand.values()[buf.readVarInt()]);
     }
 }

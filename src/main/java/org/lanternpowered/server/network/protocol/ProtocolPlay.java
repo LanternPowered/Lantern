@@ -111,6 +111,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
+import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutTabListEntries;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutTheEnd;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutSetGameMode;
@@ -222,6 +223,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.bindProcessor(MessagePlayOutParticleEffect.class, new ProcessorPlayOutParticleEffect());
         outbound.bindProcessor(MessagePlayOutSetGameMode.class, new ProcessorPlayOutSetGameMode());
         outbound.bindProcessor(MessagePlayOutWorldSky.class, new ProcessorPlayOutWorldSky());
+        outbound.bindProcessor(MessagePlayOutTabListEntries.class, new ProcessorPlayOutTabListEntries());
 
         HandlerPlayInAllPlayerMovement playerMovementHandler = new HandlerPlayInAllPlayerMovement();
 

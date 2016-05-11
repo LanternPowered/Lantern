@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.login;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
@@ -34,11 +34,9 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 public final class CodecLoginInEncryptionResponse implements Codec<MessageLoginInEncryptionResponse> {
 
     @Override
-    public MessageLoginInEncryptionResponse decode(CodecContext context, ByteBuf buf) throws CodecException {
-        byte[] sharedSecret = new byte[context.readVarInt(buf)];
-        buf.readBytes(sharedSecret);
-        byte[] verifyToken = new byte[context.readVarInt(buf)];
-        buf.readBytes(verifyToken);
+    public MessageLoginInEncryptionResponse decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        byte[] sharedSecret = buf.readByteArray();
+        byte[] verifyToken = buf.readByteArray();
         return new MessageLoginInEncryptionResponse(sharedSecret, verifyToken);
     }
 }

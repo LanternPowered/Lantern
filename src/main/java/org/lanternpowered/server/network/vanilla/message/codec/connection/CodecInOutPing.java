@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.connection;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
@@ -34,12 +34,12 @@ import org.lanternpowered.server.network.vanilla.message.type.connection.Message
 public final class CodecInOutPing implements Codec<MessageInOutPing> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessageInOutPing message) throws CodecException {
-        return context.writeVarInt(context.byteBufAlloc().buffer(), message.getKeepAliveId());
+    public ByteBuffer encode(CodecContext context, MessageInOutPing message) throws CodecException {
+        return context.byteBufAlloc().buffer().writeVarInt(message.getKeepAliveId());
     }
 
     @Override
-    public MessageInOutPing decode(CodecContext context, ByteBuf buf) throws CodecException {
-        return new MessageInOutPing(context.readVarInt(buf));
+    public MessageInOutPing decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        return new MessageInOutPing(buf.readVarInt());
     }
 }

@@ -47,7 +47,8 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import static org.lanternpowered.server.network.message.codec.serializer.SimpleSerializerContext.DEFAULT;
+import static org.lanternpowered.server.network.buffer.LanternByteBuffer.readVarInt;
+import static org.lanternpowered.server.network.buffer.LanternByteBuffer.writeVarInt;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -96,18 +97,18 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
             } else if (compressedLength >= length) {
                 // Compression increased the size. threshold is probably too low
                 // Send as an uncompressed packet
-                DEFAULT.writeVarInt(prefixBuf, 0);
+                writeVarInt(prefixBuf, 0);
                 msg.readerIndex(index);
                 msg.retain();
                 contentsBuf = msg;
             } else {
                 // All is well
-                DEFAULT.writeVarInt(prefixBuf, length);
+                writeVarInt(prefixBuf, length);
                 contentsBuf = Unpooled.wrappedBuffer(compressedData, 0, compressedLength);
             }
         } else {
             // Message should be sent through
-            DEFAULT.writeVarInt(prefixBuf, 0);
+            writeVarInt(prefixBuf, 0);
             msg.retain();
             contentsBuf = msg;
         }
@@ -118,7 +119,7 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
         int index = msg.readerIndex();
-        int uncompressedSize = DEFAULT.readVarInt(msg);
+        int uncompressedSize = readVarInt(msg);
         if (uncompressedSize == 0) {
             // Message is uncompressed
             int length = msg.readableBytes();

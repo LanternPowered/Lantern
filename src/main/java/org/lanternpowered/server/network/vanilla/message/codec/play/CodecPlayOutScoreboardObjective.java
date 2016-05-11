@@ -25,27 +25,25 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardObjective;
-import org.lanternpowered.server.text.LanternTexts;
 
 public final class CodecPlayOutScoreboardObjective implements Codec<MessagePlayOutScoreboardObjective> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutScoreboardObjective message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, Types.STRING, message.getObjectiveName());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutScoreboardObjective message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeString(message.getObjectiveName());
         if (message instanceof MessagePlayOutScoreboardObjective.CreateOrUpdate) {
-            buf.writeByte(message instanceof MessagePlayOutScoreboardObjective.Create ? 0 : 2);
+            buf.writeByte((byte) (message instanceof MessagePlayOutScoreboardObjective.Create ? 0 : 2));
             MessagePlayOutScoreboardObjective.CreateOrUpdate message0 = (MessagePlayOutScoreboardObjective.CreateOrUpdate) message;
-            context.write(buf, Types.STRING, message0.getDisplayName());
-            context.write(buf, Types.STRING, message0.getDisplayMode().getId());
+            buf.writeString(message0.getDisplayName());
+            buf.writeString(message0.getDisplayMode().getId());
         } else {
-            buf.writeByte(1);
+            buf.writeByte((byte) 1);
         }
         return buf;
     }

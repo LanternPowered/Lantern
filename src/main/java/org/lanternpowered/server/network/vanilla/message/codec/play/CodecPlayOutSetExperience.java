@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetExperience;
@@ -34,11 +34,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSetExperience implements Codec<MessagePlayOutSetExperience> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSetExperience message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSetExperience message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeFloat(message.getExp());
-        context.writeVarInt(buf, message.getLevel());
-        context.writeVarInt(buf, message.getTotal());
+        buf.writeVarInt(message.getLevel());
+        buf.writeVarInt(message.getTotal());
         return buf;
     }
 }

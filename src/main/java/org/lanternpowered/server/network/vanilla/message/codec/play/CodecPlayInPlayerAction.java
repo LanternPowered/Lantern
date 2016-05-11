@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -42,12 +42,12 @@ public final class CodecPlayInPlayerAction implements Codec<Message> {
     static final AttributeKey<Boolean> CANCEL_NEXT_JUMP_MESSAGE = AttributeKey.valueOf("cancel-next-jump-message");
 
     @Override
-    public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
+    public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         // Normally should this be the entity id, but only the
         // client player will send this, so it won't be used
-        context.readVarInt(buf);
-        int action = context.readVarInt(buf);
-        int value = context.readVarInt(buf);
+        buf.readVarInt();
+        int action = buf.readVarInt();
+        int value = buf.readVarInt();
         // Sneaking states
         if (action == 0 || action == 1) {
             return new MessagePlayInPlayerSneak(action == 0);

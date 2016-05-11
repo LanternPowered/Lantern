@@ -23,42 +23,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.channel;
+package org.lanternpowered.server.network.buffer;
 
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.spongepowered.api.network.ChannelBinding;
-import org.spongepowered.api.network.ChannelRegistrar;
-import org.spongepowered.api.network.RemoteConnection;
-import org.spongepowered.api.plugin.PluginContainer;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.Unpooled;
 
-public abstract class LanternChannelBinding implements ChannelBinding {
+public class LanternByteBufferAllocator implements ByteBufferAllocator {
 
-    final LanternChannelRegistrar registrar;
-    final PluginContainer owner;
-    final String name;
+    private final ByteBufAllocator byteBufAllocator;
 
-    boolean bound;
-
-    LanternChannelBinding(LanternChannelRegistrar registrar, String name, PluginContainer owner) {
-        this.registrar = registrar;
-        this.owner = owner;
-        this.name = name;
+    public LanternByteBufferAllocator(ByteBufAllocator byteBufAllocator) {
+        this.byteBufAllocator = byteBufAllocator;
     }
 
     @Override
-    public ChannelRegistrar getRegistrar() {
-        return this.registrar;
+    public ByteBuffer buffer() {
+        return new LanternByteBuffer(this.byteBufAllocator.buffer());
     }
 
     @Override
-    public String getName() {
-        return this.name;
+    public ByteBuffer buffer(int initialCapacity) {
+        return new LanternByteBuffer(this.byteBufAllocator.buffer(initialCapacity));
     }
 
     @Override
-    public PluginContainer getOwner() {
-        return this.owner;
+    public ByteBuffer heapBuffer() {
+        return new LanternByteBuffer(this.byteBufAllocator.heapBuffer());
     }
 
-    abstract void handlePayload(ByteBuffer buf, RemoteConnection connection);
+    @Override
+    public ByteBuffer heapBuffer(int initialCapacity) {
+        return new LanternByteBuffer(this.byteBufAllocator.heapBuffer(initialCapacity));
+    }
+
+    @Override
+    public ByteBuffer directBuffer() {
+        return new LanternByteBuffer(this.byteBufAllocator.directBuffer());
+    }
+
+    @Override
+    public ByteBuffer directBuffer(int initialCapacity) {
+        return new LanternByteBuffer(this.byteBufAllocator.directBuffer(initialCapacity));
+    }
+
+    @Override
+    public ByteBuffer wrappedBuffer(byte[] byteArray) {
+        // TODO: Use the byteBufAllocator?
+        return new LanternByteBuffer(Unpooled.wrappedBuffer(byteArray));
+    }
 }

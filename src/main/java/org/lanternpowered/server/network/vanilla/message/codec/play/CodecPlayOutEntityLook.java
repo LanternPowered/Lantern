@@ -29,6 +29,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
@@ -36,9 +37,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutEntityLook implements Codec<MessagePlayOutEntityLook> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutEntityLook message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutEntityLook message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
         buf.writeByte(wrapAngle(message.getYaw()));
         buf.writeByte(wrapAngle(message.getPitch()));
         buf.writeBoolean(message.isOnGround());

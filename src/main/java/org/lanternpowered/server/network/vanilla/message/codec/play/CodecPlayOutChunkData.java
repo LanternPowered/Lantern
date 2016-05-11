@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
@@ -35,18 +35,18 @@ import org.lanternpowered.server.util.VariableValueArray;
 public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkData> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutChunkData message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, MessagePlayOutChunkData message) throws CodecException {
         final MessagePlayOutChunkData.Section[] sections = message.getSections();
         final byte[] biomes = message.getBiomes();
 
-        final ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeInt(message.getX());
-        buf.writeInt(message.getZ());
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeInteger(message.getX());
+        buf.writeInteger(message.getZ());
         buf.writeBoolean(biomes != null);
 
         int sectionBitmask = 0;
 
-        final ByteBuf dataBuf = context.byteBufAlloc().buffer();
+        final ByteBuffer dataBuf = context.byteBufAlloc().buffer();
         for (int i = 0; i < sections.length; i++) {
             if (sections[i] == null) {
                 continue;
@@ -54,19 +54,19 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             sectionBitmask |= 1 << i;
             MessagePlayOutChunkData.Section section = sections[i];
             VariableValueArray types = section.getTypes();
-            dataBuf.writeByte(types.getBitsPerValue());
+            dataBuf.writeByte((byte) types.getBitsPerValue());
             int[] palette = section.getPalette();
             if (palette != null) {
-                context.writeVarInt(dataBuf, palette.length);
+                dataBuf.writeVarInt(palette.length);
                 for (int value : palette) {
-                    context.writeVarInt(dataBuf, value);
+                    dataBuf.writeVarInt(value);
                 }
             } else {
                 // Using global palette
-                context.writeVarInt(dataBuf, 0);
+                dataBuf.writeVarInt(0);
             }
             long[] backing = types.getBacking();
-            context.writeVarInt(dataBuf, backing.length);
+            dataBuf.writeVarInt(backing.length);
             byte[] blockLight = section.getBlockLight();
             byte[] skyLight = section.getSkyLight();
             dataBuf.ensureWritable(backing.length * 8 + blockLight.length +
@@ -84,8 +84,8 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             dataBuf.writeBytes(biomes);
         }
 
-        context.writeVarInt(buf, sectionBitmask);
-        context.writeVarInt(buf, dataBuf.writerIndex());
+        buf.writeVarInt(sectionBitmask);
+        buf.writeVarInt(dataBuf.writerIndex());
         try {
             buf.writeBytes(dataBuf);
         } finally {

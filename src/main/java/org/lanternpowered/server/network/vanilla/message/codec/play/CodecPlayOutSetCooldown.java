@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown;
@@ -34,10 +34,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSetCooldown implements Codec<MessagePlayOutSetCooldown> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSetCooldown message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getItemType());
-        context.writeVarInt(buf, message.getCooldownTicks());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSetCooldown message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getItemType());
+        buf.writeVarInt(message.getCooldownTicks());
         return buf;
     }
 }

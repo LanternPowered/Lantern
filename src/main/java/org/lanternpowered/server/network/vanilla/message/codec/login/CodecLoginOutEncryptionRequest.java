@@ -25,31 +25,27 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.login;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
 
 public final class CodecLoginOutEncryptionRequest implements Codec<MessageLoginOutEncryptionRequest> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessageLoginOutEncryptionRequest message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessageLoginOutEncryptionRequest message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
 
         byte[] publicKey = message.getPublicKey();
         byte[] verifyToken = message.getVerifyToken();
 
-        context.write(buf, Types.STRING, message.getSessionId());
+        buf.writeString(message.getSessionId());
 
         // Write the public key
-        context.writeVarInt(buf, publicKey.length);
-        buf.writeBytes(publicKey);
-
+        buf.writeByteArray(publicKey);
         // Write the verify token
-        context.writeVarInt(buf, verifyToken.length);
-        buf.writeBytes(verifyToken);
+        buf.writeByteArray(verifyToken);
 
         return buf;
     }

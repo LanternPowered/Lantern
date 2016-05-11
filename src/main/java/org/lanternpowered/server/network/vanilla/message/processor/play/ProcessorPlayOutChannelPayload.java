@@ -25,12 +25,11 @@
  */
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
@@ -55,10 +54,10 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
             if (parts > 255) {
                 throw new CodecException("Payload may not be larger than -16797616 bytes.");
             }
-            ByteBuf preamble = context.byteBufAlloc().buffer();
-            context.write(preamble, Types.STRING, message.getChannel());
-            preamble.writeByte(parts);
-            preamble.writeInt(content.length);
+            ByteBuffer preamble = context.byteBufAlloc().buffer();
+            preamble.writeString(message.getChannel());
+            preamble.writeByte((byte) parts);
+            preamble.writeInteger(content.length);
             output.add(new MessagePlayInOutChannelPayload("FML|MP", preamble));
 
             int offset = 0;
@@ -68,7 +67,7 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
                 tmp[0] = ((byte) (x & 0xff));
                 System.arraycopy(content, offset, tmp, 1, tmp.length - 1);
                 offset += tmp.length - 1;
-                output.add(new MessagePlayInOutChannelPayload("FML|MP", Unpooled.wrappedBuffer(tmp)));
+                output.add(new MessagePlayInOutChannelPayload("FML|MP", ByteBufferAllocator.unpooled().wrappedBuffer(tmp)));
             }
         }
     }

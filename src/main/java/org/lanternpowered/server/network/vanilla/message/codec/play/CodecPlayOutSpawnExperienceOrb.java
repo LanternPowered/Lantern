@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnExperienceOrb;
@@ -35,14 +35,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSpawnExperienceOrb implements Codec<MessagePlayOutSpawnExperienceOrb> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnExperienceOrb message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnExperienceOrb message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
         Vector3d position = message.getPosition();
         buf.writeDouble(position.getX());
         buf.writeDouble(position.getY());
         buf.writeDouble(position.getZ());
-        buf.writeShort(Math.min(message.getOrbsCount(), Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(message.getOrbsCount(), Short.MAX_VALUE));
         return buf;
     }
 }

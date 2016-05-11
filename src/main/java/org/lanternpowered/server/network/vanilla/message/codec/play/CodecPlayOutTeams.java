@@ -25,11 +25,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 
@@ -38,17 +37,17 @@ import java.util.List;
 public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutTeams message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.write(buf, Types.STRING, message.getTeamName());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutTeams message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeString(message.getTeamName());
         if (message instanceof MessagePlayOutTeams.Remove) {
-            buf.writeByte(1);
+            buf.writeByte((byte) 1);
         } else if (message instanceof MessagePlayOutTeams.CreateOrUpdate) {
-            buf.writeByte(message instanceof MessagePlayOutTeams.Create ? 0 : 2);
+            buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Create ? 0 : 2));
             MessagePlayOutTeams.CreateOrUpdate message1 = (MessagePlayOutTeams.CreateOrUpdate) message;
-            context.write(buf, Types.STRING, message1.getDisplayName());
-            context.write(buf, Types.STRING, message1.getPrefix());
-            context.write(buf, Types.STRING, message1.getSuffix());
+            buf.writeString(message1.getDisplayName());
+            buf.writeString(message1.getPrefix());
+            buf.writeString(message1.getSuffix());
             int flags = 0;
             if (message1.getFriendlyFire()) {
                 flags |= 0x01;
@@ -56,18 +55,16 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
             if (message1.getSeeFriendlyInvisibles()) {
                 flags |= 0x02;
             }
-            buf.writeByte(flags);
-            context.write(buf, Types.STRING, message1.getNameTagVisibility().getId());
-            context.write(buf, Types.STRING, message1.getCollisionRule().getId());
-            buf.writeByte(FormattingCodeTextSerializer.FORMATS.get(message1.getColor()));
+            buf.writeByte((byte) flags);
+            buf.writeString(message1.getNameTagVisibility().getId());
+            buf.writeString(message1.getCollisionRule().getId());
+            buf.writeByte((byte) FormattingCodeTextSerializer.FORMATS.get(message1.getColor()).charValue());
         } else {
-            buf.writeByte(message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4);
+            buf.writeByte((byte) (message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4));
             MessagePlayOutTeams.AddOrRemovePlayers message1 = (MessagePlayOutTeams.AddOrRemovePlayers) message;
             List<String> players = message1.getPlayers();
-            context.writeVarInt(buf, players.size());
-            for (String player : players) {
-                context.write(buf, Types.STRING, player);
-            }
+            buf.writeVarInt(players.size());
+            players.forEach(buf::writeString);
         }
         return buf;
     }

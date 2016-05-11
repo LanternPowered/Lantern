@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.network.message.codec.serializer;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 
 public interface ValueSerializer<V> {
 
-    void write(SerializerContext context, ByteBuf buf, V object) throws CodecException;
+    void write(ByteBuffer buf, V object) throws CodecException;
 
-    V read(SerializerContext context, ByteBuf buf) throws CodecException;
+    V read(ByteBuffer buf) throws CodecException;
 
 }

@@ -25,17 +25,16 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 
 public final class CodecPlayInChatMessage implements Codec<MessagePlayInChatMessage> {
 
     @Override
-    public MessagePlayInChatMessage decode(CodecContext context, ByteBuf buf) throws CodecException {
-        return new MessagePlayInChatMessage(context.read(buf, Types.STRING));
+    public MessagePlayInChatMessage decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        return new MessagePlayInChatMessage(buf.readString());
     }
 }

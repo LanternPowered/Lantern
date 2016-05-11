@@ -28,9 +28,9 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.fromFace;
 
 import com.flowpowered.math.vector.Vector3i;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -43,9 +43,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInPlayerDigging implements Codec<Message> {
 
     @Override
-    public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
+    public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         int action = buf.readByte();
-        Vector3i position = context.read(buf, Types.POSITION);
+        Vector3i position = buf.read(Types.VECTOR_3_I);
         int face = buf.readByte();
         switch (action) {
             case 0:

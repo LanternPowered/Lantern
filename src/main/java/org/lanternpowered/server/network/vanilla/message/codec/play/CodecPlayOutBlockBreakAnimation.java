@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -35,10 +35,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutBlockBreakAnimation implements Codec<MessagePlayOutBlockBreakAnimation> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutBlockBreakAnimation message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getId());
-        context.write(buf, Types.POSITION, message.getPosition());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutBlockBreakAnimation message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt( message.getId());
+        buf.write(Types.VECTOR_3_I, message.getPosition());
         // Make sure that the state fits in the byte
         int state = message.getState();
         buf.writeByte((byte) (state >= 0 && state <= 9 ? state : 10));

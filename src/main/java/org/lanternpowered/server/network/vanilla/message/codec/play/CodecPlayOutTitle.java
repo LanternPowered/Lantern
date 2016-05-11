@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -42,24 +42,24 @@ public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
     private static final int RESET = 4;
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutTitle message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutTitle message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         if (message instanceof MessagePlayOutTitle.Clear) {
-            context.writeVarInt(buf, CLEAR);
+            buf.writeVarInt(CLEAR);
         } else if (message instanceof MessagePlayOutTitle.Reset) {
-            context.writeVarInt(buf, RESET);
+            buf.writeVarInt(RESET);
         } else if (message instanceof MessagePlayOutTitle.SetTitle) {
-            context.writeVarInt(buf, SET_TITLE);
-            context.write(buf, Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetTitle) message).getTitle());
+            buf.writeVarInt(SET_TITLE);
+            buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetTitle) message).getTitle());
         } else if (message instanceof MessagePlayOutTitle.SetSubtitle) {
-            context.writeVarInt(buf, SET_SUBTITLE);
-            context.write(buf, Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
+            buf.writeVarInt(SET_SUBTITLE);
+            buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
         } else {
             MessagePlayOutTitle.SetTimes message0 = (SetTimes) message;
-            context.writeVarInt(buf, SET_TIMES);
-            buf.writeInt(message0.getFadeIn());
-            buf.writeInt(message0.getStay());
-            buf.writeInt(message0.getFadeOut());
+            buf.writeVarInt(SET_TIMES);
+            buf.writeInteger(message0.getFadeIn());
+            buf.writeInteger(message0.getStay());
+            buf.writeInteger(message0.getFadeOut());
         }
         return buf;
     }

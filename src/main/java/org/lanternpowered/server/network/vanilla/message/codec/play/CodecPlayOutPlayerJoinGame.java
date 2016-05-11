@@ -25,12 +25,11 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 
 public final class CodecPlayOutPlayerJoinGame implements Codec<MessagePlayOutPlayerJoinGame> {
@@ -38,19 +37,19 @@ public final class CodecPlayOutPlayerJoinGame implements Codec<MessagePlayOutPla
     public final static AttributeKey<Integer> PLAYER_ENTITY_ID = AttributeKey.valueOf("player-entity-id");
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutPlayerJoinGame message) throws CodecException {
+    public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerJoinGame message) throws CodecException {
         context.getChannel().attr(PLAYER_ENTITY_ID).set(message.getEntityId());
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        buf.writeInt(message.getEntityId());
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeInteger(message.getEntityId());
         byte gameMode = message.getGameMode().getInternalId();
         if (message.isHardcore()) {
             gameMode |= 0x8;
         }
         buf.writeByte(gameMode);
-        buf.writeInt(message.getDimensionType().getInternalId());
+        buf.writeInteger(message.getDimensionType().getInternalId());
         buf.writeByte(message.getDifficulty().getInternalId());
-        buf.writeByte(Math.min(message.getPlayerListSize(), 255));
-        context.write(buf, Types.STRING, "default"); // Not used
+        buf.writeByte((byte) Math.min(message.getPlayerListSize(), 255));
+        buf.writeString("default"); // Not used
         buf.writeBoolean(message.getReducedDebug());
         return buf;
     }

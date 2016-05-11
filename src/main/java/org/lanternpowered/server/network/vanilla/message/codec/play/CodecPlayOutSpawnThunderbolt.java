@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnThunderbolt;
@@ -35,14 +36,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutSpawnThunderbolt implements Codec<MessagePlayOutSpawnThunderbolt> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutSpawnThunderbolt message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
-        context.writeVarInt(buf, message.getEntityId());
-        buf.writeByte(1);
+    public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnThunderbolt message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
+        buf.writeByte((byte) 1);
         Vector3d position = message.getPosition();
-        buf.writeInt((int) (position.getX() * 32.0));
-        buf.writeInt((int) (position.getY() * 32.0));
-        buf.writeInt((int) (position.getZ() * 32.0));
+        buf.writeInteger((int) (position.getX() * 32.0));
+        buf.writeInteger((int) (position.getY() * 32.0));
+        buf.writeInteger((int) (position.getZ() * 32.0));
         return buf;
     }
 }

@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.status;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
@@ -34,7 +34,7 @@ import org.lanternpowered.server.network.vanilla.message.type.status.MessageStat
 public final class CodecStatusInRequest implements Codec<MessageStatusInRequest> {
 
     @Override
-    public MessageStatusInRequest decode(CodecContext context, ByteBuf buf) throws CodecException {
+    public MessageStatusInRequest decode(CodecContext context, ByteBuffer buf) throws CodecException {
         return new MessageStatusInRequest();
     }
 }

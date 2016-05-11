@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
@@ -42,8 +42,8 @@ public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMe
 
     @SuppressWarnings("deprecation")
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutChatMessage message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutChatMessage message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         LocalizedText text = message.getMessage();
         ChatType type = message.getChatType();
         int value;
@@ -59,8 +59,8 @@ public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMe
         } else {
             throw new CodecException("Unknown chat type: " + type.getName());
         }
-        context.write(buf, Types.LOCALIZED_TEXT, text);
-        buf.writeByte(value);
+        buf.write(Types.LOCALIZED_TEXT, text);
+        buf.writeByte((byte) value);
         return buf;
     }
 }

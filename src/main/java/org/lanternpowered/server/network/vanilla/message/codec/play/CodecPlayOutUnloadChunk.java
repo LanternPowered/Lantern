@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
@@ -34,7 +34,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutUnloadChunk implements Codec<MessagePlayOutUnloadChunk> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutUnloadChunk message) throws CodecException {
-        return context.byteBufAlloc().buffer(8).writeInt(message.getX()).writeInt(message.getZ());
+    public ByteBuffer encode(CodecContext context, MessagePlayOutUnloadChunk message) throws CodecException {
+        return context.byteBufAlloc().buffer(8).writeInteger(message.getX()).writeInteger(message.getZ());
     }
 }

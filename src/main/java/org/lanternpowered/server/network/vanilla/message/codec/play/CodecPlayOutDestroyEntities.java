@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
@@ -34,12 +34,12 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 public final class CodecPlayOutDestroyEntities implements Codec<MessagePlayOutDestroyEntities> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutDestroyEntities message) throws CodecException {
-        ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutDestroyEntities message) throws CodecException {
+        ByteBuffer buf = context.byteBufAlloc().buffer();
         int[] entityIds = message.getEntityIds();
-        context.writeVarInt(buf, entityIds.length);
+        buf.writeVarInt(entityIds.length);
         for (int entityId : entityIds) {
-            context.writeVarInt(buf, entityId);
+            buf.writeVarInt(entityId);
         }
         return buf;
     }

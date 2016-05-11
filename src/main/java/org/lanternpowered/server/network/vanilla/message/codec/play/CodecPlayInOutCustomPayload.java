@@ -26,18 +26,18 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import com.flowpowered.math.vector.Vector3i;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.serializer.Types;
 import org.lanternpowered.server.network.objects.RawItemStack;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditCommandBlock;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditCommandBlock;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
@@ -54,13 +54,12 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
     private final static DataQuery AUTHOR = DataQuery.of("author");
     private final static DataQuery TITLE = DataQuery.of("title");
 
-    private final static ByteBuf EMPTY = Unpooled.buffer(0);
+    private final static ByteBuffer EMPTY = ByteBufferAllocator.unpooled().buffer(0);
 
     @Override
     protected MessageResult encode0(CodecContext context, Message message) throws CodecException {
         if (message instanceof MessagePlayInOutBrand) {
-            return new MessageResult("MC|Brand", context.write(context.byteBufAlloc().buffer(), Types.STRING,
-                    ((MessagePlayInOutBrand) message).getBrand()));
+            return new MessageResult("MC|Brand", context.byteBufAlloc().buffer().writeString(((MessagePlayInOutBrand) message).getBrand()));
         } else if (message instanceof MessagePlayOutOpenBook) {
             return new MessageResult("MC|BOpen", EMPTY);
         }
@@ -68,13 +67,13 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
     }
 
     @Override
-    protected Message decode0(CodecContext context, String channel, ByteBuf content) throws CodecException {
+    protected Message decode0(CodecContext context, String channel, ByteBuffer content) throws CodecException {
         if ("MC|ItemName".equals(channel)) {
-            return new MessagePlayInChangeItemName(context.read(content, Types.STRING));
+            return new MessagePlayInChangeItemName(content.readString());
         } else if ("MC|TrSel".equals(channel)) {
-            return new MessagePlayInChangeOffer(content.readInt());
+            return new MessagePlayInChangeOffer(content.readInteger());
         } else if ("MC|Brand".equals(channel)) {
-            return new MessagePlayInOutBrand(context.read(content, Types.STRING));
+            return new MessagePlayInOutBrand(content.readString());
         } else if ("MC|Beacon".equals(channel)) {
             // TODO
         } else if ("MC|AdvCdm".equals(channel)) {
@@ -84,17 +83,17 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             int entityId = 0;
 
             if (type == 0) {
-                int x = content.readInt();
-                int y = content.readInt();
-                int z = content.readInt();
+                int x = content.readInteger();
+                int y = content.readInteger();
+                int z = content.readInteger();
                 pos = new Vector3i(x, y, z);
             } else if (type == 1) {
-                entityId = content.readInt();
+                entityId = content.readInteger();
             } else {
                 throw new CodecException("Unknown modify command message type: " + type);
             }
 
-            String command = context.read(content, Types.STRING);
+            String command = content.readString();
             boolean shouldTrackOutput = content.readBoolean();
 
             if (pos != null) {
@@ -103,18 +102,18 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
                 return new MessagePlayInEditCommandBlock.Entity(entityId, command, shouldTrackOutput);
             }
         } else if ("MC|AutoCmd".equals(channel)) {
-            int x = content.readInt();
-            int y = content.readInt();
-            int z = content.readInt();
-            String command = context.read(content, Types.STRING);
+            int x = content.readInteger();
+            int y = content.readInteger();
+            int z = content.readInteger();
+            String command = content.readString();
             boolean shouldTrackOutput = content.readBoolean();
             MessagePlayInEditCommandBlock.AdvancedBlock.Mode mode = MessagePlayInEditCommandBlock.AdvancedBlock.Mode.valueOf(
-                    context.read(content, Types.STRING));
+                    content.readString());
             boolean conditional = content.readBoolean();
             boolean automatic = content.readBoolean();
             return new MessagePlayInEditCommandBlock.AdvancedBlock(new Vector3i(x, y, z), command, shouldTrackOutput, mode, conditional, automatic);
         } else if ("MC|BSign".equals(channel)) {
-            RawItemStack rawItemStack = context.read(content, Types.RAW_ITEM_STACK);
+            RawItemStack rawItemStack = content.read(Types.RAW_ITEM_STACK);
             if (rawItemStack == null) {
                 throw new CodecException("Signed book may not be null!");
             }
@@ -127,7 +126,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             List<String> pages = dataView.getStringList(PAGES).orElseThrow(() -> new CodecException("Signed book pages missing!"));
             return new MessagePlayInSignBook(author, title, pages);
         } else if ("MC|BEdit".equals(channel)) {
-            RawItemStack rawItemStack = context.read(content, Types.RAW_ITEM_STACK);
+            RawItemStack rawItemStack = content.read(Types.RAW_ITEM_STACK);
             if (rawItemStack == null) {
                 throw new CodecException("Edited book may not be null!");
             }

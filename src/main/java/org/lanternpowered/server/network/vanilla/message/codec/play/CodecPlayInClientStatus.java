@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -37,8 +37,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 public final class CodecPlayInClientStatus implements Codec<Message> {
 
     @Override
-    public Message decode(CodecContext context, ByteBuf buf) throws CodecException {
-        int action = context.readVarInt(buf);
+    public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        int action = buf.readVarInt();
         switch (action) {
             case 0: return new MessagePlayInPerformRespawn();
             case 1: return new MessagePlayInRequestStatistics();

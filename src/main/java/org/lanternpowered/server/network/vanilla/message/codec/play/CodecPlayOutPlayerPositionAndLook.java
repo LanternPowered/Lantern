@@ -25,21 +25,20 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.spongepowered.api.util.RelativePositions;
 
-import java.util.EnumSet;
 import java.util.Set;
 
 public final class CodecPlayOutPlayerPositionAndLook implements Codec<MessagePlayOutPlayerPositionAndLook> {
 
     @Override
-    public ByteBuf encode(CodecContext context, MessagePlayOutPlayerPositionAndLook message) throws CodecException {
-        final ByteBuf buf = context.byteBufAlloc().buffer();
+    public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerPositionAndLook message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeDouble(message.getX());
         buf.writeDouble(message.getY());
         buf.writeDouble(message.getZ());
@@ -63,7 +62,7 @@ public final class CodecPlayOutPlayerPositionAndLook implements Codec<MessagePla
             flags |= 0x10;
         }
         buf.writeByte(flags);
-        context.writeVarInt(buf, message.getTeleportId());
+        buf.writeVarInt(message.getTeleportId());
         return buf;
     }
 }

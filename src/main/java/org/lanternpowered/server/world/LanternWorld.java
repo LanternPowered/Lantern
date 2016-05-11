@@ -988,12 +988,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public WorldCreationSettings getCreationSettings() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public LanternWorldProperties getProperties() {
         return this.properties;
     }

@@ -57,7 +57,6 @@ import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.SerializationBehaviors;
-import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -617,11 +616,6 @@ public final class LanternWorldProperties implements WorldProperties {
     @Override
     public void setSerializationBehavior(SerializationBehavior behavior) {
         this.serializationBehavior = checkNotNull(behavior, "behavior");
-    }
-
-    @Override
-    public WorldCreationSettings getCreationSettings() {
-        return new LanternWorldCreationSettingsBuilder().from(this).build(this.name, this.name);
     }
 
     @Override

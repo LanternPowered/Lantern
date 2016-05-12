@@ -55,6 +55,7 @@ import org.spongepowered.api.event.world.chunk.PopulateChunkEvent;
 import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -338,7 +339,7 @@ public final class ObservedChunkManager {
                 }
             }
 
-            return new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), skyLight, msgSections, biomesArray);
+            return new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), skyLight, msgSections, biomesArray, Collections.emptyMap());
         }
 
         /**

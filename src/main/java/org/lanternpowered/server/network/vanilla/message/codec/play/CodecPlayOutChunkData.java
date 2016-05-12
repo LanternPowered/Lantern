@@ -25,14 +25,23 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
 import org.lanternpowered.server.util.VariableValueArray;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+
+import java.util.Map;
 
 public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkData> {
+
+    private final static DataQuery X = DataQuery.of("x");
+    private final static DataQuery Y = DataQuery.of("y");
+    private final static DataQuery Z = DataQuery.of("z");
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutChunkData message) throws CodecException {
@@ -91,7 +100,18 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
         } finally {
             dataBuf.release();
         }
-        buf.writeVarInt(0); // TODO: Send tile entities
+
+        Map<Vector3i, DataView> tileEntities = message.getTileEntities();
+        buf.writeVarInt(tileEntities.size());
+
+        for (Map.Entry<Vector3i, DataView> tileEntity : tileEntities.entrySet()) {
+            DataView dataView = tileEntity.getValue();
+            Vector3i pos = tileEntity.getKey();
+            dataView.set(X, pos.getX());
+            dataView.set(Y, pos.getY());
+            dataView.set(Z, pos.getZ());
+            buf.writeDataView(dataView);
+        }
 
         return buf;
     }

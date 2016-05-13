@@ -28,29 +28,21 @@ package org.lanternpowered.server.game.registry.type.scoreboard;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import gnu.trove.map.TIntObjectMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
-import org.lanternpowered.server.game.registry.type.text.TextColorRegistryModule;
-import org.lanternpowered.server.game.registry.type.text.TextSerializersRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
-import org.lanternpowered.server.scoreboard.LanternObjectiveDisplayMode;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
-import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
-import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayModes;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,7 +64,7 @@ public final class DisplaySlotRegistryModule implements CatalogRegistryModule<Di
             if (textColor == TextColors.NONE) {
                 continue;
             }
-            Character character = FormattingCodeTextSerializer.FORMATS.get(textColor);
+            char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.get(textColor);
             types.put("below_name_" + textColor.getId(), new LanternDisplaySlot("sidebar.team." + textColor.getId(), textColor, 3 + character));
         }
         types.entrySet().forEach(entry -> {

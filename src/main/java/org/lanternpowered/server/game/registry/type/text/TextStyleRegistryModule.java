@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
+import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.format.LanternTextStyle;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
@@ -39,6 +40,7 @@ import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,18 +53,18 @@ public final class TextStyleRegistryModule implements CatalogRegistryModule<Text
     @Override
     public void registerDefaults() {
         List<TextStyle.Base> types = Lists.newArrayList();
-        types.add(new LanternTextStyle("bold", true, null, null, null, null));
-        types.add(new LanternTextStyle("italic", null, true, null, null, null));
-        types.add(new LanternTextStyle("underline", null, null, true, null, null));
-        types.add(new LanternTextStyle("strikethrough", null, null, null, true, null));
-        types.add(new LanternTextStyle("obfuscated", null, null, null, null, true));
-        types.add(new LanternTextStyle("reset", false, false, false, false, false));
+        types.add(new LanternTextStyle("bold", true, null, null, null, null, TextConstants.BOLD));
+        types.add(new LanternTextStyle("italic", null, true, null, null, null, TextConstants.ITALIC));
+        types.add(new LanternTextStyle("underline", null, null, true, null, null, TextConstants.UNDERLINE));
+        types.add(new LanternTextStyle("strikethrough", null, null, null, true, null, TextConstants.STRIKETHROUGH));
+        types.add(new LanternTextStyle("obfuscated", null, null, null, null, true, TextConstants.OBFUSCATED));
+        types.add(new LanternTextStyle("reset", false, false, false, false, false, TextConstants.RESET));
         types.forEach(type -> this.chatStyles.put(type.getId(), type));
     }
 
     @Override
     public Optional<TextStyle.Base> getById(String id) {
-        return Optional.ofNullable(this.chatStyles.get(checkNotNull(id).toLowerCase()));
+        return Optional.ofNullable(this.chatStyles.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
     }
 
     @Override

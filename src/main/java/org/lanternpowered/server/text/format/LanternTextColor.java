@@ -31,13 +31,15 @@ import org.lanternpowered.server.catalog.LanternCatalogType;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.util.Color;
 
-public final class LanternTextColor extends LanternCatalogType implements TextColor {
+public final class LanternTextColor extends LanternCatalogType implements TextColor, FormattingCodeHolder {
 
     private final Color color;
+    private final char code;
 
-    public LanternTextColor(String name, Color color) {
+    public LanternTextColor(String name, Color color, char code) {
         super(name, name.toLowerCase());
         this.color = checkNotNull(color, "color");
+        this.code = code;
     }
 
     @Override
@@ -45,4 +47,8 @@ public final class LanternTextColor extends LanternCatalogType implements TextCo
         return this.color;
     }
 
+    @Override
+    public char getCode() {
+        return this.code;
+    }
 }

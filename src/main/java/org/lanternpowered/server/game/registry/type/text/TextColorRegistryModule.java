@@ -31,6 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
+import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.format.LanternTextColor;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
@@ -40,6 +41,7 @@ import org.spongepowered.api.util.Color;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -51,30 +53,30 @@ public final class TextColorRegistryModule implements CatalogRegistryModule<Text
     @Override
     public void registerDefaults() {
         List<TextColor> types = Lists.newArrayList();
-        types.add(new LanternTextColor("black", Color.BLACK));
-        types.add(new LanternTextColor("dark_blue", Color.ofRgb(0x0000AA)));
-        types.add(new LanternTextColor("dark_green", Color.ofRgb(0x00AA00)));
-        types.add(new LanternTextColor("dark_aqua", Color.ofRgb(0x00AAAA)));
-        types.add(new LanternTextColor("dark_red", Color.ofRgb(0xAA0000)));
-        types.add(new LanternTextColor("dark_purple", Color.ofRgb(0xAA00AA)));
-        types.add(new LanternTextColor("gold", Color.ofRgb(0xFFAA00)));
-        types.add(new LanternTextColor("gray", Color.ofRgb(0xAAAAAA)));
-        types.add(new LanternTextColor("dark_gray", Color.ofRgb(0x555555)));
-        types.add(new LanternTextColor("blue", Color.ofRgb(0x5555FF)));
-        types.add(new LanternTextColor("green", Color.ofRgb(0x55FF55)));
-        types.add(new LanternTextColor("aqua", Color.ofRgb(0x00FFFF)));
-        types.add(new LanternTextColor("red", Color.ofRgb(0xFF5555)));
-        types.add(new LanternTextColor("light_purple", Color.ofRgb(0xFF55FF)));
-        types.add(new LanternTextColor("yellow", Color.ofRgb(0xFFFF55)));
-        types.add(new LanternTextColor("white", Color.WHITE));
-        types.add(new LanternTextColor("reset", Color.WHITE));
+        types.add(new LanternTextColor("black", Color.BLACK, TextConstants.BLACK));
+        types.add(new LanternTextColor("dark_blue", Color.ofRgb(0x0000AA), TextConstants.DARK_BLUE));
+        types.add(new LanternTextColor("dark_green", Color.ofRgb(0x00AA00), TextConstants.DARK_GREEN));
+        types.add(new LanternTextColor("dark_aqua", Color.ofRgb(0x00AAAA), TextConstants.DARK_AQUA));
+        types.add(new LanternTextColor("dark_red", Color.ofRgb(0xAA0000), TextConstants.DARK_RED));
+        types.add(new LanternTextColor("dark_purple", Color.ofRgb(0xAA00AA), TextConstants.DARK_PURPLE));
+        types.add(new LanternTextColor("gold", Color.ofRgb(0xFFAA00), TextConstants.GOLD));
+        types.add(new LanternTextColor("gray", Color.ofRgb(0xAAAAAA), TextConstants.GRAY));
+        types.add(new LanternTextColor("dark_gray", Color.ofRgb(0x555555), TextConstants.DARK_GRAY));
+        types.add(new LanternTextColor("blue", Color.ofRgb(0x5555FF), TextConstants.BLUE));
+        types.add(new LanternTextColor("green", Color.ofRgb(0x55FF55), TextConstants.GREEN));
+        types.add(new LanternTextColor("aqua", Color.ofRgb(0x55FFFF), TextConstants.AQUA));
+        types.add(new LanternTextColor("red", Color.ofRgb(0xFF5555), TextConstants.RED));
+        types.add(new LanternTextColor("light_purple", Color.ofRgb(0xFF55FF), TextConstants.LIGHT_PURPLE));
+        types.add(new LanternTextColor("yellow", Color.ofRgb(0xFFFF55), TextConstants.YELLOW));
+        types.add(new LanternTextColor("white", Color.WHITE, TextConstants.WHITE));
+        types.add(new LanternTextColor("reset", Color.WHITE, TextConstants.RESET));
         types.add(TextColors.NONE);
         types.forEach(type -> this.chatColors.put(type.getId(), type));
     }
 
     @Override
     public Optional<TextColor> getById(String id) {
-        return Optional.ofNullable(this.chatColors.get(checkNotNull(id).toLowerCase()));
+        return Optional.ofNullable(this.chatColors.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
     }
 
     @Override

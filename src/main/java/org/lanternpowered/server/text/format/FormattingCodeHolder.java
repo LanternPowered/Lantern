@@ -25,32 +25,7 @@
  */
 package org.lanternpowered.server.text.format;
 
-import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+public interface FormattingCodeHolder {
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.text.format.TextStyle;
-
-import javax.annotation.Nullable;
-
-public final class LanternTextStyle extends TextStyle.Base implements SimpleCatalogType, FormattingCodeHolder {
-
-    private final String identifier;
-    private final char code;
-
-    public LanternTextStyle(String identifier, @Nullable Boolean bold, @Nullable Boolean italic, @Nullable Boolean underline,
-            @Nullable Boolean strikethrough, @Nullable Boolean obfuscated, char code) {
-        super(bold, italic, underline, strikethrough, obfuscated);
-        this.identifier = checkNotNullOrEmpty(identifier, "identifier");
-        this.code = code;
-    }
-
-    @Override
-    public String getId() {
-        return this.identifier;
-    }
-
-    @Override
-    public char getCode() {
-        return this.code;
-    }
+    char getCode();
 }

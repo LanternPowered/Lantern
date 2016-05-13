@@ -71,7 +71,7 @@ public final class ConsoleManager {
         final ConsoleReader reader = ConsoleLaunch.getReader();
         while (this.active) {
             try {
-                String command = reader.readLine();
+                String command = reader.readLine("> ");
                 if (command != null) {
                     command = command.trim();
                     if (!command.isEmpty()) {

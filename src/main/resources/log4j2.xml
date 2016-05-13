@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" packages="org.lanternpowered.launch.console">
     <Appenders>
-        <Console name="Console" target="SYSTEM_OUT">
+        <TerminalConsole name="Console">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level] [%logger{1}]%fqcn{ [%path]}: %msg%n"/>
-        </Console>
-        <Console name="DefaultConsole" target="SYSTEM_OUT">
+        </TerminalConsole>
+        <TerminalConsole name="DefaultConsole">
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]%fqcn{ [%path]}: %msg%n"/>
-        </Console>
+        </TerminalConsole>
+        <!-- Keep a console appender open so log4j2 doesn't close our main out stream if we redirect System.out to the logger -->
+        <Console name="SysOut" target="SYSTEM_OUT"/>
         <RollingRandomAccessFile name="File" fileName="logs/latest.log" filePattern="logs/%d{yyyy-MM-dd}-%i.log.gz">
             <!-- The last regex is used to strip all the color codes from the message. -->
             <PatternLayout pattern="[%d{HH:mm:ss}] [%t/%level]: %replace{%msg}{(?i)\u00A7[0-9A-FK-OR]}{}%n"/>

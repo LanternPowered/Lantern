@@ -58,7 +58,7 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
             buf.writeByte((byte) flags);
             buf.writeString(message1.getNameTagVisibility().getId());
             buf.writeString(message1.getCollisionRule().getId());
-            buf.writeByte((byte) FormattingCodeTextSerializer.FORMATS.get(message1.getColor()).charValue());
+            buf.writeByte((byte) FormattingCodeTextSerializer.FORMATS_TO_CODE.get(message1.getColor()));
         } else {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4));
             MessagePlayOutTeams.AddOrRemovePlayers message1 = (MessagePlayOutTeams.AddOrRemovePlayers) message;

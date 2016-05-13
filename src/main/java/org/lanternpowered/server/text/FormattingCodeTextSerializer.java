@@ -27,10 +27,13 @@ package org.lanternpowered.server.text;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.BiMap;
-import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import gnu.trove.map.TCharObjectMap;
+import gnu.trove.map.TObjectCharMap;
+import gnu.trove.map.hash.TCharObjectHashMap;
+import gnu.trove.map.hash.TObjectCharHashMap;
+import org.lanternpowered.server.text.format.FormattingCodeHolder;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
@@ -55,44 +58,52 @@ import javax.annotation.Nullable;
 
 public class FormattingCodeTextSerializer implements org.spongepowered.api.text.serializer.FormattingCodeTextSerializer, LanternTextSerializer {
 
-    public static final BiMap<Object, Character> FORMATS = ImmutableBiMap.<Object, Character>builder()
-            .put(TextColors.BLACK, TextConstants.BLACK)
-            .put(TextColors.DARK_BLUE, TextConstants.DARK_BLUE)
-            .put(TextColors.DARK_GREEN, TextConstants.DARK_GREEN)
-            .put(TextColors.DARK_AQUA, TextConstants.DARK_AQUA)
-            .put(TextColors.DARK_RED, TextConstants.DARK_RED)
-            .put(TextColors.DARK_PURPLE, TextConstants.DARK_PURPLE)
-            .put(TextColors.GOLD, TextConstants.GOLD)
-            .put(TextColors.GRAY, TextConstants.GRAY)
-            .put(TextColors.DARK_GRAY, TextConstants.DARK_GRAY)
-            .put(TextColors.BLUE, TextConstants.BLUE)
-            .put(TextColors.GREEN, TextConstants.GREEN)
-            .put(TextColors.AQUA, TextConstants.AQUA)
-            .put(TextColors.RED, TextConstants.RED)
-            .put(TextColors.LIGHT_PURPLE, TextConstants.LIGHT_PURPLE)
-            .put(TextColors.YELLOW, TextConstants.YELLOW)
-            .put(TextColors.WHITE, TextConstants.WHITE)
-            .put(TextColors.RESET, TextConstants.RESET)
-            .put(TextStyles.OBFUSCATED, TextConstants.OBFUSCATED)
-            .put(TextStyles.BOLD, TextConstants.BOLD)
-            .put(TextStyles.STRIKETHROUGH, TextConstants.STRIKETHROUGH)
-            .put(TextStyles.UNDERLINE, TextConstants.UNDERLINE)
-            .put(TextStyles.ITALIC, TextConstants.ITALIC)
-            .build();
+    public static final TObjectCharMap<Object> FORMATS_TO_CODE = new TObjectCharHashMap<>();
+    public static final TCharObjectMap<Object> CODE_TO_FORMATS = new TCharObjectHashMap<>();
+
+    private static void addFormat(Object format, char code) {
+        FORMATS_TO_CODE.put(format, code);
+        CODE_TO_FORMATS.put(code, format);
+    }
+
+    static {
+        addFormat(TextColors.BLACK, TextConstants.BLACK);
+        addFormat(TextColors.DARK_BLUE, TextConstants.DARK_BLUE);
+        addFormat(TextColors.DARK_GREEN, TextConstants.DARK_GREEN);
+        addFormat(TextColors.DARK_AQUA, TextConstants.DARK_AQUA);
+        addFormat(TextColors.DARK_RED, TextConstants.DARK_RED);
+        addFormat(TextColors.DARK_PURPLE, TextConstants.DARK_PURPLE);
+        addFormat(TextColors.GOLD, TextConstants.GOLD);
+        addFormat(TextColors.GRAY, TextConstants.GRAY);
+        addFormat(TextColors.DARK_GRAY, TextConstants.DARK_GRAY);
+        addFormat(TextColors.BLUE, TextConstants.BLUE);
+        addFormat(TextColors.GREEN, TextConstants.GREEN);
+        addFormat(TextColors.AQUA, TextConstants.AQUA);
+        addFormat(TextColors.RED, TextConstants.RED);
+        addFormat(TextColors.LIGHT_PURPLE, TextConstants.LIGHT_PURPLE);
+        addFormat(TextColors.YELLOW, TextConstants.YELLOW);
+        addFormat(TextColors.WHITE, TextConstants.WHITE);
+        addFormat(TextColors.RESET, TextConstants.RESET);
+        addFormat(TextStyles.OBFUSCATED, TextConstants.OBFUSCATED);
+        addFormat(TextStyles.BOLD, TextConstants.BOLD);
+        addFormat(TextStyles.STRIKETHROUGH, TextConstants.STRIKETHROUGH);
+        addFormat(TextStyles.UNDERLINE, TextConstants.UNDERLINE);
+        addFormat(TextStyles.ITALIC, TextConstants.ITALIC);
+    }
 
     private static boolean isFormat(char format) {
-        boolean flag = FORMATS.containsValue(format);
+        boolean flag = CODE_TO_FORMATS.containsValue(format);
         if (!flag) {
-            flag = FORMATS.containsValue(Character.toLowerCase(format));
+            flag = CODE_TO_FORMATS.containsValue(Character.toLowerCase(format));
         }
         return flag;
     }
 
     @Nullable
     private static Object getFormat(char format) {
-        Object obj = FORMATS.inverse().get(format);
+        Object obj = CODE_TO_FORMATS.get(format);
         if (obj == null) {
-            obj = FORMATS.inverse().get(Character.toLowerCase(format));
+            obj = CODE_TO_FORMATS.get(Character.toLowerCase(format));
         }
         return obj;
     }
@@ -214,22 +225,22 @@ public class FormattingCodeTextSerializer implements org.spongepowered.api.text.
                     (current.italic && !style.italic) || (current.underlined && !style.underlined) ||
                     (current.strikethrough && !style.strikethrough) || (current.obfuscated && !style.obfuscated)) {
                 if (style.color != null) {
-                    apply(builder, colorCode, FORMATS.get(style.color));
+                    apply(builder, colorCode, ((FormattingCodeHolder) style.color).getCode());
                 } else if (current != null) {
-                    apply(builder, colorCode, FORMATS.get(TextColors.RESET));
+                    apply(builder, colorCode, TextConstants.RESET);
                 }
 
-                apply(builder, colorCode, FORMATS.get(TextStyles.BOLD), style.bold);
-                apply(builder, colorCode, FORMATS.get(TextStyles.ITALIC), style.italic);
-                apply(builder, colorCode, FORMATS.get(TextStyles.UNDERLINE), style.underlined);
-                apply(builder, colorCode, FORMATS.get(TextStyles.STRIKETHROUGH), style.strikethrough);
-                apply(builder, colorCode, FORMATS.get(TextStyles.OBFUSCATED), style.obfuscated);
+                apply(builder, colorCode, TextConstants.BOLD, style.bold);
+                apply(builder, colorCode, TextConstants.ITALIC, style.italic);
+                apply(builder, colorCode, TextConstants.UNDERLINE, style.underlined);
+                apply(builder, colorCode, TextConstants.STRIKETHROUGH, style.strikethrough);
+                apply(builder, colorCode, TextConstants.OBFUSCATED, style.obfuscated);
             } else {
-                apply(builder, colorCode, FORMATS.get(TextStyles.BOLD), current.bold != style.bold);
-                apply(builder, colorCode, FORMATS.get(TextStyles.ITALIC), current.italic != style.italic);
-                apply(builder, colorCode, FORMATS.get(TextStyles.UNDERLINE), current.underlined != style.underlined);
-                apply(builder, colorCode, FORMATS.get(TextStyles.STRIKETHROUGH), current.strikethrough != style.strikethrough);
-                apply(builder, colorCode, FORMATS.get(TextStyles.OBFUSCATED), current.obfuscated != style.obfuscated);
+                apply(builder, colorCode, TextConstants.BOLD, current.bold != style.bold);
+                apply(builder, colorCode, TextConstants.ITALIC, current.italic != style.italic);
+                apply(builder, colorCode, TextConstants.UNDERLINE, current.underlined != style.underlined);
+                apply(builder, colorCode, TextConstants.STRIKETHROUGH, current.strikethrough != style.strikethrough);
+                apply(builder, colorCode, TextConstants.OBFUSCATED, current.obfuscated != style.obfuscated);
             }
         }
 

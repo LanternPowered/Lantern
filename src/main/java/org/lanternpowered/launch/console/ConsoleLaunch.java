@@ -31,18 +31,12 @@ import static jline.TerminalFactory.OFF;
 import com.google.common.collect.Sets;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
-import jline.console.CursorBuffer;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.fusesource.jansi.AnsiConsole;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -62,18 +56,13 @@ public final class ConsoleLaunch {
 
     // Whether jline should be enabled
     private static final boolean ENABLE_JLINE = PropertiesUtil.getProperties().getBooleanProperty("jline.enable", true);
+    private static final boolean FORCE_JLINE = PropertiesUtil.getProperties().getBooleanProperty("jline.force", false);
 
-    private static Function<String, String> formatter = Function.identity();
-    private static ConsoleReader reader;
-
-    // A temp cursor buffer, internal use only
-    private static volatile CursorBuffer stashed;
+    static Function<String, String> formatter = Function.identity();
+    static ConsoleReader reader;
 
     // Whether the console is initialized
-    private static boolean initialized;
-
-    // Whether advanced jline is used
-    private static boolean advancedJline;
+    static boolean initialized;
 
     public static void addFqcn(String fqcn) {
         REDIRECT_FQCNS.add(checkNotNull(fqcn, "fqcn"));
@@ -104,128 +93,51 @@ public final class ConsoleLaunch {
     /**
      * Initializes the console and log manager.
      */
-    public static void init() {
+    static void init(Logger logger) {
         if (initialized) {
             return;
         }
         initialized = true;
-        // We have to delay any messages to avoid initialisation of the log manager
-        final Map<String, Throwable> outputQueue = new LinkedHashMap<>();
         if (ENABLE_JLINE) {
-            // This is handled by us
-            System.setProperty("log4j.skipJansi", "true");
-
-            // Install jansi
-            AnsiConsole.systemInstall();
-
             final boolean hasConsole = System.console() != null;
             if (hasConsole) {
                 try {
+                    // Install jansi
+                    AnsiConsole.systemInstall();
                     reader = new ConsoleReader();
                     reader.setExpandEvents(false);
-                    reader.setPrompt(">");
-                    advancedJline = true;
                 } catch (Exception e) {
-                    outputQueue.put("Failed to initialize terminal. Falling back to default.", e);
+                    logger.warn("Failed to initialize terminal. Falling back to default.", e);
                 }
             }
 
             if (reader == null) {
+                // Eclipse doesn't support colors and characters like \r so enabling jline2 on it will
+                // just cause a lot of issues with empty lines and weird characters.
+                // Enable jline2 only on IntelliJ IDEA to prevent that.
+                //      Also see: https://bugs.eclipse.org/bugs/show_bug.cgi?id=76936
+
                 // Disable advanced jline features
                 TerminalFactory.configure(OFF);
                 TerminalFactory.reset();
 
-                try {
-                    reader = new ConsoleReader();
-                    reader.setExpandEvents(false);
-                } catch (Exception e) {
-                    outputQueue.put("Failed to initialize fallback terminal. Falling back to standard output console.", e);
+                if (hasConsole || FORCE_JLINE || System.getProperty("java.class.path").contains("idea_rt.jar")) {
+                    // Disable advanced jline features
+                    TerminalFactory.configure(OFF);
+                    TerminalFactory.reset();
+
+                    try {
+                        reader = new ConsoleReader();
+                    } catch (Exception e) {
+                        logger.warn("Failed to initialize fallback terminal. Falling back to standard output console.", e);
+                    }
+                } else {
+                    logger.warn("Disabling terminal, you're running in an unsupported environment.");
                 }
             }
         }
 
-        // Setup the print streams and formatting
-        System.setOut(new ConsolePrintStream(System.out));
-        System.setErr(new ConsolePrintStream(System.err));
-
-        // Initialize the logging system and setup the logging streams
-        // Before this point may never the any method in LogManager be accessed,
-        // because they will trigger the initialization.
-
-        // This print streams will redirect all the console output through the
-        // loggers, if send through System.out or System.err
         System.setOut(new LoggingPrintStream(LogManager.getLogger(REDIRECT_OUT), Level.INFO));
         System.setErr(new LoggingPrintStream(LogManager.getLogger(REDIRECT_ERR), Level.ERROR));
-
-        final Logger logger = LogManager.getRootLogger();
-        outputQueue.entrySet().forEach(entry -> {
-            Object value = entry.getValue();
-            if (value != null) {
-                logger.warn(entry.getKey(), value);
-            } else {
-                logger.warn(entry.getKey());
-            }
-        });
     }
-
-    private static class ConsolePrintStream extends PrintStream {
-
-        private final ConsoleOutputStream out;
-
-        public ConsolePrintStream(PrintStream output) {
-            this(new ConsoleOutputStream(output));
-        }
-
-        public ConsolePrintStream(ConsoleOutputStream out) {
-            super(out, true);
-            this.out = out;
-        }
-
-        @Override
-        public void write(byte[] buf, int off, int len) {
-            this.out.flush = false;
-            super.write(buf, off, len);
-            this.out.flush = true;
-        }
-    }
-
-    private static class ConsoleOutputStream extends ByteArrayOutputStream {
-
-        private final PrintStream output;
-        private boolean flush = true;
-
-        public ConsoleOutputStream(PrintStream output) {
-            this.output = output;
-        }
-
-        @Override
-        public void flush() throws IOException {
-            if (!this.flush) {
-                return;
-            }
-
-            String message = this.toString();
-            this.reset();
-
-            // The stached field is used to fix the issue that
-            // the reader cursor gets messed up between the other lines
-            // Sadly, this doesn't work on eclipse or intellij :(
-            boolean flag = advancedJline && reader != null && stashed == null;
-
-            if (flag) {
-                stashed = reader.getCursorBuffer().copy();
-                reader.getOutput().write("\r");
-                reader.flush();
-            }
-
-            byte[] bytes = formatter.apply(message).getBytes();
-            this.output.write(bytes, 0, bytes.length);
-
-            if (flag) {
-                reader.resetPromptLine(reader.getPrompt(), stashed.toString(), stashed.cursor);
-                stashed = null;
-            }
-        }
-    }
-
 }

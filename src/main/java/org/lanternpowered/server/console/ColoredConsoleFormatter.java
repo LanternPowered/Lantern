@@ -27,55 +27,88 @@ package org.lanternpowered.server.console;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-import com.google.common.collect.ImmutableMap;
+import gnu.trove.map.TCharByteMap;
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.hash.TCharByteHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.Ansi.Color;
 import org.lanternpowered.server.text.TextConstants;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.Map.Entry;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 @NonnullByDefault
 public class ColoredConsoleFormatter implements Function<String, String> {
 
-    private static Pattern c(char code) {
-        return Pattern.compile(String.valueOf(TextConstants.LEGACY_CHAR) + code, Pattern.LITERAL | Pattern.CASE_INSENSITIVE);
+    private static final String reset = ansi().reset().toString();
+    private static final TIntObjectMap<String> replacements = new TIntObjectHashMap<>();
+    private static final TCharByteMap lookup = new TCharByteHashMap();
+
+    private static void add(char code, Ansi replacement) {
+        replacements.put(code, replacement.toString());
+        // Add here one so we can check for 0 by default,
+        // this requires also to subtract the one for lookups
+        lookup.put(code, (byte) ((byte) code + 1));
     }
 
-    private static final String RESET = ansi().reset().toString();
-    private static final ImmutableMap<Pattern, String> REPLACEMENTS = ImmutableMap.<Pattern, String>builder()
-            .put(c(TextConstants.BLACK), ansi().a(Attribute.RESET).fg(Color.BLACK).boldOff().toString())
-            .put(c(TextConstants.DARK_BLUE), ansi().a(Attribute.RESET).fg(Color.BLUE).boldOff().toString())
-            .put(c(TextConstants.DARK_GREEN), ansi().a(Attribute.RESET).fg(Color.GREEN).boldOff().toString())
-            .put(c(TextConstants.DARK_AQUA), ansi().a(Attribute.RESET).fg(Color.CYAN).boldOff().toString())
-            .put(c(TextConstants.DARK_RED), ansi().a(Attribute.RESET).fg(Color.RED).boldOff().toString())
-            .put(c(TextConstants.DARK_PURPLE), ansi().a(Attribute.RESET).fg(Color.MAGENTA).boldOff().toString())
-            .put(c(TextConstants.GOLD), ansi().a(Attribute.RESET).fg(Color.YELLOW).boldOff().toString())
-            .put(c(TextConstants.GRAY), ansi().a(Attribute.RESET).fg(Color.WHITE).boldOff().toString())
-            .put(c(TextConstants.DARK_GRAY), ansi().a(Attribute.RESET).fg(Color.BLACK).bold().toString())
-            .put(c(TextConstants.BLUE), ansi().a(Attribute.RESET).fg(Color.BLUE).bold().toString())
-            .put(c(TextConstants.GREEN), ansi().a(Attribute.RESET).fg(Color.GREEN).bold().toString())
-            .put(c(TextConstants.AQUA), ansi().a(Attribute.RESET).fg(Color.CYAN).bold().toString())
-            .put(c(TextConstants.RED), ansi().a(Attribute.RESET).fg(Color.RED).bold().toString())
-            .put(c(TextConstants.LIGHT_PURPLE), ansi().a(Attribute.RESET).fg(Color.MAGENTA).bold().toString())
-            .put(c(TextConstants.YELLOW), ansi().a(Attribute.RESET).fg(Color.YELLOW).bold().toString())
-            .put(c(TextConstants.WHITE), ansi().a(Attribute.RESET).fg(Color.WHITE).bold().toString())
-            .put(c(TextConstants.OBFUSCATED), ansi().a(Attribute.BLINK_SLOW).toString())
-            .put(c(TextConstants.BOLD), ansi().a(Attribute.INTENSITY_BOLD).toString())
-            .put(c(TextConstants.STRIKETHROUGH), ansi().a(Attribute.STRIKETHROUGH_ON).toString())
-            .put(c(TextConstants.UNDERLINE), ansi().a(Attribute.UNDERLINE).toString())
-            .put(c(TextConstants.ITALIC), ansi().a(Attribute.ITALIC).toString())
-            .put(c(TextConstants.RESET), ansi().a(Attribute.RESET).toString())
-            .build();
+    static {
+        add(TextConstants.BLACK, ansi().a(Attribute.RESET).fg(Color.BLACK).boldOff());
+        add(TextConstants.DARK_BLUE, ansi().a(Attribute.RESET).fg(Color.BLUE).boldOff());
+        add(TextConstants.DARK_GREEN, ansi().a(Attribute.RESET).fg(Color.GREEN).boldOff());
+        add(TextConstants.DARK_AQUA, ansi().a(Attribute.RESET).fg(Color.CYAN).boldOff());
+        add(TextConstants.DARK_RED, ansi().a(Attribute.RESET).fg(Color.RED).boldOff());
+        add(TextConstants.DARK_PURPLE, ansi().a(Attribute.RESET).fg(Color.MAGENTA).boldOff());
+        add(TextConstants.GOLD, ansi().a(Attribute.RESET).fg(Color.YELLOW).boldOff());
+        add(TextConstants.GRAY, ansi().a(Attribute.RESET).fg(Color.WHITE).boldOff());
+        add(TextConstants.DARK_GRAY, ansi().a(Attribute.RESET).fg(Color.BLACK).bold());
+        add(TextConstants.BLUE, ansi().a(Attribute.RESET).fg(Color.BLUE).bold());
+        add(TextConstants.GREEN, ansi().a(Attribute.RESET).fg(Color.GREEN).bold());
+        add(TextConstants.AQUA, ansi().a(Attribute.RESET).fg(Color.CYAN).bold());
+        add(TextConstants.RED, ansi().a(Attribute.RESET).fg(Color.RED).bold());
+        add(TextConstants.LIGHT_PURPLE, ansi().a(Attribute.RESET).fg(Color.MAGENTA).bold());
+        add(TextConstants.YELLOW, ansi().a(Attribute.RESET).fg(Color.YELLOW).bold());
+        add(TextConstants.WHITE, ansi().a(Attribute.RESET).fg(Color.WHITE).bold());
+        add(TextConstants.OBFUSCATED, ansi().a(Attribute.BLINK_SLOW));
+        add(TextConstants.BOLD,ansi().a(Attribute.INTENSITY_BOLD));
+        add(TextConstants.STRIKETHROUGH, ansi().a(Attribute.STRIKETHROUGH_ON));
+        add(TextConstants.UNDERLINE, ansi().a(Attribute.UNDERLINE));
+        add(TextConstants.ITALIC, ansi().a(Attribute.ITALIC));
+        add(TextConstants.RESET, ansi().a(Attribute.RESET));
+    }
 
     @Override
     public String apply(String text) {
-        for (Entry<Pattern, String> entry : REPLACEMENTS.entrySet()) {
-            text = entry.getKey().matcher(text).replaceAll(entry.getValue());
+        int next = text.indexOf(TextConstants.LEGACY_CHAR);
+        int last = text.length() - 1;
+        if (next == -1 || next == last) {
+            return text;
         }
-        return text + RESET;
+
+        StringBuilder result = new StringBuilder(text.length() + 20);
+
+        int pos = 0;
+        int format;
+        do {
+            if (pos != next) {
+                result.append(text, pos, next);
+            }
+
+            pos = next;
+
+            format = lookup.get(text.charAt(next + 1));
+            if (format != 0) {
+                result.append(replacements.get(format - 1));
+                pos = next += 2;
+            } else {
+                next++;
+            }
+
+            next = text.indexOf(TextConstants.LEGACY_CHAR, next);
+        } while (next != -1 && next < last);
+
+        return result.append(text, pos, text.length()).append(reset).toString();
     }
 
 }

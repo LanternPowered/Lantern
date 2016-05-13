@@ -37,8 +37,8 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.SerializationBehaviors;
-import org.spongepowered.api.world.WorldCreationSettings;
-import org.spongepowered.api.world.WorldCreationSettingsTypes;
+import org.spongepowered.api.world.WorldArchetype;
+import org.spongepowered.api.world.WorldArchetypes;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.gen.WorldGeneratorModifiers;
 
@@ -51,16 +51,16 @@ import java.util.Optional;
 
 @RegistrationDependency({ GameModeRegistryModule.class, GeneratorTypeRegistryModule.class, DifficultyRegistryModule.class,
         DimensionTypeRegistryModule.class, SerializationBehaviorRegistryModule.class, GeneratorModifierRegistryModule.class })
-public final class WorldCreationSettingsRegistryModule implements AdditionalCatalogRegistryModule<WorldCreationSettings>,
-        AlternateCatalogRegistryModule<WorldCreationSettings> {
+public final class WorldArchetypeRegistryModule implements AdditionalCatalogRegistryModule<WorldArchetype>,
+        AlternateCatalogRegistryModule<WorldArchetype> {
 
-    @RegisterCatalog(WorldCreationSettingsTypes.class)
-    private final Map<String, WorldCreationSettings> worldCreationSettingsMap = new HashMap<>();
+    @RegisterCatalog(WorldArchetypes.class)
+    private final Map<String, WorldArchetype> worldArchetypes = new HashMap<>();
 
     @Override
-    public Map<String, WorldCreationSettings> provideCatalogMap() {
-        Map<String, WorldCreationSettings> provided = new HashMap<>();
-        for (Map.Entry<String, WorldCreationSettings> entry : this.worldCreationSettingsMap.entrySet()) {
+    public Map<String, WorldArchetype> provideCatalogMap() {
+        Map<String, WorldArchetype> provided = new HashMap<>();
+        for (Map.Entry<String, WorldArchetype> entry : this.worldArchetypes.entrySet()) {
             provided.put(entry.getKey().replace("minecraft:", "").replace("sponge:", ""), entry.getValue());
         }
         return provided;
@@ -68,7 +68,7 @@ public final class WorldCreationSettingsRegistryModule implements AdditionalCata
 
     @Override
     public void registerDefaults() {
-        final WorldCreationSettings overworld = WorldCreationSettings.builder()
+        final WorldArchetype overworld = WorldArchetype.builder()
                 .enabled(true)
                 .loadsOnStartup(true)
                 .keepsSpawnLoaded(true)
@@ -84,40 +84,40 @@ public final class WorldCreationSettingsRegistryModule implements AdditionalCata
                 .generateBonusChest(false)
                 .serializationBehavior(SerializationBehaviors.AUTOMATIC)
                 .build("minecraft:overworld", "Overworld");
-        this.worldCreationSettingsMap.put("minecraft:overworld", overworld);
-        this.worldCreationSettingsMap.put("minecraft:the_nether", WorldCreationSettings.builder()
+        this.worldArchetypes.put("minecraft:overworld", overworld);
+        this.worldArchetypes.put("minecraft:the_nether", WorldArchetype.builder()
                 .from(overworld)
                 .generator(GeneratorTypes.NETHER)
                 .dimension(DimensionTypes.NETHER)
                 .build("minecraft:the_nether", "The Nether"));
-        this.worldCreationSettingsMap.put("minecraft:the_end", WorldCreationSettings.builder()
+        this.worldArchetypes.put("minecraft:the_end", WorldArchetype.builder()
                 .from(overworld)
                 .generator(GeneratorTypes.THE_END)
                 .dimension(DimensionTypes.THE_END)
                 .build("minecraft:the_end", "The End"));
-        this.worldCreationSettingsMap.put("sponge:skylands", WorldCreationSettings.builder()
+        this.worldArchetypes.put("sponge:skylands", WorldArchetype.builder()
                 .from(overworld)
                 .generatorModifiers(WorldGeneratorModifiers.SKYLANDS)
                 .build("sponge:the_skylands", "The Skylands"));
     }
 
     @Override
-    public void registerAdditionalCatalog(WorldCreationSettings extraCatalog) {
+    public void registerAdditionalCatalog(WorldArchetype extraCatalog) {
         checkNotNull(extraCatalog, "WorldCreationSettings cannot be null!");
         final String id = extraCatalog.getId().toLowerCase(Locale.ENGLISH);
         checkArgument(!id.isEmpty(), "Id may not be empty!");
         checkArgument(!id.startsWith("minecraft:"), "Plugin trying to register a fake minecraft generation settings!");
         checkArgument(!id.startsWith("sponge:"), "Plugin trying to register a fake sponge generation settings!");
-        this.worldCreationSettingsMap.put(id, extraCatalog);
+        this.worldArchetypes.put(id, extraCatalog);
     }
 
     @Override
-    public Optional<WorldCreationSettings> getById(String id) {
-        return Optional.ofNullable(this.worldCreationSettingsMap.get(checkNotNull(id, "id").toLowerCase(Locale.ENGLISH)));
+    public Optional<WorldArchetype> getById(String id) {
+        return Optional.ofNullable(this.worldArchetypes.get(checkNotNull(id, "id").toLowerCase(Locale.ENGLISH)));
     }
 
     @Override
-    public Collection<WorldCreationSettings> getAll() {
-        return Collections.unmodifiableCollection(this.worldCreationSettingsMap.values());
+    public Collection<WorldArchetype> getAll() {
+        return Collections.unmodifiableCollection(this.worldArchetypes.values());
     }
 }

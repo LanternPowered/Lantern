@@ -108,7 +108,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.TeleporterAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
-import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.Explosion;

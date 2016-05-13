@@ -30,13 +30,13 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.SerializationBehavior;
-import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import java.util.Collection;
 
-public final class LanternWorldCreationSettings implements WorldCreationSettings {
+public final class LanternWorldArchetype implements WorldArchetype {
 
     private final String id;
     private final String name;
@@ -63,7 +63,7 @@ public final class LanternWorldCreationSettings implements WorldCreationSettings
     private final int buildHeight;
     private final long seed;
 
-    LanternWorldCreationSettings(String id, String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
+    LanternWorldArchetype(String id, String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, Difficulty difficulty,
             SerializationBehavior serializationBehavior, boolean hardcore, boolean enabled, boolean loadsOnStartup,
             boolean keepsSpawnLoaded, boolean usesMapFeatures, boolean pvpEnabled, boolean generateBonusChest, boolean commandsAllowed,

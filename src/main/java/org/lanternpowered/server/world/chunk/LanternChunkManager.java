@@ -739,7 +739,7 @@ public final class LanternChunkManager {
         final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
         for (LoadingTicket ticket : tickets) {
             this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
-                    Cause.source(ticket).owner(this.world).build(), coords0, chunk, ticket));
+                    Cause.source(ticket).owner(this.world).build(), coords0, ticket));
         }
     }
 
@@ -1326,7 +1326,7 @@ public final class LanternChunkManager {
             if (chunk.loaded && !queueLoad && callEvents) {
                 final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
                 this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
-                        Cause.source(ticket).owner(this.world).build(), coords0, chunk, ticket));
+                        Cause.source(ticket).owner(this.world).build(), coords0, ticket));
             }
         // Queue the chunk to load
         } else {

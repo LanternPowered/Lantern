@@ -69,7 +69,7 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.storage.ChunkLayout;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -501,8 +501,8 @@ public class LanternServer implements Server {
     }
 
     @Override
-    public WorldProperties createWorldProperties(String folderName, WorldCreationSettings settings) throws IOException {
-        return this.worldManager.createWorldProperties(folderName, settings);
+    public WorldProperties createWorldProperties(String folderName, WorldArchetype worldArchetype) throws IOException {
+        return this.worldManager.createWorldProperties(folderName, worldArchetype);
     }
 
     @Override

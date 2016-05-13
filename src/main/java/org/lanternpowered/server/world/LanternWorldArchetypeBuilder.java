@@ -40,7 +40,7 @@ import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.SerializationBehaviors;
-import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
@@ -53,7 +53,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public final class LanternWorldCreationSettingsBuilder implements WorldCreationSettings.Builder {
+public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builder {
 
     private GameMode gameMode;
     private Difficulty difficulty;
@@ -81,37 +81,37 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
 
     private long seed;
 
-    public LanternWorldCreationSettingsBuilder() {
+    public LanternWorldArchetypeBuilder() {
         this.reset();
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder from(WorldCreationSettings settings) {
-        final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings)
-                checkNotNull(settings, "settings");
-        this.difficulty = settings0.getDifficulty();
-        this.hardcore = settings0.isHardcore();
-        this.enabled = settings0.isEnabled();
-        this.gameMode = settings0.getGameMode();
-        this.keepsSpawnLoaded = settings0.doesKeepSpawnLoaded();
-        this.usesMapFeatures = settings0.usesMapFeatures();
-        this.seed = settings0.getSeed();
-        this.generatorModifiers = settings0.getGeneratorModifiers();
-        this.dimensionType = settings0.getDimensionType();
-        this.generatorType = settings0.getGeneratorType();
-        this.generatorSettings = settings0.getGeneratorSettings();
-        this.generateBonusChest = settings0.doesGenerateBonusChest();
-        this.commandsAllowed = settings0.areCommandsAllowed();
-        this.waterEvaporates = settings0.waterEvaporates();
-        this.buildHeight = settings0.getBuildHeight();
-        this.allowPlayerRespawns = settings0.allowPlayerRespawns();
-        this.pvpEnabled = settings0.isPVPEnabled();
-        this.generateSpawnOnLoad = settings0.doesGenerateSpawnOnLoad();
+    public LanternWorldArchetypeBuilder from(WorldArchetype archetype) {
+        final LanternWorldArchetype archetype0 = (LanternWorldArchetype)
+                checkNotNull(archetype, "archetype");
+        this.difficulty = archetype0.getDifficulty();
+        this.hardcore = archetype0.isHardcore();
+        this.enabled = archetype0.isEnabled();
+        this.gameMode = archetype0.getGameMode();
+        this.keepsSpawnLoaded = archetype0.doesKeepSpawnLoaded();
+        this.usesMapFeatures = archetype0.usesMapFeatures();
+        this.seed = archetype0.getSeed();
+        this.generatorModifiers = archetype0.getGeneratorModifiers();
+        this.dimensionType = archetype0.getDimensionType();
+        this.generatorType = archetype0.getGeneratorType();
+        this.generatorSettings = archetype0.getGeneratorSettings();
+        this.generateBonusChest = archetype0.doesGenerateBonusChest();
+        this.commandsAllowed = archetype0.areCommandsAllowed();
+        this.waterEvaporates = archetype0.waterEvaporates();
+        this.buildHeight = archetype0.getBuildHeight();
+        this.allowPlayerRespawns = archetype0.allowPlayerRespawns();
+        this.pvpEnabled = archetype0.isPVPEnabled();
+        this.generateSpawnOnLoad = archetype0.doesGenerateSpawnOnLoad();
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder from(WorldProperties properties) {
+    public LanternWorldArchetypeBuilder from(WorldProperties properties) {
         final LanternWorldProperties properties0 = (LanternWorldProperties)
                 checkNotNull(properties, "properties");
         this.difficulty = properties0.getDifficulty();
@@ -134,49 +134,49 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder enabled(boolean state) {
+    public LanternWorldArchetypeBuilder enabled(boolean state) {
         this.enabled = state;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder loadsOnStartup(boolean state) {
+    public LanternWorldArchetypeBuilder loadsOnStartup(boolean state) {
         this.loadsOnStartup = state;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder keepsSpawnLoaded(boolean state) {
+    public LanternWorldArchetypeBuilder keepsSpawnLoaded(boolean state) {
         this.keepsSpawnLoaded = state;
         return this;
     }
 
     @Override
-    public WorldCreationSettings.Builder generateSpawnOnLoad(boolean state) {
+    public LanternWorldArchetypeBuilder generateSpawnOnLoad(boolean state) {
         this.generateSpawnOnLoad = state;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder seed(long seed) {
+    public LanternWorldArchetypeBuilder seed(long seed) {
         this.seed = seed;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder gameMode(GameMode gameMode) {
+    public LanternWorldArchetypeBuilder gameMode(GameMode gameMode) {
         this.gameMode = checkNotNull(gameMode, "gameMode");
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder generator(GeneratorType type) {
+    public LanternWorldArchetypeBuilder generator(GeneratorType type) {
         this.generatorType = checkNotNull(type, "type");
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
+    public LanternWorldArchetypeBuilder generatorModifiers(WorldGeneratorModifier... modifiers) {
         checkNotNull(modifiers, "modifiers");
         Set<WorldGeneratorModifier> entries = Sets.newHashSet();
         GeneratorModifierRegistryModule registry = Lantern.getGame().getRegistry().getWorldGeneratorModifierRegistry();
@@ -191,72 +191,72 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder dimension(DimensionType type) {
+    public LanternWorldArchetypeBuilder dimension(DimensionType type) {
         this.dimensionType = (LanternDimensionType<?>) checkNotNull(type, "type");
         return this;
     }
 
     @Override
-    public WorldCreationSettings.Builder difficulty(Difficulty difficulty) {
+    public LanternWorldArchetypeBuilder difficulty(Difficulty difficulty) {
         this.difficulty = checkNotNull(difficulty, "difficulty");
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder usesMapFeatures(boolean enabled) {
+    public LanternWorldArchetypeBuilder usesMapFeatures(boolean enabled) {
         this.usesMapFeatures = enabled;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder hardcore(boolean enabled) {
+    public LanternWorldArchetypeBuilder hardcore(boolean enabled) {
         this.hardcore = enabled;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder generatorSettings(DataContainer settings) {
+    public LanternWorldArchetypeBuilder generatorSettings(DataContainer settings) {
         this.generatorSettings = checkNotNull(settings, "settings");
         return this;
     }
 
-    public LanternWorldCreationSettingsBuilder waterEvaporates(boolean evaporates) {
+    public LanternWorldArchetypeBuilder waterEvaporates(boolean evaporates) {
         this.waterEvaporates = evaporates;
         return this;
     }
 
-    public LanternWorldCreationSettingsBuilder buildHeight(int buildHeight) {
+    public LanternWorldArchetypeBuilder buildHeight(int buildHeight) {
         checkState(buildHeight <= 256, "the build height cannot be greater then 256");
         this.buildHeight = buildHeight;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder pvp(boolean enabled) {
+    public LanternWorldArchetypeBuilder pvp(boolean enabled) {
         this.pvpEnabled = enabled;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder commandsAllowed(boolean state) {
+    public LanternWorldArchetypeBuilder commandsAllowed(boolean state) {
         this.commandsAllowed = state;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder generateBonusChest(boolean state) {
+    public LanternWorldArchetypeBuilder generateBonusChest(boolean state) {
         this.generateBonusChest = state;
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder serializationBehavior(SerializationBehavior behavior) {
+    public LanternWorldArchetypeBuilder serializationBehavior(SerializationBehavior behavior) {
         this.serializationBehavior = checkNotNull(behavior, "behavior");
         return this;
     }
 
     @Override
-    public LanternWorldCreationSettings build(String id, String name) throws IllegalArgumentException, CatalogTypeAlreadyRegisteredException {
+    public LanternWorldArchetype build(String id, String name) throws IllegalArgumentException, CatalogTypeAlreadyRegisteredException {
         checkNotNull(id, "id");
         checkNotNull(name, "name");
         GeneratorType generatorType = this.generatorType;
@@ -273,7 +273,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
                 this.dimensionType.doesWaterEvaporate() : this.waterEvaporates;
         final boolean allowPlayerRespawns = this.allowPlayerRespawns == null ?
                 this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
-        return new LanternWorldCreationSettings(id, name, this.gameMode, this.dimensionType, generatorType,
+        return new LanternWorldArchetype(id, name, this.gameMode, this.dimensionType, generatorType,
                 this.generatorModifiers, generatorSettings, this.difficulty, this.serializationBehavior,
                 this.hardcore, this.enabled, this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
                 this.generateBonusChest, this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.generateSpawnOnLoad,
@@ -281,7 +281,7 @@ public final class LanternWorldCreationSettingsBuilder implements WorldCreationS
     }
 
     @Override
-    public LanternWorldCreationSettingsBuilder reset() {
+    public LanternWorldArchetypeBuilder reset() {
         this.usesMapFeatures = true;
         this.gameMode = GameModes.SURVIVAL;
         this.difficulty = Difficulties.NORMAL;

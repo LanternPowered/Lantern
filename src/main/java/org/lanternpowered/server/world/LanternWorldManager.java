@@ -43,8 +43,8 @@ import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldCreationSettings;
-import org.spongepowered.api.world.WorldCreationSettingsTypes;
+import org.spongepowered.api.world.WorldArchetype;
+import org.spongepowered.api.world.WorldArchetypes;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.FileNotFoundException;
@@ -466,9 +466,9 @@ public final class LanternWorldManager {
     }
 
     /**
-     * Creates a new world from the given {@link WorldCreationSettings}. For the
+     * Creates a new world from the given {@link WorldArchetype}. For the
      * creation of the WorldCreationSettings please see
-     * {@link org.spongepowered.api.world.WorldCreationSettings.Builder}.
+     * {@link org.spongepowered.api.world.WorldArchetype.Builder}.
      *
      * <p>If the world already exists then the existing {@link WorldProperties}
      * are returned else a new world is created and the new WorldProperties
@@ -480,36 +480,36 @@ public final class LanternWorldManager {
      * <ul> <li>{@link #loadWorld(String)}</li> <li>{@link #loadWorld(UUID)}
      * </li> <li>{@link #loadWorld(WorldProperties)}</li> </ul>
      *
-     * @param settings the settings for creation
-     * @return the new or existing world properties, if creation was successful
+     * @param worldArchetype The world archetype for creation
+     * @return The new or existing world properties, if creation was successful
      */
-    public WorldProperties createWorldProperties(String folderName, WorldCreationSettings settings) throws IOException {
-        checkNotNull(settings, "settings");
-        WorldLookupEntry entry = this.worldByName.get(settings.getName());
+    public WorldProperties createWorldProperties(String folderName, WorldArchetype worldArchetype) throws IOException {
+        checkNotNull(worldArchetype, "worldArchetype");
+        WorldLookupEntry entry = this.worldByName.get(worldArchetype.getName());
         if (entry != null) {
             return entry.properties;
         }
         // Get the next dimension id
         final int dimensionId = this.getNextFreeDimensionId();
         // Create the world properties
-        return this.createWorld(settings, folderName, dimensionId);
+        return this.createWorld(worldArchetype, folderName, dimensionId);
     }
 
     /**
      * Creates the world properties for the specified settings and the dimension id.
      * 
-     * @param settings The creation setting
+     * @param worldArchetype The world archetype
      * @param folderName The folder name
      * @param dimensionId The dimension id
      * @return The new or existing world properties, if creation was successful
      */
-    WorldProperties createWorld(WorldCreationSettings settings, String folderName, int dimensionId) throws IOException {
-        final LanternWorldCreationSettings settings0 = (LanternWorldCreationSettings) checkNotNull(settings, "settings");
-        WorldLookupEntry entry = this.worldByName.get(settings.getName());
+    WorldProperties createWorld(WorldArchetype worldArchetype, String folderName, int dimensionId) throws IOException {
+        final LanternWorldArchetype settings0 = (LanternWorldArchetype) checkNotNull(worldArchetype, "worldArchetype");
+        final String worldName = worldArchetype.getName();
+        WorldLookupEntry entry = this.worldByName.get(worldName);
         if (entry != null) {
             return entry.properties;
         }
-        String worldName = settings.getName();
         WorldConfig worldConfig;
         // Create a config
         try {
@@ -833,8 +833,8 @@ public final class LanternWorldManager {
         if (rootWorldProperties == null) {
             final String name = "Overworld";
             // TODO: Use the default generator type once implemented
-            this.createWorld(WorldCreationSettings.builder()
-                    .from(WorldCreationSettingsTypes.OVERWORLD)
+            this.createWorld(WorldArchetype.builder()
+                    .from(WorldArchetypes.OVERWORLD)
                     .generator(GeneratorTypes.FLAT)
                     .build(name, name), "", 0);
         }

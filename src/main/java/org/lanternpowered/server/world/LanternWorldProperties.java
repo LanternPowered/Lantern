@@ -171,7 +171,7 @@ public final class LanternWorldProperties implements WorldProperties {
         this.updateWorldGenModifiers(this.worldConfig.getGeneration().getGenerationModifiers());
     }
 
-    public void update(LanternWorldCreationSettings creationSettings) throws IOException {
+    public void update(LanternWorldArchetype creationSettings) throws IOException {
         this.commandsAllowed = creationSettings.areCommandsAllowed();
         this.dimensionType = creationSettings.getDimensionType();
         this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();

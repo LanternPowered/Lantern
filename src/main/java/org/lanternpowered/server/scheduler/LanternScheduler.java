@@ -51,17 +51,6 @@ import java.util.regex.Pattern;
 @NonnullByDefault
 public class LanternScheduler implements Scheduler {
 
-    private static final LanternScheduler INSTANCE = new LanternScheduler();
-
-    /**
-     * Gets the {@link LanternScheduler} instance.
-     * 
-     * @return the scheduler
-     */
-    public static LanternScheduler getInstance() {
-        return INSTANCE;
-    }
-
     private final AsyncScheduler asyncScheduler = new AsyncScheduler();
     private final SyncScheduler syncScheduler = new SyncScheduler();
 

@@ -63,7 +63,6 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternProfileProperty;
-import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.UUIDHelper;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -158,7 +157,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             return;
         }
 
-        LanternScheduler.getInstance().submitAsyncTask(() -> {
+        Lantern.getScheduler().submitAsyncTask(() -> {
             performAuth(session, authData.getUsername(), hash);
             return null;
         });

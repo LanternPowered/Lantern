@@ -51,7 +51,6 @@ import org.lanternpowered.server.world.LanternWorldManager;
 import org.lanternpowered.server.world.chunk.LanternChunkLayout;
 import org.spongepowered.api.GameState;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
@@ -375,18 +374,6 @@ public class LanternServer implements Server {
     }
 
     /**
-     * Gets all the active command sources.
-     * 
-     * @return the active command sources
-     */
-    public Collection<CommandSource> getActiveCommandSources() {
-        ImmutableList.Builder<CommandSource> commandSources = ImmutableList.builder();
-        commandSources.add(this.getConsole());
-        commandSources.addAll(this.getOnlinePlayers());
-        return commandSources.build();
-    }
-
-    /**
      * Adds a {@link Player} to the online players lookups.
      *
      * @param player The player
@@ -675,7 +662,7 @@ public class LanternServer implements Server {
     @Override
     public Optional<ResourcePack> getDefaultResourcePack() {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override

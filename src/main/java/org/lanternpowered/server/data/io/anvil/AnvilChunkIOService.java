@@ -57,7 +57,6 @@ import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
@@ -456,12 +455,12 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public CompletableFuture<Boolean> doesChunkExist(final Vector3i chunkCoords) {
-        return LanternScheduler.getInstance().submitAsyncTask(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
+        return Lantern.getScheduler().submitAsyncTask(() -> exists(chunkCoords.getX(), chunkCoords.getZ()));
     }
 
     @Override
     public CompletableFuture<Optional<DataContainer>> getChunkData(final Vector3i chunkCoords) {
-        return LanternScheduler.getInstance().submitAsyncTask(() -> {
+        return Lantern.getScheduler().submitAsyncTask(() -> {
             int x = chunkCoords.getX();
             int z = chunkCoords.getZ();
 

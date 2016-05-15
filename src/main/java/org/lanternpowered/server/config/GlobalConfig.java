@@ -147,6 +147,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
                 "The minimum time between messages (in milliseconds) when they will be considered spam.")
         private int chatSpamThreshold = 900;
 
+        @Setting(value = "player-idle-timeout", comment =
+                "The player idle timeout in minutes, a value smaller or equal to 0 disables the check.")
+        private int playerIdleTimeout = 0;
+
         // Some context related stuff, check this issue for more information
         // https://github.com/SpongePowered/SpongeCommon/commit/71220742baf4b0317ddefe625b12cc64a7ec9084
         // TODO: Move this?
@@ -272,6 +276,14 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
     @Override
     public ChunkLoadingTickets getChunkLoadingTickets(String plugin) {
         return this.worlds.chunkLoading.getChunkLoadingTickets(plugin);
+    }
+
+    public int getPlayerIdleTimeout() {
+        return this.server.playerIdleTimeout;
+    }
+
+    public void setPlayerIdleTimeout(int playerIdleTimeout) {
+        this.server.playerIdleTimeout = playerIdleTimeout;
     }
 
 }

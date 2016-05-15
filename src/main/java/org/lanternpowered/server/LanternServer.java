@@ -679,6 +679,16 @@ public class LanternServer implements Server {
     }
 
     @Override
+    public int getPlayerIdleTimeout() {
+        return this.game.getGlobalConfig().getPlayerIdleTimeout();
+    }
+
+    @Override
+    public void setPlayerIdleTimeout(int timeout) {
+        this.game.getGlobalConfig().setPlayerIdleTimeout(timeout);
+    }
+
+    @Override
     public GameProfileManager getGameProfileManager() {
         return this.game.getGameProfileManager();
     }

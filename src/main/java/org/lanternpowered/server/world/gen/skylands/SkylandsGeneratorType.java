@@ -27,10 +27,10 @@ package org.lanternpowered.server.world.gen.skylands;
 
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.lanternpowered.server.world.gen.LanternWorldGenerator;
-import org.spongepowered.api.extra.skylands.SkylandsBiomeGenerator;
-import org.spongepowered.api.extra.skylands.SkylandsGrassPopulator;
-import org.spongepowered.api.extra.skylands.SkylandsGroundCoverPopulator;
-import org.spongepowered.api.extra.skylands.SkylandsTerrainGenerator;
+import org.spongepowered.api.extra.modifier.skylands.SkylandsBiomeGenerator;
+import org.spongepowered.api.extra.modifier.skylands.SkylandsGrassPopulator;
+import org.spongepowered.api.extra.modifier.skylands.SkylandsGroundCoverPopulator;
+import org.spongepowered.api.extra.modifier.skylands.SkylandsTerrainGenerator;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.WorldGenerator;

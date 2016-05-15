@@ -567,6 +567,8 @@ public class Session implements PlayerConnection {
         if (!joinEvent.isMessageCancelled()) {
             joinEvent.getChannel().ifPresent(channel -> channel.send(this.player, joinEvent.getMessage()));
         }
+
+        this.player.resetIdleTimeoutCounter();
     }
 
     public void onDisconnect() {

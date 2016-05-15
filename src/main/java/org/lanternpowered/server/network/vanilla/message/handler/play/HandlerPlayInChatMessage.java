@@ -30,6 +30,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -37,7 +38,6 @@ import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.text.TextConstants;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -65,7 +65,8 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
     @Override
     public void handle(NetworkContext context, MessagePlayInChatMessage message) {
         Session session = context.getSession();
-        Player player = session.getPlayer();
+        LanternPlayer player = session.getPlayer();
+        player.resetIdleTimeoutCounter();
         String message0 = message.getMessage();
         String message1 = StringUtils.normalizeSpace(message0);
         if (!isAllowedString(message0)) {

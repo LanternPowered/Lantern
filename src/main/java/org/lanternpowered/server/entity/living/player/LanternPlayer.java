@@ -26,6 +26,7 @@
 package org.lanternpowered.server.entity.living.player;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
@@ -156,6 +157,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     // The loading ticket that will force the chunks to be loaded
     @Nullable private ChunkTicketManager.PlayerEntityLoadingTicket loadingTicket;
 
+    /**
+     * The last time that the player was active.
+     */
+    private long lastActiveTime;
+
     public LanternPlayer(LanternGameProfile gameProfile, Session session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
@@ -165,6 +171,14 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.user = (LanternUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
                 .getOrCreate(gameProfile);
         this.user.setPlayer(this);
+        this.resetIdleTimeoutCounter();
+    }
+
+    /**
+     * Resets the timeout counter.
+     */
+    public void resetIdleTimeoutCounter() {
+        this.lastActiveTime = System.currentTimeMillis();
     }
 
     @Override
@@ -345,6 +359,13 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public void pulse() {
+        // Check whether the player is still active
+        int timeout = Lantern.getGame().getGlobalConfig().getPlayerIdleTimeout();
+        if (timeout > 0 && System.currentTimeMillis() - this.lastActiveTime >= timeout * 60000) {
+            this.session.disconnect(t("disconnect.idleTimeout"));
+            return;
+        }
+
         super.pulse();
 
         // TODO: Maybe async?

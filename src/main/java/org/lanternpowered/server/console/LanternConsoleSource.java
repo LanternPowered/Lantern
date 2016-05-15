@@ -42,15 +42,16 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 import java.util.Map;
 import java.util.Optional;
 
-import javax.annotation.Nullable;
-
 @NonnullByDefault
 public final class LanternConsoleSource extends AbstractSubjectBase implements ConsoleSource {
 
     public static final String NAME = "Server";
     public static final ConsoleSource INSTANCE = new LanternConsoleSource();
 
-    @Nullable private MessageChannel messageChannel;
+    /**
+     * The message channel of the console source.
+     */
+    private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     private LanternConsoleSource() {
         this.initSubject();
@@ -109,9 +110,6 @@ public final class LanternConsoleSource extends AbstractSubjectBase implements C
 
     @Override
     public MessageChannel getMessageChannel() {
-        if (this.messageChannel == null) {
-            this.messageChannel = MessageChannel.TO_ALL;
-        }
         return this.messageChannel;
     }
 

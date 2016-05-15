@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
@@ -33,6 +34,8 @@ public final class HandlerPlayInPlayerDigging implements Handler<MessagePlayInPl
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerDigging message) {
-        context.getSession().getPlayer().getInteractionHandler().handleDigging(message);
+        LanternPlayer player = context.getSession().getPlayer();
+        player.resetIdleTimeoutCounter();
+        player.getInteractionHandler().handleDigging(message);
     }
 }

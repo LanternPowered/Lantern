@@ -32,6 +32,7 @@ import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -97,7 +98,9 @@ import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
@@ -196,7 +199,16 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private final Context worldContext;
 
+    /**
+     * The directory where all the data of the
+     * world is stored.
+     */
     private final Path directory;
+
+    /**
+     * The message channel of the world.
+     */
+    private MessageChannel messageChannel = MessageChannel.world(this);
 
     public LanternWorld(LanternGame game, WorldConfig worldConfig, Path directory,
             Scoreboard scoreboard, LanternWorldProperties properties) {
@@ -828,6 +840,21 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         while (players.hasNext()) {
             players.next().getConnection().send(message);
         }
+    }
+
+    @Override
+    public void sendMessage(Text message) {
+        this.sendMessage(ChatTypes.CHAT, message);
+    }
+
+    @Override
+    public MessageChannel getMessageChannel() {
+        return this.messageChannel;
+    }
+
+    @Override
+    public void setMessageChannel(MessageChannel channel) {
+        this.messageChannel = checkNotNull(channel, "channel");
     }
 
     @Override

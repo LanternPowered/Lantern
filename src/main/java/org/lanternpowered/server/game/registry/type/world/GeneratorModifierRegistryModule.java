@@ -30,7 +30,8 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.game.registry.RegistryModuleHelper.validateIdentifier;
 
 import com.google.common.collect.ImmutableSet;
-import org.spongepowered.api.extra.skylands.SkylandsWorldGeneratorModifier;
+import org.spongepowered.api.extra.modifier.empty.VoidWorldGeneratorModifier;
+import org.spongepowered.api.extra.modifier.skylands.SkylandsWorldGeneratorModifier;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
@@ -70,6 +71,7 @@ public final class GeneratorModifierRegistryModule implements AdditionalCatalogR
     @Override
     public void registerDefaults() {
         this.registerAdditionalCatalog(new SkylandsWorldGeneratorModifier());
+        this.registerAdditionalCatalog(new VoidWorldGeneratorModifier());
     }
 
     @Override

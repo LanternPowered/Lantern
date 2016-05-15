@@ -53,6 +53,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInS
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInUseEntity;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBossBar;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutChangeGameState;
@@ -157,6 +158,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBossBar;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
@@ -307,7 +309,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x05, CodecPlayOutSpawnPlayer.class, MessagePlayOutSpawnPlayer.class);
         // 0x06
         outbound.bind(0x07, CodecPlayOutStatistics.class, MessagePlayOutStatistics.class);
-        // 0x08
+        outbound.bind(0x08, CodecPlayOutBlockBreakAnimation.class, MessagePlayOutBlockBreakAnimation.class);
         outbound.bind(0x09, CodecPlayOutUpdateTileEntity.class, MessagePlayOutUpdateTileEntity.class);
         // ...
         outbound.bind(0x0b, CodecPlayOutBlockChange.class, MessagePlayOutBlockChange.class);

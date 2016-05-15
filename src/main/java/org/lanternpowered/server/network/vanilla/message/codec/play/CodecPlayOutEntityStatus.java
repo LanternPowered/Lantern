@@ -35,6 +35,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 
 public final class CodecPlayOutEntityStatus implements Codec<Message> {
 
+    private final static int LENGTH = Integer.BYTES + Byte.BYTES;
+
     @Override
     public ByteBuffer encode(CodecContext context, Message message) throws CodecException {
         int entityId;
@@ -48,6 +50,6 @@ public final class CodecPlayOutEntityStatus implements Codec<Message> {
         } else {
             throw new CodecException("Unsupported message type: " + message.getClass().getName());
         }
-        return context.byteBufAlloc().buffer(9).writeInteger(entityId).writeByte((byte) action);
+        return context.byteBufAlloc().buffer(LENGTH).writeInteger(entityId).writeByte((byte) action);
     }
 }

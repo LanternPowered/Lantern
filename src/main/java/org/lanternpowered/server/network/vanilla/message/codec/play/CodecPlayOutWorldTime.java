@@ -33,9 +33,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 
 public final class CodecPlayOutWorldTime implements Codec<MessagePlayOutWorldTime> {
 
+    private final static int LENGTH = Long.BYTES * 2;
+
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutWorldTime message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
 
         // The time also uses a negative tag
         long time = Math.abs(message.getTime());

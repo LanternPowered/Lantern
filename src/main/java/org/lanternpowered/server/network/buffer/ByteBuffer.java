@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.network.buffer;
 
-import org.lanternpowered.server.network.message.codec.serializer.Type;
+import org.lanternpowered.server.network.buffer.objects.Type;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 

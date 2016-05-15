@@ -26,8 +26,15 @@
 package org.lanternpowered.server.network.message.codec;
 
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 
-public interface CodecContext extends SerializerContext, NetworkContext {
+public interface CodecContext extends NetworkContext {
+
+    /**
+     * Gets the {@link ByteBufferAllocator}.
+     *
+     * @return The byte buffer allocator
+     */
+    ByteBufferAllocator byteBufAlloc();
 
 }

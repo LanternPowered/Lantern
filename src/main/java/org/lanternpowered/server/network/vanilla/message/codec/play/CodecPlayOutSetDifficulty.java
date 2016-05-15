@@ -33,8 +33,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 
 public final class CodecPlayOutSetDifficulty implements Codec<MessagePlayOutSetDifficulty> {
 
+    private final static int LENGTH = Byte.BYTES;
+
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSetDifficulty message) throws CodecException {
-        return context.byteBufAlloc().buffer(1).writeByte(message.getDifficulty().getInternalId());
+        return context.byteBufAlloc().buffer(LENGTH).writeByte(message.getDifficulty().getInternalId());
     }
 }

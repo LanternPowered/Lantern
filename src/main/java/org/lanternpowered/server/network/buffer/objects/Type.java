@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.serializer;
+package org.lanternpowered.server.network.buffer.objects;
 
 import com.google.common.reflect.TypeToken;
 

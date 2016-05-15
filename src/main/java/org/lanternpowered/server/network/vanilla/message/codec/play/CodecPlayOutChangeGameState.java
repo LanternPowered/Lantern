@@ -33,9 +33,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.internal.Mess
 
 public final class CodecPlayOutChangeGameState implements Codec<MessagePlayOutChangeGameState> {
 
+    private static final int LENGTH = Byte.BYTES + Float.BYTES;
+
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutChangeGameState message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer(5);
+        ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
         buf.writeByte((byte) message.getType());
         buf.writeFloat(message.getValue());
         return buf;

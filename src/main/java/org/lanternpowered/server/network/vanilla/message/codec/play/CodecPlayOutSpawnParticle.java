@@ -34,12 +34,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 
 public final class CodecPlayOutSpawnParticle implements Codec<MessagePlayOutSpawnParticle> {
 
+    private final static int BASE_LENGTH = Integer.BYTES * 2 + Byte.BYTES + Float.BYTES * 7;
+
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnParticle message) throws CodecException {
         Vector3f position = message.getPosition();
         Vector3f offset = message.getOffset();
         int[] extra = message.getExtra();
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        ByteBuffer buf = context.byteBufAlloc().buffer(BASE_LENGTH);
         buf.writeInteger(message.getParticleId());
         buf.writeBoolean(message.isLongDistance());
         buf.writeFloat(position.getX());

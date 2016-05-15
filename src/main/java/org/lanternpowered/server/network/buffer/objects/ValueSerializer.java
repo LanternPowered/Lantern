@@ -23,17 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.serializer;
+package org.lanternpowered.server.network.buffer.objects;
 
-import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
 
-public interface SerializerContext {
+public interface ValueSerializer<V> {
 
-    /**
-     * Gets the {@link ByteBufferAllocator}.
-     *
-     * @return The byte buffer allocator
-     */
-    ByteBufferAllocator byteBufAlloc();
+    void write(ByteBuffer buf, V object) throws CodecException;
+
+    V read(ByteBuffer buf) throws CodecException;
 
 }

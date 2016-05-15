@@ -34,7 +34,7 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
-import org.lanternpowered.server.network.message.codec.serializer.Type;
+import org.lanternpowered.server.network.buffer.objects.Type;
 import org.spongepowered.api.data.DataView;
 
 import java.io.IOException;

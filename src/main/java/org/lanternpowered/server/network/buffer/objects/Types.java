@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.message.codec.serializer;
+package org.lanternpowered.server.network.buffer.objects;
 
 import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
@@ -56,6 +56,8 @@ import java.util.UUID;
 
 public final class Types {
 
+    public static final int VECTOR_3_I_LENGTH = Long.BYTES;
+
     /**
      * A vector3i (position) encoded for minecraft protocol.
      */
@@ -78,12 +80,15 @@ public final class Types {
         }
     });
 
+    public static final int VECTOR_3_F_LENGTH = Float.BYTES * 3;
+
     /**
      * A vector3i (position) encoded for minecraft protocol.
      */
     public static final Type<Vector3f> VECTOR_3_F = Type.create(Vector3f.class, new ValueSerializer<Vector3f>() {
         @Override
         public void write(ByteBuffer buf, Vector3f object) throws CodecException {
+            buf.ensureWritable(VECTOR_3_F_LENGTH);
             buf.writeFloat(object.getX());
             buf.writeFloat(object.getY());
             buf.writeFloat(object.getZ());

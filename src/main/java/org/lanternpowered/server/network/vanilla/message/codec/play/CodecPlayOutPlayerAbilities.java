@@ -33,6 +33,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 
 public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAbilities> {
 
+    private final static int LENGTH = Byte.BYTES + Float.BYTES * 2;
+
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerAbilities message) throws CodecException {
         byte bits = 0;
@@ -44,7 +46,7 @@ public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAb
             bits |= 0x4;
         }
         // TODO: Not sure what to do with the creative bit (0x8)
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
         buf.writeByte(bits);
         buf.writeFloat(message.getFlySpeed());
         buf.writeFloat(message.getFieldOfView());

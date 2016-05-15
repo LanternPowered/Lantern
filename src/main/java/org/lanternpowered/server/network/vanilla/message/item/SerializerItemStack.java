@@ -26,12 +26,10 @@
 package org.lanternpowered.server.network.vanilla.message.item;
 
 import com.google.common.collect.Lists;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.serializer.SerializerContext;
-import org.lanternpowered.server.network.message.codec.serializer.Types;
-import org.lanternpowered.server.network.message.codec.serializer.ValueSerializer;
+import org.lanternpowered.server.network.buffer.objects.Types;
+import org.lanternpowered.server.network.buffer.objects.ValueSerializer;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.spongepowered.api.data.DataContainer;

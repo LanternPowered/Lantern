@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ScoreboardIO;
@@ -60,6 +61,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -796,6 +798,11 @@ public final class LanternWorldManager {
     }
 
     /**
+     * All the directories that should be ignored while loading worlds.
+     */
+    private final Set<String> ignoredDirectoryNames = Sets.newHashSet("data", "playerdata", "region", "stats");
+
+    /**
      * Initializes the root world and the dimension id map.
      */
     public void init() throws IOException {
@@ -846,7 +853,7 @@ public final class LanternWorldManager {
 
         if (rootWorldProperties != null) {
             for (Path path : Files.list(this.rootWorldDirectory).filter(Files::isDirectory).collect(Collectors.toList())) {
-                if (Files.list(path).count() == 0) {
+                if (Files.list(path).count() == 0 || this.ignoredDirectoryNames.contains(path.getFileName().toString().toLowerCase())) {
                     continue;
                 }
                 try {
@@ -868,7 +875,7 @@ public final class LanternWorldManager {
                         this.game.getLogger().error("Unable to read/write the world config, please fix this issue before loading the world.", e);
                         throw e;
                     }
-                    // Store the worl properties
+                    // Store the world properties
                     this.addUpdatedWorldProperties(rootWorldProperties, path, null);
                     // Check if it should be loaded on startup
                     if (worldProperties.loadOnStartup()) {

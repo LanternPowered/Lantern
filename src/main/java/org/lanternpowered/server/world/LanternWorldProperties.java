@@ -99,12 +99,6 @@ public final class LanternWorldProperties implements WorldProperties {
     // The world generator modifiers
     ImmutableSet<WorldGeneratorModifier> generatorModifiers = ImmutableSet.of();
 
-    // The generator type
-    private LanternGeneratorType generatorType;
-
-    // The generator settings
-    private DataContainer generatorSettings = new MemoryDataContainer();
-
     // Whether the difficulty is locked
     private boolean difficultyLocked;
 
@@ -112,7 +106,7 @@ public final class LanternWorldProperties implements WorldProperties {
     private String name;
 
     // The spawn position
-    Vector3i spawnPosition = Vector3i.ZERO;
+    private Vector3i spawnPosition = Vector3i.ZERO;
 
     // Whether the world is initialized
     private boolean initialized;
@@ -171,24 +165,24 @@ public final class LanternWorldProperties implements WorldProperties {
         this.updateWorldGenModifiers(this.worldConfig.getGeneration().getGenerationModifiers());
     }
 
-    public void update(LanternWorldArchetype creationSettings) throws IOException {
-        this.commandsAllowed = creationSettings.areCommandsAllowed();
-        this.dimensionType = creationSettings.getDimensionType();
-        this.generatorType = (LanternGeneratorType) creationSettings.getGeneratorType();
-        this.generatorSettings = creationSettings.getGeneratorSettings();
-        this.generateBonusChest = creationSettings.doesGenerateBonusChest();
-        this.mapFeatures = creationSettings.usesMapFeatures();
-        this.worldConfig.getGeneration().setSeed(creationSettings.getSeed());
-        this.worldConfig.setGameMode(creationSettings.getGameMode());
-        this.worldConfig.setAllowPlayerRespawns(creationSettings.allowPlayerRespawns());
-        this.worldConfig.setDifficulty(creationSettings.getDifficulty());
-        this.worldConfig.setKeepSpawnLoaded(creationSettings.doesKeepSpawnLoaded());
-        this.worldConfig.setDoesWaterEvaporate(creationSettings.waterEvaporates());
-        this.setGeneratorModifiers(creationSettings.getGeneratorModifiers());
-        this.setEnabled(creationSettings.isEnabled());
-        this.worldConfig.setPVPEnabled(creationSettings.isPVPEnabled());
-        this.setBuildHeight(creationSettings.getBuildHeight());
-        this.worldConfig.setHardcore(creationSettings.isHardcore());
+    public void update(LanternWorldArchetype worldArchetype) throws IOException {
+        this.commandsAllowed = worldArchetype.areCommandsAllowed();
+        this.dimensionType = worldArchetype.getDimensionType();
+        this.setGeneratorType(worldArchetype.getGeneratorType());
+        this.worldConfig.getGeneration().setGeneratorSettings(worldArchetype.getGeneratorSettings());
+        this.generateBonusChest = worldArchetype.doesGenerateBonusChest();
+        this.mapFeatures = worldArchetype.usesMapFeatures();
+        this.worldConfig.getGeneration().setSeed(worldArchetype.getSeed());
+        this.worldConfig.setGameMode(worldArchetype.getGameMode());
+        this.worldConfig.setAllowPlayerRespawns(worldArchetype.allowPlayerRespawns());
+        this.worldConfig.setDifficulty(worldArchetype.getDifficulty());
+        this.worldConfig.setKeepSpawnLoaded(worldArchetype.doesKeepSpawnLoaded());
+        this.worldConfig.setDoesWaterEvaporate(worldArchetype.waterEvaporates());
+        this.setGeneratorModifiers(worldArchetype.getGeneratorModifiers());
+        this.setEnabled(worldArchetype.isEnabled());
+        this.worldConfig.setPVPEnabled(worldArchetype.isPVPEnabled());
+        this.setBuildHeight(worldArchetype.getBuildHeight());
+        this.worldConfig.setHardcore(worldArchetype.isHardcore());
         this.worldConfig.save();
     }
 
@@ -358,26 +352,17 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public LanternGeneratorType getGeneratorType() {
-        return this.generatorType;
+        return (LanternGeneratorType) this.worldConfig.getGeneration().getGeneratorType();
     }
 
     @Override
-    public void setGeneratorType(GeneratorType type) {
-        this.generatorType = (LanternGeneratorType) checkNotNull(type, "type");
+    public void setGeneratorType(GeneratorType generatorType) {
+        this.worldConfig.getGeneration().setGeneratorType(generatorType);
     }
 
     @Override
     public DataContainer getGeneratorSettings() {
-        return this.generatorSettings;
-    }
-
-    /**
-     * Sets the generator settings of the world properties.
-     *
-     * @param generatorSettings The generator settings
-     */
-    public void setGeneratorSettings(DataContainer generatorSettings) {
-        this.generatorSettings = checkNotNull(generatorSettings, "generatorSettings");
+        return this.worldConfig.getGeneration().getGeneratorSettings();
     }
 
     @Override

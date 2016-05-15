@@ -684,7 +684,6 @@ public final class LanternChunkManager {
         if (chunk != null) {
             this.loadedChunks.put(coords, chunk);
             this.reusableChunks.remove(coords);
-            this.tryChunkForceEvents(coords, chunk);
             if (!this.ticketsByPos.containsKey(coords)) {
                 this.pendingForUnload.add(new UnloadingChunkEntry(coords));
             }
@@ -716,31 +715,10 @@ public final class LanternChunkManager {
         }
         // Try to load the chunk
         this.load(chunk, cause, generate);
-        this.tryChunkForceEvents(coords, chunk);
         if (!this.ticketsByPos.containsKey(coords)) {
             this.pendingForUnload.add(new UnloadingChunkEntry(coords));
         }
         return chunk;
-    }
-
-    /**
-     * Calls the force chunk events that are triggered by loading tickets, we
-     * had to wait to the point that the chunk was actually loaded before we
-     * could call this events.
-     *
-     * @param coords the coordinates of the chunk
-     * @param chunk the chunk instance
-     */
-    private void tryChunkForceEvents(Vector2i coords, LanternChunk chunk) {
-        final Set<ChunkLoadingTicket> tickets = ticketsByPos.get(coords);
-        if (tickets == null || tickets.isEmpty()) {
-            return;
-        }
-        final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
-        for (LoadingTicket ticket : tickets) {
-            this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
-                    Cause.source(ticket).owner(this.world).build(), coords0, ticket));
-        }
     }
 
     private static final int UP = 0;
@@ -1322,12 +1300,6 @@ public final class LanternChunkManager {
             if (chunk.lock.isLocked() && chunk.lockState == LanternChunk.LockState.UNLOADING) {
                 queueLoad = true;
             }
-            // The chunk is already loaded
-            if (chunk.loaded && !queueLoad && callEvents) {
-                final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
-                this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
-                        Cause.source(ticket).owner(this.world).build(), coords0, ticket));
-            }
         // Queue the chunk to load
         } else {
             queueLoad = true;
@@ -1339,6 +1311,11 @@ public final class LanternChunkManager {
                         this.queueTask(coords, new LanternChunkLoadTask(coords)));
             }
         }
+        if  (callEvents) {
+            final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
+            this.game.getEventManager().post(SpongeEventFactory.createForcedChunkEvent(
+                    Cause.source(ticket).owner(this.world).build(), coords0, ticket));
+        }
     }
 
     /**
@@ -1347,7 +1324,7 @@ public final class LanternChunkManager {
      * @param ticket the ticket
      * @param coords the coordinates
      */
-    void unforce(LanternLoadingTicket ticket, Vector2i coords) {
+    void unforce(LanternLoadingTicket ticket, Vector2i coords, boolean callEvents) {
         if (this.unlockInternally(coords, ticket)) {
             final LanternChunk chunk = this.getChunk(coords, false);
             // Try to cancel any queued chunk loadings
@@ -1363,6 +1340,11 @@ public final class LanternChunkManager {
                     this.pendingForUnload.offer(entry);
                 }
             }
+        }
+        if (callEvents) {
+            final Vector3i coords0 = new Vector3i(coords.getX(), 0, coords.getY());
+            this.game.getEventManager().post(SpongeEventFactory.createUnforcedChunkEvent(
+                    Cause.source(ticket).owner(this.world).build(), coords0, ticket));
         }
     }
 

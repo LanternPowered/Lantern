@@ -38,6 +38,7 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import org.lanternpowered.server.config.serializer.CatalogTypeSerializer;
+import org.lanternpowered.server.config.serializer.DataViewTypeSerializer;
 import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
 import org.lanternpowered.server.config.serializer.InstantTypeSerializer;
 import org.lanternpowered.server.config.serializer.MultimapTypeSerializer;
@@ -46,6 +47,8 @@ import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.lanternpowered.server.util.IpSet;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
@@ -65,6 +68,7 @@ public abstract class ConfigBase {
 
     static {
         final TypeSerializerCollection typeSerializers = ConfigurationOptions.defaults().getSerializers().newChild();
+        final DataViewTypeSerializer dataViewTypeSerializer = new DataViewTypeSerializer();
         typeSerializers.registerType(TypeToken.of(Text.class), new TextTypeSerializer())
                 .registerType(TypeToken.of(CatalogType.class), new CatalogTypeSerializer())
                 .registerType(TypeToken.of(IpSet.class), new IpSet.IpSetSerializer())
@@ -74,7 +78,9 @@ public abstract class ConfigBase {
                         TypeToken.of(LanternProfileProperty.class)))
                 .registerType(TypeToken.of(InetAddress.class), new InetAddressTypeSerializer())
                 .registerType(TypeToken.of(Instant.class), new InstantTypeSerializer())
-                .registerType(TypeToken.of(Multimap.class), new MultimapTypeSerializer());
+                .registerType(TypeToken.of(Multimap.class), new MultimapTypeSerializer())
+                .registerType(TypeToken.of(DataView.class), dataViewTypeSerializer)
+                .registerType(TypeToken.of(DataContainer.class), dataViewTypeSerializer);
         DEFAULT_OPTIONS = ConfigurationOptions.defaults().setSerializers(typeSerializers);
     }
 

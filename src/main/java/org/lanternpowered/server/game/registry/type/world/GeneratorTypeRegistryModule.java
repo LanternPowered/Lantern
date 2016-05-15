@@ -32,7 +32,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
-import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.world.gen.LanternGeneratorTypeNether;
 import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
@@ -43,7 +42,6 @@ import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
-import org.spongepowered.api.world.WorldCreationSettings;
 
 import java.util.Collection;
 import java.util.HashMap;

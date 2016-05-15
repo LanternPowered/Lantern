@@ -23,41 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.chunk;
+package org.lanternpowered.server.config.serializer;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.reflect.TypeToken;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.translator.ConfigurateTranslator;
 
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
+public final class DataViewTypeSerializer implements TypeSerializer<DataView> {
 
-import java.util.UUID;
-
-class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implements PlayerEntityLoadingTicket {
-
-    private final UUID uniqueId;
-
-    LanternPlayerEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks) {
-        super(plugin, chunkManager, maxChunks);
-        this.uniqueId = uniqueId;
-    }
-
-    LanternPlayerEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, UUID uniqueId, int maxChunks, int numChunks) {
-        super(plugin, chunkManager, maxChunks, numChunks);
-        this.uniqueId = uniqueId;
+    @Override
+    public DataView deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+        return ConfigurateTranslator.instance().translateFrom(value);
     }
 
     @Override
-    public synchronized void bindToEntity(Entity entity) {
-        checkNotNull(entity, "entity");
-        checkArgument(entity.getUniqueId().equals(this.uniqueId),
-                "Only a player with the uuid (" + this.uniqueId + ") can be applied to this ticket!");
-        super.bindToEntity(entity);
+    public void serialize(TypeToken<?> type, DataView obj, ConfigurationNode value) throws ObjectMappingException {
+        value.setValue(ConfigurateTranslator.instance().translateData(obj));
     }
-
-    @Override
-    public UUID getPlayerUniqueId() {
-        return this.uniqueId;
-    }
-
 }

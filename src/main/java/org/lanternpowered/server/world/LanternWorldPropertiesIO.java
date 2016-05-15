@@ -289,59 +289,12 @@ public final class LanternWorldPropertiesIO {
             spongeDataView.getInt(GENERATE_BONUS_CHEST).ifPresent(v -> properties.setGenerateBonusChest(v > 0));
         }
 
-        if (dataView.contains(GENERATOR_NAME)) {
-            final String genName0 = dataView.getString(GENERATOR_NAME).get();
-            String genName = genName0;
-            if (genName.indexOf(':') == -1) {
-                genName = "minecraft:" + genName;
-            }
-            GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, genName).orElse(null);
-            if (generatorType == null) {
-                generatorType = properties.getDimensionType().getDefaultGeneratorType();
-            }
-            DataContainer generatorSettings = null;
-            if (dataView.contains(GENERATOR_OPTIONS)) {
-                String options = dataView.getString(GENERATOR_OPTIONS).get();
-                String customSettings = null;
-                if (genName0.equalsIgnoreCase("flat")) {
-                    customSettings = options;
-                    // Added in the lantern-server to allow to attach
-                    // custom generator options to the flat generator
-                    if (dataView.contains(GENERATOR_OPTIONS_EXTRA)) {
-                        options = dataView.getString(GENERATOR_OPTIONS_EXTRA).get();
-                    } else {
-                        options = "";
-                    }
-                }
-                if (!options.isEmpty()) {
-                    try {
-                        JsonObject json = GSON.fromJson(options, JsonObject.class);
-                        generatorSettings = JsonTranslator.instance().translateFrom(json).copy();
-                    } catch (Exception e) {
-                        Lantern.getLogger().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",
-                                options, genName);
-                        e.printStackTrace();
-                    }
-                }
-                if (generatorSettings == null) {
-                    generatorSettings = generatorType.getGeneratorSettings();
-                }
-                if (customSettings != null) {
-                    generatorSettings.set(FlatGeneratorType.SETTINGS, customSettings);
-                }
-            } else {
-                generatorSettings = generatorType.getGeneratorSettings();
-            }
-            properties.setGeneratorType(generatorType);
-            properties.setGeneratorSettings(generatorSettings);
-        }
-
         // Get the spawn position
         final Optional<Integer> spawnX = dataView.getInt(SPAWN_X);
         final Optional<Integer> spawnY = dataView.getInt(SPAWN_Y);
         final Optional<Integer> spawnZ = dataView.getInt(SPAWN_Z);
         if (spawnX.isPresent() && spawnY.isPresent() && spawnZ.isPresent()) {
-            properties.spawnPosition = new Vector3i(spawnX.get(), spawnY.get(), spawnZ.get());
+            properties.setSpawnPosition(new Vector3i(spawnX.get(), spawnY.get(), spawnZ.get()));
         }
 
         // Get the game rules
@@ -366,6 +319,55 @@ public final class LanternWorldPropertiesIO {
             worldConfig.setHardcore(dataView.getInt(HARDCORE).get() > 0);
             worldConfig.setDifficulty(DifficultyRegistryModule.getInstance().getByInternalId(dataView.getInt(DIFFICULTY).get())
                     .orElse(Difficulties.NORMAL));
+
+            if (dataView.contains(GENERATOR_NAME)) {
+                final String genName0 = dataView.getString(GENERATOR_NAME).get();
+                String genName = genName0;
+                if (genName.indexOf(':') == -1) {
+                    genName = "minecraft:" + genName;
+                }
+                GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, genName).orElse(null);
+                if (generatorType == null) {
+                    generatorType = properties.getDimensionType().getDefaultGeneratorType();
+                }
+                DataContainer generatorSettings = null;
+                if (dataView.contains(GENERATOR_OPTIONS)) {
+                    String options = dataView.getString(GENERATOR_OPTIONS).get();
+                    String customSettings = null;
+                    if (genName0.equalsIgnoreCase("flat")) {
+                        customSettings = options;
+                        // Added in the lantern-server to allow to attach
+                        // custom generator options to the flat generator
+                        if (dataView.contains(GENERATOR_OPTIONS_EXTRA)) {
+                            options = dataView.getString(GENERATOR_OPTIONS_EXTRA).get();
+                        } else {
+                            options = "";
+                        }
+                    }
+                    if (!options.isEmpty()) {
+                        try {
+                            JsonObject json = GSON.fromJson(options, JsonObject.class);
+                            generatorSettings = JsonTranslator.instance().translateFrom(json).copy();
+                        } catch (Exception e) {
+                            Lantern.getLogger().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",
+                                    options, genName);
+                            e.printStackTrace();
+                        }
+                    }
+                    if (generatorSettings == null) {
+                        generatorSettings = generatorType.getGeneratorSettings();
+                    }
+                    if (customSettings != null) {
+                        generatorSettings.set(FlatGeneratorType.SETTINGS, customSettings);
+                    }
+                } else {
+                    generatorSettings = generatorType.getGeneratorSettings();
+                }
+
+                worldConfig.getGeneration().setGeneratorType(generatorType);
+                worldConfig.getGeneration().setGeneratorSettings(generatorSettings);
+            }
+
             if (spongeDataView != null) {
                 spongeDataView.getInt(ENABLED).ifPresent(v -> worldConfig.setWorldEnabled(v > 0));
                 worldConfig.setKeepSpawnLoaded(spongeDataView.getInt(KEEP_SPAWN_LOADED).map(v -> v > 0)
@@ -436,7 +438,7 @@ public final class LanternWorldPropertiesIO {
         dataView.set(BORDER_SIZE_LERP_TIME, properties.getWorldBorderTimeRemaining());
         dataView.set(BORDER_WARNING_BLOCKS, properties.borderWarningDistance);
         dataView.set(BORDER_WARNING_TIME, properties.borderWarningTime);
-        final Vector3i spawn = properties.spawnPosition;
+        final Vector3i spawn = properties.getSpawnPosition();
         dataView.set(SPAWN_X, spawn.getX());
         dataView.set(SPAWN_Y, spawn.getY());
         dataView.set(SPAWN_Z, spawn.getZ());
@@ -452,7 +454,7 @@ public final class LanternWorldPropertiesIO {
                         .set(UUID_LEAST, uuid.getLeastSignificantBits()))
                 .collect(Collectors.toList()));
         return new LevelData(properties.getWorldName(), properties.getUniqueId(), rootContainer,
-                spongeRootContainer, dimensionId, dimensionMap/*, null*/);
+                spongeRootContainer, dimensionId, dimensionMap);
     }
 
     static void write(Path folder, LevelData levelData) throws IOException {

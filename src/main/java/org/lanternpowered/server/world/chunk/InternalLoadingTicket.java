@@ -76,11 +76,13 @@ final class InternalLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public void forceChunk(Vector2i chunk) {
+    public boolean forceChunk(Vector2i chunk) {
+        return false;
     }
 
     @Override
-    public void unforceChunk(Vector2i chunk) {
+    public boolean unforceChunk(Vector2i chunk) {
+        return false;
     }
 
     @Override

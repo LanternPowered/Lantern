@@ -25,9 +25,13 @@
  */
 package org.lanternpowered.server.config.world;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.Lists;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
 
@@ -50,6 +54,9 @@ public final class WorldGeneration {
 
     @Setting(value = "type")
     private GeneratorType generatorType = GeneratorTypes.OVERWORLD;
+
+    @Setting(value = "settings")
+    private DataContainer generatorSettings = new MemoryDataContainer();
 
     @Setting(value = "view-distance")
     private int viewDistance = 10;
@@ -83,6 +90,14 @@ public final class WorldGeneration {
     }
 
     public void setGeneratorType(GeneratorType generatorType) {
-        this.generatorType = generatorType;
+        this.generatorType = checkNotNull(generatorType, "generatorType");
+    }
+
+    public DataContainer getGeneratorSettings() {
+        return this.generatorSettings;
+    }
+
+    public void setGeneratorSettings(DataContainer generatorSettings) {
+        this.generatorSettings = checkNotNull(generatorSettings, "generatorSettings");
     }
 }

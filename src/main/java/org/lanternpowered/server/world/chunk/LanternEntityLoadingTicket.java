@@ -38,10 +38,10 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityC
 
     // The reference of the entity while it's not loaded yet,
     // this field will be cleared once the entity available is
-    @Nullable private volatile EntityReference entityReference;
+    @Nullable private EntityReference entityReference;
 
     // The entity instance
-    @Nullable private volatile Entity entity;
+    @Nullable private Entity entity;
 
     LanternEntityLoadingTicket(String plugin, LanternChunkManager chunkManager, int maxChunks, int numChunks) {
         super(plugin, chunkManager, maxChunks, numChunks);
@@ -52,38 +52,38 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityC
     }
 
     @Override
-    public void bindToEntity(Entity entity) {
+    public synchronized void bindToEntity(Entity entity) {
         this.setEntity(checkNotNull(entity, "entity"));
     }
 
     @Override
-    public Entity getBoundEntity() {
+    public synchronized Entity getBoundEntity() {
         checkState(this.entity != null, "No entity bound to the ticket.");
         return this.entity;
     }
 
     @Override
-    public void setEntity(@Nullable Entity entity) {
+    public synchronized void setEntity(@Nullable Entity entity) {
         this.entity = entity;
     }
 
     @Override
-    public Optional<Entity> getEntity() {
+    public synchronized Optional<Entity> getEntity() {
         return Optional.ofNullable(this.entity);
     }
 
     @Override
-    public void setEntityReference(@Nullable EntityReference entityReference) {
+    public synchronized void setEntityReference(@Nullable EntityReference entityReference) {
         this.entityReference = entityReference;
     }
 
     @Override
-    public Optional<EntityReference> getEntityReference() {
+    public synchronized Optional<EntityReference> getEntityReference() {
         return Optional.ofNullable(this.entityReference);
     }
 
     @Override
-    public Optional<EntityReference> getOrCreateEntityReference() {
+    public synchronized Optional<EntityReference> getOrCreateEntityReference() {
         if (this.entity != null) {
             return Optional.of(new EntityReference(this.entity.getLocation().getChunkPosition().toVector2(true),
                     this.entity.getUniqueId()));

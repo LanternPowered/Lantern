@@ -35,13 +35,13 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.util.GuavaCollectors;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.LinkedList;
 
 import javax.annotation.Nullable;
 
 class LanternLoadingTicket implements ChunkLoadingTicket {
 
-    private final ConcurrentLinkedQueue<Vector2i> queue = new ConcurrentLinkedQueue<>();
+    private final LinkedList<Vector2i> queue = new LinkedList<>();
     private final LanternChunkManager chunkManager;
     private final String plugin;
 
@@ -53,10 +53,10 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     private final int maxChunks;
 
     // The amount of chunks that may be loaded by this ticket
-    private volatile int numChunks;
+    private int numChunks;
 
     // Whether the ticket is released and may not be used again
-    private volatile boolean released;
+    private boolean released;
 
     LanternLoadingTicket(String plugin, LanternChunkManager chunkManager,
             int maxChunks) {
@@ -81,7 +81,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public boolean setNumChunks(int numChunks) {
+    public synchronized boolean setNumChunks(int numChunks) {
         checkArgument(numChunks >= 0, "numChunks may not be negative");
         if (numChunks > this.maxChunks) {
             return false;
@@ -92,7 +92,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
 
             if (numChunks < size) {
                 for (int i = 0; i < size - numChunks; i++) {
-                    this.chunkManager.unforce(this, this.queue.poll());
+                    this.chunkManager.unforce(this, this.queue.poll(), true);
                 }
             }
         }
@@ -101,7 +101,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public int getNumChunks() {
+    public synchronized int getNumChunks() {
         return this.numChunks;
     }
 
@@ -116,7 +116,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public ImmutableSet<Vector3i> getChunkList() {
+    public synchronized ImmutableSet<Vector3i> getChunkList() {
         if (this.released) {
             return ImmutableSet.of();
         }
@@ -130,22 +130,24 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public void forceChunk(Vector2i chunk) {
+    public synchronized boolean forceChunk(Vector2i chunk) {
         checkNotNull(chunk, "chunk");
         if (this.released) {
             Lantern.getLogger().warn("The plugin {} attempted to force load a chunk with an invalid ticket. "
                     + "This is not permitted.", this.plugin);
-            return;
+            return false;
         }
         // Only force if not done before
         if (!this.queue.contains(chunk)) {
             // Remove the oldest chunk if necessary
             if (this.queue.size() >= this.numChunks) {
-                this.chunkManager.unforce(this, this.queue.poll());
+                this.chunkManager.unforce(this, this.queue.poll(), true);
             }
             this.queue.add(chunk);
             this.chunkManager.force(this, chunk);
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -154,33 +156,35 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public void unforceChunk(Vector2i chunk) {
+    public synchronized boolean unforceChunk(Vector2i chunk) {
         final Vector2i chunk0 = checkNotNull(chunk, "chunk");
         if (this.released) {
-            return;
+            return false;
         }
         if (this.queue.remove(chunk0)) {
-            this.chunkManager.unforce(this, chunk0);
+            this.chunkManager.unforce(this, chunk0, true);
+            return true;
         }
+        return false;
     }
 
     @Override
-    public void unforceChunks() {
+    public synchronized void unforceChunks() {
         if (this.released) {
             return;
         }
         while (!this.queue.isEmpty()) {
-            this.chunkManager.unforce(this, this.queue.poll());
+            this.chunkManager.unforce(this, this.queue.poll(), true);
         }
     }
 
     @Override
-    public boolean isReleased() {
+    public synchronized boolean isReleased() {
         return this.released;
     }
 
     @Override
-    public void prioritizeChunk(Vector3i chunk) {
+    public synchronized void prioritizeChunk(Vector3i chunk) {
         checkNotNull(chunk, "chunk");
         if (this.released) {
             return;
@@ -193,7 +197,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public void release() {
+    public synchronized void release() {
         this.unforceChunks();
         this.chunkManager.release(this);
         this.released = true;

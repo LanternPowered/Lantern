@@ -41,15 +41,17 @@ public interface ChunkLoadingTicket extends LoadingTicket {
      * player.</p>
      *
      * @param chunk The chunk to force-load
+     * @return Whether the chunk was added
      */
-    void forceChunk(Vector2i chunk);
+    boolean forceChunk(Vector2i chunk);
 
     /**
      * Removes a chunk from the force-loaded set of this ticket.
      *
      * @param chunk The chunk to remove from force-loading
+     * @return Whether the chunk was removed
      */
-    void unforceChunk(Vector2i chunk);
+    boolean unforceChunk(Vector2i chunk);
 
     /**
      * Removes all the chunks from the force-loaded set of this ticket.

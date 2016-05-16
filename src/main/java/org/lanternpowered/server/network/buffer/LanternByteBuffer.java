@@ -33,8 +33,10 @@ import io.netty.buffer.ByteBufOutputStream;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
+import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.network.buffer.objects.Type;
+import org.lanternpowered.server.util.LimitInputStream;
 import org.spongepowered.api.data.DataView;
 
 import java.io.IOException;
@@ -238,10 +240,22 @@ public class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
-    public byte[] readByteArray() {
+    public byte[] readLimitedByteArray(int maxLength) throws DecoderException {
+        int length = this.readVarInt();
+        if (length < 0) {
+            throw new DecoderException("Byte array length may not be negative.");
+        }
+        if (length > maxLength) {
+            throw new DecoderException("Exceeded the maximum allowed length, got " + length + " which is greater then " + maxLength);
+        }
         byte[] bytes = new byte[this.readVarInt()];
         this.buf.readBytes(bytes);
         return bytes;
+    }
+
+    @Override
+    public byte[] readByteArray() {
+        return this.readLimitedByteArray(Integer.MAX_VALUE);
     }
 
     @Override
@@ -496,8 +510,13 @@ public class LanternByteBuffer implements ByteBuffer {
     }
 
     @Override
+    public String readLimitedString(int maxLength) throws DecoderException {
+        return new String(this.readLimitedByteArray(maxLength * 4), StandardCharsets.UTF_8);
+    }
+
+    @Override
     public String readString() {
-        return new String(this.readByteArray(), StandardCharsets.UTF_8);
+        return this.readLimitedString(Short.MAX_VALUE);
     }
 
     @Override
@@ -599,17 +618,26 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Nullable
     @Override
-    public DataView readDataView() {
+    public DataView readLimitedDataView(int maximumDepth, int maxBytes) {
         int index = this.buf.readerIndex();
         if (this.buf.readByte() == 0) {
             return null;
         }
         this.buf.readerIndex(index);
         try {
-            return NbtStreamUtils.read(new ByteBufInputStream(this.buf), true);
+            try (NbtDataContainerInputStream input = new NbtDataContainerInputStream(
+                    new LimitInputStream(new ByteBufInputStream(this.buf), maxBytes), true, maximumDepth)) {
+                return input.read();
+            }
         } catch (IOException e) {
             throw new CodecException(e);
         }
+    }
+
+    @Nullable
+    @Override
+    public DataView readDataView() {
+        return this.readLimitedDataView(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 
     @Nullable

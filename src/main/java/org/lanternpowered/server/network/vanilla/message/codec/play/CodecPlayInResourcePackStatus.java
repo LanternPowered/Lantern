@@ -46,7 +46,7 @@ public final class CodecPlayInResourcePackStatus implements Codec<MessagePlayInR
 
     @Override
     public MessagePlayInResourcePackStatus decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        String hash = buf.readString();
+        String hash = buf.readLimitedString(40);
         int status0 = buf.readVarInt();
         ResourcePackStatus status = this.status.get(status0);
         if (status == null) {

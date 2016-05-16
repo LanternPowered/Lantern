@@ -29,6 +29,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Sets;
 import io.netty.handler.codec.CodecException;
+import io.netty.handler.codec.DecoderException;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
@@ -80,7 +81,11 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
     @Override
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         String channel = buf.readString();
-        ByteBuffer content = context.byteBufAlloc().heapBuffer(buf.available());
+        int length = buf.available();
+        if (length > Short.MAX_VALUE) {
+            throw new DecoderException("CustomPayload messages may not be longer then " + Short.MAX_VALUE + " bytes");
+        }
+        ByteBuffer content = context.byteBufAlloc().heapBuffer(length);
         buf.readBytes(content);
         if ("REGISTER".equals(channel)) {
             Set<String> channels;

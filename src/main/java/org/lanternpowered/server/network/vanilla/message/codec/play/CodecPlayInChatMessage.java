@@ -35,6 +35,6 @@ public final class CodecPlayInChatMessage implements Codec<MessagePlayInChatMess
 
     @Override
     public MessagePlayInChatMessage decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        return new MessagePlayInChatMessage(buf.readString());
+        return new MessagePlayInChatMessage(buf.readLimitedString(100));
     }
 }

@@ -40,8 +40,7 @@ public final class CodecPlayInChangeSign implements Codec<MessagePlayInChangeSig
         Vector3i position = buf.read(Types.VECTOR_3_I);
         String[] lines = new String[4];
         for (int i = 0; i < lines.length; i++) {
-            // TODO: Limit length
-            lines[i] = buf.readString();
+            lines[i] = buf.readLimitedString(384);
         }
         return new MessagePlayInChangeSign(position, lines);
     }

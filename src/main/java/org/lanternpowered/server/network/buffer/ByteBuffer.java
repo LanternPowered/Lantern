@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.network.buffer;
 
+import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.network.buffer.objects.Type;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
 
+import java.io.IOException;
 import java.nio.ByteOrder;
 import java.util.UUID;
 
@@ -80,6 +82,17 @@ public interface ByteBuffer extends ChannelBuf {
 
     @Override
     ByteBuffer setByte(int index, byte data);
+
+    /**
+     * Reads a byte array and checks whether the length isn't
+     * longer then the specified maximum length.
+     *
+     * @param maxLength The maximum length
+     * @return The byte array
+     * @throws DecoderException If the length of the byte
+     *     array exceeded the specified maximum length
+     */
+    byte[] readLimitedByteArray(int maxLength) throws DecoderException;
 
     @Override
     ByteBuffer writeByteArray(byte[] data);
@@ -147,6 +160,17 @@ public interface ByteBuffer extends ChannelBuf {
     @Override
     ByteBuffer setVarInt(int index, int value);
 
+    /**
+     * Reads a string and checks whether the length isn't longer
+     * then the specified maximum length.
+     *
+     * @param maxLength The maximum length
+     * @return The byte array
+     * @throws DecoderException If the length of the byte
+     *     array exceeded the specified maximum length
+     */
+    String readLimitedString(int maxLength) throws DecoderException;
+
     @Override
     ByteBuffer writeString(String data);
 
@@ -170,6 +194,20 @@ public interface ByteBuffer extends ChannelBuf {
 
     @Override
     ByteBuffer setDataView(int index, @Nullable DataView data);
+
+    /**
+     * Reads a {@link DataView} and checks whether the depth of the underlying
+     * tree doesn't get bigger then the specified maximum depth and is not bigger
+     * then the maximum amount of bytes.
+     *
+     * @param maxDepth The maximum depth
+     * @param maxBytes The maximum amount of bytes
+     * @return The data view
+     * @throws IOException If the depth exceeded the maximum depth or
+     *     if the size exceeded the maximum bytes
+     */
+    @Nullable
+    DataView readLimitedDataView(int maxDepth, int maxBytes);
 
     @Nullable
     @Override

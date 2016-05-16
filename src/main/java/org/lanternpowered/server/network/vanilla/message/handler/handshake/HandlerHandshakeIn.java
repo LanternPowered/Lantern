@@ -130,9 +130,9 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                         for (int i = 0; i < jsonArray.size(); i++) {
                             JsonObject property = jsonArray.get(i).getAsJsonObject();
 
-                            String propertyName = property.get("name").getAsString();
-                            String propertyValue = property.get("value").getAsString();
-                            String propertySignature = property.has("signature") ? property.get("signature").getAsString() : null;
+                            String propertyName = property.get("n").getAsString();
+                            String propertyValue = property.get("v").getAsString();
+                            String propertySignature = property.has("s") ? property.get("s").getAsString() : null;
 
                             properties.put(propertyName, new LanternProfileProperty(propertyName, propertyValue, propertySignature));
                         }

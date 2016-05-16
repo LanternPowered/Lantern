@@ -23,60 +23,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.handshake;
+package org.lanternpowered.server.network;
 
-import org.lanternpowered.server.network.message.Message;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class MessageHandshakeIn implements Message {
+import java.util.Optional;
 
-    private final String hostname;
-    private final int port;
-
-    private final int protocol;
-    private final int state;
-
+public enum ProxyType {
     /**
-     * Creates a new handshake message.
-     * 
-     * @param state the next state
-     * @param hostname the hostname
-     * @param protocol the client protocol
+     * The Waterfall proxy.
+     *
+     * @see <a href="Waterfall">https://github.com/WaterfallMC/Waterfall</a>
      */
-    public MessageHandshakeIn(int state, String hostname, int port, int protocol) {
-        this.hostname = hostname;
-        this.protocol = protocol;
-        this.port = port;
-        this.state = state;
+    WATERFALL   ("Waterfall"),
+    /**
+     * The BungeeCord proxy.
+     *
+     * @see <a href="BungeeCord">https://github.com/SpigotMC/BungeeCord</a>
+     */
+    BUNGEE_CORD ("BungeeCord"),
+    /**
+     * There is no proxy in use.
+     */
+    NONE        ("None"),
+    ;
+
+    private final String name;
+
+    ProxyType(String name) {
+        this.name = name;
     }
 
-    /**
-     * Gets the next protocol state.
-     * 
-     * @return the state
-     */
-    public int getNextState() {
-        return this.state;
+    public String getName() {
+        return this.name;
     }
 
-    /**
-     * Gets the host name that was used to join the server.
-     * 
-     * @return the host name
-     */
-    public String getHostname() {
-        return this.hostname;
-    }
-
-    /**
-     * Gets the protocol version of the client.
-     * 
-     * @return the version
-     */
-    public int getProtocolVersion() {
-        return this.protocol;
-    }
-
-    public int getPort() {
-        return this.port;
+    public static Optional<ProxyType> getByName(String name) {
+        checkNotNull(name, "name");
+        for (ProxyType type : values()) {
+            if (type.name().equalsIgnoreCase(name) || type.name.equalsIgnoreCase(name)) {
+                return Optional.of(type);
+            }
+        }
+        return Optional.empty();
     }
 }

@@ -27,6 +27,10 @@ package org.lanternpowered.server.profile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.spongepowered.api.profile.property.ProfileProperty;
@@ -91,4 +95,31 @@ public final class LanternProfileProperty implements ProfileProperty {
         return Objects.hash(this.name, this.value, this.signature);
     }
 
+    /**
+     * Creates {@link LanternProfileProperty} from the specified {@link JsonObject}.
+     *
+     * @param jsonObject The json object
+     * @return The profile property
+     */
+    public static LanternProfileProperty createFromJson(JsonObject jsonObject) {
+        String name = jsonObject.get("name").getAsString();
+        String value = jsonObject.get("value").getAsString();
+        String signature = jsonObject.has("signature") ? jsonObject.get("signature").getAsString() : null;
+        return new LanternProfileProperty(name, value, signature);
+    }
+
+    /**
+     * Creates a multimap with {@link LanternProfileProperty}s from the specified {@link JsonArray}.
+     *
+     * @param jsonArray The json array
+     * @return The multimap
+     */
+    public static Multimap<String, ProfileProperty> createPropertiesMapFromJson(JsonArray jsonArray) {
+        Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
+        for (int i = 0; i < jsonArray.size(); i++) {
+            ProfileProperty profileProperty = createFromJson(jsonArray.get(i).getAsJsonObject());
+            properties.put(profileProperty.getName(), profileProperty);
+        }
+        return properties;
+    }
 }

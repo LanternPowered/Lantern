@@ -37,6 +37,7 @@ import org.lanternpowered.server.config.world.chunk.ChunkLoading;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingConfig;
 import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
+import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.util.IpSet;
 import org.spongepowered.api.text.Text;
 
@@ -164,6 +165,14 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "white-list", comment = "Whether the white-list is enabled.")
         private boolean whitelist = false;
 
+        @Setting(value = "proxy")
+        private Proxy proxy = new Proxy();
+    }
+
+    private static final class Proxy {
+
+        @Setting(value = "type", comment = "The type of the proxy, or none if disabled.")
+        private ProxyType type = ProxyType.NONE;
     }
 
     @ConfigSerializable
@@ -174,6 +183,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    public ProxyType getProxyType() {
+        return this.server.proxy.type;
     }
 
     public int getChatSpamThreshold() {

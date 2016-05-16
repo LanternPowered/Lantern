@@ -23,60 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.handshake;
+package org.lanternpowered.server.config.serializer;
 
-import org.lanternpowered.server.network.message.Message;
+import com.google.common.reflect.TypeToken;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.lanternpowered.server.network.ProxyType;
 
-public final class MessageHandshakeIn implements Message {
+public final class ProxyTypeSerializer implements TypeSerializer<ProxyType> {
 
-    private final String hostname;
-    private final int port;
-
-    private final int protocol;
-    private final int state;
-
-    /**
-     * Creates a new handshake message.
-     * 
-     * @param state the next state
-     * @param hostname the hostname
-     * @param protocol the client protocol
-     */
-    public MessageHandshakeIn(int state, String hostname, int port, int protocol) {
-        this.hostname = hostname;
-        this.protocol = protocol;
-        this.port = port;
-        this.state = state;
+    @Override
+    public ProxyType deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+        return ProxyType.getByName(value.getString()).orElseThrow(() -> new IllegalArgumentException("Invalid proxy type: " + value.getString()));
     }
 
-    /**
-     * Gets the next protocol state.
-     * 
-     * @return the state
-     */
-    public int getNextState() {
-        return this.state;
-    }
-
-    /**
-     * Gets the host name that was used to join the server.
-     * 
-     * @return the host name
-     */
-    public String getHostname() {
-        return this.hostname;
-    }
-
-    /**
-     * Gets the protocol version of the client.
-     * 
-     * @return the version
-     */
-    public int getProtocolVersion() {
-        return this.protocol;
-    }
-
-    public int getPort() {
-        return this.port;
+    @Override
+    public void serialize(TypeToken<?> type, ProxyType obj, ConfigurationNode value) throws ObjectMappingException {
+        value.setValue(obj.getName());
     }
 }

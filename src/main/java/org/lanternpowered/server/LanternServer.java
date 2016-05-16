@@ -174,7 +174,7 @@ public class LanternServer implements Server {
             // descriptive bind error messages
             Lantern.getLogger().error("The server could not bind to the requested address.");
             if (e.getMessage().startsWith("Cannot assign requested address")) {
-                Lantern.getLogger().error("The 'server.ip' in your configuration may not be valid.");
+                Lantern.getLogger().error("The 'server.ip' in your global.conf file may not be valid.");
                 Lantern.getLogger().error("Unless you are sure you need it, try removing it.");
                 Lantern.getLogger().error(e.toString());
             } else if (e.getMessage().startsWith("Address already in use")) {

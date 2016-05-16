@@ -80,7 +80,6 @@ import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.world.LanternWorld;
@@ -187,9 +186,6 @@ public class Session implements PlayerConnection {
     // The last ping time
     private long latencyTimeStart;
 
-    @Nullable
-    private ProxyData proxyData;
-
     /**
      * Creates a new session.
      * 
@@ -227,15 +223,6 @@ public class Session implements PlayerConnection {
      */
     public Set<String> getRegisteredChannels() {
         return this.registeredChannels;
-    }
-
-    @Nullable
-    public ProxyData getProxyData() {
-        return this.proxyData;
-    }
-
-    public void setProxyData(@Nullable ProxyData proxyData) {
-        this.proxyData = proxyData;
     }
 
     /**

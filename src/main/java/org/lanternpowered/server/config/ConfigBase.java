@@ -42,7 +42,9 @@ import org.lanternpowered.server.config.serializer.DataViewTypeSerializer;
 import org.lanternpowered.server.config.serializer.InetAddressTypeSerializer;
 import org.lanternpowered.server.config.serializer.InstantTypeSerializer;
 import org.lanternpowered.server.config.serializer.MultimapTypeSerializer;
+import org.lanternpowered.server.config.serializer.ProxyTypeSerializer;
 import org.lanternpowered.server.config.serializer.TextTypeSerializer;
+import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.profile.LanternProfileProperty;
 import org.lanternpowered.server.util.IpSet;
@@ -80,7 +82,9 @@ public abstract class ConfigBase {
                 .registerType(TypeToken.of(Instant.class), new InstantTypeSerializer())
                 .registerType(TypeToken.of(Multimap.class), new MultimapTypeSerializer())
                 .registerType(TypeToken.of(DataView.class), dataViewTypeSerializer)
-                .registerType(TypeToken.of(DataContainer.class), dataViewTypeSerializer);
+                .registerType(TypeToken.of(DataContainer.class), dataViewTypeSerializer)
+                .registerType(TypeToken.of(ProxyType.class), new ProxyTypeSerializer())
+                ;
         DEFAULT_OPTIONS = ConfigurationOptions.defaults().setSerializers(typeSerializers);
     }
 

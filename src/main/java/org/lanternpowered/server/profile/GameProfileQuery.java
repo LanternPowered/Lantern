@@ -84,19 +84,12 @@ public class GameProfileQuery {
             }
 
             String name = json.get("name").getAsString();
-            Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
+            Multimap<String, ProfileProperty> properties;
 
             if (json.has("properties")) {
-                JsonArray array = json.get("properties").getAsJsonArray();
-                for (JsonElement element : array) {
-                    JsonObject property = (JsonObject) element;
-
-                    String propName = property.get("name").getAsString();
-                    String value = property.get("value").getAsString();
-                    String signature = property.has("signature") ? property.get("signature").getAsString() : null;
-
-                    properties.put(propName, new LanternProfileProperty(propName, value, signature));
-                }
+                properties = LanternProfileProperty.createPropertiesMapFromJson(json.get("properties").getAsJsonArray());
+            } else {
+                properties = LinkedHashMultimap.create();
             }
 
             return new LanternGameProfile(uniqueId, name, properties);

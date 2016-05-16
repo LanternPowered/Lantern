@@ -52,7 +52,6 @@ import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
-import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn.ProxyData;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
@@ -68,6 +67,9 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
 
     // The data that will be used for authentication.
     static final AttributeKey<LoginAuthData> AUTH_DATA = AttributeKey.valueOf("login-auth-data");
+
+    // The spoofed game profile that may be provided by proxies
+    public static final AttributeKey<LanternGameProfile> SPOOFED_GAME_PROFILE = AttributeKey.valueOf("spoofed-game-profile");
 
     // The random used to generate the session ids
     private static final Random random = new Random();
@@ -88,13 +90,14 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             // Send created request message and wait for the response
             session.send(new MessageLoginOutEncryptionRequest(sessionId, publicKey, verifyToken));
         } else {
-            ProxyData proxy = session.getProxyData();
-            LanternGameProfile profile;
-            if (proxy == null) {
+            LanternGameProfile profile = context.getChannel().attr(SPOOFED_GAME_PROFILE).getAndRemove();
+            if (profile != null) {
+                profile = new LanternGameProfile(profile.getUniqueId(), username, profile.getPropertyMap());
+            } else {
+                // TODO: Look the actual game profile up? This IS BREAKING everything that
+                // depends on game profiles, like permissions
                 UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
                 profile = new LanternGameProfile(uuid, username);
-            } else {
-                profile = new LanternGameProfile(proxy.getUniqueId(), username, proxy.getProperties());
             }
             session.messageReceived(new MessageLoginInFinish(profile));
         }

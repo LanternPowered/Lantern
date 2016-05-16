@@ -31,17 +31,23 @@ import java.util.Optional;
 
 public enum ProxyType {
     /**
-     * The Waterfall proxy.
-     *
-     * @see <a href="Waterfall">https://github.com/WaterfallMC/Waterfall</a>
-     */
-    WATERFALL   ("Waterfall"),
-    /**
      * The BungeeCord proxy.
      *
      * @see <a href="BungeeCord">https://github.com/SpigotMC/BungeeCord</a>
      */
     BUNGEE_CORD ("BungeeCord"),
+    /**
+     * The LilyPad proxy.
+     *
+     * @see <a href="LilyPad">https://github.com/LilyPad</a>
+     */
+    LILY_PAD    ("LilyPad"),
+    /**
+     * The Waterfall proxy.
+     *
+     * @see <a href="Waterfall">https://github.com/WaterfallMC/Waterfall</a>
+     */
+    WATERFALL   ("Waterfall"),
     /**
      * There is no proxy in use.
      */

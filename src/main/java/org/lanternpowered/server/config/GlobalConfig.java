@@ -173,6 +173,12 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "type", comment = "The type of the proxy, or none if disabled.")
         private ProxyType type = ProxyType.NONE;
+
+        @Setting(value = "security-key",
+                comment = "A security key shared between a proxy and it's server to make\n"
+                        + "sure that they are connecting from your network.\n"
+                        + "Is currently only applicable for the LilyPad proxy.")
+        private String securityKey = "";
     }
 
     @ConfigSerializable
@@ -183,6 +189,10 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "root-folder", comment = "The name of the root world folder.")
         private String worldFolder = "world";
+    }
+
+    public String getProxySecurityKey() {
+        return this.server.proxy.securityKey;
     }
 
     public ProxyType getProxyType() {

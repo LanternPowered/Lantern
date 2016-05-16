@@ -31,6 +31,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
@@ -93,7 +94,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                         try {
                             properties = LanternProfileProperty.createPropertiesMapFromJson(GSON.fromJson(split[3], JsonArray.class));
                         } catch (Exception e) {
-                            session.disconnect("Invalid client forwarding data format.");
+                            session.disconnect(t("Invalid %s proxy data format.", proxyType.getName()));
                             throw new CodecException(e);
                         }
                     } else {
@@ -105,6 +106,47 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                     session.disconnect("Please enable client detail forwarding (also known as \"ip forwarding\") on "
                             + "your proxy if you wish to use it on this server, and also make sure that you joined through the proxy.");
                     return;
+                }
+                break;
+            case LILY_PAD:
+                try {
+                    JsonObject jsonObject = GSON.fromJson(hostname, JsonObject.class);
+
+                    String securityKey = jsonObject.get("s").getAsString();
+                    // Validate the security key
+                    if (!securityKey.equals(Lantern.getGame().getGlobalConfig().getProxySecurityKey())) {
+                        session.disconnect(t("Proxy security key mismatch"));
+                        Lantern.getLogger().warn("Proxy security key mismatch for the player {}", jsonObject.get("n").getAsString());
+                        return;
+                    }
+
+                    String name = jsonObject.get("n").getAsString();
+                    UUID uniqueId = UUIDHelper.fromFlatString(jsonObject.get("u").getAsString());
+
+                    Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
+                    if (jsonObject.has("p")) {
+                        JsonArray jsonArray = jsonObject.getAsJsonArray("p");
+
+                        for (int i = 0; i < jsonArray.size(); i++) {
+                            JsonObject property = jsonArray.get(i).getAsJsonObject();
+
+                            String propertyName = property.get("name").getAsString();
+                            String propertyValue = property.get("value").getAsString();
+                            String propertySignature = property.has("signature") ? property.get("signature").getAsString() : null;
+
+                            properties.put(propertyName, new LanternProfileProperty(propertyName, propertyValue, propertySignature));
+                        }
+                    }
+
+                    session.getChannel().attr(HandlerLoginStart.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, name, properties));
+
+                    int port = jsonObject.get("rP").getAsInt();
+                    String host = jsonObject.get("h").getAsString();
+
+                    virtualAddress = new InetSocketAddress(host, port);
+                } catch (Exception e) {
+                    session.disconnect(t("Invalid %s proxy data format.", proxyType.getName()));
+                    throw new CodecException(e);
                 }
                 break;
             case NONE:

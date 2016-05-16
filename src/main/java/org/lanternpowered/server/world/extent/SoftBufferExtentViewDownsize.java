@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.world.extent;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -51,6 +53,7 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
@@ -65,12 +68,11 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-public class ExtentViewDownsize implements AbstractExtent {
+public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     private final Extent extent;
     private final Vector3i blockMin;
@@ -79,8 +81,12 @@ public class ExtentViewDownsize implements AbstractExtent {
     private final Vector2i biomeMin;
     private final Vector2i biomeMax;
     private final Vector2i biomeSize;
+    private final Vector3i hardBlockMin;
+    private final Vector3i hardBlockMax;
+    private final Vector2i hardBiomeMin;
+    private final Vector2i hardBiomeMax;
 
-    public ExtentViewDownsize(Extent extent, Vector3i blockMin, Vector3i blockMax) {
+    public SoftBufferExtentViewDownsize(Extent extent, Vector3i blockMin, Vector3i blockMax, Vector3i hardMin, Vector3i hardMax) {
         this.extent = extent;
         this.blockMin = blockMin;
         this.blockMax = blockMax;
@@ -88,18 +94,10 @@ public class ExtentViewDownsize implements AbstractExtent {
         this.biomeMin = blockMin.toVector2(true);
         this.biomeMax = blockMax.toVector2(true);
         this.biomeSize = this.biomeMax.sub(this.biomeMin).add(Vector2i.ONE);
-    }
-
-    @Override
-    public Location<? extends Extent> getLocation(Vector3d position) {
-        this.checkRange(position.getX(), position.getY(), position.getZ());
-        return new Location<>(this, position);
-    }
-
-    @Override
-    public Location<? extends Extent> getLocation(Vector3i position) {
-        this.checkRange(position.getX(), position.getY(), position.getZ());
-        return new Location<>(this, position);
+        this.hardBlockMin = hardMin;
+        this.hardBlockMax = hardMax;
+        this.hardBiomeMin = hardMin.toVector2(true);
+        this.hardBiomeMax = hardMax.toVector2(true);
     }
 
     @Override
@@ -133,62 +131,20 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     private void checkRange(int x, int z) {
-        if (!VecHelper.inBounds(x, z, this.biomeMin, this.biomeMax)) {
-            throw new PositionOutOfBoundsException(new Vector2i(x, z), this.biomeMin, this.biomeMax);
+        if (!VecHelper.inBounds(x, z, this.hardBiomeMin, this.hardBiomeMax)) {
+            throw new PositionOutOfBoundsException(new Vector2i(x, z), this.hardBiomeMin, this.hardBiomeMax);
         }
     }
 
     @Override
-    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
-        this.checkRange(x, y, z);
-        return this.extent.hitBlock(x, y, z, side, cause);
-    }
-
-    @Override
-    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
-        this.checkRange(x, y, z);
-        return this.extent.interactBlock(x, y, z, side, cause);
-    }
-
-    @Override
-    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
-        this.checkRange(x, y, z);
-        return this.extent.interactBlockWith(x, y, z, itemStack, side, cause);
-    }
-
-    @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, Cause cause) {
-        this.checkRange(x, y, z);
-        return this.extent.placeBlock(x, y, z, block, direction, cause);
-    }
-
-    @Override
-    public boolean digBlock(int x, int y, int z, Cause cause) {
-        this.checkRange(x, y, z);
-        return this.extent.digBlock(x, y, z, cause);
-    }
-
-    @Override
-    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        this.checkRange(x, y, z);
-        return this.extent.digBlockWith(x, y, z, itemStack, cause);
-    }
-
-    @Override
-    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        this.checkRange(x, y, z);
-        return this.extent.getBlockDigTimeWith(x, y, z, itemStack, cause);
-    }
-
-    @Override
     public BiomeType getBiome(int x, int z) {
-        this.checkRange(x, z);
+        checkRange(x, z);
         return this.extent.getBiome(x, z);
     }
 
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
-        this.checkRange(x, z);
+        checkRange(x, z);
         this.extent.setBiome(x, z, biome);
     }
 
@@ -213,291 +169,230 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     private void checkRange(double x, double y, double z) {
-        if (!VecHelper.inBounds(x, y, z, this.blockMin, this.blockMax)) {
-            throw new PositionOutOfBoundsException(new Vector3d(x, y, z), this.blockMin.toDouble(), this.blockMax.toDouble());
+        if (!VecHelper.inBounds(x, y, z, this.hardBlockMin, this.hardBlockMax)) {
+            throw new PositionOutOfBoundsException(new Vector3d(x, y, z), this.hardBlockMin.toDouble(), this.hardBlockMax.toDouble());
         }
     }
 
     private void checkRange(int x, int y, int z) {
-        if (!VecHelper.inBounds(x, y, z, this.blockMin, this.blockMax)) {
-            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.blockMin, this.blockMax);
+        if (!VecHelper.inBounds(x, y, z, this.hardBlockMin, this.hardBlockMax)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.hardBlockMin, this.hardBlockMax);
         }
     }
 
     @Override
     public BlockType getBlockType(int x, int y, int z) {
-        return this.getBlock(x, y, z).getType();
+        checkRange(x, y, z);
+        return this.extent.getBlockType(x, y, z);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getBlock(x, y, z);
     }
 
     @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        this.checkRange(x, y, z);
-        return this.extent.getProperty(x, y, z, direction, propertyClass);
+    public void setBlock(int x, int y, int z, BlockState block) {
+        checkRange(x, y, z);
+        this.extent.setBlock(x, y, z, block);
     }
 
     @Override
-    public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
-        this.checkRange(x, y, z);
-        return this.extent.getFacesWithProperty(x, y, z, propertyClass);
+    public Location<? extends Extent> getLocation(Vector3i position) {
+        return new Location<Extent>(this, position);
+    }
+
+    @Override
+    public Location<? extends Extent> getLocation(Vector3d position) {
+        return new Location<Extent>(this, position);
     }
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         this.extent.setBlock(x, y, z, block, notifyNeighbors);
     }
 
     @Override
     public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
-        this.checkRange(x, y, z);
+        checkArgument(cause.root() instanceof PluginContainer, "PluginContainer must be at the ROOT of a cause!");
         this.extent.setBlock(x, y, z, blockState, notifyNeighbors, cause);
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        this.checkRange(x, y, z);
-        this.extent.setBlock(x, y, z, block);
-    }
-
-    @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.createSnapshot(x, y, z);
     }
 
     @Override
+    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+        final Vector3i position = snapshot.getPosition();
+        checkRange(position.getX(), position.getY(), position.getZ());
+        return this.extent.restoreSnapshot(snapshot, force, notifyNeighbors);
+    }
+
+    @Override
     public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
     }
 
     @Override
-    public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
-        this.checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.restoreSnapshot(snapshot, position);
-    }
-
-    @Override
-    public boolean spawnEntity(Entity entity, Cause cause) {
-        Vector3d position = entity.getLocation().getPosition();
-        this.checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.spawnEntity(entity, cause);
-    }
-
-    @Override
-    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
-        return false;
-    }
-
-    @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getScheduledUpdates(x, y, z);
     }
 
     @Override
     public ScheduledBlockUpdate addScheduledUpdate(int x, int y, int z, int priority, int ticks) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.addScheduledUpdate(x, y, z, priority, ticks);
     }
 
     @Override
     public void removeScheduledUpdate(int x, int y, int z, ScheduledBlockUpdate update) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         this.extent.removeScheduledUpdate(x, y, z, update);
     }
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getProperty(x, y, z, propertyClass);
     }
 
     @Override
+    public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
+        checkRange(x, y, z);
+        return this.extent.getProperty(x, y, z, direction, propertyClass);
+    }
+
+    @Override
     public Collection<Property<?, ?>> getProperties(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getProperties(x, y, z);
     }
 
     @Override
+    public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
+        checkRange(x, y, z);
+        return this.extent.getFacesWithProperty(x, y, z, propertyClass);
+    }
+
+    @Override
     public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.get(x, y, z, key);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> get(int x, int y, int z, Class<T> manipulatorClass) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.get(x, y, z, manipulatorClass);
     }
 
     @Override
     public Set<ImmutableValue<?>> getValues(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getValues(x, y, z);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(int x, int y, int z, Class<T> manipulatorClass) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getOrCreate(x, y, z, manipulatorClass);
     }
 
     @Override
-    public <E> E getOrNull(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        this.checkRange(x, y, z);
-        return this.extent.getOrNull(x, y, z, key);
-    }
-
-    @Override
-    public <E> E getOrElse(int x, int y, int z, Key<? extends BaseValue<E>> key, E defaultValue) {
-        this.checkRange(x, y, z);
-        return this.extent.getOrElse(x, y, z, key, defaultValue);
-    }
-
-    @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getValue(x, y, z, key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Key<?> key) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.supports(x, y, z, key);
     }
 
     @Override
-    public boolean supports(int x, int y, int z, BaseValue<?> value) {
-        this.checkRange(x, y, z);
-        return this.extent.supports(x, y, z, value);
-    }
-
-    @Override
     public boolean supports(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.supports(x, y, z, manipulatorClass);
     }
 
     @Override
-    public boolean supports(int x, int y, int z, DataManipulator<?, ?> manipulator) {
-        this.checkRange(x, y, z);
-        return this.extent.supports(x, y, z, manipulator);
-    }
-
-    @Override
     public Set<Key<?>> getKeys(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getKeys(x, y, z);
     }
 
     @Override
-    public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends BaseValue<E>> key, Function<E, E> function) {
-        this.checkRange(x, y, z);
-        return this.extent.transform(x, y, z, key, function);
-    }
-
-    @Override
-    public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
-        this.checkRange(x, y, z);
-        return this.extent.offer(x, y, z, value);
-    }
-
-    @Override
     public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.offer(x, y, z, key, value);
     }
 
     @Override
-    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator) {
-        this.checkRange(x, y, z);
-        return this.extent.offer(x, y, z, manipulator);
-    }
-
-    @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.offer(x, y, z, manipulator, function);
     }
 
     @Override
-    public DataTransactionResult offer(int x, int y, int z, Iterable<DataManipulator<?, ?>> manipulators) {
-        this.checkRange(x, y, z);
-        return this.extent.offer(x, y, z, manipulators);
-    }
-
-    @Override
-    public DataTransactionResult offer(Vector3i blockPosition, Iterable<DataManipulator<?, ?>> values, MergeFunction function) {
-        this.checkRange(blockPosition.getX(), blockPosition.getY(), blockPosition.getZ());
-        return this.extent.offer(blockPosition, values, function);
-    }
-
-    @Override
     public DataTransactionResult remove(int x, int y, int z, Key<?> key) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.remove(x, y, z, key);
     }
 
     @Override
     public DataTransactionResult remove(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.remove(x, y, z, manipulatorClass);
     }
 
     @Override
     public DataTransactionResult undo(int x, int y, int z, DataTransactionResult result) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.undo(x, y, z, result);
     }
 
     @Override
     public Collection<DataManipulator<?, ?>> getManipulators(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getManipulators(x, y, z);
     }
 
     @Override
     public boolean validateRawData(int x, int y, int z, DataView container) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.validateRawData(x, y, z, container);
     }
 
     @Override
     public void setRawData(int x, int y, int z, DataView container) throws InvalidDataException {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         this.extent.setRawData(x, y, z, container);
     }
 
     @Override
     public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, DataHolder from) {
-        this.checkRange(xTo, yTo, zTo);
+        checkRange(xTo, yTo, zTo);
         return this.extent.copyFrom(xTo, yTo, zTo, from);
     }
 
     @Override
-    public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, int xFrom, int yFrom, int zFrom) {
-        this.checkRange(xTo, yTo, zTo);
-        this.checkRange(xFrom, yFrom, zFrom);
-        return this.extent.copyFrom(xTo, yTo, zTo, xFrom, yFrom, zFrom);
-    }
-
-    @Override
     public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, DataHolder from, MergeFunction function) {
-        this.checkRange(xTo, yTo, zTo);
+        checkRange(xTo, yTo, zTo);
         return this.extent.copyFrom(xTo, yTo, zTo, from, function);
     }
 
     @Override
     public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, int xFrom, int yFrom, int zFrom, MergeFunction function) {
-        this.checkRange(xTo, yTo, zTo);
-        this.checkRange(xFrom, yFrom, zFrom);
+        checkRange(xTo, yTo, zTo);
+        checkRange(xFrom, yFrom, zFrom);
         return this.extent.copyFrom(xTo, yTo, zTo, xFrom, yFrom, zFrom, function);
     }
 
@@ -517,32 +412,34 @@ public class ExtentViewDownsize implements AbstractExtent {
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
-        return this.extent.getTileEntities(Functional.predicateAnd(
-                new TileEntityInBounds(this.blockMin, this.blockMax), filter));
+        return this.extent.getTileEntities(Functional.predicateAnd(input -> {
+            final Location<World> block = input.getLocation();
+            return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.blockMin, this.blockMax);
+        }, filter));
     }
 
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.extent.getTileEntity(x, y, z);
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3i position) {
-        this.checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.createEntity(type, position);
+    public boolean spawnEntity(Entity entity, Cause cause) {
+        final Location<World> location = entity.getLocation();
+        checkRange(location.getX(), location.getY(), location.getZ());
+        return this.extent.spawnEntity(entity, cause);
+    }
+
+    @Override public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+        // TODO 1.9 gabizou this is for you
+        return false;
     }
 
     @Override
     public Optional<Entity> getEntity(UUID uuid) {
-        Optional<Entity> optEntity = this.extent.getEntity(uuid);
-        if (optEntity.isPresent()) {
-            Vector3d pos = ((LanternEntity) optEntity.get()).getPosition();
-            if (VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax)) {
-                return optEntity;
-            }
-        }
-        return Optional.empty();
+        // TODO 1.9 gabizou this is for you
+        return null;
     }
 
     @Override
@@ -569,28 +466,41 @@ public class ExtentViewDownsize implements AbstractExtent {
 
     @Override
     public Optional<Entity> createEntity(EntityType type, Vector3d position) {
-        this.checkRange(position.getX(), position.getY(), position.getZ());
+        checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.createEntity(type, position);
     }
 
     @Override
     public Optional<Entity> createEntity(DataContainer entityContainer) {
         // TODO once entity containers are implemented
-        // checkRange(position.getX(), position.getY(), position.getZ());
+        //checkRange(position.getX(), position.getY(), position.getZ());
         return Optional.empty();
     }
 
     @Override
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
-        this.checkRange(position.getX(), position.getY(), position.getZ());
+        checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.createEntity(entityContainer, position);
     }
 
     @Override
+    public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
+        checkRange(position.getX(), position.getY(), position.getZ());
+        return this.extent.restoreSnapshot(snapshot, position);
+    }
+
+    private void checkSoftRange(int x, int y, int z) {
+        if (!VecHelper.inBounds(x, y, z, this.blockMin, this.blockMax)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.blockMin, this.blockMax);
+        }
+    }
+
+    @Override
     public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkRange(newMax.getX(), newMax.getY(), newMax.getZ());
-        return new ExtentViewDownsize(this.extent, newMin, newMax);
+        checkSoftRange(newMin.getX(), newMin.getY(), newMin.getZ());
+        checkSoftRange(newMax.getX(), newMax.getY(), newMax.getZ());
+        return new SoftBufferExtentViewDownsize(this.extent, newMin, newMax, newMin.add(this.hardBlockMin.sub(this.blockMin)),
+                newMax.add(this.hardBlockMax.sub(this.blockMax)));
     }
 
     @Override
@@ -599,65 +509,65 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Extent getRelativeExtentView() {
-        return this.getExtentView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
-    }
-
-    @Override
     public Optional<UUID> getCreator(int x, int y, int z) {
-        this.checkRange(x, y, z);
         return this.extent.getCreator(x, y, z);
     }
 
     @Override
     public Optional<UUID> getNotifier(int x, int y, int z) {
-        this.checkRange(x, y, z);
         return this.extent.getNotifier(x, y, z);
     }
 
     @Override
     public void setCreator(int x, int y, int z, @Nullable UUID uuid) {
-        this.checkRange(x, y, z);
         this.extent.setCreator(x, y, z, uuid);
     }
 
     @Override
     public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
-        this.checkRange(x, y, z);
         this.extent.setNotifier(x, y, z, uuid);
     }
 
-    private static class EntityInBounds implements Predicate<Entity> {
-
-        private final Vector3i min;
-        private final Vector3i max;
-
-        private EntityInBounds(Vector3i min, Vector3i max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public boolean test(Entity input) {
-            final Location<World> block = input.getLocation();
-            return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
-        }
+    @Override
+    public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
+        checkRange(x, y, z);
+        return this.extent.hitBlock(x, y, z, side, cause);
     }
 
-    private static class TileEntityInBounds implements Predicate<TileEntity> {
-
-        private final Vector3i min;
-        private final Vector3i max;
-
-        private TileEntityInBounds(Vector3i min, Vector3i max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public boolean test(TileEntity input) {
-            final Location<World> block = input.getLocation();
-            return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
-        }
+    @Override
+    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
+        checkRange(x, y, z);
+        return this.extent.interactBlock(x, y, z, side, cause);
     }
+
+    @Override
+    public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
+        checkRange(x, y, z);
+        return this.extent.interactBlockWith(x, y, z, itemStack, side, cause);
+    }
+
+    @Override
+    public boolean placeBlock(int x, int y, int z, BlockState block, Direction side, Cause cause) {
+        checkRange(x, y, z);
+        return this.extent.placeBlock(x, y, z, block, side, cause);
+    }
+
+    @Override
+    public boolean digBlock(int x, int y, int z, Cause cause) {
+        checkRange(x, y, z);
+        return this.extent.digBlock(x, y, z, cause);
+    }
+
+    @Override
+    public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        checkRange(x, y, z);
+        return this.extent.digBlockWith(x, y, z, itemStack, cause);
+    }
+
+    @Override
+    public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
+        checkRange(x, y, z);
+        return this.extent.getBlockDigTimeWith(x, y, z, itemStack, cause);
+    }
+
 }

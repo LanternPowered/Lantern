@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
@@ -37,6 +36,8 @@ import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.ShortArrayImmutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -62,6 +63,8 @@ import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
+import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -71,18 +74,18 @@ import java.util.function.Function;
 public interface AbstractExtent extends Extent {
 
     @Override
+    default MutableBiomeAreaWorker<? extends Extent> getBiomeWorker() {
+        return new LanternMutableBiomeAreaWorker<>(this);
+    }
+
+    @Override
+    default MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
+        return new LanternMutableBlockVolumeWorker<>(this);
+    }
+
+    @Override
     default <T extends Property<?, ?>> Optional<T> getProperty(Vector3i position, Direction direction, Class<T> propertyClass) {
         return this.getProperty(position.getX(), position.getY(), position.getZ(), direction, propertyClass);
-    }
-
-    @Override
-    default Location<? extends Extent> getLocation(Vector3i position) {
-        return this.getLocation(position.getX(), position.getY(), position.getZ());
-    }
-
-    @Override
-    default Location<? extends Extent> getLocation(Vector3d position) {
-        return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     @Override

@@ -58,6 +58,7 @@ import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.extent.ExtentBufferHelper;
+import org.lanternpowered.server.world.extent.SoftBufferExtentViewDownsize;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.Sponge;
@@ -76,6 +77,7 @@ import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
+import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
@@ -840,6 +842,9 @@ public final class LanternChunkManager {
 
         final EventManager eventManager = Sponge.getEventManager();
 
+        Vector3i min = new Vector3i(chunkX + 8, 0, chunkZ + 8);
+        Extent volume = new SoftBufferExtentViewDownsize(chunk.getWorld(), min, min.add(15, 0, 15), min.sub(8, 0, 8), min.add(23, 0, 23));
+
         // Call the pre populate event, this allows
         // modifications to the populators list
         // Called before a chunk begins populating. (javadoc)
@@ -849,7 +854,7 @@ public final class LanternChunkManager {
         for (Populator populator : populators) {
             // Called when a populator is about to run against a chunk. (javadoc)
             eventManager.post(SpongeEventFactory.createPopulateChunkEventPopulate(cause, populator, chunk));
-            populator.populate(chunk, random);
+            populator.populate(this.world, volume, random);
         }
 
         // Called when a chunk finishes populating. (javadoc)

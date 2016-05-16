@@ -149,15 +149,13 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
-    public Location<? extends Extent> getLocation(int x, int y, int z) {
-        // TODO: Is this right?
-        return new Location<ExtentViewTransform>(this, x, y, z);
+    public Location<? extends Extent> getLocation(Vector3d position) {
+        return new Location<>(this, position);
     }
 
     @Override
-    public Location<? extends Extent> getLocation(double x, double y, double z) {
-        // TODO: Is this right?
-        return new Location<ExtentViewTransform>(this, x, y, z);
+    public Location<? extends Extent> getLocation(Vector3i position) {
+        return new Location<>(this, position);
     }
 
     @Override
@@ -589,9 +587,9 @@ public class ExtentViewTransform implements AbstractExtent {
     public Collection<Entity> getEntities() {
         final Collection<Entity> entities = this.extent.getEntities();
         for (Iterator<Entity> iterator = entities.iterator(); iterator.hasNext(); ) {
-            final Entity tileEntity = iterator.next();
-            final Location<World> block = tileEntity.getLocation();
-            if (!VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.blockMin, this.blockMax)) {
+            final Entity entity = iterator.next();
+            final Vector3d pos = ((LanternEntity) entity).getPosition();
+            if (!VecHelper.inBounds(pos.getX(), pos.getY(), pos.getZ(), this.blockMin, this.blockMax)) {
                 iterator.remove();
             }
         }
@@ -601,8 +599,10 @@ public class ExtentViewTransform implements AbstractExtent {
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
         // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
-        return this.extent.getEntities(Functional.predicateAnd(
-                new EntityInBounds(this.blockMin, this.blockMax), filter));
+        return this.extent.getEntities(Functional.predicateAnd(input -> {
+            final Vector3d pos = ((LanternEntity) input).getPosition();
+            return VecHelper.inBounds(pos.getX(), pos.getY(), pos.getZ(), this.blockMin, this.blockMax);
+        }, filter));
     }
 
     @Override
@@ -638,16 +638,6 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
-    public MutableBiomeAreaWorker<? extends Extent> getBiomeWorker() {
-        return new LanternMutableBiomeAreaWorker<>(this);
-    }
-
-    @Override
-    public MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
-        return new LanternMutableBlockVolumeWorker<>(this);
-    }
-
-    @Override
     public Optional<UUID> getCreator(int x, int y, int z) {
         return this.extent.getCreator(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
                 this.inverseTransform.transformZ(x, y, z));
@@ -669,23 +659,6 @@ public class ExtentViewTransform implements AbstractExtent {
     public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
         this.extent.setNotifier(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
                 this.inverseTransform.transformZ(x, y, z), uuid);
-    }
-
-    private static class EntityInBounds implements Predicate<Entity> {
-
-        private final Vector3i min;
-        private final Vector3i max;
-
-        private EntityInBounds(Vector3i min, Vector3i max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public boolean test(Entity input) {
-            final Location<World> block = input.getLocation();
-            return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
-        }
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {

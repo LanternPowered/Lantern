@@ -294,6 +294,8 @@ public class LanternGame implements Game {
         // Create the global config
         this.globalConfig = new GlobalConfig(this.configFolder.resolve(GLOBAL_CONFIG));
         this.globalConfig.load();
+        // Save to update possible missing properties
+        this.globalConfig.save();
 
         // Create the ops config
         this.opsConfig = new OpsConfig(this.configFolder.resolve(OPS_CONFIG));

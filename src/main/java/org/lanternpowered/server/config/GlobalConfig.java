@@ -169,6 +169,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         private Proxy proxy = new Proxy();
     }
 
+    @ConfigSerializable
     private static final class Proxy {
 
         @Setting(value = "type", comment = "The type of the proxy, or none if disabled.")

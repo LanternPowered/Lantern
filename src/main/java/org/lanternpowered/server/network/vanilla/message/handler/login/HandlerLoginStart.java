@@ -48,6 +48,7 @@
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
 import io.netty.util.AttributeKey;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -61,6 +62,7 @@ import org.lanternpowered.server.util.SecurityHelper;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @Async
 public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
@@ -72,7 +74,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
     public static final AttributeKey<LanternGameProfile> SPOOFED_GAME_PROFILE = AttributeKey.valueOf("spoofed-game-profile");
 
     // The random used to generate the session ids
-    private static final Random random = new Random();
+    private static final Random RANDOM = new Random();
 
     @Override
     public void handle(NetworkContext context, MessageLoginInStart message) {
@@ -83,7 +85,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             // Convert to X509 format
             final byte[] publicKey = SecurityHelper.generateX509Key(session.getServer().getKeyPair().getPublic()).getEncoded();
             final byte[] verifyToken = SecurityHelper.generateVerifyToken();
-            final String sessionId = Long.toString(random.nextLong(), 16).trim();
+            final String sessionId = Long.toString(RANDOM.nextLong(), 16).trim();
 
             // Store the auth data
             context.getChannel().attr(AUTH_DATA).set(new LoginAuthData(username, sessionId, verifyToken));
@@ -94,10 +96,16 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             if (profile != null) {
                 profile = new LanternGameProfile(profile.getUniqueId(), username, profile.getPropertyMap());
             } else {
-                // TODO: Look the actual game profile up? This IS BREAKING everything that
-                // depends on game profiles, like permissions
-                UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
-                profile = new LanternGameProfile(uuid, username);
+                // Try the online id first
+                try {
+                    profile = (LanternGameProfile) Lantern.getGame().getGameProfileManager().get(username).get();
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                } catch (ExecutionException e) {
+                    // Generate a offline id
+                    UUID uniqueId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
+                    profile = new LanternGameProfile(uniqueId, username);
+                }
             }
             session.messageReceived(new MessageLoginInFinish(profile));
         }

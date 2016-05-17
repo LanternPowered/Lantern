@@ -49,11 +49,8 @@ package org.lanternpowered.server.network.vanilla.message.handler.login;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
@@ -89,8 +86,9 @@ import javax.crypto.spec.SecretKeySpec;
 
 public final class HandlerEncryptionResponse implements Handler<MessageLoginInEncryptionResponse> {
 
-    private final String authBaseUrl = "https://sessionserver.mojang.com/session/minecraft/hasJoined";
-    private final Gson gson = new Gson();
+    private final static String AUTH_BASE_URL =
+            "https://sessionserver.mojang.com/session/minecraft/hasJoined?username=%s&serverId=%s";
+    private final static Gson GSON = new Gson();
 
     @Override
     public void handle(NetworkContext context, MessageLoginInEncryptionResponse message) {
@@ -164,7 +162,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
     }
 
     private void performAuth(Session session, String username, String hash) {
-        final String postUrl = this.authBaseUrl + "?username=" + username + "&serverId=" + hash;
+        final String postUrl = String.format(AUTH_BASE_URL, username, hash);
         try {
             // Authenticate
             URLConnection connection = new URL(postUrl).openConnection();
@@ -176,7 +174,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                     return;
                 }
                 try {
-                    json = this.gson.fromJson(new InputStreamReader(is), JsonObject.class);
+                    json = GSON.fromJson(new InputStreamReader(is), JsonObject.class);
                 } catch (Exception e) {
                     Lantern.getLogger().warn("Username \"{}\" failed to authenticate!", username);
                     session.disconnect("Failed to verify username!");
@@ -198,18 +196,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 return;
             }
 
-            JsonArray propsArray = json.getAsJsonArray("properties");
-
-            // Parse properties
-            Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
-            for (JsonElement element : propsArray) {
-                JsonObject json0 = element.getAsJsonObject();
-                String propName = json0.get("name").getAsString();
-                String value = json0.get("value").getAsString();
-                String signature = json0.has("signature") ? json0.get("signature").getAsString() : null;
-                properties.put(propName, new LanternProfileProperty(propName, value, signature));
-            }
-
+            Multimap<String, ProfileProperty> properties = LanternProfileProperty.createPropertiesMapFromJson(json.getAsJsonArray("properties"));
             LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
 
             Lantern.getLogger().info("Finished authenticating.");

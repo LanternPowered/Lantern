@@ -40,6 +40,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.game.LanternPlatform;
 import org.lanternpowered.server.network.NetworkManager;
+import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.BaseRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
@@ -134,6 +135,11 @@ public class LanternServer implements Server {
             consoleManager.start();
 
             final GlobalConfig globalConfig = game.getGlobalConfig();
+            if (globalConfig.getProxyType() == ProxyType.NONE && !globalConfig.isOnlineMode()) {
+                Lantern.getLogger().warn("It is not recommend to run the server in offline mode, this allows people "
+                        + "to choose any username they want and it will look for the account attached to it.");
+            }
+
             RconServer rconServer = null;
             QueryServer queryServer = null;
             // Enable the query server if needed

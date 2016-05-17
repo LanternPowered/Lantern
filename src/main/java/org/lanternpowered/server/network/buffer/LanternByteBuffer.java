@@ -248,7 +248,7 @@ public class LanternByteBuffer implements ByteBuffer {
         if (length > maxLength) {
             throw new DecoderException("Exceeded the maximum allowed length, got " + length + " which is greater then " + maxLength);
         }
-        byte[] bytes = new byte[this.readVarInt()];
+        byte[] bytes = new byte[length];
         this.buf.readBytes(bytes);
         return bytes;
     }

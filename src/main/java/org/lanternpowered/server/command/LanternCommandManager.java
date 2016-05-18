@@ -34,7 +34,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.text.translation.TranslationHelper;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCallable;
@@ -119,7 +118,7 @@ public class LanternCommandManager implements CommandManager {
 
         synchronized (this.lock) {
             // <namespace>:<alias> for all commands
-            List<String> aliasesWithPrefix = new ArrayList<>(aliases.size() * 3);
+            List<String> aliasesWithPrefix = new ArrayList<>(aliases.size() * 2);
             for (String alias : aliases) {
                 final Collection<CommandMapping> ownedCommands = this.owners.get(container);
                 for (CommandMapping mapping : this.dispatcher.getAll(alias)) {
@@ -129,17 +128,10 @@ public class LanternCommandManager implements CommandManager {
                 }
 
                 aliasesWithPrefix.add(alias);
-                // Alias commands with unqualified ID and qualified ID
-                String unqualifiedId = container.getUnqualifiedId();
-                aliasesWithPrefix.add(unqualifiedId + ':' + alias);
-
-                if (!container.getId().equals(unqualifiedId)) {
-                    aliasesWithPrefix.add(container.getId() + ':' + alias);
-                }
+                aliasesWithPrefix.add(container.getId() + ':' + alias);
             }
 
             Optional<CommandMapping> mapping = this.dispatcher.register(callable, aliasesWithPrefix, callback);
-
             if (mapping.isPresent()) {
                 this.owners.put(container, mapping.get());
             }

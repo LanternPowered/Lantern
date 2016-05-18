@@ -33,11 +33,6 @@ public abstract class AbstractPluginContainer implements PluginContainer {
     protected AbstractPluginContainer() {
     }
 
-    @Override
-    public String getUnqualifiedId() {
-        return this.getId();
-    }
-
     protected MoreObjects.ToStringHelper toStringHelper() {
         return MoreObjects.toStringHelper("Plugin")
                 .omitNullValues()
@@ -55,10 +50,4 @@ public abstract class AbstractPluginContainer implements PluginContainer {
     public final String toString() {
         return this.toStringHelper().toString();
     }
-
-    public static String getUnqualifiedId(String id) {
-        int pos = id.lastIndexOf('.');
-        return pos >= 0 ? id.substring(pos + 1) : id;
-    }
-
 }

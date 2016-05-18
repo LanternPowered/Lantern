@@ -42,7 +42,6 @@ import javax.annotation.Nullable;
 public final class LanternPluginContainer extends AbstractPluginContainer {
 
     private final String id;
-    private final String unqualifiedId;
 
     private final Optional<String> name;
     private final Optional<String> version;
@@ -63,7 +62,6 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
             Optional<Path> source) {
         this.id = id;
         this.assetDirectory = assetDir == null ? Optional.empty() : Optional.of(Paths.get(assetDir));
-        this.unqualifiedId = getUnqualifiedId(id);
         this.name = Optional.ofNullable(name);
         this.version = Optional.ofNullable(version);
         this.description = Optional.ofNullable(description);
@@ -87,13 +85,8 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
     }
 
     @Override
-    public String getUnqualifiedId() {
-        return this.unqualifiedId;
-    }
-
-    @Override
     public String getName() {
-        return this.name.orElse(this.unqualifiedId);
+        return this.name.orElse(this.id);
     }
 
     @Override

@@ -115,7 +115,8 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
     }
 
     private static final Pattern URL_PATTERN = Pattern.compile(
-            "((?:[a-z0-9]{2,}://)?(?:(?:[0-9]{1,3}\\.){3}[0-9]{1,3}|(?:[-\\w_\\.]+\\.[a-z]{2,}?))(?::[0-9]{1,5})?.*?(?=[!\"\u00A7 \n]|$))", 2);
+            "((?:[a-z0-9]{2,}://)?(?:(?:[0-9]{1,3}\\.){3}[0-9]{1,3}|(?:[-\\w_]+\\.[a-z]{2,}?))(?::[0-9]{1,5})?.*?(?=[!\"\u00A7 \n]|$))",
+            Pattern.CASE_INSENSITIVE);
 
     private static Text newTextWithLinks(String message, boolean allowMissingHeader) {
         Text.Builder builder = null;

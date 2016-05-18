@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.plugin;
 
-import static java.util.stream.Collectors.joining;
 import static org.spongepowered.api.plugin.Plugin.ID_PATTERN;
 
 import org.lanternpowered.server.game.Lantern;
@@ -56,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -206,7 +204,7 @@ final class PluginScanner {
                 if (!name.endsWith(CLASS_EXTENSION)) {
                     if (name.equals(METADATA_FILE)) {
                         try {
-                            metadata = new ArrayList<>(McModInfo.DEFAULT.read(jar));
+                            metadata = McModInfo.DEFAULT.read(jar);
                         } catch (IOException e) {
                             logger.error("Failed to read plugin metadata from " + METADATA_FILE + " in {}", path, e);
                             return;
@@ -233,13 +231,10 @@ final class PluginScanner {
                 if (metadata != null) {
                     boolean found = false;
 
-                    Iterator<PluginMetadata> itr = metadata.iterator();
-                    while (itr.hasNext()) {
-                        PluginMetadata meta = itr.next();
+                    for (PluginMetadata meta : metadata) {
                         if (candidate.getId().equals(meta.getId())) {
                             found = true;
                             candidate.setMetadata(meta);
-                            itr.remove();
                             break;
                         }
                     }
@@ -251,12 +246,9 @@ final class PluginScanner {
             }
 
             if (metadata == null) {
-                logger.warn("{} is missing a valid " + METADATA_FILE + " file. This is not a problem when testing plugins, however it is recommended"
-                        + " to include one in public plugins. Please see the in-existent SpongeDocs link for details.", path); // TODO
-            } else if (!metadata.isEmpty()) {
-                logger.warn("Found {} plugins in " + METADATA_FILE + " which were not found in the plugin JAR. Are the plugin classes actually "
-                                + "included? Affected plugins: {} from {}",
-                        metadata.size(), metadata.stream().map(PluginMetadata::getId).collect(joining(", ")), path);
+                logger.warn("{} is missing a valid {} file. This is not a problem when testing plugins,"
+                        + "however it is recommended to include one in public plugins.\n"
+                        + "Please see https://docs.spongepowered.org/master/en/plugin/plugin-meta.html for details.", path, METADATA_FILE);
             }
         } else if (!classpath) {
             logger.error("No valid plugins found in {}. Is the file actually a plugin JAR? Please keep in mind Forge mods can be only loaded on "
@@ -268,10 +260,11 @@ final class PluginScanner {
         final String pluginClass = candidate.getPluginClass();
         final String id = candidate.getId();
 
-        if (!ID_PATTERN.matcher(id).matches()) { // TODO
+        if (!ID_PATTERN.matcher(id).matches()) {
             logger.error("Found plugin with invalid plugin ID '{}' from {}. Plugin IDs should be lowercase, and only contain characters from "
-                            + "a-z, dashes, underscores or dots. Please see the in-existent SpongeDocs link for details. The plugin will be still loaded "
-                            + "currently, however this will be removed soon. Please notify the author to update the plugin as soon as possible.",
+                            + "a-z, dashes, underscores or dots.\n"
+                            + "The plugin will be still loaded currently, however this will be removed in SpongeAPI 5.0. "
+                            + "Please notify the author to update the plugin as soon as possible.",
                     id, candidate.getDisplaySource());
             // return; // TODO
         }

@@ -136,8 +136,10 @@ public class LanternServer implements Server {
 
             final GlobalConfig globalConfig = game.getGlobalConfig();
             if (globalConfig.getProxyType() == ProxyType.NONE && !globalConfig.isOnlineMode()) {
-                Lantern.getLogger().warn("It is not recommend to run the server in offline mode, this allows people "
-                        + "to choose any username they want and it will look for the account attached to it.");
+                Lantern.getLogger().warn("It is not recommend to run the server in offline mode, this allows people to");
+                Lantern.getLogger().warn("choose any username they want. The server does will use the account attached");
+                Lantern.getLogger().warn("to the username, it doesn't care if it's in offline mode, this will only");
+                Lantern.getLogger().warn("disable the authentication and allow non registered usernames to be used.");
             }
 
             RconServer rconServer = null;

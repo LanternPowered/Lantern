@@ -148,8 +148,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             // seems like it's something mojang doesn't want to share with use,
             // they used this channel to build and save structures
         } else if ("MC|PickItem".equals(channel)) {
-            // Also a new channel in 1.9
-            // TODO
+            return new MessagePlayInPickItem(content.readVarInt());
         } else if ("FML|HS".equals(channel)) {
             throw new CodecException("Received and unexpected message with channel: " + channel);
         } else if ("FML".equals(channel)) {

@@ -75,7 +75,6 @@ import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
-import org.lanternpowered.server.text.action.LanternCallbackHolder;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
@@ -380,8 +379,6 @@ public class LanternGame implements Game {
         this.commandManager.register(this.minecraft, CommandPlaySound.create(), "playsound");
         this.commandManager.register(this.implContainer, CommandParticleEffect.create(), "particleeffect");
         this.commandManager.register(this.implContainer, CommandVersion.create(), "version");
-        this.commandManager.register(this.implContainer, LanternCallbackHolder.getInstance().createCommand(),
-                LanternCallbackHolder.CALLBACK_COMMAND);
 
         // Create the teleport helper
         this.teleportHelper = new LanternTeleportHelper();

@@ -48,8 +48,8 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
             resourcePack = factory.getById(message.getHash());
         }
         if (!resourcePack.isPresent()) {
-            Lantern.getLogger().warn("Received unknown resource pack with hash or id: " + message.getHash() +
-                    " and status: " + message.getStatus().toString().toLowerCase());
+            Lantern.getLogger().warn("Received unknown resource pack with hash or id: {} and status: {}",
+                    message.getHash(), message.getStatus().toString().toLowerCase());
             return;
         }
         Session session = context.getSession();

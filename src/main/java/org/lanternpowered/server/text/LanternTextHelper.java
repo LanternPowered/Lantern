@@ -29,7 +29,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.data.translator.JsonTranslator;
 import org.lanternpowered.server.entity.LanternEntityType;
-import org.lanternpowered.server.text.action.LanternCallbackHolder;
+import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
@@ -52,6 +52,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
@@ -84,18 +85,13 @@ public final class LanternTextHelper {
                 }
                 break;
             case "run_command":
-                if (value.toLowerCase().contains(LanternCallbackHolder.CALLBACK_COMMAND)) {
-                    final String[] parts = value.split(" ");
-                    if (parts.length > 1 && parts[0].equalsIgnoreCase(LanternCallbackHolder.CALLBACK_COMMAND)) {
-                        try {
-                            final UUID uuid = UUID.fromString(parts[1]);
-                            Optional<Consumer<CommandSource>> opt = LanternCallbackHolder.getInstance()
-                                    .getCallbackForUUID(uuid);
-                            if (opt.isPresent()) {
-                                return TextActions.executeCallback(opt.get());
-                            }
-                        } catch (IllegalArgumentException ignored) {
-                        }
+                // Check for a valid click action callback
+                Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(value.trim().toLowerCase());
+                if (matcher.matches()) {
+                    UUID uniqueId = UUID.fromString(matcher.group(1));
+                    Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.getInstance().getCallbackForUUID(uniqueId);
+                    if (callback.isPresent()) {
+                        return TextActions.executeCallback(callback.get());
                     }
                 }
                 return TextActions.runCommand(value);
@@ -152,9 +148,9 @@ public final class LanternTextHelper {
                 return new RawAction("open_url", url.toExternalForm());
             }
         } else if (clickAction instanceof ClickAction.ExecuteCallback) {
-            final UUID uniqueId = LanternCallbackHolder.getInstance().getOrCreateIdForCallback(
+            final UUID uniqueId = LanternClickActionCallbacks.getInstance().getOrCreateIdForCallback(
                     ((ClickAction.ExecuteCallback) clickAction).getResult());
-            return new RawAction("run_command", LanternCallbackHolder.CALLBACK_COMMAND_QUALIFIED + " " + uniqueId.toString());
+            return new RawAction("run_command", LanternClickActionCallbacks.COMMAND_BASE + uniqueId.toString());
         } else if (clickAction instanceof ClickAction.RunCommand) {
             return new RawAction("run_command", ((ClickAction.RunCommand) clickAction).getResult());
         } else if (clickAction instanceof ClickAction.SuggestCommand) {
@@ -211,7 +207,7 @@ public final class LanternTextHelper {
             if (this.value != null) {
                 return this.value;
             }
-            return this.value = TextSerializers.LEGACY_FORMATTING_CODE.serialize(this.text);
+            return this.value = LanternTexts.toLegacy(this.text);
         }
 
         @SuppressWarnings("deprecation")
@@ -219,7 +215,7 @@ public final class LanternTextHelper {
             if (this.text != null) {
                 return this.text;
             }
-            return this.text = TextSerializers.LEGACY_FORMATTING_CODE.deserializeUnchecked(this.value);
+            return this.text = LanternTexts.fromLegacy(this.value);
         }
     }
 

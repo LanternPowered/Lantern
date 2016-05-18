@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import static org.spongepowered.api.command.CommandMessageFormatting.error;
 
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
@@ -37,7 +38,9 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.text.TextConstants;
+import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -55,6 +58,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +73,21 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         LanternPlayer player = session.getPlayer();
         player.resetIdleTimeoutCounter();
         String message0 = message.getMessage();
+
+        // Check for a valid click action callback
+        Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(message0);
+        if (matcher.matches()) {
+            UUID uniqueId = UUID.fromString(matcher.group(1));
+            Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.getInstance().getCallbackForUUID(uniqueId);
+            if (callback.isPresent()) {
+                callback.get().accept(player);
+            } else {
+                player.sendMessage(error(t("The callback you provided was not valid. Keep in mind that callbacks will expire "
+                        + "after 10 minutes, so you might want to consider clicking faster next time!")));
+            }
+            return;
+        }
+
         String message1 = StringUtils.normalizeSpace(message0);
         if (!isAllowedString(message0)) {
             session.disconnect(t("disconnect.invalidChatCharacters"));

@@ -50,6 +50,7 @@ public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
             session.send(new MessageLoginOutSetCompression(compressionThreshold)).addListener(future ->
                     context.getChannel().pipeline().replace(COMPRESSION, COMPRESSION, new MessageCompressionHandler(compressionThreshold)));
         }
+        Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
         session.send(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
                 .addListener(future -> {
                     session.setProfile(gameProfile);

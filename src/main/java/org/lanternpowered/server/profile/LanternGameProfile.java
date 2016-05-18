@@ -26,6 +26,7 @@
 package org.lanternpowered.server.profile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
@@ -65,6 +66,7 @@ public final class LanternGameProfile implements GameProfile {
     private String name;
 
     protected LanternGameProfile() {
+        this.properties = LinkedHashMultimap.create();
     }
 
     public LanternGameProfile(UUID uniqueId, @Nullable String name) {
@@ -110,6 +112,7 @@ public final class LanternGameProfile implements GameProfile {
 
     @Override
     public UUID getUniqueId() {
+        checkState(this.uniqueId != null, "Invalid game profile, the unique id is null!");
         return this.uniqueId;
     }
 

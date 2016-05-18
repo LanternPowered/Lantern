@@ -114,7 +114,7 @@ public class LanternGameProfileCache implements GameProfileCache {
                 byName.clear();
                 this.entries.stream().filter(e -> !e.isExpired()).forEach(entry -> {
                     byUUID.put(entry.gameProfile.getUniqueId(), entry);
-                    entry.gameProfile.getName().ifPresent(n -> byName.put(n.toLowerCase(), entry));
+                    entry.gameProfile.getName().ifPresent(n -> byName.put(n, entry));
                 });
             }
         }

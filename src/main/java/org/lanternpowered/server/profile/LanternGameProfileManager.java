@@ -119,6 +119,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     @Override
     public CompletableFuture<Collection<GameProfile>> getAllByName(Iterable<String> names, boolean useCache) {
+        checkNotNull(names, "names");
         return Lantern.getScheduler().submitAsyncTask(() -> {
             if (useCache) {
                 Map<String, Optional<GameProfile>> profiles = this.gameProfileCache.getOrLookupByNames(names);
@@ -138,6 +139,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     @Override
     public CompletableFuture<GameProfile> fill(GameProfile profile, boolean signed, boolean useCache) {
+        checkNotNull(profile, "profile");
         return Lantern.getScheduler().submitAsyncTask(() -> {
             if (useCache) {
                 Optional<GameProfile> optProfile = this.gameProfileCache.fillProfile(profile, signed);

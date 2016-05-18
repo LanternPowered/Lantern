@@ -200,7 +200,6 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
 
             Lantern.getLogger().info("Finished authenticating.");
-            Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
 
             ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(Cause.source(gameProfile).build(), session,
                     new MessageEvent.MessageFormatter(t("disconnect.notAllowedToJoin")), gameProfile, false);

@@ -28,7 +28,6 @@ package org.lanternpowered.server.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.GlobalConfig;
@@ -42,6 +41,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
@@ -56,8 +56,10 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -749,6 +751,8 @@ public final class LanternWorldManager {
         return dimensionId == 0 ? this.rootWorldDirectory : this.rootWorldDirectory.resolve(folderName);
     }
 
+    private static final int MIN_CUSTOM_DIMENSION_ID = 2;
+
     /**
      * Gets the next available dimension id.
      * 
@@ -756,7 +760,7 @@ public final class LanternWorldManager {
      */
     int getNextFreeDimensionId() {
         // Keep the ids -1; 0; 1 safe
-        int next = 2;
+        int next = MIN_CUSTOM_DIMENSION_ID;
         while (true) {
             next = this.dimensionMap.nextClearBit(next);
             if (this.worldByDimensionId.containsKey(next)) {
@@ -773,7 +777,7 @@ public final class LanternWorldManager {
             return;
         }
         // Get the dimension id and make sure that it's not already used
-        if (dimensionId == null) {
+        if (dimensionId == null || this.worldByDimensionId.containsValue(dimensionId)) {
             dimensionId = this.getNextFreeDimensionId();
             // Ignore the root dimension
         } else if (dimensionId != 0) {
@@ -798,9 +802,10 @@ public final class LanternWorldManager {
     }
 
     /**
-     * All the directories that should be ignored while loading worlds.
+     * All the directories that should be ignored while loading worlds. We will
+     * also add the nether and the end manually.
      */
-    private final Set<String> ignoredDirectoryNames = Sets.newHashSet("data", "playerdata", "region", "stats");
+    private final Set<String> ignoredDirectoryNames = Sets.newHashSet("data", "playerdata", "region", "stats", "dim1", "dim-1");
 
     /**
      * Initializes the root world and the dimension id map.
@@ -834,7 +839,10 @@ public final class LanternWorldManager {
                 throw e;
             }
         }
-        this.dimensionMap = levelData == null || levelData.dimensionMap == null ? new BitSet() : levelData.dimensionMap;
+        // Always use a new dimension map, we will scan for the worlds
+        // through folders and the dimension ids will be generated or
+        // refreshed if needed
+        this.dimensionMap = new BitSet();
 
         // Generate the root (default) world if missing
         if (rootWorldProperties == null) {
@@ -847,10 +855,14 @@ public final class LanternWorldManager {
         }
 
         // Get all the dimensions (worlds) that should be loaded
-        final List<WorldLookupEntry> loadQueue = Lists.newArrayList();
+        final List<WorldLookupEntry> loadQueue = new ArrayList<>(1);
         // Add the root dimension
         loadQueue.add(this.worldByDimensionId.get(0));
 
+        // TODO: The end and nether
+
+        final Map<Integer, Tuple<Path, LevelData>> idToLevelData = new HashMap<>();
+        final List<Tuple<Path, LevelData>> levelDataWithoutId = new ArrayList<>();
         if (rootWorldProperties != null) {
             for (Path path : Files.list(this.rootWorldDirectory).filter(Files::isDirectory).collect(Collectors.toList())) {
                 if (Files.list(path).count() == 0 || this.ignoredDirectoryNames.contains(path.getFileName().toString().toLowerCase())) {
@@ -864,22 +876,12 @@ public final class LanternWorldManager {
                                 path.getFileName().toString());
                         continue;
                     }
-                    WorldProperties worldProperties;
-                    try {
-                        WorldConfigResult result = this.getOrCreateWorldConfig(levelData.worldName);
-                        worldProperties = LanternWorldPropertiesIO.convert(levelData, result.config, result.newCreated);
-                        if (result.newCreated) {
-                            result.config.save();
-                        }
-                    } catch (IOException e) {
-                        this.game.getLogger().error("Unable to read/write the world config, please fix this issue before loading the world.", e);
-                        throw e;
-                    }
-                    // Store the world properties
-                    this.addUpdatedWorldProperties(rootWorldProperties, path, null);
-                    // Check if it should be loaded on startup
-                    if (worldProperties.loadOnStartup()) {
-                        loadQueue.add(this.worldByProperties.get(worldProperties));
+                    Integer dimensionId = levelData.dimensionId;
+                    Tuple<Path, LevelData> tuple = Tuple.of(path, levelData);
+                    if (dimensionId == null || idToLevelData.containsValue(dimensionId) || dimensionId < MIN_CUSTOM_DIMENSION_ID) {
+                        levelDataWithoutId.add(tuple);
+                    } else {
+                        idToLevelData.put(dimensionId, tuple);
                     }
                 } catch (Exception e) {
                     Lantern.getLogger().info("Unable to load the world in the directory {}",
@@ -888,9 +890,36 @@ public final class LanternWorldManager {
             }
         }
 
-        // Load all the worlds
-        for (WorldLookupEntry entry : loadQueue) {
-            this.loadWorld(entry);
+        // Generate a dimension id for all the worlds that need it
+        for (Tuple<Path, LevelData> tuple : levelDataWithoutId) {
+            idToLevelData.put(this.getNextFreeDimensionId(), tuple);
         }
+        levelDataWithoutId.clear();
+
+        // Load the world properties and config files for all the worlds
+        for (Map.Entry<Integer, Tuple<Path, LevelData>> entry : idToLevelData.entrySet()) {
+            levelData = entry.getValue().getSecond();
+            WorldProperties worldProperties;
+            try {
+                WorldConfigResult result = this.getOrCreateWorldConfig(levelData.worldName);
+                worldProperties = LanternWorldPropertiesIO.convert(levelData, result.config, result.newCreated);
+                if (result.newCreated) {
+                    result.config.save();
+                }
+            } catch (IOException e) {
+                this.game.getLogger().error("Unable to read/write the world config, please fix this issue before loading the world.", e);
+                throw e;
+            }
+            // Store the world properties
+            this.addUpdatedWorldProperties(rootWorldProperties, entry.getValue().getFirst(), levelData.dimensionId);
+            // Check if it should be loaded on startup
+            if (worldProperties.loadOnStartup()) {
+                loadQueue.add(this.worldByProperties.get(worldProperties));
+            }
+        }
+        idToLevelData.clear();
+
+        // Load all the worlds
+        loadQueue.forEach(this::loadWorld);
     }
 }

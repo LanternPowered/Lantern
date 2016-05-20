@@ -780,7 +780,7 @@ public final class LanternWorldManager {
         if (dimensionId == null || this.worldByDimensionId.containsValue(dimensionId)) {
             dimensionId = this.getNextFreeDimensionId();
             // Ignore the root dimension
-        } else if (dimensionId != 0) {
+        } else if (dimensionId > MIN_CUSTOM_DIMENSION_ID) {
             this.dimensionMap.set(dimensionId);
         }
         this.addWorldProperties(properties, worldFolder, dimensionId);
@@ -789,16 +789,18 @@ public final class LanternWorldManager {
     /**
      * Adds the world properties.
      * 
-     * @param properties the properties
-     * @param worldFolder the folder of the world
-     * @param dimensionId the id of the world (dimension)
+     * @param properties The properties
+     * @param worldDirectory The directory of the world
+     * @param dimensionId The id of the world (dimension)
+     * @return The world lookup entry
      */
-    void addWorldProperties(LanternWorldProperties properties, Path worldFolder, int dimensionId) {
-        final WorldLookupEntry entry = new WorldLookupEntry(properties, worldFolder, dimensionId);
+    WorldLookupEntry addWorldProperties(LanternWorldProperties properties, Path worldDirectory, int dimensionId) {
+        final WorldLookupEntry entry = new WorldLookupEntry(properties, worldDirectory, dimensionId);
         this.worldByUUID.put(properties.getUniqueId(), entry);
         this.worldByName.put(properties.getWorldName(), entry);
         this.worldByDimensionId.put(dimensionId, entry);
         this.worldByProperties.put(properties, entry);
+        return entry;
     }
 
     /**
@@ -911,10 +913,10 @@ public final class LanternWorldManager {
                 throw e;
             }
             // Store the world properties
-            this.addUpdatedWorldProperties(rootWorldProperties, entry.getValue().getFirst(), levelData.dimensionId);
+            WorldLookupEntry lookupEntry = this.addWorldProperties(rootWorldProperties, entry.getValue().getFirst(), entry.getKey());
             // Check if it should be loaded on startup
             if (worldProperties.loadOnStartup()) {
-                loadQueue.add(this.worldByProperties.get(worldProperties));
+                loadQueue.add(lookupEntry);
             }
         }
         idToLevelData.clear();

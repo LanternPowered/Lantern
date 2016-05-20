@@ -98,6 +98,6 @@ public final class LanternClickActionCallbacks {
      * @return The callback
      */
     public Optional<Consumer<CommandSource>> getCallbackForUUID(UUID uniqueId) {
-        return Optional.of(this.reverseMap.get(checkNotNull(uniqueId, "uniqueId")));
+        return Optional.ofNullable(this.reverseMap.get(checkNotNull(uniqueId, "uniqueId")));
     }
 }

@@ -78,7 +78,7 @@ public class LanternSelectorBuilder implements Selector.Builder {
 
     @Override
     public <T> Selector.Builder add(ArgumentType<T> type, T value) {
-        this.arguments.put(type, new LanternArgument<T>(type, value));
+        this.arguments.put(type, new LanternArgument<>(type, value));
         return this;
     }
 

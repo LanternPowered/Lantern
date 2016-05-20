@@ -269,6 +269,11 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
     }
 
     @Override
+    public boolean equalTo(ItemStack that) {
+        return false;
+    }
+
+    @Override
     public ItemStack copy() {
         // TODO Auto-generated method stub
         return null;

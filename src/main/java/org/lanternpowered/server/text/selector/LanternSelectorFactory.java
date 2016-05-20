@@ -77,7 +77,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     Lantern.getLogger().debug(m + " wasn't public", e);
                     return null;
                 } catch (IllegalArgumentException e) {
-                    Lantern.getLogger().debug(m + " failed with paramter " + input, e);
+                    Lantern.getLogger().debug(m + " failed with parameter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
                     throw Throwables.propagate(e.getCause());
@@ -91,7 +91,7 @@ public class LanternSelectorFactory implements SelectorFactory {
                     Lantern.getLogger().debug(m + " wasn't public", e);
                     return null;
                 } catch (IllegalArgumentException e) {
-                    Lantern.getLogger().debug(m + " failed with paramter " + input, e);
+                    Lantern.getLogger().debug(m + " failed with parameter " + input, e);
                     return null;
                 } catch (InvocationTargetException e) {
                     throw Throwables.propagate(e.getCause());

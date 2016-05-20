@@ -95,7 +95,7 @@ public class LanternPermissionService implements PermissionService {
                     return null;
                 }));
 
-        this.defaultData = new FixedParentMemorySubjectData(this, getGroupForOpLevel(0));
+        this.defaultData = new FixedParentMemorySubjectData(this, this.getGroupForOpLevel(0));
     }
 
     public Subject getGroupForOpLevel(int level) {

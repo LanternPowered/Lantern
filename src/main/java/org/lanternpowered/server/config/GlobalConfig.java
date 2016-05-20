@@ -44,6 +44,7 @@ import org.spongepowered.api.text.Text;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Path;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -75,7 +76,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "aliases", comment = "A mapping from unqualified command alias to plugin id"
                 + " of the plugin that should handle a certain command")
-        private Map<String, String> aliases = Maps.newHashMap();
+        private Map<String, String> aliases = new HashMap<>();
     }
 
     @ConfigSerializable
@@ -175,10 +176,11 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "type", comment = "The type of the proxy, or none if disabled.")
         private ProxyType type = ProxyType.NONE;
 
-        @Setting(value = "security-key",
-                comment = "A security key shared between a proxy and it's server to make\n"
-                        + "sure that they are connecting from your network.\n"
-                        + "Is currently only applicable for the LilyPad proxy.")
+        @Setting(value = "security-key", comment =
+                "A security key shared between a proxy and it's server to make\n" +
+                "sure that they are connecting from your network.\n" +
+                "Is currently only applicable for the LilyPad proxy.\n" +
+                "If you want to disable the security you may leave this field empty.")
         private String securityKey = "";
     }
 

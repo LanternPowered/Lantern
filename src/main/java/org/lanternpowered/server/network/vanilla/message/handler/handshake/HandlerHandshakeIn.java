@@ -112,9 +112,9 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                 try {
                     JsonObject jsonObject = GSON.fromJson(hostname, JsonObject.class);
 
-                    String securityKey = jsonObject.get("s").getAsString();
+                    String securityKey = Lantern.getGame().getGlobalConfig().getProxySecurityKey();
                     // Validate the security key
-                    if (!securityKey.equals(Lantern.getGame().getGlobalConfig().getProxySecurityKey())) {
+                    if (!securityKey.isEmpty() && !jsonObject.get("s").getAsString().equals(securityKey)) {
                         session.disconnect(t("Proxy security key mismatch"));
                         Lantern.getLogger().warn("Proxy security key mismatch for the player {}", jsonObject.get("n").getAsString());
                         return;
@@ -139,6 +139,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                     }
 
                     session.getChannel().attr(HandlerLoginStart.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, name, properties));
+                    session.getChannel().attr(Session.FML_MARKER).set(false);
 
                     int port = jsonObject.get("rP").getAsInt();
                     String host = jsonObject.get("h").getAsString();

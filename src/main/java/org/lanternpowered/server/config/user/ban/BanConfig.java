@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.config.user.ban;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
@@ -34,9 +36,16 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollection;
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.user.UserStorage;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.collect.Lists2;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.BanService;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.Ban.Ip;
@@ -49,6 +58,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
 public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService {
@@ -119,8 +129,15 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
         return this.getEntryByUUID(gameProfile.getUniqueId());
     }
 
+    /**
+     * Gets a {@link BanEntry.Ip} for the specified {@link InetAddress}. May return
+     * {@link Optional#empty()} if not found.
+     *
+     * @param address The address
+     * @return The ban entry
+     */
     public Optional<BanEntry> getEntryByIp(InetAddress address) {
-        final String address0 = address.getHostAddress();
+        final String address0 = checkNotNull(address, "address").getHostAddress();
         return (Optional) this.entries0.stream().filter(e -> e instanceof BanEntry.Ip &&
                 ((BanEntry.Ip) e).getAddress().getHostAddress().equalsIgnoreCase(address0)).findFirst();
     }
@@ -132,11 +149,8 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public boolean removeEntry(UUID uniqueId) {
-        Optional<BanEntry> ban = this.getEntryByUUID(uniqueId);
-        if (ban.isPresent()) {
-            return this.removeBan(ban.get());
-        }
-        return false;
+        final Optional<BanEntry> ban = this.getEntryByUUID(checkNotNull(uniqueId, "uniqueId"));
+        return ban.isPresent() && this.removeBan(ban.get());
     }
 
     @Override
@@ -176,47 +190,125 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public boolean pardon(GameProfile profile) {
-        Optional<Ban.Profile> ban = this.getBanFor(profile);
+        final Optional<Ban.Profile> ban = this.getBanFor(checkNotNull(profile, "profile"));
         if (ban.isPresent()) {
-            this.entries0.remove(ban.get());
-            return true;
+            return this.removeBan(ban.get());
         }
         return false;
     }
 
     @Override
     public boolean pardon(InetAddress address) {
-        Optional<Ban.Ip> ban = this.getBanFor(address);
-        if (ban.isPresent()) {
-            this.entries0.remove(ban.get());
+        Optional<Ban.Ip> ban = this.getBanFor(checkNotNull(address, "address"));
+        return ban.isPresent() && this.removeBan(ban.get());
+    }
+
+    /**
+     * Removes the specified {@link Ban} and calls the proper event
+     * if needed with the specified {@link Cause}.
+     *
+     * @param ban The ban
+     * @param causeSupplier The cause supplier
+     * @return Whether a ban was removed
+     */
+    public boolean removeBan(Ban ban, Supplier<Cause> causeSupplier) {
+        checkNotNull(ban, "ban");
+        checkNotNull(causeSupplier, "causeSupplier");
+        if (this.entries0.remove(ban)) {
+            // Post the pardon events
+            Event event;
+            if (ban instanceof Ban.Ip) {
+                event = SpongeEventFactory.createPardonIpEvent(causeSupplier.get(), (Ban.Ip) ban);
+            } else {
+                Ban.Profile profileBan = (Ban.Profile) ban;
+                Cause cause = causeSupplier.get();
+                // Check if the pardoned player is online (not yet been kicked)
+                Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
+                if (optTarget.isPresent()) {
+                    event = SpongeEventFactory.createPardonUserEventTargetPlayer(cause, profileBan, optTarget.get(), optTarget.get());
+                } else {
+                    event = SpongeEventFactory.createPardonUserEvent(cause, profileBan, Lantern.getGame().getServiceManager()
+                            .provideUnchecked(UserStorageService.class).getOrCreate(profileBan.getProfile()));
+                }
+            }
+            // Just ignore for now the fact that they may be cancellable,
+            // only the PardonIpEvent seems to be cancellable
+            // TODO: Should they all be cancellable or none of them?
+            Sponge.getEventManager().post(event);
             return true;
         }
         return false;
     }
 
-    @Override
-    public boolean removeBan(Ban ban) {
-        return this.entries0.remove(ban);
+    private static Supplier<Cause> getCauseSupplierFor(Ban ban) {
+        return () -> {
+            Object src = ban.getBanCommandSource().orElse(null);
+            if (src == null) {
+                src = ban.getBanSource().orElse(null);
+            }
+            return Cause.source(src == null ? ban : src).build();
+        };
     }
 
     @Override
-    public Optional<? extends Ban> addBan(Ban ban) {
+    public boolean removeBan(Ban ban) {
+        checkNotNull(ban, "ban");
+        return this.removeBan(ban, getCauseSupplierFor(ban));
+    }
+
+    /**
+     * Adds the specified {@link Ban} and calls the proper event
+     * if needed with the specified {@link Cause}.
+     *
+     * @param ban The ban
+     * @param causeSupplier The cause supplier
+     * @return The previous ban attached to new bans profile or ip address
+     */
+    public Optional<? extends Ban> addBan(Ban ban, Supplier<Cause> causeSupplier) {
+        checkNotNull(ban, "ban");
+        checkNotNull(causeSupplier, "causeSupplier");
         Optional<Ban> oldBan;
         if (ban instanceof Ban.Ip) {
             oldBan = (Optional) this.getBanFor(((Ban.Ip) ban).getAddress());
         } else {
             oldBan = (Optional) this.getBanFor(((Ban.Profile) ban).getProfile());
         }
-        if (oldBan.isPresent()) {
-            this.entries0.remove(oldBan.get());
-        }
+        oldBan.ifPresent(this.entries0::remove);
         this.entries0.add((BanEntry) ban);
+        if (!oldBan.isPresent() || !oldBan.get().equals(ban)) {
+            // Post the ban events
+            Event event;
+            if (ban instanceof Ban.Ip) {
+                event = SpongeEventFactory.createBanIpEvent(causeSupplier.get(), (Ban.Ip) ban);
+            } else {
+                Ban.Profile profileBan = (Ban.Profile) ban;
+                Cause cause = causeSupplier.get();
+                // Check if the pardoned player is online (not yet been kicked)
+                Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
+                if (optTarget.isPresent()) {
+                    event = SpongeEventFactory.createBanUserEventTargetPlayer(cause, profileBan, optTarget.get(), optTarget.get());
+                } else {
+                    event = SpongeEventFactory.createBanUserEvent(cause, profileBan, Lantern.getGame().getServiceManager()
+                            .provideUnchecked(UserStorageService.class).getOrCreate(profileBan.getProfile()));
+                }
+            }
+            // Just ignore for now the fact that they may be cancellable,
+            // only the PardonIpEvent seems to be cancellable
+            // TODO: Should they all be cancellable or none of them?
+            Sponge.getEventManager().post(event);
+        }
         return oldBan;
     }
 
     @Override
+    public Optional<? extends Ban> addBan(Ban ban) {
+        checkNotNull(ban, "ban");
+        return this.addBan(ban, getCauseSupplierFor(ban));
+    }
+
+    @Override
     public boolean hasBan(Ban ban) {
-        return this.entries0.contains(ban);
+        return this.entries0.contains(checkNotNull(ban, "ban"));
     }
 
     @Override

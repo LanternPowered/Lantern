@@ -44,9 +44,9 @@ public final class BanEntrySerializer implements TypeSerializer<BanEntry> {
     @Override
     public void serialize(TypeToken<?> type, BanEntry obj, ConfigurationNode value) throws ObjectMappingException {
         if (obj instanceof BanEntry.Ip) {
-            value.setValue(TypeToken.of(BanEntry.Ip.class), (BanEntry.Ip) value);
+            value.setValue(TypeToken.of(BanEntry.Ip.class), (BanEntry.Ip) obj);
         } else {
-            value.setValue(TypeToken.of(BanEntry.Profile.class), (BanEntry.Profile) value);
+            value.setValue(TypeToken.of(BanEntry.Profile.class), (BanEntry.Profile) obj);
         }
     }
 

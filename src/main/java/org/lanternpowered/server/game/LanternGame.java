@@ -31,12 +31,15 @@ import org.apache.logging.log4j.util.PropertiesUtil;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.LanternAssetManager;
 import org.lanternpowered.server.command.CommandBan;
+import org.lanternpowered.server.command.CommandBanIp;
 import org.lanternpowered.server.command.CommandBorder;
 import org.lanternpowered.server.command.CommandDeop;
 import org.lanternpowered.server.command.CommandDifficulty;
 import org.lanternpowered.server.command.CommandGameRule;
 import org.lanternpowered.server.command.CommandHelp;
 import org.lanternpowered.server.command.CommandOp;
+import org.lanternpowered.server.command.CommandPardon;
+import org.lanternpowered.server.command.CommandPardonIp;
 import org.lanternpowered.server.command.CommandParticle;
 import org.lanternpowered.server.command.CommandParticleEffect;
 import org.lanternpowered.server.command.CommandPlaySound;
@@ -359,7 +362,10 @@ public class LanternGame implements Game {
 
         // Register the command service
         this.commandManager = new LanternCommandManager(this.getLogger(), new LanternCommandDisambiguator(this));
-        this.commandManager.register(this.minecraft, CommandBan.create(false), "ban-ip");
+        this.commandManager.register(this.minecraft, CommandBanIp.create(), "ban-ip");
+        this.commandManager.register(this.minecraft, CommandBan.create(), "ban");
+        this.commandManager.register(this.minecraft, CommandPardon.create(), "pardon");
+        this.commandManager.register(this.minecraft, CommandPardonIp.create(), "pardon-ip");
         this.commandManager.register(this.minecraft, CommandSay.create(), "say");
         this.commandManager.register(this.minecraft, CommandSeed.create(), "seed");
         this.commandManager.register(this.minecraft, CommandSetSpawn.create(), "setworldspawn");
@@ -439,7 +445,9 @@ public class LanternGame implements Game {
             // Group level 3 permissions
             subjectData = service.getGroupForOpLevel(3).getSubjectData();
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN_IP, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBanIp.PERMISSION_BAN_IP, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandPardon.PERMISSION_PARDON, Tristate.TRUE);
+            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandPardonIp.PERMISSION_PARDON_IP, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandWhitelist.PERMISSION, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandOp.PERMISSION, Tristate.TRUE);
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandDeop.PERMISSION, Tristate.TRUE);

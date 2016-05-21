@@ -39,11 +39,14 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-public final class CommandDifficulty {
+public final class CommandDifficulty extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.difficulty";
+    public CommandDifficulty() {
+        super(2, "difficulty");
+    }
 
-    public static CommandSpec create() {
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
         final ImmutableMap.Builder<String, Object> baseBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<String, Object> aliasesBuilder = ImmutableMap.builder();
 
@@ -53,23 +56,17 @@ public final class CommandDifficulty {
             aliasesBuilder.put(((LanternDifficulty) difficulty).getInternalId() + "", difficulty);
         }
 
-        return CommandSpec.builder()
+        specBuilder
                 .arguments(
-                        ChoicesElement.of(Text.of("difficulty"), baseBuilder.build(),
-                                aliasesBuilder.build(), false, true),
-                        GenericArguments.optional(GenericArguments.world(Text.of("world"))))
-                .permission(PERMISSION)
+                        ChoicesElement.of(Text.of("difficulty"), baseBuilder.build(), aliasesBuilder.build(), false, true),
+                        GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                )
                 .executor((src, args) -> {
                     WorldProperties world = getWorld(src, args);
                     Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
                     world.setDifficulty(difficulty);
                     src.sendMessage(t("commands.difficulty.success", difficulty.getName()));
                     return CommandResult.success();
-                })
-                .build();
+                });
     }
-
-    private CommandDifficulty() {
-    }
-
 }

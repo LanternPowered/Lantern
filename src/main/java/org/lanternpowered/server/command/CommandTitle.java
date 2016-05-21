@@ -27,8 +27,6 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.command.element.RemainingTextElement;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -40,72 +38,67 @@ import org.spongepowered.api.text.serializer.TextParseException;
 import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.text.title.Title;
 
-public final class CommandTitle {
+public final class CommandTitle extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.title";
-
-    public static CommandSpec create() {
-        return CommandSpec.builder().children(
-                ImmutableMap.of(
-                        Lists.newArrayList("clear"), CommandSpec.builder()
-                                .executor((src, args) -> {
-                                    args.<Player>getOne("player").get().clearTitle();
-                                    return CommandResult.success();
-                                })
-                                .build(),
-                        Lists.newArrayList("title"), CommandSpec.builder()
-                                .arguments(RemainingTextElement.of(Text.of("title")))
-                                .executor((src, args) -> {
-                                    Text title;
-                                    try {
-                                        title = TextSerializers.JSON.deserialize(args.<String>getOne("title").get());
-                                    } catch (TextParseException e) {
-                                        throw new CommandException(t("commands.tellraw.jsonException", e.getMessage()));
-                                    }
-                                    args.<Player>getOne("player").get().sendTitle(Title.builder().title(title).build());
-                                    return CommandResult.success();
-                                })
-                                .build(),
-                        Lists.newArrayList("subtitle"), CommandSpec.builder()
-                                .arguments(RemainingTextElement.of(Text.of("title")))
-                                .executor((src, args) -> {
-                                    Text title;
-                                    try {
-                                        title = TextSerializers.JSON.deserialize(args.<String>getOne("title").get());
-                                    } catch (TextParseException e) {
-                                        throw new CommandException(t("commands.tellraw.jsonException", e.getMessage()));
-                                    }
-                                    args.<Player>getOne("player").get().sendTitle(Title.builder().subtitle(title).build());
-                                    return CommandResult.success();
-                                })
-                                .build(),
-                        Lists.newArrayList("reset"), CommandSpec.builder()
-                                .executor((src, args) -> {
-                                    args.<Player>getOne("player").get().resetTitle();
-                                    return CommandResult.success();
-                                })
-                                .build(),
-                        Lists.newArrayList("times"), CommandSpec.builder()
-                                .arguments(
-                                        GenericArguments.integer(Text.of("fadeIn")),
-                                        GenericArguments.integer(Text.of("stay")),
-                                        GenericArguments.integer(Text.of("fadeOut")))
-                                .executor((src, args) -> {
-                                    args.<Player>getOne("player").get().sendTitle(Title.builder()
-                                            .fadeIn(args.<Integer>getOne("fadeIn").get())
-                                            .stay(args.<Integer>getOne("stay").get())
-                                            .fadeOut(args.<Integer>getOne("fadeOut").get())
-                                            .build());
-                                    return CommandResult.success();
-                                })
-                                .build()))
-                .arguments(
-                        GenericArguments.player(Text.of("player")))
-                .permission(PERMISSION)
-                .build();
+    public CommandTitle() {
+        super(2, "title");
     }
 
-    private CommandTitle() {
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
+                .child(CommandSpec.builder()
+                        .executor((src, args) -> {
+                            args.<Player>getOne("player").get().clearTitle();
+                            return CommandResult.success();
+                        })
+                        .build(), "clear")
+                .child(CommandSpec.builder()
+                        .arguments(RemainingTextElement.of(Text.of("title")))
+                        .executor((src, args) -> {
+                            Text title;
+                            try {
+                                title = TextSerializers.JSON.deserialize(args.<String>getOne("title").get());
+                            } catch (TextParseException e) {
+                                throw new CommandException(t("commands.tellraw.jsonException", e.getMessage()));
+                            }
+                            args.<Player>getOne("player").get().sendTitle(Title.builder().title(title).build());
+                            return CommandResult.success();
+                        })
+                        .build(), "title")
+                .child(CommandSpec.builder()
+                        .arguments(RemainingTextElement.of(Text.of("title")))
+                        .executor((src, args) -> {
+                            Text title;
+                            try {
+                                title = TextSerializers.JSON.deserialize(args.<String>getOne("title").get());
+                            } catch (TextParseException e) {
+                                throw new CommandException(t("commands.tellraw.jsonException", e.getMessage()));
+                            }
+                            args.<Player>getOne("player").get().sendTitle(Title.builder().subtitle(title).build());
+                            return CommandResult.success();
+                        })
+                        .build(), "subtitle")
+                .child(CommandSpec.builder()
+                        .executor((src, args) -> {
+                            args.<Player>getOne("player").get().resetTitle();
+                            return CommandResult.success();
+                        })
+                        .build(), "reset")
+                .child(CommandSpec.builder()
+                        .arguments(
+                                GenericArguments.integer(Text.of("fadeIn")),
+                                GenericArguments.integer(Text.of("stay")),
+                                GenericArguments.integer(Text.of("fadeOut"))
+                        )
+                        .executor((src, args) -> {
+                            args.<Player>getOne("player").get().sendTitle(Title.builder()
+                                    .fadeIn(args.<Integer>getOne("fadeIn").get())
+                                    .stay(args.<Integer>getOne("stay").get())
+                                    .fadeOut(args.<Integer>getOne("fadeOut").get())
+                                    .build());
+                            return CommandResult.success();
+                        })
+                        .build(), "times");
     }
-
 }

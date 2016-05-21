@@ -35,15 +35,18 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
-public final class CommandStop {
+public final class CommandStop extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.stop";
+    public CommandStop() {
+        super(4, "stop", "shutdown");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
-                        GenericArguments.optional(RemainingTextElement.of(Text.of("kick-message"))))
-                .permission(PERMISSION)
+                        GenericArguments.optional(RemainingTextElement.of(Text.of("kick-message")))
+                )
                 .description(t("commands.stop.description"))
                 .executor((src, args) -> {
                     final LanternServer server = Lantern.getGame().getServer();
@@ -53,10 +56,6 @@ public final class CommandStop {
                         server.shutdown();
                     }
                     return CommandResult.success();
-                }).build();
+                });
     }
-
-    private CommandStop() {
-    }
-
 }

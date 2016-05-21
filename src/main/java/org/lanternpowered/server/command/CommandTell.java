@@ -36,16 +36,19 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 
-public final class CommandTell {
+public final class CommandTell extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.tell";
+    public CommandTell() {
+        super(0, "tell", "msg", "w");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         GenericArguments.player(Text.of("player")),
-                        RemainingTextElement.of(Text.of("message")))
-                .permission(PERMISSION)
+                        RemainingTextElement.of(Text.of("message"))
+                )
                 .executor((src, args) -> {
                     Player player = args.<Player>getOne("player").get();
                     String message = args.<String>getOne("message").get();
@@ -54,11 +57,6 @@ public final class CommandTell {
                     src.sendMessage(Text.of(TextColors.GRAY, TextStyles.ITALIC,
                             t("commands.message.display.incoming", src.getName(), message)));
                     return CommandResult.success();
-                })
-                .build();
+                });
     }
-
-    private CommandTell() {
-    }
-
 }

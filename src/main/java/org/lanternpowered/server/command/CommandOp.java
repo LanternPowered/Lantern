@@ -49,12 +49,15 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-public final class CommandOp {
+public final class CommandOp extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.op";
+    public CommandOp() {
+        super(3, "op");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         new CommandElement(Text.of("player")) {
                             @Nullable
@@ -74,7 +77,8 @@ public final class CommandOp {
                                         .collect(GuavaCollectors.toImmutableList());
                             }
                         },
-                        GenericArguments.optional(GenericArguments.integer(Text.of("level"))))
+                        GenericArguments.optional(GenericArguments.integer(Text.of("level")))
+                )
                 .executor((src, args) -> {
                     String playerName = args.<String>getOne("player").get();
                     UserConfig<OpsEntry> config = Lantern.getGame().getOpsConfig();
@@ -91,12 +95,6 @@ public final class CommandOp {
                         }
                     });
                     return CommandResult.success();
-                })
-                .permission(PERMISSION)
-                .build();
+                });
     }
-
-    private CommandOp() {
-    }
-
 }

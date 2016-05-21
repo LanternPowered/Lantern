@@ -28,7 +28,6 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.google.common.collect.Lists;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
@@ -46,20 +45,27 @@ import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
-public final class CommandGameRule {
+public final class CommandGameRule extends CommandProvider {
 
     public static final String PERMISSION = "minecraft.command.gamerule";
 
-    public static CommandSpec create() {
-        final List<String> defaultRules = Lists.newArrayList(Sponge.getRegistry().getDefaultGameRules());
+    public CommandGameRule() {
+        super(2, "gamerule", "rule");
+    }
+
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        final Collection<String> defaultRules = Sponge.getRegistry().getDefaultGameRules();
         final ThreadLocal<RuleType<?>> currentRule = new ThreadLocal<>();
-        return CommandSpec.builder()
+
+        specBuilder
                 .arguments(
                         new CommandElement(Text.of("rule")) {
                             @Nullable
@@ -94,8 +100,8 @@ public final class CommandGameRule {
                                 return Collections.emptyList();
                             }
                         },
-                        GenericArguments.optional(GenericArguments.world(Text.of("world"))))
-                .permission(PERMISSION)
+                        GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                )
                 .executor((src, args) -> {
                     WorldProperties world = getWorld(src, args);
                     ((LanternWorldProperties) world).getRules()
@@ -103,7 +109,6 @@ public final class CommandGameRule {
                             .setValue(args.getOne("value").get());
                     src.sendMessage(t("commands.gamerule.success"));
                     return CommandResult.success();
-                })
-                .build();
+                });
     }
 }

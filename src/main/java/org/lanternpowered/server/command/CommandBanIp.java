@@ -50,7 +50,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public final class CommandBanIp {
+public final class CommandBanIp extends CommandProvider {
 
     public static final Pattern IP_PATTERN = Pattern.compile(
             "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -58,15 +58,17 @@ public final class CommandBanIp {
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
-    //public static final String PERMISSION_BAN = "minecraft.command.ban";
-    public static final String PERMISSION_BAN_IP = "minecraft.command.ban-ip";
+    public CommandBanIp() {
+        super(3, "ban-ip");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         GenericArguments.string(Text.of("address")),
-                        GenericArguments.optional(RemainingTextElement.of(Text.of("reason"))))
-                .permission(PERMISSION_BAN_IP)
+                        GenericArguments.optional(RemainingTextElement.of(Text.of("reason")))
+                )
                 .executor((src, args) -> {
                     final String target = args.<String>getOne("address").get();
                     final String reason = args.<String>getOne("reason").orElse(null);
@@ -110,11 +112,6 @@ public final class CommandBanIp {
                     }
                     src.sendMessage(t("commands.banip.success", address.toString()));
                     return CommandResult.success();
-                })
-                .build();
+                });
     }
-
-    private CommandBanIp() {
-    }
-
 }

@@ -34,13 +34,15 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public final class CommandVersion {
+public final class CommandVersion extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.version";
+    public CommandVersion() {
+        super(4, "version");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
-                .permission(PERMISSION)
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .description(t("commands.version.description"))
                 .executor((src, args) -> {
                     PluginContainer plugin = Lantern.getMinecraftPlugin();
@@ -52,10 +54,6 @@ public final class CommandVersion {
                     plugin = platform.getApi();
                     src.sendMessage(t("commands.version.api", plugin.getName(), plugin.getVersion()));
                     return CommandResult.success();
-                }).build();
+                });
     }
-
-    private CommandVersion() {
-    }
-
 }

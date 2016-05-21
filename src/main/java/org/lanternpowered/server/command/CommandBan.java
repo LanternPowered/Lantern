@@ -43,16 +43,19 @@ import org.spongepowered.api.util.ban.BanTypes;
 
 import java.util.Optional;
 
-public final class CommandBan {
+public final class CommandBan extends CommandProvider {
 
-    public static final String PERMISSION_BAN = "minecraft.command.ban";
+    public CommandBan() {
+        super(3, "ban");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         GenericArguments.string(Text.of("player")),
-                        GenericArguments.optional(RemainingTextElement.of(Text.of("reason"))))
-                .permission(PERMISSION_BAN)
+                        GenericArguments.optional(RemainingTextElement.of(Text.of("reason")))
+                )
                 .executor((src, args) -> {
                     final String target = args.<String>getOne("player").get();
                     final String reason = args.<String>getOne("reason").orElse(null);
@@ -84,11 +87,6 @@ public final class CommandBan {
                         }
                     }));
                     return CommandResult.success();
-                })
-                .build();
+                });
     }
-
-    private CommandBan() {
-    }
-
 }

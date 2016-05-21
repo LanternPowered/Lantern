@@ -37,13 +37,17 @@ import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.text.Text;
 
-public final class CommandPlaySound {
+public final class CommandPlaySound extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.playsound";
-    private static final Vector3d FOUR = new Vector3d(4.0, 4.0, 4.0);
+    private static final Vector3d FOUR_VECTOR = new Vector3d(4.0, 4.0, 4.0);
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    public CommandPlaySound() {
+        super(2, "playsound");
+    }
+
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("sound"), SoundType.class),
                         GenericArguments.catalogedElement(Text.of("category"), SoundCategory.class),
@@ -55,7 +59,6 @@ public final class CommandPlaySound {
                                 GenericArguments.doubleNum(Text.of("pitch")), false, 1)),
                         GenericArguments.optional(DelegateCompleterElement.defaultValues(
                                 GenericArguments.doubleNum(Text.of("minimum-volume")), false, 0)))
-                .permission(PERMISSION)
                 .executor((src, args) -> {
                     SoundType soundType = args.<SoundType>getOne("sound").get();
                     SoundCategory soundCategory = args.<SoundCategory>getOne("category").get();
@@ -73,16 +76,12 @@ public final class CommandPlaySound {
                     // The sound is played outside of the default volume and there
                     // is a minimum volume specified
                     if (minVolume > 0.0 && playerPos != position && position.distanceSquared(playerPos) > soundDistance * soundDistance) {
-                        position = position.sub(playerPos).normalize().mul(FOUR).add(playerPos);
+                        position = position.sub(playerPos).normalize().mul(FOUR_VECTOR).add(playerPos);
                         volume = minVolume;
                     }
 
                     player.playSound(soundType, soundCategory, position, volume, pitch);
                     return CommandResult.success();
-                })
-                .build();
-    }
-
-    private CommandPlaySound() {
+                });
     }
 }

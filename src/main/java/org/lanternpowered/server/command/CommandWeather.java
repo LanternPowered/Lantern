@@ -42,12 +42,19 @@ import org.spongepowered.api.world.weather.WeatherUniverse;
 
 import java.util.Collection;
 
-public final class CommandWeather {
+import javax.annotation.Nullable;
+
+public final class CommandWeather extends CommandProvider {
 
     public static final String PERMISSION = "minecraft.command.weather";
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    public CommandWeather() {
+        super(2, "weather");
+    }
+
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         new PatternMatchingCommandElement(Text.of("type")) {
                             @Override
@@ -69,7 +76,6 @@ public final class CommandWeather {
                         },
                         GenericArguments.optional(GenericArguments.integer(Text.of("duration"))),
                         GenericArguments.optional(GenericArguments.world(Text.of("world"))))
-                .permission(PERMISSION)
                 .executor((src, args) -> {
                     LanternWorldProperties world = getWorld(src, args);
                     WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse().orElse(null);
@@ -83,10 +89,6 @@ public final class CommandWeather {
                     }
                     src.sendMessage(t("Changing to " + type.getName() + " weather"));
                     return CommandResult.success();
-                })
-                .build();
-    }
-
-    private CommandWeather() {
+                });
     }
 }

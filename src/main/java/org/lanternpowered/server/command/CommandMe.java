@@ -25,47 +25,31 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
-import org.spongepowered.api.command.CommandException;
+import org.lanternpowered.server.command.element.RemainingTextElement;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Locatable;
-import org.spongepowered.api.world.storage.WorldProperties;
 
-public final class CommandSetSpawn extends CommandProvider {
+public final class CommandMe extends CommandProvider {
 
-    public CommandSetSpawn() {
-        super(2, "setworldspawn", "setspawn");
+    public CommandMe() {
+        super(0, "me");
     }
 
     @Override
     public void completeSpec(CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
-                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("coordinates"))),
-                        GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                        RemainingTextElement.of(Text.of("message"))
                 )
                 .executor((src, args) -> {
-                    WorldProperties world = getWorld(src, args);
-                    Vector3d position;
-                    if (args.hasAny("coordinates")) {
-                        position = args.<Vector3d>getOne("coordinates").get();
-                    } else if (src instanceof Locatable) {
-                        position = ((Locatable) src).getLocation().getPosition();
-                    } else {
-                        throw new CommandException(t("Non-located sources must specify coordinates."));
-                    }
-                    Vector3i position0 = position.toInt();
-                    world.setSpawnPosition(position0);
-                    src.sendMessage(t("commands.setworldspawn.success", position0.getX(), position0.getY(),
-                            position0.getZ()));
+                    String message = args.<String>getOne("message").get();
+                    // TODO: Use the player display name?
+                    Sponge.getServer().getBroadcastChannel().send(src,
+                            t("chat.type.emote", src.getName(), message));
                     return CommandResult.success();
                 });
     }

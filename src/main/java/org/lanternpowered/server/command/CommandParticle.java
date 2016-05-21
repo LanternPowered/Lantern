@@ -60,12 +60,15 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public final class CommandParticle {
+public final class CommandParticle extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.particle";
+    public CommandParticle() {
+        super(2, "particle");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("type"), ParticleType.class),
                         TargetedVector3dElement.of(Text.of("position"), 0),
@@ -113,8 +116,8 @@ public final class CommandParticle {
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                                 return Collections.emptyList();
                             }
-                        }))
-                .permission(PERMISSION)
+                        })
+                )
                 .executor((src, args) -> {
                     LanternParticleType particleType = args.<LanternParticleType>getOne("type").get();
                     int particleId = particleType.getInternalId();
@@ -150,10 +153,6 @@ public final class CommandParticle {
                     }
                     src.sendMessage(t("commands.particle.success", particleType.getName(), count));
                     return CommandResult.success();
-                })
-                .build();
-    }
-
-    private CommandParticle() {
+                });
     }
 }

@@ -33,21 +33,25 @@ import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.text.Text;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public final class CommandPardonIp {
+public final class CommandPardonIp extends CommandProvider {
 
-    public static final String PERMISSION_PARDON_IP = "minecraft.command.pardon-ip";
+    public CommandPardonIp() {
+        super(3, "pardon-ip");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
-                        GenericArguments.string(Text.of("address")))
-                .permission(PERMISSION_PARDON_IP)
+                        GenericArguments.string(Text.of("address"))
+                )
                 .executor((src, args) -> {
                     final String target = args.<String>getOne("address").get();
                     InetAddress address;
@@ -64,17 +68,13 @@ public final class CommandPardonIp {
                     // Try to pardon the player with a custom cause builder
                     // to append the command source, only possible for our BanService
                     if (banService instanceof BanConfig) {
-                        banService.getBanFor(address).ifPresent(((BanConfig) banService)::removeBan);
+                        banService.getBanFor(address).ifPresent(ban -> ((BanConfig) banService).removeBan(ban,
+                                () -> Cause.source(src).build()));
                     } else {
                         banService.pardon(address);
                     }
                     src.sendMessage(t("commands.banip.success", address.toString()));
                     return CommandResult.success();
-                })
-                .build();
+                });
     }
-
-    private CommandPardonIp() {
-    }
-
 }

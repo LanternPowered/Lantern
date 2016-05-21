@@ -38,19 +38,21 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import java.util.List;
+public final class CommandBorder extends CommandProvider {
 
-public final class CommandBorder {
+    public CommandBorder() {
+        super(2, "worldborder", "border");
+    }
 
-    public static final String PERMISSION = "minecraft.command.worldborder";
-
-    public static CommandSpec create() {
-        return CommandSpec.builder().children(ImmutableMap.<List<String>, CommandSpec>builder()
-                .put(Lists.newArrayList("add"), CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
+                .child(CommandSpec.builder()
                         .arguments(
                                 GenericArguments.doubleNum(Text.of("distance")),
                                 GenericArguments.optional(GenericArguments.integer(Text.of("time"))),
-                                GenericArguments.optional(GenericArguments.world(Text.of("world"))))
+                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                        )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);
                             WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
@@ -72,12 +74,13 @@ public final class CommandBorder {
                             }
                             return CommandResult.success();
                         })
-                        .build())
-                .put(Lists.newArrayList("set"), CommandSpec.builder()
+                        .build(), "add")
+                .child(CommandSpec.builder()
                         .arguments(
                                 GenericArguments.doubleNum(Text.of("distance")),
                                 GenericArguments.optional(GenericArguments.integer(Text.of("time"))),
-                                GenericArguments.optional(GenericArguments.world(Text.of("world"))))
+                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                        )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);
                             WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
@@ -99,12 +102,13 @@ public final class CommandBorder {
                             }
                             return CommandResult.success();
                         })
-                        .build())
-                .put(Lists.newArrayList("center"), CommandSpec.builder()
+                        .build(), "set")
+                .child(CommandSpec.builder()
                         .arguments(
                                 GenericArguments.doubleNum(Text.of("x")),
                                 GenericArguments.doubleNum(Text.of("z")),
-                                GenericArguments.optional(GenericArguments.world(Text.of("world"))))
+                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                        )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);
                             WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
@@ -114,42 +118,42 @@ public final class CommandBorder {
                             src.sendMessage(t("commands.worldborder.center.success", x, z));
                             return CommandResult.success();
                         })
-                        .build())
-                .put(Lists.newArrayList("damage"), CommandSpec.builder()
-                        .children(ImmutableMap.of(
-                                Lists.newArrayList("amount"), CommandSpec.builder()
-                                        .arguments(
-                                                GenericArguments.doubleNum(Text.of("damagePerBlock")),
-                                                GenericArguments.optional(GenericArguments.world(Text.of("world"))))
-                                        .executor((src, args) -> {
-                                            WorldProperties world = getWorld(src, args);
-                                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
-                                            double oldDamage = border.getDamageAmount();
-                                            double damage = args.<Double>getOne("damagePerBlock").get();
-                                            border.setDamageAmount(damage);
-                                            src.sendMessage(t("commands.worldborder.damage.buffer.success",
-                                                    String.format("%.1f", damage), String.format("%.1f", oldDamage)));
-                                            return CommandResult.success();
-                                        })
-                                        .build(),
-                                Lists.newArrayList("buffer"), CommandSpec.builder()
-                                        .arguments(
-                                                GenericArguments.doubleNum(Text.of("distance")),
-                                                GenericArguments.optional(GenericArguments.world(Text.of("world"))))
-                                        .executor((src, args) -> {
-                                            WorldProperties world = getWorld(src, args);
-                                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
-                                            double oldDistance = border.getDamageThreshold();
-                                            double distance = args.<Double>getOne("distance").get();
-                                            border.setDamageThreshold(args.<Double>getOne("distance").get());
-                                            src.sendMessage(t("commands.worldborder.damage.amount.success",
-                                                    String.format("%.1f", distance), String.format("%.1f", oldDistance)));
-                                            return CommandResult.success();
-                                        })
-                                        .build()
-                        ))
-                        .build())
-                .put(Lists.newArrayList("warning"), CommandSpec.builder()
+                        .build(), "center")
+                .child(CommandSpec.builder()
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.doubleNum(Text.of("damagePerBlock")),
+                                        GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                                )
+                                .executor((src, args) -> {
+                                    WorldProperties world = getWorld(src, args);
+                                    WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                                    double oldDamage = border.getDamageAmount();
+                                    double damage = args.<Double>getOne("damagePerBlock").get();
+                                    border.setDamageAmount(damage);
+                                    src.sendMessage(t("commands.worldborder.damage.buffer.success",
+                                            String.format("%.1f", damage), String.format("%.1f", oldDamage)));
+                                    return CommandResult.success();
+                                })
+                                .build(), "amount")
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.doubleNum(Text.of("distance")),
+                                        GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                                )
+                                .executor((src, args) -> {
+                                    WorldProperties world = getWorld(src, args);
+                                    WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                                    double oldDistance = border.getDamageThreshold();
+                                    double distance = args.<Double>getOne("distance").get();
+                                    border.setDamageThreshold(args.<Double>getOne("distance").get());
+                                    src.sendMessage(t("commands.worldborder.damage.amount.success",
+                                            String.format("%.1f", distance), String.format("%.1f", oldDistance)));
+                                    return CommandResult.success();
+                                })
+                                .build(), "buffer")
+                        .build(), "damage")
+                .child(CommandSpec.builder()
                         .children(ImmutableMap.of(
                                 Lists.newArrayList("distance"), CommandSpec.builder()
                                         .arguments(
@@ -180,10 +184,11 @@ public final class CommandBorder {
                                         })
                                         .build()
                         ))
-                        .build())
-                .put(Lists.newArrayList("get"), CommandSpec.builder()
+                        .build(), "warning")
+                .child(CommandSpec.builder()
                         .arguments(
-                                GenericArguments.optional(GenericArguments.world(Text.of("world"))))
+                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                        )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);
                             WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
@@ -192,12 +197,6 @@ public final class CommandBorder {
                                     String.format("%.1f", diameter), String.format("%.1f", diameter)));
                             return CommandResult.builder().queryResult((int) (diameter + 0.5)).build();
                         })
-                        .build()).build())
-                .permission(PERMISSION)
-                .build();
+                        .build(), "get");
     }
-
-    private CommandBorder() {
-    }
-
 }

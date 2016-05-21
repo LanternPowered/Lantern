@@ -49,13 +49,15 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.world.World;
 
-public final class CommandParticleEffect {
+public final class CommandParticleEffect extends CommandProvider {
 
-    public static final String PERMISSION = "lantern.command.particleeffect";
+    public CommandParticleEffect() {
+        super(2, "particleeffect", "particles");
+    }
 
-    @SuppressWarnings("unchecked")
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("type"), ParticleType.class),
                         TargetedVector3dElement.of(Text.of("position"), 0),
@@ -71,8 +73,8 @@ public final class CommandParticleEffect {
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("note"), NotePitch.class), "-note", "n")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("block"), BlockState.class), "-block", "b")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("item"), ItemType.class), "-item", "i")
-                                .buildWith(GenericArguments.none()))
-                .permission(PERMISSION)
+                                .buildWith(GenericArguments.none())
+                )
                 .executor((src, args) -> {
                     ParticleType particleType = args.<ParticleType>getOne("type").get();
                     Vector3d position = args.<Vector3d>getOne("position").get();
@@ -126,10 +128,6 @@ public final class CommandParticleEffect {
                     world.spawnParticles(builder.build(), position);
                     src.sendMessage(t("commands.particle.success", particleType.getName(), count));
                     return CommandResult.success();
-                })
-                .build();
-    }
-
-    private CommandParticleEffect() {
+                });
     }
 }

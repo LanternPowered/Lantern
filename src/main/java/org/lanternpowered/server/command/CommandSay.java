@@ -33,24 +33,23 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
-public final class CommandSay {
+public final class CommandSay extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.say";
+    public CommandSay() {
+        super(1, "say");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
-                        RemainingTextElement.of(Text.of("message")))
-                .permission(PERMISSION)
+                        RemainingTextElement.of(Text.of("message"))
+                )
                 .executor((src, args) -> {
                     String message = args.<String>getOne("message").get();
-                    Sponge.getServer().getBroadcastChannel().send(src, t("chat.type.announcement", src.getName(), message));
+                    Sponge.getServer().getBroadcastChannel().send(src,
+                            t("chat.type.announcement", src.getName(), message));
                     return CommandResult.success();
-                })
-                .build();
+                });
     }
-
-    private CommandSay() {
-    }
-
 }

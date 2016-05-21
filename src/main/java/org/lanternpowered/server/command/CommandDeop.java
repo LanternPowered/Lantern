@@ -46,12 +46,15 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class CommandDeop {
+public final class CommandDeop extends CommandProvider {
 
-    public static final String PERMISSION = "minecraft.command.deop";
+    public CommandDeop() {
+        super(3, "deop");
+    }
 
-    public static CommandSpec create() {
-        return CommandSpec.builder()
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
+        specBuilder
                 .arguments(
                         new CommandElement(Text.of("player")) {
                             @Nullable
@@ -70,7 +73,8 @@ public final class CommandDeop {
                                         .filter(new StartsWithPredicate(prefix))
                                         .collect(GuavaCollectors.toImmutableList());
                             }
-                        })
+                        }
+                )
                 .executor((src, args) -> {
                     String playerName = args.<String>getOne("player").get();
                     UserConfig<OpsEntry> config = Lantern.getGame().getOpsConfig();
@@ -82,12 +86,6 @@ public final class CommandDeop {
                         src.sendMessage(t("commands.deop.failed", playerName));
                     }
                     return CommandResult.success();
-                })
-                .permission(PERMISSION)
-                .build();
+                });
     }
-
-    private CommandDeop() {
-    }
-
 }

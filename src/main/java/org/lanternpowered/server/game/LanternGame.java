@@ -27,6 +27,8 @@ package org.lanternpowered.server.game;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.asset.LanternAssetManager;
@@ -37,14 +39,15 @@ import org.lanternpowered.server.command.CommandDeop;
 import org.lanternpowered.server.command.CommandDifficulty;
 import org.lanternpowered.server.command.CommandGameRule;
 import org.lanternpowered.server.command.CommandHelp;
+import org.lanternpowered.server.command.CommandMe;
 import org.lanternpowered.server.command.CommandOp;
 import org.lanternpowered.server.command.CommandPardon;
 import org.lanternpowered.server.command.CommandPardonIp;
 import org.lanternpowered.server.command.CommandParticle;
 import org.lanternpowered.server.command.CommandParticleEffect;
 import org.lanternpowered.server.command.CommandPlaySound;
+import org.lanternpowered.server.command.CommandProvider;
 import org.lanternpowered.server.command.CommandSay;
-import org.lanternpowered.server.command.CommandSeed;
 import org.lanternpowered.server.command.CommandSetSpawn;
 import org.lanternpowered.server.command.CommandStop;
 import org.lanternpowered.server.command.CommandTell;
@@ -120,6 +123,7 @@ import org.spongepowered.api.world.TeleportHelper;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @NonnullByDefault
@@ -130,8 +134,8 @@ public class LanternGame implements Game {
     public static final String API_NAME = "SpongeAPI";
     public static final String API_ID = "spongeapi";
 
-    public static final String IMPL_NAME = "LanternServer";
-    public static final String IMPL_ID = "lanternserver";
+    public static final String IMPL_NAME = "Lantern";
+    public static final String IMPL_ID = "lantern";
 
     public static final String MINECRAFT_ID = "minecraft";
     public static final String MINECRAFT_NAME = "Minecraft";
@@ -362,29 +366,36 @@ public class LanternGame implements Game {
 
         // Register the command service
         this.commandManager = new LanternCommandManager(this.getLogger(), new LanternCommandDisambiguator(this));
-        this.commandManager.register(this.minecraft, CommandBanIp.create(), "ban-ip");
-        this.commandManager.register(this.minecraft, CommandBan.create(), "ban");
-        this.commandManager.register(this.minecraft, CommandPardon.create(), "pardon");
-        this.commandManager.register(this.minecraft, CommandPardonIp.create(), "pardon-ip");
-        this.commandManager.register(this.minecraft, CommandSay.create(), "say");
-        this.commandManager.register(this.minecraft, CommandSeed.create(), "seed");
-        this.commandManager.register(this.minecraft, CommandSetSpawn.create(), "setworldspawn");
-        this.commandManager.register(this.minecraft, CommandTitle.create(), "title");
-        this.commandManager.register(this.minecraft, CommandStop.create(), "stop", "shutdown");
-        this.commandManager.register(this.minecraft, CommandTell.create(), "tell", "msg", "w");
-        this.commandManager.register(this.minecraft, CommandDifficulty.create(), "difficulty");
-        this.commandManager.register(this.minecraft, CommandGameRule.create(), "gamerule", "rule");
-        this.commandManager.register(this.minecraft, CommandHelp.create(), "help", "?");
-        this.commandManager.register(this.minecraft, CommandWhitelist.create(), "whitelist");
-        this.commandManager.register(this.minecraft, CommandTime.create(), "time");
-        this.commandManager.register(this.minecraft, CommandBorder.create(), "worldborder");
-        this.commandManager.register(this.minecraft, CommandOp.create(), "op");
-        this.commandManager.register(this.minecraft, CommandDeop.create(), "deop");
-        this.commandManager.register(this.minecraft, CommandWeather.create(), "weather");
-        this.commandManager.register(this.minecraft, CommandParticle.create(), "particle");
-        this.commandManager.register(this.minecraft, CommandPlaySound.create(), "playsound");
-        this.commandManager.register(this.implContainer, CommandParticleEffect.create(), "particleeffect");
-        this.commandManager.register(this.implContainer, CommandVersion.create(), "version");
+
+        final Multimap<PluginContainer, CommandProvider> commandProviders = HashMultimap.create();
+        commandProviders.put(this.minecraft, new CommandBan());
+        commandProviders.put(this.minecraft, new CommandBanIp());
+        commandProviders.put(this.minecraft, new CommandBorder());
+        commandProviders.put(this.minecraft, new CommandDeop());
+        commandProviders.put(this.minecraft, new CommandDifficulty());
+        commandProviders.put(this.minecraft, new CommandGameRule());
+        commandProviders.put(this.minecraft, new CommandHelp());
+        commandProviders.put(this.minecraft, new CommandMe());
+        commandProviders.put(this.minecraft, new CommandOp());
+        commandProviders.put(this.minecraft, new CommandPardon());
+        commandProviders.put(this.minecraft, new CommandPardonIp());
+        commandProviders.put(this.minecraft, new CommandParticle());
+        commandProviders.put(this.implContainer, new CommandParticleEffect());
+        commandProviders.put(this.minecraft, new CommandPlaySound());
+        commandProviders.put(this.minecraft, new CommandSay());
+        commandProviders.put(this.minecraft, new CommandSetSpawn());
+        commandProviders.put(this.minecraft, new CommandStop());
+        commandProviders.put(this.minecraft, new CommandTell());
+        commandProviders.put(this.minecraft, new CommandTime());
+        commandProviders.put(this.minecraft, new CommandTitle());
+        commandProviders.put(this.implContainer, new CommandVersion());
+        commandProviders.put(this.minecraft, new CommandWeather());
+        commandProviders.put(this.minecraft, new CommandWhitelist());
+
+        for (Map.Entry<PluginContainer, CommandProvider> entry : commandProviders.entries()) {
+            final PluginContainer plugin = entry.getKey();
+            this.commandManager.register(plugin, entry.getValue().buildSpecFor(plugin), entry.getValue().getAliases());
+        }
 
         // Create the teleport helper
         this.teleportHelper = new LanternTeleportHelper();
@@ -420,41 +431,17 @@ public class LanternGame implements Game {
         // Provide the default permission service if no custom one is found
         if (!this.serviceManager.provide(PermissionService.class).isPresent()) {
             final LanternPermissionService service = new LanternPermissionService(this);
-            // Group level 0 permissions
-            SubjectData subjectData = service.getGroupForOpLevel(0).getSubjectData();
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandHelp.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandTell.PERMISSION, Tristate.TRUE);
+
+            for (Map.Entry<PluginContainer, CommandProvider> entry : commandProviders.entries()) {
+                entry.getValue().getOpPermissionLevel().ifPresent(level -> service.getGroupForOpLevel(level).getSubjectData()
+                        .setPermission(SubjectData.GLOBAL_CONTEXT, entry.getValue().getPermissionFor(entry.getKey()), Tristate.TRUE));
+            }
             // Group level 1 permissions
-            subjectData = service.getGroupForOpLevel(1).getSubjectData();
+            SubjectData subjectData = service.getGroupForOpLevel(1).getSubjectData();
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, "minecraft.selector", Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandSay.PERMISSION, Tristate.TRUE);
             // Group level 2 permissions
             subjectData = service.getGroupForOpLevel(2).getSubjectData();
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, "minecraft.commandblock", Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandSeed.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandGameRule.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandDifficulty.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandSetSpawn.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandTitle.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandTime.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBorder.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandWeather.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandParticle.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandPlaySound.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandParticleEffect.PERMISSION, Tristate.TRUE);
-            // Group level 3 permissions
-            subjectData = service.getGroupForOpLevel(3).getSubjectData();
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBan.PERMISSION_BAN, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandBanIp.PERMISSION_BAN_IP, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandPardon.PERMISSION_PARDON, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandPardonIp.PERMISSION_PARDON_IP, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandWhitelist.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandOp.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandDeop.PERMISSION, Tristate.TRUE);
-            // Group level 4 permissions
-            subjectData = service.getGroupForOpLevel(4).getSubjectData();
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandStop.PERMISSION, Tristate.TRUE);
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, CommandVersion.PERMISSION, Tristate.TRUE);
 
             this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
         }

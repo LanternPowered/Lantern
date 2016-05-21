@@ -60,9 +60,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public final class CommandHelp {
-
-    public static final String PERMISSION = "minecraft.commands.help";
+public final class CommandHelp extends CommandProvider {
 
     private static final Field extendedDescriptionField;
 
@@ -75,30 +73,36 @@ public final class CommandHelp {
         }
     }
 
-    public static CommandSpec create() {
+    public CommandHelp() {
+        super(0, "help", "?");
+    }
+
+    @Override
+    public void completeSpec(CommandSpec.Builder specBuilder) {
         final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
-        return CommandSpec
-                .builder()
-                .permission(PERMISSION)
-                .arguments(GenericArguments.optional(new CommandElement(Text.of("command")) {
+        specBuilder
+                .arguments(
+                        GenericArguments.optional(new CommandElement(Text.of("command")) {
+                            @Nullable
+                            @Override
+                            protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+                                return args.next();
+                            }
 
-                    @Nullable
-                    @Override
-                    protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
-                        return args.next();
-                    }
-
-                    @Override
-                    public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
-                        final String nextArg = args.nextIfPresent().orElse("");
-                        return Lantern.getGame().getCommandManager().getAliases().stream()
-                                .filter(new StartsWithPredicate(nextArg))
-                                .collect(Collectors.toList());
-                    }
-                }))
+                            @Override
+                            public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+                                final String nextArg = args.nextIfPresent().orElse("");
+                                return Lantern.getGame().getCommandManager().getAliases().stream()
+                                        .filter(new StartsWithPredicate(nextArg))
+                                        .collect(Collectors.toList());
+                            }
+                        })
+                )
                 .description(Text.of("View a list of all commands"))
-                .extendedDescription(Text.of("View a list of all commands. Hover over\n" + " a command to view its description."
-                        + " Click\n a command to insert it into your chat bar."))
+                .extendedDescription(Text.of(
+                        "View a list of all commands. Hover over\n" +
+                        " a command to view its description. Click\n" +
+                        " a command to insert it into your chat bar."))
                 .executor((src, args) -> {
                     Optional<String> command = args.getOne("command");
                     if (command.isPresent()) {
@@ -158,12 +162,12 @@ public final class CommandHelp {
                     });
 
                     return CommandResult.success();
-                }).build();
+                });
     }
 
     @SuppressWarnings("unchecked")
     private static Text getDescription(CommandSource source, CommandMapping mapping) {
-        final Optional<Text> description = (Optional<Text>) mapping.getCallable().getShortDescription(source);
+        final Optional<Text> description = mapping.getCallable().getShortDescription(source);
         Text.Builder text = Text.builder("/" + mapping.getPrimaryAlias());
         text.color(TextColors.GREEN);
         text.style(TextStyles.UNDERLINE);
@@ -174,8 +178,4 @@ public final class CommandHelp {
         }
         return Text.of(text, " ", description.orElse(mapping.getCallable().getUsage(source)));
     }
-
-    private CommandHelp() {
-    }
-
 }

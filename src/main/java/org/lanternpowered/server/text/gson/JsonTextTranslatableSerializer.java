@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import static org.lanternpowered.server.text.gson.TextConstants.TEXT;
 import static org.lanternpowered.server.text.gson.TextConstants.TRANSLATABLE;
 import static org.lanternpowered.server.text.gson.TextConstants.TRANSLATABLE_ARGS;
 
@@ -83,10 +82,12 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
 
     private final TranslationManager translationManager;
     private final boolean networkingFormat;
+    private final boolean removeComplexity;
 
-    public JsonTextTranslatableSerializer(TranslationManager translationManager, boolean networkingFormat) {
+    public JsonTextTranslatableSerializer(TranslationManager translationManager, boolean networkingFormat, boolean removeComplexity) {
         this.translationManager = translationManager;
         this.networkingFormat = networkingFormat;
+        this.removeComplexity = removeComplexity;
     }
 
     @Override
@@ -103,7 +104,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
             arguments = new Object[0];
         }
         TranslatableText.Builder builder = Text.builder(translation, arguments);
-        this.deserialize(json0, builder, context);
+        deserialize(json0, builder, context);
         return builder.build();
     }
 
@@ -130,17 +131,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
                 }
             }
             String content = src.getTranslation().get(locale, legacyArguments);
-            // Check if there are no styles/events applied to the text object
-            // and then send use the plain string
-            if (JsonTextSerializer.isAlmostEmpty(src)) {
-                return new JsonPrimitive(content);
-            // There were styles/events found, serialize as a literal text object
-            } else {
-                JsonObject json = new JsonObject();
-                json.addProperty(TEXT, content);
-                this.serialize(json, src, context);
-                return json;
-            }
+            return JsonTextLiteralSerializer.serializeLiteralText(src, content, context, this.removeComplexity);
         }
         JsonObject json = new JsonObject();
         json.addProperty(TRANSLATABLE, src.getTranslation().getId());
@@ -165,7 +156,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
             }
             json.add(TRANSLATABLE_ARGS, argumentsArray);
         }
-        this.serialize(json, src, context);
+        serialize(json, src, context);
         return json;
     }
 

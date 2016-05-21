@@ -47,7 +47,7 @@ public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer imp
         JsonObject json0 = json.getAsJsonObject();
         Selector selector = Selector.parse(json0.get(SELECTOR).getAsString());
         SelectorText.Builder builder = SelectorText.builder(selector);
-        this.deserialize(json0, builder, context);
+        deserialize(json0, builder, context);
         return builder.build();
     }
 
@@ -55,7 +55,7 @@ public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer imp
     public JsonElement serialize(SelectorText src, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject json = new JsonObject();
         json.addProperty(SELECTOR, src.getSelector().toPlain());
-        this.serialize(json, src, context);
+        serialize(json, src, context);
         return json;
     }
 

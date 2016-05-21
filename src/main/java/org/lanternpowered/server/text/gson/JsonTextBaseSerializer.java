@@ -51,11 +51,11 @@ import javax.annotation.Nullable;
 
 abstract class JsonTextBaseSerializer {
 
-    public void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
-        this.deserialize(json, builder, context, json.has(CHILDREN) ? json.getAsJsonArray(CHILDREN) : null);
+    public static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
+        deserialize(json, builder, context, json.has(CHILDREN) ? json.getAsJsonArray(CHILDREN) : null);
     }
 
-    public void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context, @Nullable JsonArray children)
+    public static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context, @Nullable JsonArray children)
             throws JsonParseException {
         if (json.has(COLOR)) {
             Sponge.getRegistry().getType(TextColor.class, json.get(COLOR).getAsString()).ifPresent(builder::color);
@@ -117,11 +117,11 @@ abstract class JsonTextBaseSerializer {
         }
     }
 
-    public void serialize(JsonObject json, Text text, JsonSerializationContext context) {
-        this.serialize(json, text, context, text.getChildren());
+    public static void serialize(JsonObject json, Text text, JsonSerializationContext context) {
+        serialize(json, text, context, text.getChildren());
     }
 
-    public void serialize(JsonObject json, Text text, JsonSerializationContext context, List<Text> children) {
+    public static void serialize(JsonObject json, Text text, JsonSerializationContext context, List<Text> children) {
         TextColor color = text.getColor();
         if (color != TextColors.NONE) {
             json.addProperty(COLOR, color.getId());

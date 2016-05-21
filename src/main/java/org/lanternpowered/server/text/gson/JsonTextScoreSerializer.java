@@ -90,7 +90,9 @@ public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implem
         // score to the objective
         score.setScore(value);
 
-        return Text.builder(score).override(override).build();
+        ScoreText.Builder builder = Text.builder(score).override(override);
+        deserialize(json0, builder, context);
+        return builder.build();
     }
 
     private void tryAddObjective(String objectiveName, Set<Objective> objectives) {
@@ -137,6 +139,7 @@ public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implem
         }
         override.ifPresent(v -> json.addProperty(SCORE_OVERRIDE, override.get()));
         json.addProperty(SCORE_VALUE, Integer.toString(score.getScore()));
+        serialize(json, src, context);
         return json;
     }
 

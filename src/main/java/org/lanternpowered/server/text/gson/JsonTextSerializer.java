@@ -25,7 +25,10 @@
  */
 package org.lanternpowered.server.text.gson;
 
-import static org.lanternpowered.server.text.gson.TextConstants.*;
+import static org.lanternpowered.server.text.gson.TextConstants.SCORE_VALUE;
+import static org.lanternpowered.server.text.gson.TextConstants.SELECTOR;
+import static org.lanternpowered.server.text.gson.TextConstants.TEXT;
+import static org.lanternpowered.server.text.gson.TextConstants.TRANSLATABLE;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -41,7 +44,6 @@ import org.spongepowered.api.text.ScoreText;
 import org.spongepowered.api.text.SelectorText;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.lang.reflect.Type;
 
@@ -58,10 +60,11 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
     public static GsonBuilder applyTo(GsonBuilder gsonBuilder, TranslationManager translationManager,
             boolean networkingFormat) {
         gsonBuilder.registerTypeAdapter(Text.class, new JsonTextSerializer());
-        gsonBuilder.registerTypeAdapter(LiteralText.class, new JsonTextLiteralSerializer());
+        gsonBuilder.registerTypeAdapter(LiteralText.class, new JsonTextLiteralSerializer(networkingFormat));
         gsonBuilder.registerTypeAdapter(ScoreText.class, new JsonTextScoreSerializer(networkingFormat));
         gsonBuilder.registerTypeAdapter(SelectorText.class, new JsonTextSelectorSerializer());
-        gsonBuilder.registerTypeAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(translationManager, networkingFormat));
+        gsonBuilder.registerTypeAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(
+                translationManager, networkingFormat, networkingFormat));
         return gsonBuilder;
     }
 
@@ -97,17 +100,5 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
         } else {
             throw new JsonParseException("Unknown text format: " + json.toString());
         }
-    }
-
-    /**
-     * Gets whether the {@link Text} almost empty is, meaning that everything is empty
-     * that is commonly used between all {@link Text} subclasses.
-     *
-     * @param text The text
-     * @return Is almost empty
-     */
-    static boolean isAlmostEmpty(Text text) {
-        return !text.getHoverAction().isPresent() && !text.getClickAction().isPresent() && !text.getShiftClickAction().isPresent() &&
-                text.getStyle().isEmpty() && text.getColor().equals(TextColors.NONE) && text.getChildren().isEmpty();
     }
 }

@@ -29,6 +29,7 @@ import jline.console.ConsoleReader;
 import org.lanternpowered.launch.console.ConsoleLaunch;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.text.channel.MessageChannel;
 
 import java.io.IOException;
 
@@ -45,6 +46,8 @@ public final class ConsoleManager {
 
         // Register the fqcn for the console source
         ConsoleLaunch.addFqcn(LanternConsoleSource.class.getName());
+        // Register the fqcn for the message channel
+        ConsoleLaunch.addFqcn(MessageChannel.class.getName());
 
         // Add the command completer
         final ConsoleReader reader = ConsoleLaunch.getReader();

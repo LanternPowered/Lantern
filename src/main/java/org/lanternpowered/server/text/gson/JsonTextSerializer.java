@@ -33,6 +33,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
@@ -43,7 +45,7 @@ import org.spongepowered.api.text.format.TextColors;
 
 import java.lang.reflect.Type;
 
-public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text> {
+public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text>, JsonSerializer<Text> {
 
     /**
      * Registers the json text serializers for the specified gson builder.
@@ -61,6 +63,21 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
         gsonBuilder.registerTypeAdapter(SelectorText.class, new JsonTextSelectorSerializer());
         gsonBuilder.registerTypeAdapter(TranslatableText.class, new JsonTextTranslatableSerializer(translationManager, networkingFormat));
         return gsonBuilder;
+    }
+
+    @Override
+    public JsonElement serialize(Text src, Type typeOfSrc, JsonSerializationContext context) {
+        if (src instanceof LiteralText) {
+            return context.serialize(src, LiteralText.class);
+        } else if (src instanceof TranslatableText) {
+            return context.serialize(src, TranslatableText.class);
+        } else if (src instanceof ScoreText) {
+            return context.serialize(src, ScoreText.class);
+        } else if (src instanceof SelectorText) {
+            return context.serialize(src, SelectorText.class);
+        } else {
+            throw new IllegalStateException("Attempted to serialize an unsupported text type: " + src.getClass().getName());
+        }
     }
 
     @Override

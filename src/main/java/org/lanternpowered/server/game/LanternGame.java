@@ -39,6 +39,7 @@ import org.lanternpowered.server.command.CommandDeop;
 import org.lanternpowered.server.command.CommandDifficulty;
 import org.lanternpowered.server.command.CommandGameRule;
 import org.lanternpowered.server.command.CommandHelp;
+import org.lanternpowered.server.command.CommandListPlayers;
 import org.lanternpowered.server.command.CommandMe;
 import org.lanternpowered.server.command.CommandOp;
 import org.lanternpowered.server.command.CommandPardon;
@@ -375,6 +376,7 @@ public class LanternGame implements Game {
         commandProviders.put(this.minecraft, new CommandDifficulty());
         commandProviders.put(this.minecraft, new CommandGameRule());
         commandProviders.put(this.minecraft, new CommandHelp());
+        commandProviders.put(this.minecraft, new CommandListPlayers());
         commandProviders.put(this.minecraft, new CommandMe());
         commandProviders.put(this.minecraft, new CommandOp());
         commandProviders.put(this.minecraft, new CommandPardon());

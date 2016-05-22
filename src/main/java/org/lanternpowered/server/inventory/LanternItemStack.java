@@ -25,6 +25,9 @@
  */
 package org.lanternpowered.server.inventory;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
@@ -50,12 +53,27 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
 
     private final ItemType itemType;
 
+    private int quantity;
+
     public LanternItemStack(BlockType blockType) {
-        // TODO: Implement the getHeldItem method
-        this.itemType = null; // blockType.getHeldItem().get();
+        this(blockType, 1);
+    }
+
+    public LanternItemStack(BlockType blockType, int quantity) {
+        // this(blockType.getItem().orElseThrow(() -> new IllegalArgumentException("That BlockType doesn't have a ItemType.")), quantity);
+        // TODO: Once (block) item types are implemented
+        this.itemType = null;
+        this.quantity = quantity;
     }
 
     public LanternItemStack(ItemType itemType) {
+        this(itemType, 1);
+    }
+
+    public LanternItemStack(ItemType itemType, int quantity) {
+        checkArgument(quantity >= 0, "quantity may not be negative");
+        checkNotNull(itemType, "itemType");
+        this.quantity = quantity;
         this.itemType = itemType;
     }
 
@@ -240,32 +258,29 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
 
     @Override
     public ItemType getItem() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.itemType;
     }
 
     @Override
     public int getQuantity() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.quantity;
     }
 
     @Override
     public void setQuantity(int quantity) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
-        
+        checkArgument(quantity > 0, "quantity may not be negative");
+        this.quantity = quantity;
     }
 
     @Override
     public int getMaxStackQuantity() {
-        // TODO Auto-generated method stub
-        return 0;
+        return this.itemType.getMaxStackQuantity();
     }
 
     @Override
     public ItemStackSnapshot createSnapshot() {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Copy data
+        return new LanternItemStackSnapshot(this.itemType, this.quantity);
     }
 
     @Override
@@ -274,8 +289,28 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
     }
 
     @Override
-    public ItemStack copy() {
-        // TODO Auto-generated method stub
-        return null;
+    public LanternItemStack copy() {
+        // TODO: Copy data
+        return new LanternItemStack(this.itemType, this.quantity);
+    }
+
+    /**
+     * Gets whether this item stack is equal to the other item stack
+     * except for the stack size, making it possible to merge the
+     * items.
+     *
+     * Shouldn't be confused with {@link #equalTo(ItemStack)}, which I
+     * think has a poor name for what it actually does.
+     *
+     * @param that The other item stack
+     * @return Whether the item stacks are equal
+     */
+    public boolean isEqualToOther(ItemStack that) {
+        checkNotNull(that, "that");
+        if (!that.getItem().equals(this.itemType)) {
+            return false;
+        }
+        // TODO: Match data
+        return true;
     }
 }

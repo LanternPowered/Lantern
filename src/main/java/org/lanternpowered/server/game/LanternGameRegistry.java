@@ -73,6 +73,7 @@ import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistry
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CollisionRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
@@ -153,6 +154,7 @@ import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
 import org.spongepowered.api.network.status.Favicon;
@@ -278,6 +280,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
                 .registerModule(GameMode.class, GameModeRegistryModule.getInstance())
+                .registerModule(EquipmentType.class, new EquipmentTypeRegistryModule())
                 .registerModule(ItemType.class, new ItemRegistryModule())
                 .registerModule(LanternCollisionRule.class, new CollisionRuleRegistryModule()) // TODO: Use the api class once available
                 .registerModule(Criterion.class, new CriterionRegistryModule())

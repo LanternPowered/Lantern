@@ -67,6 +67,9 @@ public final class CommandGameRule extends CommandProvider {
 
         specBuilder
                 .arguments(
+                        GenericArguments.flags()
+                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .buildWith(GenericArguments.none()),
                         new CommandElement(Text.of("rule")) {
                             @Nullable
                             @Override
@@ -99,8 +102,7 @@ public final class CommandGameRule extends CommandProvider {
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                                 return Collections.emptyList();
                             }
-                        },
-                        GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                        }
                 )
                 .executor((src, args) -> {
                     WorldProperties world = getWorld(src, args);

@@ -28,6 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
@@ -60,6 +61,11 @@ public final class CommandTime extends CommandProvider {
         presets.put("night", 13000);
 
         specBuilder
+                .arguments(
+                        GenericArguments.flags()
+                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .buildWith(GenericArguments.none())
+                )
                 .child(CommandSpec.builder()
                         .arguments(
                                 new CommandElement(Text.of("value")) {
@@ -84,8 +90,7 @@ public final class CommandTime extends CommandProvider {
                                         return presets.keySet().stream().filter(new StartsWithPredicate(prefix)).collect(
                                                 GuavaCollectors.toImmutableList());
                                     }
-                                },
-                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                                }
                         )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);
@@ -97,8 +102,7 @@ public final class CommandTime extends CommandProvider {
                         .build(), "set")
                 .child(CommandSpec.builder()
                         .arguments(
-                                GenericArguments.integer(Text.of("value")),
-                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                                GenericArguments.integer(Text.of("value"))
                         )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);
@@ -110,8 +114,7 @@ public final class CommandTime extends CommandProvider {
                         .build(), "add")
                 .child(CommandSpec.builder()
                         .arguments(
-                                GenericArguments.enumValue(Text.of("value"), QueryType.class),
-                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                                GenericArguments2.enumValue(Text.of("value"), QueryType.class)
                         )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);
@@ -140,6 +143,12 @@ public final class CommandTime extends CommandProvider {
         DAYTIME,
         GAMETIME,
         DAY,
+        ;
+
+        @Override
+        public String toString() {
+            return this.name().toLowerCase();
+        }
     }
 
 }

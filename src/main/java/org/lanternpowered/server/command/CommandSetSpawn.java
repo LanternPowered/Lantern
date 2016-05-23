@@ -49,8 +49,10 @@ public final class CommandSetSpawn extends CommandProvider {
     public void completeSpec(CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
-                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("coordinates"))),
-                        GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                        GenericArguments.flags()
+                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .buildWith(GenericArguments.none()),
+                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("coordinates")))
                 )
                 .executor((src, args) -> {
                     WorldProperties world = getWorld(src, args);

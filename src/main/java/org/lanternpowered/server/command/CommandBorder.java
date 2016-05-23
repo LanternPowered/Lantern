@@ -49,9 +49,11 @@ public final class CommandBorder extends CommandProvider {
         specBuilder
                 .child(CommandSpec.builder()
                         .arguments(
+                                GenericArguments.flags()
+                                        .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                        .buildWith(GenericArguments.none()),
                                 GenericArguments.doubleNum(Text.of("distance")),
-                                GenericArguments.optional(GenericArguments.integer(Text.of("time"))),
-                                GenericArguments.optional(GenericArguments.world(Text.of("world")))
+                                GenericArguments.optional(GenericArguments.integer(Text.of("time")))
                         )
                         .executor((src, args) -> {
                             WorldProperties world = getWorld(src, args);

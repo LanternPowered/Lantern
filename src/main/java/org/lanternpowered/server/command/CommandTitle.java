@@ -27,7 +27,7 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.command.element.RemainingTextElement;
+import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -54,7 +54,7 @@ public final class CommandTitle extends CommandProvider {
                         })
                         .build(), "clear")
                 .child(CommandSpec.builder()
-                        .arguments(RemainingTextElement.of(Text.of("title")))
+                        .arguments(GenericArguments2.remainingString(Text.of("title")))
                         .executor((src, args) -> {
                             Text title;
                             try {
@@ -67,7 +67,7 @@ public final class CommandTitle extends CommandProvider {
                         })
                         .build(), "title")
                 .child(CommandSpec.builder()
-                        .arguments(RemainingTextElement.of(Text.of("title")))
+                        .arguments(GenericArguments2.remainingString(Text.of("title")))
                         .executor((src, args) -> {
                             Text title;
                             try {

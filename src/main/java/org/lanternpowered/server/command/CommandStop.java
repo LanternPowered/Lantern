@@ -28,7 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.command.element.RemainingTextElement;
+import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -45,7 +45,7 @@ public final class CommandStop extends CommandProvider {
     public void completeSpec(CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
-                        GenericArguments.optional(RemainingTextElement.of(Text.of("kick-message")))
+                        GenericArguments.optional(GenericArguments2.remainingString(Text.of("kick-message")))
                 )
                 .description(t("commands.stop.description"))
                 .executor((src, args) -> {

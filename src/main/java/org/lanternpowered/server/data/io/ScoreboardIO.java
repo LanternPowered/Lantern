@@ -136,7 +136,7 @@ public class ScoreboardIO {
                     .objectiveDisplayMode(objectiveDisplayMode)
                     .build());
         }));
-        dataView.getViewList(OBJECTIVES).ifPresent(list -> list.forEach(entry -> {
+        dataView.getViewList(SCORES).ifPresent(list -> list.forEach(entry -> {
             // The invalid state is added by lantern, it means that there is already
             // a other score with the same name and target objective
             // We have to keep all the entries to remain compatible with vanilla mc.

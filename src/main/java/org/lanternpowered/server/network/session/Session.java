@@ -449,8 +449,7 @@ public class Session implements PlayerConnection {
      * @param throwable the throwable
      */
     public void onHandlerThrowable(Message message, Handler<?> handle, Throwable throwable) {
-        Lantern.getLogger().error("Error while handling " + message + " (handler: " +
-                handle.getClass().getSimpleName() + ")", throwable);
+        Lantern.getLogger().error("Error while handling " + message, throwable);
     }
 
     /**

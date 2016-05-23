@@ -42,11 +42,7 @@ import org.spongepowered.api.world.weather.WeatherUniverse;
 
 import java.util.Collection;
 
-import javax.annotation.Nullable;
-
 public final class CommandWeather extends CommandProvider {
-
-    public static final String PERMISSION = "minecraft.command.weather";
 
     public CommandWeather() {
         super(2, "weather");
@@ -56,6 +52,9 @@ public final class CommandWeather extends CommandProvider {
     public void completeSpec(CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
+                        GenericArguments.flags()
+                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .buildWith(GenericArguments.none()),
                         new PatternMatchingCommandElement(Text.of("type")) {
                             @Override
                             protected Iterable<String> getChoices(CommandSource source) {
@@ -74,8 +73,8 @@ public final class CommandWeather extends CommandProvider {
                                         () -> new IllegalArgumentException("Invalid input " + choice + " was found"));
                             }
                         },
-                        GenericArguments.optional(GenericArguments.integer(Text.of("duration"))),
-                        GenericArguments.optional(GenericArguments.world(Text.of("world"))))
+                        GenericArguments.optional(GenericArguments.integer(Text.of("duration")))
+                )
                 .executor((src, args) -> {
                     LanternWorldProperties world = getWorld(src, args);
                     WeatherUniverse weatherUniverse = world.getWorld().get().getWeatherUniverse().orElse(null);

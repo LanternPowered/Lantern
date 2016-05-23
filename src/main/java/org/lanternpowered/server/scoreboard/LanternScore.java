@@ -42,7 +42,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class LanternScore implements Score {
+public final class LanternScore implements Score {
 
     private final Set<Objective> objectives = new HashSet<>();
     private final Text name;

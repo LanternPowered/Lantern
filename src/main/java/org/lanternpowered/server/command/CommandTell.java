@@ -27,7 +27,7 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.command.element.RemainingTextElement;
+import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
@@ -47,7 +47,7 @@ public final class CommandTell extends CommandProvider {
         specBuilder
                 .arguments(
                         GenericArguments.player(Text.of("player")),
-                        RemainingTextElement.of(Text.of("message"))
+                        GenericArguments2.remainingString(Text.of("message"))
                 )
                 .executor((src, args) -> {
                     Player player = args.<Player>getOne("player").get();

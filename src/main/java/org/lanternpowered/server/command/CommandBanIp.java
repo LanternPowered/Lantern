@@ -27,7 +27,7 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
-import org.lanternpowered.server.command.element.RemainingTextElement;
+import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
@@ -67,7 +67,7 @@ public final class CommandBanIp extends CommandProvider {
         specBuilder
                 .arguments(
                         GenericArguments.string(Text.of("address")),
-                        GenericArguments.optional(RemainingTextElement.of(Text.of("reason")))
+                        GenericArguments.optional(GenericArguments2.remainingString(Text.of("reason")))
                 )
                 .executor((src, args) -> {
                     final String target = args.<String>getOne("address").get();

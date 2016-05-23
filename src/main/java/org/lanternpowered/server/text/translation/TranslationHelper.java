@@ -31,7 +31,8 @@ import org.spongepowered.api.text.Text;
 public final class TranslationHelper {
 
     /**
-     * Get the translated text for a given string.
+     * Gets the translated {@link Text} for a given
+     * string and arguments.
      *
      * @param key The translation key
      * @param args Translation parameters
@@ -39,6 +40,18 @@ public final class TranslationHelper {
      */
     public static Text t(String key, Object... args) {
         return Text.of(Lantern.getGame().getRegistry().getTranslationManager().get(key), args);
+    }
+
+    /**
+     * Gets the translated {@link Text.Builder} for a given
+     * string and arguments.
+     *
+     * @param key The translation key
+     * @param args Translation parameters
+     * @return The translatable text builder
+     */
+    public static Text.Builder tb(String key, Object... args) {
+        return Text.builder(Lantern.getGame().getRegistry().getTranslationManager().get(key), args);
     }
 
     private TranslationHelper() {

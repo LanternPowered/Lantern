@@ -107,7 +107,7 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
                     }
                     JsonObject object3 = new JsonObject();
                     object3.addProperty("name", optName.get());
-                    object3.addProperty("uuid", profile.getUniqueId().toString());
+                    object3.addProperty("id", profile.getUniqueId().toString());
                     array.add(object3);
                 }
                 playersObject.add("sample", array);

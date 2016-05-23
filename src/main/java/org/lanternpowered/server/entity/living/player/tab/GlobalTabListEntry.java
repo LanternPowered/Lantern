@@ -76,6 +76,23 @@ public class GlobalTabListEntry {
         }
     }
 
+    /**
+     * Removes this entry from all the {@link LanternTabList}s.
+     */
+   public void removeEntry() {
+        if (this.tabListEntries.isEmpty()) {
+            return;
+        }
+        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
+                new MessagePlayOutTabListEntries.Entry.Remove(this.gameProfile)));
+        this.tabListEntries.forEach(tabListEntry -> {
+            tabListEntry.getList().removeRawEntry(this.gameProfile.getUniqueId());
+            tabListEntry.getList().getPlayer().getConnection().send(message);
+        });
+        this.tabListEntries.clear();
+        this.tabList.remove(this.gameProfile);
+    }
+
     public void setDisplayName(@Nullable Text displayName) {
         if (this.tabListEntries.isEmpty()) {
             return;

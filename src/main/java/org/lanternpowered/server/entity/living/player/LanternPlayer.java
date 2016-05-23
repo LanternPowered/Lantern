@@ -38,6 +38,7 @@ import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
+import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabList;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
@@ -275,12 +276,9 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             this.setScoreboard(world.getScoreboard());
         } else {
             this.session.getServer().removePlayer(this);
-            // Remove this player from all the tab lists
-            for (Player player : Sponge.getServer().getOnlinePlayers()) {
-                player.getTabList().removeEntry(this.getProfile().getUniqueId());
-            }
             this.tabList.clear();
-            GlobalTabList.getInstance().remove(this.gameProfile);
+            // Remove this player from the global tab list
+            GlobalTabList.getInstance().get(this.gameProfile).ifPresent(GlobalTabListEntry::removeEntry);
         }
     }
 

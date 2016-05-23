@@ -73,6 +73,7 @@ public class LanternTabList implements TabList {
         entries.forEach(e -> {
             checkArgument(e.getList() == this, "Tab list entry targets the wrong tab list!");
             this.tabListEntries.put(e.getProfile().getUniqueId(), e);
+            e.getGlobalEntry().addEntry(e);
             messageEntries.add(new MessagePlayOutTabListEntries.Entry.Add(e.getProfile(), e.getGameMode(),
                     e.getDisplayName().orElse(null), e.getLatency()));
         });
@@ -154,14 +155,23 @@ public class LanternTabList implements TabList {
         return this;
     }
 
-    @Override
-    public Optional<TabListEntry> removeEntry(UUID uniqueId) {
+    Optional<TabListEntry> removeRawEntry(UUID uniqueId) {
         LanternTabListEntry entry = this.tabListEntries.remove(checkNotNull(uniqueId, "uniqueId"));
         if (entry != null) {
             entry.attached = false;
-            entry.getGlobalEntry().removeEntry(entry);
             return Optional.of(entry);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<TabListEntry> removeEntry(UUID uniqueId) {
+        final Optional<TabListEntry> entry = this.removeRawEntry(uniqueId);
+        entry.ifPresent(entry0 -> {
+            this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
+                    new MessagePlayOutTabListEntries.Entry.Remove(entry0.getProfile()))));
+            ((LanternTabListEntry) entry0).getGlobalEntry().removeEntry((LanternTabListEntry) entry0);
+        });
+        return entry;
     }
 }

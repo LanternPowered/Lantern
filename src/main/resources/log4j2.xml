@@ -20,7 +20,7 @@
     </Appenders>
     <Loggers>
         <!-- Log server messages without prefix. -->
-        <Logger name="LanternServer" level="all" additivity="false">
+        <Logger name="Lantern" level="all" additivity="false">
             <AppenderRef ref="DefaultConsole" level="info"/>
             <AppenderRef ref="File"/>
         </Logger>

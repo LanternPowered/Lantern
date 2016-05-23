@@ -40,9 +40,7 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
     public ByteBuffer encode(CodecContext context, MessagePlayOutTeams message) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeString(message.getTeamName());
-        if (message instanceof MessagePlayOutTeams.Remove) {
-            buf.writeByte((byte) 1);
-        } else if (message instanceof MessagePlayOutTeams.CreateOrUpdate) {
+        if (message instanceof MessagePlayOutTeams.CreateOrUpdate) {
             buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Create ? 0 : 2));
             MessagePlayOutTeams.CreateOrUpdate message1 = (MessagePlayOutTeams.CreateOrUpdate) message;
             buf.writeString(message1.getDisplayName());
@@ -60,9 +58,11 @@ public final class CodecPlayOutTeams implements Codec<MessagePlayOutTeams> {
             buf.writeString(message1.getCollisionRule().getId());
             buf.writeByte((byte) FormattingCodeTextSerializer.FORMATS_TO_CODE.get(message1.getColor()));
         } else {
-            buf.writeByte((byte) (message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4));
-            MessagePlayOutTeams.AddOrRemovePlayers message1 = (MessagePlayOutTeams.AddOrRemovePlayers) message;
-            List<String> players = message1.getPlayers();
+            buf.writeByte((byte) (message instanceof MessagePlayOutTeams.Remove ? 1 :
+                    message instanceof MessagePlayOutTeams.AddPlayers ? 3 : 4));
+        }
+        if (message instanceof MessagePlayOutTeams.Players) {
+            List<String> players = ((MessagePlayOutTeams.Players) message).getPlayers();
             buf.writeVarInt(players.size());
             players.forEach(buf::writeString);
         }

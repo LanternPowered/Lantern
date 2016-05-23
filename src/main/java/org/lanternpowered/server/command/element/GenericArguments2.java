@@ -26,6 +26,7 @@
 package org.lanternpowered.server.command.element;
 
 import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.ArgumentParseException;
 import org.spongepowered.api.command.args.CommandArgs;
@@ -35,12 +36,43 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.args.PatternMatchingCommandElement;
 import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public final class GenericArguments2 {
+
+    public static CommandElement remainingStringArray(Text key) {
+        return new StringArrayElement(key);
+    }
+
+    private static class StringArrayElement extends CommandElement {
+
+        private StringArrayElement(Text key) {
+            super(key);
+        }
+
+        @Override
+        protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+            List<String> values = new ArrayList<>();
+            // Move the position to the end
+            while (args.hasNext()) {
+                String arg = args.next();
+                if (!arg.isEmpty()) {
+                    Lantern.getLogger().info(arg);
+                    values.add(arg);
+                }
+            }
+            return values.toArray(new String[values.size()]);
+        }
+
+        @Override
+        public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+            return Collections.emptyList();
+        }
+    }
 
     public static CommandElement remainingString(Text key) {
         return new RemainingStringElement(key);

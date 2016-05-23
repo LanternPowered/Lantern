@@ -196,10 +196,15 @@ public class ScoreboardIO {
                         entry.getString(COLLISION_RULE).get());
                 return Sponge.getRegistry().getType(LanternCollisionRule.class, "always").get();
             })));
-            entry.getString(TEAM_COLOR).ifPresent(color -> builder.color(Sponge.getRegistry().getType(TextColor.class, color).orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a team color with id: {}, default to none.", color);
-                return TextColors.NONE;
-            })));
+            entry.getString(TEAM_COLOR).ifPresent(color -> {
+                TextColor textColor = Sponge.getRegistry().getType(TextColor.class, color).orElseGet(() -> {
+                    Lantern.getLogger().warn("Unable to find a team color with id: {}, default to none.", color);
+                    return TextColors.NONE;
+                });
+                if (textColor != TextColors.NONE && textColor != TextColors.RESET) {
+                    builder.color(textColor);
+                }
+            });
             teams.add(builder.build());
         }));
 
@@ -284,6 +289,7 @@ public class ScoreboardIO {
             }
             Set<Text> members = team.getMembers();
             container.set(MEMBERS, members.stream().map(LanternTexts::toLegacy).collect(Collectors.toList()));
+            teams.add(container);
         }
 
         DataContainer dataContainer = new MemoryDataContainer();

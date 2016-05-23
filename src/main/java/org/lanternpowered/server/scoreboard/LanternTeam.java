@@ -38,9 +38,13 @@ import org.spongepowered.api.scoreboard.Visibility;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColor;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -88,7 +92,8 @@ public class LanternTeam implements Team {
         return create ?
                 new MessagePlayOutTeams.Create(this.name, this.legacyDisplayName,
                         this.legacyPrefix, this.legacySuffix, this.nameTagVisibility,
-                        this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles) :
+                        this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles,
+                        this.members.stream().map(LanternTexts::toLegacy).collect(Collectors.toList())) :
                 new MessagePlayOutTeams.Update(this.name, this.legacyDisplayName,
                         this.legacyPrefix, this.legacySuffix, this.nameTagVisibility,
                         this.collisionRule, this.color, this.allowFriendlyFire, this.canSeeFriendlyInvisibles);
@@ -268,6 +273,45 @@ public class LanternTeam implements Team {
             return true;
         }
         return false;
+    }
+
+    public List<Text> addMembers(Collection<Text> members) {
+        checkNotNull(members, "members");
+        final List<Text> failedMembers = new ArrayList<>();
+        final List<String> addedPlayers = new ArrayList<>();
+        for (Text member : members) {
+            if (this.members.add(member)) {
+                addedPlayers.add(LanternTexts.toLegacy(member));
+            } else {
+                failedMembers.add(member);
+            }
+        }
+        if (this.scoreboard != null) {
+            this.scoreboard.sendToPlayers(() -> Collections.singletonList(
+                    new MessagePlayOutTeams.AddPlayers(this.name, addedPlayers)));
+        }
+        return failedMembers;
+    }
+
+    public List<Text> removeMembers(Collection<Text> members) {
+        checkNotNull(members, "members");
+        final List<Text> failedMembers = new ArrayList<>();
+        if (this.members.isEmpty()) {
+            return failedMembers;
+        }
+        final List<String> removedPlayers = new ArrayList<>();
+        for (Text member : members) {
+            if (this.members.remove(member)) {
+                removedPlayers.add(LanternTexts.toLegacy(member));
+            } else {
+                failedMembers.add(member);
+            }
+        }
+        if (this.scoreboard != null) {
+            this.scoreboard.sendToPlayers(() -> Collections.singletonList(
+                    new MessagePlayOutTeams.RemovePlayers(this.name, removedPlayers)));
+        }
+        return failedMembers;
     }
 
     @Override

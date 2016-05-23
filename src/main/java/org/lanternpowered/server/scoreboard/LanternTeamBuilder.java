@@ -86,7 +86,7 @@ public class LanternTeamBuilder implements Team.Builder {
     @Override
     public LanternTeamBuilder displayName(Text displayName) throws IllegalArgumentException {
         String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
-        checkArgument(legacyDisplayName.length() > 32, "Display name is %s characters long! It must be at most 32.",
+        checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
                 legacyDisplayName.length());
         this.displayName = checkNotNull(displayName, "displayName");
         return this;
@@ -95,7 +95,7 @@ public class LanternTeamBuilder implements Team.Builder {
     @Override
     public LanternTeamBuilder prefix(Text prefix) {
         String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
-        checkArgument(legacyPrefix.length() > 16, "Prefix is %s characters long! It must be at most 16.",
+        checkArgument(legacyPrefix.length() <= 16, "Prefix is %s characters long! It must be at most 16.",
                 legacyPrefix.length());
         this.prefix = checkNotNull(prefix, "prefix");
         return this;
@@ -104,7 +104,7 @@ public class LanternTeamBuilder implements Team.Builder {
     @Override
     public LanternTeamBuilder suffix(Text suffix) {
         String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
-        checkArgument(legacySuffix.length() > 16, "Suffix is %s characters long! It must be at most 16.",
+        checkArgument(legacySuffix.length() <= 16, "Suffix is %s characters long! It must be at most 16.",
                 legacySuffix.length());
         this.suffix = checkNotNull(suffix, "suffix");
         return this;

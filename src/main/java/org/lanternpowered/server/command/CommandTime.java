@@ -134,7 +134,7 @@ public final class CommandTime extends CommandProvider {
                                     throw new IllegalStateException("Unknown query type: " + queryType);
                             }
                             src.sendMessage(t("commands.time.query", result));
-                            return CommandResult.builder().queryResult(result).build();
+                            return CommandResult.builder().successCount(1).queryResult(result).build();
                         })
                         .build(), "query");
     }

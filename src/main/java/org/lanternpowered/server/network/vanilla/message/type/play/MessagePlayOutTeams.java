@@ -51,11 +51,20 @@ public abstract class MessagePlayOutTeams implements Message {
         }
     }
 
-    public static final class Create extends CreateOrUpdate {
+    public static final class Create extends CreateOrUpdate implements Players {
+
+        private final List<String> players;
 
         public Create(String teamName, String displayName, String prefix, String suffix, Visibility nameTagVisibility,
-                LanternCollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles) {
+                LanternCollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles,
+                List<String> players) {
             super(teamName, displayName, prefix, suffix, nameTagVisibility, collisionRule, color, friendlyFire, seeFriendlyInvisibles);
+            this.players = players;
+        }
+
+        @Override
+        public List<String> getPlayers() {
+            return this.players;
         }
     }
 
@@ -138,7 +147,7 @@ public abstract class MessagePlayOutTeams implements Message {
         }
     }
 
-    public static abstract class AddOrRemovePlayers extends MessagePlayOutTeams {
+    static abstract class AddOrRemovePlayers extends MessagePlayOutTeams implements Players {
 
         private final List<String> players;
 
@@ -147,8 +156,22 @@ public abstract class MessagePlayOutTeams implements Message {
             this.players = players;
         }
 
+        @Override
         public List<String> getPlayers() {
             return this.players;
         }
+    }
+
+    /**
+     * Holds a list of player names.
+     */
+    public interface Players {
+
+        /**
+         * Gets the player names of the message.
+         *
+         * @return The players
+         */
+        List<String> getPlayers();
     }
 }

@@ -27,16 +27,20 @@ package org.lanternpowered.server.command;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tb;
+import static org.spongepowered.api.command.CommandMessageFormatting.error;
 
-import com.google.common.base.Joiner;
 import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.scoreboard.LanternScore;
+import org.lanternpowered.server.scoreboard.LanternTeam;
+import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
+import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.scoreboard.objective.Objective;
@@ -44,8 +48,11 @@ import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMo
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -105,13 +112,19 @@ public final class CommandScoreboard extends CommandProvider {
                                         throw new CommandException(t("commands.scoreboard.objectives.add.alreadyExists", name));
                                     }
                                     if (name.length() > 16) {
-                                        throw new CommandException(t("commands.scoreboard.objectives.add.tooLong", name));
+                                        throw new CommandException(t("commands.scoreboard.objectives.add.tooLong", name, 16));
+                                    }
+                                    String displayName = args.<String>getOne("display-name").orElse(null);
+                                    if (displayName != null && displayName.length() > 32) {
+                                        throw new CommandException(t("commands.scoreboard.objectives.add.displayTooLong", displayName, 32));
                                     }
 
                                     Objective.Builder builder = Objective.builder()
                                             .name(name)
                                             .criterion(criterion);
-                                    args.<String>getOne("display-name").ifPresent(displayName -> builder.displayName(Text.of(displayName)));
+                                    if (displayName != null && !displayName.isEmpty()) {
+                                        builder.displayName(Text.of(displayName));
+                                    }
                                     args.<ObjectiveDisplayMode>getOne("display-mode").ifPresent(builder::objectiveDisplayMode);
 
                                     scoreboard.addObjective(builder.build());
@@ -175,27 +188,25 @@ public final class CommandScoreboard extends CommandProvider {
                                         if (scores.isEmpty()) {
                                             throw new CommandException(t("commands.scoreboard.players.list.player.empty"));
                                         }
-                                        src.sendMessage(tb("commands.scoreboard.players.list.player.count", scores.size(), entity)
+                                        result = scores.size();
+                                        src.sendMessage(tb("commands.scoreboard.players.list.player.count", result, entity)
                                                 .color(TextColors.DARK_GREEN)
                                                 .build());
                                         scores.forEach(score -> score.getObjectives().forEach(objective ->
                                                 src.sendMessage(t("commands.scoreboard.players.list.player.entry",
                                                         score.getScore(), objective.getDisplayName(), objective.getName()))));
-                                        result = scores.size();
                                     } else {
-                                        Set<String> names = scoreboard.getScores().stream()
-                                                .map(score -> ((LanternScore) score).getLegacyName())
-                                                .collect(Collectors.toSet());
+                                        Set<Text> names = scoreboard.getScores().stream().map(Score::getName).collect(Collectors.toSet());
                                         if (names.isEmpty()) {
                                             throw new CommandException(t("commands.scoreboard.players.list.empty"));
                                         }
-                                        src.sendMessage(tb("commands.scoreboard.players.list.count", names.size())
+                                        result = names.size();
+                                        src.sendMessage(tb("commands.scoreboard.players.list.count", result)
                                                 .color(TextColors.DARK_GREEN)
                                                 .build());
-                                        src.sendMessage(Text.of(Joiner.on(", ").join(names)));
-                                        result = names.size();
+                                        src.sendMessage(Text.joinWith(Text.of(", "), names));
                                     }
-                                    return CommandResult.builder().queryResult(result).build();
+                                    return CommandResult.builder().successCount(1).queryResult(result).build();
                                 })
                                 .build(), "list")
                         .child(createPlayerScoreSpec(Score::setScore), "set")
@@ -224,7 +235,198 @@ public final class CommandScoreboard extends CommandProvider {
                                     return CommandResult.success();
                                 })
                                 .build(), "reset")
-                        .build(), "players");
+                        .build(), "players")
+                .child(CommandSpec.builder()
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.optional(GenericArguments.string(Text.of("name")))
+                                )
+                                .executor((src, args) -> {
+                                    // Get the scoreboard of the world the command source is located in
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+
+                                    int result;
+                                    if (args.hasAny("name")) {
+                                        String teamName = args.<String>getOne("name").get();
+                                        Team team = scoreboard.getTeam(teamName).orElseThrow(
+                                                () -> new CommandException(t("commands.scoreboard.teamNotFound", teamName)));
+                                        Set<Text> members = team.getMembers();
+                                        if (members.isEmpty()) {
+                                            throw new CommandException(t("commands.scoreboard.teams.list.player.empty", teamName));
+                                        }
+                                        result = members.size();
+                                        src.sendMessage(tb("commands.scoreboard.teams.list.player.count", result, teamName)
+                                                .color(TextColors.DARK_GREEN)
+                                                .build());
+                                        src.sendMessage(Text.joinWith(Text.of(", "), members));
+                                    } else {
+                                        Set<Team> teams = scoreboard.getTeams();
+                                        if (teams.isEmpty()) {
+                                            throw new CommandException(t("commands.scoreboard.teams.list.empty"));
+                                        }
+                                        result = teams.size();
+                                        src.sendMessage(tb("commands.scoreboard.teams.list.count", result)
+                                                .color(TextColors.DARK_GREEN)
+                                                .build());
+                                        teams.forEach(team -> src.sendMessage(t("commands.scoreboard.teams.list.entry",
+                                                team.getName(), team.getDisplayName(), team.getMembers().size())));
+                                    }
+
+                                    return CommandResult.builder().successCount(1).queryResult(result).build();
+                                })
+                                .build(), "list")
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.string(Text.of("name")),
+                                        GenericArguments.optional(GenericArguments2.remainingString(Text.of("display-name")))
+                                )
+                                .executor((src, args) -> {
+                                    // Get the scoreboard of the world the command source is located in
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final String teamName = args.<String>getOne("name").get();
+
+                                    if (scoreboard.getTeam(teamName).isPresent()) {
+                                        throw new CommandException(t("commands.scoreboard.teams.add.alreadyExists", teamName));
+                                    }
+                                    if (teamName.length() > 16) {
+                                        throw new CommandException(t("commands.scoreboard.teams.add.tooLong", teamName, 16));
+                                    }
+                                    String displayName = args.<String>getOne("display-name").orElse(null);
+                                    if (displayName != null && displayName.length() > 32) {
+                                        throw new CommandException(t("commands.scoreboard.teams.add.displayTooLong", displayName, 32));
+                                    }
+                                    Team.Builder teamBuilder = Team.builder()
+                                            .name(teamName);
+                                    if (displayName != null && !displayName.isEmpty()) {
+                                        teamBuilder.displayName(Text.of(displayName));
+                                    }
+                                    scoreboard.registerTeam(teamBuilder.build());
+                                    src.sendMessage(t("commands.scoreboard.teams.add.success", teamName));
+                                    return CommandResult.success();
+                                })
+                                .build(), "add")
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.string(Text.of("name"))
+                                )
+                                .executor((src, args) -> {
+                                    // Get the scoreboard of the world the command source is located in
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    String teamName = args.<String>getOne("name").get();
+                                    final Team team = scoreboard.getTeam(teamName).orElseThrow(
+                                            () -> new CommandException(t("commands.scoreboard.teamNotFound", teamName)));
+                                    team.unregister();
+                                    src.sendMessage(t("commands.scoreboard.teams.remove.success", teamName));
+                                    return CommandResult.success();
+                                })
+                                .build(), "remove")
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.string(Text.of("name"))
+                                )
+                                .executor((src, args) -> {
+                                    // Get the scoreboard of the world the command source is located in
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    String teamName = args.<String>getOne("name").get();
+                                    final Team team = scoreboard.getTeam(teamName).orElseThrow(
+                                            () -> new CommandException(t("commands.scoreboard.teamNotFound", teamName)));
+                                    Set<Text> members = team.getMembers();
+                                    if (members.isEmpty()) {
+                                        throw new CommandException(t("commands.scoreboard.teams.empty.alreadyEmpty", teamName));
+                                    }
+                                    int result = members.size();
+                                    ((LanternTeam) team).removeMembers(members);
+                                    src.sendMessage(t("commands.scoreboard.teams.empty.success", result, teamName));
+                                    return CommandResult.builder().successCount(1).queryResult(result).build();
+                                })
+                                .build(), "empty")
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.optional(GenericArguments.string(Text.of("name"))),
+                                        GenericArguments.optional(GenericArguments2.remainingStringArray(Text.of("players")))
+                                )
+                                .executor((src, args) -> {
+                                    // Get the scoreboard of the world the command source is located in
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+
+                                    String teamName = args.<String>getOne("name").orElse(null);
+                                    final Team team = teamName == null ? null : scoreboard.getTeam(teamName).orElse(null);
+                                    Set<Text> members = args.<String[]>getOne("players")
+                                            .map(array -> Arrays.stream(array).map(LanternTexts::fromLegacy).collect(Collectors.toSet()))
+                                            .orElse(new HashSet<>());
+                                    // The team doesn't exist, then assume that the team name a player is
+                                    // that wants to leave a team
+                                    if (teamName != null && team == null) {
+                                        members.add(LanternTexts.fromLegacy(teamName));
+                                    }
+
+                                    // If there are no members found, use the source if possible
+                                    if (members.isEmpty() && src instanceof Player) {
+                                        members.add(((Player) src).getTeamRepresentation());
+                                    }
+
+                                    // If there is a team specified, remove the members from a specific team
+                                    Collection<Team> teams = team == null ? scoreboard.getTeams() : Collections.singleton(team);
+                                    List<Text> failedMembers = null;
+                                    for (Team team0 : teams) {
+                                        List<Text> failedMembers0 = ((LanternTeam) team0).removeMembers(members);
+                                        if (failedMembers == null) {
+                                            failedMembers = failedMembers0;
+                                        } else {
+                                            failedMembers.retainAll(failedMembers0);
+                                        }
+                                    }
+                                    if (failedMembers != null) {
+                                        members.removeAll(failedMembers);
+                                    }
+
+                                    int result = members.size();
+                                    if (result > 0) {
+                                        src.sendMessage(t("commands.scoreboard.teams.leave.success",
+                                                result, Text.joinWith(Text.of(", "), members)));
+                                    }
+                                    if (failedMembers != null && failedMembers.size() > 0) {
+                                        src.sendMessage(error(t("commands.scoreboard.teams.leave.failure",
+                                                failedMembers.size(), Text.joinWith(Text.of(", "), failedMembers))));
+                                    }
+                                    return CommandResult.builder().successCount(1).queryResult(result).build();
+                                })
+                                .build(), "leave")
+                        .child(CommandSpec.builder()
+                                .arguments(
+                                        GenericArguments.string(Text.of("name")),
+                                        GenericArguments.optional(GenericArguments2.remainingStringArray(Text.of("players")))
+                                )
+                                .executor((src, args) -> {
+                                    // Get the scoreboard of the world the command source is located in
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+
+                                    String teamName = args.<String>getOne("name").get();
+                                    final Team team = scoreboard.getTeam(teamName).orElseThrow(
+                                            () -> new CommandException(t("commands.scoreboard.teamNotFound", teamName)));
+                                    Set<Text> members = args.<String[]>getOne("players")
+                                            .map(array -> Arrays.stream(array).map(LanternTexts::fromLegacy).collect(Collectors.toSet()))
+                                            .orElse(new HashSet<>());
+
+                                    // If there are no members found, use the source if possible
+                                    if (members.isEmpty() && src instanceof Player) {
+                                        members.add(((Player) src).getTeamRepresentation());
+                                    }
+
+                                    List<Text> failedMembers = ((LanternTeam) team).addMembers(members);
+                                    int result = members.size();
+                                    if (result > 0) {
+                                        src.sendMessage(t("commands.scoreboard.teams.join.success",
+                                                result, teamName, Text.joinWith(Text.of(", "), members)));
+                                    }
+                                    if (failedMembers.size() > 0) {
+                                        src.sendMessage(error(t("commands.scoreboard.teams.join.failure",
+                                                failedMembers.size(), teamName, Text.joinWith(Text.of(", "), failedMembers))));
+                                    }
+                                    return CommandResult.builder().successCount(1).queryResult(result).build();
+                                })
+                                .build(), "join")
+                        .build(), "teams");
     }
 
     private static CommandSpec createPlayerScoreSpec(BiConsumer<Score, Integer> scoreConsumer) {

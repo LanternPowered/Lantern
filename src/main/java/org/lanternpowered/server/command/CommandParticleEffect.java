@@ -28,8 +28,8 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.command.element.ColorElement;
 import org.lanternpowered.server.command.element.DelegateCompleterElement;
+import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.spongepowered.api.block.BlockState;
@@ -68,7 +68,7 @@ public final class CommandParticleEffect extends CommandProvider {
                         GenericArguments.flags()
                                 .valueFlag(DelegateCompleterElement.vector3d(GenericArguments.vector3d(Text.of("offset")), 0.0), "-offset", "o")
                                 .valueFlag(DelegateCompleterElement.vector3d(GenericArguments.vector3d(Text.of("motion")), 0.0), "-motion", "m")
-                                .valueFlag(ColorElement.of(Text.of("color"), Color.CYAN, true), "-color", "c")
+                                .valueFlag(GenericArguments2.color(Text.of("color"), Color.CYAN), "-color", "c")
                                 .valueFlag(DelegateCompleterElement.defaultValues(GenericArguments.doubleNum(Text.of("size")), false, 1.0), "-size", "s")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("note"), NotePitch.class), "-note", "n")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("block"), BlockState.class), "-block", "b")

@@ -159,7 +159,7 @@ public class LanternTeamBuilder implements Team.Builder {
     public LanternTeamBuilder reset() {
         this.name = null;
         this.displayName = null;
-        this.color = TextColors.RESET;
+        this.color = TextColors.NONE;
         this.prefix = Text.of();
         this.suffix = Text.of();
         this.allowFriendlyFire = false;

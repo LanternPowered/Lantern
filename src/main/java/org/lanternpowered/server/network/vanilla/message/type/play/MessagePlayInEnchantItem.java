@@ -23,23 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.lanternpowered.server.network.message.Message;
 
-public final class CodecPlayOutWindowSetSlot implements Codec<MessagePlayOutSetWindowSlot> {
+public final class MessagePlayInEnchantItem implements Message {
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutSetWindowSlot message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.writeByte((byte) message.getWindow());
-        buf.writeShort((short) message.getIndex());
-        buf.write(Types.ITEM_STACK, message.getItem());
-        return buf;
+    private final int windowId;
+    private final int enchantmentSlot;
+
+    public MessagePlayInEnchantItem(int windowId, int enchantmentSlot) {
+        this.enchantmentSlot = enchantmentSlot;
+        this.windowId = windowId;
+    }
+
+    public int getEnchantmentSlot() {
+        return this.enchantmentSlot;
+    }
+
+    public int getWindowId() {
+        return this.windowId;
     }
 }

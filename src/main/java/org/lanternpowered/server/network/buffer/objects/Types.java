@@ -37,6 +37,8 @@ import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.objects.Parameter;
@@ -47,6 +49,7 @@ import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
@@ -166,12 +169,23 @@ public final class Types {
     public static final Type<ItemStack> ITEM_STACK = Type.create(ItemStack.class, new ValueSerializer<ItemStack>() {
         @Override
         public void write(ByteBuffer buf, ItemStack object) throws CodecException {
-            throw new UnsupportedOperationException("TODO");
+            // TODO: Properly serialize the item stack data
+            buf.write(Types.RAW_ITEM_STACK, object == null ? null :
+                   new RawItemStack(ItemRegistryModule.get().getInternalId(object.getItem()), 0, object.getQuantity(), null));
         }
 
         @Override
         public ItemStack read(ByteBuffer buf) throws CodecException {
-            throw new UnsupportedOperationException("TODO");
+            // TODO: Properly deserialize the item stack data back
+            RawItemStack rawItemStack = buf.read(Types.RAW_ITEM_STACK);
+            if (rawItemStack == null) {
+                return null;
+            }
+            ItemType itemType = ItemRegistryModule.get().getTypeByInternalId(rawItemStack.getItemType()).orElse(null);
+            if (itemType == null) {
+                return null;
+            }
+            return new LanternItemStack(itemType, rawItemStack.getAmount());
         }
     });
 

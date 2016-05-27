@@ -293,9 +293,9 @@ public interface ByteBuffer extends ChannelBuf {
      * @param <V> The value type
      * @return This stream for chaining
      */
-    <V> ByteBuffer write(Type<V> type, V value);
+    <V> ByteBuffer write(Type<V> type, @Nullable V value);
 
-    <V> ByteBuffer set(int index, Type<V> type, V value);
+    <V> ByteBuffer set(int index, Type<V> type, @Nullable V value);
 
     <V> V read(Type<V> type);
 

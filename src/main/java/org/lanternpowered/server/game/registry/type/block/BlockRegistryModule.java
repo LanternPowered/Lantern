@@ -27,6 +27,7 @@ package org.lanternpowered.server.game.registry.type.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.block.LanternBlockType.DEFAULT_ITEM_TYPE_BUILDER;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
@@ -39,10 +40,13 @@ import org.lanternpowered.server.block.type.BlockAir;
 import org.lanternpowered.server.block.type.BlockBedrock;
 import org.lanternpowered.server.block.type.BlockDirt;
 import org.lanternpowered.server.block.type.BlockGrass;
+import org.lanternpowered.server.block.type.BlockSand;
 import org.lanternpowered.server.block.type.BlockStone;
 import org.lanternpowered.server.data.type.LanternDirtType;
+import org.lanternpowered.server.data.type.LanternSandType;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -51,6 +55,7 @@ import org.spongepowered.api.registry.util.RegisterCatalog;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
@@ -59,7 +64,14 @@ import javax.annotation.Nullable;
 
 public final class BlockRegistryModule implements BlockRegistry, AlternateCatalogRegistryModule<BlockType> {
 
-    @RegisterCatalog(BlockTypes.class) private final Map<String, BlockType> blockTypes = Maps.newHashMap();
+    private static final BlockRegistryModule INSTANCE = new BlockRegistryModule();
+
+    public static BlockRegistryModule get() {
+        return INSTANCE;
+    }
+
+    @RegisterCatalog(BlockTypes.class)
+    private final Map<String, BlockType> blockTypes = new HashMap<>();
 
     private final TShortObjectMap<BlockType> blockTypeByInternalId = new TShortObjectHashMap<>();
     private final TObjectShortMap<BlockType> internalIdByBlockType = new TObjectShortHashMap<>();
@@ -69,6 +81,9 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
 
     // The counter for custom block ids. (Non vanilla ones.)
     private int blockIdCounter = 1024;
+
+    private BlockRegistryModule() {
+    }
 
     @Override
     public int getBlockStatesCount() {
@@ -125,6 +140,7 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
         BlockStateRegistryModule blockStateRegistryModule = Lantern.getRegistry()
                 .getRegistryModule(BlockStateRegistryModule.class).get();
         blockType.getAllStates().forEach(blockStateRegistryModule::put);
+        blockType.getItem().ifPresent(itemType -> ItemRegistryModule.get().register(internalId, itemType));
     }
 
     @Override
@@ -214,19 +230,24 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
 
     @Override
     public void registerDefaults() {
-        this.register(0, new BlockAir("minecraft", "air"));
-        this.register(1, new BlockStone("minecraft", "stone"), (data, state) -> {
+        this.register(0, new BlockAir("minecraft", "air", null));
+        this.register(1, new BlockStone("minecraft", "stone", DEFAULT_ITEM_TYPE_BUILDER), (data, state) -> {
             final LanternStoneType stoneType = Arrays.stream(LanternStoneType.values()).filter(t -> t.getInternalId() == data)
                     .findFirst().orElse(null);
             return stoneType != null ? state.withTrait(BlockStone.TYPE, stoneType).get() : null;
         });
-        this.register(2, new BlockGrass("minecraft", "grass"), (data, state) -> data == 0 ? state : null);
-        this.register(3, new BlockDirt("minecraft", "dirt"), (data, state) -> {
+        this.register(2, new BlockGrass("minecraft", "grass", DEFAULT_ITEM_TYPE_BUILDER), (data, state) -> data == 0 ? state : null);
+        this.register(3, new BlockDirt("minecraft", "dirt", DEFAULT_ITEM_TYPE_BUILDER), (data, state) -> {
             final LanternDirtType dirtType = Arrays.stream(LanternDirtType.values()).filter(t -> t.getInternalId() == data)
                     .findFirst().orElse(null);
             return dirtType != null ? state.withTrait(BlockDirt.TYPE, dirtType).get() : null;
         });
-        this.register(7, new BlockBedrock("minecraft", "bedrock"));
+        this.register(7, new BlockBedrock("minecraft", "bedrock", DEFAULT_ITEM_TYPE_BUILDER));
+        this.register(12, new BlockSand("minecraft", "sand", DEFAULT_ITEM_TYPE_BUILDER), (data, state) -> {
+            final LanternSandType sandType = Arrays.stream(LanternSandType.values()).filter(t -> t.getInternalId() == data)
+                    .findFirst().orElse(null);
+            return sandType != null ? state.withTrait(BlockSand.TYPE, sandType).get() : null;
+        });
     }
 
 }

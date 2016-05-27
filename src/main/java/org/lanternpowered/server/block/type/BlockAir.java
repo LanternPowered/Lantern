@@ -26,11 +26,18 @@
 package org.lanternpowered.server.block.type;
 
 import org.lanternpowered.server.block.LanternBlockType;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.property.block.MatterProperty.Matter;
+import org.spongepowered.api.item.ItemType;
+
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class BlockAir extends LanternBlockType {
 
-    public BlockAir(String pluginId, String identifier) {
-        super(pluginId, identifier, Matter.GAS);
+    public BlockAir(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        super(pluginId, identifier, itemTypeBuilder);
+        this.setMatter(Matter.GAS);
     }
 }

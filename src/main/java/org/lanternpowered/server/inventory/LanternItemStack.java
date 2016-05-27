@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -60,10 +61,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
     }
 
     public LanternItemStack(BlockType blockType, int quantity) {
-        // this(blockType.getItem().orElseThrow(() -> new IllegalArgumentException("That BlockType doesn't have a ItemType.")), quantity);
-        // TODO: Once (block) item types are implemented
-        this.itemType = null;
-        this.quantity = quantity;
+        this(blockType.getItem().orElseThrow(() -> new IllegalArgumentException("That BlockType doesn't have a ItemType.")), quantity);
     }
 
     public LanternItemStack(ItemType itemType) {
@@ -252,8 +250,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
 
     @Override
     public Translation getTranslation() {
-        // TODO Auto-generated method stub
-        return null;
+        return ((LanternItemType) this.itemType).getTranslationFor(this);
     }
 
     @Override

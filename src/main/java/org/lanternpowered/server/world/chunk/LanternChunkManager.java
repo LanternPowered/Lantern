@@ -48,7 +48,7 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.util.SoftThreadLocal;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
@@ -1081,7 +1081,7 @@ public final class LanternChunkManager {
             final int sy = y >> 4;
             final int index = ((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf;
             final short[] types = this.types[sy];
-            final short type = Registries.getBlockRegistry().getStateInternalIdAndData(block);
+            final short type = BlockRegistryModule.get().getStateInternalIdAndData(block);
             if (type == 0 && types[index] != 0) {
                 this.nonAirCount[sy]--;
             } else if (type != 0 && types[index] == 0) {
@@ -1098,7 +1098,7 @@ public final class LanternChunkManager {
         @Override
         public BlockState getBlock(int x, int y, int z) {
             this.checkRange(x, y, z);
-            return Registries.getBlockRegistry().getStateByInternalIdAndData(this.types[y >> 4][((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf])
+            return BlockRegistryModule.get().getStateByInternalIdAndData(this.types[y >> 4][((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf])
                     .orElse(BlockTypes.AIR.getDefaultState());
         }
 

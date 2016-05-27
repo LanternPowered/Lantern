@@ -32,7 +32,8 @@ import com.google.common.cache.LoadingCache;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
@@ -102,12 +103,12 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
             ItemType itemType = item.getType();
             int extraData = 0;
             if (type == ParticleTypes.ITEM_CRACK) {
-                extraData = Registries.getItemRegistry().getInternalId(itemType);
+                extraData = ItemRegistryModule.get().getInternalId(itemType);
             } else if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
                 BlockType blockType = itemType.getBlock().orElse(null);
                 // Only block types are allowed
                 if (blockType != null) {
-                    int id = Registries.getBlockRegistry().getStateInternalId(blockType.getDefaultState());
+                    int id = BlockRegistryModule.get().getStateInternalId(blockType.getDefaultState());
                     int data = 0; // TODO: Retrieve data value from item stack
                     extraData = data << 12 | id;
                 }
@@ -119,8 +120,8 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         } else if (effect instanceof BlockParticle) {
             if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
                 BlockState blockState = ((BlockParticle) effect).getBlockState();
-                int id = Registries.getBlockRegistry().getStateInternalId(blockState);
-                int data = Registries.getBlockRegistry().getStateData(blockState);
+                int id = BlockRegistryModule.get().getStateInternalId(blockState);
+                int data = BlockRegistryModule.get().getStateData(blockState);
                 extra = new int[] { data << 12 | id };
             } else {
                 return CachedParticleEffect.EMPTY;

@@ -44,7 +44,7 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
@@ -574,7 +574,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void sendBlockChange(Vector3i position, BlockState state) {
         checkNotNull(state, "state");
         checkNotNull(position, "position");
-        this.session.send(new MessagePlayOutBlockChange(position, Registries.getBlockRegistry().getStateInternalIdAndData(state)));
+        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalIdAndData(state)));
     }
 
     @Override
@@ -589,7 +589,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         if (world == null) {
             return;
         }
-        this.session.send(new MessagePlayOutBlockChange(position, Registries.getBlockRegistry().getStateInternalIdAndData(world.getBlock(position))));
+        this.session.send(new MessagePlayOutBlockChange(position, BlockRegistryModule.get().getStateInternalIdAndData(world.getBlock(position))));
     }
 
     @Override

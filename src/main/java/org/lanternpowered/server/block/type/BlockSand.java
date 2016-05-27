@@ -28,17 +28,44 @@ package org.lanternpowered.server.block.type;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.data.type.LanternSandType;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.text.translation.Translation;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class BlockSand extends LanternBlockType {
 
+    @SuppressWarnings("unchecked")
     public static final BlockTrait<LanternSandType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.SAND_TYPE, LanternSandType.class);
 
-    public BlockSand(String pluginId, String identifier) {
-        super(pluginId, identifier, MatterProperty.Matter.SOLID, TYPE);
-        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternSandType.NORMAL).get());
+    private final Map<LanternSandType, Translation> translations = new HashMap<>();
+
+    public BlockSand(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        super(pluginId, identifier, itemTypeBuilder, TYPE);
+
+        for (LanternSandType sandType : LanternSandType.values()) {
+            this.translations.put(sandType, Lantern.getRegistry().getTranslationManager().get(
+                    "tile." + this.getId().replace("minecraft:", "").replace(":", ".") + "." + sandType.getId() + ".name"));
+        }
+    }
+
+    @Override
+    public Translation getTranslation(BlockState blockState) {
+        final Optional<LanternSandType> sandType = blockState.getTraitValue(TYPE);
+        if (sandType.isPresent()) {
+            return this.translations.get(sandType.get());
+        }
+        return super.getTranslation(blockState);
     }
 }

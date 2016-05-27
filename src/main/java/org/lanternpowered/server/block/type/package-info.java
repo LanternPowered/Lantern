@@ -23,19 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.type;
-
-import org.lanternpowered.server.block.LanternBlockType;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.item.ItemType;
-
-import java.util.function.Function;
-
-import javax.annotation.Nullable;
-
-public class BlockBedrock extends LanternBlockType {
-
-    public BlockBedrock(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.block.type;

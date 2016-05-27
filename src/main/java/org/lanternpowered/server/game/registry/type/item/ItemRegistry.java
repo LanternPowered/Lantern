@@ -33,7 +33,8 @@ import java.util.Optional;
 public interface ItemRegistry extends CatalogRegistryModule<ItemType> {
 
     /**
-     * Gets the internal id of the item type.
+     * Gets the internal id of the item type. Will return -1
+     * if there wasn't a id found.
      *
      * @param itemType the item type
      * @return the internal id

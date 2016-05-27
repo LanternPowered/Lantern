@@ -26,7 +26,7 @@
 package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
@@ -54,7 +54,7 @@ public class ShortArrayMutableBlockBuffer extends AbstractMutableBlockBuffer {
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
         this.checkRange(x, y, z);
-        this.blocks[this.index(x, y, z)] = Registries.getBlockRegistry().getStateInternalIdAndData(block);
+        this.blocks[this.index(x, y, z)] = BlockRegistryModule.get().getStateInternalIdAndData(block);
     }
 
     @Override
@@ -66,7 +66,7 @@ public class ShortArrayMutableBlockBuffer extends AbstractMutableBlockBuffer {
     public BlockState getBlock(int x, int y, int z) {
         this.checkRange(x, y, z);
         final short blockState = this.blocks[this.index(x, y, z)];
-        final BlockState block = Registries.getBlockRegistry().getStateByInternalIdAndData(blockState)
+        final BlockState block = BlockRegistryModule.get().getStateByInternalIdAndData(blockState)
                 .orElse(BlockTypes.AIR.getDefaultState());
         return block == null ? this.air : block;
     }

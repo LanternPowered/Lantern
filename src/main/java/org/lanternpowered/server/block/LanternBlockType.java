@@ -25,10 +25,14 @@
  */
 package org.lanternpowered.server.block;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
@@ -40,64 +44,118 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Locale;
 import java.util.Optional;
+import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class LanternBlockType extends LanternPluginCatalogType implements BlockType, AbstractPropertyHolder {
 
+    /**
+     * The default {@link ItemType} builder that can be used
+     * to generate item types for the {@link BlockType}s.
+     */
+    public static final Function<BlockType, ItemType> DEFAULT_ITEM_TYPE_BUILDER =
+            type -> new LanternItemType(((LanternBlockType) type).getPluginId(), type.getName(), type);
+
     // The block state base which contains all the possible block states
     private final LanternBlockStateMap blockStateBase;
-    private final Matter matter;
+    private Matter matter = Matter.SOLID;
+    private Translation translation;
+    private final Optional<ItemType> itemType;
     private BlockState defaultBlockState;
     private boolean tickRandomly;
 
-    public LanternBlockType(String pluginId, String identifier, Matter matter) {
-        this(pluginId, identifier, matter, Lists.newArrayList());
+    public LanternBlockType(String pluginId, String identifier,
+            @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        this(pluginId, identifier, itemTypeBuilder, Collections.emptyList());
     }
 
-    public LanternBlockType(String pluginId, String identifier, Matter matter, BlockTrait<?>... blockTraits) {
-        this(pluginId, identifier, matter, Lists.newArrayList(blockTraits));
+    public LanternBlockType(String pluginId, String identifier,
+            @Nullable Function<BlockType, ItemType> itemTypeBuilder, BlockTrait<?>... blockTraits) {
+        this(pluginId, identifier, itemTypeBuilder, Lists.newArrayList(blockTraits));
     }
 
-    public LanternBlockType(String pluginId, String identifier, Matter matter, Iterable<BlockTrait<?>> blockTraits) {
+    public LanternBlockType(String pluginId, String identifier,
+            @Nullable Function<BlockType, ItemType> itemTypeBuilder, Iterable<BlockTrait<?>> blockTraits) {
         super(pluginId, identifier);
 
+        final String translationId = "tile." + ((pluginId.equalsIgnoreCase("minecraft") ? "" :
+                pluginId.toLowerCase(Locale.ENGLISH)) + ".") + identifier.toLowerCase(Locale.ENGLISH) + ".name";
+        this.translation = Lantern.getRegistry().getTranslationManager().get(translationId);
         // Create the block state base
+        this.itemType = itemTypeBuilder == null ? Optional.empty() : Optional.of(itemTypeBuilder.apply(this));
         this.blockStateBase = new LanternBlockStateMap(this, blockTraits);
         this.defaultBlockState = this.blockStateBase.getBaseState();
-        this.matter = matter;
     }
 
     protected void setDefaultState(BlockState blockState) {
-        this.defaultBlockState = blockState;
+        this.defaultBlockState = checkNotNull(blockState, "blockState");
     }
 
     /**
      * Gets the base of the block state.
      *
-     * @return the block state base
+     * @return The block state base
      */
     public LanternBlockStateMap getBlockStateBase() {
         return this.blockStateBase;
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
+    }
+
+    /**
+     * Gets the {@link Translation} of the specified block state, normally it should be
+     * always the same, which means that the block state is ignored.
+     *
+     * @param blockState The block state
+     * @return The translation
+     */
+    public Translation getTranslation(BlockState blockState) {
+        return this.translation;
+    }
+
+    /**
+     * Sets the {@link Translation} of this block type.
+     *
+     * @param translation The translation
+     */
+    protected void setTranslation(Translation translation) {
+        this.translation = checkNotNull(translation, "translation");
     }
 
     /**
      * Gets the {@link Matter} of the specified block state, normally it should be
      * always the same, which means that the block state is ignored.
      *
-     * @param blockState the block state
-     * @return the matter
+     * @param blockState The block state
+     * @return The matter
      */
     public Matter getMatter(BlockState blockState) {
         return this.matter;
     }
 
     /**
+     * Sets the {@link Matter} of this block type.
+     *
+     * @param matter The matter
+     */
+    protected void setMatter(Matter matter) {
+        this.matter = checkNotNull(matter, "matter");
+    }
+
+    /**
      * Gets the extended state for the specified block state, extra properties provided by surrounding blocks
      * may be applied in this method.
      *
-     * @param blockState the block state
-     * @param location the location
-     * @return the actual state
+     * @param blockState The block state
+     * @param location The location
+     * @return The actual state
      */
     public BlockState getExtendedState(BlockState blockState, Location<World> location) {
         return blockState;
@@ -107,8 +165,8 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
      * Gets the extended state for the specified location, extra properties provided by surrounding blocks
      * may be applied in this method.
      *
-     * @param location the location
-     * @return the actual state
+     * @param location The location
+     * @return The actual state
      */
     public BlockState getExtendedState(Location<World> location) {
         return this.getExtendedState(location.getBlock(), location);
@@ -117,8 +175,8 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
     /**
      * Gets the block state of this type from the target item stack.
      *
-     * @param itemStack the item stack
-     * @return the block state
+     * @param itemStack The item stack
+     * @return The block state
      */
     public BlockState getStateFromItemStack(ItemStack itemStack) {
         return this.getDefaultState();
@@ -127,22 +185,15 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
     /**
      * Performs a random tick at the specified location for a specific block state.
      *
-     * @param location the location
-     * @param blockState the block state
+     * @param location The location
+     * @param blockState The block state
      */
     public void doRandomTickAt(Location<World> location, BlockState blockState) {
     }
 
     @Override
     public Optional<ItemType> getItem() {
-        // TODO Auto-generated method stub
-        return Optional.empty();
-    }
-
-    @Override
-    public Translation getTranslation() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.itemType;
     }
 
     @Override

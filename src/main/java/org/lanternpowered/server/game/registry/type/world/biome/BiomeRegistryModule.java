@@ -47,12 +47,21 @@ import java.util.Optional;
 // TODO Lookup biome registry data from the worlds.
 public final class BiomeRegistryModule implements BiomeRegistry, AlternateCatalogRegistryModule<BiomeType> {
 
+    private static final BiomeRegistryModule INSTANCE = new BiomeRegistryModule();
+
+    public static BiomeRegistryModule get() {
+        return INSTANCE;
+    }
+
     @RegisterCatalog(BiomeTypes.class) private final Map<String, BiomeType> biomeTypes = Maps.newHashMap();
 
     private final TShortObjectMap<BiomeType> biomeTypeByInternalId = new TShortObjectHashMap<>();
     private final TObjectShortMap<BiomeType> internalIdByBiomeType = new TObjectShortHashMap<>();
 
     private int biomeIdCounter = 1024;
+
+    private BiomeRegistryModule() {
+    }
 
     @Override
     public Map<String, BiomeType> provideCatalogMap() {

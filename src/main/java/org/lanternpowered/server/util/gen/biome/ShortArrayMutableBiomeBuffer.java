@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector2i;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
@@ -80,7 +80,7 @@ public class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements
     public void setBiome(int x, int z, BiomeType biome) {
         this.checkOpen();
         this.checkRange(x, z);
-        this.biomes[this.index(x, z)] = Registries.getBiomeRegistry().getInternalId(biome);
+        this.biomes[this.index(x, z)] = BiomeRegistryModule.get().getInternalId(biome);
     }
 
     @Override
@@ -92,7 +92,7 @@ public class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements
     public BiomeType getBiome(int x, int z) {
         this.checkOpen();
         this.checkRange(x, z);
-        return Registries.getBiomeRegistry().getByInternalId(this.biomes[this.index(x, z)]).orElse(BiomeTypes.OCEAN);
+        return BiomeRegistryModule.get().getByInternalId(this.biomes[this.index(x, z)]).orElse(BiomeTypes.OCEAN);
     }
 
     /**

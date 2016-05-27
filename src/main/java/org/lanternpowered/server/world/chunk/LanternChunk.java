@@ -44,7 +44,8 @@ import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
@@ -1173,7 +1174,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public void setBlock(int x, int y, int z, BlockState block) {
-        this.setType(x, y, z, Registries.getBlockRegistry().getStateInternalIdAndData(block));
+        this.setType(x, y, z, BlockRegistryModule.get().getStateInternalIdAndData(block));
     }
 
     private void checkAreaBounds(int x, int z) {
@@ -1222,7 +1223,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return Registries.getBlockRegistry().getStateByInternalIdAndData(this.getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
+        return BlockRegistryModule.get().getStateByInternalIdAndData(this.getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
     }
 
     @Override
@@ -1232,7 +1233,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public void setBiome(int x, int z, BiomeType biome) {
-        this.setBiomeId(x, z, Registries.getBiomeRegistry().getInternalId(biome));
+        this.setBiomeId(x, z, BiomeRegistryModule.get().getInternalId(biome));
     }
 
     @Override
@@ -1257,7 +1258,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BiomeType getBiome(int x, int z) {
-        return Registries.getBiomeRegistry().getByInternalId(this.getBiomeId(x, z)).orElse(BiomeTypes.OCEAN);
+        return BiomeRegistryModule.get().getByInternalId(this.getBiomeId(x, z)).orElse(BiomeTypes.OCEAN);
     }
 
     @Override

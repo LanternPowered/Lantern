@@ -36,7 +36,7 @@ import gnu.trove.map.hash.TObjectIntHashMap;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.objects.Parameter;
@@ -266,7 +266,7 @@ public final class Types {
                                 }
                                 break;
                             case BLOCK_STATE:
-                                buf.writeVarInt(Registries.getBlockRegistry().getStateInternalId((BlockState) parameter.getObject()));
+                                buf.writeVarInt(BlockRegistryModule.get().getStateInternalId((BlockState) parameter.getObject()));
                                 break;
                         }
                     }

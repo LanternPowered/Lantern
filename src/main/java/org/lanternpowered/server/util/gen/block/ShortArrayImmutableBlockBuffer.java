@@ -26,7 +26,7 @@
 package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewDownsize;
 import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
@@ -60,7 +60,7 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
     public BlockState getBlock(int x, int y, int z) {
         this.checkRange(x, y, z);
         short blockState = this.blocks[this.index(x, y, z)];
-        BlockState block = Registries.getBlockRegistry().getStateByInternalId(blockState).orElse(BlockTypes.AIR.getDefaultState());
+        BlockState block = BlockRegistryModule.get().getStateByInternalId(blockState).orElse(BlockTypes.AIR.getDefaultState());
         return block == null ? this.air : block;
     }
 

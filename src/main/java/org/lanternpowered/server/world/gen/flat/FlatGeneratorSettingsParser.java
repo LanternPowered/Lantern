@@ -29,7 +29,8 @@ import com.flowpowered.math.GenericMath;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -66,7 +67,7 @@ public final class FlatGeneratorSettingsParser {
             BlockState block = layer.getBlockState();
             // Append the block id
             builder.append(block.getType().getId());
-            int data = Registries.getBlockRegistry().getStateData(block);
+            int data = BlockRegistryModule.get().getStateData(block);
             // Only append the data if needed
             if (data > 0) {
                 builder.append(':').append(data);
@@ -77,7 +78,7 @@ public final class FlatGeneratorSettingsParser {
         // Add the layers part
         parts.add(Joiner.on(',').join(layers));
         // Add the biome id part
-        parts.add(Registries.getBiomeRegistry().getInternalId(settings.getBiomeType()));
+        parts.add(BiomeRegistryModule.get().getInternalId(settings.getBiomeType()));
 
         List<String> extraDataValues = Lists.newArrayList();
         settings.getExtraData().getValues(false).entrySet().stream().forEach(e -> {
@@ -175,13 +176,13 @@ public final class FlatGeneratorSettingsParser {
                 // Try to parse the block id as internal (int) id
                 Optional<Integer> optId = Coerce.asInteger(blockStatePart);
                 if (optId.isPresent()) {
-                    blockType = Registries.getBlockRegistry().getStateByInternalId(optId.get()).orElse(BlockTypes.STONE.getDefaultState()).getType();
+                    blockType = BlockRegistryModule.get().getStateByInternalId(optId.get()).orElse(BlockTypes.STONE.getDefaultState()).getType();
                 // Not an integer, try the catalog system
                 } else {
-                    blockType = Registries.getBlockRegistry().getById(blockStatePart).orElse(BlockTypes.STONE);
+                    blockType = BlockRegistryModule.get().getById(blockStatePart).orElse(BlockTypes.STONE);
                 }
 
-                layers.add(new FlatLayer(Registries.getBlockRegistry().getStateByTypeAndData(blockType, (byte) blockData).get(), depth));
+                layers.add(new FlatLayer(BlockRegistryModule.get().getStateByTypeAndData(blockType, (byte) blockData).get(), depth));
             });
         }
 
@@ -194,9 +195,9 @@ public final class FlatGeneratorSettingsParser {
             Optional<Integer> optBiomeId = Coerce.asInteger(biomePart);
             Optional<BiomeType> optBiome;
             if (optBiomeId.isPresent()) {
-                optBiome = Registries.getBiomeRegistry().getByInternalId(optBiomeId.get());
+                optBiome = BiomeRegistryModule.get().getByInternalId(optBiomeId.get());
             } else {
-                optBiome = Registries.getBiomeRegistry().getById(biomePart);
+                optBiome = BiomeRegistryModule.get().getById(biomePart);
             }
             if (optBiome.isPresent()) {
                 biomeType = optBiome.get();

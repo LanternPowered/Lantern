@@ -27,7 +27,8 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.game.registry.Registries;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.BiomeArea;
 import org.spongepowered.api.world.extent.BlockVolume;
@@ -45,7 +46,7 @@ public final class ExtentBufferHelper {
         int i = 0;
         for (int y = min.getY(); y <= max.getY(); y++) {
             for (int x = min.getX(); x <= max.getX(); x++) {
-                copy[i++] = Registries.getBiomeRegistry().getInternalId(area.getBiome(y, x));
+                copy[i++] = BiomeRegistryModule.get().getInternalId(area.getBiome(x, y));
             }
         }
         return copy;
@@ -62,7 +63,7 @@ public final class ExtentBufferHelper {
         int i = 0;
         for (int y = min.getY(); y <= max.getY(); y++) {
             for (int x = min.getX(); x <= max.getX(); x++) {
-                copy[i++] = area.getBiome(y, x);
+                copy[i++] = area.getBiome(x, y);
             }
         }
         return copy;
@@ -80,7 +81,7 @@ public final class ExtentBufferHelper {
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
                 for (int y = min.getY(); y <= max.getY(); y++) {
-                    copy[i++] = Registries.getBlockRegistry().getStateInternalIdAndData(volume.getBlock(x, y, z));
+                    copy[i++] = BlockRegistryModule.get().getStateInternalIdAndData(volume.getBlock(x, y, z));
                 }
             }
         }

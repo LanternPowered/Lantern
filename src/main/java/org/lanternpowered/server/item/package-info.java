@@ -23,28 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry;
-
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.registry.type.block.BlockRegistry;
-import org.lanternpowered.server.game.registry.type.item.ItemRegistry;
-import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistry;
-
-public final class Registries {
-
-    public static BlockRegistry getBlockRegistry() {
-        return Lantern.getGame().getRegistry().getBlockRegistry();
-    }
-
-    public static ItemRegistry getItemRegistry() {
-        return Lantern.getGame().getRegistry().getItemRegistry();
-    }
-
-    public static BiomeRegistry getBiomeRegistry() {
-        return Lantern.getGame().getRegistry().getBiomeRegistry();
-    }
-
-    private Registries() {
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.item;

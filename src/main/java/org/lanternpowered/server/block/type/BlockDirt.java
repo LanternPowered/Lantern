@@ -25,47 +25,25 @@
  */
 package org.lanternpowered.server.block.type;
 
-import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.data.type.LanternDirtType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.text.translation.Translation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public final class BlockDirt extends LanternBlockType {
+public final class BlockDirt extends VariantBlock<LanternDirtType> {
 
     @SuppressWarnings("unchecked")
-    public static final BlockTrait<LanternDirtType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.DIRT_TYPE, LanternDirtType.class);
-
-    private final Map<LanternDirtType, Translation> translations = new HashMap<>();
+    public static final EnumTrait<LanternDirtType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.DIRT_TYPE, LanternDirtType.class);
 
     public BlockDirt(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-
-        for (LanternDirtType dirtType : LanternDirtType.values()) {
-            this.translations.put(dirtType, Lantern.getRegistry().getTranslationManager().get(
-                    "tile." + this.getId().replace("minecraft:", "").replace(":", ".") + "." + dirtType.getId() + ".name"));
-        }
-    }
-
-    @Override
-    public Translation getTranslation(BlockState blockState) {
-        final Optional<LanternDirtType> dirtType = blockState.getTraitValue(TYPE);
-        if (dirtType.isPresent()) {
-            return this.translations.get(dirtType.get());
-        }
-        return super.getTranslation(blockState);
+        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternDirtType.DIRT).get());
     }
 }

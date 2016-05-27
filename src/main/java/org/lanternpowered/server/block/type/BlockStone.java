@@ -25,48 +25,26 @@
  */
 package org.lanternpowered.server.block.type;
 
-import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.data.type.LanternStoneType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.text.translation.Translation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public final class BlockStone extends LanternBlockType {
+public final class BlockStone extends VariantBlock<LanternStoneType> {
 
     @SuppressWarnings("unchecked")
-    public static final BlockTrait<LanternStoneType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.STONE_TYPE, LanternStoneType.class);
-
-    private final Map<LanternStoneType, Translation> translations = new HashMap<>();
+    public static final EnumTrait<LanternStoneType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.STONE_TYPE, LanternStoneType.class);
 
     public BlockStone(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-
-        for (LanternStoneType stoneType : LanternStoneType.values()) {
-            this.translations.put(stoneType, Lantern.getRegistry().getTranslationManager().get(
-                    "tile." + this.getId().replace("minecraft:", "").replace(":", ".") + "." + stoneType.getId() + ".name"));
-        }
-    }
-
-    @Override
-    public Translation getTranslation(BlockState blockState) {
-        final Optional<LanternStoneType> stoneType = blockState.getTraitValue(TYPE);
-        if (stoneType.isPresent()) {
-            return this.translations.get(stoneType.get());
-        }
-        return super.getTranslation(blockState);
+        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternStoneType.STONE).get());
     }
 
 }

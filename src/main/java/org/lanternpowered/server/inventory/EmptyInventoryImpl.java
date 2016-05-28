@@ -36,6 +36,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -80,8 +81,34 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
     }
 
     @Override
+    public Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher) {
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher) {
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher) {
+        return Optional.empty();
+    }
+
+    @Override
+    public PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack stack) {
+        return new PeekSetTransactionsResult(new ArrayList<>(), InventoryTransactionResult.builder()
+                .type(InventoryTransactionResult.Type.FAILURE).reject(stack).build());
+    }
+
+    @Override
+    public boolean isValidItem(ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public boolean isChild(Inventory child) {
+        return false;
     }
 
     @Override
@@ -191,7 +218,7 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Inventory> T query(Predicate<Inventory> matcher) {
+    public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
         return (T) this;
     }
 
@@ -209,6 +236,11 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
     @Override
     public FastOfferResult offerFast(ItemStack stack) {
         return new FastOfferResult(checkNotNull(stack, "stack"), false);
+    }
+
+    @Override
+    public PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack) {
+        return new PeekOfferTransactionsResult(new ArrayList<>(), new FastOfferResult(checkNotNull(stack, "stack"), false));
     }
 
     @Override

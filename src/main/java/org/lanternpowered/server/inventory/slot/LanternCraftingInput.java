@@ -23,29 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.slot;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
-public class ChestInventory extends LanternGridInventory {
+public class LanternCraftingInput extends LanternSlot {
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
+    public LanternCraftingInput(@Nullable Inventory parent) {
+        super(parent);
     }
 
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
+    public LanternCraftingInput(@Nullable Inventory parent, @Nullable Translation name) {
+        super(parent, name);
+    }
 
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
-        this.finalizeContent();
+    @Override
+    public boolean isReverseShiftClickOfferOrder() {
+        return false;
+    }
+
+    @Override
+    public boolean doesAllowShiftClickOffer() {
+        return false;
     }
 }

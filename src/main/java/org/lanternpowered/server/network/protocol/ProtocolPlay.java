@@ -35,6 +35,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInC
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInClientSettings;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInClientStatus;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInEnchantItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCloseWindow;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutCustomPayload;
@@ -113,7 +114,12 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChatMessage;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInClientSettings;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCloseWindow;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCreativeWindowAction;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInHeldItemChange;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInOpenInventory;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
@@ -127,6 +133,7 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditCommandBlock;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
@@ -254,8 +261,10 @@ public final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInClientSettings());
         inbound.bind(0x05, CodecPlayInOutConfirmWindowTransaction.class, MessagePlayInOutConfirmWindowTransaction.class); // TODO: Handler
         inbound.bind(0x06, CodecPlayInEnchantItem.class, MessagePlayInEnchantItem.class); // TODO: Handler
-        inbound.bind(0x06, CodecPlayInClickWindow.class, MessagePlayInClickWindow.class); // TODO: Handler
-        inbound.bind(0x08, CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class); // TODO: Handler
+        inbound.bind(0x07, CodecPlayInClickWindow.class, MessagePlayInClickWindow.class)
+                .bindHandler(new HandlerPlayInClickWindow());
+        inbound.bind(0x08, CodecPlayInOutCloseWindow.class, MessagePlayInOutCloseWindow.class)
+                .bindHandler(new HandlerPlayInCloseWindow());
         inbound.bind(0x09, CodecPlayInOutCustomPayload.class);
         inbound.bind(0x0a, CodecPlayInUseEntity.class);
         inbound.bind(0x0b, CodecInOutPing.class, MessageInOutPing.class)
@@ -274,8 +283,10 @@ public final class ProtocolPlay extends ProtocolBase {
         inbound.bind(0x15, CodecPlayInPlayerVehicleControls.class);
         inbound.bind(0x16, CodecPlayInResourcePackStatus.class, MessagePlayInResourcePackStatus.class)
                 .bindHandler(new HandlerPlayInResourcePackStatus());
-        inbound.bind(0x17, CodecPlayInOutHeldItemChange.class, MessagePlayInOutHeldItemChange.class);
-        // 0x18
+        inbound.bind(0x17, CodecPlayInOutHeldItemChange.class, MessagePlayInOutHeldItemChange.class)
+                .bindHandler(new HandlerPlayInHeldItemChange());
+        inbound.bind(0x18, CodecPlayInCreativeWindowAction.class, MessagePlayInCreativeWindowAction.class)
+                .bindHandler(new HandlerPlayInCreativeWindowAction());
         inbound.bind(0x19, CodecPlayInChangeSign.class, MessagePlayInChangeSign.class)
                 .bindHandler(new HandlerPlayInChangeSign());
         inbound.bind(0x1a, CodecPlayInPlayerSwingArm.class, MessagePlayInPlayerSwingArm.class); // TODO: Handler
@@ -305,7 +316,7 @@ public final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInFinishUsingItem.class); // TODO: Handler
         inbound.bind(MessagePlayInSwapHandItems.class); // TODO: Handler
         // Provided by CodecPlayInClientStatus
-        inbound.bind(MessagePlayInOpenInventory.class); // TODO: Handler
+        inbound.bind(MessagePlayInOpenInventory.class).bindHandler(new HandlerPlayInOpenInventory());
         inbound.bind(MessagePlayInPerformRespawn.class); // TODO: Handler
         inbound.bind(MessagePlayInRequestStatistics.class); // TODO: Handler
         // Provided by CodecPlayInPlayerAction

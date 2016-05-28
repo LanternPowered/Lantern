@@ -300,7 +300,7 @@ public final class Types {
         @Override
         public void write(ByteBuffer buf, RawItemStack object) throws CodecException {
             if (object == null) {
-                buf.writeByte((byte) -1);
+                buf.writeShort((short) -1);
             } else {
                 buf.writeShort((short) object.getItemType());
                 buf.writeByte((byte) object.getAmount());

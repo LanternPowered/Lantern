@@ -23,29 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.entity;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
 
-import javax.annotation.Nullable;
-
-public class ChestInventory extends LanternGridInventory {
-
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
-    }
-
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
-        this.finalizeContent();
-    }
+/**
+ * The different kind of {@link Inventory} views that can be
+ * used for the {@link LanternHumanInventory}. This mainly
+ * modifies the insertion/poll order of item stacks. And the
+ * which sub {@link Inventory}s are available.
+ */
+public enum HumanInventoryView {
+    /**
+     * The hotbar inventory view. Contains only the hotbar.
+     */
+    HOTBAR,
+    /**
+     * The main inventory view. Contains only the main inventory,
+     * excludes the hotbar.
+     */
+    MAIN,
+    /**
+     * The main and hotbar inventory.
+     */
+    MAIN_AND_PRIORITY_HOTBAR,
+    /**
+     * The main and hotbar inventory, but the main inventory
+     * has priority for offer/poll functions.
+     */
+    PRIORITY_MAIN_AND_HOTBAR,
+    /**
+     * The reverse order for the main and hotbar inventory. Starting
+     * from the bottom right corner, then going left until the row
+     * is finished and doing this for every row until the most
+     * upper one is reached.
+     */
+    REVERSE_MAIN_AND_HOTBAR,
+    /**
+     * All the inventories but the main inventory has priority over
+     * the hotbar.
+     */
+    ALL_PRIORITY_MAIN,
 }

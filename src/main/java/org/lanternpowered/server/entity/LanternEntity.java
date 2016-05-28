@@ -438,7 +438,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override

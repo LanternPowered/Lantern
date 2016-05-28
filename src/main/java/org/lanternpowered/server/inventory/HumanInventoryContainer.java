@@ -23,29 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
+import com.google.common.collect.Sets;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
+import org.spongepowered.api.entity.living.Humanoid;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.text.translation.Translation;
+
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class ChestInventory extends LanternGridInventory {
+public class HumanInventoryContainer extends LanternContainer {
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
+    public HumanInventoryContainer(@Nullable Translation name, LanternHumanInventory humanInventory) {
+        super(name, humanInventory, null);
     }
 
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
+    @Override
+    protected void openInventoryFor(LanternPlayer viewer) {
+    }
 
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
+    @Override
+    public void queueSlotChange(Slot slot) {
+        this.queueHumanSlotChange(slot);
+    }
+
+    @Override
+    Set<Player> getRawViewers() {
+        Humanoid humanoid = this.humanInventory.getCarrier().orElse(null);
+        if (humanoid instanceof Player) {
+            final Set<Player> viewers = Sets.newHashSet(this.viewers);
+            viewers.add((Player) humanoid);
+            return viewers;
         }
-        this.finalizeContent();
+        return this.viewers;
     }
 }

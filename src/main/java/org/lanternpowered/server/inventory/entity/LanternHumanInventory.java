@@ -25,10 +25,15 @@
  */
 package org.lanternpowered.server.inventory.entity;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.lanternpowered.server.inventory.ChildrenInventoryBase;
+import org.lanternpowered.server.inventory.InventoryBase;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
+import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.inventory.slot.LanternEquipmentSlot;
 import org.spongepowered.api.entity.living.Humanoid;
@@ -39,6 +44,11 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -46,7 +56,9 @@ import javax.annotation.Nullable;
 public class LanternHumanInventory extends LanternOrderedInventory implements HumanInventory {
 
     @Nullable private final WeakReference<Humanoid> humanoid;
-    private Hotbar hotbar;
+    private LanternHotbar hotbar;
+
+    private final Map<HumanInventoryView, InventoryBase> inventoryViews = new EnumMap<>(HumanInventoryView.class);
 
     public LanternHumanInventory(@Nullable Inventory parent, @Nullable Translation name, @Nullable Humanoid humanoid) {
         super(parent, name);
@@ -59,7 +71,7 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                     {
                         for (int y = 0; y < 2; y++) {
                             for (int x = 0; x < 2; x++) {
-                                this.registerSlotAt(x, y);
+                                this.registerSlotAt(x, y, new LanternCraftingInput(this));
                             }
                         }
                         this.finalizeContent();
@@ -77,7 +89,7 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                 this.finalizeContent();
             }
         });
-        this.registerChild(new HumanMainInventory(this, null) {
+        final HumanMainInventory mainInventory = this.registerChild(new HumanMainInventory(this, null) {
             {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 9; x++) {
@@ -93,13 +105,74 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                     }
                 });
                 this.finalizeContent();
+                this.prioritizeChild(hotbar);
             }
         });
         this.registerChild(new OffHandSlot(this, null));
+
+        // Generate inventory views
+        this.inventoryViews.put(HumanInventoryView.MAIN,
+                this.generateMainView(this, mainInventory));
+        this.inventoryViews.put(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR,
+                this.generateReverseMainAndHotbarView(this, mainInventory));
+        final InventoryBase priorityMainAndHotbarView = this.generatePriorityMainAndHotbarView(this, mainInventory);
+        this.inventoryViews.put(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR,
+                priorityMainAndHotbarView);
+        this.inventoryViews.put(HumanInventoryView.ALL_PRIORITY_MAIN,
+                this.generateAllPriorityMainView(mainInventory));
+
+        // This is the default views/inventories
+        this.inventoryViews.put(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR, mainInventory);
+        this.inventoryViews.put(HumanInventoryView.HOTBAR, this.hotbar);
+    }
+
+    private InventoryBase generateMainView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+        final List<InventoryBase> children = new ArrayList<>(mainInventory.getChildren());
+        children.removeAll(this.hotbar.getChildren());
+        return new ChildrenInventoryBase(parent, null, children);
+    }
+
+    private InventoryBase generateReverseMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+        final List<InventoryBase> children = new ArrayList<>(mainInventory.getChildren());
+        final List<InventoryBase> hotbarSlots = new ArrayList<>(this.hotbar.getChildren());
+        children.removeAll(hotbarSlots);
+        Collections.reverse(children);
+        Collections.reverse(hotbarSlots);
+        children.addAll(0, hotbarSlots);
+        return new ChildrenInventoryBase(parent, null, children);
+    }
+
+    private InventoryBase generatePriorityMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+        final List<InventoryBase> children = new ArrayList<>(mainInventory.getChildren());
+        final List<InventoryBase> hotbarSlots =  new ArrayList<>(this.hotbar.getChildren());
+        children.removeAll(hotbarSlots);
+        children.addAll(hotbarSlots);
+        return new ChildrenInventoryBase(parent, null, children);
+    }
+
+    private InventoryBase generateAllPriorityMainView(HumanMainInventory mainInventory) {
+        final List<InventoryBase> children = new ArrayList<>(this.getChildren());
+        return new ChildrenInventoryBase(null, null) {
+            {
+                children.set(children.indexOf(mainInventory), generatePriorityMainAndHotbarView(this, mainInventory));
+                children.forEach(this::registerChild);
+            }
+        };
+    }
+
+    /**
+     * Gets the {@link Inventory} for the specified
+     * {@link HumanInventoryView}.
+     *
+     * @param inventoryView The inventory view
+     * @return The inventory
+     */
+    public InventoryBase getInventoryView(HumanInventoryView inventoryView) {
+        return this.inventoryViews.get(checkNotNull(inventoryView, "inventoryView"));
     }
 
     @Override
-    public Hotbar getHotbar() {
+    public LanternHotbar getHotbar() {
         return this.hotbar;
     }
 

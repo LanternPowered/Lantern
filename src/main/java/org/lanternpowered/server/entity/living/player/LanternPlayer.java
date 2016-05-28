@@ -45,6 +45,12 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBui
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.inventory.HumanInventoryContainer;
+import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.PlayerContainerSession;
+import org.lanternpowered.server.inventory.entity.HumanMainInventory;
+import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
@@ -67,6 +73,7 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
@@ -159,6 +166,21 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Nullable private ChunkTicketManager.PlayerEntityLoadingTicket loadingTicket;
 
     /**
+     * The inventory of the {@link Player}.
+     */
+    private final LanternHumanInventory inventory;
+
+    /**
+     * The {@link LanternContainer} of the players inventory.
+     */
+    private final HumanInventoryContainer inventoryContainer;
+
+    /**
+     * The container session of this {@link Player}.
+     */
+    private final PlayerContainerSession containerSession;
+
+    /**
      * The last time that the player was active.
      */
     private long lastActiveTime;
@@ -166,6 +188,9 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public LanternPlayer(LanternGameProfile gameProfile, Session session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
+        this.inventory = new LanternHumanInventory(null, null, this);
+        this.inventoryContainer = new HumanInventoryContainer(null, this.inventory);
+        this.containerSession = new PlayerContainerSession(this);
         this.session = session;
         this.gameProfile = gameProfile;
         // Get or create the user object
@@ -224,7 +249,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             oldWorld.removePlayer(this);
         }
         if (world != null) {
-            LanternGameMode gameMode = (LanternGameMode) GameModes.CREATIVE; // TODO
+            LanternGameMode gameMode = (LanternGameMode) GameModes.SURVIVAL; // TODO
             LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
             LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
             boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
@@ -274,6 +299,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(),
                     (float) rotation.getY(), (float) rotation.getX(), Collections.emptySet(), 0));
             this.setScoreboard(world.getScoreboard());
+            this.inventoryContainer.openInventoryForAndInitialize(this);
         } else {
             this.session.getServer().removePlayer(this);
             this.tabList.clear();
@@ -371,6 +397,12 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
         // Pulse the interaction handler
         this.interactionHandler.pulse();
+
+        // Stream the inventory updates
+        this.inventoryContainer.streamSlotChanges();
+        if (this.containerSession.getOpenContainer() != null) {
+            this.containerSession.getOpenContainer().streamSlotChanges();
+        }
     }
 
     /**
@@ -730,5 +762,23 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     public PlayerInteractionHandler getInteractionHandler() {
         return this.interactionHandler;
+    }
+
+    @Override
+    public LanternHumanInventory getInventory() {
+        return this.inventory;
+    }
+
+    /**
+     * Gets the {@link PlayerContainerSession}.
+     *
+     * @return The container session
+     */
+    public PlayerContainerSession getContainerSession() {
+        return this.containerSession;
+    }
+
+    public HumanInventoryContainer getInventoryContainer() {
+        return this.inventoryContainer;
     }
 }

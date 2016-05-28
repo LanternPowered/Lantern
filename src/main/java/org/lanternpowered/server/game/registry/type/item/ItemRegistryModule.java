@@ -34,8 +34,12 @@ import gnu.trove.map.TObjectIntMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
 import gnu.trove.map.hash.TObjectIntHashMap;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.item.LanternItemType;
+import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
@@ -106,4 +110,15 @@ public final class ItemRegistryModule implements ItemRegistry {
         return ImmutableSet.copyOf(this.itemTypes.values());
     }
 
+    @Override
+    public void registerDefaults() {
+        final LanternItemType none = new LanternItemType("minecraft", "none", null);
+        this.register(0, none);
+        try {
+            ReflectionHelper.setField(ItemStackSnapshot.class.getDeclaredField("NONE"), null,
+                    new LanternItemStack(none, 0).createSnapshot());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

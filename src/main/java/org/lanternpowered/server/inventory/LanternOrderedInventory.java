@@ -41,6 +41,7 @@ import org.spongepowered.api.item.inventory.type.OrderedInventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,11 +57,20 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
      * All the {@link Slot}s of this inventory, may also contain indirect
      * {@link Slot}s.
      */
-    final List<LanternSlot> slots = new ArrayList<>();
+    protected final List<LanternSlot> slots = new ArrayList<>();
     final TObjectIntMap<LanternSlot> indexBySlot = new TObjectIntHashMap<>();
 
     public LanternOrderedInventory(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
+    }
+
+    /**
+     * Gets the {@link Slot}s of this inventory.
+     *
+     * @return The slots
+     */
+    public List<LanternSlot> getSlots() {
+        return Collections.unmodifiableList(this.slots);
     }
 
     /**
@@ -76,16 +86,13 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
 
     <T extends Slot> T registerSlot(T slot, boolean leaf) {
         this.registerSlot(this.nextFreeSlotIndex(), slot, leaf);
-        if (leaf) {
-            super.registerChild(slot);
-        }
         return slot;
     }
 
     @Override
     protected <T extends Inventory> T registerChild(T childInventory) {
         if (childInventory instanceof Slot) {
-            this.registerSlot((Slot) childInventory);
+            this.registerSlot((Slot) childInventory, true);
             return childInventory;
         }
         super.registerChild(childInventory);
@@ -121,6 +128,7 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
         this.indexBySlot.put((LanternSlot) slot, index);
         if (leaf) {
             this.leafSlots.add((LanternSlot) slot);
+            super.registerChild(slot);
         }
     }
 
@@ -185,8 +193,8 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
      * @param index The slot index
      * @return The slot if found
      */
-    public Optional<Slot> getSlotAt(int index) {
-        return Optional.ofNullable(this.slots.get(index));
+    public Optional<LanternSlot> getSlotAt(int index) {
+        return index < 0 || index >= this.slots.size() ? Optional.empty() : Optional.ofNullable(this.slots.get(index));
     }
 
     /**

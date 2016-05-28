@@ -25,7 +25,12 @@
  */
 package org.lanternpowered.server.inventory.entity;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternInventoryRow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.text.translation.Translation;
@@ -49,8 +54,27 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
         return this.selectedSlotIndex;
     }
 
+    public void setRawSelectedSlotIndex(int index) {
+        this.selectedSlotIndex = index;
+    }
+
     @Override
     public void setSelectedSlotIndex(int index) {
-        this.selectedSlotIndex = index;
+        checkArgument(index >= 0 && index < this.slots.size(), "The index %s may not be smaller then 0 or greater then %s",
+                index, this.slots.size() - 1);
+        Inventory inventory = this;
+        while (!(inventory instanceof LanternHumanInventory)) {
+            Inventory inventory1 = inventory.parent();
+            if (inventory == inventory1) {
+                inventory = null;
+                break;
+            }
+            inventory = inventory1;
+        }
+        if (inventory != null) {
+            ((LanternHumanInventory) inventory).getCarrier().filter(human -> human instanceof Player)
+                    .ifPresent(player -> ((LanternPlayer) player).getConnection().send(new MessagePlayInOutHeldItemChange(index)));
+        }
+        this.setRawSelectedSlotIndex(index);
     }
 }

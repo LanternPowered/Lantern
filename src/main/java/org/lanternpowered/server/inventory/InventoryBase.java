@@ -99,6 +99,8 @@ public abstract class InventoryBase implements Inventory {
      */
     public abstract FastOfferResult offerFast(ItemStack stack);
 
+    public abstract PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack);
+
     @Override
     public InventoryTransactionResult offer(ItemStack stack) {
         return this.offerFast(stack).asTransactionResult();
@@ -167,7 +169,7 @@ public abstract class InventoryBase implements Inventory {
                 }
             }
             return false;
-        });
+        }, true);
     }
 
     @Override
@@ -180,7 +182,7 @@ public abstract class InventoryBase implements Inventory {
                 }
             }
             return false;
-        });
+        }, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -198,7 +200,7 @@ public abstract class InventoryBase implements Inventory {
                 }
             }
             return false;
-        });
+        }, true);
     }
 
     @SuppressWarnings("unchecked")
@@ -212,7 +214,7 @@ public abstract class InventoryBase implements Inventory {
                 }
             }
             return false;
-        });
+        }, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -226,7 +228,7 @@ public abstract class InventoryBase implements Inventory {
                 }
             }
             return false;
-        });
+        }, false);
     }
 
     @Override
@@ -240,7 +242,7 @@ public abstract class InventoryBase implements Inventory {
                 }
             }
             return false;
-        });
+        }, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -254,10 +256,10 @@ public abstract class InventoryBase implements Inventory {
                 }
             }
             return false;
-        });
+        }, false);
     }
 
-    public abstract <T extends Inventory> T query(Predicate<Inventory> matcher);
+    public abstract <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested);
 
     @Override
     public Optional<ItemStack> poll() {
@@ -295,6 +297,8 @@ public abstract class InventoryBase implements Inventory {
 
     public abstract Optional<ItemStack> peek(Predicate<ItemStack> matcher);
 
+    public abstract Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher);
+
     @Override
     public Optional<ItemStack> peek(int limit) {
         return this.peek(limit, stack -> true);
@@ -307,4 +311,26 @@ public abstract class InventoryBase implements Inventory {
 
     public abstract Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher);
 
+    public abstract Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher);
+
+    public abstract PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack itemStack);
+
+    /**
+     * Check whether the supplied item can be inserted into this one of the children of the
+     * inventory. Returning false from this method implies that {@link #offer} <b>would
+     * always return false</b> for this item.
+     *
+     * @param stack ItemStack to check
+     * @return true if the stack is valid for one of the children of this inventory
+     */
+    public abstract boolean isValidItem(ItemStack stack);
+
+    /**
+     * Gets whether the specified {@link Inventory} a child is of this inventory,
+     * this includes if it's a child of a child inventory.
+     *
+     * @param child The child inventory
+     * @return Whether the inventory was a child of this inventory
+     */
+    public abstract boolean isChild(Inventory child);
 }

@@ -62,6 +62,7 @@ import org.lanternpowered.server.command.CommandWeather;
 import org.lanternpowered.server.command.CommandWhitelist;
 import org.lanternpowered.server.command.LanternCommandDisambiguator;
 import org.lanternpowered.server.command.LanternCommandManager;
+import org.lanternpowered.server.command.test.CommandOpenTestContainer;
 import org.lanternpowered.server.config.GlobalConfig;
 import org.lanternpowered.server.config.LanternConfigManager;
 import org.lanternpowered.server.config.user.OpsConfig;
@@ -399,6 +400,9 @@ public class LanternGame implements Game {
         commandProviders.put(this.implContainer, new CommandVersion());
         commandProviders.put(this.minecraft, new CommandWeather());
         commandProviders.put(this.minecraft, new CommandWhitelist());
+
+        // Testing
+        commandProviders.put(this.implContainer, new CommandOpenTestContainer());
 
         for (Map.Entry<PluginContainer, CommandProvider> entry : commandProviders.entries()) {
             final PluginContainer plugin = entry.getKey();

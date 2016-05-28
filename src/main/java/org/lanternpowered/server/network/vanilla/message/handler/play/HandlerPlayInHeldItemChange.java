@@ -23,29 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.server.inventory.entity.LanternHotbar;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 
-import javax.annotation.Nullable;
+public final class HandlerPlayInHeldItemChange implements Handler<MessagePlayInOutHeldItemChange> {
 
-public class ChestInventory extends LanternGridInventory {
-
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
-    }
-
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
-        this.finalizeContent();
+    @Override
+    public void handle(NetworkContext context, MessagePlayInOutHeldItemChange message) {
+        ((LanternHotbar) context.getSession().getPlayer().getInventory().getHotbar())
+                .setRawSelectedSlotIndex(message.getSlot());
     }
 }

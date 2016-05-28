@@ -23,29 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory.container;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.block.ChestInventory;
+import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.spongepowered.api.text.Text;
 
-import javax.annotation.Nullable;
+public class ChestInventoryContainer extends LanternContainer {
 
-public class ChestInventory extends LanternGridInventory {
-
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
+    public ChestInventoryContainer(LanternHumanInventory humanInventory, ChestInventory openInventory) {
+        super(openInventory.getName(), humanInventory, openInventory);
     }
 
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
-        this.finalizeContent();
+    @Override
+    protected void openInventoryFor(LanternPlayer viewer) {
+        viewer.getConnection().send(new MessagePlayOutOpenWindow(this.windowId, MessagePlayOutOpenWindow.WindowType.CONTAINER,
+                Text.of(this.openInventory.getName()), this.openInventory.getSlots().size(), 0));
     }
 }

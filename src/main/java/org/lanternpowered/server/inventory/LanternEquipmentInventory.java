@@ -25,19 +25,9 @@
  */
 package org.lanternpowered.server.inventory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
-import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.item.inventory.slot.EquipmentSlot;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.ref.WeakReference;
@@ -45,7 +35,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternEquipmentInventory extends LanternOrderedInventory implements EquipmentInventory {
+public class LanternEquipmentInventory extends SimpleEquipmentInventory implements EquipmentInventory {
 
     @Nullable private final WeakReference<ArmorEquipable> armorEquipable;
 
@@ -57,150 +47,6 @@ public class LanternEquipmentInventory extends LanternOrderedInventory implement
             @Nullable ArmorEquipable armorEquipable) {
         super(parent, name);
         this.armorEquipable = armorEquipable == null ? null : new WeakReference<>(armorEquipable);
-    }
-
-    @Override
-    public Optional<ItemStack> poll(EquipmentSlotType equipmentType) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.poll(stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public Optional<ItemStack> poll(EquipmentSlotType equipmentType, int limit) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.poll(limit, stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public Optional<ItemStack> poll(EquipmentType equipmentType) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.poll(stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
-    }
-
-    @Override
-    public Optional<ItemStack> poll(EquipmentType equipmentType, int limit) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.poll(limit, stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
-    }
-
-    @Override
-    public Optional<ItemStack> peek(EquipmentSlotType equipmentType) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.peek(stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public Optional<ItemStack> peek(EquipmentSlotType equipmentType, int limit) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.peek(limit, stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
-    }
-
-    @Override
-    public Optional<ItemStack> peek(EquipmentType equipmentType) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.peek(stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
-    }
-
-    @Override
-    public Optional<ItemStack> peek(EquipmentType equipmentType, int limit) {
-        checkNotNull(equipmentType, "equipmentType");
-        return this.peek(limit, stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
-    }
-
-    @Override
-    public InventoryTransactionResult set(EquipmentSlotType equipmentType, ItemStack stack) {
-        checkNotNull(equipmentType, "equipmentType");
-        LanternSlot slot = null;
-        if (equipmentType.getValue() != null) {
-            slot = this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
-                    ((EquipmentSlot) s).isValidItem(equipmentType.getValue())).findFirst().orElse(null);
-        }
-        return slot == null ? InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE)
-                .reject(stack).build() : slot.set(stack);
-    }
-
-    @Override
-    public InventoryTransactionResult set(EquipmentType equipmentType, ItemStack stack) {
-        checkNotNull(equipmentType, "equipmentType");
-        LanternSlot slot = this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
-                    ((EquipmentSlot) s).isValidItem(equipmentType)).findFirst().orElse(null);
-        return slot == null ? InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE)
-                .reject(stack).build() : slot.set(stack);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Optional<Slot> getSlot(EquipmentSlotType equipmentType) {
-        checkNotNull(equipmentType, "equipmentType");
-        if (equipmentType.getValue() != null) {
-            return (Optional) this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
-                    ((EquipmentSlot) s).isValidItem(equipmentType.getValue())).findFirst();
-        }
-        return Optional.empty();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Optional<Slot> getSlot(EquipmentType equipmentType) {
-        checkNotNull(equipmentType, "equipmentType");
-        return (Optional) this.slots.stream().filter(s -> s instanceof EquipmentSlot
-                && ((EquipmentSlot) s).isValidItem(equipmentType)).findFirst();
     }
 
     @Override

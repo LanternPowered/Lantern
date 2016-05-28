@@ -41,6 +41,7 @@ import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -198,6 +199,7 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
             this.rows.add(null);
         }
         this.rows.set(y, (LanternInventoryRow) inventoryRow);
+        ((LanternOrderedInventory) inventoryRow).slots.forEach(slot -> this.registerSlot(slot, true));
         return inventoryRow;
     }
 
@@ -218,15 +220,28 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
             this.columns.add(null);
         }
         this.columns.set(x, (LanternInventoryColumn) inventoryColumn);
-        ((LanternOrderedInventory) inventoryColumn).slots.forEach(slot -> this.registerSlot(slot, false));
+        ((LanternOrderedInventory) inventoryColumn).slots.forEach(slot -> this.registerSlot(slot, true));
         return inventoryColumn;
     }
 
     @Override
-    List<Inventory> queryInventories(Predicate<Inventory> matcher) {
-        final List<Inventory> inventories = super.queryInventories(matcher);
+    protected <T extends Inventory> T prioritizeChild(T childInventory) {
+        checkNotNull(childInventory, "inventory");
+        if (this.rows.contains(childInventory) || this.columns.contains(childInventory)) {
+            List<Inventory> children = new ArrayList<>(((LanternOrderedInventory) childInventory).children);
+            // Prioritize in backwards order
+            Collections.reverse(children);
+            children.forEach(this::prioritizeChild);
+            return childInventory;
+        }
+        return super.prioritizeChild(childInventory);
+    }
+
+    @Override
+    List<Inventory> queryInventories(Predicate<Inventory> matcher, boolean nested) {
+        final List<Inventory> inventories = super.queryInventories(matcher, nested);
         // Ignore if there weren't any matches found or if when everything matched
-        if (inventories.isEmpty() || inventories.get(0) == this) {
+        if (nested && !inventories.isEmpty() && inventories.get(0) == this) {
             return inventories;
         }
         // TODO: What should happen if there are matching columns and rows?
@@ -238,6 +253,8 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
                 inventories.removeAll(row.slots);
                 inventories.add(row);
                 rowFound = true;
+            } else if (matcher.test(row)) {
+                inventories.add(row);
             }
         }
         if (rowFound) {
@@ -247,6 +264,8 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
             // If all the slots were found, a full row is present
             if (inventories.containsAll(column.slots)) {
                 inventories.removeAll(column.slots);
+                inventories.add(column);
+            } else if (matcher.test(column)) {
                 inventories.add(column);
             }
         }

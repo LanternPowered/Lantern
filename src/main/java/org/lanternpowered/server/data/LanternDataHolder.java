@@ -159,7 +159,7 @@ public class LanternDataHolder implements DataHolder {
     @Override
     public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override

@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory.block;
 
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
+import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.translation.Translation;
@@ -43,7 +44,7 @@ public class WorkbenchInventory extends LanternCraftingInventory {
             {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 3; x++) {
-                        this.registerSlotAt(x, y);
+                        this.registerSlotAt(x, y, new LanternCraftingInput(this));
                     }
                 }
                 this.finalizeContent();

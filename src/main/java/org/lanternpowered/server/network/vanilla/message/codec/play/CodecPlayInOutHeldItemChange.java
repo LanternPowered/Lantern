@@ -37,11 +37,9 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
  */
 public final class CodecPlayInOutHeldItemChange implements Codec<MessagePlayInOutHeldItemChange> {
 
-    private final static int LENGTH = Byte.BYTES;
-
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayInOutHeldItemChange message) throws CodecException {
-        return context.byteBufAlloc().buffer(LENGTH).writeByte(message.getSlot());
+        return context.byteBufAlloc().buffer(1).writeByte((byte) message.getSlot());
     }
 
     @Override

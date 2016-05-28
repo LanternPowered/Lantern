@@ -36,4 +36,14 @@ public class OffHandSlot extends LanternSlot {
     public OffHandSlot(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
     }
+
+    @Override
+    public boolean isReverseShiftClickOfferOrder() {
+        return false;
+    }
+
+    @Override
+    public boolean doesAllowShiftClickOffer() {
+        return false;
+    }
 }

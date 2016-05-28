@@ -62,7 +62,7 @@ public class LanternFilteringSlot extends LanternSlot implements FilteringSlot {
         if (this.itemFilter != null && !this.itemFilter.isValidItem(stack)) {
             return false;
         }
-        return this.doesAllowItem(stack);
+        return super.isValidItem(stack);
     }
 
     @Override

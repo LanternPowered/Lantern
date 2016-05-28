@@ -27,7 +27,6 @@ package org.lanternpowered.server.inventory.slot;
 
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
-import org.spongepowered.api.item.inventory.slot.OutputSlot;
 import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;

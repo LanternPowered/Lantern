@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -41,6 +42,7 @@ import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.translation.Translation;
@@ -49,6 +51,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
 
@@ -265,7 +269,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
 
     @Override
     public void setQuantity(int quantity) throws IllegalArgumentException {
-        checkArgument(quantity > 0, "quantity may not be negative");
+        checkArgument(quantity >= 0, "quantity may not be negative");
         this.quantity = quantity;
     }
 
@@ -309,5 +313,19 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder {
         }
         // TODO: Match data
         return true;
+    }
+
+    @Nullable
+    public static ItemStack toNullable(@Nullable ItemStack itemStack) {
+        if (itemStack == null || itemStack.getItem() == ItemTypes.NONE ||
+                itemStack.getQuantity() <= 0) {
+            return null;
+        }
+        return itemStack;
+    }
+
+    public static ItemStackSnapshot toSnapshot(@Nullable ItemStack itemStack) {
+        itemStack = toNullable(itemStack);
+        return itemStack == null ? ItemStackSnapshot.NONE : itemStack.createSnapshot();
     }
 }

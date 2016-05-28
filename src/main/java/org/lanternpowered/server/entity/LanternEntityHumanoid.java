@@ -28,19 +28,13 @@ package org.lanternpowered.server.entity;
 import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.equipment.EquipmentType;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.annotation.Nullable;
-
 @NonnullByDefault
-public class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
+public abstract class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
 
     public LanternEntityHumanoid(UUID uniqueId) {
         super(uniqueId);
@@ -52,52 +46,11 @@ public class LanternEntityHumanoid extends LanternEntityLiving implements Humano
 
     @Override
     public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean canEquip(EquipmentType type) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Optional<ItemStack> getEquipped(EquipmentType type) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
-        if (!this.canEquip(type, equipment)) {
-            return false;
-        }
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public CarriedInventory<? extends Carrier> getInventory() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public String getName() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

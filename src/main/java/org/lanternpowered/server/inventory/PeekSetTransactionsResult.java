@@ -23,29 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
-import javax.annotation.Nullable;
+import java.util.List;
 
-public class ChestInventory extends LanternGridInventory {
+public final class PeekSetTransactionsResult {
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
+    private final List<SlotTransaction> transactions;
+    private final InventoryTransactionResult transactionResult;
+
+    public PeekSetTransactionsResult(List<SlotTransaction> transactions, InventoryTransactionResult transactionResult) {
+        this.transactions = transactions;
+        this.transactionResult = transactionResult;
     }
 
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
+    public List<SlotTransaction> getTransactions() {
+        return this.transactions;
+    }
 
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
-        this.finalizeContent();
+    public InventoryTransactionResult getTransactionResult() {
+        return this.transactionResult;
     }
 }

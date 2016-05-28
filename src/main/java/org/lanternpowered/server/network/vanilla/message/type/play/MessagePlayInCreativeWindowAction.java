@@ -23,29 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
-public class ChestInventory extends LanternGridInventory {
+public final class MessagePlayInCreativeWindowAction implements Message {
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
+    private final int slot;
+    @Nullable private final ItemStack itemStack;
+
+    public MessagePlayInCreativeWindowAction(int slot, ItemStack itemStack) {
+        this.itemStack = itemStack;
+        this.slot = slot;
     }
 
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
+    public int getSlot() {
+        return this.slot;
+    }
 
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
-        this.finalizeContent();
+    @Nullable
+    public ItemStack getItemStack() {
+        return this.itemStack;
     }
 }

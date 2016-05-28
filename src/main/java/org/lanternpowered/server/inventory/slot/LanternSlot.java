@@ -30,25 +30,34 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.FastOfferResult;
 import org.lanternpowered.server.inventory.InventoryBase;
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
+import org.lanternpowered.server.inventory.PeekPollTransactionsResult;
+import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.item.inventory.slot.FilteringSlot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -66,12 +75,27 @@ public class LanternSlot extends InventoryBase implements Slot {
      */
     private int maxStackSize = 64;
 
+    /**
+     * All the {@link LanternContainer}s this slot is attached to.
+     */
+    private final Set<LanternContainer> containers = Collections.newSetFromMap(new WeakHashMap<>());
+
     public LanternSlot(@Nullable Inventory parent) {
         super(parent, null);
     }
 
     public LanternSlot(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
+    }
+
+    public void addContainer(LanternContainer container) {
+        this.containers.add(checkNotNull(container, "container"));
+    }
+
+    private void queueUpdate() {
+        for (LanternContainer container : this.containers) {
+            container.queueSlotChange(this);
+        }
     }
 
     /**
@@ -83,6 +107,25 @@ public class LanternSlot extends InventoryBase implements Slot {
     @Nullable
     public ItemStack getRawItemStack() {
         return this.itemStack;
+    }
+
+    /**
+     * Check whether the supplied item can be inserted into this slot. Returning
+     * false from this method implies that {@link #offer} <b>would always return
+     * false</b> for this item.
+     *
+     * @param stack ItemStack to check
+     * @return true if the stack is valid for this slot
+     */
+    @Override
+    public boolean isValidItem(ItemStack stack) {
+        return this.doesAllowEquipmentType(stack) &&
+                this.doesAcceptItemType(stack);
+    }
+
+    @Override
+    public boolean isChild(Inventory child) {
+        return false;
     }
 
     @Override
@@ -120,6 +163,7 @@ public class LanternSlot extends InventoryBase implements Slot {
         // Just remove the item, the complete stack was
         // being polled
         this.itemStack = null;
+        this.queueUpdate();
         return Optional.of(itemStack);
     }
 
@@ -141,6 +185,7 @@ public class LanternSlot extends InventoryBase implements Slot {
         } else {
             this.itemStack = null;
         }
+        this.queueUpdate();
         return Optional.of(itemStack);
     }
 
@@ -148,6 +193,17 @@ public class LanternSlot extends InventoryBase implements Slot {
     public Optional<ItemStack> peek(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         return Optional.ofNullable(this.itemStack == null || !matcher.test(this.itemStack) ? null : this.itemStack.copy());
+    }
+
+    @Override
+    public Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher) {
+        checkNotNull(matcher, "matcher");
+        if (this.itemStack == null || !matcher.test(this.itemStack)) {
+            return Optional.empty();
+        }
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        transactions.add(new SlotTransaction(this, this.itemStack.createSnapshot(), ItemStackSnapshot.NONE));
+        return Optional.of(new PeekPollTransactionsResult(transactions, this.itemStack.copy()));
     }
 
     @Override
@@ -167,14 +223,78 @@ public class LanternSlot extends InventoryBase implements Slot {
         return Optional.of(itemStack);
     }
 
+    @Override
+    public Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher) {
+        checkNotNull(matcher, "matcher");
+        checkArgument(limit >= 0, "Limit may not be negative");
+        ItemStack itemStack = this.itemStack;
+        // There is no item available
+        if (limit == 0 || itemStack == null || !matcher.test(itemStack)) {
+            return Optional.empty();
+        }
+        ItemStackSnapshot oldItem = itemStack.createSnapshot();
+        itemStack = itemStack.copy();
+        int quantity = itemStack.getQuantity();
+        ItemStackSnapshot newItem;
+        if (limit >= quantity) {
+            newItem = ItemStackSnapshot.NONE;
+        } else {
+            itemStack.setQuantity(quantity - limit);
+            newItem = LanternItemStack.toSnapshot(itemStack);
+            itemStack.setQuantity(limit);
+        }
+        final List<SlotTransaction> transactions = new ArrayList<>();
+        transactions.add(new SlotTransaction(this, oldItem, newItem));
+        return Optional.of(new PeekPollTransactionsResult(transactions, itemStack));
+    }
+
+    @Override
+    public PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack stack) {
+        stack = LanternItemStack.toNullable(stack);
+        boolean fail = false;
+        if (stack != null) {
+            if (stack.getQuantity() <= 0) {
+                stack = null;
+            } else {
+                fail = !this.isValidItem(stack);
+            }
+        }
+        List<SlotTransaction> transactions = new ArrayList<>();
+        if (fail) {
+            return new PeekSetTransactionsResult(transactions, InventoryTransactionResult.builder()
+                    .type(InventoryTransactionResult.Type.FAILURE)
+                    .reject(stack)
+                    .build());
+        }
+        InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder()
+                .type(InventoryTransactionResult.Type.SUCCESS);
+        ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(this.itemStack);
+        if (this.itemStack != null) {
+            resultBuilder.replace(this.itemStack);
+        }
+        ItemStackSnapshot newItem = ItemStackSnapshot.NONE;
+        if (stack != null) {
+            int quantity = stack.getQuantity();
+            if (quantity > this.maxStackSize) {
+                stack = stack.copy();
+                stack.setQuantity(this.maxStackSize);
+                newItem = LanternItemStack.toSnapshot(stack);
+                // Create the rest stack that was rejected,
+                // because the inventory doesn't allow so many items
+                stack = stack.copy();
+                stack.setQuantity(quantity - this.maxStackSize);
+                resultBuilder.reject(stack);
+            } else {
+                newItem = LanternItemStack.toSnapshot(stack);
+            }
+        }
+        transactions.add(new SlotTransaction(this, oldItem, newItem));
+        return new PeekSetTransactionsResult(transactions, resultBuilder.build());
+    }
+
     protected boolean doesAllowItem(ItemType type) {
         return this.doesAllowEquipmentType(type) &&
                 this.doesAcceptItemType(type);
-    }
-
-    protected boolean doesAllowItem(ItemStack stack) {
-        return this.doesAllowEquipmentType(stack) &&
-                this.doesAcceptItemType(stack);
     }
 
     protected boolean doesAllowEquipmentType(ItemType type) {
@@ -234,46 +354,89 @@ public class LanternSlot extends InventoryBase implements Slot {
     @Override
     public FastOfferResult offerFast(ItemStack stack) {
         checkNotNull(stack, "stack");
-        boolean fail;
-        if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isEqualToOther(stack) ||
-                this.itemStack.getQuantity() >= this.maxStackSize)) {
-            fail = true;
-        } else if (this instanceof FilteringSlot) {
-            fail = !((FilteringSlot) this).isValidItem(stack);
-        } else {
-            fail = !this.doesAllowItem(stack);
+        if (LanternItemStack.toNullable(stack) == null) {
+            return new FastOfferResult(stack, false);
         }
-
-        if (fail) {
+        if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isEqualToOther(stack)
+                || this.itemStack.getQuantity() >= this.maxStackSize) || !this.isValidItem(stack)) {
             return new FastOfferResult(stack, false);
         }
         // Get the amount of space we have left
         int availableSpace = this.itemStack == null ? this.maxStackSize :
                 this.maxStackSize - this.itemStack.getQuantity();
         int quantity = stack.getQuantity();
-        if (this.itemStack != null && quantity > availableSpace) {
+        if (quantity > availableSpace) {
+            if (this.itemStack == null) {
+                this.itemStack = stack.copy();
+            }
             this.itemStack.setQuantity(this.maxStackSize);
             stack = stack.copy();
             stack.setQuantity(quantity - availableSpace);
+            this.queueUpdate();
             return new FastOfferResult(stack, true);
         } else {
             if (this.itemStack == null) {
-                this.itemStack = stack;
+                this.itemStack = stack.copy();
             } else {
                 this.itemStack.setQuantity(this.itemStack.getQuantity() + quantity);
             }
+            this.queueUpdate();
             return FastOfferResult.SUCCESS;
         }
     }
 
     @Override
-    public InventoryTransactionResult set(ItemStack stack) {
+    public PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack) {
         checkNotNull(stack, "stack");
-        boolean fail;
-        if (this instanceof FilteringSlot) {
-            fail = !((FilteringSlot) this).isValidItem(stack);
+        List<SlotTransaction> transactions = new ArrayList<>();
+        if (LanternItemStack.toNullable(stack) == null) {
+            return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
+        }
+        if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isEqualToOther(stack)
+                || this.itemStack.getQuantity() >= this.maxStackSize) || !this.isValidItem(stack)) {
+            return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
+        }
+        // Get the amount of space we have left
+        int availableSpace = this.itemStack == null ? this.maxStackSize :
+                this.maxStackSize - this.itemStack.getQuantity();
+        int quantity = stack.getQuantity();
+        if (quantity > availableSpace) {
+            ItemStack newStack;
+            if (this.itemStack == null) {
+                newStack = stack.copy();
+            } else {
+                newStack = this.itemStack.copy();
+            }
+            newStack.setQuantity(this.maxStackSize);
+            stack = stack.copy();
+            stack.setQuantity(quantity - availableSpace);
+            transactions.add(new SlotTransaction(this, LanternItemStack.toSnapshot(this.itemStack),
+                    newStack.createSnapshot()));
+            return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, true));
         } else {
-            fail = !this.doesAllowItem(stack);
+            ItemStack newStack;
+            if (this.itemStack == null) {
+                newStack = stack.copy();
+            } else {
+                newStack = this.itemStack.copy();
+                newStack.setQuantity(newStack.getQuantity() + quantity);
+            }
+            transactions.add(new SlotTransaction(this, LanternItemStack.toSnapshot(this.itemStack),
+                    newStack.createSnapshot()));
+            return new PeekOfferTransactionsResult(transactions, FastOfferResult.SUCCESS);
+        }
+    }
+
+    @Override
+    public InventoryTransactionResult set(@Nullable ItemStack stack) {
+        stack = LanternItemStack.toNullable(stack);
+        boolean fail = false;
+        if (stack != null) {
+            if (stack.getQuantity() <= 0) {
+                stack = null;
+            } else {
+                fail = !this.isValidItem(stack);
+            }
         }
         if (fail) {
             return InventoryTransactionResult.builder()
@@ -286,16 +449,20 @@ public class LanternSlot extends InventoryBase implements Slot {
         if (this.itemStack != null) {
             resultBuilder.replace(this.itemStack);
         }
-        this.itemStack = stack;
-        int quantity = stack.getQuantity();
-        if (quantity > this.maxStackSize) {
-            stack.setQuantity(this.maxStackSize);
-            // Create the rest stack that was rejected,
-            // because the inventory doesn't allow so many items
+        if (stack != null) {
             stack = stack.copy();
-            stack.setQuantity(quantity - this.maxStackSize);
-            resultBuilder.reject(stack);
+            int quantity = stack.getQuantity();
+            if (quantity > this.maxStackSize) {
+                stack.setQuantity(this.maxStackSize);
+                // Create the rest stack that was rejected,
+                // because the inventory doesn't allow so many items
+                stack = stack.copy();
+                stack.setQuantity(quantity - this.maxStackSize);
+                resultBuilder.reject(stack);
+            }
         }
+        this.itemStack = stack;
+        this.queueUpdate();
         return resultBuilder.build();
     }
 
@@ -326,11 +493,13 @@ public class LanternSlot extends InventoryBase implements Slot {
 
     @Override
     public boolean contains(ItemStack stack) {
+        checkNotNull(stack, "stack");
         return this.itemStack != null && ((LanternItemStack) this.itemStack).isEqualToOther(stack);
     }
 
     @Override
     public boolean contains(ItemType type) {
+        checkNotNull(type, "type");
         return this.itemStack != null && this.itemStack.getItem().equals(type);
     }
 
@@ -347,13 +516,30 @@ public class LanternSlot extends InventoryBase implements Slot {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Inventory> T query(Predicate<Inventory> matcher) {
-        return (T) (matcher.test(this) ? this : this.emptyInventory);
+    public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
+        return (T) this.emptyInventory;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Iterator<Inventory> iterator() {
         return EmptyIterator.get();
+    }
+
+    /**
+     * Gets whether the content of this slot should be offered
+     * in the reverse offer to the main inventory when retrieving
+     * the items through shift click.
+     *
+     * TODO: A cleaner way to implement this?
+     *
+     * @return Is reverse offer order
+     */
+    public boolean isReverseShiftClickOfferOrder() {
+        return true;
+    }
+
+    public boolean doesAllowShiftClickOffer() {
+        return true;
     }
 }

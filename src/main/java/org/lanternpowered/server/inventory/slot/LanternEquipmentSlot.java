@@ -109,4 +109,9 @@ public class LanternEquipmentSlot extends LanternFilteringSlot implements Equipm
         }
         return this.doesAllowEquipmentType(() -> Optional.of(type));
     }
+
+    @Override
+    public boolean isReverseShiftClickOfferOrder() {
+        return false;
+    }
 }

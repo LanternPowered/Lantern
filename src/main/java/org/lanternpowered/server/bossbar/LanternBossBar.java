@@ -227,7 +227,7 @@ public class LanternBossBar implements ServerBossBar {
         checkNotNull(player, "player");
         final LanternPlayer player1 = (LanternPlayer) player;
         if (this.viewers.add(player1) && this.visible) {
-            player1.getConnection().send(this.createAddMessage(player1.getLocale()));
+            this.resendBossBar(player1);
         }
         return this;
     }
@@ -237,7 +237,7 @@ public class LanternBossBar implements ServerBossBar {
         checkNotNull(player, "player");
         final LanternPlayer player1 = (LanternPlayer) player;
         if (this.viewers.remove(player1) && this.visible) {
-            this.resendBossBar(player1);
+            player1.getConnection().send(new MessagePlayOutBossBar.Remove(this.uniqueId));
         }
         return this;
     }
@@ -254,7 +254,7 @@ public class LanternBossBar implements ServerBossBar {
     }
 
     public void resendBossBar(LanternPlayer player) {
-        player.getConnection().send(new MessagePlayOutBossBar.Remove(this.uniqueId));
+        player.getConnection().send(this.createAddMessage(player.getLocale()));
     }
 
     private MessagePlayOutBossBar.Add createAddMessage(Locale locale) {

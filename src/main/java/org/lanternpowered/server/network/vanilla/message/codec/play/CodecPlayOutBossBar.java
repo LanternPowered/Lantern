@@ -27,6 +27,8 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
+import org.lanternpowered.server.bossbar.LanternBossBarColor;
+import org.lanternpowered.server.bossbar.LanternBossBarOverlay;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -44,22 +46,22 @@ public final class CodecPlayOutBossBar implements Codec<MessagePlayOutBossBar> {
             buf.writeVarInt(0);
             buf.write(Types.LOCALIZED_TEXT, message0.getTitle());
             buf.writeFloat(message0.getHealth());
-            buf.writeVarInt(message0.getColor().ordinal());
-            buf.writeVarInt(message0.getDivision().ordinal());
+            buf.writeVarInt(((LanternBossBarColor) message0.getColor()).getInternalId());
+            buf.writeVarInt(((LanternBossBarOverlay) message0.getOverlay()).getInternalId());
             buf.writeByte(toFlags(message0.isDarkenSky(), message0.isEndMusic()));
         } else if (message instanceof MessagePlayOutBossBar.Remove) {
             buf.writeVarInt(1);
-        } else if (message instanceof MessagePlayOutBossBar.UpdateHealth) {
+        } else if (message instanceof MessagePlayOutBossBar.UpdatePercent) {
             buf.writeVarInt(2);
-            buf.writeFloat(((MessagePlayOutBossBar.UpdateHealth) message).getHealth());
+            buf.writeFloat(((MessagePlayOutBossBar.UpdatePercent) message).getPercent());
         } else if (message instanceof MessagePlayOutBossBar.UpdateTitle) {
             buf.writeVarInt(3);
             buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutBossBar.UpdateTitle) message).getTitle());
         } else if (message instanceof MessagePlayOutBossBar.UpdateStyle) {
             MessagePlayOutBossBar.UpdateStyle message0 = (MessagePlayOutBossBar.UpdateStyle) message;
             buf.writeVarInt(4);
-            buf.writeVarInt(message0.getColor().ordinal());
-            buf.writeVarInt(message0.getDivision().ordinal());
+            buf.writeVarInt(((LanternBossBarColor) message0.getColor()).getInternalId());
+            buf.writeVarInt(((LanternBossBarOverlay) message0.getOverlay()).getInternalId());
         } else if (message instanceof MessagePlayOutBossBar.UpdateMisc) {
             MessagePlayOutBossBar.UpdateMisc message0 = (MessagePlayOutBossBar.UpdateMisc) message;
             buf.writeVarInt(5);

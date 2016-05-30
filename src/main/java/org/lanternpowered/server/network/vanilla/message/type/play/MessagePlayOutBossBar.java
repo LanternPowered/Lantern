@@ -27,6 +27,8 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
+import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.BossBarOverlay;
 
 import java.util.UUID;
 
@@ -35,34 +37,33 @@ public abstract class MessagePlayOutBossBar implements Message {
     public static final class Add extends MessagePlayOutBossBar {
 
         private final LocalizedText title;
-        private final Color color;
-        private final Division division;
+        private final BossBarColor color;
+        private final BossBarOverlay overlay;
         private final float health;
         private final boolean darkenSky;
         private final boolean endMusic;
 
-        public Add(UUID uniqueId, LocalizedText title, Color color, Division division, float health,
+        public Add(UUID uniqueId, LocalizedText title, BossBarColor color, BossBarOverlay overlay, float health,
                 boolean darkenSky, boolean endMusic) {
             super(uniqueId);
             this.title = title;
             this.color = color;
-            this.division = division;
+            this.overlay = overlay;
             this.health = health;
             this.darkenSky = darkenSky;
             this.endMusic = endMusic;
         }
 
-
         public LocalizedText getTitle() {
             return this.title;
         }
 
-        public Color getColor() {
+        public BossBarColor getColor() {
             return this.color;
         }
 
-        public Division getDivision() {
-            return this.division;
+        public BossBarOverlay getOverlay() {
+            return this.overlay;
         }
 
         public boolean isDarkenSky() {
@@ -85,17 +86,17 @@ public abstract class MessagePlayOutBossBar implements Message {
         }
     }
 
-    public static final class UpdateHealth extends MessagePlayOutBossBar {
+    public static final class UpdatePercent extends MessagePlayOutBossBar {
 
-        private final float health;
+        private final float percent;
 
-        public UpdateHealth(UUID uniqueId, float health) {
+        public UpdatePercent(UUID uniqueId, float percent) {
             super(uniqueId);
-            this.health = health;
+            this.percent = percent;
         }
 
-        public float getHealth() {
-            return this.health;
+        public float getPercent() {
+            return this.percent;
         }
     }
 
@@ -115,21 +116,21 @@ public abstract class MessagePlayOutBossBar implements Message {
 
     public static final class UpdateStyle extends MessagePlayOutBossBar {
 
-        private final Color color;
-        private final Division division;
+        private final BossBarColor color;
+        private final BossBarOverlay overlay;
 
-        public UpdateStyle(UUID uniqueId, Color color, Division division) {
+        public UpdateStyle(UUID uniqueId, BossBarColor color, BossBarOverlay overlay) {
             super(uniqueId);
             this.color = color;
-            this.division = division;
+            this.overlay = overlay;
         }
 
-        public Color getColor() {
+        public BossBarColor getColor() {
             return this.color;
         }
 
-        public Division getDivision() {
-            return this.division;
+        public BossBarOverlay getOverlay() {
+            return this.overlay;
         }
     }
 
@@ -161,23 +162,5 @@ public abstract class MessagePlayOutBossBar implements Message {
 
     public UUID getUniqueId() {
         return uniqueId;
-    }
-
-    public enum Color {
-        PINK,
-        BLUE,
-        RED,
-        GREEN,
-        YELLOW,
-        PURPLE,
-        WHITE,
-    }
-
-    public enum Division {
-        NONE,
-        SIX,
-        TEN,
-        TWELVE,
-        TWENTY,
     }
 }

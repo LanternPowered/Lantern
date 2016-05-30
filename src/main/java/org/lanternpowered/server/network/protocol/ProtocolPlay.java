@@ -343,7 +343,7 @@ public final class ProtocolPlay extends ProtocolBase {
         CodecRegistration<MessagePlayOutBossBar, CodecPlayOutBossBar> codecPlayOutBossBar = outbound.bind(0x0c, CodecPlayOutBossBar.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.Add.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.Remove.class);
-        codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdateHealth.class);
+        codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdatePercent.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdateStyle.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdateTitle.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdateMisc.class);

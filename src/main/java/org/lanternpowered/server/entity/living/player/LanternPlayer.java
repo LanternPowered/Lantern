@@ -32,6 +32,7 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.bossbar.LanternBossBar;
 import org.lanternpowered.server.command.targeted.AbstractTargetingCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
@@ -47,9 +48,7 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.HumanInventoryContainer;
 import org.lanternpowered.server.inventory.LanternContainer;
-import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
-import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.session.Session;
@@ -73,7 +72,6 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
@@ -181,6 +179,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     private final PlayerContainerSession containerSession;
 
     /**
+     * All the boss bars that are visible for this {@link Player}.
+     */
+    private final Set<LanternBossBar> bossBars = new HashSet<>();
+
+    /**
      * The last time that the player was active.
      */
     private long lastActiveTime;
@@ -198,6 +201,10 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                 .getOrCreate(gameProfile);
         this.user.setPlayer(this);
         this.resetIdleTimeoutCounter();
+    }
+
+    public Set<LanternBossBar> getBossBars() {
+        return this.bossBars;
     }
 
     /**
@@ -300,8 +307,10 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                     (float) rotation.getY(), (float) rotation.getX(), Collections.emptySet(), 0));
             this.setScoreboard(world.getScoreboard());
             this.inventoryContainer.openInventoryForAndInitialize(this);
+            this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
         } else {
             this.session.getServer().removePlayer(this);
+            this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));
             this.tabList.clear();
             // Remove this player from the global tab list
             GlobalTabList.getInstance().get(this.gameProfile).ifPresent(GlobalTabListEntry::removeEntry);

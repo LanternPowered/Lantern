@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -38,6 +39,7 @@ import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
+import org.lanternpowered.server.bossbar.LanternBossBarBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
@@ -49,6 +51,8 @@ import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryM
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
+import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
+import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
@@ -103,10 +107,10 @@ import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryMod
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
+import org.lanternpowered.server.scoreboard.LanternCollisionRule;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder;
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder;
-import org.lanternpowered.server.scoreboard.LanternCollisionRule;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
@@ -120,6 +124,9 @@ import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.boss.BossBarColor;
+import org.spongepowered.api.boss.BossBarOverlay;
+import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.persistence.DataFormat;
 import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.DirtType;
@@ -257,6 +264,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(new AttributeTargetRegistryModule())
                 .registerModule(BlockType.class, BlockRegistryModule.get())
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
+                .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
+                .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
                 .registerModule(BrickType.class, new BrickTypeRegistryModule())
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())
@@ -325,6 +334,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(Objective.Builder.class, LanternObjectiveBuilder::new)
                 .registerBuilderSupplier(Scoreboard.Builder.class, LanternScoreboardBuilder::new)
                 .registerBuilderSupplier(Team.Builder.class, LanternTeamBuilder::new)
+                .registerBuilderSupplier(ServerBossBar.Builder.class, LanternBossBarBuilder::new)
                 ;
         this.registerFactories();
     }
@@ -391,6 +401,21 @@ public class LanternGameRegistry implements GameRegistry {
             return Collections.emptyList();
         } else {
             return registryModule.getAll();
+        }
+    }
+
+    @Override
+    public <T extends CatalogType> Collection<T> getAllFor(String pluginId, Class<T> typeClass) {
+        checkNotNull(pluginId);
+        final CatalogRegistryModule<T> registryModule = this.getCatalogRegistryModule(typeClass).orElse(null);
+        if (registryModule == null) {
+            return Collections.emptyList();
+        } else {
+            ImmutableList.Builder<T> builder = ImmutableList.builder();
+            registryModule.getAll().stream()
+                    .filter(type -> pluginId.equals(type.getId().split(":")[0]))
+                    .forEach(builder::add);
+            return builder.build();
         }
     }
 

@@ -124,6 +124,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSwapHandItems;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutTabListEntries;
@@ -306,19 +307,25 @@ public final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInEditBook.class); // TODO: Handler
         inbound.bind(MessagePlayInSignBook.class); // TODO: Handler
         inbound.bind(MessagePlayInPickItem.class); // TODO: Handler
-        inbound.bind(MessagePlayInOutChannelPayload.class).bindHandler(new HandlerPlayInChannelPayload());
-        inbound.bind(MessagePlayInOutRegisterChannels.class).bindHandler(new HandlerPlayInRegisterChannels());
-        inbound.bind(MessagePlayInOutUnregisterChannels.class).bindHandler(new HandlerPlayInUnregisterChannels());
+        inbound.bind(MessagePlayInOutChannelPayload.class)
+                .bindHandler(new HandlerPlayInChannelPayload());
+        inbound.bind(MessagePlayInOutRegisterChannels.class)
+                .bindHandler(new HandlerPlayInRegisterChannels());
+        inbound.bind(MessagePlayInOutUnregisterChannels.class)
+                .bindHandler(new HandlerPlayInUnregisterChannels());
         // Provided by CodecPlayInUseEntity
         inbound.bind(MessagePlayInUseEntity.Attack.class); // TODO: Handler
         inbound.bind(MessagePlayInUseEntity.Interact.class); // TODO: Handler
         // Provided by CodecPlayInPlayerDigging
-        inbound.bind(MessagePlayInPlayerDigging.class).bindHandler(new HandlerPlayInPlayerDigging());
+        inbound.bind(MessagePlayInPlayerDigging.class)
+                .bindHandler(new HandlerPlayInPlayerDigging());
         inbound.bind(MessagePlayInDropHeldItem.class); // TODO: Handler
         inbound.bind(MessagePlayInFinishUsingItem.class); // TODO: Handler
-        inbound.bind(MessagePlayInSwapHandItems.class); // TODO: Handler
+        inbound.bind(MessagePlayInSwapHandItems.class)
+                .bindHandler(new HandlerPlayInSwapHandItems());
         // Provided by CodecPlayInClientStatus
-        inbound.bind(MessagePlayInOpenInventory.class).bindHandler(new HandlerPlayInOpenInventory());
+        inbound.bind(MessagePlayInOpenInventory.class)
+                .bindHandler(new HandlerPlayInOpenInventory());
         inbound.bind(MessagePlayInPerformRespawn.class); // TODO: Handler
         inbound.bind(MessagePlayInRequestStatistics.class); // TODO: Handler
         // Provided by CodecPlayInPlayerAction

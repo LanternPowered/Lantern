@@ -38,7 +38,6 @@ import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.inventory.slot.LanternEquipmentSlot;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.entity.HumanInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.text.translation.Translation;

@@ -23,32 +23,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.item;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.fromFace;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.item.ItemInteractionType;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.World;
 
-public final class CodecPlayInPlayerBlockPlacement implements Codec<MessagePlayInPlayerBlockPlacement> {
+import java.util.Optional;
+
+import javax.annotation.Nullable;
+
+public class BlockItemType extends LanternItemType {
+
+    private final BlockType blockType;
+
+    public BlockItemType(String pluginId, String identifier, BlockType blockType) {
+        super(pluginId, identifier, checkNotNull(blockType, "blockType").getTranslation());
+        this.blockType = blockType;
+    }
 
     @Override
-    public MessagePlayInPlayerBlockPlacement decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        Vector3i position = buf.read(Types.VECTOR_3_I);
-        Direction face = fromFace(buf.readVarInt());
-        ItemInteractionType hand = ItemInteractionType.values()[buf.readVarInt()];
-        double ox = (double) buf.readByte() / 15.0;
-        double oy = (double) buf.readByte() / 15.0;
-        double oz = (double) buf.readByte() / 15.0;
-        Vector3d offset = new Vector3d(ox , oy, oz);
-        return new MessagePlayInPlayerBlockPlacement(position, offset, face, hand);
+    public Optional<BlockType> getBlock() {
+        return Optional.of(this.blockType);
     }
+
+    @Override
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
+            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
+        itemStack = itemStack.copy();
+        itemStack.setQuantity(itemStack.getQuantity() - 1);
+        world.setBlock(clickedBlock.add(blockFace.toVector3d().toInt()), this.blockType.getDefaultState());
+        return ItemInteractionResult.builder()
+                .type(ItemInteractionResult.Type.SUCCESS)
+                .resultItem(itemStack.createSnapshot())
+                .build();
+    }
+
 }

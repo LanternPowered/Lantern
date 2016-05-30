@@ -23,12 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player;
-
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
-public enum PlayerHand {
-    LEFT,
-    RIGHT,
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.economy;

@@ -32,7 +32,7 @@ import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.item.LanternItemType;
+import org.lanternpowered.server.item.BlockItemType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
@@ -45,7 +45,6 @@ import org.spongepowered.api.world.World;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -58,7 +57,7 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
      * to generate item types for the {@link BlockType}s.
      */
     public static final Function<BlockType, ItemType> DEFAULT_ITEM_TYPE_BUILDER =
-            type -> new LanternItemType(((LanternBlockType) type).getPluginId(), type.getName(), type);
+            type -> new BlockItemType(((LanternBlockType) type).getPluginId(), type.getName(), type);
 
     // The block state base which contains all the possible block states
     private final LanternBlockStateMap blockStateBase;
@@ -78,17 +77,26 @@ public class LanternBlockType extends LanternPluginCatalogType implements BlockT
         this(pluginId, identifier, itemTypeBuilder, Lists.newArrayList(blockTraits));
     }
 
+    public LanternBlockType(String pluginId, String identifier, String translationKey,
+            @Nullable Function<BlockType, ItemType> itemTypeBuilder, BlockTrait<?>... blockTraits) {
+        this(pluginId, identifier, translationKey, itemTypeBuilder, Lists.newArrayList(blockTraits));
+    }
+
     public LanternBlockType(String pluginId, String identifier,
+            @Nullable Function<BlockType, ItemType> itemTypeBuilder, Iterable<BlockTrait<?>> blockTraits) {
+        this(pluginId, identifier, identifier, itemTypeBuilder, blockTraits);
+    }
+
+    public LanternBlockType(String pluginId, String identifier, String translationKey,
             @Nullable Function<BlockType, ItemType> itemTypeBuilder, Iterable<BlockTrait<?>> blockTraits) {
         super(pluginId, identifier);
 
-        final String translationId = "tile." + ((pluginId.equalsIgnoreCase("minecraft") ? "" :
-                pluginId.toLowerCase(Locale.ENGLISH)) + ".") + identifier.toLowerCase(Locale.ENGLISH) + ".name";
-        this.translation = Lantern.getRegistry().getTranslationManager().get(translationId);
-        // Create the block state base
-        this.itemType = itemTypeBuilder == null ? Optional.empty() : Optional.of(itemTypeBuilder.apply(this));
+        this.translation = Lantern.getRegistry().getTranslationManager().get(
+                "tile." + translationKey + ".name");
         this.blockStateBase = new LanternBlockStateMap(this, blockTraits);
         this.defaultBlockState = this.blockStateBase.getBaseState();
+        // Create the block state base
+        this.itemType = itemTypeBuilder == null ? Optional.empty() : Optional.of(itemTypeBuilder.apply(this));
     }
 
     protected void setDefaultState(BlockState blockState) {

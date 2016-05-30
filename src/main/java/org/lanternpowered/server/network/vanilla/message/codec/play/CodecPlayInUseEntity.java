@@ -28,7 +28,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
-import org.lanternpowered.server.entity.living.player.PlayerHand;
+import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -50,7 +50,7 @@ public final class CodecPlayInUseEntity implements Codec<MessagePlayInUseEntity>
                 double z = buf.readFloat();
                 position = new Vector3d(x, y, z);
             }
-            PlayerHand hand = PlayerHand.values()[buf.readVarInt()];
+            ItemInteractionType hand = ItemInteractionType.values()[buf.readVarInt()];
             return new MessagePlayInUseEntity.Interact(entityId, hand, position);
         } else {
             throw new DecoderException("Recieved a UseEntity message with a unknown action: " + action);

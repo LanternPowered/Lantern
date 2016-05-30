@@ -120,6 +120,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInCreativeWindowAction;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInOpenInventory;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInResourcePackStatus;
@@ -291,7 +292,8 @@ public final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInChangeSign());
         inbound.bind(0x1a, CodecPlayInPlayerSwingArm.class, MessagePlayInPlayerSwingArm.class); // TODO: Handler
         inbound.bind(0x1b, CodecPlayInSpectate.class, MessagePlayInSpectate.class); // TODO: Handler
-        inbound.bind(0x1c, CodecPlayInPlayerBlockPlacement.class, MessagePlayInPlayerBlockPlacement.class); // TODO: Handler
+        inbound.bind(0x1c, CodecPlayInPlayerBlockPlacement.class, MessagePlayInPlayerBlockPlacement.class)
+                .bindHandler(new HandlerPlayInPlayerBlockPlacement());
         inbound.bind(0x1d, CodecPlayInPlayerUseItem.class, MessagePlayInPlayerUseItem.class); // TODO: Handler
 
         // Provided by CodecPlayInOutCustomPayload

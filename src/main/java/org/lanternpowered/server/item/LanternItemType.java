@@ -28,19 +28,23 @@ package org.lanternpowered.server.item;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.catalog.LanternPluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Property;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.World;
 
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -50,16 +54,22 @@ import javax.annotation.Nullable;
 public class LanternItemType extends LanternPluginCatalogType implements ItemType {
 
     private final Map<Class<?>, Property<?,?>> properties = new HashMap<>();
-    @Nullable private final BlockType blockType;
     private Translation translation;
     private int maxStackQuantity = 64;
 
-    public LanternItemType(String pluginId, String identifier, @Nullable BlockType blockType) {
+    public LanternItemType(String pluginId, String identifier) {
+        this(pluginId, identifier, identifier);
+    }
+
+    public LanternItemType(String pluginId, String identifier, String translationKey) {
         super(pluginId, identifier);
-        final String translationId = "tile." + ((pluginId.equalsIgnoreCase("minecraft") ? "" :
-                pluginId.toLowerCase(Locale.ENGLISH)) + ".") + identifier.toLowerCase(Locale.ENGLISH) + ".name";
-        this.translation = Lantern.getRegistry().getTranslationManager().get(translationId);
-        this.blockType = blockType;
+        this.translation = Lantern.getRegistry().getTranslationManager().get(
+                "item." + translationKey + ".name");
+    }
+
+    public LanternItemType(String pluginId, String identifier, Translation translation) {
+        super(pluginId, identifier);
+        this.translation = checkNotNull(translation, "translation");
     }
 
     @Override
@@ -119,13 +129,18 @@ public class LanternItemType extends LanternPluginCatalogType implements ItemTyp
 
     @Override
     public Optional<BlockType> getBlock() {
-        return Optional.ofNullable(this.blockType);
+        return Optional.empty();
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Property<?, ?>> Optional<T> getDefaultProperty(Class<T> propertyClass) {
         return Optional.ofNullable((T) this.properties.get(checkNotNull(propertyClass, "propertyClass")));
+    }
+
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
+            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
+        return ItemInteractionResult.pass();
     }
 
 }

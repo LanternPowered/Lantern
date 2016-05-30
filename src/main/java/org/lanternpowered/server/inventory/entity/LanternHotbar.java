@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternInventoryRow;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -47,6 +48,10 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
 
     public LanternHotbar(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
+    }
+
+    public LanternSlot getSelectedSlot() {
+        return this.getSlotAt(this.selectedSlotIndex).get();
     }
 
     @Override

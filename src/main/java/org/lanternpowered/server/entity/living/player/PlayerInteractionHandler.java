@@ -27,12 +27,20 @@ package org.lanternpowered.server.entity.living.player;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.entity.LanternHotbar;
+import org.lanternpowered.server.inventory.entity.OffHandSlot;
+import org.lanternpowered.server.item.ItemInteractionResult;
+import org.lanternpowered.server.item.ItemInteractionType;
+import org.lanternpowered.server.item.LanternItemType;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.Optional;
 import java.util.Set;
 
 public final class PlayerInteractionHandler {
@@ -52,7 +60,7 @@ public final class PlayerInteractionHandler {
     /**
      * The amount of time the digging takes.
      */
-    private long diggingTime;
+    private long diggingDuration;
     /**
      * The last send break state.
      */
@@ -75,7 +83,7 @@ public final class PlayerInteractionHandler {
      */
     void pulse() {
         if (this.diggingBlock != null) {
-            int breakState = (int) Math.round(((double) Math.max(0, this.diggingEndTime - System.nanoTime()) / (double) this.diggingTime) * 10.0);
+            int breakState = (int) Math.round(((double) Math.max(0, this.diggingEndTime - System.nanoTime()) / (double) this.diggingDuration) * 10.0);
             if (this.lastBreakState != breakState) {
                 this.sendBreakUpdate(breakState);
                 this.lastBreakState = breakState;
@@ -131,12 +139,12 @@ public final class PlayerInteractionHandler {
             this.diggingBlock = blockPos;
             this.diggingBlockType = blockType;
 
-            long diggingDuration = this.getDiggingDuration(blockType);
+            this.diggingDuration = this.getDiggingDuration(blockType);
             // The client won't send a finish message
-            if (diggingDuration <= 0) {
+            if (this.diggingDuration <= 0) {
                 this.handleBrokenBlock();
             } else {
-                this.diggingEndTime = System.nanoTime() + diggingDuration;
+                this.diggingEndTime = System.nanoTime() + this.diggingDuration;
             }
         } else if (action == MessagePlayInPlayerDigging.Action.CANCEL) {
             if (this.diggingBlock == null || !this.diggingBlock.equals(blockPos)) {
@@ -180,5 +188,34 @@ public final class PlayerInteractionHandler {
      */
     private long getDiggingDuration(BlockType blockType) {
         return 0;
+    }
+
+    public void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
+        // The hand the action was excepted from
+        // HandType expectedHand = message.getHand();
+        // TODO: Send updates if something failed, events, ...
+
+        ItemInteractionResult interactionResult = null;
+
+        // Try the action of the hotbar item first
+        LanternHotbar hotbar = this.player.getInventory().query(LanternHotbar.class).first();
+        Optional<ItemStack> optItemStack = hotbar.getSelectedSlot().peek();
+        if (optItemStack.isPresent()) {
+            final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
+            interactionResult = itemType.onInteractWithItemAt(this.player, this.player.getWorld(), ItemInteractionType.MAIN,
+                    optItemStack.get(), message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult.getResultItem().ifPresent(item -> hotbar.getSelectedSlot().set(item.createStack()));
+        }
+
+        if (interactionResult == null || interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
+            OffHandSlot offHandSlot = this.player.getInventory().query(OffHandSlot.class).first();
+            optItemStack = offHandSlot.peek();
+            if (optItemStack.isPresent()) {
+                final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
+                interactionResult = itemType.onInteractWithItemAt(this.player, this.player.getWorld(), ItemInteractionType.OFF,
+                        optItemStack.get(), message.getPosition(), message.getFace(), message.getClickOffset());
+                interactionResult.getResultItem().ifPresent(item -> offHandSlot.set(item.createStack()));
+            }
+        }
     }
 }

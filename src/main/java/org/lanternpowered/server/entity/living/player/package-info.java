@@ -23,20 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
-
-import org.lanternpowered.server.item.ItemInteractionType;
-import org.lanternpowered.server.network.message.Message;
-
-public final class MessagePlayInPlayerUseItem implements Message {
-
-    private final ItemInteractionType interactionType;
-
-    public MessagePlayInPlayerUseItem(ItemInteractionType interactionType) {
-        this.interactionType = interactionType;
-    }
-
-    public ItemInteractionType getInteractionType() {
-        return this.interactionType;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.entity.living.player;

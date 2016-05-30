@@ -137,7 +137,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     private ChatVisibility chatVisibility = ChatVisibilities.FULL;
 
     // The main hand of the player
-    private PlayerHand mainHand = PlayerHand.RIGHT;
+    private HandType mainHand = HandType.RIGHT;
 
     // Whether the chat colors are enabled
     private boolean chatColorsEnabled;
@@ -703,11 +703,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.skinParts = checkNotNull(skinParts, "skinParts");
     }
 
-    public PlayerHand getMainHand() {
+    public HandType getMainHand() {
         return this.mainHand;
     }
 
-    public void setMainHand(PlayerHand mainHand) {
+    public void setMainHand(HandType mainHand) {
         this.mainHand = checkNotNull(mainHand, "mainHand");
     }
 

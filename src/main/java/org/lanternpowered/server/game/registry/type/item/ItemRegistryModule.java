@@ -112,7 +112,7 @@ public final class ItemRegistryModule implements ItemRegistry {
 
     @Override
     public void registerDefaults() {
-        final LanternItemType none = new LanternItemType("minecraft", "none", null);
+        final LanternItemType none = new LanternItemType("minecraft", "none");
         this.register(0, none);
         try {
             ReflectionHelper.setField(ItemStackSnapshot.class.getDeclaredField("NONE"), null,

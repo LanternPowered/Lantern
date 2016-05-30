@@ -26,7 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.entity.living.player.PlayerHand;
+import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.network.message.Message;
 
 import java.util.Optional;
@@ -54,17 +54,17 @@ public abstract class MessagePlayInUseEntity implements Message {
 
     public static final class Interact extends MessagePlayInUseEntity {
 
-        private final PlayerHand hand;
+        private final ItemInteractionType interactionType;
         private final Optional<Vector3d> position;
 
-        public Interact(int entityId, PlayerHand hand, @Nullable Vector3d position) {
+        public Interact(int entityId, ItemInteractionType interactionType, @Nullable Vector3d position) {
             super(entityId);
             this.position = Optional.ofNullable(position);
-            this.hand = hand;
+            this.interactionType = interactionType;
         }
 
-        public PlayerHand getHand() {
-            return this.hand;
+        public ItemInteractionType getInteractionType() {
+            return this.interactionType;
         }
 
         public Optional<Vector3d> getPosition() {

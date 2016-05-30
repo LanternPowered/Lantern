@@ -23,32 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.fromFace;
-
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.item.ItemInteractionType;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
-import org.spongepowered.api.util.Direction;
 
-public final class CodecPlayInPlayerBlockPlacement implements Codec<MessagePlayInPlayerBlockPlacement> {
+public final class HandlerPlayInPlayerBlockPlacement implements Handler<MessagePlayInPlayerBlockPlacement> {
 
     @Override
-    public MessagePlayInPlayerBlockPlacement decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        Vector3i position = buf.read(Types.VECTOR_3_I);
-        Direction face = fromFace(buf.readVarInt());
-        ItemInteractionType hand = ItemInteractionType.values()[buf.readVarInt()];
-        double ox = (double) buf.readByte() / 15.0;
-        double oy = (double) buf.readByte() / 15.0;
-        double oz = (double) buf.readByte() / 15.0;
-        Vector3d offset = new Vector3d(ox , oy, oz);
-        return new MessagePlayInPlayerBlockPlacement(position, offset, face, hand);
+    public void handle(NetworkContext context, MessagePlayInPlayerBlockPlacement message) {
+        LanternPlayer player = context.getSession().getPlayer();
+        player.resetIdleTimeoutCounter();
+        player.getInteractionHandler().handleBlockPlacing(message);
     }
 }

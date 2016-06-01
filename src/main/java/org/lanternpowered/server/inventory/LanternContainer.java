@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
 import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
@@ -45,8 +46,10 @@ import org.spongepowered.api.item.inventory.type.OrderedInventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -57,7 +60,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     private static int windowIdCounter = 1;
 
     final Set<Player> viewers = new HashSet<>();
-    final Set<LanternSlot> dirtySlots = new HashSet<>();
+    final Map<LanternSlot, Boolean> dirtySlots = new HashMap<>();
 
     protected final int windowId;
 
@@ -88,7 +91,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             this.openInventory = (LanternOrderedInventory) openInventory;
         } else {
             this.registerChild(humanInventory);
-            this.openInventory = (LanternOrderedInventory) humanInventory;
+            this.openInventory = humanInventory;
             this.windowId = 0;
         }
         for (LanternSlot slot : this.slots) {
@@ -143,26 +146,40 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     }
 
     /**
-     * Is called when the {@link ItemStack} in a {@link Slot}
-     * is being modified.
+     * Queues a {@link ItemStack} change of a {@link Slot}.
      *
      * @param slot The slot
      */
     public void queueSlotChange(Slot slot) {
+        this.queueSlotChange(slot, false);
+    }
+
+    /**
+     * Queues a {@link ItemStack} change of a {@link Slot}. This
+     * is done "silently" and this means that there won't be any
+     * animation played (in the hotbar).
+     *
+     * @param slot The slot
+     */
+    public void queueSilentSlotChange(Slot slot) {
+        this.queueSlotChange(slot, true);
+    }
+
+    void queueSlotChange(Slot slot, boolean silent) {
         if (!this.viewers.isEmpty()) {
             int index = this.openInventory.getSlotIndex(slot);
             if (index != -1) {
-                this.dirtySlots.add((LanternSlot) slot);
+                this.dirtySlots.put((LanternSlot) slot, silent);
             } else {
-                this.queueHumanSlotChange(slot);
+                this.queueHumanSlotChange(slot, silent);
             }
         }
     }
 
-    void queueHumanSlotChange(Slot slot) {
-        int index = ((LanternOrderedInventory) this.humanInventory).getSlotIndex(slot);
+    void queueHumanSlotChange(Slot slot, boolean silent) {
+        int index = this.humanInventory.getSlotIndex(slot);
         if (index != -1) {
-            this.dirtySlots.add((LanternSlot) slot);
+            this.dirtySlots.put((LanternSlot) slot, silent);
         }
     }
 
@@ -172,10 +189,28 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
 
     public void streamSlotChanges() {
         final List<Message> messages = new ArrayList<>();
-        for (LanternSlot slot : this.dirtySlots) {
+        for (Map.Entry<LanternSlot, Boolean> entry : this.dirtySlots.entrySet()) {
             int windowId = this.windowId;
-            int index = this.getSlotIndex(slot);
-            messages.add(new MessagePlayOutSetWindowSlot(windowId, index, slot.peek().orElse(null)));
+            int index = -1;
+            if (windowId != 0) {
+                index = this.openInventory.getSlotIndex(entry.getKey());
+            } else {
+                // The silent slot index, is different....
+                // Try the raw inventory slots first
+                if (entry.getValue()) {
+                    index = ((LanternOrderedInventory) this.humanInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY))
+                            .getSlotIndex(entry.getKey());
+                    // Silent updates use the window id -2, this is not
+                    // supported for all slot though
+                    if (index != -1) {
+                        windowId = -2;
+                    }
+                }
+                if (index == -1) {
+                    index = this.getSlotIndex(entry.getKey());
+                }
+            }
+            messages.add(new MessagePlayOutSetWindowSlot(windowId, index, entry.getKey().peek().orElse(null)));
         }
         this.dirtySlots.clear();
         if (!messages.isEmpty()) {

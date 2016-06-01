@@ -64,4 +64,16 @@ public enum HumanInventoryView {
      * the hotbar.
      */
     ALL_PRIORITY_MAIN,
+    /**
+     * A view that uses the raw inventory slot indexes of vanilla
+     * minecraft, this is mainly for networking only and this doesn't
+     * contain the crafting grid.
+     *
+     * Inventory arrangement:
+     * - Hotbar
+     * - Main inventory
+     * - Equipment inventory
+     * - Off hand slot
+     */
+    RAW_INVENTORY,
 }

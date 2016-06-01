@@ -33,20 +33,22 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 
 public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAbilities> {
 
-    private final static int LENGTH = Byte.BYTES + Float.BYTES * 2;
-
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerAbilities message) throws CodecException {
         byte bits = 0;
-        // Ignore the invulnerable bit (0x1), it server side
+        if (message.isInvulnerable()) {
+            bits |= 0x1;
+        }
         if (message.isFlying()) {
             bits |= 0x2;
         }
         if (message.canFly()) {
             bits |= 0x4;
         }
-        // TODO: Not sure what to do with the creative bit (0x8)
-        ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
+        if (message.isCreative()) {
+            bits |= 0x8;
+        }
+        ByteBuffer buf = context.byteBufAlloc().buffer(9);
         buf.writeByte(bits);
         buf.writeFloat(message.getFlySpeed());
         buf.writeFloat(message.getFieldOfView());

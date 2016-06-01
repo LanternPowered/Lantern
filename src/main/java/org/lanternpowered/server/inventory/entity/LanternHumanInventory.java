@@ -79,7 +79,7 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                 this.finalizeContent();
             }
         });
-        this.registerChild(new LanternEquipmentInventory(this, humanoid) {
+        final LanternEquipmentInventory equipmentInventory = this.registerChild(new LanternEquipmentInventory(this, humanoid) {
             {
                 this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.HEADWEAR));
                 this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.CHESTPLATE));
@@ -107,7 +107,7 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                 this.prioritizeChild(hotbar);
             }
         });
-        this.registerChild(new OffHandSlot(this, null));
+        final OffHandSlot offHandSlot = this.registerChild(new OffHandSlot(this, null));
 
         // Generate inventory views
         this.inventoryViews.put(HumanInventoryView.MAIN,
@@ -119,10 +119,30 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                 priorityMainAndHotbarView);
         this.inventoryViews.put(HumanInventoryView.ALL_PRIORITY_MAIN,
                 this.generateAllPriorityMainView(mainInventory));
+        this.inventoryViews.put(HumanInventoryView.RAW_INVENTORY,
+                this.generateRawInventoryView(mainInventory, equipmentInventory, offHandSlot));
 
         // This is the default views/inventories
         this.inventoryViews.put(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR, mainInventory);
         this.inventoryViews.put(HumanInventoryView.HOTBAR, this.hotbar);
+    }
+
+    private InventoryBase generateRawInventoryView(HumanMainInventory mainInventory,
+            LanternEquipmentInventory equipmentInventory, OffHandSlot offHandSlot) {
+        return new LanternOrderedInventory(null, null) {
+            {
+                this.registerChild(new HumanMainInventory(this, null) {
+                    {
+                        this.registerRow(0, hotbar);
+                        for (int i = 0; i < 3; i++) {
+                            this.registerRow(i + 1, mainInventory.getRow(i).get());
+                        }
+                    }
+                });
+                this.registerChild(equipmentInventory);
+                this.registerChild(offHandSlot);
+            }
+        };
     }
 
     private InventoryBase generateMainView(@Nullable Inventory parent, HumanMainInventory mainInventory) {

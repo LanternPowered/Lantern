@@ -33,12 +33,19 @@ public class MessagePlayOutPlayerAbilities implements Message {
     private final boolean canFly;
     private final float flySpeed;
     private final float fieldOfView;
+    private final boolean canBreak;
+    private final boolean invulnerable;
+    private final boolean creative;
 
-    public MessagePlayOutPlayerAbilities(boolean flying, boolean canFly, float flySpeed, float fieldOfView) {
+    public MessagePlayOutPlayerAbilities(boolean flying, boolean canFly, boolean canBreak, boolean invulnerable,
+            boolean creative, float flySpeed, float fieldOfView) {
         this.fieldOfView = fieldOfView;
         this.flySpeed = flySpeed;
         this.flying = flying;
         this.canFly = canFly;
+        this.canBreak = canBreak;
+        this.invulnerable = invulnerable;
+        this.creative = creative;
     }
 
     public boolean isFlying() {
@@ -57,4 +64,15 @@ public class MessagePlayOutPlayerAbilities implements Message {
         return this.fieldOfView;
     }
 
+    public boolean getCanBreak() {
+        return this.canBreak;
+    }
+
+    public boolean isInvulnerable() {
+        return this.invulnerable;
+    }
+
+    public boolean isCreative() {
+        return this.creative;
+    }
 }

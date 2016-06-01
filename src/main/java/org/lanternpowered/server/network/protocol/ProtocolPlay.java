@@ -108,7 +108,8 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWindowProperty;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
-import org.lanternpowered.server.network.vanilla.message.codec.play.MessagePlayInPickItem;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInAllPlayerMovement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
@@ -306,7 +307,8 @@ public final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInEditCommandBlock.Entity.class); // TODO: Handler
         inbound.bind(MessagePlayInEditBook.class); // TODO: Handler
         inbound.bind(MessagePlayInSignBook.class); // TODO: Handler
-        inbound.bind(MessagePlayInPickItem.class); // TODO: Handler
+        inbound.bind(MessagePlayInPickItem.class)
+                .bindHandler(new HandlerPlayInPickItem());
         inbound.bind(MessagePlayInOutChannelPayload.class)
                 .bindHandler(new HandlerPlayInChannelPayload());
         inbound.bind(MessagePlayInOutRegisterChannels.class)

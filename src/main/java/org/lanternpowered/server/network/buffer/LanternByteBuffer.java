@@ -658,7 +658,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public ByteBuffer readBytes(byte[] byteArray) {
-        this.buf.writeBytes(byteArray);
+        this.buf.readBytes(byteArray);
         return this;
     }
 

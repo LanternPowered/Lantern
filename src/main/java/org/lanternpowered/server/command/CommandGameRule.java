@@ -28,6 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
@@ -53,8 +54,6 @@ import javax.annotation.Nullable;
 
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class CommandGameRule extends CommandProvider {
-
-    public static final String PERMISSION = "minecraft.command.gamerule";
 
     public CommandGameRule() {
         super(2, "gamerule", "rule");
@@ -86,6 +85,8 @@ public final class CommandGameRule extends CommandProvider {
                             }
                         },
                         new CommandElement(Text.of("value")) {
+                            private final List<String> booleanRuleSuggestions = ImmutableList.of("true", "false");
+
                             @Nullable
                             @Override
                             protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
@@ -100,16 +101,24 @@ public final class CommandGameRule extends CommandProvider {
 
                             @Override
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+                                RuleType<?> ruleType = context.<RuleType<?>>getOne("rule").get();
+                                if (ruleType.getDataType() == RuleDataTypes.BOOLEAN) {
+                                    // Just return the suggestions, there is no need to
+                                    // match the first part of the string
+                                    return this.booleanRuleSuggestions;
+                                }
                                 return Collections.emptyList();
                             }
                         }
                 )
                 .executor((src, args) -> {
                     WorldProperties world = getWorld(src, args);
+                    Object value = args.getOne("value").get();
+                    RuleType ruleType = args.<RuleType>getOne("rule").get();
                     ((LanternWorldProperties) world).getRules()
-                            .getOrCreateRule(args.<RuleType>getOne("rule").get())
-                            .setValue(args.getOne("value").get());
-                    src.sendMessage(t("commands.gamerule.success"));
+                            .getOrCreateRule(ruleType)
+                            .setValue(value);
+                    src.sendMessage(t("commands.gamerule.success", ruleType.getName(), ruleType.getDataType().serialize(value)));
                     return CommandResult.success();
                 });
     }

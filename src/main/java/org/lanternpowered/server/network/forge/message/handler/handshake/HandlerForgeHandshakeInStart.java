@@ -64,7 +64,10 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
         if (!channels.isEmpty()) {
             session.send(new MessagePlayInOutRegisterChannels(channels));
         }
-        if (fml) {
+        // Disable Forge for now, we need to send the registries and stuff,
+        // which isn't actually used. We may also remove the protocol in the
+        // future if sponge uses completely it's own protocol.
+        if (false && fml) {
             phase.set(ForgeServerHandshakePhase.HELLO);
             session.send(new MessageForgeHandshakeInOutHello());
             Lantern.getLogger().info("{}: Start forge handshake.", session.getGameProfile().getName().get());

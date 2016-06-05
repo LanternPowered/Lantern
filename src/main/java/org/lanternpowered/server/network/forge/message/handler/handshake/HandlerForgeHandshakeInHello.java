@@ -44,6 +44,6 @@ public final class HandlerForgeHandshakeInHello implements Handler<MessageForgeH
             session.disconnect("Retrieved unexpected forge handshake hello message.");
             return;
         }
-        Lantern.getLogger().info("{}: Forge handshake -> Received hello message.", session.getGameProfile().getName());
+        Lantern.getLogger().info("{}: Forge handshake -> Received hello message.", session.getGameProfile().getName().get());
     }
 }

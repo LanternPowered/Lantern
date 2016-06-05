@@ -30,6 +30,7 @@ import static org.lanternpowered.server.network.pipeline.MessageCodecHandler.CON
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -52,7 +53,8 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
         MessageRegistration registration = protocol.outbound().findByMessageType(message.getClass()).orElse(null);
 
         if (registration == null) {
-            throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered!");
+            throw new EncoderException("Message type (" + message.getClass().getName() +
+                    ") is not registered in state " + ctx.channel().attr(Session.STATE).get().name() + "!");
         }
 
         List<Processor> processors = ((MessageRegistration) protocol.outbound()

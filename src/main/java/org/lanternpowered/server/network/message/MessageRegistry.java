@@ -27,8 +27,8 @@ package org.lanternpowered.server.network.message;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
@@ -41,7 +41,7 @@ import java.util.Optional;
 public final class MessageRegistry {
 
     private final Map<Class<? extends Message>, MessageRegistration<?>> registrationByMessageType = new HashMap<>();
-    private final TIntObjectMap<CodecRegistration<?, ?>> registrationByOpcode = new TIntObjectHashMap<>();
+    private final Int2ObjectMap<CodecRegistration<?, ?>> registrationByOpcode = new Int2ObjectOpenHashMap<>();
 
     <M extends Message> MessageRegistration<M> checkCodecBinding(Class<M> messageType) {
         final MessageRegistration messageRegistration = this.registrationByMessageType.computeIfAbsent(messageType,
@@ -167,7 +167,7 @@ public final class MessageRegistry {
      * @return the codec registration
      */
     public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(C codec) {
-        for (CodecRegistration<?, ?> registration : this.registrationByOpcode.valueCollection()) {
+        for (CodecRegistration<?, ?> registration : this.registrationByOpcode.values()) {
             if (codec.equals(registration.getCodec())) {
                 return Optional.of((CodecRegistration) registration);
             }
@@ -184,7 +184,7 @@ public final class MessageRegistry {
      * @return the codec registration
      */
     public <M extends Message, C extends Codec<M>> Optional<CodecRegistration<M, C>> find(Class<C> codec) {
-        for (CodecRegistration<?, ?> registration : this.registrationByOpcode.valueCollection()) {
+        for (CodecRegistration<?, ?> registration : this.registrationByOpcode.values()) {
             if (codec.isInstance(registration.getCodec())) {
                 return Optional.of((CodecRegistration) registration);
             }

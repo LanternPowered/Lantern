@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.gradle
+package org.lanternpowered.gradle.transformer
 
 import org.codehaus.plexus.util.IOUtil
 import org.gradle.api.file.FileTreeElement
@@ -33,6 +33,8 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 
 import static org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
+
+import org.lanternpowered.gradle.io.DelegateOutputStream
 
 /**
  * This is a modification of the maven plugin:
@@ -45,7 +47,7 @@ class Log4jCacheFileTransformer implements Transformer {
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
-        PLUGIN_CACHE_FILE.equals(element.relativePath.pathString)
+        return PLUGIN_CACHE_FILE.equals(element.relativePath.pathString)
     }
 
     @Override
@@ -58,23 +60,29 @@ class Log4jCacheFileTransformer implements Transformer {
             fos.close()
             is.close()
         }
-        tempFiles.add(tempFile)
+        this.tempFiles.add(tempFile)
     }
 
     @Override
     boolean hasTransformedResource() {
-        tempFiles.size() > 1
+        return this.tempFiles.size() > 1
     }
 
     @Override
     void modifyOutputStream(ZipOutputStream os) {
         try {
             def aggregator = new PluginCache()
-            aggregator.loadCacheFiles(Collections.enumeration(tempFiles.collect { it.toURI().toURL() }))
+            aggregator.loadCacheFiles(Collections.enumeration(this.tempFiles.collect { it.toURI().toURL() }))
             os.putNextEntry(new ZipEntry(PLUGIN_CACHE_FILE))
-            aggregator.writeCache(os)
+            aggregator.writeCache(new DelegateOutputStream(os) {
+                @Override
+                public void close() throws IOException {
+                    // Make sure that the write method
+                    // doesn't close the stream
+                }
+            })
         } finally {
-            tempFiles.each { it.delete() }
+            this.tempFiles.each { it.delete() }
         }
     }
 }

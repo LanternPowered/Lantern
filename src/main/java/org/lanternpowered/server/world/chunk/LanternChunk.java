@@ -37,8 +37,8 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import gnu.trove.map.TShortShortMap;
-import gnu.trove.map.hash.TShortShortHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
+import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
@@ -262,7 +262,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
          * The amount of blocks per block type/state in
          * this chunk section.
          */
-        public final TShortShortMap typesCountMap = new TShortShortHashMap();
+        public final Short2ShortMap typesCountMap = new Short2ShortOpenHashMap();
 
         /**
          * The light level arrays.
@@ -335,13 +335,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
             for (short type : this.types) {
                 if (type != 0) {
                     this.nonAirCount++;
-                    this.typesCountMap.adjustOrPutValue(type, (short) 1, (short) 1);
+                    this.typesCountMap.put(type, (short) (this.typesCountMap.get(type) + 1));
                 }
             }
         }
 
         public ChunkSectionSnapshot asSnapshot(boolean skylight) {
-            final TShortShortHashMap typeCounts = new TShortShortHashMap(this.typesCountMap);
+            final Short2ShortMap typeCounts = new Short2ShortOpenHashMap(this.typesCountMap);
             int count = this.types.length - this.nonAirCount;
             if (count > 0) {
                 typeCounts.put((short) 0, (short) count);
@@ -356,13 +356,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
         // The block types array.
         public final short[] types;
         // The types count map.
-        public final TShortShortMap typesCountMap;
+        public final Short2ShortMap typesCountMap;
 
         // The light level arrays.
         @Nullable public final byte[] lightFromSky;
         public final byte[] lightFromBlock;
 
-        public ChunkSectionSnapshot(short[] types, TShortShortMap typesCountMap, byte[] lightFromBlock, @Nullable byte[] lightFromSky) {
+        public ChunkSectionSnapshot(short[] types, Short2ShortMap typesCountMap, byte[] lightFromBlock, @Nullable byte[] lightFromSky) {
             this.lightFromBlock = lightFromBlock;
             this.typesCountMap = typesCountMap;
             this.lightFromSky = lightFromSky;
@@ -918,11 +918,18 @@ public class LanternChunk implements AbstractExtent, Chunk {
             int index = ChunkSection.index(x1, y & 0xf, z1);
             short oldType = section.types[index];
             if (oldType != type1) {
-                if (oldType != 0 && section.typesCountMap.adjustOrPutValue(oldType, (short) -1, (short) 0) <= 0) {
-                    section.typesCountMap.remove(oldType);
+                if (oldType != 0) {
+                    short count = section.typesCountMap.get(oldType);
+                    if (count > 0) {
+                        if (--count <= 0) {
+                            section.typesCountMap.remove(oldType);
+                        } else {
+                            section.typesCountMap.put(oldType, count);
+                        }
+                    }
                 }
                 if (type1 != 0) {
-                    section.typesCountMap.adjustOrPutValue(type1, (short) 1, (short) 1);
+                    section.typesCountMap.put(type1, (short) (section.typesCountMap.get(type1) + 1));
                     if (oldType == 0) {
                         section.nonAirCount++;
                     }

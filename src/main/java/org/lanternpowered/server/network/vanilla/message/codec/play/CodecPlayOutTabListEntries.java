@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import gnu.trove.TCollections;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import io.netty.handler.codec.CodecException;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMaps;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -51,16 +51,16 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
     private static final int UPDATE_DISPLAY_NAME = 3;
     private static final int REMOVE = 4;
 
-    private final TObjectIntMap<Class<?>> typeLookup;
+    private final Object2IntMap<Class<?>> typeLookup;
 
     {
-        TObjectIntMap<Class<?>> typeLookup = new TObjectIntHashMap<>();
+        Object2IntMap<Class<?>> typeLookup = new Object2IntOpenHashMap<>();
         typeLookup.put(Entry.Add.class, ADD);
         typeLookup.put(Entry.UpdateGameMode.class, UPDATE_GAME_MODE);
         typeLookup.put(Entry.UpdateLatency.class, UPDATE_LATENCY);
         typeLookup.put(Entry.UpdateDisplayName.class, UPDATE_DISPLAY_NAME);
         typeLookup.put(Entry.Remove.class, REMOVE);
-        this.typeLookup = TCollections.unmodifiableMap(typeLookup);
+        this.typeLookup = Object2IntMaps.unmodifiable(typeLookup);
     }
 
     @Override

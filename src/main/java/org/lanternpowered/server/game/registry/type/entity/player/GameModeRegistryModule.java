@@ -30,8 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -52,7 +52,7 @@ public final class GameModeRegistryModule implements CatalogRegistryModule<GameM
 
     @RegisterCatalog(GameModes.class)
     private final Map<String, GameMode> gameModes = Maps.newHashMap();
-    private final TIntObjectMap<GameMode> gameModesByInternalId = new TIntObjectHashMap<>();
+    private final Int2ObjectMap<GameMode> gameModesByInternalId = new Int2ObjectOpenHashMap<>();
 
     @Override
     public void registerDefaults() {

@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.text.chat;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.chat.ChatType;
@@ -37,7 +37,7 @@ import java.util.function.Predicate;
 
 public final class LanternChatVisibility extends SimpleLanternCatalogType implements ChatVisibility {
 
-    private final static TIntObjectMap<LanternChatVisibility> lookup = new TIntObjectHashMap<>();
+    private final static Int2ObjectMap<LanternChatVisibility> lookup = new Int2ObjectOpenHashMap<>();
 
     private final Predicate<ChatType> chatTypePredicate;
     private final Translation translation;

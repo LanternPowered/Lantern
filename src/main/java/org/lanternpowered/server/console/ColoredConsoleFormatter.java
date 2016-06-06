@@ -27,10 +27,10 @@ package org.lanternpowered.server.console;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
-import gnu.trove.map.TCharByteMap;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TCharByteHashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.chars.Char2ByteMap;
+import it.unimi.dsi.fastutil.chars.Char2ByteOpenHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.Ansi.Color;
@@ -43,8 +43,8 @@ import java.util.function.Function;
 public class ColoredConsoleFormatter implements Function<String, String> {
 
     private static final String reset = ansi().reset().toString();
-    private static final TIntObjectMap<String> replacements = new TIntObjectHashMap<>();
-    private static final TCharByteMap lookup = new TCharByteHashMap();
+    private static final Int2ObjectMap<String> replacements = new Int2ObjectOpenHashMap<>();
+    private static final Char2ByteMap lookup = new Char2ByteOpenHashMap();
 
     private static void add(char code, Ansi replacement) {
         replacements.put(code, replacement.toString());

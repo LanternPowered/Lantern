@@ -31,10 +31,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
@@ -209,7 +209,7 @@ public final class Types {
                 private final static int OPTIONAL_UUID = 11;
                 private final static int BLOCK_STATE = 12;
 
-                private final TObjectIntMap<ParameterType<?>> idByParameterType = new TObjectIntHashMap<>();
+                private final Object2IntMap<ParameterType<?>> idByParameterType = new Object2IntOpenHashMap<>();
 
                 {
                     this.idByParameterType.put(ParameterTypes.BYTE, BYTE);

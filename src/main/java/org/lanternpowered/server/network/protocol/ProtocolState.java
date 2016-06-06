@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.protocol;
 
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
 public enum ProtocolState {
     /**
@@ -51,7 +51,7 @@ public enum ProtocolState {
      */
     FORGE_HANDSHAKE     (999, new ProtocolForgeHandshake());
 
-    private final static TIntObjectMap<ProtocolState> lookup = new TIntObjectHashMap<>();
+    private final static Int2ObjectMap<ProtocolState> lookup = new Int2ObjectOpenHashMap<>();
 
     private final int id;
     private final Protocol protocol;

@@ -33,8 +33,8 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import gnu.trove.map.TShortShortMap;
-import gnu.trove.map.hash.TShortShortHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
+import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
@@ -280,7 +280,7 @@ public final class ObservedChunkManager {
                     // The palette that will be send to the client
                     int[] palette;
                     // The lookup for global to local palette id
-                    TShortShortMap globalToLocalPalette;
+                    Short2ShortMap globalToLocalPalette;
                     // TODO: How to fix this?
                     // There seems to be a weird issue, some blocks are not rendered
                     // on the client (bedrock with the flat generator) and it cannot
@@ -290,15 +290,14 @@ public final class ObservedChunkManager {
                         if (bitsPerValue < 4) {
                             bitsPerValue = 4;
                         }
-                        globalToLocalPalette = new TShortShortHashMap(paletteSize);
+                        globalToLocalPalette = new Short2ShortOpenHashMap(paletteSize);
                         palette = new int[paletteSize];
-                        short[] currentId = { 0 };
-                        section.typesCountMap.forEachEntry((type, count) -> {
-                            short id = currentId[0]++;
-                            globalToLocalPalette.put(type, id);
-                            palette[id] = type;
-                            return true;
-                        });
+                        short currentId = 0;
+                        for (short type : section.typesCountMap.keySet().toShortArray()) {
+                            globalToLocalPalette.put(type, currentId);
+                            palette[currentId] = type;
+                            currentId++;
+                        }
                     } else {
                         // int statesCount = Registries.getBlockRegistry().getBlockStatesCount();
                         // bitsPerValue = Integer.highestOneBit(statesCount);

@@ -29,10 +29,10 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.LanternItemType;
@@ -64,8 +64,8 @@ public final class ItemRegistryModule implements ItemRegistry {
     @RegisterCatalog(ItemTypes.class)
     private final Map<String, ItemType> itemTypes = new HashMap<>();
 
-    private final TIntObjectMap<ItemType> itemTypeByInternalId = new TIntObjectHashMap<>();
-    private final TObjectIntMap<ItemType> internalIdByItemType = new TObjectIntHashMap<>();
+    private final Int2ObjectMap<ItemType> itemTypeByInternalId = new Int2ObjectOpenHashMap<>();
+    private final Object2IntMap<ItemType> internalIdByItemType = new Object2IntOpenHashMap<>();
 
     private ItemRegistryModule() {
     }

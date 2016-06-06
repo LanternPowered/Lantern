@@ -26,8 +26,8 @@
 package org.lanternpowered.server.data.type;
 
 import com.google.common.collect.ImmutableSet;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SkinPart;
@@ -38,7 +38,7 @@ import java.util.Set;
 
 public final class LanternSkinPart extends SimpleLanternCatalogType implements SkinPart {
 
-    private static final TIntObjectMap<LanternSkinPart> lookup = new TIntObjectHashMap<>();
+    private static final Int2ObjectMap<LanternSkinPart> lookup = new Int2ObjectOpenHashMap<>();
 
     private final int mask;
     private final int index;

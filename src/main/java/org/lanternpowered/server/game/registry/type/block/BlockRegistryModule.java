@@ -31,10 +31,10 @@ import static org.lanternpowered.server.block.LanternBlockType.DEFAULT_ITEM_TYPE
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import gnu.trove.map.TObjectShortMap;
-import gnu.trove.map.TShortObjectMap;
-import gnu.trove.map.hash.TObjectShortHashMap;
-import gnu.trove.map.hash.TShortObjectHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.type.BlockAir;
 import org.lanternpowered.server.block.type.BlockBedrock;
@@ -73,11 +73,11 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
     @RegisterCatalog(BlockTypes.class)
     private final Map<String, BlockType> blockTypes = new HashMap<>();
 
-    private final TShortObjectMap<BlockType> blockTypeByInternalId = new TShortObjectHashMap<>();
-    private final TObjectShortMap<BlockType> internalIdByBlockType = new TObjectShortHashMap<>();
+    private final Short2ObjectMap<BlockType> blockTypeByInternalId = new Short2ObjectOpenHashMap<>();
+    private final Object2ShortMap<BlockType> internalIdByBlockType = new Object2ShortOpenHashMap<>();
 
-    private final TShortObjectMap<BlockState> blockStateByPackedType = new TShortObjectHashMap<>();
-    private final TObjectShortMap<BlockState> packedTypeByBlockState = new TObjectShortHashMap<>();
+    private final Short2ObjectMap<BlockState> blockStateByPackedType = new Short2ObjectOpenHashMap<>();
+    private final Object2ShortMap<BlockState> packedTypeByBlockState = new Object2ShortOpenHashMap<>();
 
     // The counter for custom block ids. (Non vanilla ones.)
     private int blockIdCounter = 1024;

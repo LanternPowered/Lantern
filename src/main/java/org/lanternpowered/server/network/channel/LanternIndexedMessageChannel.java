@@ -30,8 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Maps;
-import gnu.trove.map.TByteObjectMap;
-import gnu.trove.map.hash.TByteObjectHashMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
+import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
@@ -55,7 +55,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
 
     private final class RegistrationLookup {
 
-        private final TByteObjectMap<IndexedMessageRegistration> opcodeToRegistration = new TByteObjectHashMap<>();
+        private final Byte2ObjectMap<IndexedMessageRegistration> opcodeToRegistration = new Byte2ObjectOpenHashMap<>();
         private final Map<Class<? extends Message>, IndexedMessageRegistration> classToRegistration = Maps.newHashMap();
     }
 

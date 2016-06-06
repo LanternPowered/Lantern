@@ -29,8 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.spongepowered.api.Sponge;
@@ -51,7 +51,7 @@ public final class DisplaySlotRegistryModule implements CatalogRegistryModule<Di
     @RegisterCatalog(DisplaySlots.class)
     private final Map<String, DisplaySlot> objectiveDisplayModes = Maps.newHashMap();
 
-    private final TIntObjectMap<DisplaySlot> displaySlotByInternalIds = new TIntObjectHashMap<>();
+    private final Int2ObjectMap<DisplaySlot> displaySlotByInternalIds = new Int2ObjectOpenHashMap<>();
 
     @Override
     public void registerDefaults() {

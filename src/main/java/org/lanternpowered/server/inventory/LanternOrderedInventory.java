@@ -28,8 +28,8 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import gnu.trove.map.TObjectIntMap;
-import gnu.trove.map.hash.TObjectIntHashMap;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
@@ -58,7 +58,7 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
      * {@link Slot}s.
      */
     protected final List<LanternSlot> slots = new ArrayList<>();
-    final TObjectIntMap<LanternSlot> indexBySlot = new TObjectIntHashMap<>();
+    final Object2IntMap<LanternSlot> indexBySlot = new Object2IntOpenHashMap<>();
 
     public LanternOrderedInventory(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);

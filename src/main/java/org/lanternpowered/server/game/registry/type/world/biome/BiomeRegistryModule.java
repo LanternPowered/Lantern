@@ -30,10 +30,10 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import gnu.trove.map.TObjectShortMap;
-import gnu.trove.map.TShortObjectMap;
-import gnu.trove.map.hash.TObjectShortHashMap;
-import gnu.trove.map.hash.TShortObjectHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortMap;
+import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
@@ -55,8 +55,8 @@ public final class BiomeRegistryModule implements BiomeRegistry, AlternateCatalo
 
     @RegisterCatalog(BiomeTypes.class) private final Map<String, BiomeType> biomeTypes = Maps.newHashMap();
 
-    private final TShortObjectMap<BiomeType> biomeTypeByInternalId = new TShortObjectHashMap<>();
-    private final TObjectShortMap<BiomeType> internalIdByBiomeType = new TObjectShortHashMap<>();
+    private final Short2ObjectMap<BiomeType> biomeTypeByInternalId = new Short2ObjectOpenHashMap<>();
+    private final Object2ShortMap<BiomeType> internalIdByBiomeType = new Object2ShortOpenHashMap<>();
 
     private int biomeIdCounter = 1024;
 
@@ -105,7 +105,7 @@ public final class BiomeRegistryModule implements BiomeRegistry, AlternateCatalo
 
     @Override
     public short getInternalId(BiomeType biomeType) {
-        return this.internalIdByBiomeType.get(checkNotNull(biomeType, "biomeType"));
+        return this.internalIdByBiomeType.getShort(checkNotNull(biomeType, "biomeType"));
     }
 
     @Override

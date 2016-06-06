@@ -29,11 +29,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import gnu.trove.map.TIntObjectMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.world.difficulty.Difficulties;
@@ -54,7 +52,7 @@ public final class DifficultyRegistryModule implements CatalogRegistryModule<Dif
 
     @RegisterCatalog(Difficulties.class)
     private final Map<String, Difficulty> difficulties = new HashMap<>();
-    private final TIntObjectMap<Difficulty> difficultiesByInternalId = new TIntObjectHashMap<>();
+    private final Int2ObjectMap<Difficulty> difficultiesByInternalId = new Int2ObjectOpenHashMap<>();
 
     @Override
     public void registerDefaults() {

@@ -29,10 +29,10 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import gnu.trove.map.TCharObjectMap;
-import gnu.trove.map.TObjectCharMap;
-import gnu.trove.map.hash.TCharObjectHashMap;
-import gnu.trove.map.hash.TObjectCharHashMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
+import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2CharMap;
+import it.unimi.dsi.fastutil.objects.Object2CharOpenHashMap;
 import org.lanternpowered.server.text.format.FormattingCodeHolder;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.ScoreText;
@@ -58,8 +58,8 @@ import javax.annotation.Nullable;
 
 public class FormattingCodeTextSerializer implements org.spongepowered.api.text.serializer.FormattingCodeTextSerializer, LanternTextSerializer {
 
-    public static final TObjectCharMap<Object> FORMATS_TO_CODE = new TObjectCharHashMap<>();
-    public static final TCharObjectMap<Object> CODE_TO_FORMATS = new TCharObjectHashMap<>();
+    public static final Object2CharMap<Object> FORMATS_TO_CODE = new Object2CharOpenHashMap<>();
+    public static final Char2ObjectMap<Object> CODE_TO_FORMATS = new Char2ObjectOpenHashMap<>();
 
     private static void addFormat(Object format, char code) {
         FORMATS_TO_CODE.put(format, code);

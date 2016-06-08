@@ -1,9 +1,51 @@
+// plugins {} cannot be used in the buildSrc
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.13.1"
+    }
+}
+
+try {
+    // The will throw a exception if the project isn't found,
+    // and this is the case if it isn't run as submodule of LanternServer
+    rootProject.project(':buildSrc')
+
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+    apply plugin: 'eclipse'
+    apply plugin: 'idea'
+
+    // Must be executed as submodule, we need info from the main
+    // module for the licences
+    apply plugin: 'com.github.hierynomus.license'
+    apply from: rootProject.file('gradle/license.gradle')
+
+    idea.module {
+        sourceDirs += file('src/main/java')
+        sourceDirs += file('src/main/groovy')
+    }
+
+    // Disable some tasks to avoid them being executed twice
+    def taskNames = [ "compileJava", "compileGroovy", "processResources", "classes", "jar",
+                      "assemble", "compileTestJava", "compileTestGroovy", "processTestResources",
+                      "testClasses", "test", "check", "build" ]
+    taskNames.each { tasks.getByName(it).enabled = false }
+} catch (Exception e) {
+}
+
 repositories {
     mavenCentral()
     jcenter()
 }
 
 dependencies {
+    compile gradleApi()
+    compile localGroovy()
     compile 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
     compile 'org.apache.logging.log4j:log4j-core:2.5'
     compile 'org.ow2.asm:asm-all:5.0.3'

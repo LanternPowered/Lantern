@@ -1,0 +1,21 @@
+license {
+    header rootProject.file('HEADER.txt')
+    sourceSets = project.sourceSets
+    include '**/*.java'
+    include '**/*.groovy'
+
+    strictCheck true
+    ignoreFailures = false
+
+    ext {
+        name = rootProject.name
+        urla = rootProject.url
+        organizationa = rootProject.organization
+        urlb = rootProject.api.url
+        organizationb = rootProject.api.organization
+    }
+
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}

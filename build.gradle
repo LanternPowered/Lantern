@@ -16,7 +16,7 @@ buildscript {
 }
 
 plugins {
-    id "com.github.hierynomus.license" version "0.12.0"
+    id "com.github.hierynomus.license" version "0.13.1"
     // Defined in 'buildSrc/build.gradle'
     // id "com.github.johnrengelman.shadow" version "1.2.3"
 }
@@ -25,7 +25,7 @@ plugins {
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'license'
+apply plugin: 'com.github.hierynomus.license'
 
 // Apply shadow plugin
 apply plugin: 'com.github.johnrengelman.shadow'
@@ -118,9 +118,6 @@ dependencies {
 idea.module {
     // The java6 sourceset
     sourceDirs += file('src/java6/java')
-    // The gradle java/groovy source set
-    // sourceDirs += file('buildSrc/src/main/java')
-    // sourceDirs += file('buildSrc/src/main/groovy')
 }
 
 // Generate application setups, currently only for intellij
@@ -162,7 +159,7 @@ idea.workspace.iws.withXml { provider ->
 }
 
 jar {
-    classifier = 'release'
+    classifier = 'base'
     from sourceSets.java6.output
     manifest {
         attributes(
@@ -175,6 +172,10 @@ jar {
                 'Specification-Vendor': api.url
         )
     }
+}
+
+processResources {
+    from 'LICENSE.txt'
 }
 
 test {
@@ -317,28 +318,9 @@ if (!project.fastutilJar.archivePath.exists()) {
     assemble.dependsOn fastutilJar
 }
 
-license {
-    header project.file('HEADER.txt')
-    sourceSets = project.sourceSets
-    include '**/*.java'
-
-    strictCheck true
-    ignoreFailures = false
-
-    ext {
-        name = project.name
-        urla = project.url
-        organizationa = project.organization
-        urlb = api.url
-        organizationb = api.organization
-    }
-
-    mapping {
-        java = 'SLASHSTAR_STYLE'
-    }
-}
+apply from: file('gradle/license.gradle')
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.10'
+    gradleVersion = '2.13'
 }

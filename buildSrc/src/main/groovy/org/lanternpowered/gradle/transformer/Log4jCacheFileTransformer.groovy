@@ -2,6 +2,7 @@
  * This file is part of LanternServer, licensed under the MIT License (MIT).
  *
  * Copyright (c) LanternPowered <https://github.com/LanternPowered>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
  * Copyright (c) Contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -65,7 +66,7 @@ class Log4jCacheFileTransformer implements Transformer {
 
     @Override
     boolean hasTransformedResource() {
-        return this.tempFiles.size() > 1
+        return !this.tempFiles.isEmpty()
     }
 
     @Override

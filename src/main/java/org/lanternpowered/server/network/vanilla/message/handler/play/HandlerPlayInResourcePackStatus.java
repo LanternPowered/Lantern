@@ -25,12 +25,11 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInResourcePackStatus;
-import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -42,18 +41,14 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
 
     @Override
     public void handle(NetworkContext context, MessagePlayInResourcePackStatus message) {
-        LanternResourcePackFactory factory = Lantern.getGame().getRegistry().getResourcePackFactory();
-        Optional<ResourcePack> resourcePack = factory.getByHash(message.getHash());
+        Optional<ResourcePack> resourcePack = context.getSession().getPlayer().pollPendingResourcePackForStatus();
+        LanternPlayer player = context.getSession().getPlayer();
         if (!resourcePack.isPresent()) {
-            resourcePack = factory.getById(message.getHash());
-        }
-        if (!resourcePack.isPresent()) {
-            Lantern.getLogger().warn("Received unknown resource pack with hash or id: {} and status: {}",
-                    message.getHash(), message.getStatus().toString().toLowerCase());
+            Lantern.getLogger().warn("{} received a unexpected resource pack status message, no resource pack was pending",
+                    player.getName());
             return;
         }
-        Session session = context.getSession();
         Sponge.getEventManager().post(SpongeEventFactory.createResourcePackStatusEvent(
-                Cause.source(session.getPlayer()).build(), resourcePack.get(), session.getPlayer(), message.getStatus()));
+                Cause.source(player).build(), resourcePack.get(), player, message.getStatus()));
     }
 }

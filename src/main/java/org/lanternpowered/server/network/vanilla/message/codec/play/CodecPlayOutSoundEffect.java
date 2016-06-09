@@ -50,7 +50,7 @@ public final class CodecPlayOutSoundEffect implements Codec<MessagePlayOutSoundE
         buf.writeInteger((int) (pos.getY() * 8.0));
         buf.writeInteger((int) (pos.getZ() * 8.0));
         buf.writeFloat(message.getVolume());
-        buf.writeByte((byte) Math.max(message.getPitch() * 63.0, Byte.MAX_VALUE));
+        buf.writeFloat(message.getPitch());
         return buf;
     }
 }

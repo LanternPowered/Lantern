@@ -115,6 +115,16 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.9.0'
 }
 
+// Create the run folder
+task createRunFolder {
+    if (!project.file('run').exists()) {
+        project.file('run').mkdirs()
+    }
+}
+
+tasks.eclipse.dependsOn createRunFolder
+tasks.idea.dependsOn createRunFolder
+
 idea.module {
     // The java6 sourceset
     sourceDirs += file('src/java6/java')

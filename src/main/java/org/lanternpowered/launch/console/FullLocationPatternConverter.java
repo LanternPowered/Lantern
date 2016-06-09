@@ -29,7 +29,6 @@ import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.pattern.ConverterKeys;
 import org.apache.logging.log4j.core.pattern.LogEventPatternConverter;
-import org.apache.logging.log4j.util.PropertiesUtil;
 
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -37,10 +36,6 @@ import java.util.regex.Matcher;
 @ConverterKeys({ "fqcn", "loc" })
 @Plugin(name = "FQCN", category = "Converter")
 public final class FullLocationPatternConverter extends LogEventPatternConverter {
-
-    // Whether the full location should be appended, if false it will be ignored
-    // event if it's specified in the configuration
-    private static final boolean enabled = PropertiesUtil.getProperties().getBooleanProperty("log4j.full-location", false);
 
     // Packages that will be ignored
     private static final String[] ignoredPackages = { "java.", "kotlin.io." };
@@ -58,9 +53,6 @@ public final class FullLocationPatternConverter extends LogEventPatternConverter
 
     @Override
     public void format(LogEvent event, StringBuilder builder) {
-        if (!enabled) {
-            return;
-        }
         final String name = event.getLoggerName();
         final StackTraceElement element;
         if (ConsoleLaunch.isInitialized() && (ConsoleLaunch.REDIRECT_ERR.equals(name) || ConsoleLaunch.REDIRECT_OUT.equals(name))) {

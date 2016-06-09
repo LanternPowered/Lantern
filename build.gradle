@@ -95,7 +95,7 @@ dependencies {
     compile 'org.ow2.asm:asm-all:5.0.3'
     compile 'org.apache.commons:commons-lang3:3.4'
     compile 'org.mariadb.jdbc:mariadb-java-client:1.4.3'
-    compile 'org.fusesource.jansi:jansi:1.11'
+    compile 'org.fusesource.jansi:jansi:1.12'
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
     compile 'com.zaxxer:HikariCP:2.4.6'
     compile 'com.google.guava:guava:18.0'
@@ -109,16 +109,18 @@ dependencies {
     compile 'ninja.leaping.configurate:configurate-gson:3.1.1'
     compile 'ninja.leaping.configurate:configurate-hocon:3.1.1'
     compile 'ninja.leaping.configurate:configurate-yaml:3.1.1'
-    compile 'jline:jline:2.12.1'
+    compile 'jline:jline:2.14.2'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:1.9.0'
 }
 
+ext.runFolder = 'run'
+
 // Create the run folder
 task createRunFolder {
-    if (!project.file('run').exists()) {
-        project.file('run').mkdirs()
+    if (!project.file(runFolder).exists()) {
+        project.file(runFolder).mkdirs()
     }
 }
 
@@ -156,9 +158,9 @@ idea.workspace.iws.withXml { provider ->
         customNode.each {
             if (it.name() == 'option' && it.@name != null) {
                 switch (it.@name) {
-                    case 'MAIN_CLASS_NAME':   it.@value = 'org.lanternpowered.launch.Launch'; break
-                    case 'VM_PARAMETERS':     it.@value = '-Dlog4j.full-location=true';       break
-                    case 'WORKING_DIRECTORY': it.@value = 'file://$PROJECT_DIR$/run';         break
+                    case 'MAIN_CLASS_NAME':   it.@value = 'org.lanternpowered.launch.Launch';           break
+                    case 'VM_PARAMETERS':     it.@value = '-Dlog4j.configurationFile=log4j2_indev.xml'; break
+                    case 'WORKING_DIRECTORY': it.@value = 'file://$PROJECT_DIR$/' + runFolder;          break
                 }
             } else if (it.name() == 'module') {
                 it.@name = project.name
@@ -250,6 +252,7 @@ shadowJar {
     // Exclude source files
     exclude '**/*.java'
     exclude 'Version.java.template'
+    exclude 'log4j2_indev.xml'
 
     // Make sure that the jar is generated
     afterEvaluate {

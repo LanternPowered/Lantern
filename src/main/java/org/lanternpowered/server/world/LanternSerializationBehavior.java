@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.world;
 
-import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.catalog.CatalogTypeBase;
 import org.spongepowered.api.world.SerializationBehavior;
 
-public final class LanternSerializationBehavior extends LanternCatalogType implements SerializationBehavior {
+public final class LanternSerializationBehavior extends CatalogTypeBase implements SerializationBehavior {
 
     public LanternSerializationBehavior(String identifier, String name) {
         super(identifier, name);

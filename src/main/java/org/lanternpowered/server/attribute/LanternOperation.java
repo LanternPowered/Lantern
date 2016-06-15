@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.attribute;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.util.annotation.CatalogedBy;
 
 @CatalogedBy(LanternOperations.class)
-public class LanternOperation extends SimpleLanternCatalogType implements Comparable<LanternOperation> {
+public class LanternOperation extends SimpleCatalogType.Base implements Comparable<LanternOperation> {
 
     private final int priority;
     private final boolean changeValueImmediately;

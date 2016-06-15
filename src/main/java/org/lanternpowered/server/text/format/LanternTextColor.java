@@ -27,17 +27,17 @@ package org.lanternpowered.server.text.format;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.LanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.util.Color;
 
-public final class LanternTextColor extends LanternCatalogType implements TextColor, FormattingCodeHolder {
+public final class LanternTextColor extends SimpleCatalogType.Base implements TextColor, FormattingCodeHolder {
 
     private final Color color;
     private final char code;
 
     public LanternTextColor(String name, Color color, char code) {
-        super(name, name.toLowerCase());
+        super(name);
         this.color = checkNotNull(color, "color");
         this.code = code;
     }

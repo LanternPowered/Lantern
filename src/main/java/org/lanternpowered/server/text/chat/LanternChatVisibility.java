@@ -27,28 +27,25 @@ package org.lanternpowered.server.text.chat;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.function.Predicate;
 
-public final class LanternChatVisibility extends SimpleLanternCatalogType implements ChatVisibility {
+public final class LanternChatVisibility extends SimpleCatalogType.Base.Translatable implements ChatVisibility {
 
     private final static Int2ObjectMap<LanternChatVisibility> lookup = new Int2ObjectOpenHashMap<>();
 
     private final Predicate<ChatType> chatTypePredicate;
-    private final Translation translation;
     private final int internalId;
 
     public LanternChatVisibility(int internalId, String identifier, Predicate<ChatType> chatTypePredicate) {
-        super(identifier);
+        super(identifier, Lantern.getGame().getRegistry().getTranslationManager().get(
+                "options.chat.visibility." + identifier));
         this.internalId = internalId;
         this.chatTypePredicate = chatTypePredicate;
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "options.chat.visibility." + identifier);
         lookup.put(internalId, this);
     }
 
@@ -59,11 +56,6 @@ public final class LanternChatVisibility extends SimpleLanternCatalogType implem
     @Override
     public boolean isVisible(ChatType chatType) {
         return this.chatTypePredicate.test(chatType);
-    }
-
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
     }
 
     /**

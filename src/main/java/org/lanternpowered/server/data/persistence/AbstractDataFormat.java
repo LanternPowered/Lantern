@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.data.persistence;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.data.persistence.DataFormat;
 
-public abstract class AbstractDataFormat extends SimpleLanternCatalogType implements DataFormat {
+public abstract class AbstractDataFormat extends SimpleCatalogType.Base implements DataFormat {
 
     public AbstractDataFormat(String identifier) {
         super(identifier);

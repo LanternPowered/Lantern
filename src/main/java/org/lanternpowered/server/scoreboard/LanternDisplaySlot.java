@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.text.format.TextColor;
 
@@ -33,7 +33,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternDisplaySlot extends SimpleLanternCatalogType implements DisplaySlot {
+public class LanternDisplaySlot extends SimpleCatalogType.Base implements DisplaySlot {
 
     private final Optional<TextColor> teamColor;
     private final int internalId;

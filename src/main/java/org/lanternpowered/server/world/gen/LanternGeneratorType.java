@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.world.gen;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.GeneratorType;
 
 import javax.annotation.Nullable;
 
-public abstract class LanternGeneratorType extends LanternPluginCatalogType implements GeneratorType {
+public abstract class LanternGeneratorType extends PluginCatalogType.Base implements GeneratorType {
 
     // The maximum height the generator will generate the world,
     // for example 128 blocks in the nether and in overworld 256

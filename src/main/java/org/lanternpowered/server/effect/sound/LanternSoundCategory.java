@@ -25,27 +25,19 @@
  */
 package org.lanternpowered.server.effect.sound;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.text.translation.Translatable;
-import org.spongepowered.api.text.translation.Translation;
 
-public final class LanternSoundCategory extends LanternPluginCatalogType implements SoundCategory, Translatable {
+public final class LanternSoundCategory extends PluginCatalogType.Base.Translatable implements SoundCategory, Translatable {
 
-    private final Translation translation;
     private final int internalId;
 
     public LanternSoundCategory(String pluginId, String identifier, int internalId) {
-        super(pluginId, identifier);
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager()
-                .get("soundCategory." + identifier);
+        super(pluginId, identifier, Lantern.getGame().getRegistry().getTranslationManager()
+                .get("soundCategory." + identifier));
         this.internalId = internalId;
-    }
-
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
     }
 
     public int getInternalId() {

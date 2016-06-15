@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Property;
@@ -51,7 +51,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class LanternItemType extends LanternPluginCatalogType implements ItemType {
+public class LanternItemType extends PluginCatalogType.Base implements ItemType {
 
     private final Map<Class<?>, Property<?,?>> properties = new HashMap<>();
     private Translation translation;

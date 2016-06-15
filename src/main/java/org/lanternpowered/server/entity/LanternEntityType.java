@@ -27,7 +27,7 @@ package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -35,7 +35,7 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 @NonnullByDefault
-public final class LanternEntityType extends SimpleLanternCatalogType implements EntityType {
+public final class LanternEntityType extends SimpleCatalogType.Base implements EntityType {
 
     private final Class<? extends Entity> entityClass;
     private final String minecraftId;

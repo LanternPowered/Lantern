@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.world.biome;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.world.biome.BiomeType;
 
-public class LanternBiomeType extends LanternPluginCatalogType implements BiomeType {
+public class LanternBiomeType extends PluginCatalogType.Base implements BiomeType {
 
     private final LanternBiomeGenerationSettings defaultSettings = new LanternBiomeGenerationSettings();
 

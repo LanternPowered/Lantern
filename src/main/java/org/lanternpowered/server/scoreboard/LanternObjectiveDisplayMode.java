@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 
-public class LanternObjectiveDisplayMode extends SimpleLanternCatalogType implements ObjectiveDisplayMode {
+public class LanternObjectiveDisplayMode extends SimpleCatalogType.Base implements ObjectiveDisplayMode {
 
     public LanternObjectiveDisplayMode(String identifier) {
         super(identifier);

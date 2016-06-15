@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.world.dimension;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Dimension;
@@ -34,7 +34,7 @@ import org.spongepowered.api.world.GeneratorType;
 
 import java.util.function.BiFunction;
 
-public final class LanternDimensionType<T extends LanternDimension> extends LanternPluginCatalogType implements DimensionType {
+public final class LanternDimensionType<T extends LanternDimension> extends PluginCatalogType.Base implements DimensionType {
 
     private final BiFunction<LanternWorld, LanternDimensionType<T>, T> supplier;
     private final GeneratorType defaultGeneratorType;

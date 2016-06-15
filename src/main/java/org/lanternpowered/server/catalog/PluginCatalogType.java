@@ -25,7 +25,14 @@
  */
 package org.lanternpowered.server.catalog;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
+
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.text.translation.Translation;
+
+import java.util.Locale;
 
 public interface PluginCatalogType extends CatalogType {
 
@@ -45,4 +52,50 @@ public interface PluginCatalogType extends CatalogType {
      */
     String getPluginId();
 
+    abstract class Base implements PluginCatalogType {
+
+        private final String id;
+        private final String pluginId;
+        private final String name;
+
+        public Base(String pluginId, String name) {
+            this.pluginId = checkNotNullOrEmpty(pluginId, "pluginId").toLowerCase(Locale.ENGLISH);
+            this.name = checkNotNullOrEmpty(name, "name");
+            this.id = this.pluginId + name.toLowerCase(Locale.ENGLISH);
+        }
+
+        @Override
+        public String getId() {
+            return this.id;
+        }
+
+        @Override
+        public String getName() {
+            return this.name;
+        }
+
+        @Override
+        public String getPluginId() {
+            return this.pluginId;
+        }
+
+        public static abstract class Translatable extends Base implements org.spongepowered.api.text.translation.Translatable {
+
+            private final Translation translation;
+
+            public Translatable(String pluginId, String name, String translation) {
+                this(pluginId, name, Lantern.getRegistry().getTranslationManager().get(translation));
+            }
+
+            public Translatable(String pluginId, String name, Translation translation) {
+                super(pluginId, name);
+                this.translation = checkNotNull(translation, "translation");
+            }
+
+            @Override
+            public Translation getTranslation() {
+                return this.translation;
+            }
+        }
+    }
 }

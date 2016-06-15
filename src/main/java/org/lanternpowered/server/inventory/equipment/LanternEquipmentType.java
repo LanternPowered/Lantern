@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.inventory.equipment;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 
 import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-public class LanternEquipmentType extends SimpleLanternCatalogType implements EquipmentType {
+public class LanternEquipmentType extends SimpleCatalogType.Base implements EquipmentType {
 
     @Nullable private final Predicate<EquipmentType> childChecker;
 

@@ -28,7 +28,7 @@ package org.lanternpowered.server.data.type;
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
@@ -36,7 +36,7 @@ import org.spongepowered.api.text.translation.Translation;
 import java.util.Collection;
 import java.util.Set;
 
-public final class LanternSkinPart extends SimpleLanternCatalogType implements SkinPart {
+public final class LanternSkinPart extends SimpleCatalogType.Base implements SkinPart {
 
     private static final Int2ObjectMap<LanternSkinPart> lookup = new Int2ObjectOpenHashMap<>();
 

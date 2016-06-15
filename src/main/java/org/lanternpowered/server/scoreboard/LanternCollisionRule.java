@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 
-public class LanternCollisionRule extends SimpleLanternCatalogType {
+public class LanternCollisionRule extends SimpleCatalogType.Base {
 
     public LanternCollisionRule(String identifier) {
         super(identifier);

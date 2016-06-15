@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.bossbar;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.boss.BossBarColor;
 
-public final class LanternBossBarColor extends SimpleLanternCatalogType implements BossBarColor {
+public final class LanternBossBarColor extends SimpleCatalogType.Base implements BossBarColor {
 
     private final int internalId;
 

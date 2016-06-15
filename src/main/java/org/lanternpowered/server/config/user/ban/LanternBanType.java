@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.config.user.ban;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 
-public final class LanternBanType extends SimpleLanternCatalogType implements BanType {
+public final class LanternBanType extends SimpleCatalogType.Base implements BanType {
 
     private final Class<? extends Ban> banClass;
 

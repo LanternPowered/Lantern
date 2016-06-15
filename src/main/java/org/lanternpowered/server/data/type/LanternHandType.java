@@ -25,14 +25,12 @@
  */
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.text.translation.Translation;
 
-public class LanternHandType extends SimpleLanternCatalogType implements HandType {
-
-    private final Translation translation;
+public class LanternHandType extends SimpleCatalogType.Base.Translatable implements HandType {
 
     public LanternHandType(String identifier, String translationKey) {
         // The used translations are not available in vanilla minecraft
@@ -40,12 +38,6 @@ public class LanternHandType extends SimpleLanternCatalogType implements HandTyp
     }
 
     public LanternHandType(String identifier, Translation translation) {
-        super(identifier);
-        this.translation = translation;
-    }
-
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
+        super(identifier, translation);
     }
 }

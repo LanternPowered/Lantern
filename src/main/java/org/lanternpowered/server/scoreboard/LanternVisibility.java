@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.scoreboard.Visibility;
 
-public class LanternVisibility extends SimpleLanternCatalogType implements Visibility {
+public class LanternVisibility extends SimpleCatalogType.Base implements Visibility {
 
     public LanternVisibility(String identifier) {
         super(identifier);

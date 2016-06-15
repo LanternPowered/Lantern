@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.world.portal;
 
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.world.PortalAgent;
 import org.spongepowered.api.world.PortalAgentType;
 
 import java.util.function.BiFunction;
 
-public class LanternPortalAgentType<T extends PortalAgent> extends LanternPluginCatalogType implements PortalAgentType {
+public class LanternPortalAgentType<T extends PortalAgent> extends PluginCatalogType.Base implements PortalAgentType {
 
     private final Class<T> portalAgentClass;
     private final BiFunction<LanternWorld, LanternPortalAgentType<T>, T> supplier;

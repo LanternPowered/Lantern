@@ -26,24 +26,25 @@
 package org.lanternpowered.server.world.gen;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.gen.PopulatorType;
 
 import javax.annotation.Nullable;
 
-public final class LanternPopulatorType extends LanternPluginCatalogType implements PopulatorType {
-
-    private final Translation translation;
+public final class LanternPopulatorType extends PluginCatalogType.Base.Translatable implements PopulatorType {
 
     public LanternPopulatorType(String name) {
         this("minecraft", name);
     }
 
     public LanternPopulatorType(String pluginId, String name) {
-        super(pluginId, name);
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get("populator." + name + ".name");
+        super(pluginId, name, Lantern.getGame().getRegistry().getTranslationManager().get("populator." + name + ".name"));
+    }
+
+    public LanternPopulatorType(String pluginId, String name, Translation translation) {
+        super(pluginId, name, translation);
     }
 
     @Override
@@ -68,10 +69,4 @@ public final class LanternPopulatorType extends LanternPluginCatalogType impleme
                 .add("pluginId", this.getPluginId())
                 .toString();
     }
-
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
-    }
-
 }

@@ -28,23 +28,20 @@ package org.lanternpowered.server.effect.sound;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
-import org.lanternpowered.server.util.OptInt;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.OptionalInt;
-
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public final class LanternSoundType extends SimpleLanternCatalogType implements SoundType {
+public final class LanternSoundType extends SimpleCatalogType.Base implements SoundType {
 
-    private final OptionalInt eventId;
+    private final int eventId;
 
     public LanternSoundType(String identifier) {
         this(identifier, null);
@@ -52,15 +49,15 @@ public final class LanternSoundType extends SimpleLanternCatalogType implements 
 
     public LanternSoundType(String identifier, @Nullable Integer eventId) {
         super(identifier);
-        this.eventId = OptInt.ofNullable(eventId);
+        this.eventId = eventId == null ? -1 : eventId;
     }
 
     public MessagePlayOutSoundEffectBase createMessage(Vector3d position, SoundCategory soundCategory,
             float volume, float pitch) {
         checkNotNull(soundCategory, "soundCategory");
         checkNotNull(position, "position");
-        if (this.eventId.isPresent()) {
-            return new MessagePlayOutSoundEffect(this.eventId.getAsInt(), position, soundCategory, volume, pitch);
+        if (this.eventId != -1) {
+            return new MessagePlayOutSoundEffect(this.eventId, position, soundCategory, volume, pitch);
         } else {
             return new MessagePlayOutNamedSoundEffect(this.getName(), position, soundCategory, volume, pitch);
         }

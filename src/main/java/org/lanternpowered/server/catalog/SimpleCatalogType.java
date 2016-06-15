@@ -25,12 +25,44 @@
  */
 package org.lanternpowered.server.catalog;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.text.translation.Translation;
+
+import java.util.Locale;
 
 public interface SimpleCatalogType extends CatalogType {
 
     @Override
     default String getName() {
         return this.getId();
+    }
+
+    abstract class Base extends CatalogTypeBase implements SimpleCatalogType {
+
+        public Base(String identifier) {
+            super(identifier.toLowerCase(Locale.ENGLISH), identifier);
+        }
+
+        @Override
+        public String getId() {
+            return this.identifier;
+        }
+
+        public static abstract class Translatable extends Base implements org.spongepowered.api.text.translation.Translatable {
+
+            private final Translation translation;
+
+            public Translatable(String identifier, Translation translation) {
+                super(identifier);
+                this.translation = checkNotNull(translation, "translation");
+            }
+
+            @Override
+            public Translation getTranslation() {
+                return this.translation;
+            }
+        }
     }
 }

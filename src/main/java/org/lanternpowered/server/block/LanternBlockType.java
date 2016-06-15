@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
-import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.BlockItemType;
@@ -50,7 +50,7 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class LanternBlockType extends LanternPluginCatalogType implements BlockType, AbstractPropertyHolder {
+public class LanternBlockType extends PluginCatalogType.Base implements BlockType, AbstractPropertyHolder {
 
     /**
      * The default {@link ItemType} builder that can be used

@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 
-public class LanternCriterion extends SimpleLanternCatalogType implements Criterion {
+public class LanternCriterion extends SimpleCatalogType.Base implements Criterion {
 
     public LanternCriterion(String identifier) {
         super(identifier);

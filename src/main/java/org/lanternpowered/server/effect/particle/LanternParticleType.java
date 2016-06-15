@@ -27,14 +27,14 @@ package org.lanternpowered.server.effect.particle;
 
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Color;
 
-public class LanternParticleType extends SimpleLanternCatalogType implements ParticleType {
+public class LanternParticleType extends SimpleCatalogType.Base implements ParticleType {
 
     private final String vanillaId;
     private final boolean hasMotion;

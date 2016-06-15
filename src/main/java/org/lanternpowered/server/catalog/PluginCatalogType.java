@@ -61,7 +61,7 @@ public interface PluginCatalogType extends CatalogType {
         public Base(String pluginId, String name) {
             this.pluginId = checkNotNullOrEmpty(pluginId, "pluginId").toLowerCase(Locale.ENGLISH);
             this.name = checkNotNullOrEmpty(name, "name");
-            this.id = this.pluginId + name.toLowerCase(Locale.ENGLISH);
+            this.id = this.pluginId + ':' + name.toLowerCase(Locale.ENGLISH);
         }
 
         @Override

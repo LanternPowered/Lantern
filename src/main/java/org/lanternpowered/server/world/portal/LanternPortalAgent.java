@@ -23,82 +23,58 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world;
+package org.lanternpowered.server.world.portal;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.TeleporterAgent;
+import org.spongepowered.api.world.PortalAgent;
+import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public class LanternTeleporterAgent implements TeleporterAgent {
+public abstract class LanternPortalAgent implements PortalAgent {
 
-    protected boolean canCreateTeleporter;
+    private final PortalAgentType portalAgentType;
 
     protected int searchRadius;
     protected int creationRadius;
 
+    public LanternPortalAgent(PortalAgentType portalAgentType) {
+        this.portalAgentType = checkNotNull(portalAgentType, "portalAgentType");
+    }
+
     @Override
-    public int getTeleporterSearchRadius() {
+    public int getSearchRadius() {
         return this.searchRadius;
     }
 
     @Override
-    public TeleporterAgent setTeleporterSearchRadius(int radius) {
+    public LanternPortalAgent setSearchRadius(int radius) {
         this.searchRadius = radius;
         return this;
     }
 
     @Override
-    public int getTeleporterCreationRadius() {
+    public int getCreationRadius() {
         return this.creationRadius;
     }
 
     @Override
-    public TeleporterAgent setTeleporterCreationRadius(int radius) {
+    public LanternPortalAgent setCreationRadius(int radius) {
         this.creationRadius = radius;
         return this;
     }
 
     @Override
-    public boolean canCreateTeleporter() {
-        return this.canCreateTeleporter;
+    public Optional<Location<World>> findOrCreatePortal(Location<World> targetLocation) {
+        final Optional<Location<World>> optLoc = this.findPortal(targetLocation);
+        return optLoc.isPresent() ? optLoc : this.createPortal(targetLocation);
     }
 
     @Override
-    public TeleporterAgent setCanCreateTeleporter() {
-        this.canCreateTeleporter = true;
-        return this;
+    public PortalAgentType getType() {
+        return this.portalAgentType;
     }
-
-    @Override
-    public Optional<Location<World>> findOrCreateTeleporter(Location<World> targetLocation) {
-        Optional<Location<World>> teleporter = this.findTeleporter(targetLocation);
-        if (teleporter.isPresent()) {
-            return teleporter;
-        }
-        return this.createTeleporter(targetLocation);
-    }
-
-    @Override
-    public Optional<Location<World>> findTeleporter(Location<World> targetLocation) {
-        return this.findTeleporter0(targetLocation);
-    }
-
-    @Override
-    public Optional<Location<World>> createTeleporter(Location<World> targetLocation) {
-        if (!this.canCreateTeleporter) {
-            return Optional.empty();
-        }
-        return this.createTeleporter0(targetLocation);
-    }
-
-    protected Optional<Location<World>> findTeleporter0(Location<World> targetLocation) {
-        return Optional.empty();
-    }
-
-    protected Optional<Location<World>> createTeleporter0(Location<World> targetLocation) {
-        return Optional.empty();
-    }
-
 }

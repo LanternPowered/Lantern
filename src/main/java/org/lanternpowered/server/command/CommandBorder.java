@@ -25,18 +25,17 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
-import org.spongepowered.api.world.storage.WorldProperties;
 
 public final class CommandBorder extends CommandProvider {
 
@@ -45,19 +44,19 @@ public final class CommandBorder extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .child(CommandSpec.builder()
                         .arguments(
                                 GenericArguments.flags()
-                                        .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                        .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY), "-world", "w")
                                         .buildWith(GenericArguments.none()),
                                 GenericArguments.doubleNum(Text.of("distance")),
                                 GenericArguments.optional(GenericArguments.integer(Text.of("time")))
                         )
                         .executor((src, args) -> {
-                            WorldProperties world = getWorld(src, args);
-                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                            World world = CommandHelper.getWorld(src, args);
+                            WorldBorder border = world.getWorldBorder();
                             double oldDiameter = border.getDiameter();
                             double diameter = oldDiameter + args.<Double>getOne("distance").get();
                             int time = args.<Integer>getOne("time").orElse(0);
@@ -84,8 +83,8 @@ public final class CommandBorder extends CommandProvider {
                                 GenericArguments.optional(GenericArguments.world(Text.of("world")))
                         )
                         .executor((src, args) -> {
-                            WorldProperties world = getWorld(src, args);
-                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                            World world = CommandHelper.getWorld(src, args);
+                            WorldBorder border = world.getWorldBorder();
                             double oldDiameter = border.getDiameter();
                             double diameter = args.<Double>getOne("distance").get();
                             int time = args.<Integer>getOne("time").orElse(0);
@@ -112,8 +111,8 @@ public final class CommandBorder extends CommandProvider {
                                 GenericArguments.optional(GenericArguments.world(Text.of("world")))
                         )
                         .executor((src, args) -> {
-                            WorldProperties world = getWorld(src, args);
-                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                            World world = CommandHelper.getWorld(src, args);
+                            WorldBorder border = world.getWorldBorder();
                             double x = args.<Double>getOne("x").get();
                             double z = args.<Double>getOne("z").get();
                             border.setCenter(x, z);
@@ -128,8 +127,8 @@ public final class CommandBorder extends CommandProvider {
                                         GenericArguments.optional(GenericArguments.world(Text.of("world")))
                                 )
                                 .executor((src, args) -> {
-                                    WorldProperties world = getWorld(src, args);
-                                    WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                                    World world = CommandHelper.getWorld(src, args);
+                                    WorldBorder border = world.getWorldBorder();
                                     double oldDamage = border.getDamageAmount();
                                     double damage = args.<Double>getOne("damagePerBlock").get();
                                     border.setDamageAmount(damage);
@@ -144,8 +143,8 @@ public final class CommandBorder extends CommandProvider {
                                         GenericArguments.optional(GenericArguments.world(Text.of("world")))
                                 )
                                 .executor((src, args) -> {
-                                    WorldProperties world = getWorld(src, args);
-                                    WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                                    World world = CommandHelper.getWorld(src, args);
+                                    WorldBorder border = world.getWorldBorder();
                                     double oldDistance = border.getDamageThreshold();
                                     double distance = args.<Double>getOne("distance").get();
                                     border.setDamageThreshold(args.<Double>getOne("distance").get());
@@ -162,8 +161,8 @@ public final class CommandBorder extends CommandProvider {
                                                 GenericArguments.integer(Text.of("distance")),
                                                 GenericArguments.optional(GenericArguments.world(Text.of("world"))))
                                         .executor((src, args) -> {
-                                            WorldProperties world = getWorld(src, args);
-                                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                                            World world = CommandHelper.getWorld(src, args);
+                                            WorldBorder border = world.getWorldBorder();
                                             int oldDistance = border.getWarningDistance();
                                             int distance = args.<Integer>getOne("distance").get();
                                             border.setWarningDistance(distance);
@@ -176,8 +175,8 @@ public final class CommandBorder extends CommandProvider {
                                                 GenericArguments.integer(Text.of("time")),
                                                 GenericArguments.optional(GenericArguments.world(Text.of("world"))))
                                         .executor((src, args) -> {
-                                            WorldProperties world = getWorld(src, args);
-                                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                                            World world = CommandHelper.getWorld(src, args);
+                                            WorldBorder border = world.getWorldBorder();
                                             int oldTime = border.getWarningTime();
                                             int time = args.<Integer>getOne("time").get();
                                             border.setWarningTime(time);
@@ -192,8 +191,8 @@ public final class CommandBorder extends CommandProvider {
                                 GenericArguments.optional(GenericArguments.world(Text.of("world")))
                         )
                         .executor((src, args) -> {
-                            WorldProperties world = getWorld(src, args);
-                            WorldBorder border = ((LanternWorldProperties) world).getWorld().get().getWorldBorder();
+                            World world = CommandHelper.getWorld(src, args);
+                            WorldBorder border = world.getWorldBorder();
                             double diameter = border.getDiameter();
                             src.sendMessage(t("commands.worldborder.get.success",
                                     String.format("%.1f", diameter), String.format("%.1f", diameter)));

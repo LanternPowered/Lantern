@@ -26,9 +26,11 @@
 package org.lanternpowered.server.world;
 
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
+import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -47,6 +49,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
     private final Collection<WorldGeneratorModifier> generatorModifiers;
     private final DataContainer generatorSettings;
     private final SerializationBehavior serializationBehavior;
+    private final LanternPortalAgentType portalAgentType;
 
     private final boolean hardcore;
     private final boolean enabled;
@@ -65,9 +68,9 @@ public final class LanternWorldArchetype implements WorldArchetype {
 
     LanternWorldArchetype(String id, String name, GameMode gameMode, LanternDimensionType<?> dimensionType, GeneratorType generatorType,
             Collection<WorldGeneratorModifier> generatorModifiers, DataContainer generatorSettings, Difficulty difficulty,
-            SerializationBehavior serializationBehavior, boolean hardcore, boolean enabled, boolean loadsOnStartup,
-            boolean keepsSpawnLoaded, boolean usesMapFeatures, boolean pvpEnabled, boolean generateBonusChest, boolean commandsAllowed,
-            boolean waterEvaporates, boolean allowPlayerRespawns, boolean generateSpawnOnLoad, long seed, int buildHeight) {
+            SerializationBehavior serializationBehavior, LanternPortalAgentType portalAgentType, boolean hardcore, boolean enabled,
+            boolean loadsOnStartup, boolean keepsSpawnLoaded, boolean usesMapFeatures, boolean pvpEnabled, boolean generateBonusChest,
+            boolean commandsAllowed, boolean waterEvaporates, boolean allowPlayerRespawns, boolean generateSpawnOnLoad, long seed, int buildHeight) {
         this.serializationBehavior = serializationBehavior;
         this.generateSpawnOnLoad = generateSpawnOnLoad;
         this.allowPlayerRespawns = allowPlayerRespawns;
@@ -76,6 +79,7 @@ public final class LanternWorldArchetype implements WorldArchetype {
         this.generateBonusChest = generateBonusChest;
         this.keepsSpawnLoaded = keepsSpawnLoaded;
         this.usesMapFeatures = usesMapFeatures;
+        this.portalAgentType = portalAgentType;
         this.commandsAllowed = commandsAllowed;
         this.waterEvaporates = waterEvaporates;
         this.loadsOnStartup = loadsOnStartup;
@@ -173,6 +177,11 @@ public final class LanternWorldArchetype implements WorldArchetype {
     @Override
     public LanternDimensionType<?> getDimensionType() {
         return this.dimensionType;
+    }
+
+    @Override
+    public LanternPortalAgentType getPortalAgentType() {
+        return this.portalAgentType;
     }
 
     @Override

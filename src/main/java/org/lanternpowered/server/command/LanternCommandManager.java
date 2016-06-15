@@ -55,6 +55,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.util.TextMessageException;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -296,20 +298,20 @@ public class LanternCommandManager implements CommandManager {
     }
 
     @Override
-    public List<String> getSuggestions(CommandSource source, String arguments) {
+    public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition) {
         try {
             final List<String> suggestions;
             final String[] argSplit = arguments.split(" ", 2);
             // TODO: Fix this in the SimpleDispatcher -> in 'getSuggestions' add after
             // 'argSplit.length == 1' the check '&& !arguments.endsWith(" ")'
             if (argSplit.length == 1 && !arguments.endsWith(" ")) {
-                suggestions = this.dispatcher.getSuggestions(source, arguments);
+                suggestions = this.dispatcher.getSuggestions(source, arguments, targetPosition);
             } else {
                 Optional<? extends CommandMapping> cmdOptional = this.dispatcher.get(argSplit[0], source);
                 if (!cmdOptional.isPresent()) {
                     suggestions = ImmutableList.of();
                 } else {
-                    suggestions = cmdOptional.get().getCallable().getSuggestions(source, argSplit[1]);
+                    suggestions = cmdOptional.get().getCallable().getSuggestions(source, argSplit[1], targetPosition);
                 }
             }
             final List<String> rawSuggestions = new ArrayList<>(suggestions);

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.command.CommandHelper.getWorld;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableList;
@@ -41,6 +40,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
@@ -60,14 +60,14 @@ public final class CommandGameRule extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         final Collection<String> defaultRules = Sponge.getRegistry().getDefaultGameRules();
         final ThreadLocal<RuleType<?>> currentRule = new ThreadLocal<>();
 
         specBuilder
                 .arguments(
                         GenericArguments.flags()
-                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY), "-world", "w")
                                 .buildWith(GenericArguments.none()),
                         new CommandElement(Text.of("rule")) {
                             @Nullable
@@ -112,7 +112,7 @@ public final class CommandGameRule extends CommandProvider {
                         }
                 )
                 .executor((src, args) -> {
-                    WorldProperties world = getWorld(src, args);
+                    WorldProperties world = CommandHelper.getWorldProperties(src, args);
                     Object value = args.getOne("value").get();
                     RuleType ruleType = args.<RuleType>getOne("rule").get();
                     ((LanternWorldProperties) world).getRules()

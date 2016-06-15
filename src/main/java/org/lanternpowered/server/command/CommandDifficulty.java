@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.command.CommandHelper.getWorld;
+import static org.lanternpowered.server.command.CommandHelper.getWorldProperties;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableMap;
@@ -35,6 +35,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -46,7 +47,7 @@ public final class CommandDifficulty extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         final ImmutableMap.Builder<String, Object> baseBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<String, Object> aliasesBuilder = ImmutableMap.builder();
 
@@ -59,12 +60,12 @@ public final class CommandDifficulty extends CommandProvider {
         specBuilder
                 .arguments(
                         GenericArguments.flags()
-                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY), "-world", "w")
                                 .buildWith(GenericArguments.none()),
                         ChoicesElement.of(Text.of("difficulty"), baseBuilder.build(), aliasesBuilder.build(), false, true)
                 )
                 .executor((src, args) -> {
-                    WorldProperties world = getWorld(src, args);
+                    WorldProperties world = CommandHelper.getWorldProperties(src, args);
                     Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
                     world.setDifficulty(difficulty);
                     src.sendMessage(t("commands.difficulty.success", difficulty.getName()));

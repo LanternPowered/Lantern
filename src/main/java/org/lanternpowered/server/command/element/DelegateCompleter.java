@@ -23,4 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.command.targeted;
+package org.lanternpowered.server.command.element;
+
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
+
+import java.util.List;
+
+@FunctionalInterface
+public interface DelegateCompleter {
+
+    /**
+     * Fetch completions for command arguments.
+     *
+     * @param src The source requesting tab completions
+     * @param args The arguments currently provided
+     * @param context The context to store state in
+     * @param original The original completer
+     * @return Any relevant completions
+     */
+    List<String> complete(CommandSource src, CommandArgs args, CommandContext context, Completer original);
+}

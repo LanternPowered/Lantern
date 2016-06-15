@@ -42,6 +42,7 @@ import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
@@ -78,7 +79,7 @@ public final class CommandHelp extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         final Comparator<CommandMapping> comparator = (o1, o2) -> o1.getPrimaryAlias().compareTo(o2.getPrimaryAlias());
         specBuilder
                 .arguments(

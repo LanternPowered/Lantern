@@ -59,7 +59,7 @@ public class ConsoleCommandCompleter implements Completer {
 
         final String command0 = command;
         Future<List<String>> tabComplete = ((LanternScheduler) Sponge.getScheduler()).callSync(() ->
-                Sponge.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, command0));
+                Sponge.getCommandManager().getSuggestions(LanternConsoleSource.INSTANCE, command0, null));
 
         try {
             // Get the suggestions

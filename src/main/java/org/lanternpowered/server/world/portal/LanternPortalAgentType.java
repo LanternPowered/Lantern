@@ -23,29 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command.element;
+package org.lanternpowered.server.world.portal;
 
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.args.CommandArgs;
-import org.spongepowered.api.command.args.CommandContext;
-import org.spongepowered.api.command.args.CommandElement;
+import org.lanternpowered.server.catalog.LanternPluginCatalogType;
+import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.world.PortalAgent;
+import org.spongepowered.api.world.PortalAgentType;
 
-import java.util.List;
+import java.util.function.BiFunction;
 
-/**
- * A interface used to complete commands, this is similar as the method
- * {@link CommandElement#complete(CommandSource, CommandArgs, CommandContext)}.
- */
-@FunctionalInterface
-public interface CommandElementCompleter {
+public class LanternPortalAgentType<T extends PortalAgent> extends LanternPluginCatalogType implements PortalAgentType {
+
+    private final Class<T> portalAgentClass;
+    private final BiFunction<LanternWorld, LanternPortalAgentType<T>, T> supplier;
+
+    public LanternPortalAgentType(String pluginId, String name, Class<T> portalAgentClass,
+            BiFunction<LanternWorld, LanternPortalAgentType<T>, T> supplier) {
+        super(pluginId, name);
+        this.portalAgentClass = portalAgentClass;
+        this.supplier = supplier;
+    }
 
     /**
-     * Fetch completions for command arguments.
+     * Creates a {@link T} for the specified {@link LanternWorld}.
      *
-     * @param src The source requesting tab completions
-     * @param args The arguments currently provided
-     * @param context The context to store state in
-     * @return Any relevant completions
+     * @param world The target world
+     * @return The portal agent instance
      */
-    List<String> complete(CommandSource src, CommandArgs args, CommandContext context);
+    public T newPortalAgent(LanternWorld world) {
+        return this.supplier.apply(world, this);
+    }
+
+    @Override
+    public Class<? extends PortalAgent> getPortalAgentClass() {
+        return this.portalAgentClass;
+    }
 }

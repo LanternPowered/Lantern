@@ -40,6 +40,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
+import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
@@ -55,6 +56,8 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.PortalAgentType;
+import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -95,6 +98,9 @@ public final class LanternWorldProperties implements WorldProperties {
 
     // The type of the dimension
     private LanternDimensionType<?> dimensionType = (LanternDimensionType<?>) DimensionTypes.OVERWORLD;
+
+    // The portal agent type
+    private LanternPortalAgentType portalAgentType = (LanternPortalAgentType) PortalAgentTypes.DEFAULT;
 
     // The world generator modifiers
     ImmutableSet<WorldGeneratorModifier> generatorModifiers = ImmutableSet.of();
@@ -168,6 +174,7 @@ public final class LanternWorldProperties implements WorldProperties {
     public void update(LanternWorldArchetype worldArchetype) throws IOException {
         this.commandsAllowed = worldArchetype.areCommandsAllowed();
         this.dimensionType = worldArchetype.getDimensionType();
+        this.portalAgentType = worldArchetype.getPortalAgentType();
         this.setGeneratorType(worldArchetype.getGeneratorType());
         this.worldConfig.getGeneration().setGeneratorSettings(worldArchetype.getGeneratorSettings());
         this.generateBonusChest = worldArchetype.doesGenerateBonusChest();
@@ -390,6 +397,11 @@ public final class LanternWorldProperties implements WorldProperties {
         return this.dimensionType;
     }
 
+    @Override
+    public LanternPortalAgentType getPortalAgentType() {
+        return this.portalAgentType;
+    }
+
     /**
      * Sets the {@link DimensionType}.
      *
@@ -397,6 +409,10 @@ public final class LanternWorldProperties implements WorldProperties {
      */
     public void setDimensionType(DimensionType dimensionType) {
         this.dimensionType = (LanternDimensionType<?>) checkNotNull(dimensionType, "dimensionType");
+    }
+
+    public void setPortalAgentType(PortalAgentType portalAgentType) {
+        this.portalAgentType = (LanternPortalAgentType) checkNotNull(portalAgentType, "portalAgentType");
     }
 
     @Override

@@ -140,8 +140,6 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
                 .findByMessageType(message.getClass()).orElseThrow(() -> new DecoderException(
                         "The returned message type is not attached to the used protocol state (" + state.toString() + ")!"));
 
-        Lantern.getLogger().debug("Received message with type: " + message.getClass().getName());
-
         final List<Processor> processors = messageRegistration.getProcessors();
         // Only process if there are processors found
         if (!processors.isEmpty()) {

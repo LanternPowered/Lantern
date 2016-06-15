@@ -38,6 +38,7 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
@@ -65,18 +66,18 @@ public final class CommandScoreboard extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
                         GenericArguments.flags()
-                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY), "-world", "w")
                                 .buildWith(GenericArguments.none())
                 )
                 .child(CommandSpec.builder()
                         .child(CommandSpec.builder()
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     final Set<Objective> objectives = scoreboard.getObjectives();
                                     if (objectives.isEmpty()) {
@@ -103,7 +104,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     final String name = args.<String>getOne("name").get();
                                     final Criterion criterion = args.<Criterion>getOne("criterion").get();
@@ -138,7 +139,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     final String name = args.<String>getOne("name").get();
                                     scoreboard.removeObjective(scoreboard.getObjective(name).orElseThrow(
@@ -154,7 +155,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     final Optional<String> optName = args.<String>getOne("name");
                                     DisplaySlot displaySlot = args.<DisplaySlot>getOne("display-slot").get();
@@ -179,7 +180,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     int result;
                                     if (args.hasAny("target")) {
@@ -219,7 +220,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     String target = args.<String>getOne("target").get();
                                     if (args.hasAny("objective")) {
@@ -243,7 +244,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     int result;
                                     if (args.hasAny("name")) {
@@ -282,7 +283,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
                                     final String teamName = args.<String>getOne("name").get();
 
                                     if (scoreboard.getTeam(teamName).isPresent()) {
@@ -311,7 +312,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
                                     String teamName = args.<String>getOne("name").get();
                                     final Team team = scoreboard.getTeam(teamName).orElseThrow(
                                             () -> new CommandException(t("commands.scoreboard.teamNotFound", teamName)));
@@ -326,7 +327,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
                                     String teamName = args.<String>getOne("name").get();
                                     final Team team = scoreboard.getTeam(teamName).orElseThrow(
                                             () -> new CommandException(t("commands.scoreboard.teamNotFound", teamName)));
@@ -347,7 +348,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     String teamName = args.<String>getOne("name").orElse(null);
                                     final Team team = teamName == null ? null : scoreboard.getTeam(teamName).orElse(null);
@@ -399,7 +400,7 @@ public final class CommandScoreboard extends CommandProvider {
                                 )
                                 .executor((src, args) -> {
                                     // Get the scoreboard of the world the command source is located in
-                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                                     String teamName = args.<String>getOne("name").get();
                                     final Team team = scoreboard.getTeam(teamName).orElseThrow(
@@ -438,7 +439,7 @@ public final class CommandScoreboard extends CommandProvider {
                 )
                 .executor((src, args) -> {
                     // Get the scoreboard of the world the command source is located in
-                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getWorld().get().getScoreboard();
+                    final Scoreboard scoreboard = CommandHelper.getWorld(src, args).getScoreboard();
 
                     String objectiveName = args.<String>getOne("objective").get();
                     Objective objective = scoreboard.getObjective(objectiveName).orElseThrow(

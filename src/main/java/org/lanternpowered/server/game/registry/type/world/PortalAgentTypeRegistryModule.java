@@ -28,16 +28,12 @@ package org.lanternpowered.server.game.registry.type.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.world.dimension.LanternDimensionEnd;
-import org.lanternpowered.server.world.dimension.LanternDimensionNether;
-import org.lanternpowered.server.world.dimension.LanternDimensionOverworld;
-import org.lanternpowered.server.world.dimension.LanternDimensionType;
+import org.lanternpowered.server.world.portal.EmptyPortalAgent;
+import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
-import org.spongepowered.api.registry.util.RegistrationDependency;
-import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.DimensionTypes;
-import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.api.world.PortalAgentType;
+import org.spongepowered.api.world.PortalAgentTypes;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,15 +43,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-@RegistrationDependency(GeneratorTypeRegistryModule.class)
-public class DimensionTypeRegistryModule implements AlternateCatalogRegistryModule<DimensionType> {
+public class PortalAgentTypeRegistryModule implements AlternateCatalogRegistryModule<PortalAgentType> {
 
-    @RegisterCatalog(DimensionTypes.class) private final Map<String, DimensionType> dimensionTypes = new HashMap<>();
+    @RegisterCatalog(PortalAgentTypes.class) private final Map<String, PortalAgentType> portalAgentTypes = new HashMap<>();
 
     @Override
-    public Map<String, DimensionType> provideCatalogMap() {
-        final Map<String, DimensionType> mappings = new HashMap<>();
-        for (DimensionType type : this.dimensionTypes.values()) {
+    public Map<String, PortalAgentType> provideCatalogMap() {
+        final Map<String, PortalAgentType> mappings = new HashMap<>();
+        for (PortalAgentType type : this.portalAgentTypes.values()) {
             mappings.put(type.getName(), type);
         }
         return mappings;
@@ -63,30 +58,25 @@ public class DimensionTypeRegistryModule implements AlternateCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
-        final List<DimensionType> types = new ArrayList<>();
-        types.add(new LanternDimensionType<>("minecraft", "the_end", -1, LanternDimensionEnd.class, GeneratorTypes.THE_END, true, false,
-                false, false, LanternDimensionEnd::new));
-        types.add(new LanternDimensionType<>("minecraft", "overworld", 0, LanternDimensionOverworld.class, GeneratorTypes.OVERWORLD, true, false,
-                true, true, LanternDimensionOverworld::new));
-        types.add(new LanternDimensionType<>("minecraft", "nether", 1, LanternDimensionNether.class, GeneratorTypes.NETHER, true, true,
-                false, false, LanternDimensionNether::new));
+        final List<PortalAgentType> types = new ArrayList<>();
+        types.add(new LanternPortalAgentType<>("minecraft", "default", EmptyPortalAgent.class, (world, type) -> new EmptyPortalAgent(type)));
 
-        for (DimensionType type : types) {
-            this.dimensionTypes.put(type.getId(), type);
+        for (PortalAgentType type : types) {
+            this.portalAgentTypes.put(type.getId(), type);
         }
     }
 
     @Override
-    public Optional<DimensionType> getById(String id) {
+    public Optional<PortalAgentType> getById(String id) {
         if (checkNotNull(id).indexOf(':') == -1) {
             id = "minecraft:" + id;
         }
-        return Optional.ofNullable(this.dimensionTypes.get(id.toLowerCase(Locale.ENGLISH)));
+        return Optional.ofNullable(this.portalAgentTypes.get(id.toLowerCase(Locale.ENGLISH)));
     }
 
     @Override
-    public Collection<DimensionType> getAll() {
-        return ImmutableSet.copyOf(this.dimensionTypes.values());
+    public Collection<PortalAgentType> getAll() {
+        return ImmutableSet.copyOf(this.portalAgentTypes.values());
     }
 
 }

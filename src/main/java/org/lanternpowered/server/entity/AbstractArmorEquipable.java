@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.entity;
 
+import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -80,12 +81,14 @@ public interface AbstractArmorEquipable extends AbstractEquipable, ArmorEquipabl
     }
 
     @Override
-    default Optional<ItemStack> getItemInHand() {
+    default Optional<ItemStack> getItemInHand(HandType handType) {
+        // TODO: Hand type
         return this.getEquipped(EquipmentTypes.EQUIPPED);
     }
 
     @Override
-    default void setItemInHand(@Nullable ItemStack itemInHand) {
+    default void setItemInHand(HandType hand, @Nullable ItemStack itemInHand) {
+        // TODO: Hand type
         this.equip(EquipmentTypes.EQUIPPED, itemInHand);
     }
 

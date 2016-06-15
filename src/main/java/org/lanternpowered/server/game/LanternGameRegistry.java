@@ -57,6 +57,7 @@ import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DoublePlantTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HingeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.LogAxisRegistryModule;
@@ -100,6 +101,7 @@ import org.lanternpowered.server.game.registry.type.world.DifficultyRegistryModu
 import org.lanternpowered.server.game.registry.type.world.DimensionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.GeneratorTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.PortalAgentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.SerializationBehaviorRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistryModule;
@@ -132,6 +134,7 @@ import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.DisguisedBlockType;
 import org.spongepowered.api.data.type.DoublePlantType;
+import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
@@ -207,6 +210,7 @@ import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -271,6 +275,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())
                 .registerModule(DisguisedBlockType.class, new DisguisedBlockTypeRegistryModule())
                 .registerModule(DoublePlantType.class, new DoublePlantTypeRegistryModule())
+                .registerModule(HandType.class, new HandTypeRegistryModule())
                 .registerModule(Hinge.class, new HingeRegistryModule())
                 .registerModule(new KeyRegistryModule())
                 .registerModule(LogAxis.class, new LogAxisRegistryModule())
@@ -314,6 +319,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DimensionType.class, new DimensionTypeRegistryModule())
                 .registerModule(WorldGeneratorModifier.class, new GeneratorModifierRegistryModule())
                 .registerModule(GeneratorType.class, new GeneratorTypeRegistryModule())
+                .registerModule(PortalAgentType.class, new PortalAgentTypeRegistryModule())
                 .registerModule(SerializationBehavior.class, new SerializationBehaviorRegistryModule())
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())

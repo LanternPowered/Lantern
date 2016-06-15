@@ -33,6 +33,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 import java.util.stream.Collectors;
@@ -44,7 +45,7 @@ public final class CommandListPlayers extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
                         GenericArguments.optional(GenericArguments.string(Text.of("uuids")))

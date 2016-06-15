@@ -23,19 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command.targeted;
+package org.lanternpowered.server.data.type;
 
-import com.flowpowered.math.vector.Vector3i;
-import org.spongepowered.api.command.CommandSource;
+import org.lanternpowered.server.catalog.SimpleLanternCatalogType;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Optional;
+public class LanternHandType extends SimpleLanternCatalogType implements HandType {
 
-public interface TargetingCommandSource extends CommandSource {
+    private final Translation translation;
 
-    /**
-     * Gets the targeted block position.
-     *
-     * @return The targeted block position
-     */
-    Optional<Vector3i> getTargetBlock();
+    public LanternHandType(String identifier, String translationKey) {
+        // The used translations are not available in vanilla minecraft
+        this(identifier, Lantern.getRegistry().getTranslationManager().get("hand." + translationKey));
+    }
+
+    public LanternHandType(String identifier, Translation translation) {
+        super(identifier);
+        this.translation = translation;
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
+    }
 }

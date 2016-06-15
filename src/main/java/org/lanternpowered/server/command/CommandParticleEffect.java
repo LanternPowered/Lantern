@@ -28,9 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.command.element.DelegateCompleterElement;
 import org.lanternpowered.server.command.element.GenericArguments2;
-import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandResult;
@@ -45,6 +43,7 @@ import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.world.World;
@@ -56,20 +55,20 @@ public final class CommandParticleEffect extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("type"), ParticleType.class),
-                        TargetedVector3dElement.of(Text.of("position"), 0),
-                        DelegateCompleterElement.defaultValues(GenericArguments.integer(Text.of("count")), false, 1),
+                        GenericArguments2.targetedVector3d(Text.of("position")),
+                        GenericArguments2.integer(Text.of("count"), 1),
                         // TODO: Can we place the world arg after the position without that the parsing system complains
                         // TODO: Tab complaining is currently throwing errors, but it's a small bug in SpongeAPI
-                        GenericArguments.optional(GenericArguments.world(Text.of("world"))),
+                        GenericArguments.optional(GenericArguments.world(CommandHelper.WORLD_KEY)),
                         GenericArguments.flags()
-                                .valueFlag(DelegateCompleterElement.vector3d(GenericArguments.vector3d(Text.of("offset")), 0.0), "-offset", "o")
-                                .valueFlag(DelegateCompleterElement.vector3d(GenericArguments.vector3d(Text.of("motion")), 0.0), "-motion", "m")
+                                .valueFlag(GenericArguments2.vector3d(Text.of("offset"), Vector3d.ZERO), "-offset", "o")
+                                .valueFlag(GenericArguments2.vector3d(Text.of("motion"), Vector3d.ZERO), "-motion", "m")
                                 .valueFlag(GenericArguments2.color(Text.of("color"), Color.CYAN), "-color", "c")
-                                .valueFlag(DelegateCompleterElement.defaultValues(GenericArguments.doubleNum(Text.of("size")), false, 1.0), "-size", "s")
+                                .valueFlag(GenericArguments2.doubleNum(Text.of("size"), 1.0), "-size", "s")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("note"), NotePitch.class), "-note", "n")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("block"), BlockState.class), "-block", "b")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("item"), ItemType.class), "-item", "i")
@@ -78,7 +77,7 @@ public final class CommandParticleEffect extends CommandProvider {
                 .executor((src, args) -> {
                     ParticleType particleType = args.<ParticleType>getOne("type").get();
                     Vector3d position = args.<Vector3d>getOne("position").get();
-                    World world = CommandHelper.getWorld(src, args).getWorld().get();
+                    World world = CommandHelper.getWorld(src, args);
 
                     ParticleEffect.ParticleBuilder builder;
                     if (particleType instanceof ParticleType.Colorable) {

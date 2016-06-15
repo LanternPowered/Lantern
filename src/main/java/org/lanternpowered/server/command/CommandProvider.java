@@ -67,9 +67,9 @@ public abstract class CommandProvider {
      * @return The command spec
      */
     public CommandSpec buildSpecFor(PluginContainer pluginContainer) {
-        CommandSpec.Builder builder = CommandSpec.builder();
+        final CommandSpec.Builder builder = CommandSpec.builder();
         builder.permission(this.getPermissionFor(pluginContainer));
-        this.completeSpec(builder);
+        this.completeSpec(pluginContainer, builder);
         return builder.build();
     }
 
@@ -79,7 +79,7 @@ public abstract class CommandProvider {
      *
      * @param specBuilder The spec builder
      */
-    public abstract void completeSpec(CommandSpec.Builder specBuilder);
+    public abstract void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder);
 
     /**
      * Gets the name for the permission for the specified {@link PluginContainer}.

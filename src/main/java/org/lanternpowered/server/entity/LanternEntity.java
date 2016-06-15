@@ -174,9 +174,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         this.setRawPosition(position);
     }
 
-    public void setPositionAndWorld(World world, Vector3d position) {
+    public boolean setPositionAndWorld(World world, Vector3d position) {
         this.setRawPosition(position);
         this.setWorld((LanternWorld) world);
+        // TODO: Events
+        return true;
     }
 
     @Override
@@ -186,9 +188,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public void setLocation(Location<World> location) {
+    public boolean setLocation(Location<World> location) {
         checkNotNull(location, "location");
-        this.setPositionAndWorld(location.getExtent(), location.getPosition());
+        return this.setPositionAndWorld(location.getExtent(), location.getPosition());
     }
 
     @Override
@@ -202,8 +204,8 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public void transferToWorld(World world, Vector3d position) {
-        this.setPositionAndWorld(checkNotNull(world, "world"), position);
+    public boolean transferToWorld(World world, Vector3d position) {
+        return this.setPositionAndWorld(checkNotNull(world, "world"), position);
     }
 
     @Override
@@ -232,24 +234,28 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public void setTransform(Transform<World> transform) {
+    public boolean setTransform(Transform<World> transform) {
         checkNotNull(transform, "transform");
         this.setLocationAndRotation(transform.getLocation(), transform.getRotation());
         this.setScale(transform.getScale());
+        // TODO: Events
+        return true;
     }
 
     @Override
-    public void setLocationAndRotation(Location<World> location, Vector3d rotation) {
+    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation) {
         checkNotNull(location, "location");
         checkNotNull(rotation, "rotation");
 
         this.setWorld((LanternWorld) location.getExtent());
         this.setRawPosition(location.getPosition());
         this.setRawRotation(rotation);
+        // TODO: Events
+        return true;
     }
 
     @Override
-    public void setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
         checkNotNull(location, "location");
         checkNotNull(rotation, "rotation");
         checkNotNull(relativePositions, "relativePositions");
@@ -284,6 +290,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         this.setWorld((LanternWorld) world);
         this.setRawPosition(new Vector3d(x, y, z));
         this.setRawRotation(new Vector3d(pitch, yaw, roll));
+
+        // TODO: Events
+        return true;
     }
 
     @Override

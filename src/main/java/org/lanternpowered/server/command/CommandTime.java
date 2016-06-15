@@ -37,6 +37,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
@@ -55,7 +56,7 @@ public final class CommandTime extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         final Map<String, Integer> presets = new HashMap<>();
         presets.put("day", 1000);
         presets.put("night", 13000);
@@ -63,7 +64,7 @@ public final class CommandTime extends CommandProvider {
         specBuilder
                 .arguments(
                         GenericArguments.flags()
-                                .valueFlag(GenericArguments.world(Text.of("world")), "-world", "w")
+                                .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY), "-world", "w")
                                 .buildWith(GenericArguments.none())
                 )
                 .child(CommandSpec.builder()
@@ -93,7 +94,7 @@ public final class CommandTime extends CommandProvider {
                                 }
                         )
                         .executor((src, args) -> {
-                            WorldProperties world = getWorld(src, args);
+                            WorldProperties world = CommandHelper.getWorldProperties(src, args);
                             int time = args.<Integer>getOne("value").get();
                             world.setWorldTime(time);
                             src.sendMessage(t("commands.time.set", time));
@@ -105,7 +106,7 @@ public final class CommandTime extends CommandProvider {
                                 GenericArguments.integer(Text.of("value"))
                         )
                         .executor((src, args) -> {
-                            WorldProperties world = getWorld(src, args);
+                            WorldProperties world = CommandHelper.getWorldProperties(src, args);
                             int time = args.<Integer>getOne("value").get();
                             world.setWorldTime(world.getWorldTime() + time);
                             src.sendMessage(t("commands.time.added", time));
@@ -117,7 +118,7 @@ public final class CommandTime extends CommandProvider {
                                 GenericArguments2.enumValue(Text.of("value"), QueryType.class)
                         )
                         .executor((src, args) -> {
-                            WorldProperties world = getWorld(src, args);
+                            WorldProperties world = CommandHelper.getWorldProperties(src, args);
                             QueryType queryType = args.<QueryType>getOne("value").get();
                             int result;
                             switch (queryType) {

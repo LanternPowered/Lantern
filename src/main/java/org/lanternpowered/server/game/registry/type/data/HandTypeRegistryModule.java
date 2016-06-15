@@ -23,16 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.entity.player;
+package org.lanternpowered.server.game.registry.type.data;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.lanternpowered.server.data.type.LanternHandType;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 
@@ -44,45 +42,26 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
-public final class GameModeRegistryModule implements CatalogRegistryModule<GameMode> {
+public final class HandTypeRegistryModule implements CatalogRegistryModule<HandType> {
 
-    public static GameModeRegistryModule getInstance() {
-        return Holder.INSTANCE;
-    }
-
-    @RegisterCatalog(GameModes.class)
-    private final Map<String, GameMode> gameModes = new HashMap<>();
-    private final Int2ObjectMap<GameMode> gameModesByInternalId = new Int2ObjectOpenHashMap<>();
+    @RegisterCatalog(HandTypes.class)
+    private final Map<String, HandType> handTypes = new HashMap<>();
 
     @Override
     public void registerDefaults() {
-        final List<LanternGameMode> types = new ArrayList<>();
-        types.add(new LanternGameMode("not_set", -1));
-        types.add(new LanternGameMode("survival", 0));
-        types.add(new LanternGameMode("creative", 1));
-        types.add(new LanternGameMode("adventure", 2));
-        types.add(new LanternGameMode("spectator", 3));
-        types.forEach(type -> {
-            this.gameModes.put(type.getId(), type);
-            this.gameModesByInternalId.put(type.getInternalId(), type);
-        });
+        final List<LanternHandType> types = new ArrayList<>();
+        types.add(new LanternHandType("main_hand", "main"));
+        types.add(new LanternHandType("off_hand", "off"));
+        types.forEach(type -> this.handTypes.put(type.getId(), type));
     }
 
     @Override
-    public Optional<GameMode> getById(String id) {
-        return Optional.ofNullable(this.gameModes.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
+    public Optional<HandType> getById(String id) {
+        return Optional.ofNullable(this.handTypes.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
     }
 
     @Override
-    public Collection<GameMode> getAll() {
-        return ImmutableSet.copyOf(this.gameModes.values());
-    }
-
-    public Optional<GameMode> getByInternalId(int internalId) {
-        return Optional.ofNullable(this.gameModesByInternalId.get(internalId));
-    }
-
-    private static final class Holder {
-        private static final GameModeRegistryModule INSTANCE = new GameModeRegistryModule();
+    public Collection<HandType> getAll() {
+        return ImmutableSet.copyOf(this.handTypes.values());
     }
 }

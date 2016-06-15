@@ -97,6 +97,7 @@ dependencies {
     compile 'org.mariadb.jdbc:mariadb-java-client:1.4.3'
     compile 'org.fusesource.jansi:jansi:1.12'
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
+    compile 'com.h2database:h2:1.4.192'
     compile 'com.zaxxer:HikariCP:2.4.6'
     compile 'com.google.guava:guava:18.0'
     compile 'com.google.inject:guice:4.0'

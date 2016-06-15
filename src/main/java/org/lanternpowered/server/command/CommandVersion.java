@@ -41,7 +41,7 @@ public final class CommandVersion extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .description(t("commands.version.description"))
                 .executor((src, args) -> {

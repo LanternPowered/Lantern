@@ -23,38 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command.targeted;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-
-import javax.annotation.Nullable;
-
-/**
- * This helper class is used to track the looked block positions
- * send through the {@link MessagePlayInTabComplete}.
- */
-public final class TargetedBlockHelper {
-
-    private static final ThreadLocal<Map<TargetingCommandSource, Vector3i>> positions = ThreadLocal.withInitial(HashMap::new);
-
-    public static void setPosition(TargetingCommandSource source, @Nullable Vector3i position) {
-        checkNotNull(source, "source");
-        if (position == null) {
-            positions.get().remove(source);
-        } else {
-            positions.get().put(source, position);
-        }
-    }
-
-    static Optional<Vector3i> getPosition(TargetingCommandSource source) {
-        return Optional.ofNullable(positions.get().get(checkNotNull(source, "source")));
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.world.portal;

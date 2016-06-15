@@ -27,6 +27,7 @@ package org.lanternpowered.server.command.element;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -43,12 +44,15 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -304,7 +308,6 @@ public final class GenericArguments2 {
             while (args.hasNext()) {
                 String arg = args.next();
                 if (!arg.isEmpty()) {
-                    Lantern.getLogger().info(arg);
                     values.add(arg);
                 }
             }
@@ -391,6 +394,160 @@ public final class GenericArguments2 {
         @Override
         protected Object getValue(String choice) throws IllegalArgumentException {
             return this.mappings.get(choice.toLowerCase());
+        }
+    }
+
+    public static CommandElement integer(Text key) {
+        return GenericArguments.integer(key);
+    }
+
+    public static CommandElement integer(Text key, @Nullable Integer defaultValue) {
+        return defaultValue == null ? integer(key) : delegateCompleter(integer(key),
+                (src, args, context) -> Collections.singletonList(Integer.toString(defaultValue)));
+    }
+
+    public static CommandElement doubleNum(Text key) {
+        return GenericArguments.doubleNum(key);
+    }
+
+    public static CommandElement doubleNum(Text key, @Nullable Double defaultValue) {
+        return defaultValue == null ? doubleNum(key) : delegateCompleter(doubleNum(key),
+                (src, args, context) -> Collections.singletonList(Double.toString(defaultValue)));
+    }
+
+    public static CommandElement targetedVector3d(Text key) {
+        return targetedVector3d(key, null);
+    }
+
+    public static CommandElement targetedVector3d(Text key, @Nullable Vector3d defaultValue) {
+        return delegateCompleter(vector3d(key), new Vector3dElementCompleter() {
+
+            private List<String> complete(CommandContext context, Function<Vector3d, Double> function) {
+                final Optional<Location<World>> location = context.<Location<World>>getOne(CommandContext.TARGET_BLOCK_ARG);
+                if (location.isPresent() || defaultValue != null) {
+                    final Vector3d pos = location.map(Location::getPosition).orElse(defaultValue);
+                    return Collections.singletonList(Double.toString(function.apply(pos)));
+                }
+                return Collections.emptyList();
+            }
+
+            @Override
+            protected List<String> completeX(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getX);
+            }
+
+            @Override
+            protected List<String> completeY(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getY);
+            }
+
+            @Override
+            protected List<String> completeZ(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getZ);
+            }
+        });
+    }
+
+    public static CommandElement vector3d(Text key) {
+        return GenericArguments.vector3d(key);
+    }
+
+    public static CommandElement vector3d(Text key, @Nullable Vector3d defaultValue) {
+        return defaultValue == null ? vector3d(key) : delegateCompleter(vector3d(key), new Vector3dElementCompleter() {
+            @Override
+            protected List<String> completeX(CommandSource src, CommandContext context) {
+                return Collections.singletonList(Double.toString(defaultValue.getX()));
+            }
+
+            @Override
+            protected List<String> completeY(CommandSource src, CommandContext context) {
+                return Collections.singletonList(Double.toString(defaultValue.getY()));
+            }
+
+            @Override
+            protected List<String> completeZ(CommandSource src, CommandContext context) {
+                return Collections.singletonList(Double.toString(defaultValue.getZ()));
+            }
+        });
+    }
+
+    private static abstract class Vector3dElementCompleter implements DelegateCompleter {
+
+        protected abstract List<String> completeX(CommandSource src, CommandContext context);
+
+        protected abstract List<String> completeY(CommandSource src, CommandContext context);
+
+        protected abstract List<String> completeZ(CommandSource src, CommandContext context);
+
+        @Override
+        public List<String> complete(CommandSource src, CommandArgs args, CommandContext context, Completer original) {
+            Object state = args.getState();
+            final List<String> completions = original.complete(src, args, context);
+            // Why are there empty entries in the list?
+            if (!completions.isEmpty() && completions.size() != 1 && !completions.get(0).isEmpty()) {
+                return completions;
+            }
+            args.setState(state);
+            if (!args.nextIfPresent().isPresent()) {
+                return Collections.emptyList();
+            }
+            if (args.nextIfPresent().isPresent()) {
+                if (args.nextIfPresent().isPresent()) {
+                    // Store the current state
+                    state = args.getState();
+                    if (args.nextIfPresent().isPresent()) {
+                        // We finished the vector3d, reset before the last arg
+                        args.setState(state);
+                        Lantern.getLogger().warn("Attempted to complete to many args, vector3d has only 3 components.");
+                    } else {
+                        // The z is being completed
+                        return this.completeZ(src, context);
+                    }
+                } else {
+                    // The y is being completed
+                    return this.completeY(src, context);
+                }
+            } else {
+                // The x is being completed
+                return this.completeX(src, context);
+            }
+            return Collections.emptyList();
+        }
+    }
+
+    public static CommandElement delegateCompleter(CommandElement originalElement, Completer delegateCompleter) {
+        return new DelegateCompleterElement(originalElement, (src, args, context, original) -> delegateCompleter.complete(src, args, context));
+    }
+
+    public static CommandElement delegateCompleter(CommandElement originalElement, DelegateCompleter delegateCompleter) {
+        return new DelegateCompleterElement(originalElement, delegateCompleter);
+    }
+
+    private static class DelegateCompleterElement extends CommandElement {
+
+        private final CommandElement originalElement;
+        private final DelegateCompleter delegateCompleter;
+
+        protected DelegateCompleterElement(CommandElement originalElement, DelegateCompleter delegateCompleter) {
+            super(originalElement.getKey());
+            this.delegateCompleter = delegateCompleter;
+            this.originalElement = originalElement;
+        }
+
+        @Override
+        public void parse(CommandSource source, CommandArgs args, CommandContext context) throws ArgumentParseException {
+            this.originalElement.parse(source, args, context);
+        }
+
+        @Nullable
+        @Override
+        protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+            return this.delegateCompleter.complete(src, args, context, this.originalElement::complete);
         }
     }
 

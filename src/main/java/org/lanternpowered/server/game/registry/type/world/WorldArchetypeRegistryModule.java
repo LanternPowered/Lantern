@@ -52,7 +52,7 @@ import java.util.Optional;
 
 @RegistrationDependency({ GameModeRegistryModule.class, GeneratorTypeRegistryModule.class, DifficultyRegistryModule.class,
         DimensionTypeRegistryModule.class, SerializationBehaviorRegistryModule.class, GeneratorModifierRegistryModule.class,
-        BiomeRegistryModule.class })
+        BiomeRegistryModule.class, PortalAgentTypeRegistryModule.class })
 public final class WorldArchetypeRegistryModule implements AdditionalCatalogRegistryModule<WorldArchetype>,
         AlternateCatalogRegistryModule<WorldArchetype> {
 

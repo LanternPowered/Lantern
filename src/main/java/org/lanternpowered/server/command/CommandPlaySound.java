@@ -27,14 +27,14 @@ package org.lanternpowered.server.command;
 
 import com.flowpowered.math.GenericMath;
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.command.element.DelegateCompleterElement;
-import org.lanternpowered.server.command.targeted.TargetedVector3dElement;
+import org.lanternpowered.server.command.element.GenericArguments2;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 public final class CommandPlaySound extends CommandProvider {
@@ -46,19 +46,16 @@ public final class CommandPlaySound extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("sound"), SoundType.class),
                         GenericArguments.catalogedElement(Text.of("category"), SoundCategory.class),
                         GenericArguments.player(Text.of("player")),
-                        GenericArguments.optional(TargetedVector3dElement.of(Text.of("position"), 0)),
-                        GenericArguments.optional(DelegateCompleterElement.defaultValues(
-                                GenericArguments.doubleNum(Text.of("volume")), false, 1)),
-                        GenericArguments.optional(DelegateCompleterElement.defaultValues(
-                                GenericArguments.doubleNum(Text.of("pitch")), false, 1)),
-                        GenericArguments.optional(DelegateCompleterElement.defaultValues(
-                                GenericArguments.doubleNum(Text.of("minimum-volume")), false, 0)))
+                        GenericArguments.optional(GenericArguments2.targetedVector3d(Text.of("position"))),
+                        GenericArguments.optional(GenericArguments2.doubleNum(Text.of("volume")), 1.0),
+                        GenericArguments.optional(GenericArguments2.doubleNum(Text.of("pitch"), 1.0)),
+                        GenericArguments.optional(GenericArguments2.doubleNum(Text.of("minimum-volume"), 0.0)))
                 .executor((src, args) -> {
                     SoundType soundType = args.<SoundType>getOne("sound").get();
                     SoundCategory soundCategory = args.<SoundCategory>getOne("category").get();

@@ -65,6 +65,7 @@ import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
+import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
 import org.lanternpowered.server.world.rules.RuleType;
@@ -108,7 +109,7 @@ import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.TeleporterAgent;
+import org.spongepowered.api.world.PortalAgent;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -194,7 +195,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The properties of this world
     final LanternWorldProperties properties;
 
-    private final TeleporterAgent teleporterAgent = null;
+    private final PortalAgent portalAgent;
 
     // The context of this world
     private final Context worldContext;
@@ -231,8 +232,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         }
         // Create the world border
         this.worldBorder = this.addComponent(LanternWorldBorder.class);
-        // Create the new dimension instance
+        // Create the dimension
         this.dimension = dimensionType.newDimension(this);
+        // Create the portal agent
+        this.portalAgent = properties.getPortalAgentType().newPortalAgent(this);
         // Create a new world generator
         final WorldGenerator worldGenerator = properties.getGeneratorType().createGenerator(this);
         // Finally, create the chunk manager
@@ -1047,8 +1050,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public TeleporterAgent getTeleporterAgent() {
-        return this.teleporterAgent;
+    public PortalAgent getPortalAgent() {
+        return this.portalAgent;
     }
 
     @Override

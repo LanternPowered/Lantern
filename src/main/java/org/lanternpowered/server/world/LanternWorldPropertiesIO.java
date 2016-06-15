@@ -52,6 +52,8 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.PortalAgentType;
+import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.difficulty.Difficulties;
 
 import java.io.DataInputStream;
@@ -126,6 +128,7 @@ public final class LanternWorldPropertiesIO {
     // Sponge properties
     private final static DataQuery UUID_MOST = DataQuery.of("uuid_most");
     private final static DataQuery UUID_LEAST = DataQuery.of("uuid_least");
+    private final static DataQuery PORTAL_AGENT_TYPE = DataQuery.of("portalAgentType");
     private final static DataQuery DIMENSION_TYPE = DataQuery.of("dimensionType");
     private final static DataQuery DIMENSION_INDEX = DataQuery.of("dimensionId");
     private final static DataQuery GENERATOR_MODIFIERS = DataQuery.of("generatorModifiers");
@@ -266,16 +269,32 @@ public final class LanternWorldPropertiesIO {
         // Get the sponge properties
         if (spongeDataView != null) {
             // This can be null, this is provided in the lantern-server
-            String dimensionType = spongeDataView.getString(DIMENSION_TYPE).get();
-            if (dimensionType.equalsIgnoreCase(OVERWORLD)) {
+            final String dimensionTypeId = spongeDataView.getString(DIMENSION_TYPE).get();
+            if (dimensionTypeId.equalsIgnoreCase(OVERWORLD)) {
                 properties.setDimensionType(DimensionTypes.OVERWORLD);
-            } else if (dimensionType.equalsIgnoreCase(NETHER)) {
+            } else if (dimensionTypeId.equalsIgnoreCase(NETHER)) {
                 properties.setDimensionType(DimensionTypes.NETHER);
-            } else if (dimensionType.equalsIgnoreCase(END)) {
+            } else if (dimensionTypeId.equalsIgnoreCase(END)) {
                 properties.setDimensionType(DimensionTypes.THE_END);
             } else {
-                properties.setDimensionType(Sponge.getRegistry().getType(DimensionType.class, dimensionType).orElse(DimensionTypes.OVERWORLD));
+                final DimensionType dimensionType = Sponge.getRegistry().getType(DimensionType.class, dimensionTypeId).orElse(null);
+                if (dimensionType == null) {
+                    Lantern.getLogger().warn("Could not find a dimension type with id {} for the world {}, falling back to overworld...",
+                            dimensionTypeId, levelData.worldName);
+                }
+                properties.setDimensionType(dimensionType == null ? DimensionTypes.OVERWORLD : dimensionType);
             }
+
+            PortalAgentType portalAgentType = null;
+            if (spongeDataView.contains(PORTAL_AGENT_TYPE)) {
+                final String portalAgentTypeId = spongeDataView.getString(PORTAL_AGENT_TYPE).get();
+                portalAgentType = Sponge.getRegistry().getType(PortalAgentType.class, portalAgentTypeId).orElse(null);
+                if (portalAgentType == null) {
+                    Lantern.getLogger().warn("Could not find a portal agent type with id {} for the world {}, falling back to default...",
+                            portalAgentTypeId, levelData.worldName);
+                }
+            }
+            properties.setPortalAgentType(portalAgentType == null ? PortalAgentTypes.DEFAULT : portalAgentType);
 
             if (spongeDataView.contains(PLAYER_UUID_TABLE)) {
                 List<DataView> views = spongeDataView.getViewList(PLAYER_UUID_TABLE).get();
@@ -446,6 +465,7 @@ public final class LanternWorldPropertiesIO {
         final DataView spongeContainer = spongeRootContainer.createView(DataQueries.SPONGE_DATA);
         spongeContainer.set(GENERATE_BONUS_CHEST, (byte) (properties.doesGenerateBonusChest() ? 1 : 0));
         spongeContainer.set(DIMENSION_TYPE, properties.getDimensionType().getId());
+        spongeContainer.set(PORTAL_AGENT_TYPE, properties.getPortalAgentType().getId());
         spongeContainer.set(GENERATOR_MODIFIERS, properties.generatorModifiers.stream().map(
                 CatalogType::getId).collect(Collectors.toList()));
         spongeContainer.set(PLAYER_UUID_TABLE, properties.pendingUniqueIds.stream().map(

@@ -33,10 +33,15 @@ import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.sql.SqlService;
 
 import java.io.Closeable;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
@@ -44,6 +49,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -66,6 +72,7 @@ import javax.sql.DataSource;
 public class LanternSqlService implements SqlService, Closeable {
 
     private static final Map<String, Properties> PROTOCOL_SPECIFIC_PROPS;
+    private static final Map<String, BiFunction<PluginContainer, String, String>> PATH_CANONICALIZERS;
 
     static {
         ImmutableMap.Builder<String, Properties> build = ImmutableMap.builder();
@@ -77,6 +84,23 @@ public class LanternSqlService implements SqlService, Closeable {
         build.put("org.mariadb.jdbc.Driver", mySqlProps);
 
         PROTOCOL_SPECIFIC_PROPS = build.build();
+        PATH_CANONICALIZERS = ImmutableMap.of("h2", (plugin, orig) -> {
+            // Bleh if only h2 had a better way of supplying a base directory... oh well...
+            org.h2.engine.ConnectionInfo h2Info = new org.h2.engine.ConnectionInfo(orig);
+            if (!h2Info.isPersistent() || h2Info.isRemote()) {
+                return orig;
+            }
+            if (orig.startsWith("file:")) {
+                orig = orig.substring("file:".length());
+            }
+            Path origPath = Paths.get(orig);
+            if (origPath.isAbsolute()) {
+                return origPath.toString();
+            } else {
+                return Lantern.getGame().getConfigManager().getPluginConfig(plugin)
+                        .getDirectory().resolve(orig).toAbsolutePath().toString();
+            }
+        });
     }
 
     private final LoadingCache<ConnectionInfo, HikariDataSource> connectionCache =
@@ -108,8 +132,19 @@ public class LanternSqlService implements SqlService, Closeable {
 
     @Override
     public DataSource getDataSource(String jdbcConnection) throws SQLException {
+        return this.getDataSource(null, jdbcConnection);
+    }
+
+    @Override
+    public DataSource getDataSource(@Nullable Object plugin, String jdbcConnection) throws SQLException {
         jdbcConnection = getConnectionUrlFromAlias(jdbcConnection).orElse(jdbcConnection);
-        ConnectionInfo info = ConnectionInfo.fromUrl(jdbcConnection);
+        PluginContainer container = null;
+        if (plugin != null) {
+            container = Sponge.getPluginManager().fromInstance(plugin).orElseThrow(() -> new IllegalArgumentException(
+                    "The provided plugin object does not have an associated plugin container"
+                            + " (in other words, is 'plugin' actually your plugin object?"));
+        }
+        ConnectionInfo info = ConnectionInfo.fromUrl(container, jdbcConnection);
         try {
             return this.connectionCache.get(info);
         } catch (ExecutionException e) {
@@ -193,11 +228,12 @@ public class LanternSqlService implements SqlService, Closeable {
         /**
          * Extracts the connection info from a JDBC url with additional authentication information as specified in {@link SqlService}.
          *
+         * @param container The plugin to put a path relative to
          * @param fullUrl The full JDBC URL as specified in SqlService
          * @return A constructed ConnectionInfo object using the info from the provided URL
          * @throws SQLException If the driver for the given URL is not present
          */
-        public static ConnectionInfo fromUrl(String fullUrl) throws SQLException {
+        public static ConnectionInfo fromUrl(@Nullable PluginContainer container, String fullUrl) throws SQLException {
             Matcher match = URL_REGEX.matcher(fullUrl);
             if (!match.matches()) {
                 throw new IllegalArgumentException("URL " + fullUrl + " is not a valid JDBC URL");
@@ -207,7 +243,11 @@ public class LanternSqlService implements SqlService, Closeable {
             final boolean hasSlashes = match.group(2) != null;
             final String user = match.group(3);
             final String pass = match.group(4);
-            final String serverDatabaseSpecifier = match.group(5);
+            String serverDatabaseSpecifier = match.group(5);
+            BiFunction<PluginContainer, String, String> derelativizer = PATH_CANONICALIZERS.get(protocol);
+            if (container != null && derelativizer != null) {
+                serverDatabaseSpecifier = derelativizer.apply(container, serverDatabaseSpecifier);
+            }
             final String unauthedUrl = "jdbc:" + protocol + (hasSlashes ? "://" : ":") + serverDatabaseSpecifier;
             final String driverClass = DriverManager.getDriver(unauthedUrl).getClass().getCanonicalName();
             return new ConnectionInfo(user, pass, driverClass, unauthedUrl, fullUrl);

@@ -23,16 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command.targeted;
+package org.lanternpowered.server.world.portal;
 
-import com.flowpowered.math.vector.Vector3i;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.PortalAgentType;
+import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
-public interface AbstractTargetingCommandSource extends TargetingCommandSource {
+public final class EmptyPortalAgent extends LanternPortalAgent {
+
+    public EmptyPortalAgent(PortalAgentType portalAgentType) {
+        super(portalAgentType);
+    }
 
     @Override
-    default Optional<Vector3i> getTargetBlock() {
-        return TargetedBlockHelper.getPosition(this);
+    public Optional<Location<World>> findPortal(Location<World> targetLocation) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Location<World>> createPortal(Location<World> targetLocation) {
+        return Optional.empty();
     }
 }

@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
@@ -32,12 +33,15 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.world.GeneratorModifierRegistryModule;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
+import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.registry.CatalogTypeAlreadyRegisteredException;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.PortalAgentType;
+import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.WorldArchetype;
@@ -57,6 +61,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
 
     private GameMode gameMode;
     private Difficulty difficulty;
+    private LanternPortalAgentType portalAgentType;
     @Nullable private LanternDimensionType<?> dimensionType;
     // If not specified, fall back to dimension default
     @Nullable private GeneratorType generatorType;
@@ -74,7 +79,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     private boolean enabled;
     private boolean loadsOnStartup;
     private boolean usesMapFeatures;
-    private boolean generateBonusChest; // No builder method available
+    private boolean generateBonusChest;
     private boolean commandsAllowed; // No builder method available
     private boolean pvpEnabled;
     private boolean generateSpawnOnLoad;
@@ -107,6 +112,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.allowPlayerRespawns = archetype0.allowPlayerRespawns();
         this.pvpEnabled = archetype0.isPVPEnabled();
         this.generateSpawnOnLoad = archetype0.doesGenerateSpawnOnLoad();
+        this.portalAgentType = archetype0.getPortalAgentType();
         return this;
     }
 
@@ -130,6 +136,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.buildHeight = properties0.getBuildHeight();
         this.pvpEnabled = properties0.isPVPEnabled();
         this.generateSpawnOnLoad = properties0.doesGenerateSpawnOnLoad();
+        this.portalAgentType = properties0.getPortalAgentType();
         return this;
     }
 
@@ -220,6 +227,12 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         return this;
     }
 
+    @Override
+    public WorldArchetype.Builder portalAgent(PortalAgentType type) {
+        this.portalAgentType = (LanternPortalAgentType) checkNotNull(type, "type");
+        return this;
+    }
+
     public LanternWorldArchetypeBuilder waterEvaporates(boolean evaporates) {
         this.waterEvaporates = evaporates;
         return this;
@@ -259,6 +272,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
     public LanternWorldArchetype build(String id, String name) throws IllegalArgumentException, CatalogTypeAlreadyRegisteredException {
         checkNotNull(id, "id");
         checkNotNull(name, "name");
+        checkArgument(this.dimensionType != null, "Dimension type must be set");
         GeneratorType generatorType = this.generatorType;
         if (generatorType == null) {
             generatorType = this.dimensionType.getDefaultGeneratorType();
@@ -274,7 +288,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         final boolean allowPlayerRespawns = this.allowPlayerRespawns == null ?
                 this.dimensionType.allowsPlayerRespawns() : this.allowPlayerRespawns;
         return new LanternWorldArchetype(id, name, this.gameMode, this.dimensionType, generatorType,
-                this.generatorModifiers, generatorSettings, this.difficulty, this.serializationBehavior,
+                this.generatorModifiers, generatorSettings, this.difficulty, this.serializationBehavior, this.portalAgentType,
                 this.hardcore, this.enabled, this.loadsOnStartup, keepsSpawnLoaded, this.usesMapFeatures, this.pvpEnabled,
                 this.generateBonusChest, this.commandsAllowed, waterEvaporates, allowPlayerRespawns, this.generateSpawnOnLoad,
                 this.seed, this.buildHeight);
@@ -285,6 +299,7 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.usesMapFeatures = true;
         this.gameMode = GameModes.SURVIVAL;
         this.difficulty = Difficulties.NORMAL;
+        this.portalAgentType = (LanternPortalAgentType) PortalAgentTypes.DEFAULT;
         this.hardcore = false;
         this.keepsSpawnLoaded = null;
         this.loadsOnStartup = false;
@@ -292,9 +307,9 @@ public final class LanternWorldArchetypeBuilder implements WorldArchetype.Builde
         this.enabled = true;
         this.generateBonusChest = false;
         this.commandsAllowed = true;
+        this.dimensionType = null;
         this.generatorModifiers = Collections.emptySet();
         this.seed = new Random().nextLong();
-        this.dimensionType = null;
         this.generatorType = null;
         this.generatorSettings = null;
         this.waterEvaporates = null;

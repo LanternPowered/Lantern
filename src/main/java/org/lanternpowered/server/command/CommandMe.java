@@ -31,6 +31,7 @@ import org.lanternpowered.server.command.element.GenericArguments2;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
 public final class CommandMe extends CommandProvider {
@@ -40,7 +41,7 @@ public final class CommandMe extends CommandProvider {
     }
 
     @Override
-    public void completeSpec(CommandSpec.Builder specBuilder) {
+    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
                         GenericArguments2.remainingString(Text.of("message"))

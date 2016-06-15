@@ -33,7 +33,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.bossbar.LanternBossBar;
-import org.lanternpowered.server.command.targeted.AbstractTargetingCommandSource;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntityHumanoid;
@@ -116,7 +115,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 @NonnullByDefault
-public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, AbstractTargetingCommandSource {
+public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer {
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
@@ -335,12 +334,13 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             RelativePositions.X, RelativePositions.Y, RelativePositions.Z);
 
     @Override
-    public void setPositionAndWorld(World world, Vector3d position) {
+    public boolean setPositionAndWorld(World world, Vector3d position) {
         LanternWorld oldWorld = this.getWorld();
-        super.setPositionAndWorld(world, position);
-        if (world == oldWorld) {
+        boolean success = super.setPositionAndWorld(world, position);
+        if (success && world == oldWorld) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
         }
+        return success;
     }
 
     @Override
@@ -363,31 +363,37 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public void setLocationAndRotation(Location<World> location, Vector3d rotation) {
+    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation) {
         World oldWorld = this.getWorld();
-        super.setLocationAndRotation(location, rotation);
-        World world = location.getExtent();
-        // Only send this if the world isn't changed, otherwise will the position be resend anyway
-        if (oldWorld == world) {
-            Vector3d pos = location.getPosition();
-            MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
-                    (float) rotation.getX(), (float) rotation.getY(), Collections.emptySet(), 0);
-            this.session.send(message);
+        boolean success = super.setLocationAndRotation(location, rotation);
+        if (success) {
+            World world = location.getExtent();
+            // Only send this if the world isn't changed, otherwise will the position be resend anyway
+            if (oldWorld == world) {
+                Vector3d pos = location.getPosition();
+                MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
+                        (float) rotation.getX(), (float) rotation.getY(), Collections.emptySet(), 0);
+                this.session.send(message);
+            }
         }
+        return success;
     }
 
     @Override
-    public void setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
+    public boolean setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
         World oldWorld = this.getWorld();
-        super.setLocationAndRotation(location, rotation, relativePositions);
-        World world = location.getExtent();
-        // Only send this if the world isn't changed, otherwise will the position be resend anyway
-        if (oldWorld == world) {
-            Vector3d pos = location.getPosition();
-            MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
-                    (float) rotation.getX(), (float) rotation.getY(), Sets.immutableEnumSet(relativePositions), 0);
-            this.session.send(message);
+        boolean success = super.setLocationAndRotation(location, rotation, relativePositions);
+        if (success) {
+            World world = location.getExtent();
+            // Only send this if the world isn't changed, otherwise will the position be resend anyway
+            if (oldWorld == world) {
+                Vector3d pos = location.getPosition();
+                MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
+                        (float) rotation.getX(), (float) rotation.getY(), Sets.immutableEnumSet(relativePositions), 0);
+                this.session.send(message);
+            }
         }
+        return success;
     }
 
     public void setRawPosition(Vector3d position) {

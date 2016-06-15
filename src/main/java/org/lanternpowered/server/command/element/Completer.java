@@ -23,34 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.command;
+package org.lanternpowered.server.command.element;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.args.CommandArgs;
+import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.CommandElement;
 
-import org.lanternpowered.server.command.element.GenericArguments2;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandResult;
-import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
+import java.util.List;
 
-public final class CommandSay extends CommandProvider {
+/**
+ * A interface used to complete commands, this is similar as the method
+ * {@link CommandElement#complete(CommandSource, CommandArgs, CommandContext)}.
+ */
+@FunctionalInterface
+public interface Completer {
 
-    public CommandSay() {
-        super(1, "say");
-    }
-
-    @Override
-    public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
-        specBuilder
-                .arguments(
-                        GenericArguments2.remainingString(Text.of("message"))
-                )
-                .executor((src, args) -> {
-                    String message = args.<String>getOne("message").get();
-                    Sponge.getServer().getBroadcastChannel().send(src,
-                            t("chat.type.announcement", src.getName(), message));
-                    return CommandResult.success();
-                });
-    }
+    /**
+     * Fetch completions for command arguments.
+     *
+     * @param src The source requesting tab completions
+     * @param args The arguments currently provided
+     * @param context The context to store state in
+     * @return Any relevant completions
+     */
+    List<String> complete(CommandSource src, CommandArgs args, CommandContext context);
 }

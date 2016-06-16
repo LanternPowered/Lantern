@@ -23,25 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.rcon;
-
-import org.spongepowered.api.service.rcon.RconService;
-
-public class BaseRconService implements RconService {
-
-    protected final String password;
-
-    public BaseRconService(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public boolean isRconEnabled() {
-        return false;
-    }
-
-    @Override
-    public String getRconPassword() {
-        return this.password;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.network.query;

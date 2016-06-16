@@ -36,4 +36,5 @@
  *
  * More info at: http://wiki.vg/Protocol#Login
  */
+@org.spongepowered.api.util.annotation.NonnullByDefault
 package org.lanternpowered.server.network.vanilla.message.handler.login;

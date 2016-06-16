@@ -27,15 +27,15 @@ package org.lanternpowered.server.network.message.codec;
 
 import io.netty.channel.Channel;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 
 public class SimpleCodecContext implements CodecContext {
 
     private final ByteBufferAllocator byteBufferAlloc;
+    private final NetworkSession session;
     private final Channel channel;
-    private final Session session;
 
-    public SimpleCodecContext(ByteBufferAllocator byteBufferAlloc, Channel channel, Session session) {
+    public SimpleCodecContext(ByteBufferAllocator byteBufferAlloc, Channel channel, NetworkSession session) {
         this.byteBufferAlloc = byteBufferAlloc;
         this.channel = channel;
         this.session = session;
@@ -47,7 +47,7 @@ public class SimpleCodecContext implements CodecContext {
     }
 
     @Override
-    public Session getSession() {
+    public NetworkSession getSession() {
         return this.session;
     }
 

@@ -104,7 +104,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.flowpowered:flow-math:1.0.1'
     compile 'com.flowpowered:flow-noise:1.0.1-SNAPSHOT'
-    compile 'io.netty:netty-all:4.0.21.Final'
+    compile 'io.netty:netty-all:4.1.1.Final'
     fastutil 'it.unimi.dsi:fastutil:7.0.12'
     compile 'ninja.leaping.configurate:configurate-core:3.1.1'
     compile 'ninja.leaping.configurate:configurate-gson:3.1.1'

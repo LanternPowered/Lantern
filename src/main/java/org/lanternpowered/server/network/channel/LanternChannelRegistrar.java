@@ -33,12 +33,11 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import io.netty.buffer.ByteBuf;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.spongepowered.api.Platform;
@@ -91,7 +90,7 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
         binding.bound = true;
         MessagePlayInOutRegisterChannels message = new MessagePlayInOutRegisterChannels(Sets.newHashSet(channel));
         for (Player player : this.server.getOnlinePlayers()) {
-            ((Session) player.getConnection()).send(message);
+            ((NetworkSession) player.getConnection()).send(message);
         }
         return binding;
     }
@@ -119,7 +118,7 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
     void sendPayload(Player player, String channel, Consumer<ByteBuffer> payload) {
         checkNotNull(player, "player");
         checkNotNull(payload, "payload");
-        Session session = ((LanternPlayer) player).getConnection();
+        final NetworkSession session = ((LanternPlayer) player).getConnection();
         if (session.getRegisteredChannels().contains(channel)) {
             ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);

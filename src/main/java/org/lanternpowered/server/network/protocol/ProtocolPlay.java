@@ -110,7 +110,6 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
-import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInAllPlayerMovement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
@@ -133,7 +132,7 @@ import org.lanternpowered.server.network.vanilla.message.processor.play.Processo
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.processor.play.ProcessorPlayOutWorldSky;
-import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClickWindow;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInCreativeWindowAction;
@@ -270,8 +269,7 @@ public final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInCloseWindow());
         inbound.bind(0x09, CodecPlayInOutCustomPayload.class);
         inbound.bind(0x0a, CodecPlayInUseEntity.class);
-        inbound.bind(0x0b, CodecInOutPing.class, MessageInOutPing.class)
-                .bindHandler(new HandlerInPing());
+        inbound.bind(0x0b, CodecInOutPing.class, MessageInOutKeepAlive.class);
         inbound.bind(0x0c, CodecPlayInPlayerMovement.class, MessagePlayInPlayerMovement.class)
                 .bindHandler(playerMovementHandler.new HandlerPlayInPlayerMovement());
         inbound.bind(0x0d, CodecPlayInPlayerMovementAndLook.class, MessagePlayInPlayerMovementAndLook.class)
@@ -383,7 +381,7 @@ public final class ProtocolPlay extends ProtocolBase {
         // 0x1c
         outbound.bind(0x1d, CodecPlayOutUnloadChunk.class, MessagePlayOutUnloadChunk.class);
         outbound.bind(0x1e, CodecPlayOutChangeGameState.class, MessagePlayOutChangeGameState.class);
-        outbound.bind(0x1f, CodecInOutPing.class, MessageInOutPing.class);
+        outbound.bind(0x1f, CodecInOutPing.class, MessageInOutKeepAlive.class);
         outbound.bind(0x20, CodecPlayOutChunkData.class, MessagePlayOutChunkData.class);
         // 0x21
         outbound.bind(0x22, CodecPlayOutSpawnParticle.class, MessagePlayOutSpawnParticle.class);

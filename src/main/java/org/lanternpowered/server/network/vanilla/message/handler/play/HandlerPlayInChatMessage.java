@@ -35,7 +35,7 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChatMessage;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
@@ -69,10 +69,10 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
 
     @Override
     public void handle(NetworkContext context, MessagePlayInChatMessage message) {
-        Session session = context.getSession();
-        LanternPlayer player = session.getPlayer();
+        final NetworkSession session = context.getSession();
+        final LanternPlayer player = session.getPlayer();
         player.resetIdleTimeoutCounter();
-        String message0 = message.getMessage();
+        final String message0 = message.getMessage();
 
         // Check for a valid click action callback
         Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(message0);

@@ -35,7 +35,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageCodec;
-import io.netty.util.AttributeKey;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.LanternByteBuffer;
@@ -51,7 +50,6 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.session.Session;
 
 import java.util.List;
 import java.util.Set;
@@ -59,12 +57,16 @@ import java.util.Set;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Message> {
 
-    public static final AttributeKey<CodecContext> CONTEXT = AttributeKey.valueOf("codec-context");
+    private final CodecContext codecContext;
+
+    public MessageCodecHandler(CodecContext codecContext) {
+        this.codecContext = codecContext;
+    }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
-        Protocol protocol = ctx.channel().attr(Session.STATE).get().getProtocol();
-        MessageRegistration<Message> registration = (MessageRegistration<Message>) protocol.outbound()
+        final Protocol protocol = this.codecContext.getSession().getProtocol();
+        final MessageRegistration<Message> registration = (MessageRegistration<Message>) protocol.outbound()
                 .findByMessageType(message.getClass()).orElse(null);
 
         if (registration == null) {
@@ -75,14 +77,13 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
             throw new EncoderException("Message type (" + message.getClass().getName() + ") is not registered to allow encoding!");
         }
 
-        ByteBuf opcode = ctx.alloc().buffer();
+        final ByteBuf opcode = ctx.alloc().buffer();
 
         // Write the opcode of the message
-        CodecContext context = ctx.channel().attr(CONTEXT).get();
         writeVarInt(opcode, codecRegistration.getOpcode());
 
-        Codec codec = codecRegistration.getCodec();
-        ByteBuffer content = codec.encode(context, message);
+        final Codec codec = codecRegistration.getCodec();
+        final ByteBuffer content = codec.encode(this.codecContext, message);
 
         // Add the buffer to the output
         output.add(Unpooled.wrappedBuffer(opcode, ((LanternByteBuffer) content).getDelegate()));
@@ -96,12 +97,11 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
             return;
         }
 
-        CodecContext context = ctx.channel().attr(CONTEXT).get();
-        int opcode = readVarInt(input);
+        final int opcode = readVarInt(input);
 
-        final ProtocolState state = ctx.channel().attr(Session.STATE).get();
+        final ProtocolState state = this.codecContext.getSession().getProtocolState();
         final Protocol protocol = state.getProtocol();
-        CodecRegistration registration = protocol.inbound().find(opcode).orElse(null);
+        final CodecRegistration registration = protocol.inbound().find(opcode).orElse(null);
 
         if (registration == null) {
             if (warnedMissingOpcodes.add(opcode)) {
@@ -112,34 +112,31 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
 
         // Copy the remaining content of the buffer to a new buffer used by the
         // message decoding
-        ByteBuffer content = context.byteBufAlloc().buffer(input.readableBytes());
+        final ByteBuffer content = this.codecContext.byteBufAlloc().buffer(input.readableBytes());
         input.readBytes(((LanternByteBuffer) content).getDelegate(), input.readableBytes());
 
         // Read the content of the message
-        Message message;
+        final Message message;
         try {
-            message = registration.getCodec().decode(context, content);
+            message = registration.getCodec().decode(this.codecContext, content);
         } finally {
             content.release();
         }
-        this.processMessage(message, output, protocol, state, context);
+        this.processMessage(message, output, protocol, state, this.codecContext);
     }
 
     private void processMessage(Message message, List<Object> output, Protocol protocol, ProtocolState state, CodecContext context) {
         if (message == NullMessage.INSTANCE) {
             return;
         }
-
         if (message instanceof BulkMessage) {
             ((BulkMessage) message).getMessages().forEach(message1 ->
                     this.processMessage(message1, output, protocol, state, context));
             return;
         }
-
         final MessageRegistration messageRegistration = (MessageRegistration) protocol.inbound()
                 .findByMessageType(message.getClass()).orElseThrow(() -> new DecoderException(
                         "The returned message type is not attached to the used protocol state (" + state.toString() + ")!"));
-
         final List<Processor> processors = messageRegistration.getProcessors();
         // Only process if there are processors found
         if (!processors.isEmpty()) {

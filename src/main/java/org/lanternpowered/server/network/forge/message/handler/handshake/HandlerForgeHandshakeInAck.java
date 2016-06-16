@@ -36,8 +36,8 @@ import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePha
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutAck;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeOutRegistryData;
 import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.session.Session;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,8 +47,8 @@ public final class HandlerForgeHandshakeInAck implements Handler<MessageForgeHan
 
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInOutAck message) {
-        Session session = context.getSession();
-        Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
+        final NetworkSession session = context.getSession();
+        final Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
         switch (phase.get()) {
             case WAITING_ACK:
                 if (!message.getPhase().equals(ForgeClientHandshakePhase.WAITING_SERVER_DATA)) {

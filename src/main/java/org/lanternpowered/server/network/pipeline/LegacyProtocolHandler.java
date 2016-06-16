@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.pipeline.legacy;
+package org.lanternpowered.server.network.pipeline;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
@@ -34,7 +34,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusHelper;
 import org.lanternpowered.server.status.LanternStatusResponse;
@@ -51,11 +51,17 @@ import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("deprecation")
-public final class LegacyPingHandler extends ChannelInboundHandlerAdapter {
+public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
+
+    private final NetworkSession session;
+
+    public LegacyProtocolHandler(NetworkSession session) {
+        this.session = session;
+    }
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object object) throws Exception {
-        LanternServer server = ctx.channel().attr(Session.SESSION).get().getServer();
+        final LanternServer server = this.session.getServer();
 
         ByteBuf buf = (ByteBuf) object;
         buf.markReaderIndex();

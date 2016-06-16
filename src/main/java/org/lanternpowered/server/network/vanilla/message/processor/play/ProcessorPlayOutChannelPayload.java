@@ -31,7 +31,7 @@ import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 
 import java.util.List;
@@ -46,7 +46,7 @@ public final class ProcessorPlayOutChannelPayload implements Processor<MessagePl
             output.add(message);
         // Support the multi part messages of forge, but only if the client supports it
         } else {
-            boolean enabled = context.getChannel().attr(Session.FML_MARKER).get();
+            boolean enabled = context.getChannel().attr(NetworkSession.FML_MARKER).get();
             if (!enabled) {
                 throw new CodecException("Payload may not be larger than 16777135 bytes.");
             }

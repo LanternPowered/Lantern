@@ -214,7 +214,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
         }
         this.dirtySlots.clear();
         if (!messages.isEmpty()) {
-            this.getRawViewers().forEach(player -> ((LanternPlayer) player).getConnection().sendAll(messages));
+            this.getRawViewers().forEach(player -> ((LanternPlayer) player).getConnection().send(messages));
         }
     }
 

@@ -23,29 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.connection;
+package org.lanternpowered.server.network.rcon;
 
-import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.service.rcon.RconService;
 
-public final class MessageInOutPing implements Message {
+public final class EmptyRconService implements RconService {
 
-    private final int id;
+    private final String password;
 
-    /**
-     * Creates a ping message with a specific keep alive id.
-     * 
-     * @param id the id
-     */
-    public MessageInOutPing(int id) {
-        this.id = id;
+    public EmptyRconService(String password) {
+        this.password = password;
     }
 
-    /**
-     * Gets the keep alive id.
-     * 
-     * @return the id
-     */
-    public int getKeepAliveId() {
-        return this.id;
+    @Override
+    public boolean isRconEnabled() {
+        return false;
+    }
+
+    @Override
+    public String getRconPassword() {
+        return this.password;
     }
 }

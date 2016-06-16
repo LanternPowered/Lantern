@@ -113,7 +113,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
             throw new IllegalStateException("Rcon source may not be set more than once!");
         }
 
-        this.server.onChannelActive(channel, source);
+        this.server.onChannelActive(source);
 
         RconConnectionEvent.Connect event = SpongeEventFactory.createRconConnectionEventConnect(Cause.source(source).build(), source);
         Sponge.getEventManager().post(event);
@@ -127,7 +127,7 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
         RconConnectionEvent.Disconnect event = SpongeEventFactory.createRconConnectionEventDisconnect(Cause.source(source).build(), source);
         Sponge.getEventManager().post(event);
 
-        this.server.onChannelInactive(channel, source);
+        this.server.onChannelInactive(source);
     }
 
     private static void handleLogin(ChannelHandlerContext ctx, String payload, String password, int requestId) {

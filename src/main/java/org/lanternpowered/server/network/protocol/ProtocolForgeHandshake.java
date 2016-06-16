@@ -42,11 +42,10 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistry;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecInOutPing;
 import org.lanternpowered.server.network.vanilla.message.codec.connection.CodecOutDisconnect;
-import org.lanternpowered.server.network.vanilla.message.handler.connection.HandlerInPing;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRegisterChannels;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUnregisterChannels;
-import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
@@ -63,7 +62,7 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         MessageRegistry inbound = this.inbound();
         MessageRegistry outbound = this.outbound();
 
-        inbound.bind(0x0b, CodecInOutPing.class, MessageInOutPing.class).bindHandler(new HandlerInPing());
+        inbound.bind(0x0b, CodecInOutPing.class, MessageInOutKeepAlive.class);
         CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayInCustomPayloadRegistration =
                 inbound.bind(0x09, CodecPlayInOutCustomPayload.class);
         codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class).bindHandler(new HandlerPlayInChannelPayload());
@@ -74,7 +73,7 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutRegisterChannels.class).bindHandler(new HandlerPlayInRegisterChannels());
         codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutUnregisterChannels.class).bindHandler(new HandlerPlayInUnregisterChannels());
 
-        outbound.bind(0x1f, CodecInOutPing.class, MessageInOutPing.class);
+        outbound.bind(0x1f, CodecInOutPing.class, MessageInOutKeepAlive.class);
         CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayOutCustomPayloadRegistration =
                 outbound.bind(0x18, CodecPlayInOutCustomPayload.class);
         codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class);

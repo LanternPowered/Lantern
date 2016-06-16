@@ -84,12 +84,12 @@ public final class MessageCompressionHandler extends MessageToMessageCodec<ByteB
 
             byte[] sourceData = new byte[length];
             msg.readBytes(sourceData);
-            deflater.setInput(sourceData);
-            deflater.finish();
+            this.deflater.setInput(sourceData);
+            this.deflater.finish();
 
             byte[] compressedData = new byte[length];
-            int compressedLength = deflater.deflate(compressedData);
-            deflater.reset();
+            int compressedLength = this.deflater.deflate(compressedData);
+            this.deflater.reset();
 
             if (compressedLength == 0) {
                 // Compression failed in some weird way

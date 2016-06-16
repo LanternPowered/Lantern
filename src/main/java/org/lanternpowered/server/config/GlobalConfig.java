@@ -90,6 +90,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25563;
+
+        @Setting(value = "use-epoll-when-available", comment = "Enables epoll if it's supported by the os.")
+        private boolean useEpollWhenAvailable = true;
     }
 
     @ConfigSerializable
@@ -103,6 +106,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25564;
+
+        @Setting(value = "use-epoll-when-available", comment = "Enables epoll if it's supported by the os.")
+        private boolean useEpollWhenAvailable = true;
     }
 
     @ConfigSerializable
@@ -115,6 +121,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "port", comment = "The port that should be bound.")
         private int port = 25565;
+
+        @Setting(value = "use-epoll-when-available", comment = "Enables epoll if it's supported by the os.")
+        private boolean useEpollWhenAvailable = true;
 
         @Setting(value = "name", comment = "The name of the server.")
         private String name = "Lantern Server";
@@ -168,6 +177,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "proxy")
         private Proxy proxy = new Proxy();
+
     }
 
     @ConfigSerializable
@@ -312,4 +322,15 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         this.server.playerIdleTimeout = playerIdleTimeout;
     }
 
+    public boolean useServerEpollWhenAvailable() {
+        return this.server.useEpollWhenAvailable;
+    }
+
+    public boolean useRconEpollWhenAvailable() {
+        return this.rcon.useEpollWhenAvailable;
+    }
+
+    public boolean useQueryEpollWhenAvailable() {
+        return this.query.useEpollWhenAvailable;
+    }
 }

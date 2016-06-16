@@ -52,7 +52,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInStart;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutEncryptionRequest;
@@ -78,8 +78,8 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
 
     @Override
     public void handle(NetworkContext context, MessageLoginInStart message) {
-        Session session = context.getSession();
-        String username = message.getUsername();
+        final NetworkSession session = context.getSession();
+        final String username = message.getUsername();
 
         if (session.getServer().getOnlineMode()) {
             // Convert to X509 format
@@ -92,6 +92,8 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
             // Send created request message and wait for the response
             session.send(new MessageLoginOutEncryptionRequest(sessionId, publicKey, verifyToken));
         } else {
+            // Remove the encryption handler placeholder
+            context.getChannel().pipeline().remove(NetworkSession.ENCRYPTION);
             LanternGameProfile profile = context.getChannel().attr(SPOOFED_GAME_PROFILE).getAndRemove();
             if (profile != null) {
                 profile = new LanternGameProfile(profile.getUniqueId(), username, profile.getPropertyMap());

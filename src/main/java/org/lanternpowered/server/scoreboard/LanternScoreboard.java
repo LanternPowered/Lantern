@@ -72,7 +72,7 @@ public class LanternScoreboard implements Scoreboard {
     void sendToPlayers(Supplier<List<Message>> messageSupplier) {
         if (!this.players.isEmpty()) {
             List<Message> messages = messageSupplier.get();
-            this.players.forEach(player -> player.getConnection().sendAll(messages));
+            this.players.forEach(player -> player.getConnection().send(messages));
         }
     }
 
@@ -89,7 +89,7 @@ public class LanternScoreboard implements Scoreboard {
     public void addPlayer(LanternPlayer player) {
         this.players.add(player);
         for (Objective objective : this.objectives.values()) {
-            player.getConnection().sendAll(this.createObjectiveInitMessages(objective));
+            player.getConnection().send(this.createObjectiveInitMessages(objective));
         }
         for (Map.Entry<DisplaySlot, Objective> entry : this.objectivesInSlot.entrySet()) {
             player.getConnection().send(new MessagePlayOutScoreboardDisplayObjective(entry.getValue().getName(), entry.getKey()));

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.forge.message.handler.handshake;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import com.google.common.collect.Sets;
 import io.netty.util.Attribute;
 import org.lanternpowered.server.game.Lantern;
@@ -34,8 +36,8 @@ import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePha
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInOutHello;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
@@ -47,12 +49,12 @@ public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeH
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInStart message) {
         Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
-        Session session = context.getSession();
+        NetworkSession session = context.getSession();
         if (phase.get() != null && phase.get() != ForgeServerHandshakePhase.START) {
-            session.disconnect("Retrieved unexpected forge handshake start message.");
+            session.disconnect(t("Retrieved unexpected forge handshake start message."));
             return;
         }
-        boolean fml = session.getChannel().attr(Session.FML_MARKER).get();
+        boolean fml = session.getChannel().attr(NetworkSession.FML_MARKER).get();
 
         Set<String> channels = Sets.newHashSet(Sponge.getChannelRegistrar()
                 .getRegisteredChannels(Platform.Type.SERVER));

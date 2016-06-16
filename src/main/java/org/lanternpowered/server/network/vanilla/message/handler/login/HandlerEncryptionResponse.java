@@ -55,7 +55,8 @@ import com.google.gson.JsonObject;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.pipeline.MessageEncryptionHandler;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInEncryptionResponse;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -92,8 +93,8 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
 
     @Override
     public void handle(NetworkContext context, MessageLoginInEncryptionResponse message) {
-        Session session = context.getSession();
-        PrivateKey privateKey = session.getServer().getKeyPair().getPrivate();
+        final NetworkSession session = context.getSession();
+        final PrivateKey privateKey = session.getServer().getKeyPair().getPrivate();
 
         // Create rsaCipher
         Cipher rsaCipher;
@@ -101,7 +102,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             rsaCipher = Cipher.getInstance("RSA");
         } catch (GeneralSecurityException e) {
             Lantern.getLogger().error("Could not initialize RSA cipher", e);
-            session.disconnect("Unable to initialize RSA cipher.");
+            session.disconnect(t("Unable to initialize RSA cipher."));
             return;
         }
 
@@ -112,7 +113,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             sharedSecret = new SecretKeySpec(rsaCipher.doFinal(message.getSharedSecret()), "AES");
         } catch (Exception e) {
             Lantern.getLogger().warn("Could not decrypt shared secret", e);
-            session.disconnect("Unable to decrypt shared secret.");
+            session.disconnect(t("Unable to decrypt shared secret."));
             return;
         }
 
@@ -123,7 +124,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             verifyToken = rsaCipher.doFinal(message.getVerifyToken());
         } catch (Exception e) {
             Lantern.getLogger().warn("Could not decrypt verify token", e);
-            session.disconnect("Unable to decrypt verify token.");
+            session.disconnect(t("Unable to decrypt verify token."));
             return;
         }
 
@@ -131,12 +132,13 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
 
         // Check verify token
         if (!Arrays.equals(verifyToken, authData.getVerifyToken())) {
-            session.disconnect("Invalid verify token.");
+            session.disconnect(t("Invalid verify token."));
             return;
         }
 
         // Initialize stream encryption
-        session.setEncryption(sharedSecret);
+        session.getChannel().pipeline().replace(NetworkSession.ENCRYPTION, NetworkSession.ENCRYPTION,
+                new MessageEncryptionHandler(sharedSecret));
 
         // Create hash for auth
         String hash;
@@ -151,7 +153,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             hash = new BigInteger(digest.digest()).toString(16);
         } catch (NoSuchAlgorithmException e) {
             Lantern.getLogger().error("Unable to generate SHA-1 digest", e);
-            session.disconnect("Failed to hash login data.");
+            session.disconnect(t("Failed to hash login data."));
             return;
         }
 
@@ -161,7 +163,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
         });
     }
 
-    private void performAuth(Session session, String username, String hash) {
+    private void performAuth(NetworkSession session, String username, String hash) {
         final String postUrl = String.format(AUTH_BASE_URL, username, hash);
         try {
             // Authenticate
@@ -170,14 +172,14 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             JsonObject json;
             try (InputStream is = connection.getInputStream()) {
                 if (is.available() == 0) {
-                    session.disconnect("Invalid username or session id!");
+                    session.disconnect(t("Invalid username or session id!"));
                     return;
                 }
                 try {
                     json = GSON.fromJson(new InputStreamReader(is), JsonObject.class);
                 } catch (Exception e) {
                     Lantern.getLogger().warn("Username \"{}\" failed to authenticate!", username);
-                    session.disconnect("Failed to verify username!");
+                    session.disconnect(t("Failed to verify username!"));
                     return;
                 }
             }
@@ -192,7 +194,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 uuid = UUIDHelper.fromFlatString(id);
             } catch (IllegalArgumentException e) {
                 Lantern.getLogger().error("Returned authentication UUID invalid: {}", id, e);
-                session.disconnect("Invalid UUID.");
+                session.disconnect(t("Invalid UUID."));
                 return;
             }
 
@@ -212,7 +214,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             }
         } catch (Exception e) {
             Lantern.getLogger().error("Error in authentication thread", e);
-            session.disconnect("Internal error during authentication.");
+            session.disconnect(t("Internal error during authentication."));
         }
     }
 }

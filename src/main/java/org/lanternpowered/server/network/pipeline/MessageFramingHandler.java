@@ -51,6 +51,7 @@ import static org.lanternpowered.server.network.buffer.LanternByteBuffer.readVar
 import static org.lanternpowered.server.network.buffer.LanternByteBuffer.writeVarInt;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 
@@ -59,29 +60,27 @@ import java.util.List;
 public final class MessageFramingHandler extends ByteToMessageCodec<ByteBuf> {
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf buf0, ByteBuf output) throws Exception {
-        writeVarInt(output, buf0.readableBytes());
-        output.writeBytes(buf0);
+    protected void encode(ChannelHandlerContext ctx, ByteBuf buf, ByteBuf output) throws Exception {
+        writeVarInt(output, buf.readableBytes());
+        output.writeBytes(buf);
     }
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buf, List<Object> output) throws Exception {
-        buf.markReaderIndex();
+        while (readableVarInt(buf)) {
+            buf.markReaderIndex();
 
-        if (!readableVarInt(buf)) {
-            return;
+            final int length = readVarInt(buf);
+            if (buf.readableBytes() < length) {
+                buf.resetReaderIndex();
+                break;
+            }
+
+            final ByteBuf msg = ctx.alloc().buffer(length);
+            buf.readBytes(msg, length);
+
+            output.add(msg);
         }
-
-        int length = readVarInt(buf);
-        if (buf.readableBytes() < length) {
-            buf.resetReaderIndex();
-            return;
-        }
-
-        ByteBuf buf1 = ctx.alloc().buffer(length);
-        buf.readBytes(buf1, length);
-
-        output.add(buf1);
     }
 
     private static boolean readableVarInt(ByteBuf buf) {

@@ -26,16 +26,15 @@
 package org.lanternpowered.server.network;
 
 import io.netty.channel.Channel;
-import org.lanternpowered.server.network.session.Session;
 
 public interface NetworkContext {
 
     /**
-     * Gets the {@link Session} that is targeted.
+     * Gets the {@link NetworkSession} that is targeted.
      *
      * @return the session
      */
-    Session getSession();
+    NetworkSession getSession();
 
     /**
      * Gets the {@link Channel} that is targeted.

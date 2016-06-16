@@ -33,7 +33,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
 import org.lanternpowered.server.status.LanternFavicon;
@@ -58,9 +58,9 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
 
     @Override
     public void handle(NetworkContext context, MessageStatusInRequest message) {
-        Session session = context.getSession();
-        LanternServer server = session.getServer();
-        Gson gson = new Gson();
+        final NetworkSession session = context.getSession();
+        final LanternServer server = session.getServer();
+        final Gson gson = new Gson();
 
         MinecraftVersion version0 = Lantern.getGame().getPlatform().getMinecraftVersion();
         Text description = server.getMotd();

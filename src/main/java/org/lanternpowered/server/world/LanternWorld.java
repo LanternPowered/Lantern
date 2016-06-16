@@ -878,7 +878,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         checkNotNull(title, "title");
         if (!this.players.isEmpty()) {
             List<Message> networkMessages = LanternTitles.getMessages(title);
-            this.players.forEach(player -> player.getConnection().sendAll(networkMessages));
+            this.players.forEach(player -> player.getConnection().send(networkMessages));
         }
     }
 

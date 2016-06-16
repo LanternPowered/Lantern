@@ -47,23 +47,25 @@
  */
 package org.lanternpowered.server.network.rcon;
 
-import com.google.common.collect.Maps;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.lanternpowered.server.network.ServerBase;
+import org.spongepowered.api.service.rcon.RconService;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class RconServer extends BaseRconService {
+public class RconServer extends ServerBase implements RconService {
 
-    private final Map<String, RconSource> sourcesByHostname = Maps.newConcurrentMap();
+    private final Map<String, RconSource> sourcesByHostname = new ConcurrentHashMap<>();
+    private final String password;
 
     private ServerBootstrap bootstrap;
     private EventLoopGroup bossGroup;
@@ -72,48 +74,31 @@ public class RconServer extends BaseRconService {
     private InetSocketAddress address;
 
     public RconServer(String password) {
-        super(password);
+        this.password = password;
     }
 
-    /**
-     * Initializes the rcon server.
-     * 
-     * @param address the address to bind to
-     * @return the channel future
-     */
-    public ChannelFuture bind(final InetSocketAddress address) {
-        if (this.bootstrap != null) {
-            throw new IllegalStateException("The rcon server is already active.");
-        }
-
-        this.address = address;
+    @Override
+    protected ChannelFuture init0(SocketAddress address, boolean epoll) {
+        this.address = (InetSocketAddress) address;
         this.bootstrap = new ServerBootstrap();
-        this.bossGroup = new NioEventLoopGroup();
-        this.workerGroup = new NioEventLoopGroup();
-
+        this.bossGroup = createEventLoopGroup(epoll);
+        this.workerGroup = createEventLoopGroup(epoll);
         return this.bootstrap
                 .group(this.bossGroup, this.workerGroup)
-                .channel(NioServerSocketChannel.class)
+                .channel(getServerSocketChannelClass(epoll))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
-
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
                                 .addLast(new RconFramingHandler())
                                 .addLast(new RconHandler(RconServer.this, password));
                     }
-
                 })
                 .bind(address);
     }
 
-    /**
-     * Shut the Rcon server down.
-     */
-    public void shutdown() {
-        if (this.bootstrap == null) {
-            throw new IllegalStateException("The rcon server is not active.");
-        }
+    @Override
+    protected void shutdown0() {
         this.workerGroup.shutdownGracefully();
         this.bossGroup.shutdownGracefully();
         this.workerGroup = null;
@@ -124,30 +109,28 @@ public class RconServer extends BaseRconService {
     /**
      * Creates a new rcon source.
      * 
-     * @param channel the channel
-     * @return the rcon source
+     * @param channel The channel
+     * @return source The rcon source
      */
-    public RconSource newSource(Channel channel) {
+    RconSource newSource(Channel channel) {
         return new RconSource(new RconConnection((InetSocketAddress) channel.remoteAddress(), this.address));
     }
 
     /**
      * Called when the channel becomes active.
-     * 
-     * @param channel the channel
-     * @param source the source
+     *
+     * @param source The rcon source
      */
-    public void onChannelActive(Channel channel, RconSource source) {
+    public void onChannelActive(RconSource source) {
         this.sourcesByHostname.put(source.getConnection().getAddress().getHostName(), source);
     }
 
     /**
      * Called when the channel becomes inactive.
-     * 
-     * @param channel the channel
-     * @param source the source
+     *
+     * @param source The rcon source
      */
-    public void onChannelInactive(Channel channel, RconSource source) {
+    public void onChannelInactive(RconSource source) {
         this.sourcesByHostname.remove(source.getConnection().getAddress().getHostName());
     }
 
@@ -158,6 +141,11 @@ public class RconServer extends BaseRconService {
     @Override
     public boolean isRconEnabled() {
         return this.bootstrap != null;
+    }
+
+    @Override
+    public String getRconPassword() {
+        return this.password;
     }
 
 }

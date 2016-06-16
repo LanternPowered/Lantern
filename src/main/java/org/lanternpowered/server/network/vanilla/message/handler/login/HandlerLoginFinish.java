@@ -25,15 +25,13 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.login;
 
-import static org.lanternpowered.server.network.session.Session.COMPRESSION;
-
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
@@ -44,16 +42,20 @@ public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
     @Override
     public void handle(NetworkContext context, MessageLoginInFinish message) {
         final LanternGameProfile gameProfile = message.getGameProfile();
-        final Session session = context.getSession();
+        final NetworkSession session = context.getSession();
         int compressionThreshold = Lantern.getGame().getGlobalConfig().getNetworkCompressionThreshold();
         if (compressionThreshold != -1) {
-            session.send(new MessageLoginOutSetCompression(compressionThreshold)).addListener(future ->
-                    context.getChannel().pipeline().replace(COMPRESSION, COMPRESSION, new MessageCompressionHandler(compressionThreshold)));
+            session.sendWithFuture(new MessageLoginOutSetCompression(compressionThreshold)).addListener(future ->
+                    context.getChannel().pipeline().replace(NetworkSession.COMPRESSION, NetworkSession.COMPRESSION,
+                            new MessageCompressionHandler(compressionThreshold)));
+        } else {
+            // Remove the compression handler placeholder
+            context.getChannel().pipeline().remove(NetworkSession.COMPRESSION);
         }
         Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
-        session.send(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
+        session.sendWithFuture(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
                 .addListener(future -> {
-                    session.setProfile(gameProfile);
+                    session.setGameProfile(gameProfile);
                     session.setProtocolState(ProtocolState.FORGE_HANDSHAKE);
                     session.messageReceived(new MessageForgeHandshakeInStart());
                 });

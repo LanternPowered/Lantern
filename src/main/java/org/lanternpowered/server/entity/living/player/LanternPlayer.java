@@ -50,7 +50,7 @@ import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
 import org.lanternpowered.server.network.objects.LocalizedText;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
@@ -119,7 +119,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
-    private final Session session;
+    private final NetworkSession session;
 
     private final LanternTabList tabList = new LanternTabList(this);
 
@@ -191,7 +191,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
      */
     private long lastActiveTime;
 
-    public LanternPlayer(LanternGameProfile gameProfile, Session session) {
+    public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
         this.inventory = new LanternHumanInventory(null, null, this);
@@ -540,7 +540,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public boolean isOnline() {
-        return this.session.isActive();
+        return this.session.getChannel().isActive();
     }
 
     @Override
@@ -613,7 +613,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public void sendTitle(Title title) {
-        this.session.sendAll(LanternTitles.getMessages(checkNotNull(title, "title")));
+        this.session.send(LanternTitles.getMessages(checkNotNull(title, "title")));
     }
 
     @Override
@@ -722,7 +722,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public Session getConnection() {
+    public NetworkSession getConnection() {
         return this.session;
     }
 

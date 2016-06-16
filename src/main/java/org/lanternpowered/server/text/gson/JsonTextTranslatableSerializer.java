@@ -110,11 +110,11 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
 
     @Override
     public JsonElement serialize(TranslatableText src, Type typeOfSrc, JsonSerializationContext context) {
-        Translation translation = src.getTranslation();
+        final Translation translation = src.getTranslation();
         if (this.networkingFormat && !(translation instanceof MinecraftTranslation)) {
-            Object[] rawArguments = src.getArguments().toArray();
-            String[] legacyArguments = new String[rawArguments.length];
-            Locale locale = currentLocale.get();
+            final ImmutableList<Object> arguments = src.getArguments();
+            final Object[] rawArguments = arguments.toArray(new Object[arguments.size()]);
+            final Locale locale = currentLocale.get();
             for (int i = 0; i < rawArguments.length; i++) {
                 Object object = rawArguments[i];
                 if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
@@ -125,12 +125,12 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
                     } else {
                         object = ((TextRepresentable) object).toText();
                     }
-                    legacyArguments[i] = ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE).serialize((Text) object, locale);
+                    rawArguments[i] = ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE).serialize((Text) object, locale);
                 } else {
-                    legacyArguments[i] = object.toString();
+                    rawArguments[i] = object.toString();
                 }
             }
-            String content = src.getTranslation().get(locale, legacyArguments);
+            String content = src.getTranslation().get(locale, rawArguments);
             return JsonTextLiteralSerializer.serializeLiteralText(src, content, context, this.removeComplexity);
         }
         JsonObject json = new JsonObject();

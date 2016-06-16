@@ -29,17 +29,17 @@ import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutPing;
+import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 
-public final class CodecInOutPing implements Codec<MessageInOutPing> {
+public final class CodecInOutPing implements Codec<MessageInOutKeepAlive> {
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessageInOutPing message) throws CodecException {
-        return context.byteBufAlloc().buffer().writeVarInt(message.getKeepAliveId());
+    public ByteBuffer encode(CodecContext context, MessageInOutKeepAlive message) throws CodecException {
+        return context.byteBufAlloc().buffer().writeVarInt(message.getId());
     }
 
     @Override
-    public MessageInOutPing decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        return new MessageInOutPing(buf.readVarInt());
+    public MessageInOutKeepAlive decode(CodecContext context, ByteBuffer buf) throws CodecException {
+        return new MessageInOutKeepAlive(buf.readVarInt());
     }
 }

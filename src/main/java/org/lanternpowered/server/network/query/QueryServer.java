@@ -50,9 +50,8 @@ package org.lanternpowered.server.network.query;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioDatagramChannel;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.ServerBase;
 import org.spongepowered.api.scheduler.Task;
 
 import java.net.InetSocketAddress;
@@ -67,13 +66,13 @@ import java.util.concurrent.TimeUnit;
  * Implementation of a server for the minecraft server query protocol.
  * @see <a href="http://wiki.vg/Query">Protocol Specifications</a>
  */
-public class QueryServer {
+public class QueryServer extends ServerBase {
 
     // The {@link EventLoopGroup} used by the query server.
-    private EventLoopGroup group = new NioEventLoopGroup();
+    private EventLoopGroup group;
 
     // The {@link Bootstrap} used by netty to instantiate the query server
-    private Bootstrap bootstrap = new Bootstrap();
+    private Bootstrap bootstrap;
 
     // Instance of the LanternServer
     private LanternGame game;
@@ -87,21 +86,20 @@ public class QueryServer {
     // The task used to invalidate all challenge tokens every 30 seconds
     private Task flushTask;
 
+    private final boolean showPlugins;
+
     public QueryServer(LanternGame game, boolean showPlugins) {
+        this.showPlugins = showPlugins;
         this.game = game;
-        this.bootstrap
-                .group(this.group)
-                .channel(NioDatagramChannel.class)
-                .handler(new QueryHandler(this, showPlugins));
     }
 
-    /**
-     * Bind the server on the specified address.
-     * 
-     * @param address the address
-     * @return the netty channel future for bind operation
-     */
-    public ChannelFuture bind(final SocketAddress address) {
+    @Override
+    protected ChannelFuture init0(SocketAddress address, boolean epoll) {
+        this.group = createEventLoopGroup(epoll);
+        this.bootstrap = new Bootstrap()
+                .group(this.group)
+                .channel(getDatagramChannelClass(epoll))
+                .handler(new QueryHandler(this, showPlugins));
         if (this.flushTask == null) {
             this.flushTask = this.game.getScheduler().createTaskBuilder().async()
                     .delay(30, TimeUnit.SECONDS).interval(30, TimeUnit.SECONDS)
@@ -110,10 +108,9 @@ public class QueryServer {
         return this.bootstrap.bind(address);
     }
 
-    /**
-     * Shut the query server down.
-     */
-    public void shutdown() {
+    @Override
+    protected void shutdown0() {
+        this.bootstrap = null;
         this.group.shutdownGracefully();
         if (this.flushTask != null) {
             this.flushTask.cancel();

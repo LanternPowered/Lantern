@@ -25,18 +25,14 @@
  */
 package org.lanternpowered.server.network.pipeline;
 
-import static org.lanternpowered.server.network.pipeline.MessageCodecHandler.CONTEXT;
-
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageEncoder;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
-import org.lanternpowered.server.network.session.Session;
 
 import java.util.List;
 
@@ -47,24 +43,29 @@ import java.util.List;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
 
+    private final CodecContext codecContext;
+
+    public MessageProcessorHandler(CodecContext codecContext) {
+        this.codecContext = codecContext;
+    }
+
     @Override
     protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
-        Protocol protocol = ctx.channel().attr(Session.STATE).get().getProtocol();
-        MessageRegistration registration = protocol.outbound().findByMessageType(message.getClass()).orElse(null);
+        final Protocol protocol = this.codecContext.getSession().getProtocol();
+        final MessageRegistration registration = protocol.outbound().findByMessageType(message.getClass()).orElse(null);
 
         if (registration == null) {
             throw new EncoderException("Message type (" + message.getClass().getName() +
-                    ") is not registered in state " + ctx.channel().attr(Session.STATE).get().name() + "!");
+                    ") is not registered in state " + this.codecContext.getSession().getProtocolState().name() + "!");
         }
 
-        List<Processor> processors = ((MessageRegistration) protocol.outbound()
+        final List<Processor> processors = ((MessageRegistration) protocol.outbound()
                 .findByMessageType(message.getClass()).get()).getProcessors();
         // Only process if there are processors found
         if (!processors.isEmpty()) {
-            CodecContext context = ctx.channel().attr(CONTEXT).get();
             for (Processor processor : processors) {
                 // The processor should handle the output messages
-                processor.process(context, message, output);
+                processor.process(this.codecContext, message, output);
             }
         } else {
             // Add the message to the output

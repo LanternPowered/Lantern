@@ -39,8 +39,8 @@ import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.message.Async;
 import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.protocol.ProtocolState;
-import org.lanternpowered.server.network.session.Session;
 import org.lanternpowered.server.network.vanilla.message.handler.login.HandlerLoginStart;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -59,8 +59,8 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
 
     @Override
     public void handle(NetworkContext context, MessageHandshakeIn message) {
-        ProtocolState next = ProtocolState.fromId(message.getNextState());
-        Session session = context.getSession();
+        final ProtocolState next = ProtocolState.fromId(message.getNextState());
+        final NetworkSession session = context.getSession();
         if (next == null) {
             session.disconnect(t("Unknown protocol state! (%s)", message.getNextState()));
             return;
@@ -82,7 +82,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                 String[] split = hostname.split("\0\\|", 2);
 
                 // Check for a fml marker
-                session.getChannel().attr(Session.FML_MARKER).set(split.length == 2 == split[1].contains(FML_MARKER));
+                session.getChannel().attr(NetworkSession.FML_MARKER).set(split.length == 2 == split[1].contains(FML_MARKER));
 
                 split = split[0].split("\00");
                 if (split.length == 3 || split.length == 4) {
@@ -103,8 +103,8 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
 
                     session.getChannel().attr(HandlerLoginStart.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, null, properties));
                 } else {
-                    session.disconnect("Please enable client detail forwarding (also known as \"ip forwarding\") on "
-                            + "your proxy if you wish to use it on this server, and also make sure that you joined through the proxy.");
+                    session.disconnect(t("Please enable client detail forwarding (also known as \"ip forwarding\") on "
+                            + "your proxy if you wish to use it on this server, and also make sure that you joined through the proxy."));
                     return;
                 }
                 break;
@@ -139,7 +139,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                     }
 
                     session.getChannel().attr(HandlerLoginStart.SPOOFED_GAME_PROFILE).set(new LanternGameProfile(uniqueId, name, properties));
-                    session.getChannel().attr(Session.FML_MARKER).set(false);
+                    session.getChannel().attr(NetworkSession.FML_MARKER).set(false);
 
                     int port = jsonObject.get("rP").getAsInt();
                     String host = jsonObject.get("h").getAsString();
@@ -152,7 +152,7 @@ public final class HandlerHandshakeIn implements Handler<MessageHandshakeIn> {
                 break;
             case NONE:
                 int index = hostname.indexOf(FML_MARKER);
-                session.getChannel().attr(Session.FML_MARKER).set(index != -1);
+                session.getChannel().attr(NetworkSession.FML_MARKER).set(index != -1);
                 if (index != -1) {
                     hostname = hostname.substring(0, index);
                 }

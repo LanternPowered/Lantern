@@ -27,55 +27,65 @@ package org.lanternpowered.server.network;
 
 import com.google.common.collect.Sets;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.Channel;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.util.concurrent.FastThreadLocal;
+import io.netty.util.concurrent.FastThreadLocalThread;
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.network.pipeline.MessageChannelInitializer;
-import org.lanternpowered.server.network.session.Session;
+import org.lanternpowered.server.network.buffer.LanternByteBufferAllocator;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.message.codec.SimpleCodecContext;
+import org.lanternpowered.server.network.pipeline.MessageCodecHandler;
+import org.lanternpowered.server.network.pipeline.MessageFramingHandler;
+import org.lanternpowered.server.network.pipeline.MessageProcessorHandler;
+import org.lanternpowered.server.network.pipeline.NoopHandler;
+import org.lanternpowered.server.network.pipeline.LegacyProtocolHandler;
 
 import java.net.SocketAddress;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.annotation.Nullable;
 
-public final class NetworkManager {
+public final class NetworkManager extends ServerBase {
 
-    private final ServerBootstrap bootstrap = new ServerBootstrap();
-    private final AtomicInteger counter = new AtomicInteger(0);
+    private final static AtomicInteger threadCounter = new AtomicInteger(0);
 
-    private final EventLoopGroup bossGroup = new NioEventLoopGroup(0,
-            runnable -> new Thread(runnable, "netty-" + this.counter.getAndIncrement()));
-    private final EventLoopGroup workerGroup = new NioEventLoopGroup(0,
-            runnable -> new Thread(runnable, "netty-" + this.counter.getAndIncrement()));
+    private ServerBootstrap bootstrap;
 
-    private final Set<Session> sessions = Sets.newConcurrentHashSet();
+    private EventLoopGroup bossGroup;
+    private EventLoopGroup workerGroup;
+
+    private final Set<NetworkSession> sessions = Sets.newConcurrentHashSet();
     private final LanternServer server;
 
-    private SocketAddress socketAddress;
+    @Nullable private SocketAddress socketAddress;
 
     public NetworkManager(LanternServer server) {
         this.server = server;
     }
 
     /**
-     * Gets the socket address.
+     * Gets the {@link SocketAddress} if present.
      * 
-     * @return the socket address
+     * @return The socket address
      */
-    @Nullable
-    public SocketAddress getAddress() {
-        return this.socketAddress;
+    public Optional<SocketAddress> getAddress() {
+        return Optional.ofNullable(this.socketAddress);
     }
 
     /**
-     * Gets the server.
+     * Gets the {@link LanternServer}.
      * 
-     * @return the server
+     * @return The server
      */
     public LanternServer getServer() {
         return this.server;
@@ -85,60 +95,72 @@ public final class NetworkManager {
      * Pulses all the sessions.
      */
     public void pulseSessions() {
-        this.sessions.forEach(Session::pulse);
+        this.sessions.forEach(NetworkSession::pulse);
     }
 
     /**
-     * Creates a new session for the channel.
-     * 
-     * @param channel the channel
-     * @return the session
+     * Called when the {@link NetworkSession} becomes active.
+     *
+     * @param session The session
      */
-    public Session newSession(Channel channel) {
-        return new Session(this.server, channel);
-    }
-
-    /**
-     * Called when the channel becomes active.
-     * 
-     * @param channel the channel
-     * @param session the session
-     */
-    public void onChannelActive(Channel channel, Session session) {
+    public void onActive(NetworkSession session) {
         this.sessions.add(session);
     }
 
     /**
-     * Called when the channel becomes inactive.
-     * 
-     * @param channel the channel
-     * @param session the session
+     * Called when the {@link NetworkSession} becomes inactive.
+     *
+     * @param session The session
      */
-    public void onChannelInactive(Channel channel, Session session) {
+    public void onInactive(NetworkSession session) {
         this.sessions.remove(session);
     }
 
-    /**
-     * Initializes and loads the netty server.
-     * 
-     * @param address the address
-     */
-    public ChannelFuture init(SocketAddress address) {
+    @Override
+    protected ChannelFuture init0(SocketAddress address, boolean epoll) {
+        this.bootstrap = new ServerBootstrap();
+        // Take advantage of the fast thread local threads,
+        // this is also provided by the default thread factory
+        final ThreadFactory threadFactory = runnable -> new FastThreadLocalThread(() -> {
+            try {
+                runnable.run();
+            } finally {
+                // Cleanup the fast thread local values
+                FastThreadLocal.removeAll();
+            }
+        }, "netty-" + threadCounter.getAndIncrement());
+        this.bossGroup = createEventLoopGroup(epoll, threadFactory);
+        this.workerGroup = createEventLoopGroup(epoll, threadFactory);
         this.socketAddress = address;
         return this.bootstrap
                 .group(this.bossGroup, this.workerGroup)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new MessageChannelInitializer(this))
+                .channel(getServerSocketChannelClass(epoll))
+                .childHandler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        final ChannelPipeline pipeline = ch.pipeline();
+                        final NetworkSession networkSession = new NetworkSession(ch, server, NetworkManager.this);
+                        final CodecContext codecContext = new SimpleCodecContext(new LanternByteBufferAllocator(ch.alloc()), ch, networkSession);
+                        pipeline.addLast(new ReadTimeoutHandler(NetworkSession.READ_TIMEOUT_SECONDS))
+                                .addLast(NetworkSession.LEGACY_PING, new LegacyProtocolHandler(networkSession))
+                                .addLast(NetworkSession.ENCRYPTION, NoopHandler.INSTANCE)
+                                .addLast(NetworkSession.FRAMING, new MessageFramingHandler())
+                                .addLast(NetworkSession.COMPRESSION, NoopHandler.INSTANCE)
+                                .addLast(NetworkSession.CODECS, new MessageCodecHandler(codecContext))
+                                .addLast(NetworkSession.PROCESSOR, new MessageProcessorHandler(codecContext))
+                                .addLast(NetworkSession.HANDLER, networkSession);
+                    }
+                })
+                .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .bind(address);
     }
 
-    /**
-     * Shuts down the netty server.
-     */
-    public void shutdown() {
+    @Override
+    public void shutdown0() {
         this.workerGroup.shutdownGracefully();
         this.bossGroup.shutdownGracefully();
+        this.bootstrap = null;
     }
 }

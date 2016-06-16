@@ -42,7 +42,7 @@ import org.lanternpowered.server.game.LanternPlatform;
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.query.QueryServer;
-import org.lanternpowered.server.network.rcon.BaseRconService;
+import org.lanternpowered.server.network.rcon.EmptyRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.LanternTexts;
@@ -166,7 +166,7 @@ public class LanternServer implements Server {
             final Path worldFolder = new File(game.getGlobalConfig().getRootWorldFolder()).toPath();
 
             // Initialize the game
-            game.initialize(server, rconServer == null ? new BaseRconService(globalConfig.getRconPassword()) :
+            game.initialize(server, rconServer == null ? new EmptyRconService(globalConfig.getRconPassword()) :
                     rconServer, worldFolder);
 
             // Bind the network channel
@@ -274,9 +274,10 @@ public class LanternServer implements Server {
     }
 
     public void bind() throws BindException {
-        InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getServerPort());
+        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getServerPort());
+        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useServerEpollWhenAvailable();
 
-        ChannelFuture future = this.networkManager.init(address);
+        ChannelFuture future = this.networkManager.init(address, useEpollWhenAvailable);
         Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             final Throwable cause = future.cause();
@@ -294,11 +295,12 @@ public class LanternServer implements Server {
             return;
         }
 
-        InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getQueryPort());
+        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getQueryPort());
+        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useQueryEpollWhenAvailable();
         this.game.getLogger().info("Binding query to address: " + address + "...");
 
-        ChannelFuture future = this.queryServer.bind(address);
-        Channel channel = future.awaitUninterruptibly().channel();
+        final ChannelFuture future = this.queryServer.init(address, useEpollWhenAvailable);
+        final Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             this.game.getLogger().warn("Failed to bind query. Address already in use?");
         }
@@ -309,11 +311,12 @@ public class LanternServer implements Server {
             return;
         }
 
-        InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getRconPort());
+        final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getRconPort());
+        final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useRconEpollWhenAvailable();
         this.game.getLogger().info("Binding rcon to address: " + address + "...");
 
-        ChannelFuture future = this.rconServer.bind(address);
-        Channel channel = future.awaitUninterruptibly().channel();
+        final ChannelFuture future = this.rconServer.init(address, useEpollWhenAvailable);
+        final Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             this.game.getLogger().warn("Failed to bind rcon. Address already in use?");
         }
@@ -547,7 +550,7 @@ public class LanternServer implements Server {
 
     @Override
     public Optional<InetSocketAddress> getBoundAddress() {
-        return Optional.of((InetSocketAddress) this.networkManager.getAddress());
+        return this.networkManager.getAddress().filter(a -> a instanceof InetSocketAddress).map(a -> (InetSocketAddress) a);
     }
 
     @Override

@@ -36,33 +36,40 @@ import org.lanternpowered.gradle.asm.ClassDependencyCollector
 
 /**
  * TODO: A better class name
+ * TODO: Move the transformers to a different plugin that it can
+ * be shared between project.
  */
 class DependencyClassTransformer implements Transformer {
 
     /**
-     * The files that should be added and checked for dependencies.
+     * All the files that should be checked for dependencies. If they are also
+     * applicable to dependencyPaths, they will also be included in the final
+     * jar.
      */
-    PatternSet filesToInclude = new PatternSet()
+    PatternSet filesToScan = new PatternSet()
 
     /**
      * The paths of file/packages which may be added as dependencies
      * by the included files.
      */
-    PatternSet pathsToCheck = new PatternSet()
+    PatternSet dependencyFiles = new PatternSet()
 
-    private final Set<String> includedFiles = new HashSet<>()
+    private final Set<String> includableFiles = new HashSet<>()
+    private final Set<String> foundFilesToScan = new HashSet<>()
     private final Map<String, File> processedFiles = new HashMap<>()
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
-        if (this.filesToInclude.asSpec.isSatisfiedBy(element)) {
-            this.includedFiles.add(element.relativePath.pathString)
+        boolean includable = this.dependencyFiles.asSpec.isSatisfiedBy(element)
+        String path = element.relativePath.pathString
+        if (includable) {
+            this.includableFiles.add(path)
+        }
+        if (this.filesToScan.asSpec.isSatisfiedBy(element)) {
+            this.foundFilesToScan.add(path)
             return true
         }
-        if (this.pathsToCheck.asSpec.isSatisfiedBy(element)) {
-            return true
-        }
-        return false
+        return includable
     }
 
     @Override
@@ -87,10 +94,8 @@ class DependencyClassTransformer implements Transformer {
     void modifyOutputStream(ZipOutputStream os) {
         try {
             Set<String> processedPaths = new HashSet<>()
-            for (String path : this.includedFiles) {
-                if (this.processedFiles.containsKey(path) && processedPaths.add(path)) {
-                    this.modifyOutputStream0(processedPaths, os, path)
-                }
+            for (String path : this.foundFilesToScan) {
+                this.modifyOutputStream0(processedPaths, os, path)
             }
         } finally {
             this.processedFiles.each { it.getValue().delete() }
@@ -98,24 +103,27 @@ class DependencyClassTransformer implements Transformer {
     }
 
     private void modifyOutputStream0(Set<String> processedPaths, ZipOutputStream os, String path) {
+        if (!processedPaths.add(path)) {
+            return;
+        }
         File file = this.processedFiles.get(path);
         if (file == null) {
             return;
         }
         InputStream is = new FileInputStream(file)
         try {
-            os.putNextEntry(new ZipEntry(path))
-            try {
-                IOUtil.copy(is, os)
-            } finally {
-                is.close()
+            if (this.includableFiles.contains(path)) {
+                os.putNextEntry(new ZipEntry(path))
+                try {
+                    IOUtil.copy(is, os)
+                } finally {
+                    is.close()
+                }
+                is = new FileInputStream(file)
             }
 
-            is = new FileInputStream(file)
             ClassDependencyCollector.collect(is).each {
-                if (this.processedFiles.containsKey(path) && processedPaths.add(it)) {
-                    this.modifyOutputStream0(processedPaths, os, it)
-                }
+                this.modifyOutputStream0(processedPaths, os, it)
             }
         } finally {
             is.close()

@@ -215,18 +215,18 @@ task fastutilJar(type: ShadowJar) {
     // Loop through the files and check for the files which
     // should be included in the final jar
     transform(DependencyClassTransformer) {
-        pathsToCheck.include 'it/unimi/dsi/fastutil/**'
-        filesToInclude.include 'it/unimi/dsi/fastutil/bytes/Byte2CharOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/bytes/Byte2ObjectOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/objects/Object2CharOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/objects/Object2IntOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/objects/Object2IntMaps.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/objects/Object2ShortOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/chars/Char2ByteOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/chars/Char2ObjectOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/shorts/Short2ObjectOpenHashMap.class'
-        filesToInclude.include 'it/unimi/dsi/fastutil/shorts/Short2ShortOpenHashMap.class'
+        dependencyFiles.include 'it/unimi/dsi/fastutil/**'
+        filesToScan.include 'it/unimi/dsi/fastutil/bytes/Byte2CharOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/bytes/Byte2ObjectOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2CharOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2IntOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2IntMaps.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/objects/Object2ShortOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ByteOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/chars/Char2ObjectOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/ints/Int2ObjectOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ObjectOpenHashMap.class'
+        filesToScan.include 'it/unimi/dsi/fastutil/shorts/Short2ShortOpenHashMap.class'
     }
 }
 

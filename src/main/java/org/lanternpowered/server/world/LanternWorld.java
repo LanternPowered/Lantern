@@ -32,7 +32,6 @@ import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -65,7 +64,6 @@ import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
-import org.lanternpowered.server.world.portal.LanternPortalAgentType;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
 import org.lanternpowered.server.world.rules.RuleType;
@@ -930,11 +928,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public Optional<Chunk> getChunk(int x, int y, int z) {
         return Optional.ofNullable(this.chunkManager.getChunk(x, z));
-    }
-
-    @Override
-    public Optional<Chunk> loadChunk(Vector3i position, boolean generate) {
-        return this.loadChunk(position.getX(), position.getY(), position.getZ(), generate);
     }
 
     @Override

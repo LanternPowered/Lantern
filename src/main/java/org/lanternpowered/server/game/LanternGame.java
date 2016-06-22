@@ -129,6 +129,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @NonnullByDefault
@@ -440,8 +441,10 @@ public class LanternGame implements Game {
         // Call init phase for registry
         this.gameRegistry.init();
 
+        final Optional<PermissionService> optPermissionService = this.serviceManager.provide(PermissionService.class);
+
         // Provide the default permission service if no custom one is found
-        if (!this.serviceManager.provide(PermissionService.class).isPresent()) {
+        if (!optPermissionService.isPresent()) {
             final LanternPermissionService service = new LanternPermissionService(this);
 
             for (Map.Entry<PluginContainer, CommandProvider> entry : commandProviders.entries()) {
@@ -456,6 +459,15 @@ public class LanternGame implements Game {
             subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, "minecraft.commandblock", Tristate.TRUE);
 
             this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
+        } else {
+            final PermissionService service = optPermissionService.get();
+
+            for (Map.Entry<PluginContainer, CommandProvider> entry : commandProviders.entries()) {
+                if (entry.getValue().getOpPermissionLevel().orElse(0) == 0) {
+                    service.getDefaults().getTransientSubjectData().setPermission(SubjectData.GLOBAL_CONTEXT, entry.getValue()
+                            .getPermissionFor(entry.getKey()), Tristate.TRUE);
+                }
+            }
         }
 
         // Init phase

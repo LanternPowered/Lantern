@@ -44,21 +44,19 @@ import java.util.function.Function;
 
 public class DataFactoryCollection extends LanternSubjectCollection {
 
-    private final LanternPermissionService service;
     private final ConcurrentMap<String, LanternSubject> subjects = new ConcurrentHashMap<>();
     private final Function<String, MemorySubjectData> dataFactory;
     private final Function<String, CommandSource> commandSourceFunction;
 
     protected DataFactoryCollection(String identifier, LanternPermissionService service, Function<String, MemorySubjectData> dataFactory,
             Function<String, CommandSource> commandSourceFunction) {
-        super(identifier);
-        this.service = service;
+        super(identifier, service);
         this.dataFactory = dataFactory;
         this.commandSourceFunction = commandSourceFunction;
     }
 
     @Override
-    public Subject get(String identifier) {
+    public LanternSubject get(String identifier) {
         checkNotNull(identifier, "identifier");
         if (!this.subjects.containsKey(identifier)) {
             this.subjects.putIfAbsent(identifier, new DataFactorySubject(identifier, this.dataFactory.apply(identifier)));
@@ -111,7 +109,10 @@ public class DataFactoryCollection extends LanternSubjectCollection {
         public Tristate getPermissionValue(Set<Context> contexts, String permission) {
             Tristate ret = super.getPermissionValue(contexts, permission);
             if (ret == Tristate.UNDEFINED) {
-                ret = this.getDataPermissionValue(DataFactoryCollection.this.service.getDefaultData(), permission);
+                ret = getDataPermissionValue(DataFactoryCollection.this.getDefaults().getTransientSubjectData(), permission);
+            }
+            if (ret == Tristate.UNDEFINED) {
+                ret = this.getDataPermissionValue(DataFactoryCollection.this.service.getDefaults().getTransientSubjectData(), permission);
             }
             return ret;
         }

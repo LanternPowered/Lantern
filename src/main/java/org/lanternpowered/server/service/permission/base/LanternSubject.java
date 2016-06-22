@@ -37,8 +37,8 @@ import java.util.Set;
 public abstract class LanternSubject implements Subject {
 
     @Override
-    public SubjectData getTransientSubjectData() {
-        return getSubjectData();
+    public MemorySubjectData getTransientSubjectData() {
+        return this.getSubjectData();
     }
 
     @Override
@@ -71,12 +71,12 @@ public abstract class LanternSubject implements Subject {
 
     @Override
     public boolean isChildOf(Set<Context> contexts, Subject parent) {
-        return getSubjectData().getParents(contexts).contains(parent);
+        return this.getSubjectData().getParents(contexts).contains(parent);
     }
 
     @Override
     public List<Subject> getParents(Set<Context> contexts) {
-        return getSubjectData().getParents(contexts);
+        return this.getSubjectData().getParents(contexts);
     }
 
     @Override

@@ -26,6 +26,7 @@
 package org.lanternpowered.server.service.permission;
 
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.profile.GameProfile;
@@ -41,15 +42,12 @@ import javax.annotation.Nullable;
  */
 public class UserCollection extends LanternSubjectCollection {
 
-    private final LanternPermissionService service;
-
     public UserCollection(LanternPermissionService service) {
-        super(PermissionService.SUBJECTS_USER);
-        this.service = service;
+        super(PermissionService.SUBJECTS_USER, service);
     }
 
     @Override
-    public Subject get(String identifier) {
+    public LanternSubject get(String identifier) {
         UUID uid = identifierToUUID(identifier);
         if (uid == null) {
             throw new IllegalArgumentException("Provided identifier must be a uuid, was " + identifier);
@@ -57,7 +55,7 @@ public class UserCollection extends LanternSubjectCollection {
         return get(uuidToGameProfile(uid));
     }
 
-    public Subject get(GameProfile profile) {
+    public LanternSubject get(GameProfile profile) {
         return new UserSubject(profile, this);
     }
 
@@ -96,9 +94,4 @@ public class UserCollection extends LanternSubjectCollection {
                         // WARNING: This gives dupes
                     }), Sponge.getGame().getServer().getOnlinePlayers()));*/
     }
-
-    public LanternPermissionService getService() {
-        return this.service;
-    }
-
 }

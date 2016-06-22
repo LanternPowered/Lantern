@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.service.permission.base;
 
+import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -38,14 +39,21 @@ import java.util.Set;
 public abstract class LanternSubjectCollection implements SubjectCollection {
 
     private final String identifier;
+    protected final LanternPermissionService service;
 
-    protected LanternSubjectCollection(String identifier) {
+    protected LanternSubjectCollection(String identifier, LanternPermissionService service) {
         this.identifier = identifier;
+        this.service = service;
     }
 
     @Override
     public String getIdentifier() {
         return this.identifier;
+    }
+
+    @Override
+    public LanternSubject getDefaults() {
+        return this.service.getDefaultCollection().get(this.getIdentifier());
     }
 
     @Override
@@ -71,5 +79,20 @@ public abstract class LanternSubjectCollection implements SubjectCollection {
         }
         return Collections.unmodifiableMap(ret);
     }
+
+    public LanternPermissionService getService() {
+        return this.service;
+    }
+
+    /**
+     * Returns the subject specified. Will not return null.
+     *
+     * @param identifier The identifier to look up a subject by.
+     *                   Case-insensitive
+     * @return A stored subject if present, otherwise a subject that may be
+     * stored if data is changed from defaults
+     */
+    @Override
+    public abstract LanternSubject get(String identifier);
 
 }

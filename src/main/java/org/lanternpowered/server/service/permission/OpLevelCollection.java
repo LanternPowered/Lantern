@@ -49,7 +49,7 @@ public class OpLevelCollection extends LanternSubjectCollection {
     private final Map<String, OpLevelSubject> levels;
 
     public OpLevelCollection(LanternPermissionService service) {
-        super(PermissionService.SUBJECTS_GROUP);
+        super(PermissionService.SUBJECTS_GROUP, service);
         ImmutableMap.Builder<String, OpLevelSubject> build = ImmutableMap.builder();
         for (int i = 0; i <= 4; ++i) {
             build.put("op_" + i, new OpLevelSubject(service, i)); // TODO: Add subject data
@@ -58,7 +58,7 @@ public class OpLevelCollection extends LanternSubjectCollection {
     }
 
     @Override
-    public Subject get(String identifier) {
+    public LanternSubject get(String identifier) {
         if (this.levels.containsKey(identifier)) {
             return this.levels.get(identifier);
         } else {

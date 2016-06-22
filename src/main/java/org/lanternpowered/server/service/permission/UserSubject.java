@@ -99,11 +99,7 @@ public class UserSubject extends LanternSubject {
     }
 
     int getOpLevel() {
-        Optional<OpsEntry> entry = Lantern.getGame().getOpsConfig().getEntryByUUID(this.player.getUniqueId());
-        if (entry.isPresent()) {
-            return entry.get().getOpLevel();
-        }
-        return 0;
+        return Lantern.getGame().getOpsConfig().getEntryByUUID(this.player.getUniqueId()).map(OpsEntry::getOpLevel).orElse(0);
     }
 
     @Override
@@ -120,7 +116,10 @@ public class UserSubject extends LanternSubject {
     public Tristate getPermissionValue(Set<Context> contexts, String permission) {
         Tristate ret = super.getPermissionValue(contexts, permission);
         if (ret == Tristate.UNDEFINED) {
-            ret = getDataPermissionValue(this.collection.getService().getDefaultData(), permission);
+            ret = this.getDataPermissionValue(this.collection.getDefaults().getSubjectData(), permission);
+        }
+        if (ret == Tristate.UNDEFINED) {
+            ret = this.getDataPermissionValue(this.collection.getService().getDefaults().getSubjectData(), permission);
         }
         if (ret == Tristate.UNDEFINED && this.getOpLevel() >= Lantern.getGame().getGlobalConfig().getDefaultOpPermissionLevel()) {
             ret = Tristate.TRUE;

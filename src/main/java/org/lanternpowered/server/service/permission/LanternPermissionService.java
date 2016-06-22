@@ -34,12 +34,13 @@ import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.rcon.RconSource;
 import org.lanternpowered.server.service.permission.base.FixedParentMemorySubjectData;
 import org.lanternpowered.server.service.permission.base.GlobalMemorySubjectData;
+import org.lanternpowered.server.service.permission.base.LanternSubject;
+import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.ContextCalculator;
-import org.spongepowered.api.service.permission.MemorySubjectData;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -64,16 +65,19 @@ import javax.annotation.Nullable;
  */
 public class LanternPermissionService implements PermissionService {
 
+    private static final String SUBJECTS_DEFAULT = "default";
     private static final Function<String, CommandSource> NO_COMMAND_SOURCE = s -> null;
 
     private final Game game;
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<>();
     @Nullable private Collection<PermissionDescription> descriptions;
     private final ConcurrentMap<String, SubjectCollection> subjects = new ConcurrentHashMap<>();
-    private final MemorySubjectData defaultData;
+    private final LanternSubjectCollection defaultCollection;
+    private final LanternSubject defaultData;
 
     public LanternPermissionService(Game game) {
         this.game = game;
+        this.subjects.put(SUBJECTS_DEFAULT, (this.defaultCollection = this.newCollection(SUBJECTS_DEFAULT)));
         this.subjects.put(SUBJECTS_USER, new UserCollection(this));
         this.subjects.put(SUBJECTS_GROUP, new OpLevelCollection(this));
 
@@ -95,7 +99,7 @@ public class LanternPermissionService implements PermissionService {
                     return null;
                 }));
 
-        this.defaultData = new FixedParentMemorySubjectData(this, this.getGroupForOpLevel(0));
+        this.defaultData = this.getDefaultCollection().get(SUBJECTS_DEFAULT);
     }
 
     public Subject getGroupForOpLevel(int level) {
@@ -113,7 +117,7 @@ public class LanternPermissionService implements PermissionService {
     }
 
     @Override
-    public MemorySubjectData getDefaultData() {
+    public LanternSubject getDefaults() {
         return this.defaultData;
     }
 
@@ -133,7 +137,7 @@ public class LanternPermissionService implements PermissionService {
         return ret;
     }
 
-    private SubjectCollection newCollection(String identifier) {
+    private LanternSubjectCollection newCollection(String identifier) {
         return new DataFactoryCollection(identifier, this, s -> new GlobalMemorySubjectData(LanternPermissionService.this), NO_COMMAND_SOURCE);
     }
 
@@ -174,4 +178,7 @@ public class LanternPermissionService implements PermissionService {
         return descriptions;
     }
 
+    public LanternSubjectCollection getDefaultCollection() {
+        return this.defaultCollection;
+    }
 }

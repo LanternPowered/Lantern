@@ -25,36 +25,40 @@
  */
 package org.lanternpowered.server.command;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.t;
-
-import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.command.element.GenericArguments2;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 
-public final class CommandStop extends CommandProvider {
+import java.util.Optional;
 
-    public CommandStop() {
-        super(4, "stop", "shutdown");
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
+public final class CommandKick extends CommandProvider {
+
+    public CommandKick() {
+        super(3, "kick");
     }
 
     @Override
     public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
                 .arguments(
+                        GenericArguments.player(Text.of("player")),
                         GenericArguments.optional(GenericArguments2.remainingString(Text.of("reason")))
                 )
-                .description(t("commands.stop.description"))
+                .description(t("commands.kick.description"))
                 .executor((src, args) -> {
-                    final LanternServer server = Lantern.getGame().getServer();
-                    if (args.hasAny("reason")) {
-                        server.shutdown(Text.of(args.<String>getOne("reason").get()));
+                    final Player player = args.<Player>getOne("player").get();
+                    final Optional<String> optReason = args.<String>getOne("reason");
+                    player.kick(optReason.<Text>map(Text::of).orElse(t("disconnect.kickedByOperator")));
+                    if (optReason.isPresent()) {
+                        src.sendMessage(t("commands.kick.success.reason", player.getName(), optReason.get()));
                     } else {
-                        server.shutdown();
+                        src.sendMessage(t("commands.kick.success", player.getName()));
                     }
                     return CommandResult.success();
                 });

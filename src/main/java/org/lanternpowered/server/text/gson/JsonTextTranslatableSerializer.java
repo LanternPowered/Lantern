@@ -38,9 +38,11 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import io.netty.util.concurrent.FastThreadLocal;
 import org.lanternpowered.server.text.LanternTextSerializer;
 import org.lanternpowered.server.text.translation.MinecraftTranslation;
 import org.lanternpowered.server.text.translation.TranslationManager;
+import org.lanternpowered.server.util.FastThreadLocals;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextRepresentable;
 import org.spongepowered.api.text.TranslatableText;
@@ -53,7 +55,7 @@ import java.util.Locale;
 public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer implements JsonSerializer<TranslatableText>,
         JsonDeserializer<TranslatableText> {
 
-    private final static ThreadLocal<Locale> currentLocale = ThreadLocal.withInitial(() -> Locale.ENGLISH);
+    private final static FastThreadLocal<Locale> currentLocale = FastThreadLocals.withInitial(() -> Locale.ENGLISH);
 
     /**
      * Sets the current locale that should be used to translate all

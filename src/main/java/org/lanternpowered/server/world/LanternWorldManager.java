@@ -35,6 +35,7 @@ import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
@@ -661,26 +662,23 @@ public final class LanternWorldManager {
         if (this.worldThreads.containsKey(world)) {
             return;
         }
-        final Thread thread = new Thread("world-" + world.getName()) {
-            @Override
-            public void run() {
-                try {
-                    while (!this.isInterrupted() && !tickEnd.isTerminated()) {
-                        tickBegin.arriveAndAwaitAdvance();
-                        try {
-                            world.pulse();
-                        } catch (Exception e) {
-                            game.getLogger().error("Error occurred while pulsing the world {}", world.getName(), e);
-                        } finally {
-                            tickEnd.arriveAndAwaitAdvance();
-                        }
+        final Thread thread = ThreadHelper.newFastThreadLocalThread(thread0 -> {
+            try {
+                while (!thread0.isInterrupted() && !this.tickEnd.isTerminated()) {
+                    this.tickBegin.arriveAndAwaitAdvance();
+                    try {
+                        world.pulse();
+                    } catch (Exception e) {
+                        this.game.getLogger().error("Error occurred while pulsing the world {}", world.getName(), e);
+                    } finally {
+                        this.tickEnd.arriveAndAwaitAdvance();
                     }
-                } finally {
-                    tickBegin.arriveAndDeregister();
-                    tickEnd.arriveAndDeregister();
                 }
+            } finally {
+                this.tickBegin.arriveAndDeregister();
+                this.tickEnd.arriveAndDeregister();
             }
-        };
+        }, "world-" + world.getName());
         this.worldThreads.put(world, thread);
         this.tickBegin.register();
         this.tickEnd.register();

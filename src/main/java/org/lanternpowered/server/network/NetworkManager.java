@@ -35,25 +35,23 @@ import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import io.netty.util.concurrent.FastThreadLocal;
-import io.netty.util.concurrent.FastThreadLocalThread;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.network.buffer.LanternByteBufferAllocator;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.codec.SimpleCodecContext;
+import org.lanternpowered.server.network.pipeline.LegacyProtocolHandler;
 import org.lanternpowered.server.network.pipeline.MessageCodecHandler;
 import org.lanternpowered.server.network.pipeline.MessageFramingHandler;
 import org.lanternpowered.server.network.pipeline.MessageProcessorHandler;
 import org.lanternpowered.server.network.pipeline.NoopHandler;
-import org.lanternpowered.server.network.pipeline.LegacyProtocolHandler;
+import org.lanternpowered.server.util.ThreadHelper;
 
+import javax.annotation.Nullable;
 import java.net.SocketAddress;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
-
-import javax.annotation.Nullable;
 
 public final class NetworkManager extends ServerBase {
 
@@ -121,14 +119,7 @@ public final class NetworkManager extends ServerBase {
         this.bootstrap = new ServerBootstrap();
         // Take advantage of the fast thread local threads,
         // this is also provided by the default thread factory
-        final ThreadFactory threadFactory = runnable -> new FastThreadLocalThread(() -> {
-            try {
-                runnable.run();
-            } finally {
-                // Cleanup the fast thread local values
-                FastThreadLocal.removeAll();
-            }
-        }, "netty-" + threadCounter.getAndIncrement());
+        final ThreadFactory threadFactory = ThreadHelper.newFastThreadLocalThreadFactory(() -> "netty-" + threadCounter.getAndIncrement());
         this.bossGroup = createEventLoopGroup(epoll, threadFactory);
         this.workerGroup = createEventLoopGroup(epoll, threadFactory);
         this.socketAddress = address;

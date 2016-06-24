@@ -49,7 +49,9 @@ import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.util.FastSoftThreadLocal;
 import org.lanternpowered.server.util.SoftThreadLocal;
+import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
@@ -171,7 +173,8 @@ public final class LanternChunkManager {
 
     // The chunk load executor
     private final ThreadPoolExecutor chunkTaskExecutor = new ThreadPoolExecutor(
-            CHUNK_LOADING_CORE_POOL_SIZE, CHUNK_LOADING_MAX_POOL_SIZE, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
+            CHUNK_LOADING_CORE_POOL_SIZE, CHUNK_LOADING_MAX_POOL_SIZE, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>(),
+            ThreadHelper.newFastThreadLocalThreadFactory());
 
     // Some objects that can be used in {@link Chunk} population.
     private class PopulationData {
@@ -313,10 +316,10 @@ public final class LanternChunkManager {
     }
 
     // The world generation buffers that will be reused
-    private final SoftThreadLocal<GenerationBuffers> genBuffers = SoftThreadLocal.withInitial(GenerationBuffers::new);
+    private final FastSoftThreadLocal<GenerationBuffers> genBuffers = FastSoftThreadLocal.withInitial(GenerationBuffers::new);
 
     // The randoms that will be shared for population
-    private final SoftThreadLocal<PopulationData> populationData = SoftThreadLocal.withInitial(PopulationData::new);
+    private final FastSoftThreadLocal<PopulationData> populationData = FastSoftThreadLocal.withInitial(PopulationData::new);
 
     // The world generator
     private volatile WorldGenerator worldGenerator;

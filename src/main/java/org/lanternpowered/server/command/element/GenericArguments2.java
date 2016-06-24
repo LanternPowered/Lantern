@@ -31,6 +31,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.command.CommandSource;
@@ -40,13 +41,18 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.args.PatternMatchingCommandElement;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.StartsWithPredicate;
+import org.spongepowered.api.util.blockray.BlockRay;
+import org.spongepowered.api.util.blockray.BlockRayHit;
+import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,8 +61,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
 
 public final class GenericArguments2 {
 
@@ -397,6 +401,37 @@ public final class GenericArguments2 {
         }
     }
 
+    public static CommandElement relativeDoubleNum(Text key) {
+        return new RelativeDoubleElement(key);
+    }
+
+    public static CommandElement relativeDoubleNum(Text key, @Nullable Double defaultValue) {
+        return defaultValue == null ? relativeDoubleNum(key) : delegateCompleter(relativeDoubleNum(key),
+                (src, args, context) -> Collections.singletonList(defaultValue.toString()));
+    }
+
+    public static CommandElement relativeDoubleNum(Text key, @Nullable RelativeDouble defaultValue) {
+        return defaultValue == null ? relativeDoubleNum(key) : delegateCompleter(relativeDoubleNum(key),
+                (src, args, context) -> Collections.singletonList(relativeDoubleToString(defaultValue)));
+    }
+
+    private static class RelativeDoubleElement extends CommandElement {
+
+        protected RelativeDoubleElement(Text key) {
+            super(key);
+        }
+
+        @Override
+        public Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+            return parseRelativeDouble(args, args.next());
+        }
+
+        @Override
+        public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+            return Collections.emptyList();
+        }
+    }
+
     public static CommandElement integer(Text key) {
         return GenericArguments.integer(key);
     }
@@ -446,6 +481,184 @@ public final class GenericArguments2 {
                 return this.complete(context, Vector3d::getZ);
             }
         });
+    }
+
+    public static CommandElement targetedRelativeVector3d(Text key, @Nullable Vector3d defaultValue) {
+        return delegateCompleter(relativeVector3d(key), new Vector3dElementCompleter() {
+
+            private List<String> complete(CommandContext context, Function<Vector3d, Double> function) {
+                final Optional<Location<World>> location = context.<Location<World>>getOne(CommandContext.TARGET_BLOCK_ARG);
+                if (location.isPresent() || defaultValue != null) {
+                    final Vector3d pos = location.map(Location::getPosition).orElse(defaultValue);
+                    return Collections.singletonList(Double.toString(function.apply(pos)));
+                }
+                return Collections.emptyList();
+            }
+
+            @Override
+            protected List<String> completeX(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getX);
+            }
+
+            @Override
+            protected List<String> completeY(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getY);
+            }
+
+            @Override
+            protected List<String> completeZ(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getZ);
+            }
+        });
+    }
+
+    public static CommandElement targetedRelativeVector3d(Text key) {
+        return targetedRelativeVector3d(key, (Vector3d) null);
+    }
+
+    public static CommandElement targetedRelativeVector3d(Text key, @Nullable RelativeVector3d defaultValue) {
+        return delegateCompleter(relativeVector3d(key), new Vector3dElementCompleter() {
+
+            private List<String> complete(CommandContext context, Function<Vector3d, Double> function,
+                    @Nullable RelativeDouble defaultValue) {
+                final Optional<Location<World>> location = context.<Location<World>>getOne(CommandContext.TARGET_BLOCK_ARG);
+                if (location.isPresent() || defaultValue != null) {
+                    return Collections.singletonList(location.isPresent() ? Double.toString(
+                            function.apply(location.get().getPosition())) : relativeDoubleToString(defaultValue));
+                }
+                return Collections.emptyList();
+            }
+
+            @Override
+            protected List<String> completeX(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getX, defaultValue == null ? null : defaultValue.getX());
+            }
+
+            @Override
+            protected List<String> completeY(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getY, defaultValue == null ? null : defaultValue.getY());
+            }
+
+            @Override
+            protected List<String> completeZ(CommandSource src, CommandContext context) {
+                return this.complete(context, Vector3d::getZ, defaultValue == null ? null : defaultValue.getZ());
+            }
+        });
+    }
+
+    public static CommandElement relativeVector3d(Text key) {
+        return new RelativeVector3dCommandElement(key);
+    }
+
+    public static CommandElement relativeVector3d(Text key, @Nullable RelativeVector3d defaultValue) {
+        return defaultValue == null ? relativeVector3d(key) : delegateCompleter(relativeVector3d(key),
+                new Vector3dElementCompleter() {
+                    @Override
+                    protected List<String> completeX(CommandSource src, CommandContext context) {
+                        return Collections.singletonList(relativeDoubleToString(defaultValue.getX()));
+                    }
+
+                    @Override
+                    protected List<String> completeY(CommandSource src, CommandContext context) {
+                        return Collections.singletonList(relativeDoubleToString(defaultValue.getY()));
+                    }
+
+                    @Override
+                    protected List<String> completeZ(CommandSource src, CommandContext context) {
+                        return Collections.singletonList(relativeDoubleToString(defaultValue.getZ()));
+                    }
+                }
+        );
+    }
+
+    private static String relativeDoubleToString(RelativeDouble relativeDouble) {
+        final double value = relativeDouble.getValue();
+        if (relativeDouble.isRelative()) {
+            return value == 0 ? "~" : "~" + Double.toString(value);
+        }
+        return Double.toString(value);
+    }
+
+    private static class RelativeVector3dCommandElement extends CommandElement {
+        private static final ImmutableSet<String> SPECIAL_TOKENS = ImmutableSet.of("#target", "#me");
+
+        protected RelativeVector3dCommandElement(@Nullable Text key) {
+            super(key);
+        }
+
+        @Override
+        protected Object parseValue(CommandSource source, CommandArgs args) throws ArgumentParseException {
+            String xStr;
+            String yStr;
+            String zStr;
+            xStr = args.next();
+            if (xStr.contains(",")) {
+                String[] split = xStr.split(",");
+                if (split.length != 3) {
+                    throw args.createError(t("Comma-separated location must have 3 elements, not %s", split.length));
+                }
+                xStr = split[0];
+                yStr = split[1];
+                zStr = split[2];
+            } else if (xStr.equals("#target") && source instanceof Entity) {
+                Optional<BlockRayHit<World>> hit = BlockRay.from(((Entity) source))
+                        .filter(BlockRay.onlyAirFilter()).build().end();
+                if (!hit.isPresent()) {
+                    throw args.createError(t("No target block is available! Stop stargazing!"));
+                }
+                return hit.get().getPosition();
+            } else if (xStr.equalsIgnoreCase("#me") && source instanceof Locatable) {
+                return ((Locatable) source).getLocation().getPosition();
+            } else {
+                yStr = args.next();
+                zStr = args.next();
+            }
+            final RelativeDouble x = parseRelativeDouble(args, xStr);
+            final RelativeDouble y = parseRelativeDouble(args, yStr);
+            final RelativeDouble z = parseRelativeDouble(args, zStr);
+
+            return new RelativeVector3d(x, y, z);
+        }
+
+        @Override
+        public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
+            Optional<String> arg = args.nextIfPresent();
+            // Traverse through the possible arguments. We can't really complete arbitrary integers
+            if (arg.isPresent()) {
+                if (arg.get().startsWith("#")) {
+                    return SPECIAL_TOKENS.stream().filter(new StartsWithPredicate(arg.get()))
+                            .collect(GuavaCollectors.toImmutableList());
+                } else if (arg.get().contains(",") || !args.hasNext()) {
+                    return ImmutableList.of(arg.get());
+                } else {
+                    arg = args.nextIfPresent();
+                    if (args.hasNext()) {
+                        return ImmutableList.of(args.nextIfPresent().get());
+                    } else {
+                        return ImmutableList.of(arg.get());
+                    }
+                }
+            } else {
+                return ImmutableList.of();
+            }
+        }
+    }
+
+    private static RelativeDouble parseRelativeDouble(CommandArgs args, String arg) throws ArgumentParseException {
+        boolean relative = arg.startsWith("~");
+        double value;
+        if (relative) {
+            arg = arg.substring(1);
+            if (arg.isEmpty()) {
+                return RelativeDouble.ZERO_RELATIVE;
+            }
+        }
+        try {
+            value = Double.parseDouble(arg);
+        } catch (NumberFormatException e) {
+            throw args.createError(t("Expected input %s to be a double, but was not", arg));
+        }
+        return new RelativeDouble(value, relative);
     }
 
     public static CommandElement vector3d(Text key) {
@@ -516,7 +729,8 @@ public final class GenericArguments2 {
     }
 
     public static CommandElement delegateCompleter(CommandElement originalElement, Completer delegateCompleter) {
-        return new DelegateCompleterElement(originalElement, (src, args, context, original) -> delegateCompleter.complete(src, args, context));
+        return new DelegateCompleterElement(originalElement,
+                (src, args, context, original) -> delegateCompleter.complete(src, args, context));
     }
 
     public static CommandElement delegateCompleter(CommandElement originalElement, DelegateCompleter delegateCompleter) {

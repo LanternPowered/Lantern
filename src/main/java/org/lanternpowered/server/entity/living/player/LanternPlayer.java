@@ -362,6 +362,10 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         }
     }
 
+    public void setRawRotation(Vector3d rotation) {
+        super.setRawRotation(rotation);
+    }
+
     @Override
     public boolean setLocationAndRotation(Location<World> location, Vector3d rotation) {
         World oldWorld = this.getWorld();

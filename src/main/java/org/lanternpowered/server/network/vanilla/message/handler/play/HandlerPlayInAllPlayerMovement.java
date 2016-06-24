@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
@@ -34,15 +35,12 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 
 public final class HandlerPlayInAllPlayerMovement {
 
-    private void handlePosition(NetworkContext context, Vector3d position) {
-        context.getSession().getPlayer().setRawPosition(position);
-    }
-
     public class HandlerPlayInPlayerMovement implements Handler<MessagePlayInPlayerMovement> {
 
         @Override
         public void handle(NetworkContext context, MessagePlayInPlayerMovement message) {
-            handlePosition(context, new Vector3d(message.getX(), message.getY(), message.getZ()));
+            final LanternPlayer player = context.getSession().getPlayer();
+            player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
         }
     }
 
@@ -50,7 +48,9 @@ public final class HandlerPlayInAllPlayerMovement {
 
         @Override
         public void handle(NetworkContext context, MessagePlayInPlayerMovementAndLook message) {
-            handlePosition(context, new Vector3d(message.getX(), message.getY(), message.getZ()));
+            final LanternPlayer player = context.getSession().getPlayer();
+            player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
+            player.setRawRotation(new Vector3d(message.getYaw(), message.getPitch(), 0));
         }
     }
 
@@ -58,7 +58,8 @@ public final class HandlerPlayInAllPlayerMovement {
 
         @Override
         public void handle(NetworkContext context, MessagePlayInPlayerLook message) {
-
+            final LanternPlayer player = context.getSession().getPlayer();
+            player.setRawRotation(new Vector3d(message.getYaw(), message.getPitch(), 0));
         }
     }
 }

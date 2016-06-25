@@ -58,8 +58,6 @@ public final class CommandTeleport extends CommandProvider {
                                 .buildWith(GenericArguments.none()),
                         GenericArguments.vector3d(Text.of("position")),
                         GenericArguments.optional(GenericArguments.seq(
-                                        // X and Y rotation are here swapped, don't
-                                        // ask me why
                                         GenericArguments2.relativeDoubleNum(Text.of("y-rot")),
                                         GenericArguments2.relativeDoubleNum(Text.of("x-rot"))
                                 )

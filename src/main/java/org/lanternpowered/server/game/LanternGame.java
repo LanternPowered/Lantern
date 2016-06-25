@@ -60,6 +60,7 @@ import org.lanternpowered.server.command.CommandTeleport;
 import org.lanternpowered.server.command.CommandTell;
 import org.lanternpowered.server.command.CommandTime;
 import org.lanternpowered.server.command.CommandTitle;
+import org.lanternpowered.server.command.CommandTp;
 import org.lanternpowered.server.command.CommandVersion;
 import org.lanternpowered.server.command.CommandWeather;
 import org.lanternpowered.server.command.CommandWhitelist;
@@ -404,6 +405,7 @@ public class LanternGame implements Game {
         commandProviders.put(this.minecraft, new CommandTell());
         commandProviders.put(this.minecraft, new CommandTime());
         commandProviders.put(this.minecraft, new CommandTitle());
+        commandProviders.put(this.minecraft, new CommandTp());
         commandProviders.put(this.implContainer, new CommandVersion());
         commandProviders.put(this.minecraft, new CommandWeather());
         commandProviders.put(this.minecraft, new CommandWhitelist());

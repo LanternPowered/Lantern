@@ -1,4 +1,5 @@
-sudo: false
+sudo: required
+dist: trusty
 
 after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && ./gradlew artifactoryPublish

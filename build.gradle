@@ -31,10 +31,10 @@ ext {
     if (!project.hasProperty('artifactory_contextUrl')) artifactory_contextUrl = System.getenv('artifactory_contextUrl')
     if (!project.hasProperty('artifactory_username')) artifactory_username = System.getenv('artifactory_username')
     if (!project.hasProperty('artifactory_password')) artifactory_password = System.getenv('artifactory_password')
-    buildNumber = System.env.BUILD_NUMBER ?: '0'
-    ciSystem = System.env.CI_SYSTEM
-    commit = System.env.GIT_COMMIT
-    branch = System.env.GIT_BRANCH
+    buildNumber = System.env.BUILD_NUMBER ?: System.env.TRAVIS_BUILD_NUMBER ?: '0'
+    ciSystem = System.env.CI_SYSTEM ?: (System.env.TRAVIS ? 'travis' : null)
+    commit = System.env.GIT_COMMIT ?: System.env.TRAVIS_COMMIT
+    branch = System.env.GIT_BRANCH ?: System.env.TRAVIS_BRANCH
 }
 
 // Apply plugin

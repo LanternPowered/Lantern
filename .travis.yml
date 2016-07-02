@@ -2,7 +2,7 @@ sudo: required
 dist: trusty
 
 after_success:
-  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $TRAVIS_JOB_NUMBER == *.2 && ./gradlew artifactoryPublish
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && test $TRAVIS_JOB_NUMBER == $TRAVIS_BUILD_NUMBER + ".2" && ./gradlew artifactoryPublish
 
 language: java
 jdk:

@@ -4,7 +4,9 @@ after_success:
   - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && ./gradlew artifactoryPublish
 
 language: java
-jdk: oraclejdk8
+jdk:
+  - openjdk8
+  - oraclejdk8
 
 env: GRADLE_OPTS="-Xms1g -Xmx3g"
 install: true

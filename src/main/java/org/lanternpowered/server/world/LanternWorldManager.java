@@ -508,7 +508,7 @@ public final class LanternWorldManager {
      * @param dimensionId The dimension id
      * @return The new or existing world properties, if creation was successful
      */
-    WorldProperties createWorld(WorldArchetype worldArchetype, String folderName, int dimensionId) throws IOException {
+    LanternWorldProperties createWorld(WorldArchetype worldArchetype, String folderName, int dimensionId) throws IOException {
         final LanternWorldArchetype settings0 = (LanternWorldArchetype) checkNotNull(worldArchetype, "worldArchetype");
         final String worldName = worldArchetype.getName();
         WorldLookupEntry entry = this.worldByName.get(worldName);
@@ -844,11 +844,12 @@ public final class LanternWorldManager {
         // refreshed if needed
         this.dimensionMap = new BitSet();
 
+        LanternWorldProperties rootWorldProperties0 = rootWorldProperties;
         // Generate the root (default) world if missing
-        if (rootWorldProperties == null) {
+        if (rootWorldProperties0 == null) {
             final String name = "Overworld";
             // TODO: Use the default generator type once implemented
-            this.createWorld(WorldArchetype.builder()
+            rootWorldProperties0 = this.createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.OVERWORLD)
                     .generator(GeneratorTypes.FLAT)
                     .build(name, name), "", 0);
@@ -899,7 +900,7 @@ public final class LanternWorldManager {
         // Load the world properties and config files for all the worlds
         for (Map.Entry<Integer, Tuple<Path, LevelData>> entry : idToLevelData.entrySet()) {
             levelData = entry.getValue().getSecond();
-            WorldProperties worldProperties;
+            LanternWorldProperties worldProperties;
             try {
                 WorldConfigResult result = this.getOrCreateWorldConfig(levelData.worldName);
                 worldProperties = LanternWorldPropertiesIO.convert(levelData, result.config, result.newCreated);
@@ -911,13 +912,16 @@ public final class LanternWorldManager {
                 throw e;
             }
             // Store the world properties
-            WorldLookupEntry lookupEntry = this.addWorldProperties(rootWorldProperties, entry.getValue().getFirst(), entry.getKey());
+            WorldLookupEntry lookupEntry = this.addWorldProperties(worldProperties, entry.getValue().getFirst(), entry.getKey());
             // Check if it should be loaded on startup
             if (worldProperties.loadOnStartup()) {
                 loadQueue.add(lookupEntry);
             }
         }
         idToLevelData.clear();
+
+        // The root world must be enabled
+        rootWorldProperties0.setEnabled(true);
 
         // Load all the worlds
         loadQueue.forEach(this::loadWorld);

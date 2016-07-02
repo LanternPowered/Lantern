@@ -1,10 +1,10 @@
-sudo: required
-dist: trusty
+sudo: false
+
+after_success:
+  - test $TRAVIS_PULL_REQUEST == "false" && test $TRAVIS_BRANCH == "master" && ./gradlew artifactoryPublish
 
 language: java
-jdk:
-  - openjdk8
-  - oraclejdk8
+jdk: oraclejdk8
 
 env: GRADLE_OPTS="-Xms1g -Xmx3g"
 install: true

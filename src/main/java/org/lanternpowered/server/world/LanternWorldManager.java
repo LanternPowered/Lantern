@@ -813,7 +813,7 @@ public final class LanternWorldManager {
     public void init() throws IOException {
         // The properties of the root world
         LanternWorldProperties rootWorldProperties = null;
-        LevelData levelData = null;
+        LevelData levelData;
 
         if (Files.exists(this.rootWorldDirectory)) {
             try {

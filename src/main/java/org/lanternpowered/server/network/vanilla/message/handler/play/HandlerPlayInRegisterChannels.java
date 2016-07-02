@@ -29,11 +29,13 @@ import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.network.ChannelRegistrationEvent;
 
+import java.util.Optional;
 import java.util.Set;
 
 public final class HandlerPlayInRegisterChannels implements Handler<MessagePlayInOutRegisterChannels> {
@@ -42,11 +44,12 @@ public final class HandlerPlayInRegisterChannels implements Handler<MessagePlayI
     public void handle(NetworkContext context, MessagePlayInOutRegisterChannels message) {
         final Set<String> channels = message.getChannels();
         final Set<String> registeredChannels = context.getSession().getRegisteredChannels();
+        final Optional<Player> player = Optional.of(context.getSession().getPlayer());
 
         for (String channel : channels) {
             if (registeredChannels.add(channel)) {
                 ChannelRegistrationEvent.Register event  = SpongeEventFactory.createChannelRegistrationEventRegister(
-                        Cause.of(NamedCause.source(context.getSession())), channel);
+                        Cause.of(NamedCause.source(context.getSession())), channel, player);
                 Sponge.getEventManager().post(event);
             }
         }

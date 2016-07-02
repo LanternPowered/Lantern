@@ -180,6 +180,32 @@ public class LanternGameProfileCache implements GameProfileCache {
     }
 
     @Override
+    public boolean remove(GameProfile profile) {
+        boolean flag = this.byUUID.remove(profile.getUniqueId()) != null;
+        if (profile.getName().isPresent()) {
+            flag = this.byName.remove(profile.getName().get()) != null || flag;
+        }
+        return flag;
+    }
+
+    @Override
+    public Collection<GameProfile> remove(Iterable<GameProfile> profiles) {
+        final ImmutableList.Builder<GameProfile> removed = ImmutableList.builder();
+        for (GameProfile profile : profiles) {
+            if (this.remove(profile)) {
+                removed.add(profile);
+            }
+        }
+        return removed.build();
+    }
+
+    @Override
+    public void clear() {
+        this.byName.clear();
+        this.byUUID.clear();
+    }
+
+    @Override
     public Optional<GameProfile> getById(UUID uniqueId) {
         ProfileCacheEntry entry = this.byUUID.get(checkNotNull(uniqueId, "uniqueId"));
         if (entry != null) {

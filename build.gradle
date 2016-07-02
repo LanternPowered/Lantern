@@ -9,9 +9,13 @@ buildscript {
             name = 'eclipse-staging'
             url = 'https://repo.eclipse.org/content/repositories/eclipse-staging'
         }
+        maven {
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
     }
     dependencies {
         classpath 'org.spongepowered:spongegradle:0.3.1-SNAPSHOT'
+        classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0'
     }
 }
 
@@ -21,13 +25,23 @@ plugins {
     // id "com.github.johnrengelman.shadow" version "1.2.3"
 }
 
+
+// Environment variables for the build set by the build server
+ext {
+    if (!project.hasProperty('artifactory_contextUrl')) artifactory_contextUrl = System.getenv('artifactory_contextUrl')
+    if (!project.hasProperty('artifactory_username')) artifactory_username = System.getenv('artifactory_username')
+    if (!project.hasProperty('artifactory_password')) artifactory_password = System.getenv('artifactory_password')
+    buildNumber = System.env.BUILD_NUMBER ?: '0'
+    ciSystem = System.env.CI_SYSTEM
+    commit = System.env.GIT_COMMIT
+    branch = System.env.GIT_BRANCH
+}
+
 // Apply plugin
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'com.github.hierynomus.license'
-
-// Apply shadow plugin
 apply plugin: 'com.github.johnrengelman.shadow'
 
 // Minimum version of Java required
@@ -187,6 +201,14 @@ jar {
     }
 }
 
+afterEvaluate {
+    jar.manifest {
+        attributes['Implementation-Version'] = project.version
+        if (commit) attributes['Git-Commit'] = commit
+        if (branch) attributes['Git-Branch'] = branch
+    }
+}
+
 processResources {
     from 'LICENSE.txt'
 }
@@ -326,6 +348,49 @@ task sourceJar(type: Jar) {
 // Run shadowJar and sourceJar on build
 assemble.dependsOn shadowJar
 assemble.dependsOn sourceJar
+
+if (artifactory_contextUrl && artifactory_username && artifactory_password) {
+    apply plugin: 'maven-publish'
+    apply plugin: 'com.jfrog.artifactory'
+
+    publishing {
+        publications {
+            thePublication(MavenPublication) {
+                artifact shadowJar
+                artifact sourceJar
+                artifactId archivesBaseName
+            }
+        }
+    }
+
+    artifactory {
+        contextUrl = "${artifactory_contextUrl}"
+        publish {
+            repository {
+                repoKey = project.version.contains("SNAPSHOT") ? 'libs-snapshot-local' : 'libs-release-local'
+                username = "${artifactory_username}"
+                password = "${artifactory_password}"
+                maven = true
+            }
+            defaults {
+                publications('thePublication')
+                publishArtifacts = true
+            }
+        }
+
+        resolve {
+            repository {
+                repoKey = 'repo'
+                username = "${artifactory_username}"
+                password = "${artifactory_password}"
+                maven = true
+            }
+        }
+    }
+    clientConfig.setIncludeEnvVars(true)
+    clientConfig.info.setBuildNumber(buildNumber)
+    if (ciSystem) clientConfig.info.addEnvironmentProperty('ci-system', ciSystem)
+}
 
 // The fastutil jar should be generated if missing
 if (!project.fastutilJar.archivePath.exists()) {

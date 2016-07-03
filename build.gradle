@@ -12,17 +12,20 @@ buildscript {
         maven {
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
+        maven {
+            url = 'http://repo.lanternpowered.org:8070/artifactory/libs'
+        }
     }
     dependencies {
         classpath 'org.spongepowered:spongegradle:0.3.1-SNAPSHOT'
+        classpath 'org.lanternpowered:lanterngradle:1.0.0-SNAPSHOT'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0'
     }
 }
 
 plugins {
     id "com.github.hierynomus.license" version "0.13.1"
-    // Defined in 'buildSrc/build.gradle'
-    // id "com.github.johnrengelman.shadow" version "1.2.3"
+    id "com.github.johnrengelman.shadow" version "1.2.3"
 }
 
 // Environment variables for the build set by the build server
@@ -42,6 +45,8 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'com.github.hierynomus.license'
 apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'org.lanternpowered.gradle'
+apply plugin: 'org.lanternpowered.run-configs'
 
 // Minimum version of Java required
 sourceCompatibility = '1.8'
@@ -129,58 +134,17 @@ dependencies {
     testCompile 'org.mockito:mockito-core:1.9.0'
 }
 
-ext.runFolder = 'run'
-
-// Create the run folder
-task createRunFolder {
-    if (!project.file(runFolder).exists()) {
-        project.file(runFolder).mkdirs()
-    }
-}
-
-tasks.eclipse.dependsOn createRunFolder
-tasks.idea.dependsOn createRunFolder
-
 idea.module {
     // The java6 sourceset
     sourceDirs += file('src/java6/java')
 }
 
-// Generate application setups, currently only for intellij
-idea.workspace.iws.withXml { provider ->
-    // The app name
-    def appName = 'Lantern Server'
-
-    // Get the run manager node, this will contain the configuration
-    def node = provider.asNode().component.find { it.@name == 'RunManager' }
-
-    // Find the default and custom app node
-    def defaultNode = node.find { it.@type == 'Application' && it.@default == 'true' }
-    def customNode = node.find { it.@type == 'Application' && it.@name == appName }
-
-    // It should always be present
-    if (defaultNode == null) {
-        throw new IllegalStateException('Unable to find the default application config node,' +
-                ' please try to regenerate the intellij project files to resolve this issue.')
-    }
-
-    // Only create a new configuration if the old one is missing
-    if (customNode == null) {
-        customNode = defaultNode.clone()
-        customNode.@default = 'false'
-        customNode.@name = appName
-        customNode.each {
-            if (it.name() == 'option' && it.@name != null) {
-                switch (it.@name) {
-                    case 'MAIN_CLASS_NAME':   it.@value = 'org.lanternpowered.launch.Launch';           break
-                    case 'VM_PARAMETERS':     it.@value = '-Dlog4j.configurationFile=log4j2_indev.xml'; break
-                    case 'WORKING_DIRECTORY': it.@value = 'file://$PROJECT_DIR$/' + runFolder;          break
-                }
-            } else if (it.name() == 'module') {
-                it.@name = project.name
-            }
-        }
-        node.append customNode
+runConfigurations {
+    theConfig {
+        name = 'Lantern Server'
+        mainClass = 'org.lanternpowered.launch.Launch'
+        workingDirectory = 'run'
+        vmOptions = '-Dlog4j.configurationFile=log4j2_indev.xml'
     }
 }
 
@@ -217,10 +181,6 @@ test {
         exceptionFormat = 'full' // Always print full stack trace if something goes wrong in the unit tests
     }
 }
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.lanternpowered.gradle.transformer.Log4jCacheFileTransformer
-import org.lanternpowered.gradle.transformer.DependencyClassTransformer
 
 // A separate task to generate the fastutil jar,
 // doing this separate to avoid long wait times
@@ -331,7 +291,7 @@ shadowJar {
         mergeServiceFiles()
 
         // Merge the Log4j2Plugins.dat file properly
-        transform(Log4jCacheFileTransformer)
+        transform(Log4jPluginCacheFileTransformer)
     }
 
     exclude 'LICENSE', 'NOTICE'
@@ -396,7 +356,27 @@ if (!project.fastutilJar.archivePath.exists()) {
     assemble.dependsOn fastutilJar
 }
 
-apply from: file('gradle/license.gradle')
+license {
+    header rootProject.file('HEADER.txt')
+    sourceSets = project.sourceSets
+    include '**/*.java'
+    include '**/*.groovy'
+
+    strictCheck true
+    ignoreFailures = false
+
+    ext {
+        name = rootProject.name
+        urla = rootProject.url
+        organizationa = rootProject.organization
+        urlb = rootProject.api.url
+        organizationb = rootProject.api.organization
+    }
+
+    mapping {
+        java = 'SLASHSTAR_STYLE'
+    }
+}
 
 // Gradle version used for generating the Gradle wrapper
 task wrapper(type: Wrapper) {

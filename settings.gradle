@@ -1,5 +1,2 @@
 rootProject.name = name
 include 'SpongeAPI'
-// Part of the workaround to get the
-// buildSrc module in intellij
-include 'buildSrc'

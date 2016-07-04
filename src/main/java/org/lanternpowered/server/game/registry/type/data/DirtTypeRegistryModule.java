@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.DirtTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class DirtTypeRegistryModule extends EnumValueRegistryModule<DirtType> {
 
-public final class DirtTypeRegistryModule implements CatalogRegistryModule<DirtType> {
-
-    @RegisterCatalog(DirtTypes.class) private final Map<String, DirtType> dirtTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternDirtType type : LanternDirtType.values()) {
-            this.dirtTypes.put(type.getId(), type);
-            this.dirtTypes.put(type.name().toLowerCase(), type);
-        }
+    public DirtTypeRegistryModule() {
+        super(LanternDirtType.class, DirtTypes.class);
     }
-
-    @Override
-    public Optional<DirtType> getById(String id) {
-        return Optional.ofNullable(this.dirtTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<DirtType> getAll() {
-        return ImmutableSet.copyOf(this.dirtTypes.values());
-    }
-
 }

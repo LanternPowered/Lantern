@@ -29,6 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.block.LanternBlockType;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -58,7 +60,9 @@ public class BlockItemType extends LanternItemType {
             ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
         itemStack = itemStack.copy();
         itemStack.setQuantity(itemStack.getQuantity() - 1);
-        world.setBlock(clickedBlock.add(blockFace.toVector3d().toInt()), this.blockType.getDefaultState());
+        BlockState blockState = ((LanternBlockType) this.blockType).placeBlockAt(player, world, interactionType,
+                itemStack, clickedBlock, blockFace, cursorOffset);
+        world.setBlock(clickedBlock.add(blockFace.toVector3d().toInt()), blockState);
         return ItemInteractionResult.builder()
                 .type(ItemInteractionResult.Type.SUCCESS)
                 .resultItem(itemStack.createSnapshot())

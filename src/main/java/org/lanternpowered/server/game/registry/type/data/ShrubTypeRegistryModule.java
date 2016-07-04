@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternShrubType;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class ShrubTypeRegistryModule extends EnumValueRegistryModule<ShrubType> {
 
-public final class ShrubTypeRegistryModule implements CatalogRegistryModule<ShrubType> {
-
-    @RegisterCatalog(ShrubTypes.class) private final Map<String, ShrubType> shrubTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternShrubType type : LanternShrubType.values()) {
-            this.shrubTypes.put(type.getId(), type);
-            this.shrubTypes.put(type.name().toLowerCase(), type);
-        }
+    public ShrubTypeRegistryModule() {
+        super(LanternShrubType.class, ShrubTypes.class);
     }
-
-    @Override
-    public Optional<ShrubType> getById(String id) {
-        return Optional.ofNullable(this.shrubTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<ShrubType> getAll() {
-        return ImmutableSet.copyOf(this.shrubTypes.values());
-    }
-
 }

@@ -25,30 +25,52 @@
  */
 package org.lanternpowered.server.block.type;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
-import org.lanternpowered.server.data.type.LanternStoneType;
+import org.lanternpowered.server.data.type.LanternLogAxis;
+import org.lanternpowered.server.data.type.LanternTreeType;
+import org.lanternpowered.server.item.ItemInteractionType;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-public final class BlockStone extends VariantBlock<LanternStoneType> {
+public class BlockLog extends VariantBlock<LanternTreeType> {
 
     @SuppressWarnings("unchecked")
-    public static final EnumTrait<LanternStoneType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.STONE_TYPE, LanternStoneType.class);
+    public static final EnumTrait<LanternLogAxis> AXIS = LanternEnumTrait.of("axis", (Key) Keys.LOG_AXIS, LanternLogAxis.class);
 
-    public BlockStone(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, TYPE);
-        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternStoneType.STONE).get());
+    public BlockLog(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder,
+            EnumTrait<LanternTreeType> treeTrait) {
+        super(pluginId, identifier, itemTypeBuilder, treeTrait, AXIS);
         this.modifyPropertyProviders(builder -> {
-            builder.add(PropertyProviders.hardness(1.5));
-            builder.add(PropertyProviders.blastResistance(7.5));
+            builder.add(PropertyProviders.hardness(2.0));
+            builder.add(PropertyProviders.blastResistance(5.0));
+            builder.add(PropertyProviders.flammableInfo(5, 5));
         });
     }
 
+    @Override
+    protected String getTranslationKey(LanternTreeType element) {
+        return "tile.log." + element.getTranslationKeyBase() + ".name";
+    }
+
+    @Override
+    public BlockState placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
+            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
+        final BlockState state = super.placeBlockAt(player, world, interactionType, itemStack,
+                clickedBlock, blockFace, cursorOffset);
+        return state.withTrait(AXIS, LanternLogAxis.fromDirection(blockFace)).get();
+    }
 }

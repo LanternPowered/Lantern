@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
 import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.data.type.PlantTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class DoublePlantTypeRegistryModule extends EnumValueRegistryModule<DoublePlantType> {
 
-public final class DoublePlantTypeRegistryModule implements CatalogRegistryModule<DoublePlantType> {
-
-    @RegisterCatalog(PlantTypes.class) private final Map<String, DoublePlantType> plantTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternDoublePlantType type : LanternDoublePlantType.values()) {
-            this.plantTypes.put(type.getId(), type);
-            this.plantTypes.put(type.name().toLowerCase(), type);
-        }
+    public DoublePlantTypeRegistryModule() {
+        super(LanternDoublePlantType.class, PlantTypes.class);
     }
-
-    @Override
-    public Optional<DoublePlantType> getById(String id) {
-        return Optional.ofNullable(this.plantTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<DoublePlantType> getAll() {
-        return ImmutableSet.copyOf(this.plantTypes.values());
-    }
-
 }

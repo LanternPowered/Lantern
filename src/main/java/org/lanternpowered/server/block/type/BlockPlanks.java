@@ -25,34 +25,35 @@
  */
 package org.lanternpowered.server.block.type;
 
-import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.PropertyProviders;
-import org.lanternpowered.server.block.trait.LanternBooleanTrait;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.trait.BooleanTrait;
+import org.lanternpowered.server.block.trait.LanternEnumTrait;
+import org.lanternpowered.server.data.type.LanternTreeType;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemType;
 
+import javax.annotation.Nullable;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+public class BlockPlanks extends VariantBlock<LanternTreeType> {
 
-public final class BlockGrass extends LanternBlockType {
+    @SuppressWarnings("unchecked")
+    public static final EnumTrait<LanternTreeType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE, LanternTreeType.class);
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
-
-    public BlockGrass(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, SNOWY);
-        this.modifyDefaultState(state -> state.withTrait(SNOWY, false).get());
+    public BlockPlanks(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        super(pluginId, identifier, itemTypeBuilder, TYPE);
+        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get());
         this.modifyPropertyProviders(builder -> {
-            builder.add(PropertyProviders.hardness(0.6));
-            builder.add(PropertyProviders.blastResistance(3.0));
+            builder.add(PropertyProviders.hardness(2.0));
+            builder.add(PropertyProviders.blastResistance(5.0));
+            builder.add(PropertyProviders.flammableInfo(5, 20));
         });
     }
 
     @Override
-    public BlockState removeExtendedState(BlockState blockState) {
-        return blockState.withTrait(SNOWY, false).get();
+    protected String getTranslationKey(LanternTreeType element) {
+        return "tile.wood." + element.getTranslationKeyBase() + ".name";
     }
 }

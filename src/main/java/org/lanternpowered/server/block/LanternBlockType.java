@@ -27,28 +27,33 @@ package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.block.state.LanternBlockStateMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.BlockItemType;
+import org.lanternpowered.server.item.ItemInteractionType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
-import org.spongepowered.api.data.property.block.MatterProperty.Matter;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
-
-import javax.annotation.Nullable;
 
 public class LanternBlockType extends PluginCatalogType.Base implements BlockType, AbstractPropertyHolder {
 
@@ -59,9 +64,10 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
     public static final Function<BlockType, ItemType> DEFAULT_ITEM_TYPE_BUILDER =
             type -> new BlockItemType(((LanternBlockType) type).getPluginId(), type.getName(), type);
 
+    private PropertyProviderCollection propertyProviderCollection = PropertyProviderCollections.DEFAULT;
+
     // The block state base which contains all the possible block states
     private final LanternBlockStateMap blockStateBase;
-    private Matter matter = Matter.SOLID;
     private Translation translation;
     private final Optional<ItemType> itemType;
     private BlockState defaultBlockState;
@@ -103,6 +109,25 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
         this.defaultBlockState = checkNotNull(blockState, "blockState");
     }
 
+    protected void modifyDefaultState(Function<BlockState, BlockState> function) {
+        this.defaultBlockState = checkNotNull(function.apply(this.defaultBlockState));
+    }
+
+    public PropertyProviderCollection getPropertyProviderCollection() {
+        return this.propertyProviderCollection;
+    }
+
+    protected void modifyPropertyProviders(Consumer<PropertyProviderCollection.Builder> consumer) {
+        final PropertyProviderCollection.Builder builder = this.propertyProviderCollection.toBuilder();
+        consumer.accept(builder);
+        this.setPropertyProviderCollection(builder.build());
+    }
+
+    protected void setPropertyProviderCollection(PropertyProviderCollection propertyProviderCollection) {
+        this.propertyProviderCollection = checkNotNull(propertyProviderCollection, "propertyProviderCollection");
+        LanternPropertyRegistry.getInstance().registerBlockPropertyStores(propertyProviderCollection);
+    }
+
     /**
      * Gets the base of the block state.
      *
@@ -138,23 +163,23 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
     }
 
     /**
-     * Gets the {@link Matter} of the specified block state, normally it should be
-     * always the same, which means that the block state is ignored.
+     * Gets whether the specified {@link BlockState} contains extra data.
      *
      * @param blockState The block state
-     * @return The matter
+     * @return Is extended state
      */
-    public Matter getMatter(BlockState blockState) {
-        return this.matter;
+    public boolean isExtendedState(BlockState blockState) {
+        return this.removeExtendedState(blockState) != blockState;
     }
 
     /**
-     * Sets the {@link Matter} of this block type.
+     * Removes all the extended data from the state.
      *
-     * @param matter The matter
+     * @param blockState The block state
+     * @return The block state without the extended data
      */
-    protected void setMatter(Matter matter) {
-        this.matter = checkNotNull(matter, "matter");
+    public BlockState removeExtendedState(BlockState blockState) {
+        return blockState;
     }
 
     /**
@@ -244,4 +269,8 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
         return this.blockStateBase.getBlockStates();
     }
 
+    public BlockState placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
+            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
+        return this.getDefaultState();
+    }
 }

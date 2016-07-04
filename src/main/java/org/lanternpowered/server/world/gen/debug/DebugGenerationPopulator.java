@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.state.LanternBlockState;
 import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -41,6 +42,7 @@ import org.spongepowered.api.world.gen.GenerationPopulator;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class DebugGenerationPopulator implements GenerationPopulator {
 
@@ -60,7 +62,8 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
         checkNotNull(registry, "registry");
         Set<BlockState> blockStates = Sets.newLinkedHashSet();
         for (BlockType blockType : registry.getAllOf(BlockType.class)) {
-            blockStates.addAll(((LanternBlockType) blockType).getAllStates());
+            blockStates.addAll(((LanternBlockType) blockType).getAllStates().stream().filter(state ->
+                    !((LanternBlockState) state).isExtended()).collect(Collectors.toList()));
         }
         this.blockStateCache = blockStates.toArray(new BlockState[blockStates.size()]);
         this.size = (int) Math.ceil(Math.sqrt((double) this.blockStateCache.length));
@@ -85,11 +88,8 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
                 if (placeBarriers) {
                     buffer.setBlock(x, BARRIER_PLANE, z, BlockTypes.BARRIER.getDefaultState());
                 }
-                if (placeBlocks && (x & 0x1) != 0 && (z & 0x1) != 0) {
-                    int i = x >> 1;
-                    int j = z >> 1;
-
-                    int index = i * this.size + j;
+                if (placeBlocks && x > 0 && z > 0 && x % 2 != 0 && z % 2 != 0) {
+                    int index = (x / 2) * this.size + (z / 2);
                     if (index >= 0 && index < this.blockStateCache.length) {
                         buffer.setBlock(x, BLOCKS_PLANE, z, this.blockStateCache[index]);
                     }

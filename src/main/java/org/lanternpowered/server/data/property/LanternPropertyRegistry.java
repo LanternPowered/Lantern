@@ -32,6 +32,8 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.lanternpowered.server.block.PropertyProviderCollection;
+import org.lanternpowered.server.data.property.block.BlockPropertyStore;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.data.property.PropertyRegistry;
@@ -56,6 +58,15 @@ public class LanternPropertyRegistry implements PropertyRegistry {
     private boolean allowRegistrations = true;
 
     private LanternPropertyRegistry() {
+    }
+
+    @SuppressWarnings("unchecked")
+    public void registerBlockPropertyStores(PropertyProviderCollection collection) {
+        for (Class<? extends Property> entry : collection.keys()) {
+            if (!this.propertyStoreMap.containsKey(entry)) {
+                this.register(entry, new BlockPropertyStore(entry));
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")

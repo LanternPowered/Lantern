@@ -23,15 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.block.property;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+import org.spongepowered.api.data.Property;
+import org.spongepowered.api.data.property.AbstractProperty;
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+public final class FlameInfoProperty extends AbstractProperty<String, FlameInfo> {
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
+    public FlameInfoProperty(FlameInfo value) {
+        super(value);
+    }
+
+    public FlameInfoProperty(FlameInfo value, Operator operator) {
+        super(value, operator);
+    }
+
+    @Override
+    public int compareTo(Property<?, ?> o) {
+        return o == null ?  0 : this.getValue().compareTo((FlameInfo) o.getValue());
     }
 }

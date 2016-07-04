@@ -23,15 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.block;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+import javax.annotation.Nullable;
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
-    }
+@FunctionalInterface
+public interface ObjectProvider<T> {
+
+    T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face);
 }

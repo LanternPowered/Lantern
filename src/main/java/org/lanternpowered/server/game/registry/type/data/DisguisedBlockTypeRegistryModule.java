@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.spongepowered.api.data.type.DisguisedBlockType;
 import org.spongepowered.api.data.type.DisguisedBlockTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class DisguisedBlockTypeRegistryModule extends EnumValueRegistryModule<DisguisedBlockType> {
 
-public final class DisguisedBlockTypeRegistryModule implements CatalogRegistryModule<DisguisedBlockType> {
-
-    @RegisterCatalog(DisguisedBlockTypes.class) private final Map<String, DisguisedBlockType> blockTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternDisguisedBlockType type : LanternDisguisedBlockType.values()) {
-            this.blockTypes.put(type.getId(), type);
-            this.blockTypes.put(type.name().toLowerCase(), type);
-        }
+    public DisguisedBlockTypeRegistryModule() {
+        super(LanternDisguisedBlockType.class, DisguisedBlockTypes.class);
     }
-
-    @Override
-    public Optional<DisguisedBlockType> getById(String id) {
-        return Optional.ofNullable(this.blockTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<DisguisedBlockType> getAll() {
-        return ImmutableSet.copyOf(this.blockTypes.values());
-    }
-
 }

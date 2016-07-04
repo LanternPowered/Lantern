@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternWallType;
 import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.data.type.WallTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class WallTypeRegistryModule extends EnumValueRegistryModule<WallType> {
 
-public final class WallTypeRegistryModule implements CatalogRegistryModule<WallType> {
-
-    @RegisterCatalog(WallTypes.class) private final Map<String, WallType> wallTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternWallType type : LanternWallType.values()) {
-            this.wallTypes.put(type.getId(), type);
-            this.wallTypes.put(type.name().toLowerCase(), type);
-        }
+    public WallTypeRegistryModule() {
+        super(LanternWallType.class, WallTypes.class);
     }
-
-    @Override
-    public Optional<WallType> getById(String id) {
-        return Optional.ofNullable(this.wallTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<WallType> getAll() {
-        return ImmutableSet.copyOf(this.wallTypes.values());
-    }
-
 }

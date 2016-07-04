@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternBrickType;
 import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.BrickTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class BrickTypeRegistryModule extends EnumValueRegistryModule<BrickType> {
 
-public final class BrickTypeRegistryModule implements CatalogRegistryModule<BrickType> {
-
-    @RegisterCatalog(BrickTypes.class) private final Map<String, BrickType> brickTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternBrickType type : LanternBrickType.values()) {
-            this.brickTypes.put(type.getId(), type);
-            this.brickTypes.put(type.name().toLowerCase(), type);
-        }
+    public BrickTypeRegistryModule() {
+        super(LanternBrickType.class, BrickTypes.class);
     }
-
-    @Override
-    public Optional<BrickType> getById(String id) {
-        return Optional.ofNullable(this.brickTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<BrickType> getAll() {
-        return ImmutableSet.copyOf(this.brickTypes.values());
-    }
-
 }

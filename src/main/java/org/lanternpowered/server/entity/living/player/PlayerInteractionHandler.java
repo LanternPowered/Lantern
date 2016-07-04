@@ -34,12 +34,17 @@ import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.property.block.HardnessProperty;
+import org.spongepowered.api.data.property.block.UnbreakableProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Set;
 
@@ -50,8 +55,8 @@ public final class PlayerInteractionHandler {
     /**
      * The block that is being digged.
      */
-    private Vector3i diggingBlock;
-    private BlockType diggingBlockType;
+    @Nullable private Vector3i diggingBlock;
+    @Nullable private BlockType diggingBlockType;
 
     /**
      * The time when the digging should end.
@@ -89,6 +94,10 @@ public final class PlayerInteractionHandler {
                 this.lastBreakState = breakState;
             }
         }
+    }
+
+    public void handleUseItem(MessagePlayInPlayerUseItem message) {
+
     }
 
     /**
@@ -139,12 +148,12 @@ public final class PlayerInteractionHandler {
             this.diggingBlock = blockPos;
             this.diggingBlockType = blockType;
 
-            this.diggingDuration = this.getDiggingDuration(blockType);
+            this.diggingDuration = this.getDiggingDuration(blockPos, blockType);
             // The client won't send a finish message
-            if (this.diggingDuration <= 0) {
+            if (this.diggingDuration == 0) {
                 this.handleBrokenBlock();
             } else {
-                this.diggingEndTime = System.nanoTime() + this.diggingDuration;
+                this.diggingEndTime = this.diggingDuration == -1 ? -1 : System.nanoTime() + this.diggingDuration;
             }
         } else if (action == MessagePlayInPlayerDigging.Action.CANCEL) {
             if (this.diggingBlock == null || !this.diggingBlock.equals(blockPos)) {
@@ -164,11 +173,16 @@ public final class PlayerInteractionHandler {
             if (blockType != this.diggingBlockType) {
                 return;
             }
-            long deltaTime = System.nanoTime() - this.diggingEndTime;
-            if (deltaTime < 0) {
-                Lantern.getLogger().warn("{} finished breaking a block too early, {}ms too fast.", this.player.getName(), -(deltaTime / 1000));
+            if (this.diggingEndTime == -1) {
+                Lantern.getLogger().warn("{} attempted to break a unbreakable block.", this.player.getName());
+            } else {
+                long deltaTime = System.nanoTime() - this.diggingEndTime;
+                if (deltaTime < 0) {
+                    Lantern.getLogger().warn("{} finished breaking a block too early, {}ms too fast.",
+                            this.player.getName(), -(deltaTime / 1000));
+                }
+                this.handleBrokenBlock();
             }
-            this.handleBrokenBlock();
         }
     }
 
@@ -186,7 +200,19 @@ public final class PlayerInteractionHandler {
      *
      * @return The digging duration
      */
-    private long getDiggingDuration(BlockType blockType) {
+    private long getDiggingDuration(Vector3i pos, BlockType blockType) {
+        final World world = this.player.getWorld();
+        final Optional<UnbreakableProperty> optUnbreakableProperty = world.getProperty(pos, UnbreakableProperty.class);
+        if (optUnbreakableProperty.isPresent() && optUnbreakableProperty.get().getValue() == Boolean.TRUE) {
+            return -1L;
+        }
+        final Optional<HardnessProperty> optHardnessProperty = world.getProperty(pos, HardnessProperty.class);
+        if (optHardnessProperty.isPresent()) {
+            final Double value = optHardnessProperty.get().getValue();
+            double hardness = value == null ? 0 : value;
+            // TODO: Calculate the duration
+            return hardness <= 0 ? 0 : 1;
+        }
         return 0;
     }
 

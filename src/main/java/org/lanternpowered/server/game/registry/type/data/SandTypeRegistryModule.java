@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternSandType;
 import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.data.type.SandTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class SandTypeRegistryModule extends EnumValueRegistryModule<SandType> {
 
-public final class SandTypeRegistryModule implements CatalogRegistryModule<SandType> {
-
-    @RegisterCatalog(SandTypes.class) private final Map<String, SandType> sandTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternSandType type : LanternSandType.values()) {
-            this.sandTypes.put(type.getId(), type);
-            this.sandTypes.put(type.name().toLowerCase(), type);
-        }
+    public SandTypeRegistryModule() {
+        super(LanternSandType.class, SandTypes.class);
     }
-
-    @Override
-    public Optional<SandType> getById(String id) {
-        return Optional.ofNullable(this.sandTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<SandType> getAll() {
-        return ImmutableSet.copyOf(this.sandTypes.values());
-    }
-
 }

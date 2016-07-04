@@ -63,10 +63,14 @@ public class VariantBlock<E extends CatalogType & Comparable<E>> extends Lantern
             pluginPath = this.getPluginId() + '.';
         }
         for (E element : variantTrait.getPossibleValues()) {
-            final String id = element.getId().toLowerCase();
             this.translations.put(element, Lantern.getRegistry().getTranslationManager().get(
-                    "tile." + pluginPath + id + ".name"));
+                    pluginPath + this.getTranslationKey(element)));
         }
+    }
+
+    protected String getTranslationKey(E element) {
+        final String id = element.getId().toLowerCase();
+        return "tile." + id + ".name";
     }
 
     @Override

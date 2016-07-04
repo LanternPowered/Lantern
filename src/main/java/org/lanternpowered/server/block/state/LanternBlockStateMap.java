@@ -125,6 +125,9 @@ public final class LanternBlockStateMap {
             }));
             state.propertyValueTable = tableBuilder.build();
         });
+
+        this.blockStates.stream().map(state -> (LanternBlockState) state)
+                .forEach(state -> state.extended = blockType.isExtendedState(state));
     }
 
     public LanternBlockType getBlockType() {

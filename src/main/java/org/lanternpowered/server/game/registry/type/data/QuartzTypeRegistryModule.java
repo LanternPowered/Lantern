@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternQuartzType;
 import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.data.type.QuartzTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class QuartzTypeRegistryModule extends EnumValueRegistryModule<QuartzType> {
 
-public final class QuartzTypeRegistryModule implements CatalogRegistryModule<QuartzType> {
-
-    @RegisterCatalog(QuartzTypes.class) private final Map<String, QuartzType> quartzTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternQuartzType type : LanternQuartzType.values()) {
-            this.quartzTypes.put(type.getId(), type);
-            this.quartzTypes.put(type.name().toLowerCase(), type);
-        }
+    public QuartzTypeRegistryModule() {
+        super(LanternQuartzType.class, QuartzTypes.class);
     }
-
-    @Override
-    public Optional<QuartzType> getById(String id) {
-        return Optional.ofNullable(this.quartzTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<QuartzType> getAll() {
-        return ImmutableSet.copyOf(this.quartzTypes.values());
-    }
-
 }

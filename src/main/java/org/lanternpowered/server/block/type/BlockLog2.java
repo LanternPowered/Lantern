@@ -23,15 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.block.type;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+import org.lanternpowered.server.block.trait.LanternEnumTrait;
+import org.lanternpowered.server.data.type.LanternTreeType;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.ItemType;
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+import javax.annotation.Nullable;
+import java.util.function.Function;
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
+public class BlockLog2 extends BlockLog {
+
+    @SuppressWarnings("unchecked")
+    public static final EnumTrait<LanternTreeType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,
+            LanternTreeType.ACACIA, LanternTreeType.DARK_OAK);
+
+    public BlockLog2(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        super(pluginId, identifier, itemTypeBuilder, TYPE);
     }
 }

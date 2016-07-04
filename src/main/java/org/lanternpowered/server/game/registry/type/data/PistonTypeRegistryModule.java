@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternPistonType;
 import org.spongepowered.api.data.type.PistonType;
 import org.spongepowered.api.data.type.PistonTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class PistonTypeRegistryModule extends EnumValueRegistryModule<PistonType> {
 
-public final class PistonTypeRegistryModule implements CatalogRegistryModule<PistonType> {
-
-    @RegisterCatalog(PistonTypes.class) private final Map<String, PistonType> pistonTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternPistonType type : LanternPistonType.values()) {
-            this.pistonTypes.put(type.getId(), type);
-            this.pistonTypes.put(type.name().toLowerCase(), type);
-        }
+    public PistonTypeRegistryModule() {
+        super(LanternPistonType.class, PistonTypes.class);
     }
-
-    @Override
-    public Optional<PistonType> getById(String id) {
-        return Optional.ofNullable(this.pistonTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<PistonType> getAll() {
-        return ImmutableSet.copyOf(this.pistonTypes.values());
-    }
-
 }

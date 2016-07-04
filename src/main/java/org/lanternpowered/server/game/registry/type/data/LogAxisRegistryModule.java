@@ -25,39 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternLogAxis;
 import org.spongepowered.api.data.type.LogAxes;
 import org.spongepowered.api.data.type.LogAxis;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class LogAxisRegistryModule extends EnumValueRegistryModule<LogAxis> {
 
-public final class LogAxisRegistryModule implements CatalogRegistryModule<LogAxis> {
-
-    @RegisterCatalog(LogAxes.class) private final Map<String, LogAxis> logAxes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternLogAxis type : LanternLogAxis.values()) {
-            this.logAxes.put(type.getId(), type);
-        }
+    public LogAxisRegistryModule() {
+        super(LanternLogAxis.class, LogAxes.class);
     }
-
-    @Override
-    public Optional<LogAxis> getById(String id) {
-        return Optional.ofNullable(this.logAxes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<LogAxis> getAll() {
-        return ImmutableSet.copyOf(this.logAxes.values());
-    }
-
 }

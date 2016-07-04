@@ -23,15 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.block.property;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+public final class FlameInfo implements Comparable<FlameInfo> {
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+    private final int encouragement;
+    private final int flammability;
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
+    public FlameInfo(int encouragement, int flammability) {
+        this.encouragement = encouragement;
+        this.flammability = flammability;
+    }
+
+    public int getEncouragement() {
+        return this.encouragement;
+    }
+
+    public int getFlammability() {
+        return this.flammability;
+    }
+
+    @Override
+    public int compareTo(FlameInfo o) {
+        int r = Integer.compare(this.encouragement, o.encouragement);
+        if (r != 0) {
+            return r;
+        }
+        return Integer.compare(this.flammability, o.flammability);
     }
 }

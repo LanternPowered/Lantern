@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternHinge;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.Hinges;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class HingeRegistryModule extends EnumValueRegistryModule<Hinge> {
 
-public final class HingeRegistryModule implements CatalogRegistryModule<Hinge> {
-
-    @RegisterCatalog(Hinges.class) private final Map<String, Hinge> hinges = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternHinge type : LanternHinge.values()) {
-            this.hinges.put(type.getId(), type);
-            this.hinges.put(type.name().toLowerCase(), type);
-        }
+    public HingeRegistryModule() {
+        super(LanternHinge.class, Hinges.class);
     }
-
-    @Override
-    public Optional<Hinge> getById(String id) {
-        return Optional.ofNullable(this.hinges.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<Hinge> getAll() {
-        return ImmutableSet.copyOf(this.hinges.values());
-    }
-
 }

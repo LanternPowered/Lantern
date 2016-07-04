@@ -23,15 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.block.type;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.PropertyProviderCollections;
+import org.lanternpowered.server.block.PropertyProviders;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.item.ItemType;
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+import javax.annotation.Nullable;
+import java.util.function.Function;
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
+public class BlockGlass extends LanternBlockType {
+
+    public BlockGlass(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        super(pluginId, identifier, itemTypeBuilder);
+        this.modifyPropertyProviders(builder -> {
+            builder.add(PropertyProviders.hardness(0.3));
+            builder.add(PropertyProviders.blastResistance(1.5));
+        });
     }
 }

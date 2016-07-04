@@ -25,12 +25,15 @@
  */
 package org.lanternpowered.server.block.type;
 
-import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.PropertyProviderCollections;
 import org.lanternpowered.server.block.PropertyProviders;
-import org.lanternpowered.server.block.trait.LanternBooleanTrait;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.trait.BooleanTrait;
+import org.lanternpowered.server.block.trait.LanternEnumTrait;
+import org.lanternpowered.server.block.trait.LanternIntegerTrait;
+import org.lanternpowered.server.data.type.LanternTreeType;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.block.trait.IntegerTrait;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemType;
 
@@ -38,21 +41,24 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public final class BlockGrass extends LanternBlockType {
+public final class BlockSapling extends VariantBlock<LanternTreeType> {
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+    @SuppressWarnings("unchecked")
+    public static final EnumTrait<LanternTreeType> TYPE = LanternEnumTrait.of("type", (Key) Keys.TREE_TYPE, LanternTreeType.class);
+    public static final IntegerTrait STAGE = LanternIntegerTrait.of("stage", Keys.GROWTH_STAGE, 0, 1);
 
-    public BlockGrass(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, SNOWY);
-        this.modifyDefaultState(state -> state.withTrait(SNOWY, false).get());
+    public BlockSapling(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        super(pluginId, identifier, itemTypeBuilder, TYPE, STAGE);
+        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get().withTrait(STAGE, 0).get());
         this.modifyPropertyProviders(builder -> {
-            builder.add(PropertyProviders.hardness(0.6));
-            builder.add(PropertyProviders.blastResistance(3.0));
+            builder.add(PropertyProviderCollections.PASSABLE);
+            builder.add(PropertyProviders.hardness(0.0));
+            builder.add(PropertyProviders.blastResistance(0.0));
         });
     }
 
     @Override
-    public BlockState removeExtendedState(BlockState blockState) {
-        return blockState.withTrait(SNOWY, false).get();
+    protected String getTranslationKey(LanternTreeType element) {
+        return "tile.sapling." + element.getTranslationKeyBase() + ".name";
     }
 }

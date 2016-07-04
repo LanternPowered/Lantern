@@ -23,15 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.game.registry;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+import java.util.List;
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+public interface CatalogMappingDataHolder {
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
-    }
+    List<CatalogMappingData> getCatalogMappings();
 }

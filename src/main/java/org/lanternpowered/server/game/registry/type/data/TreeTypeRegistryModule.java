@@ -25,13 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+import org.lanternpowered.server.data.type.LanternTreeType;
+import org.spongepowered.api.data.type.TreeType;
+import org.spongepowered.api.data.type.TreeTypes;
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+public final class TreeTypeRegistryModule extends EnumValueRegistryModule<TreeType> {
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
+    public TreeTypeRegistryModule() {
+        super(LanternTreeType.class, TreeTypes.class);
     }
 }

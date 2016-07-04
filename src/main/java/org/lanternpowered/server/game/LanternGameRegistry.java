@@ -33,7 +33,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
@@ -44,7 +43,9 @@ import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
+import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
@@ -70,6 +71,7 @@ import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.WallTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
@@ -146,6 +148,7 @@ import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.StoneType;
+import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.effect.particle.BlockParticle;
@@ -288,6 +291,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SandType.class, new SandTypeRegistryModule())
                 .registerModule(ShrubType.class, new ShrubTypeRegistryModule())
                 .registerModule(StoneType.class, new StoneTypeRegistryModule())
+                .registerModule(TreeType.class, new TreeTypeRegistryModule())
                 .registerModule(WallType.class, new WallTypeRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
@@ -524,12 +528,12 @@ public class LanternGameRegistry implements GameRegistry {
             methods.stream().filter(this::isProperPhase).forEach(method -> this.invokeCustomRegistration(module, method));
             if (this.isProperPhase(module)) {
                 module.registerDefaults();
-                CatalogMapData data = this.getCatalogMapData(module);
-                if (data != null) {
-                    if (data.mappings.isEmpty()) {
+                for (CatalogMappingData data : this.getCatalogMappingData(module)) {
+                    final Map<String, ?> mappings = data.getMappings();
+                    if (mappings.isEmpty()) {
                         return;
                     }
-                    RegistryHelper.mapFields(data.target, data.mappings, data.ignoredFields);
+                    RegistryHelper.mapFields(data.getTarget(), mappings, data.getIgnoredFields());
                 }
             }
         } catch (Exception e) {
@@ -537,25 +541,13 @@ public class LanternGameRegistry implements GameRegistry {
         }
     }
 
-    private static class CatalogMapData {
-
-        private final Map<String, ?> mappings;
-        private final Class<?> target;
-        @Nullable private final Set<String> ignoredFields;
-
-        public CatalogMapData(Class<?> target, Map<String, ?> mappings, @Nullable Set<String> ignoredFields) {
-            this.ignoredFields = ignoredFields;
-            this.mappings = mappings;
-            this.target = target;
-        }
-    }
-
-    @Nullable
-    private CatalogMapData getCatalogMapData(RegistryModule module) {
+    @SuppressWarnings("unchecked")
+    private List<CatalogMappingData> getCatalogMappingData(RegistryModule module) {
         Map<String, ?> mappings = null;
         if (module instanceof AlternateCatalogRegistryModule) {
             mappings = checkNotNull(((AlternateCatalogRegistryModule) module).provideCatalogMap());
         }
+        final List<CatalogMappingData> data = new ArrayList<>();
         for (Field field : module.getClass().getDeclaredFields()) {
             RegisterCatalog annotation = field.getAnnotation(RegisterCatalog.class);
             if (annotation != null) {
@@ -570,11 +562,13 @@ public class LanternGameRegistry implements GameRegistry {
                                 module.getClass().getCanonicalName());
                     }
                 }
-                Set<String> ignored = annotation.ignoredFields().length == 0 ? null : Sets.newHashSet(annotation.ignoredFields());
-                return new CatalogMapData(annotation.value(), mappings, ignored);
+                data.add(new CatalogMappingData(annotation, mappings));
             }
         }
-        return null;
+        if (module instanceof CatalogMappingDataHolder) {
+            data.addAll(((CatalogMappingDataHolder) module).getCatalogMappings());
+        }
+        return data;
     }
 
     private void invokeCustomRegistration(RegistryModule module, Method method) {

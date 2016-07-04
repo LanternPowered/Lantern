@@ -461,49 +461,49 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public Collection<Entity> getEntities() {
         // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
         // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public Optional<Entity> createEntity(EntityType type, Vector3d position) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Optional<Entity> createEntity(EntityType type, Vector3i position) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Optional<Entity> createEntity(DataContainer entityContainer) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
         // TODO Auto-generated method stub
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Collection<TileEntity> getTileEntities() {
         // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
         // TODO Auto-generated method stub
-        return null;
+        return Collections.emptyList();
     }
 
     @Override

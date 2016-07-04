@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.StoneTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class StoneTypeRegistryModule extends EnumValueRegistryModule<StoneType> {
 
-public final class StoneTypeRegistryModule implements CatalogRegistryModule<StoneType> {
-
-    @RegisterCatalog(StoneTypes.class) private final Map<String, StoneType> stoneTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternStoneType type : LanternStoneType.values()) {
-            this.stoneTypes.put(type.getId(), type);
-            this.stoneTypes.put(type.name().toLowerCase(), type);
-        }
+    public StoneTypeRegistryModule() {
+        super(LanternStoneType.class, StoneTypes.class);
     }
-
-    @Override
-    public Optional<StoneType> getById(String id) {
-        return Optional.ofNullable(this.stoneTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<StoneType> getAll() {
-        return ImmutableSet.copyOf(this.stoneTypes.values());
-    }
-
 }

@@ -33,6 +33,9 @@ import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.util.GuavaCollectors;
+
+import java.util.function.Predicate;
 
 @SuppressWarnings("unchecked")
 public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait<E> implements EnumTrait<E> {
@@ -78,4 +81,46 @@ public final class LanternEnumTrait<E extends Enum<E>> extends LanternBlockTrait
         return new LanternEnumTrait<>(name, enumClass, key, ImmutableSet.copyOf(enumClass.getEnumConstants()));
     }
 
+    /**
+     * Creates a new enum trait with the specified name and all the values
+     * from the enum that match the {@link Predicate}.
+     *
+     * <p>The enum must contain values.</p>
+     *
+     * @param name the name
+     * @param key the key that should be attached to the trait
+     * @param enumClass the enum class
+     * @return the enum trait
+     */
+    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key,
+            Class<E> enumClass, Predicate<E> predicate) {
+        checkNotNullOrEmpty(name, "name");
+        checkNotNull(enumClass, "enumClass");
+        checkNotNull(key, "key");
+        checkState(enumClass.getEnumConstants().length != 0, "enumClass must contain values");
+        return new LanternEnumTrait<>(name, enumClass, key, ImmutableSet.copyOf(enumClass.getEnumConstants())
+                .stream().filter(predicate).collect(GuavaCollectors.toImmutableSet()));
+    }
+
+    /**
+     * Creates a new enum trait with the specified name and all the values
+     * from the enum that match the {@link Predicate}.
+     *
+     * <p>The enum must contain values.</p>
+     *
+     * @param name the name
+     * @param key the key that should be attached to the trait
+     * @param value the value
+     * @param values the values
+     * @return the enum trait
+     */
+    public static <E extends Enum<E>> EnumTrait<E> of(String name, Key<? extends Value<E>> key, E value, E... values) {
+        checkNotNullOrEmpty(name, "name");
+        checkNotNull(value, "value");
+        checkNotNull(values, "values");
+        checkNotNull(key, "key");
+        checkState(values.length != 0, "enumClass must contain values");
+        return new LanternEnumTrait<>(name, (Class) value.getClass(), key,
+                ImmutableSet.<E>builder().add(value).add(values).build());
+    }
 }

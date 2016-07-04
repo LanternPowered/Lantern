@@ -23,34 +23,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.game.registry;
 
-import static org.spongepowered.api.data.DataQuery.of;
-import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Maps;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.DirtType;
-import org.spongepowered.api.data.type.StoneType;
-import org.spongepowered.api.data.type.TreeType;
-import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.registry.RegistryModule;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
-public final class KeyRegistryModule implements RegistryModule {
+public final class CatalogMappingData {
 
-    @RegisterCatalog(Keys.class) private final Map<String, Key<?>> mappings = new HashMap<>();
+    private final Class<?> target;
+    private final Set<String> ignoredFields;
+    private final Map<String, ?> mappings;
 
-    @Override
-    public void registerDefaults() {
-        this.mappings.put("dirt_type", makeSingleKey(DirtType.class, Value.class, of("DirtType")));
-        this.mappings.put("snowed", makeSingleKey(Boolean.class, Value.class, of("Snowed")));
-        this.mappings.put("stone_type", makeSingleKey(StoneType.class, Value.class, of("StoneType")));
-        this.mappings.put("tree_type", makeSingleKey(TreeType.class, Value.class, of("TreeType")));
+    public CatalogMappingData(RegisterCatalog annotation, Map<String, ?> mappings) {
+        this(annotation.value(), mappings, ImmutableSet.copyOf(annotation.ignoredFields()));
     }
 
+    public CatalogMappingData(Class<?> target, Map<String, ?> mappings) {
+        this(target, mappings, Collections.emptySet());
+    }
+
+    public CatalogMappingData(Class<?> target, Map<String, ?> mappings, Set<String> ignoredFields) {
+        this.ignoredFields = ImmutableSet.copyOf(checkNotNull(ignoredFields, "ignoredFields"));
+        this.mappings = ImmutableMap.copyOf(checkNotNull(mappings, "mappings"));
+        this.target = checkNotNull(target, "target");
+    }
+
+    public Class<?> getTarget() {
+        return this.target;
+    }
+
+    public Set<String> getIgnoredFields() {
+        return this.ignoredFields;
+    }
+
+    public Map<String, ?> getMappings() {
+        return this.mappings;
+    }
 }

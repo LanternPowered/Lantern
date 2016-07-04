@@ -26,16 +26,17 @@
 package org.lanternpowered.server.block.type;
 
 import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.PropertyProviderCollections;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.item.ItemType;
 
-import java.util.function.Function;
-
 import javax.annotation.Nullable;
+import java.util.function.Function;
 
 public class BlockBedrock extends LanternBlockType {
 
     public BlockBedrock(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder);
+        this.modifyPropertyProviders(builder -> builder.add(PropertyProviderCollections.UNBREAKABLE));
     }
 }

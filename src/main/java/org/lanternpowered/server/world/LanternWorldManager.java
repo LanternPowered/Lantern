@@ -851,6 +851,7 @@ public final class LanternWorldManager {
             // TODO: Use the default generator type once implemented
             rootWorldProperties0 = this.createWorld(WorldArchetype.builder()
                     .from(WorldArchetypes.OVERWORLD)
+                    //.generator(GeneratorTypes.DEBUG)
                     .generator(GeneratorTypes.FLAT)
                     .build(name, name), "", 0);
         }

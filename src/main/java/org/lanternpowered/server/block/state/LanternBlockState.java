@@ -33,13 +33,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableTable;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
+import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -54,6 +54,7 @@ import org.spongepowered.api.util.Cycleable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -62,8 +63,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public final class LanternBlockState implements BlockState, AbstractDirectionRelativePropertyHolder {
@@ -82,6 +81,9 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
 
     // The id of the block state
     private final String id;
+
+    // Whether this state is extended
+    boolean extended;
 
     LanternBlockState(LanternBlockStateMap baseState, ImmutableMap<BlockTrait<?>, Comparable<?>> traitValues) {
         this.traitValues = traitValues;
@@ -126,7 +128,7 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
     }
 
     @Override
-    public BlockType getType() {
+    public LanternBlockType getType() {
         return this.baseState.getBlockType();
     }
 
@@ -396,6 +398,10 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
     public boolean supportsTraitValue(BlockTrait<?> blockTrait, Object value) {
         return this.supportsTrait(checkNotNull(blockTrait, "blockTrait")) &&
                 ((Predicate) blockTrait.getPredicate()).test(checkNotNull(value, "value"));
+    }
+
+    public boolean isExtended() {
+        return this.extended;
     }
 
     @Override

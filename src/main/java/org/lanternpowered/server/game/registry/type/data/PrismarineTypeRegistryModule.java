@@ -25,40 +25,13 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
 import org.spongepowered.api.data.type.PrismarineType;
 import org.spongepowered.api.data.type.PrismarineTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class PrismarineTypeRegistryModule extends EnumValueRegistryModule<PrismarineType> {
 
-public final class PrismarineTypeRegistryModule implements CatalogRegistryModule<PrismarineType> {
-
-    @RegisterCatalog(PrismarineTypes.class) private final Map<String, PrismarineType> prismarineTypes = Maps.newHashMap();
-
-    @Override
-    public void registerDefaults() {
-        for (LanternPrismarineType type : LanternPrismarineType.values()) {
-            this.prismarineTypes.put(type.getId(), type);
-            this.prismarineTypes.put(type.name().toLowerCase(), type);
-        }
+    public PrismarineTypeRegistryModule() {
+        super(LanternPrismarineType.class, PrismarineTypes.class);
     }
-
-    @Override
-    public Optional<PrismarineType> getById(String id) {
-        return Optional.ofNullable(this.prismarineTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<PrismarineType> getAll() {
-        return ImmutableSet.copyOf(this.prismarineTypes.values());
-    }
-
 }

@@ -71,7 +71,7 @@ public final class CommandOp extends CommandProvider {
                             public List<String> complete(CommandSource src, CommandArgs args, CommandContext context) {
                                 final String prefix = args.nextIfPresent().orElse("");
                                 final UserConfig<OpsEntry> config = Lantern.getGame().getOpsConfig();
-                                return Lantern.getGame().getGameProfileManager().getCachedProfiles().stream()
+                                return Lantern.getGame().getGameProfileManager().getCache().getProfiles().stream()
                                         .filter(p -> p.getName().isPresent() && !config.getEntryByUUID(p.getUniqueId()).isPresent())
                                         .map(p -> p.getName().get())
                                         .filter(new StartsWithPredicate(prefix))

@@ -147,4 +147,15 @@ public interface AbstractSubject extends Subject {
         return subject == null ? Collections.emptySet() : subject.getActiveContexts();
     }
 
+    @Override
+    default Optional<String> getOption(String key) {
+        final Subject subject = this.getInternalSubject();
+        return subject == null ? Optional.empty() : subject.getOption(key);
+    }
+
+    @Override
+    default Optional<String> getOption(Set<Context> contexts, String key) {
+        final Subject subject = this.getInternalSubject();
+        return subject == null ? Optional.empty() : subject.getOption(contexts, key);
+    }
 }

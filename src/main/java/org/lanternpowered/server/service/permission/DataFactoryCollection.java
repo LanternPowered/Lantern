@@ -117,6 +117,10 @@ public class DataFactoryCollection extends LanternSubjectCollection {
             return ret;
         }
 
+        @Override
+        public Optional<String> getOption(Set<Context> contexts, String key) {
+            return Optional.empty();
+        }
     }
 
 }

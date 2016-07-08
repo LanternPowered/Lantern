@@ -62,7 +62,7 @@ public class BlockItemType extends LanternItemType {
         itemStack.setQuantity(itemStack.getQuantity() - 1);
         BlockState blockState = ((LanternBlockType) this.blockType).placeBlockAt(player, world, interactionType,
                 itemStack, clickedBlock, blockFace, cursorOffset);
-        world.setBlock(clickedBlock.add(blockFace.toVector3d().toInt()), blockState);
+        world.setBlock(clickedBlock.add(blockFace.asBlockOffset()), blockState);
         return ItemInteractionResult.builder()
                 .type(ItemInteractionResult.Type.SUCCESS)
                 .resultItem(itemStack.createSnapshot())

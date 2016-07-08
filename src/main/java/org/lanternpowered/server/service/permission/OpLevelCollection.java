@@ -126,6 +126,10 @@ public class OpLevelCollection extends LanternSubjectCollection {
             return this.data;
         }
 
+        @Override
+        public Optional<String> getOption(Set<Context> contexts, String key) {
+            return Optional.empty();
+        }
     }
 
 }

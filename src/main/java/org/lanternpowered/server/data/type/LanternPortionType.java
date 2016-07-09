@@ -23,34 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.block;
+package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.PropertyProvider;
-import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.data.type.PortionType;
 
-import java.util.Optional;
+public enum LanternPortionType implements PortionType, SimpleCatalogType, InternalCatalogType {
 
-import javax.annotation.Nullable;
+    BOTTOM        ("bottom"),
+    TOP           ("top"),
+    ;
 
-public final class BlockPropertyStore<T extends Property<?,?>> extends AbstractBlockPropertyStore<T> {
+    private final String identifier;
 
-    private final Class<T> propertyType;
-
-    public BlockPropertyStore(Class<T> propertyType) {
-        this.propertyType = propertyType;
+    LanternPortionType(String identifier) {
+        this.identifier = identifier;
     }
 
     @Override
-    protected Optional<T> getFor(BlockState blockState, @Nullable Location<World> location,
-             @Nullable Direction direction) {
-        final Optional<PropertyProvider<? extends T>> provider = ((LanternBlockType) blockState.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.of(provider.get().get(blockState, location, direction)) : Optional.empty();
+    public String getId() {
+        return this.identifier;
     }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
+    }
+
 }

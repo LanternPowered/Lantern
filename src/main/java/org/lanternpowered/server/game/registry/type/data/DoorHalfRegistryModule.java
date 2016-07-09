@@ -23,34 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.block;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.PropertyProvider;
-import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.lanternpowered.server.data.LanternDoorHalf;
 
-import java.util.Optional;
+public final class DoorHalfRegistryModule extends EnumValueRegistryModule<LanternDoorHalf> {
 
-import javax.annotation.Nullable;
-
-public final class BlockPropertyStore<T extends Property<?,?>> extends AbstractBlockPropertyStore<T> {
-
-    private final Class<T> propertyType;
-
-    public BlockPropertyStore(Class<T> propertyType) {
-        this.propertyType = propertyType;
-    }
-
-    @Override
-    protected Optional<T> getFor(BlockState blockState, @Nullable Location<World> location,
-             @Nullable Direction direction) {
-        final Optional<PropertyProvider<? extends T>> provider = ((LanternBlockType) blockState.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.of(provider.get().get(blockState, location, direction)) : Optional.empty();
+    public DoorHalfRegistryModule() {
+        super(LanternDoorHalf.class, null);
     }
 }

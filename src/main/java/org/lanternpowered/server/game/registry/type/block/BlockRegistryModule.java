@@ -51,7 +51,11 @@ import org.lanternpowered.server.block.type.BlockLog2;
 import org.lanternpowered.server.block.type.BlockPlanks;
 import org.lanternpowered.server.block.type.BlockSand;
 import org.lanternpowered.server.block.type.BlockSapling;
+import org.lanternpowered.server.block.type.BlockSlabBase;
 import org.lanternpowered.server.block.type.BlockStone;
+import org.lanternpowered.server.block.type.BlockStoneSlab1;
+import org.lanternpowered.server.block.type.BlockStoneSlab2;
+import org.lanternpowered.server.block.type.BlockStoneSlabBase;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.spongepowered.api.block.BlockState;
@@ -127,7 +131,7 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
             byte value = checkNotNull(stateToDataConverter.apply(blockState));
             if (usedValues.containsKey(value)) {
                 throw new IllegalStateException("The data value " + value + " for state '" + blockState.getId() +
-                        "' is already used by '" + usedValues.get(value) + "'");
+                        "' is already used by '" + usedValues.get(value).getId() + "'");
             }
             usedValues.put(value, blockState);
             final short internalStateId =  (short) (internalStateIdBase | value & 0xf);
@@ -264,12 +268,32 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
             final byte axis = (byte) blockState.getTraitValue(BlockLog.AXIS).get().getInternalId();
             return (byte) (axis << 2 | treeType);
         });
+        this.register(43, new BlockStoneSlab1("minecraft", "double_stone_slab", BlockSlabBase.ITEM_TYPE_BUILDER, true), blockState -> {
+            final byte slabType = (byte) blockState.getTraitValue(BlockStoneSlab1.TYPE).get().getInternalId();
+            final byte seamless = (byte) (blockState.getTraitValue(BlockStoneSlabBase.SEAMLESS).get() ? 1 : 0);
+            return (byte) (seamless << 3 | slabType);
+        });
+        this.register(44, new BlockStoneSlab1("minecraft", "stone_slab", BlockSlabBase.ITEM_TYPE_BUILDER, false), blockState -> {
+            final byte slabType = (byte) blockState.getTraitValue(BlockStoneSlab1.TYPE).get().getInternalId();
+            final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
+            return (byte) (portion << 3 | slabType);
+        });
         this.register(162, new BlockLog2("minecraft", "log2", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final byte treeType = (byte) (blockState.getTraitValue(BlockLog2.TYPE).get().getInternalId() - 4);
             final byte axis = (byte) blockState.getTraitValue(BlockLog.AXIS).get().getInternalId();
             return (byte) (axis << 2 | treeType);
         });
         this.register(166, new BlockBarrier("minecraft", "barrier", DEFAULT_ITEM_TYPE_BUILDER));
+        this.register(181, new BlockStoneSlab2("minecraft", "double_stone_slab2", BlockSlabBase.ITEM_TYPE_BUILDER, true), blockState -> {
+            final byte slabType = (byte) (blockState.getTraitValue(BlockStoneSlab2.TYPE).get().getInternalId() - 8);
+            final byte seamless = (byte) (blockState.getTraitValue(BlockStoneSlabBase.SEAMLESS).get() ? 1 : 0);
+            return (byte) (seamless << 3 | slabType);
+        });
+        this.register(182, new BlockStoneSlab2("minecraft", "stone_slab2", BlockSlabBase.ITEM_TYPE_BUILDER, false), blockState -> {
+            final byte slabType = (byte) (blockState.getTraitValue(BlockStoneSlab2.TYPE).get().getInternalId() - 8);
+            final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
+            return (byte) (portion << 3 | slabType);
+        });
     }
 
 }

@@ -23,34 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.block;
+package org.lanternpowered.server.block.type;
 
-import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.PropertyProvider;
-import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.Property;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.lanternpowered.server.block.trait.LanternEnumTrait;
+import org.lanternpowered.server.data.type.LanternSlabType;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.ItemType;
 
-import java.util.Optional;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public final class BlockPropertyStore<T extends Property<?,?>> extends AbstractBlockPropertyStore<T> {
+public class BlockStoneSlab2 extends BlockStoneSlabBase {
 
-    private final Class<T> propertyType;
+    @SuppressWarnings("unchecked")
+    public static final EnumTrait<LanternSlabType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.SLAB_TYPE, LanternSlabType.class,
+            type -> type.ordinal() >= 8 && type.ordinal() < 16);
 
-    public BlockPropertyStore(Class<T> propertyType) {
-        this.propertyType = propertyType;
+    public BlockStoneSlab2(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder, boolean doubleSlab) {
+        super(pluginId, identifier, "stoneSlab2", itemTypeBuilder, doubleSlab, TYPE);
+        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternSlabType.RED_SAND).get());
     }
 
     @Override
-    protected Optional<T> getFor(BlockState blockState, @Nullable Location<World> location,
-             @Nullable Direction direction) {
-        final Optional<PropertyProvider<? extends T>> provider = ((LanternBlockType) blockState.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.of(provider.get().get(blockState, location, direction)) : Optional.empty();
+    public BlockType getHalf() {
+        return this.doubleBlock ? BlockTypes.STONE_SLAB2 : this;
+    }
+
+    @Override
+    public BlockType getDouble() {
+        return this.doubleBlock ? this : BlockTypes.DOUBLE_STONE_SLAB2;
     }
 }

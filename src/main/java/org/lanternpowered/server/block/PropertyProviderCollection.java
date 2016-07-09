@@ -125,6 +125,7 @@ public final class PropertyProviderCollection {
 
         @Override
         public Builder from(PropertyProviderCollection value) {
+            this.propertyProviders.clear();
             this.propertyProviders.putAll(value.propertyProviders);
             return this;
         }

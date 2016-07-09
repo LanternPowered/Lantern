@@ -32,6 +32,7 @@ import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
@@ -43,11 +44,11 @@ import javax.annotation.Nullable;
 
 public class BlockItemType extends LanternItemType {
 
-    private final BlockType blockType;
+    protected final LanternBlockType blockType;
 
     public BlockItemType(String pluginId, String identifier, BlockType blockType) {
         super(pluginId, identifier, checkNotNull(blockType, "blockType").getTranslation());
-        this.blockType = blockType;
+        this.blockType = (LanternBlockType) blockType;
     }
 
     @Override
@@ -58,15 +59,20 @@ public class BlockItemType extends LanternItemType {
     @Override
     public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
             ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
-        itemStack = itemStack.copy();
-        itemStack.setQuantity(itemStack.getQuantity() - 1);
-        BlockState blockState = ((LanternBlockType) this.blockType).placeBlockAt(player, world, interactionType,
+        if (world.getProperty(clickedBlock, ReplaceableProperty.class).get().getValue() != Boolean.TRUE) {
+            clickedBlock = clickedBlock.add(blockFace.getOpposite().asBlockOffset());
+        }
+        Optional<BlockState> blockState = this.blockType.placeBlockAt(player, world, interactionType,
                 itemStack, clickedBlock, blockFace, cursorOffset);
-        world.setBlock(clickedBlock.add(blockFace.asBlockOffset()), blockState);
-        return ItemInteractionResult.builder()
-                .type(ItemInteractionResult.Type.SUCCESS)
-                .resultItem(itemStack.createSnapshot())
-                .build();
+        if (blockState.isPresent()) {
+            itemStack = itemStack.copy();
+            itemStack.setQuantity(itemStack.getQuantity() - 1);
+            world.setBlock(clickedBlock, blockState.get());
+            return ItemInteractionResult.builder()
+                    .type(ItemInteractionResult.Type.SUCCESS)
+                    .resultItem(itemStack.createSnapshot())
+                    .build();
+        }
+        return ItemInteractionResult.pass();
     }
-
 }

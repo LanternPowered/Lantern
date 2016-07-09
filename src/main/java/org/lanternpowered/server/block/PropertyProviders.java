@@ -37,6 +37,7 @@ import org.spongepowered.api.data.property.block.PassableProperty;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.data.property.block.SolidCubeProperty;
 import org.spongepowered.api.data.property.block.StatisticsTrackedProperty;
+import org.spongepowered.api.data.property.block.SurrogateBlockProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
 
 import java.util.EnumMap;
@@ -66,6 +67,9 @@ public final class PropertyProviders {
 
     private static final StatisticsTrackedProperty STATISTICS_TRACKED_PROPERTY_TRUE = new StatisticsTrackedProperty(true);
     private static final StatisticsTrackedProperty STATISTICS_TRACKED_PROPERTY_FALSE = new StatisticsTrackedProperty(false);
+
+    private static final SurrogateBlockProperty SURROGATE_BLOCK_PROPERTY_TRUE = new SurrogateBlockProperty(true);
+    private static final SurrogateBlockProperty SURROGATE_BLOCK_PROPERTY_FALSE = new SurrogateBlockProperty(false);
 
     static {
         for (MatterProperty.Matter matter : MatterProperty.Matter.values()) {
@@ -226,6 +230,20 @@ public final class PropertyProviders {
         return PropertyProviderCollection.builder()
                 .add(StatisticsTrackedProperty.class, (blockState, location, face) ->
                         provider.get(blockState, location, face) ? STATISTICS_TRACKED_PROPERTY_TRUE : STATISTICS_TRACKED_PROPERTY_FALSE)
+                .build();
+    }
+
+    public static PropertyProviderCollection surrogateBlock(boolean constant) {
+        final SurrogateBlockProperty property = constant ? SURROGATE_BLOCK_PROPERTY_TRUE : SURROGATE_BLOCK_PROPERTY_FALSE;
+        return PropertyProviderCollection.builder()
+                .add(SurrogateBlockProperty.class, (blockState, location, face) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection surrogateBlock(ObjectProvider<Boolean> provider) {
+        return PropertyProviderCollection.builder()
+                .add(SurrogateBlockProperty.class, (blockState, location, face) ->
+                        provider.get(blockState, location, face) ? SURROGATE_BLOCK_PROPERTY_TRUE : SURROGATE_BLOCK_PROPERTY_FALSE)
                 .build();
     }
 

@@ -41,6 +41,7 @@ import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.bossbar.LanternBossBarBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
+import org.lanternpowered.server.data.LanternDoorHalf;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
@@ -57,6 +58,7 @@ import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegist
 import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.DoorHalfRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DoublePlantTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HingeRegistryModule;
@@ -65,11 +67,13 @@ import org.lanternpowered.server.game.registry.type.data.LogAxisRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PistonTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.PortionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PrismarineTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.WallTypeRegistryModule;
@@ -142,11 +146,13 @@ import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.PistonType;
 import org.spongepowered.api.data.type.PlantType;
+import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PrismarineType;
 import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.ShrubType;
+import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.WallType;
@@ -277,6 +283,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BrickType.class, new BrickTypeRegistryModule())
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())
                 .registerModule(DisguisedBlockType.class, new DisguisedBlockTypeRegistryModule())
+                .registerModule(LanternDoorHalf.class, new DoorHalfRegistryModule())
                 .registerModule(DoublePlantType.class, new DoublePlantTypeRegistryModule())
                 .registerModule(HandType.class, new HandTypeRegistryModule())
                 .registerModule(Hinge.class, new HingeRegistryModule())
@@ -285,12 +292,14 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
                 .registerModule(PistonType.class, new PistonTypeRegistryModule())
                 .registerModule(PlantType.class, new PlantTypeRegistryModule())
+                .registerModule(PortionType.class, new PortionTypeRegistryModule())
                 .registerModule(PrismarineType.class, new PrismarineTypeRegistryModule())
                 .registerModule(QuartzType.class, new QuartzTypeRegistryModule())
                 .registerModule(SandstoneType.class, new SandstoneTypeRegistryModule())
                 .registerModule(SandType.class, new SandTypeRegistryModule())
                 .registerModule(ShrubType.class, new ShrubTypeRegistryModule())
                 .registerModule(StoneType.class, new StoneTypeRegistryModule())
+                .registerModule(SlabType.class, new SlabTypeRegistryModule())
                 .registerModule(TreeType.class, new TreeTypeRegistryModule())
                 .registerModule(WallType.class, new WallTypeRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())

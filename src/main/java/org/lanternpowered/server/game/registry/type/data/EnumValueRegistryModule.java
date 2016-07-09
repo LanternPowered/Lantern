@@ -50,11 +50,11 @@ public class EnumValueRegistryModule<V extends CatalogType>
     private final Map<String, V> values = new HashMap<>();
     @Nullable private Set<V> unmodifiableValues;
     private final Class<? extends Enum<?>> enumType;
-    private final Class<?> catalogClass;
+    @Nullable private final Class<?> catalogClass;
 
-    public EnumValueRegistryModule(Class<? extends Enum<?>> enumType, Class<?> catalogClass) {
+    public EnumValueRegistryModule(Class<? extends Enum<?>> enumType, @Nullable Class<?> catalogClass) {
         this.enumType = checkNotNull(enumType, "enumType");
-        this.catalogClass = checkNotNull(catalogClass, "catalogClass");
+        this.catalogClass = catalogClass;
     }
 
     @SuppressWarnings("unchecked")
@@ -80,6 +80,6 @@ public class EnumValueRegistryModule<V extends CatalogType>
 
     @Override
     public List<CatalogMappingData> getCatalogMappings() {
-        return ImmutableList.of(new CatalogMappingData(this.catalogClass, this.values));
+        return this.catalogClass == null ? ImmutableList.of() : ImmutableList.of(new CatalogMappingData(this.catalogClass, this.values));
     }
 }

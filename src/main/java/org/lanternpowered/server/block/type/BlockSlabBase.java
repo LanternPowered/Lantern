@@ -25,54 +25,60 @@
  */
 package org.lanternpowered.server.block.type;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
+import org.apache.commons.lang3.ArrayUtils;
+import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
-import org.lanternpowered.server.data.type.LanternLogAxis;
-import org.lanternpowered.server.data.type.LanternTreeType;
-import org.lanternpowered.server.item.ItemInteractionType;
-import org.spongepowered.api.block.BlockState;
+import org.lanternpowered.server.data.type.LanternPortionType;
+import org.lanternpowered.server.item.BlockItemSlab;
+import org.lanternpowered.server.item.BlockItemType;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.World;
+
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-import java.util.Optional;
-import java.util.function.Function;
+public abstract class BlockSlabBase extends LanternBlockType {
 
-public class BlockLog extends VariantBlock<LanternTreeType> {
+    public static final Function<BlockType, ItemType> ITEM_TYPE_BUILDER =
+            type -> new BlockItemSlab(((LanternBlockType) type).getPluginId(), type.getName(), (BlockSlabBase) type);
 
     @SuppressWarnings("unchecked")
-    public static final EnumTrait<LanternLogAxis> AXIS = LanternEnumTrait.of("axis", (Key) Keys.LOG_AXIS, LanternLogAxis.class);
+    public static final EnumTrait<LanternPortionType> PORTION = LanternEnumTrait.of("half", (Key) Keys.PORTION_TYPE, LanternPortionType.class);
 
-    public BlockLog(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder,
-            EnumTrait<LanternTreeType> treeTrait) {
-        super(pluginId, identifier, itemTypeBuilder, treeTrait, AXIS);
+    private final EnumTrait<?> variantTrait;
+    protected final boolean doubleBlock;
+
+    public BlockSlabBase(String pluginId, String identifier, String translationKey, @Nullable Function<BlockType, ItemType> itemTypeBuilder,
+            boolean doubleBlock, EnumTrait<?> variantTrait, BlockTrait<?>... blockTraits) {
+        super(pluginId, identifier, translationKey, itemTypeBuilder, ArrayUtils.add(blockTraits, variantTrait));
+        this.variantTrait = variantTrait;
+        this.doubleBlock = doubleBlock;
         this.modifyPropertyProviders(builder -> {
-            builder.add(PropertyProviders.hardness(2.0));
-            builder.add(PropertyProviders.blastResistance(5.0));
-            builder.add(PropertyProviders.flammableInfo(5, 5));
+            if (!doubleBlock) {
+                builder.add(PropertyProviders.solidCube(false));
+            }
         });
     }
 
-    @Override
-    protected String getTranslationKey(LanternTreeType element) {
-        return "tile.log." + element.getTranslationKeyBase() + ".name";
+    public EnumTrait<?> getVariantTrait() {
+        return this.variantTrait;
     }
 
-    @Override
-    public Optional<BlockState> placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
-        final BlockState state = super.placeBlockAt(player, world, interactionType, itemStack,
-                clickedBlock, blockFace, cursorOffset).orElse(this.getDefaultState());
-        return Optional.of(state.withTrait(AXIS, LanternLogAxis.fromDirection(blockFace)).get());
+    public boolean isHalf() {
+        return !this.doubleBlock;
     }
+
+    public boolean isDouble() {
+        return this.doubleBlock;
+    }
+
+    public abstract BlockType getHalf();
+
+    public abstract BlockType getDouble();
 }

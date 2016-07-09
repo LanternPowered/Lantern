@@ -43,6 +43,9 @@ public final class PropertyProviderCollections {
             .add(PropertyProviders.solidCube(true))
             .add(PropertyProviders.gravityAffected(false))
             .add(PropertyProviders.unbreakable(false))
+            .add(PropertyProviders.replaceable(false))
+            .add(PropertyProviders.surrogateBlock(false))
+            .add(PropertyProviders.statisticsTracked(true))
             .build();
 
     public static final PropertyProviderCollection PASSABLE = PropertyProviderCollection.builder()

@@ -31,12 +31,12 @@ final class CodecUtils {
 
     public static Direction fromFace(int face) {
         switch (face) {
-            case 0: return Direction.DOWN;
-            case 1: return Direction.UP;
-            case 2: return Direction.NORTH;
-            case 3: return Direction.SOUTH;
-            case 4: return Direction.WEST;
-            case 5: return Direction.EAST;
+            case 0: return Direction.UP;
+            case 1: return Direction.DOWN;
+            case 2: return Direction.SOUTH;
+            case 3: return Direction.NORTH;
+            case 4: return Direction.EAST;
+            case 5: return Direction.WEST;
             default:
                 throw new IllegalStateException("Unknown face: " + face);
         }

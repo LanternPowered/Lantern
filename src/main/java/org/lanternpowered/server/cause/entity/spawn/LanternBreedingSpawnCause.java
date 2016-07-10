@@ -36,7 +36,7 @@ public class LanternBreedingSpawnCause extends AbstractEntitySpawnCause implemen
 
     private final Entity mate;
 
-    public LanternBreedingSpawnCause(LanternBreedingSpawnCauseBuilder builder) {
+    protected LanternBreedingSpawnCause(LanternBreedingSpawnCauseBuilder builder) {
         super(builder);
         this.mate = builder.mate;
     }

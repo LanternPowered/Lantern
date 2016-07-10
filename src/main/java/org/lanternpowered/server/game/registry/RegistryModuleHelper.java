@@ -37,6 +37,6 @@ public class RegistryModuleHelper {
     public static void validateIdentifier(@Nullable String identifier) {
         checkArgument(identifier != null, "The identifier may not be null.");
         checkArgument(!identifier.isEmpty(), "The id may not be empty.");
-        checkArgument(identifier.indexOf(' ') == -1, "The id (" + identifier + ") may not contain a space.");
+        checkArgument(identifier.indexOf(' ') == -1, "The id (" + identifier + ") may not contain a spaces.");
     }
 }

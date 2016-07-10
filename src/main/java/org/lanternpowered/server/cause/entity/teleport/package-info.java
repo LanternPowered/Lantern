@@ -23,23 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.spawn;
-
-import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.common.AbstractSpawnCause;
-import org.spongepowered.api.world.weather.Weather;
-
-public class LanternWeatherSpawnCause extends AbstractSpawnCause implements WeatherSpawnCause {
-
-    private final Weather weather;
-
-    protected LanternWeatherSpawnCause(LanternWeatherSpawnCauseBuilder builder) {
-        super(builder);
-        this.weather = builder.weather;
-    }
-
-    @Override
-    public Weather getWeather() {
-        return this.weather;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.cause.entity.teleport;

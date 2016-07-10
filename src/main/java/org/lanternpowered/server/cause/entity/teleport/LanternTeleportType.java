@@ -23,23 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.spawn;
+package org.lanternpowered.server.cause.entity.teleport;
 
-import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.common.AbstractSpawnCause;
-import org.spongepowered.api.world.weather.Weather;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 
-public class LanternWeatherSpawnCause extends AbstractSpawnCause implements WeatherSpawnCause {
+public class LanternTeleportType extends PluginCatalogType.Base implements TeleportType {
 
-    private final Weather weather;
-
-    protected LanternWeatherSpawnCause(LanternWeatherSpawnCauseBuilder builder) {
-        super(builder);
-        this.weather = builder.weather;
-    }
-
-    @Override
-    public Weather getWeather() {
-        return this.weather;
+    public LanternTeleportType(String pluginId, String name) {
+        super(pluginId, name);
     }
 }

@@ -29,7 +29,7 @@ import org.spongepowered.api.event.cause.entity.spawn.common.AbstractSpawnCause;
 
 public class LanternSpawnCause extends AbstractSpawnCause {
 
-    public LanternSpawnCause(LanternSpawnCauseBuilder builder) {
+    protected LanternSpawnCause(LanternSpawnCauseBuilder builder) {
         super(builder);
     }
 }

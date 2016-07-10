@@ -23,23 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.cause.entity.spawn;
+package org.lanternpowered.server.cause.entity.teleport;
 
-import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.common.AbstractSpawnCause;
-import org.spongepowered.api.world.weather.Weather;
+import static com.google.common.base.Preconditions.checkState;
 
-public class LanternWeatherSpawnCause extends AbstractSpawnCause implements WeatherSpawnCause {
+import org.spongepowered.api.event.cause.entity.teleport.EntityTeleportCause;
+import org.spongepowered.api.event.cause.entity.teleport.common.AbstractEntityTeleportCauseBuilder;
 
-    private final Weather weather;
-
-    protected LanternWeatherSpawnCause(LanternWeatherSpawnCauseBuilder builder) {
-        super(builder);
-        this.weather = builder.weather;
-    }
+public class LanternEntityTeleportCauseBuilder extends AbstractEntityTeleportCauseBuilder<EntityTeleportCause, EntityTeleportCause.Builder>
+        implements EntityTeleportCause.Builder {
 
     @Override
-    public Weather getWeather() {
-        return this.weather;
+    public EntityTeleportCause build() {
+        checkState(this.teleportType != null, "The teleport type must be set");
+        checkState(this.entity != null, "The entity must be set");
+        return new LanternEntityTeleportCause(this);
     }
 }

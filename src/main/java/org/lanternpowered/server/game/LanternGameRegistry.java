@@ -46,6 +46,9 @@ import org.lanternpowered.server.cause.entity.spawn.LanternEntitySpawnCauseBuild
 import org.lanternpowered.server.cause.entity.spawn.LanternMobSpawnerSpawnCauseBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternSpawnCauseBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternWeatherSpawnCauseBuilder;
+import org.lanternpowered.server.cause.entity.teleport.LanternEntityTeleportCauseBuilder;
+import org.lanternpowered.server.cause.entity.teleport.LanternPortalTeleportCauseBuilder;
+import org.lanternpowered.server.cause.entity.teleport.LanternTeleportCauseBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
@@ -63,6 +66,7 @@ import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModu
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
@@ -188,6 +192,10 @@ import org.spongepowered.api.event.cause.entity.spawn.MobSpawnerSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
 import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCause;
+import org.spongepowered.api.event.cause.entity.teleport.EntityTeleportCause;
+import org.spongepowered.api.event.cause.entity.teleport.PortalTeleportCause;
+import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
+import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
@@ -296,6 +304,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
+                .registerModule(TeleportType.class, new TeleportTypeRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
                 .registerModule(BrickType.class, new BrickTypeRegistryModule())
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())
@@ -378,6 +387,9 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(MobSpawnerSpawnCause.Builder.class, LanternMobSpawnerSpawnCauseBuilder::new)
                 .registerBuilderSupplier(SpawnCause.Builder.class, LanternSpawnCauseBuilder::new)
                 .registerBuilderSupplier(WeatherSpawnCause.Builder.class, LanternWeatherSpawnCauseBuilder::new)
+                .registerBuilderSupplier(EntityTeleportCause.Builder.class, LanternEntityTeleportCauseBuilder::new)
+                .registerBuilderSupplier(PortalTeleportCause.Builder.class, LanternPortalTeleportCauseBuilder::new)
+                .registerBuilderSupplier(TeleportCause.Builder.class, LanternTeleportCauseBuilder::new)
                 ;
         this.registerFactories();
     }

@@ -52,8 +52,7 @@ public final class BlockSapling extends VariantBlock<LanternTreeType> {
         this.modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get().withTrait(STAGE, 0).get());
         this.modifyPropertyProviders(builder -> {
             builder.add(PropertyProviderCollections.PASSABLE);
-            builder.add(PropertyProviders.hardness(0.0));
-            builder.add(PropertyProviders.blastResistance(0.0));
+            builder.add(PropertyProviderCollections.INSTANT_BROKEN);
         });
     }
 

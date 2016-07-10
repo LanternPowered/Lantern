@@ -51,25 +51,29 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
-
 public class LanternBlockSnapshot implements BlockSnapshot {
 
     private final WeakWorldReference world;
-    @Nullable private final Vector3i position;
+    private final Vector3i position;
     private final BlockState state;
+    private final Optional<UUID> notifier;
+    private final Optional<UUID> creator;
 
-    public LanternBlockSnapshot(Location<World> location, BlockState blockState) {
+    public LanternBlockSnapshot(Location<World> location, BlockState blockState,
+            Optional<UUID> notifier, Optional<UUID> creator) {
         this(new WeakWorldReference(checkNotNull(location, "location").getExtent()),
-                location.getBlockPosition(), blockState);
+                location.getBlockPosition(), blockState, notifier, creator);
     }
 
-    public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState) {
-        this(new WeakWorldReference(checkNotNull(worldUUID, "worldUUID")), position, blockState);
+    public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState,
+            Optional<UUID> notifier, Optional<UUID> creator) {
+        this(new WeakWorldReference(checkNotNull(worldUUID, "worldUUID")), position, blockState, notifier, creator);
     }
 
     private LanternBlockSnapshot(WeakWorldReference world, Vector3i position,
-            BlockState blockState) {
+            BlockState blockState, Optional<UUID> notifier, Optional<UUID> creator) {
+        this.notifier = checkNotNull(notifier, "notifier");
+        this.creator = checkNotNull(creator, "creator");
         this.state = checkNotNull(blockState, "blockState");
         this.position = checkNotNull(position, "position");
         this.world = world;
@@ -105,7 +109,7 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public LanternBlockSnapshot copy() {
-        return new LanternBlockSnapshot(this.world == null ? null : this.world.copy(), this.position, this.state);
+        return new LanternBlockSnapshot(this.world == null ? null : this.world.copy(), this.position, this.state, notifier, creator);
     }
 
     @Override
@@ -248,7 +252,7 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     public BlockSnapshot withLocation(Location<World> location) {
         checkNotNull(location, "location");
         return new LanternBlockSnapshot(new WeakWorldReference(location.getExtent()),
-                location.getBlockPosition(), this.state);
+                location.getBlockPosition(), this.state, notifier, creator);
     }
 
     @Override
@@ -259,18 +263,25 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public boolean restore(boolean force, boolean notifyNeighbors) {
-        // TODO Auto-generated method stub
-        return false;
+        Location<World> loc = this.getLocation().orElse(null);
+        if (loc == null || (!force && loc.getBlockType() != this.state.getType())) {
+            return false;
+        }
+        loc.setBlock(this.state, notifyNeighbors);
+        final World world = loc.getExtent();
+        world.setCreator(this.position, this.creator.orElse(null));
+        world.setNotifier(this.position, this.notifier.orElse(null));
+        return true;
     }
 
     @Override
     public Optional<UUID> getCreator() {
-        return Optional.empty();
+        return this.creator;
     }
 
     @Override
     public Optional<UUID> getNotifier() {
-        return Optional.empty();
+        return this.notifier;
     }
 
     @Override

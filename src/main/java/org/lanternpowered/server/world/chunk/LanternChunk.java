@@ -1005,7 +1005,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
         this.checkVolumeBounds(x, y, z);
-        return new LanternBlockSnapshot(new Location<>(this.world, x, y, z), this.getBlock(x, y, z));
+        return new LanternBlockSnapshot(new Location<>(this.world, x, y, z), this.getBlock(x, y, z),
+                this.getNotifier(x, y, z), this.getCreator(x, y, z));
     }
 
     @Override

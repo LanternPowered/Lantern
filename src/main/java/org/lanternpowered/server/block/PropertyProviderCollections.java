@@ -60,6 +60,11 @@ public final class PropertyProviderCollections {
             .add(PropertyProviders.statisticsTracked(false))
             .build();
 
+    public static final PropertyProviderCollection INSTANT_BROKEN = PropertyProviderCollection.builder()
+            .add(PropertyProviders.hardness(0.0))
+            .add(PropertyProviders.blastResistance(0.0))
+            .build();
+
     public static final PropertyProviderCollection DEFAULT_GAS = DEFAULT.toBuilder()
             .add(PropertyProviders.matter(MatterProperty.Matter.GAS))
             .add(PropertyProviders.replaceable(true))

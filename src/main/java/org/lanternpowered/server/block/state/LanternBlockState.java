@@ -27,6 +27,7 @@ package org.lanternpowered.server.block.state;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableBiMap;
 import com.google.common.collect.ImmutableMap;
@@ -293,7 +294,9 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
 
     @Override
     public BlockSnapshot snapshotFor(Location<World> location) {
-        return new LanternBlockSnapshot(location, this);
+        final World world = location.getExtent();
+        final Vector3i pos = location.getBlockPosition();
+        return new LanternBlockSnapshot(location, this, world.getNotifier(pos), world.getCreator(pos));
     }
 
     @Override

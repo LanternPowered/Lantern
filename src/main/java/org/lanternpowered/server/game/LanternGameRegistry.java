@@ -37,8 +37,15 @@ import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternOperation;
+import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.bossbar.LanternBossBarBuilder;
+import org.lanternpowered.server.cause.entity.spawn.LanternBlockSpawnCauseBuilder;
+import org.lanternpowered.server.cause.entity.spawn.LanternBreedingSpawnCauseBuilder;
+import org.lanternpowered.server.cause.entity.spawn.LanternEntitySpawnCauseBuilder;
+import org.lanternpowered.server.cause.entity.spawn.LanternMobSpawnerSpawnCauseBuilder;
+import org.lanternpowered.server.cause.entity.spawn.LanternSpawnCauseBuilder;
+import org.lanternpowered.server.cause.entity.spawn.LanternWeatherSpawnCauseBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
@@ -55,6 +62,7 @@ import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
@@ -130,6 +138,7 @@ import org.lanternpowered.server.world.LanternWorldArchetypeBuilder;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.boss.BossBarColor;
@@ -172,6 +181,13 @@ import org.spongepowered.api.entity.ai.task.AbstractAITask;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
+import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.MobSpawnerSpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
+import org.spongepowered.api.event.cause.entity.spawn.WeatherSpawnCause;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
@@ -279,6 +295,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
+                .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
                 .registerModule(BrickType.class, new BrickTypeRegistryModule())
                 .registerModule(DirtType.class, new DirtTypeRegistryModule())
@@ -339,6 +356,7 @@ public class LanternGameRegistry implements GameRegistry {
                 ;
         this.registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
+                .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
                 .registerBuilderSupplier(NoteParticle.Builder.class, LanternParticleEffectBuilder.Note::new)
@@ -354,6 +372,12 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(Scoreboard.Builder.class, LanternScoreboardBuilder::new)
                 .registerBuilderSupplier(Team.Builder.class, LanternTeamBuilder::new)
                 .registerBuilderSupplier(ServerBossBar.Builder.class, LanternBossBarBuilder::new)
+                .registerBuilderSupplier(BlockSpawnCause.Builder.class, LanternBlockSpawnCauseBuilder::new)
+                .registerBuilderSupplier(BreedingSpawnCause.Builder.class, LanternBreedingSpawnCauseBuilder::new)
+                .registerBuilderSupplier(EntitySpawnCause.Builder.class, LanternEntitySpawnCauseBuilder::new)
+                .registerBuilderSupplier(MobSpawnerSpawnCause.Builder.class, LanternMobSpawnerSpawnCauseBuilder::new)
+                .registerBuilderSupplier(SpawnCause.Builder.class, LanternSpawnCauseBuilder::new)
+                .registerBuilderSupplier(WeatherSpawnCause.Builder.class, LanternWeatherSpawnCauseBuilder::new)
                 ;
         this.registerFactories();
     }

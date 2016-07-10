@@ -45,7 +45,7 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnType;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.CreativeInventoryEvent;
@@ -181,24 +181,9 @@ public class PlayerContainerSession {
         ItemStack itemStack = LanternItemStack.toNullable(message.getItemStack());
         int slotIndex = message.getSlot();
         if (slotIndex < 0) {
-            // TODO: Implement spawn causes
-            SpawnType dummySpawnType = new SpawnType() {
+            Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
+                    .type(SpawnTypes.DROPPED_ITEM).build()).named(NamedCause.SOURCE, this.player).build();
 
-                @Override
-                public String getId() {
-                    return "dropped_item";
-                }
-
-                @Override
-                public String getName() {
-                    return "dropped_item";
-                }
-            };
-            SpawnCause spawnCause = () -> dummySpawnType;
-
-            // Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
-            //         .type(dummySpawnType).build()).named(NamedCause.SOURCE, this.player).build();
-            Cause cause = Cause.builder().named("SpawnCause", spawnCause).named(NamedCause.SOURCE, this.player).build();
             List<Entity> entities = new ArrayList<>();
             World world = this.player.getWorld();
 
@@ -592,24 +577,8 @@ public class PlayerContainerSession {
         } else if ((mode == 4 || mode == 0) && (button == 0 || button == 1)) {
             ClickInventoryEvent.Drop event = null;
 
-            // TODO: Implement spawn causes
-            SpawnType dummySpawnType = new SpawnType() {
-
-                @Override
-                public String getId() {
-                    return "dropped_item";
-                }
-
-                @Override
-                public String getName() {
-                    return "dropped_item";
-                }
-            };
-            SpawnCause spawnCause = () -> dummySpawnType;
-
-            // Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
-            //         .type(dummySpawnType).build()).named(NamedCause.SOURCE, this.player).build();
-            Cause cause = Cause.builder().named("SpawnCause", spawnCause).named(NamedCause.SOURCE, this.player).build();
+            Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
+                    .type(SpawnTypes.DROPPED_ITEM).build()).named(NamedCause.SOURCE, this.player).build();
             List<Entity> entities = new ArrayList<>();
             World world = this.player.getWorld();
 

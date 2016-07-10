@@ -34,9 +34,11 @@ import java.lang.ref.WeakReference;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 public final class WeakWorldReference {
 
-    private WeakReference<World> world;
+    @Nullable private WeakReference<World> world;
     private final UUID uniqueId;
 
     /**
@@ -74,7 +76,7 @@ public final class WeakWorldReference {
      * @return the world if present, otherwise {@link Optional#empty()}
      */
     public Optional<World> getWorld() {
-        World world = this.world.get();
+        World world = this.world == null ? null : this.world.get();
         if (world != null) {
             return Optional.of(world);
         }
@@ -92,7 +94,7 @@ public final class WeakWorldReference {
      * @return the copy
      */
     public WeakWorldReference copy() {
-        final World world = this.world.get();
+        final World world = this.world == null ? null : this.world.get();
         return world != null ? new WeakWorldReference(world) : new WeakWorldReference(this.uniqueId);
     }
 

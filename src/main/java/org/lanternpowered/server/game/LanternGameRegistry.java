@@ -41,7 +41,7 @@ import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.bossbar.LanternBossBarBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
-import org.lanternpowered.server.data.LanternDoorHalf;
+import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.registry.CatalogMappingData;

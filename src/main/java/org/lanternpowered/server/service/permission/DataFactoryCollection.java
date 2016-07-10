@@ -118,8 +118,15 @@ public class DataFactoryCollection extends LanternSubjectCollection {
         }
 
         @Override
-        public Optional<String> getOption(Set<Context> contexts, String key) {
-            return Optional.empty();
+        public Optional<String> getOption(Set<Context> contexts, String option) {
+            Optional<String> ret = super.getOption(contexts, option);
+            if (!ret.isPresent()) {
+                ret = this.getDataOptionValue(DataFactoryCollection.this.getDefaults().getSubjectData(), option);
+            }
+            if (!ret.isPresent()) {
+                ret = this.getDataOptionValue(DataFactoryCollection.this.service.getDefaults().getSubjectData(), option);
+            }
+            return ret;
         }
     }
 

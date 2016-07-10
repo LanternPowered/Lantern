@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.data.LanternDoorHalf;
+import org.lanternpowered.server.data.type.LanternDoorHalf;
 
 public final class DoorHalfRegistryModule extends EnumValueRegistryModule<LanternDoorHalf> {
 

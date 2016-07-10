@@ -128,8 +128,15 @@ public class UserSubject extends LanternSubject {
     }
 
     @Override
-    public Optional<String> getOption(Set<Context> contexts, String key) {
-        return Optional.empty();
+    public Optional<String> getOption(Set<Context> contexts, String option) {
+        Optional<String> ret = super.getOption(contexts, option);
+        if (!ret.isPresent()) {
+            ret = this.getDataOptionValue(this.collection.getDefaults().getSubjectData(), option);
+        }
+        if (!ret.isPresent()) {
+            ret = this.getDataOptionValue(this.collection.getService().getDefaults().getSubjectData(), option);
+        }
+        return ret;
     }
 
 }

@@ -32,6 +32,7 @@ import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public abstract class LanternSubject implements Subject {
@@ -77,6 +78,25 @@ public abstract class LanternSubject implements Subject {
     @Override
     public List<Subject> getParents(Set<Context> contexts) {
         return this.getSubjectData().getParents(contexts);
+    }
+
+    protected Optional<String> getDataOptionValue(MemorySubjectData subject, String option) {
+        Optional<String> res = Optional.ofNullable(subject.getOptions(SubjectData.GLOBAL_CONTEXT).get(option));
+        if (!res.isPresent()) {
+            for (Subject parent : subject.getParents(SubjectData.GLOBAL_CONTEXT)) {
+                Optional<String> tempRes = parent.getOption(SubjectData.GLOBAL_CONTEXT, option);
+                if (tempRes.isPresent()) {
+                    res = tempRes;
+                    break;
+                }
+            }
+        }
+        return res;
+    }
+
+    @Override
+    public Optional<String> getOption(Set<Context> contexts, String key) {
+        return this.getDataOptionValue(this.getSubjectData(), key);
     }
 
     @Override

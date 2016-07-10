@@ -186,7 +186,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
                 if (entry.type == COMPOUND) {
                     this.readObject(container.createView(DataQuery.of(entry.name)), entry, depth1);
                 } else {
-                    container.set(DataQuery.of('.', entry.name), this.readObject(null, entry, depth1));
+                    container.set(DataQuery.of(entry.name), this.readObject(null, entry, depth1));
                 }
             }
             return container;

@@ -23,15 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
-
-import org.lanternpowered.server.data.type.LanternSlabType;
-import org.spongepowered.api.data.type.SlabType;
-import org.spongepowered.api.data.type.SlabTypes;
-
-public final class SlabTypeRegistryModule extends EnumValueRegistryModule<SlabType> {
-
-    public SlabTypeRegistryModule() {
-        super(LanternSlabType.class, SlabTypes.class);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.cause.entity.damage.source;

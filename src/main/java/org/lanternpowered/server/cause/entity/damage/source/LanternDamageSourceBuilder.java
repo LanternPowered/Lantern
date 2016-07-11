@@ -23,15 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.cause.entity.damage.source;
 
-import org.lanternpowered.server.data.type.LanternLogAxis;
-import org.spongepowered.api.data.type.LogAxes;
-import org.spongepowered.api.data.type.LogAxis;
+import static com.google.common.base.Preconditions.checkState;
 
-public final class LogAxisRegistryModule extends EnumValueRegistryModule<LogAxis> {
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSourceBuilder;
 
-    public LogAxisRegistryModule() {
-        super(LanternLogAxis.class, LogAxes.class);
+public class LanternDamageSourceBuilder extends AbstractDamageSourceBuilder<DamageSource, DamageSource.Builder>
+        implements DamageSource.Builder {
+
+    @Override
+    public DamageSource build() throws IllegalStateException {
+        checkState(this.damageType != null, "The damage type must be set");
+        return new LanternDamageSource(this);
     }
 }

@@ -40,6 +40,8 @@ import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.bossbar.LanternBossBarBuilder;
+import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
+import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternBlockSpawnCauseBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternBreedingSpawnCauseBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternEntitySpawnCauseBuilder;
@@ -51,12 +53,32 @@ import org.lanternpowered.server.cause.entity.teleport.LanternPortalTeleportCaus
 import org.lanternpowered.server.cause.entity.teleport.LanternTeleportCauseBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
+import org.lanternpowered.server.data.type.LanternBigMushroomType;
+import org.lanternpowered.server.data.type.LanternBrickType;
+import org.lanternpowered.server.data.type.LanternComparatorType;
+import org.lanternpowered.server.data.type.LanternDirtType;
+import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
+import org.lanternpowered.server.data.type.LanternDoublePlantType;
+import org.lanternpowered.server.data.type.LanternHinge;
+import org.lanternpowered.server.data.type.LanternLogAxis;
+import org.lanternpowered.server.data.type.LanternPistonType;
+import org.lanternpowered.server.data.type.LanternPlantType;
+import org.lanternpowered.server.data.type.LanternPortionType;
+import org.lanternpowered.server.data.type.LanternPrismarineType;
+import org.lanternpowered.server.data.type.LanternQuartzType;
+import org.lanternpowered.server.data.type.LanternSandType;
+import org.lanternpowered.server.data.type.LanternSandstoneType;
+import org.lanternpowered.server.data.type.LanternShrubType;
+import org.lanternpowered.server.data.type.LanternSlabType;
+import org.lanternpowered.server.data.type.LanternStoneType;
+import org.lanternpowered.server.data.type.LanternTreeType;
+import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
-import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
+import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
@@ -65,30 +87,13 @@ import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.BrickTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DisguisedBlockTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DoorHalfRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.DoublePlantTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.HingeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.LogAxisRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.PistonTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.PortionTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.PrismarineTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.WallTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
@@ -149,26 +154,48 @@ import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.persistence.DataFormat;
+import org.spongepowered.api.data.type.BigMushroomType;
+import org.spongepowered.api.data.type.BigMushroomTypes;
 import org.spongepowered.api.data.type.BrickType;
+import org.spongepowered.api.data.type.BrickTypes;
+import org.spongepowered.api.data.type.ComparatorType;
+import org.spongepowered.api.data.type.ComparatorTypes;
 import org.spongepowered.api.data.type.DirtType;
+import org.spongepowered.api.data.type.DirtTypes;
 import org.spongepowered.api.data.type.DisguisedBlockType;
+import org.spongepowered.api.data.type.DisguisedBlockTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
+import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.Hinge;
+import org.spongepowered.api.data.type.Hinges;
+import org.spongepowered.api.data.type.LogAxes;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.data.type.PistonTypes;
 import org.spongepowered.api.data.type.PlantType;
+import org.spongepowered.api.data.type.PlantTypes;
 import org.spongepowered.api.data.type.PortionType;
+import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.data.type.PrismarineType;
+import org.spongepowered.api.data.type.PrismarineTypes;
 import org.spongepowered.api.data.type.QuartzType;
+import org.spongepowered.api.data.type.QuartzTypes;
 import org.spongepowered.api.data.type.SandType;
+import org.spongepowered.api.data.type.SandTypes;
 import org.spongepowered.api.data.type.SandstoneType;
+import org.spongepowered.api.data.type.SandstoneTypes;
 import org.spongepowered.api.data.type.ShrubType;
+import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.SlabType;
+import org.spongepowered.api.data.type.SlabTypes;
 import org.spongepowered.api.data.type.StoneType;
+import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.type.TreeType;
+import org.spongepowered.api.data.type.TreeTypes;
 import org.spongepowered.api.data.type.WallType;
+import org.spongepowered.api.data.type.WallTypes;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.effect.particle.BlockParticle;
 import org.spongepowered.api.effect.particle.ColoredParticle;
@@ -185,6 +212,12 @@ import org.spongepowered.api.entity.ai.task.AbstractAITask;
 import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
+import org.spongepowered.api.event.cause.entity.damage.DamageType;
+import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
@@ -303,31 +336,34 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BlockState.class, new BlockStateRegistryModule())
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
+                .registerModule(DamageType.class, new DamageTypeRegistryModule())
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(TeleportType.class, new TeleportTypeRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
-                .registerModule(BrickType.class, new BrickTypeRegistryModule())
-                .registerModule(DirtType.class, new DirtTypeRegistryModule())
-                .registerModule(DisguisedBlockType.class, new DisguisedBlockTypeRegistryModule())
-                .registerModule(LanternDoorHalf.class, new DoorHalfRegistryModule())
-                .registerModule(DoublePlantType.class, new DoublePlantTypeRegistryModule())
+                .registerModule(BigMushroomType.class, new EnumValueRegistryModule<>(LanternBigMushroomType.class, BigMushroomTypes.class))
+                .registerModule(BrickType.class, new EnumValueRegistryModule<>(LanternBrickType.class, BrickTypes.class))
+                .registerModule(ComparatorType.class, new EnumValueRegistryModule<>(LanternComparatorType.class, ComparatorTypes.class))
+                .registerModule(DirtType.class, new EnumValueRegistryModule<>(LanternDirtType.class, DirtTypes.class))
+                .registerModule(DisguisedBlockType.class, new EnumValueRegistryModule<>(LanternDisguisedBlockType.class, DisguisedBlockTypes.class))
+                .registerModule(LanternDoorHalf.class, new EnumValueRegistryModule<>(LanternDoorHalf.class, null))
+                .registerModule(DoublePlantType.class, new EnumValueRegistryModule<>(LanternDoublePlantType.class, DoublePlantTypes.class))
                 .registerModule(HandType.class, new HandTypeRegistryModule())
-                .registerModule(Hinge.class, new HingeRegistryModule())
+                .registerModule(Hinge.class, new EnumValueRegistryModule<>(LanternHinge.class, Hinges.class))
                 .registerModule(new KeyRegistryModule())
-                .registerModule(LogAxis.class, new LogAxisRegistryModule())
+                .registerModule(LogAxis.class, new EnumValueRegistryModule<>(LanternLogAxis.class, LogAxes.class))
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
-                .registerModule(PistonType.class, new PistonTypeRegistryModule())
-                .registerModule(PlantType.class, new PlantTypeRegistryModule())
-                .registerModule(PortionType.class, new PortionTypeRegistryModule())
-                .registerModule(PrismarineType.class, new PrismarineTypeRegistryModule())
-                .registerModule(QuartzType.class, new QuartzTypeRegistryModule())
-                .registerModule(SandstoneType.class, new SandstoneTypeRegistryModule())
-                .registerModule(SandType.class, new SandTypeRegistryModule())
-                .registerModule(ShrubType.class, new ShrubTypeRegistryModule())
-                .registerModule(StoneType.class, new StoneTypeRegistryModule())
-                .registerModule(SlabType.class, new SlabTypeRegistryModule())
-                .registerModule(TreeType.class, new TreeTypeRegistryModule())
-                .registerModule(WallType.class, new WallTypeRegistryModule())
+                .registerModule(PistonType.class, new EnumValueRegistryModule<>(LanternPistonType.class, PistonTypes.class))
+                .registerModule(PlantType.class, new EnumValueRegistryModule<>(LanternPlantType.class, PlantTypes.class))
+                .registerModule(PortionType.class, new EnumValueRegistryModule<>(LanternPortionType.class, PortionTypes.class))
+                .registerModule(PrismarineType.class, new EnumValueRegistryModule<>(LanternPrismarineType.class, PrismarineTypes.class))
+                .registerModule(QuartzType.class, new EnumValueRegistryModule<>(LanternQuartzType.class, QuartzTypes.class))
+                .registerModule(SandstoneType.class, new EnumValueRegistryModule<>(LanternSandstoneType.class, SandstoneTypes.class))
+                .registerModule(SandType.class, new EnumValueRegistryModule<>(LanternSandType.class, SandTypes.class))
+                .registerModule(ShrubType.class, new EnumValueRegistryModule<>(LanternShrubType.class, ShrubTypes.class))
+                .registerModule(StoneType.class, new EnumValueRegistryModule<>(LanternStoneType.class, StoneTypes.class))
+                .registerModule(SlabType.class, new EnumValueRegistryModule<>(LanternSlabType.class, SlabTypes.class))
+                .registerModule(TreeType.class, new EnumValueRegistryModule<>(LanternTreeType.class, TreeTypes.class))
+                .registerModule(WallType.class, new EnumValueRegistryModule<>(LanternWallType.class, WallTypes.class))
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
@@ -390,6 +426,11 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(EntityTeleportCause.Builder.class, LanternEntityTeleportCauseBuilder::new)
                 .registerBuilderSupplier(PortalTeleportCause.Builder.class, LanternPortalTeleportCauseBuilder::new)
                 .registerBuilderSupplier(TeleportCause.Builder.class, LanternTeleportCauseBuilder::new)
+                .registerBuilderSupplier(BlockDamageSource.Builder.class, LanternBlockDamageSourceBuilder::new)
+                .registerBuilderSupplier(DamageSource.Builder.class, LanternDamageSourceBuilder::new)
+                //.registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
+                //.registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
+                //.registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
                 ;
         this.registerFactories();
     }

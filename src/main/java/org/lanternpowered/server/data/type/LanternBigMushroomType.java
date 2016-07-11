@@ -23,15 +23,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.data.type.LanternPlantType;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
+import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.spongepowered.api.data.type.BigMushroomType;
 
-public final class PlantTypeRegistryModule extends EnumValueRegistryModule<PlantType> {
+public enum LanternBigMushroomType implements BigMushroomType, SimpleCatalogType, InternalCatalogType {
 
-    public PlantTypeRegistryModule() {
-        super(LanternPlantType.class, PlantTypes.class);
+    NORTH_WEST      ("north_west"),
+    NORTH           ("north"),
+    NORTH_EAST      ("north_east"),
+    WEST            ("west"),
+    CENTER          ("center"),
+    EAST            ("east"),
+    SOUTH_WEST      ("south_west"),
+    SOUTH           ("south"),
+    SOUTH_EAST      ("south_east"),
+    STEM            ("stem"),
+    ALL_INSIDE      ("all_inside"),
+    ALL_OUTSIDE     ("all_outside"),
+    ALL_STEM        ("all_stem"),
+    ;
+
+    private final String identifier;
+
+    LanternBigMushroomType(String identifier) {
+        this.identifier = identifier;
     }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
+    }
+
 }

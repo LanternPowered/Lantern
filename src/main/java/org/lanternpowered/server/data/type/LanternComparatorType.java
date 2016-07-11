@@ -23,15 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.data.type.LanternPrismarineType;
-import org.spongepowered.api.data.type.PrismarineType;
-import org.spongepowered.api.data.type.PrismarineTypes;
+import org.lanternpowered.server.catalog.InternalCatalogType;
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.type.BrickType;
+import org.spongepowered.api.data.type.ComparatorType;
+import org.spongepowered.api.text.translation.Translation;
 
-public final class PrismarineTypeRegistryModule extends EnumValueRegistryModule<PrismarineType> {
+public enum LanternComparatorType implements ComparatorType, SimpleCatalogType, InternalCatalogType {
 
-    public PrismarineTypeRegistryModule() {
-        super(LanternPrismarineType.class, PrismarineTypes.class);
+    COMPARE         ("compare"),
+    SUBTRACT        ("subtract"),
+    ;
+
+    private final String identifier;
+
+    LanternComparatorType(String identifier) {
+        this.identifier = identifier;
     }
+
+    @Override
+    public String getId() {
+        return this.identifier;
+    }
+
+    @Override
+    public int getInternalId() {
+        return this.ordinal();
+    }
+
 }

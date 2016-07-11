@@ -23,13 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
-
-import org.lanternpowered.server.data.type.LanternDoorHalf;
-
-public final class DoorHalfRegistryModule extends EnumValueRegistryModule<LanternDoorHalf> {
-
-    public DoorHalfRegistryModule() {
-        super(LanternDoorHalf.class, null);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.cause.entity.damage;

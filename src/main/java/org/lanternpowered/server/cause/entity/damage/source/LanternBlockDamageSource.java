@@ -23,15 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.cause.entity.damage.source;
 
-import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
-import org.spongepowered.api.data.type.DisguisedBlockType;
-import org.spongepowered.api.data.type.DisguisedBlockTypes;
+import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSource;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public final class DisguisedBlockTypeRegistryModule extends EnumValueRegistryModule<DisguisedBlockType> {
+public class LanternBlockDamageSource extends AbstractDamageSource implements BlockDamageSource {
 
-    public DisguisedBlockTypeRegistryModule() {
-        super(LanternDisguisedBlockType.class, DisguisedBlockTypes.class);
+    private final Location<World> location;
+    private final BlockSnapshot blockSnapshot;
+
+    protected LanternBlockDamageSource(LanternBlockDamageSourceBuilder builder,
+            Location<World> location, BlockSnapshot blockSnapshot) {
+        super(builder);
+        this.location = location;
+        this.blockSnapshot = blockSnapshot;
+    }
+
+    @Override
+    public Location<World> getLocation() {
+        return this.location;
+    }
+
+    @Override
+    public BlockSnapshot getBlockSnapshot() {
+        return this.blockSnapshot;
     }
 }

@@ -26,7 +26,9 @@
 package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.data.util.DataUtil.checkDataExists;
 
+import org.lanternpowered.server.data.util.DataQueries;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -96,7 +98,14 @@ public class LanternBlockStateBuilder implements BlockState.Builder {
 
     @Override
     public Optional<BlockState> build(DataView container) throws InvalidDataException {
-        // TODO Auto-generated method stub
-        return null;
+        if (!container.contains(DataQueries.BLOCK_STATE)) {
+            return Optional.empty();
+        }
+        checkDataExists(container, DataQueries.BLOCK_STATE);
+        try {
+            return container.getCatalogType(DataQueries.BLOCK_STATE, BlockState.class);
+        } catch (Exception e) {
+            throw new InvalidDataException("Could not retrieve a block state!", e);
+        }
     }
 }

@@ -23,15 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.cause.entity.damage;
 
-import org.lanternpowered.server.data.type.LanternStoneType;
-import org.spongepowered.api.data.type.StoneType;
-import org.spongepowered.api.data.type.StoneTypes;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.event.cause.entity.damage.DamageType;
 
-public final class StoneTypeRegistryModule extends EnumValueRegistryModule<StoneType> {
+public class LanternDamageType extends PluginCatalogType.Base implements DamageType {
 
-    public StoneTypeRegistryModule() {
-        super(LanternStoneType.class, StoneTypes.class);
+    public LanternDamageType(String pluginId, String name) {
+        super(pluginId, name);
     }
 }

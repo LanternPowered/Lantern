@@ -23,15 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.cause.entity.damage.source;
 
-import org.lanternpowered.server.data.type.LanternQuartzType;
-import org.spongepowered.api.data.type.QuartzType;
-import org.spongepowered.api.data.type.QuartzTypes;
+import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSource;
 
-public final class QuartzTypeRegistryModule extends EnumValueRegistryModule<QuartzType> {
+public class LanternDamageSource extends AbstractDamageSource {
 
-    public QuartzTypeRegistryModule() {
-        super(LanternQuartzType.class, QuartzTypes.class);
+    protected LanternDamageSource(LanternDamageSourceBuilder builder) {
+        super(builder);
     }
 }

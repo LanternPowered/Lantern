@@ -95,17 +95,29 @@ public class LanternBlockSnapshotBuilder implements BlockSnapshot.Builder {
 
     @Override
     public BlockSnapshot.Builder add(DataManipulator<?, ?> manipulator) {
-        return null;
+        final Optional<BlockState> blockState = this.blockState.with(manipulator.asImmutable());
+        if (blockState.isPresent()) {
+            this.blockState = blockState.get();
+        }
+        return this;
     }
 
     @Override
     public BlockSnapshot.Builder add(ImmutableDataManipulator<?, ?> manipulator) {
-        return null;
+        final Optional<BlockState> blockState = this.blockState.with(manipulator);
+        if (blockState.isPresent()) {
+            this.blockState = blockState.get();
+        }
+        return this;
     }
 
     @Override
     public <V> BlockSnapshot.Builder add(Key<? extends BaseValue<V>> key, V value) {
-        return null;
+        final Optional<BlockState> blockState = this.blockState.with(key, value);
+        if (blockState.isPresent()) {
+            this.blockState = blockState.get();
+        }
+        return this;
     }
 
     @Override

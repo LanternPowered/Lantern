@@ -193,14 +193,26 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
 
     @Override
     public Optional<BlockState> with(ImmutableDataManipulator<?, ?> valueContainer) {
-        // TODO Auto-generated method stub
-        return null;
+        Optional<BlockState> state = null;
+        for (ImmutableValue<?> value : valueContainer.getValues()) {
+            state = this.with(value);
+            if (!state.isPresent()) {
+                return state;
+            }
+        }
+        return state == null ? Optional.of(this) : state;
     }
 
     @Override
     public Optional<BlockState> with(Iterable<ImmutableDataManipulator<?, ?>> valueContainers) {
-        // TODO Auto-generated method stub
-        return null;
+        Optional<BlockState> state = null;
+        for (ImmutableDataManipulator<?, ?> valueContainer : valueContainers) {
+            state = this.with(valueContainer);
+            if (!state.isPresent()) {
+                return state;
+            }
+        }
+        return state == null ? Optional.of(this) : state;
     }
 
     @Override

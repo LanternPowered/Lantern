@@ -31,7 +31,6 @@ import static org.lanternpowered.server.game.registry.RegistryModuleHelper.valid
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.cause.entity.teleport.LanternTeleportType;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
 import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;

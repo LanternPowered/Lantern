@@ -37,8 +37,10 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.world.LanternWorldPropertiesIO.LevelData;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.GuavaCollectors;
@@ -536,6 +538,8 @@ public final class LanternWorldManager {
         }
         // Store the new properties
         this.addWorldProperties(worldProperties, worldFolder, dimensionId);
+        Sponge.getEventManager().post(SpongeEventFactory.createConstructWorldPropertiesEvent(
+                Cause.source(Lantern.getMinecraftPlugin()).build(), worldArchetype, worldProperties));
         // Save the world properties to reserve the world folder
         this.saveWorldProperties(worldProperties);
         return worldProperties;
@@ -616,14 +620,19 @@ public final class LanternWorldManager {
         if (worldEntry.properties.doesKeepSpawnLoaded()) {
             world.enableSpawnArea(true);
         }
-        // The world is ready for ticks
-        this.addWorldTask(world);
         // Load the chunk loading tickets, they may load some chunks
         try {
             world.getChunkManager().loadTickets();
         } catch (IOException e) {
             this.game.getLogger().warn("An error occurred while loading the chunk loading tickets", e);
         }
+        final LoadWorldEvent event = SpongeEventFactory.createLoadWorldEvent(Cause.source(Lantern.getMinecraftPlugin()).build(), world);
+        Sponge.getEventManager().post(event);
+        if (event.isCancelled()) {
+            return Optional.empty();
+        }
+        // The world is ready for ticks
+        this.addWorldTask(world);
         return Optional.of(world);
     }
 

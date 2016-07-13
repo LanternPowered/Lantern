@@ -25,12 +25,17 @@
  */
 package org.lanternpowered.server.scoreboard;
 
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 
-public class LanternObjectiveDisplayMode extends SimpleCatalogType.Base implements ObjectiveDisplayMode {
+public class LanternObjectiveDisplayMode extends PluginCatalogType.Base implements ObjectiveDisplayMode {
 
-    public LanternObjectiveDisplayMode(String identifier) {
-        super(identifier);
+    public LanternObjectiveDisplayMode(String pluginId, String name) {
+        super(pluginId, name);
+    }
+
+    public LanternObjectiveDisplayMode(String pluginId, String id, String name) {
+        super(pluginId, id, name);
     }
 }

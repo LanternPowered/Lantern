@@ -25,49 +25,26 @@
  */
 package org.lanternpowered.server.game.registry.type.item.inventory.equipment;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypeWorn;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class EquipmentTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<EquipmentType> {
 
-public final class EquipmentTypeRegistryModule implements CatalogRegistryModule<EquipmentType> {
-
-    @RegisterCatalog(EquipmentTypes.class)
-    private final Map<String, EquipmentType> equipmentTypes = new HashMap<>();
+    public EquipmentTypeRegistryModule() {
+        super(EquipmentTypes.class);
+    }
 
     @Override
     public void registerDefaults() {
-        final List<EquipmentType> types = new ArrayList<>();
-        types.add(new LanternEquipmentType("all", type -> true));
-        types.add(new LanternEquipmentType("equipped"));
-        types.add(new LanternEquipmentTypeWorn("worn", type -> type instanceof LanternEquipmentTypeWorn));
-        types.add(new LanternEquipmentTypeWorn("boots"));
-        types.add(new LanternEquipmentTypeWorn("chestplate"));
-        types.add(new LanternEquipmentTypeWorn("headwear"));
-        types.add(new LanternEquipmentTypeWorn("leggings"));
-        types.forEach(type -> this.equipmentTypes.put(type.getId(), type));
+        this.register(new LanternEquipmentType("minecraft", "all", type -> true));
+        this.register(new LanternEquipmentType("minecraft", "equipped"));
+        this.register(new LanternEquipmentTypeWorn("minecraft", "worn", type -> type instanceof LanternEquipmentTypeWorn));
+        this.register(new LanternEquipmentTypeWorn("minecraft", "boots"));
+        this.register(new LanternEquipmentTypeWorn("minecraft", "chestplate"));
+        this.register(new LanternEquipmentTypeWorn("minecraft", "headwear"));
+        this.register(new LanternEquipmentTypeWorn("minecraft", "leggings"));
     }
-
-    @Override
-    public Optional<EquipmentType> getById(String id) {
-        return Optional.ofNullable(this.equipmentTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<EquipmentType> getAll() {
-        return ImmutableSet.copyOf(this.equipmentTypes.values());
-    }
-
 }

@@ -142,7 +142,7 @@ public class LanternGame implements Game {
     private final static boolean SCAN_CLASSPATH = PropertiesUtil.getProperties().getBooleanProperty("scanClasspath", false);
 
     public static final String API_NAME = "SpongeAPI";
-    public static final String API_ID = "spongeapi";
+    public static final String API_ID = "sponge";
 
     public static final String IMPL_NAME = "Lantern";
     public static final String IMPL_ID = "lantern";

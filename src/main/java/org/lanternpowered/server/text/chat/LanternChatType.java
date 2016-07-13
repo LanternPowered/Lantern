@@ -25,13 +25,12 @@
  */
 package org.lanternpowered.server.text.chat;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.text.chat.ChatType;
 
-public final class LanternChatType extends SimpleCatalogType.Base implements ChatType {
+public final class LanternChatType extends PluginCatalogType.Base implements ChatType {
 
-    public LanternChatType(String identifier) {
-        super(identifier);
+    public LanternChatType(String pluginId, String name) {
+        super(pluginId, name);
     }
-
 }

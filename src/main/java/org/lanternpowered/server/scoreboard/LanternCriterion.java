@@ -25,17 +25,16 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 
-public class LanternCriterion extends SimpleCatalogType.Base implements Criterion {
+public class LanternCriterion extends PluginCatalogType.Base implements Criterion {
 
-    public LanternCriterion(String identifier) {
-        super(identifier);
+    public LanternCriterion(String pluginId, String name) {
+        super(pluginId, name);
     }
 
-    @Override
-    public String getName() {
-        return super.getName();
+    public LanternCriterion(String pluginId, String id, String name) {
+        super(pluginId, id, name);
     }
 }

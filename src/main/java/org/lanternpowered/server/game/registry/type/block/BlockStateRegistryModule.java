@@ -25,35 +25,16 @@
  */
 package org.lanternpowered.server.game.registry.type.block;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.registry.CatalogRegistryModule;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+public final class BlockStateRegistryModule extends PluginCatalogRegistryModule<BlockState> {
 
-public final class BlockStateRegistryModule implements CatalogRegistryModule<BlockState> {
-
-    private final Map<String, BlockState> blockStates = new HashMap<>();
-
-    @Override
-    public Optional<BlockState> getById(String id) {
-        if (checkNotNull(id, "identifier").indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.blockStates.get(id.toLowerCase()));
+    public BlockStateRegistryModule() {
+        super(null, "^[a-z][a-z0-9-_]+:[a-z][a-z0-9-_\\[\\]=,]+$");
     }
 
-    @Override
-    public Collection<BlockState> getAll() {
-        return ImmutableSet.copyOf(this.blockStates.values());
-    }
-
-    void put(BlockState blockState) {
-        this.blockStates.put(blockState.getId(), blockState);
+    void registerState(BlockState catalogType) {
+        this.register(catalogType);
     }
 }

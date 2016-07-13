@@ -25,43 +25,20 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternObjectiveDisplayMode;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayModes;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class ObjectiveDisplayModeRegistryModule extends AdditionalPluginCatalogRegistryModule<ObjectiveDisplayMode> {
 
-public final class ObjectiveDisplayModeRegistryModule implements CatalogRegistryModule<ObjectiveDisplayMode> {
-
-    @RegisterCatalog(ObjectiveDisplayModes.class)
-    private final Map<String, ObjectiveDisplayMode> objectiveDisplayModes = Maps.newHashMap();
+    public ObjectiveDisplayModeRegistryModule() {
+        super(ObjectiveDisplayModes.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<ObjectiveDisplayMode> types = Lists.newArrayList();
-        types.add(new LanternObjectiveDisplayMode("integer"));
-        types.add(new LanternObjectiveDisplayMode("hearts"));
-        types.forEach(type -> this.objectiveDisplayModes.put(type.getId(), type));
+        this.register(new LanternObjectiveDisplayMode("minecraft", "integer"));
+        this.register(new LanternObjectiveDisplayMode("minecraft", "hearts"));
     }
-
-    @Override
-    public Optional<ObjectiveDisplayMode> getById(String id) {
-        return Optional.ofNullable(this.objectiveDisplayModes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<ObjectiveDisplayMode> getAll() {
-        return ImmutableSet.copyOf(this.objectiveDisplayModes.values());
-    }
-
 }

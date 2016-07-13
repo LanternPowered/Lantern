@@ -25,44 +25,21 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.text.chat.LanternChatType;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class ChatTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<ChatType> {
 
-public final class ChatTypeRegistryModule implements CatalogRegistryModule<ChatType> {
-
-    @RegisterCatalog(ChatTypes.class)
-    private final Map<String, ChatType> chatTypes = Maps.newHashMap();
+    public ChatTypeRegistryModule() {
+        super(ChatTypes.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<ChatType> types = Lists.newArrayList();
-        types.add(new LanternChatType("chat"));
-        types.add(new LanternChatType("action_bar"));
-        types.add(new LanternChatType("system"));
-        types.forEach(type -> this.chatTypes.put(type.getId(), type));
+        this.register(new LanternChatType("minecraft", "chat"));
+        this.register(new LanternChatType("minecraft", "action_bar"));
+        this.register(new LanternChatType("minecraft", "system"));
     }
-
-    @Override
-    public Optional<ChatType> getById(String id) {
-        return Optional.ofNullable(this.chatTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<ChatType> getAll() {
-        return ImmutableSet.copyOf(this.chatTypes.values());
-    }
-
 }

@@ -25,45 +25,25 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.text.chat.LanternChatVisibility;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class ChatVisibilityRegistryModule extends AdditionalPluginCatalogRegistryModule<ChatVisibility> {
 
-public final class ChatVisibilityRegistryModule implements CatalogRegistryModule<ChatVisibility> {
-
-    @RegisterCatalog(ChatVisibilities.class)
-    private final Map<String, ChatVisibility> chatVisibilities = Maps.newHashMap();
+    public ChatVisibilityRegistryModule() {
+        super(ChatVisibilities.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<ChatVisibility> types = Lists.newArrayList();
-        types.add(new LanternChatVisibility(0, "full", type -> true));
-        types.add(new LanternChatVisibility(1, "system", type -> type == ChatTypes.SYSTEM || type == ChatTypes.ACTION_BAR));
-        types.add(new LanternChatVisibility(2, "hidden", type -> false));
-        types.forEach(type -> this.chatVisibilities.put(type.getId(), type));
+        this.register(new LanternChatVisibility("minecraft", "full", 0,
+                type -> true));
+        this.register(new LanternChatVisibility("minecraft", "system", 1,
+                type -> type == ChatTypes.SYSTEM || type == ChatTypes.ACTION_BAR));
+        this.register(new LanternChatVisibility("minecraft", "hidden", 2,
+                type -> false));
     }
-
-    @Override
-    public Optional<ChatVisibility> getById(String id) {
-        return Optional.ofNullable(this.chatVisibilities.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<ChatVisibility> getAll() {
-        return ImmutableList.copyOf(this.chatVisibilities.values());
-    }
-
 }

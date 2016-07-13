@@ -25,72 +25,35 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
 import org.lanternpowered.server.world.gen.LanternGeneratorTypeNether;
 import org.lanternpowered.server.world.gen.debug.DebugGeneratorType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.gen.skylands.SkylandsGeneratorType;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.GeneratorTypes;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 @RegistrationDependency({ BlockRegistryModule.class, BlockStateRegistryModule.class })
-public final class GeneratorTypeRegistryModule implements CatalogRegistryModule<GeneratorType>, AlternateCatalogRegistryModule<GeneratorType> {
+public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<GeneratorType> {
 
-    @RegisterCatalog(GeneratorTypes.class)
-    private final Map<String, GeneratorType> generatorTypes = Maps.newHashMap();
-
-    @Override
-    public Map<String, GeneratorType> provideCatalogMap() {
-        Map<String, GeneratorType> provided = new HashMap<>();
-        for (Map.Entry<String, GeneratorType> entry : this.generatorTypes.entrySet()) {
-            provided.put(entry.getKey().replace("minecraft:", "").replace("sponge:", ""), entry.getValue());
-        }
-        return provided;
+    public GeneratorTypeRegistryModule() {
+        super(GeneratorTypes.class);
     }
 
     @Override
     public void registerDefaults() {
-        List<GeneratorType> types = Lists.newArrayList();
-        types.add(new LanternGeneratorTypeNether("minecraft", "nether"));
-        types.add(new FlatGeneratorType("minecraft", "flat"));
-        types.add(new DebugGeneratorType("minecraft", "debug"));
-        types.add(new SkylandsGeneratorType("sponge", "skylands"));
+        this.register(new LanternGeneratorTypeNether("minecraft", "nether"));
+        this.register(new FlatGeneratorType("minecraft", "flat"));
+        this.register(new DebugGeneratorType("minecraft", "debug"));
+        this.register(new SkylandsGeneratorType("sponge", "skylands"));
         // TODO: Add the other generator types
-        types.add(new FlatGeneratorType("minecraft", "default"));
-        types.add(new FlatGeneratorType("minecraft", "overworld"));
-        types.add(new FlatGeneratorType("minecraft", "the_end"));
-        types.add(new FlatGeneratorType("minecraft", "large_biomes"));
-        types.add(new FlatGeneratorType("minecraft", "amplified"));
-        types.forEach(type -> this.generatorTypes.put(type.getId(), type));
+        this.register(new FlatGeneratorType("minecraft", "default"));
+        this.register(new FlatGeneratorType("minecraft", "overworld"));
+        this.register(new FlatGeneratorType("minecraft", "the_end"));
+        this.register(new FlatGeneratorType("minecraft", "large_biomes"));
+        this.register(new FlatGeneratorType("minecraft", "amplified"));
     }
-
-    @Override
-    public Optional<GeneratorType> getById(String id) {
-        if (checkNotNull(id).indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.generatorTypes.get(id.toLowerCase()));
-    }
-
-    @Override
-    public Collection<GeneratorType> getAll() {
-        return ImmutableSet.copyOf(this.generatorTypes.values());
-    }
-
 }

@@ -25,14 +25,14 @@
  */
 package org.lanternpowered.server.game.registry.type.item;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.LanternItemType;
@@ -40,17 +40,12 @@ import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 
 @RegistrationDependency(BlockRegistryModule.class)
-public final class ItemRegistryModule implements ItemRegistry {
+public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
 
     private static class Holder {
 
@@ -61,13 +56,11 @@ public final class ItemRegistryModule implements ItemRegistry {
         return Holder.INSTANCE;
     }
 
-    @RegisterCatalog(ItemTypes.class)
-    private final Map<String, ItemType> itemTypes = new HashMap<>();
-
     private final Int2ObjectMap<ItemType> itemTypeByInternalId = new Int2ObjectOpenHashMap<>();
     private final Object2IntMap<ItemType> internalIdByItemType = new Object2IntOpenHashMap<>();
 
     private ItemRegistryModule() {
+        super(ItemTypes.class);
     }
 
     /**
@@ -77,11 +70,8 @@ public final class ItemRegistryModule implements ItemRegistry {
      * @param itemType The item type
      */
     public void register(int internalId, ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        checkArgument(!this.itemTypes.containsValue(itemType), "The item type %s is already registered", itemType.getId());
-        checkArgument(!this.itemTypeByInternalId.containsKey(internalId), "The internal id %d is already in use", internalId);
-        checkArgument(!this.itemTypes.containsKey(itemType.getId()), "The id %s is already in use", itemType.getId());
-        this.itemTypes.put(itemType.getId(), itemType);
+        checkState(!this.itemTypeByInternalId.containsKey(internalId), "The internal id is already used: %s", internalId);
+        super.register(itemType);
         this.internalIdByItemType.put(itemType, internalId);
         this.itemTypeByInternalId.put(internalId, itemType);
     }
@@ -98,16 +88,6 @@ public final class ItemRegistryModule implements ItemRegistry {
     @Override
     public Optional<ItemType> getTypeByInternalId(int internalId) {
         return Optional.ofNullable(this.itemTypeByInternalId.get(internalId));
-    }
-
-    @Override
-    public Optional<ItemType> getById(String id) {
-        return Optional.ofNullable(this.itemTypes.get(checkNotNull(id, "identifier").toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<ItemType> getAll() {
-        return ImmutableSet.copyOf(this.itemTypes.values());
     }
 
     @Override

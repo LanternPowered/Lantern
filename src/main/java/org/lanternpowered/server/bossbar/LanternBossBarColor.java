@@ -25,15 +25,15 @@
  */
 package org.lanternpowered.server.bossbar;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.boss.BossBarColor;
 
-public final class LanternBossBarColor extends SimpleCatalogType.Base implements BossBarColor {
+public final class LanternBossBarColor extends PluginCatalogType.Base implements BossBarColor {
 
     private final int internalId;
 
-    public LanternBossBarColor(String identifier, int internalId) {
-        super(identifier);
+    public LanternBossBarColor(String pluginId, String name, int internalId) {
+        super(pluginId, name);
         this.internalId = internalId;
     }
 

@@ -25,43 +25,20 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.data.type.LanternHandType;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+public final class HandTypeRegistryModule extends SimpleCatalogRegistryModule<HandType> {
 
-public final class HandTypeRegistryModule implements CatalogRegistryModule<HandType> {
-
-    @RegisterCatalog(HandTypes.class)
-    private final Map<String, HandType> handTypes = new HashMap<>();
+    public HandTypeRegistryModule() {
+        super(HandTypes.class);
+    }
 
     @Override
     public void registerDefaults() {
-        final List<LanternHandType> types = new ArrayList<>();
-        types.add(new LanternHandType("main_hand", "main"));
-        types.add(new LanternHandType("off_hand", "off"));
-        types.forEach(type -> this.handTypes.put(type.getId(), type));
-    }
-
-    @Override
-    public Optional<HandType> getById(String id) {
-        return Optional.ofNullable(this.handTypes.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<HandType> getAll() {
-        return ImmutableSet.copyOf(this.handTypes.values());
+        this.register(new LanternHandType("main_hand", "main"));
+        this.register(new LanternHandType("off_hand", "off"));
     }
 }

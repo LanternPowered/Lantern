@@ -23,20 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry;
-
-import static com.google.common.base.Preconditions.checkArgument;
-
-import javax.annotation.Nullable;
-
-public class RegistryModuleHelper {
-
-    private RegistryModuleHelper() {
-    }
-
-    public static void validateIdentifier(@Nullable String identifier) {
-        checkArgument(identifier != null, "The identifier may not be null.");
-        checkArgument(!identifier.isEmpty(), "The id may not be empty.");
-        checkArgument(identifier.indexOf(' ') == -1, "The id (" + identifier + ") may not contain a spaces.");
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.entity.living.player.gamemode;

@@ -25,46 +25,22 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.text.selector.LanternSelectorType;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.text.selector.SelectorType;
 import org.spongepowered.api.text.selector.SelectorTypes;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class SelectorTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SelectorType> {
 
-public final class SelectorTypeRegistryModule implements CatalogRegistryModule<SelectorType> {
-
-    @RegisterCatalog(SelectorTypes.class)
-    private final Map<String, SelectorType> selectorMappings = Maps.newHashMap();
+    public SelectorTypeRegistryModule() {
+        super(SelectorTypes.class);
+    }
 
     @Override
     public void registerDefaults() {
-        Map<String, SelectorType> mappings = Maps.newHashMap();
-        mappings.put("all_players", new LanternSelectorType("a"));
-        mappings.put("all_entities", new LanternSelectorType("e"));
-        mappings.put("nearest_player", new LanternSelectorType("p"));
-        mappings.put("random", new LanternSelectorType("r"));
-        mappings.forEach((name, type) -> {
-            this.selectorMappings.put(name, type);
-            this.selectorMappings.put(type.getId(), type);
-        });
+        this.register(new LanternSelectorType("minecraft", "all_players", "a"));
+        this.register(new LanternSelectorType("minecraft", "all_entities", "e"));
+        this.register(new LanternSelectorType("minecraft", "nearest_player", "p"));
+        this.register(new LanternSelectorType("minecraft", "random", "r"));
     }
-
-    @Override
-    public Optional<SelectorType> getById(String id) {
-        return Optional.ofNullable(this.selectorMappings.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<SelectorType> getAll() {
-        return ImmutableSet.copyOf(this.selectorMappings.values());
-    }
-
 }

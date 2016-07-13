@@ -25,47 +25,25 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternSkinPart;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class SkinPartRegistryModule extends PluginCatalogRegistryModule<SkinPart> {
 
-public final class SkinPartRegistryModule implements CatalogRegistryModule<SkinPart> {
-
-    @RegisterCatalog(SkinParts.class) private final Map<String, SkinPart> skinParts = Maps.newHashMap();
+    public SkinPartRegistryModule() {
+        super(SkinParts.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<SkinPart> types = Lists.newArrayList();
-        types.add(new LanternSkinPart("cape", 0));
-        types.add(new LanternSkinPart("jacket", 1));
-        types.add(new LanternSkinPart("left_sleeve", 2));
-        types.add(new LanternSkinPart("right_sleeve", 3));
-        types.add(new LanternSkinPart("left_pants_leg", 4));
-        types.add(new LanternSkinPart("right_pants_leg", 5));
-        types.add(new LanternSkinPart("hat", 6));
-        types.forEach(type -> this.skinParts.put(type.getId(), type));
+        this.register(new LanternSkinPart("minecraft", "cape", 0));
+        this.register(new LanternSkinPart("minecraft", "jacket", 1));
+        this.register(new LanternSkinPart("minecraft", "left_sleeve", 2));
+        this.register(new LanternSkinPart("minecraft", "right_sleeve", 3));
+        this.register(new LanternSkinPart("minecraft", "left_pants_leg", 4));
+        this.register(new LanternSkinPart("minecraft", "right_pants_leg", 5));
+        this.register(new LanternSkinPart("minecraft", "hat", 6));
     }
-
-    @Override
-    public Optional<SkinPart> getById(String id) {
-        return Optional.ofNullable(this.skinParts.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<SkinPart> getAll() {
-        return ImmutableSet.copyOf(this.skinParts.values());
-    }
-
 }

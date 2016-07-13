@@ -25,10 +25,11 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
+import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
-import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.lanternpowered.server.text.LanternTextSerializerFactory;
 import org.lanternpowered.server.text.PlainTextSerializer;
@@ -40,25 +41,30 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
 @RegistrationDependency({ TranslationManagerRegistryModule.class, TextColorRegistryModule.class, TextStyleRegistryModule.class })
-public final class TextSerializersRegistryModule implements RegistryModule {
+public final class TextSerializersRegistryModule implements RegistryModule, CatalogMappingDataHolder {
 
     private TextSerializerFactory textSerializerFactory;
 
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        final Map<String, Object> mappings = Maps.newHashMap();
-        mappings.put("plain", new PlainTextSerializer());
-        mappings.put("legacy_formatting_code", new FormattingCodeTextSerializer(TextConstants.LEGACY_CHAR));
-        mappings.put("formatting_code", new FormattingCodeTextSerializer('&'));
-        mappings.put("json", new LanternJsonTextSerializer(Lantern.getGame().getRegistry().getRegistryModule(
-                TranslationManagerRegistryModule.class).get().getTranslationManager()));
-        mappings.put("text_xml", new XmlTextSerializer());
-        RegistryHelper.mapFields(TextSerializers.class, mappings);
         this.textSerializerFactory = new LanternTextSerializerFactory();
+    }
+
+    @Override
+    public List<CatalogMappingData> getCatalogMappings() {
+        return Collections.singletonList(new CatalogMappingData(TextSerializers.class, ImmutableMap.<String, Object>builder()
+                .put("plain", new PlainTextSerializer())
+                .put("legacy_formatting_code", new FormattingCodeTextSerializer(TextConstants.LEGACY_CHAR))
+                .put("formatting_code", new FormattingCodeTextSerializer('&'))
+                .put("json", new LanternJsonTextSerializer(Lantern.getGame().getRegistry().getRegistryModule(
+                        TranslationManagerRegistryModule.class).get().getTranslationManager()))
+                .put("text_xml", new XmlTextSerializer())
+                .build()));
     }
 
     public TextSerializerFactory getTextSerializerFactory() {

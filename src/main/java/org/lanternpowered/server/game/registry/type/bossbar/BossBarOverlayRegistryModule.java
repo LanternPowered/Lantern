@@ -25,47 +25,23 @@
  */
 package org.lanternpowered.server.game.registry.type.bossbar;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.bossbar.LanternBossBarOverlay;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.BossBarOverlays;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+public final class BossBarOverlayRegistryModule extends AdditionalPluginCatalogRegistryModule<BossBarOverlay> {
 
-public final class BossBarOverlayRegistryModule implements CatalogRegistryModule<BossBarOverlay> {
-
-    @RegisterCatalog(BossBarOverlays.class)
-    private final Map<String, BossBarOverlay> bossBarOverlays = new HashMap<>();
+    public BossBarOverlayRegistryModule() {
+        super(BossBarOverlays.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<BossBarOverlay> types = new ArrayList<>();
-        types.add(new LanternBossBarOverlay("progress", 0));
-        types.add(new LanternBossBarOverlay("notched_6", 1));
-        types.add(new LanternBossBarOverlay("notched_10", 2));
-        types.add(new LanternBossBarOverlay("notched_12", 3));
-        types.add(new LanternBossBarOverlay("notched_20", 4));
-        types.forEach(type -> this.bossBarOverlays.put(type.getId(), type));
+        this.register(new LanternBossBarOverlay("minecraft", "progress", 0));
+        this.register(new LanternBossBarOverlay("minecraft", "notched_6", 1));
+        this.register(new LanternBossBarOverlay("minecraft", "notched_10", 2));
+        this.register(new LanternBossBarOverlay("minecraft", "notched_12", 3));
+        this.register(new LanternBossBarOverlay("minecraft", "notched_20", 4));
     }
-
-    @Override
-    public Optional<BossBarOverlay> getById(String id) {
-        return Optional.ofNullable(this.bossBarOverlays.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<BossBarOverlay> getAll() {
-        return ImmutableSet.copyOf(this.bossBarOverlays.values());
-    }
-
 }

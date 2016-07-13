@@ -26,15 +26,16 @@
 package org.lanternpowered.server.economy;
 
 import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
 
 import javax.annotation.Nullable;
 
-public class LanternTransactionType extends SimpleCatalogType.Base implements TransactionType {
+public class LanternTransactionType extends PluginCatalogType.Base implements TransactionType {
 
-    public LanternTransactionType(String identifier) {
-        super(identifier);
+    public LanternTransactionType(String pluginId, String name) {
+        super(pluginId, name);
     }
 
     @Override

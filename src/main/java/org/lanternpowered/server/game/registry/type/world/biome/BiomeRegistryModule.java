@@ -28,24 +28,19 @@ package org.lanternpowered.server.game.registry.type.world.biome;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 
-import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 
 // TODO Lookup biome registry data from the worlds.
-public final class BiomeRegistryModule implements BiomeRegistry, AlternateCatalogRegistryModule<BiomeType> {
+public final class BiomeRegistryModule extends AdditionalPluginCatalogRegistryModule<BiomeType> implements BiomeRegistry {
 
     private static final BiomeRegistryModule INSTANCE = new BiomeRegistryModule();
 
@@ -53,25 +48,13 @@ public final class BiomeRegistryModule implements BiomeRegistry, AlternateCatalo
         return INSTANCE;
     }
 
-    @RegisterCatalog(BiomeTypes.class) private final Map<String, BiomeType> biomeTypes = Maps.newHashMap();
-
     private final Short2ObjectMap<BiomeType> biomeTypeByInternalId = new Short2ObjectOpenHashMap<>();
     private final Object2ShortMap<BiomeType> internalIdByBiomeType = new Object2ShortOpenHashMap<>();
 
     private int biomeIdCounter = 1024;
 
     private BiomeRegistryModule() {
-    }
-
-    @Override
-    public Map<String, BiomeType> provideCatalogMap() {
-        Map<String, BiomeType> mappings = Maps.newHashMap();
-        this.biomeTypes.forEach((key, value) -> {
-            if (key.startsWith("minecraft:")) {
-                mappings.put(key.replace("minecraft:", ""), value);
-            }
-        });
-        return mappings;
+        super(BiomeTypes.class);
     }
 
     @Override
@@ -80,14 +63,10 @@ public final class BiomeRegistryModule implements BiomeRegistry, AlternateCatalo
     }
 
     private void register(short internalId, BiomeType biomeType) {
-        checkNotNull(biomeType, "biomeType");
-        checkState(!this.biomeTypeByInternalId.containsKey(internalId), "Biome internal id already present! (" + internalId + ")");
-        checkState(!this.internalIdByBiomeType.containsKey(biomeType), "Biome type already present! (" + biomeType.getId() + ")");
-        String id = biomeType.getId().toLowerCase();
-        checkState(!this.biomeTypes.containsKey(id), "Identifier is already used! (" + id + ")");
+        checkState(!this.biomeTypeByInternalId.containsKey(internalId), "The internal id is already used: %s", internalId);
+        super.register(biomeType);
         this.biomeTypeByInternalId.put(internalId, biomeType);
         this.internalIdByBiomeType.put(biomeType, internalId);
-        this.biomeTypes.put(id, biomeType);
     }
 
     private int nextInternalId() {
@@ -111,19 +90,6 @@ public final class BiomeRegistryModule implements BiomeRegistry, AlternateCatalo
     @Override
     public Optional<BiomeType> getByInternalId(int internalId) {
         return Optional.ofNullable(this.biomeTypeByInternalId.get((short) internalId));
-    }
-
-    @Override
-    public Optional<BiomeType> getById(String id) {
-        if (checkNotNull(id, "identifier").indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.biomeTypes.get(id.toLowerCase()));
-    }
-
-    @Override
-    public Collection<BiomeType> getAll() {
-        return ImmutableSet.copyOf(this.biomeTypes.values());
     }
 
     @Override

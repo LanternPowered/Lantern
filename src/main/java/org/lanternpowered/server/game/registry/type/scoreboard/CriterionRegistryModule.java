@@ -25,48 +25,24 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternCriterion;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.scoreboard.critieria.Criteria;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class CriterionRegistryModule extends AdditionalPluginCatalogRegistryModule<Criterion> {
 
-public final class CriterionRegistryModule implements CatalogRegistryModule<Criterion> {
-
-    @RegisterCatalog(Criteria.class)
-    private final Map<String, Criterion> criteria = Maps.newHashMap();
+    public CriterionRegistryModule() {
+        super(Criteria.class);
+    }
 
     @Override
     public void registerDefaults() {
-        Map<String, Criterion> types = Maps.newHashMap();
-        types.put("dummy", new LanternCriterion("dummy"));
-        types.put("trigger", new LanternCriterion("trigger"));
-        types.put("health", new LanternCriterion("health"));
-        types.put("player_kills", new LanternCriterion("playerKillCount"));
-        types.put("total_kills", new LanternCriterion("totalKillCount"));
-        types.put("deaths", new LanternCriterion("deathCount"));
-        types.entrySet().forEach(entry -> {
-            this.criteria.put(entry.getValue().getId(), entry.getValue());
-            this.criteria.put(entry.getKey(), entry.getValue());
-        });
+        this.register(new LanternCriterion("minecraft", "dummy"));
+        this.register(new LanternCriterion("minecraft", "trigger"));
+        this.register(new LanternCriterion("minecraft", "health"));
+        this.register(new LanternCriterion("minecraft", "player_kills", "playerKillCount"));
+        this.register(new LanternCriterion("minecraft", "total_kills", "totalKillCount"));
+        this.register(new LanternCriterion("minecraft", "deaths", "deathCount"));
     }
-
-    @Override
-    public Optional<Criterion> getById(String id) {
-        return Optional.ofNullable(this.criteria.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<Criterion> getAll() {
-        return ImmutableSet.copyOf(this.criteria.values());
-    }
-
 }

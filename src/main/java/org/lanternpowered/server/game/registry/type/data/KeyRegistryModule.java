@@ -28,29 +28,28 @@ package org.lanternpowered.server.game.registry.type.data;
 import static org.spongepowered.api.data.DataQuery.of;
 import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
 
-import com.google.common.collect.Maps;
-import org.spongepowered.api.data.key.Key;
+import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
+import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DirtType;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.registry.RegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collections;
+import java.util.List;
 
-public final class KeyRegistryModule implements RegistryModule {
-
-    @RegisterCatalog(Keys.class) private final Map<String, Key<?>> mappings = new HashMap<>();
+public final class KeyRegistryModule implements RegistryModule, CatalogMappingDataHolder {
 
     @Override
-    public void registerDefaults() {
-        this.mappings.put("dirt_type", makeSingleKey(DirtType.class, Value.class, of("DirtType")));
-        this.mappings.put("snowed", makeSingleKey(Boolean.class, Value.class, of("Snowed")));
-        this.mappings.put("stone_type", makeSingleKey(StoneType.class, Value.class, of("StoneType")));
-        this.mappings.put("tree_type", makeSingleKey(TreeType.class, Value.class, of("TreeType")));
+    public List<CatalogMappingData> getCatalogMappings() {
+        return Collections.singletonList(new CatalogMappingData(Keys.class, ImmutableMap.<String, Object>builder()
+                .put("dirt_type", makeSingleKey(DirtType.class, Value.class, of("DirtType")))
+                .put("snowed", makeSingleKey(Boolean.class, Value.class, of("Snowed")))
+                .put("stone_type", makeSingleKey(StoneType.class, Value.class, of("StoneType")))
+                .put("tree_type", makeSingleKey(TreeType.class, Value.class, of("TreeType")))
+                .build()));
     }
-
 }

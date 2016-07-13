@@ -25,46 +25,22 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternVisibility;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.scoreboard.Visibilities;
 import org.spongepowered.api.scoreboard.Visibility;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class VisibilityRegistryModule extends AdditionalPluginCatalogRegistryModule<Visibility> {
 
-public final class VisibilityRegistryModule implements CatalogRegistryModule<Visibility> {
-
-    @RegisterCatalog(Visibilities.class)
-    private final Map<String, Visibility> visibilities = Maps.newHashMap();
+    public VisibilityRegistryModule() {
+        super(Visibilities.class);
+    }
 
     @Override
     public void registerDefaults() {
-        Map<String, Visibility> types = Maps.newHashMap();
-        types.put("all", new LanternVisibility("always"));
-        types.put("own_team", new LanternVisibility("hideForOwnTeam"));
-        types.put("other_teams", new LanternVisibility("hideForOtherTeams"));
-        types.put("none", new LanternVisibility("never"));
-        types.entrySet().forEach(entry -> {
-            this.visibilities.put(entry.getValue().getId(), entry.getValue());
-            this.visibilities.put(entry.getKey(), entry.getValue());
-        });
+        this.register(new LanternVisibility("minecraft", "all", "always"));
+        this.register(new LanternVisibility("minecraft", "own_team", "hideForOwnTeam"));
+        this.register(new LanternVisibility("minecraft", "other_teams", "hideForOtherTeams"));
+        this.register(new LanternVisibility("minecraft", "none", "never"));
     }
-
-    @Override
-    public Optional<Visibility> getById(String id) {
-        return Optional.ofNullable(this.visibilities.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<Visibility> getAll() {
-        return ImmutableSet.copyOf(this.visibilities.values());
-    }
-
 }

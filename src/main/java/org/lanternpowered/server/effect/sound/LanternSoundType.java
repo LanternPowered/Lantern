@@ -28,28 +28,25 @@ package org.lanternpowered.server.effect.sound;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSoundEffectBase;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import javax.annotation.Nullable;
-
-@NonnullByDefault
-public final class LanternSoundType extends SimpleCatalogType.Base implements SoundType {
+public final class LanternSoundType extends PluginCatalogType.Base implements SoundType {
 
     private final int eventId;
 
-    public LanternSoundType(String identifier) {
-        this(identifier, null);
+    public LanternSoundType(String pluginId, String id, String name, int eventId) {
+        super(pluginId, id, name);
+        this.eventId = eventId;
     }
 
-    public LanternSoundType(String identifier, @Nullable Integer eventId) {
-        super(identifier);
-        this.eventId = eventId == null ? -1 : eventId;
+    public LanternSoundType(String pluginId, String id, String name) {
+        super(pluginId, id, name);
+        this.eventId = -1;
     }
 
     public MessagePlayOutSoundEffectBase createMessage(Vector3d position, SoundCategory soundCategory,

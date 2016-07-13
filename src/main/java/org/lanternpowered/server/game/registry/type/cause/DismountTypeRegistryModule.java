@@ -25,70 +25,21 @@
  */
 package org.lanternpowered.server.game.registry.type.cause;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.game.registry.RegistryModuleHelper.validateIdentifier;
-
-import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.cause.entity.damage.LanternDamageType;
 import org.lanternpowered.server.cause.entity.dismount.LanternDismountType;
-import org.spongepowered.api.event.cause.entity.damage.DamageType;
-import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.event.cause.entity.dismount.DismountType;
 import org.spongepowered.api.event.cause.entity.dismount.DismountTypes;
-import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+public class DismountTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<DismountType> {
 
-public class DismountTypeRegistryModule implements AdditionalCatalogRegistryModule<DismountType>,
-        AlternateCatalogRegistryModule<DismountType> {
-
-    @RegisterCatalog(DismountTypes.class)
-    private final Map<String, DismountType> dismountTypes = new HashMap<>();
-
-    @Override
-    public Map<String, DismountType> provideCatalogMap() {
-        Map<String, DismountType> provided = new HashMap<>();
-        for (Map.Entry<String, DismountType> entry : this.dismountTypes.entrySet()) {
-            provided.put(entry.getKey().replace("minecraft:", ""), entry.getValue());
-        }
-        return provided;
-    }
-
-    @Override
-    public void registerAdditionalCatalog(DismountType damageType) {
-        checkNotNull(damageType, "damageType");
-        final String id = damageType.getId();
-        validateIdentifier(id);
-        checkState(!this.dismountTypes.containsKey(id),
-                "There is already a dismount type registered with the id. (" + id + ")");
-        this.dismountTypes.put(id, damageType);
+    public DismountTypeRegistryModule() {
+        super(DismountTypes.class);
     }
 
     @Override
     public void registerDefaults() {
-        this.registerAdditionalCatalog(new LanternDismountType("minecraft", "death"));
-        this.registerAdditionalCatalog(new LanternDismountType("minecraft", "derail"));
-        this.registerAdditionalCatalog(new LanternDismountType("minecraft", "player"));
+        this.register(new LanternDismountType("minecraft", "death"));
+        this.register(new LanternDismountType("minecraft", "derail"));
+        this.register(new LanternDismountType("minecraft", "player"));
     }
-
-    @Override
-    public Optional<DismountType> getById(String id) {
-        if (checkNotNull(id).indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.dismountTypes.get(id.toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<DismountType> getAll() {
-        return ImmutableSet.copyOf(this.dismountTypes.values());
-    }
-
 }

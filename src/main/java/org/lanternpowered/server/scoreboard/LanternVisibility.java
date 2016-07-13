@@ -25,12 +25,17 @@
  */
 package org.lanternpowered.server.scoreboard;
 
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.scoreboard.Visibility;
 
-public class LanternVisibility extends SimpleCatalogType.Base implements Visibility {
+public class LanternVisibility extends PluginCatalogType.Base implements Visibility {
 
-    public LanternVisibility(String identifier) {
-        super(identifier);
+    public LanternVisibility(String pluginId, String name) {
+        super(pluginId, name);
+    }
+
+    public LanternVisibility(String pluginId, String id, String name) {
+        super(pluginId, id, name);
     }
 }

@@ -25,46 +25,23 @@
  */
 package org.lanternpowered.server.game.registry.type.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.config.user.ban.LanternBanType;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.BanType;
 import org.spongepowered.api.util.ban.BanTypes;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class BanTypeRegistryModule extends SimpleCatalogRegistryModule<BanType> {
 
-public final class BanTypeRegistryModule implements CatalogRegistryModule<BanType> {
-
-    @RegisterCatalog(BanTypes.class)
-    private final Map<String, BanType> banTypes = Maps.newHashMap();
+    public BanTypeRegistryModule() {
+        super(BanTypes.class);
+    }
 
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        List<BanType> types = Lists.newArrayList();
-        types.add(new LanternBanType("profile", Ban.Profile.class));
-        types.add(new LanternBanType("ip", Ban.Ip.class));
-        types.forEach(type -> this.banTypes.put(type.getId(), type));
+        this.register(new LanternBanType("profile", Ban.Profile.class));
+        this.register(new LanternBanType("ip", Ban.Ip.class));
     }
-
-    @Override
-    public Optional<BanType> getById(String id) {
-        return Optional.ofNullable(this.banTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<BanType> getAll() {
-        return ImmutableSet.copyOf(this.banTypes.values());
-    }
-
 }

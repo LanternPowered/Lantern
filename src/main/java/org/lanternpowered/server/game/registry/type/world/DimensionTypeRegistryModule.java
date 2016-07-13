@@ -25,68 +25,30 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.world.dimension.LanternDimensionEnd;
 import org.lanternpowered.server.world.dimension.LanternDimensionNether;
 import org.lanternpowered.server.world.dimension.LanternDimensionOverworld;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorTypes;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-
 @RegistrationDependency(GeneratorTypeRegistryModule.class)
-public class DimensionTypeRegistryModule implements AlternateCatalogRegistryModule<DimensionType> {
+public class DimensionTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<DimensionType> {
 
-    @RegisterCatalog(DimensionTypes.class) private final Map<String, DimensionType> dimensionTypes = new HashMap<>();
-
-    @Override
-    public Map<String, DimensionType> provideCatalogMap() {
-        final Map<String, DimensionType> mappings = new HashMap<>();
-        for (DimensionType type : this.dimensionTypes.values()) {
-            mappings.put(type.getName(), type);
-        }
-        return mappings;
+    public DimensionTypeRegistryModule() {
+        super(DimensionTypes.class);
     }
 
     @Override
     public void registerDefaults() {
-        final List<DimensionType> types = new ArrayList<>();
-        types.add(new LanternDimensionType<>("minecraft", "the_end", -1, LanternDimensionEnd.class, GeneratorTypes.THE_END, true, false,
+        this.register(new LanternDimensionType<>("minecraft", "the_end", -1, LanternDimensionEnd.class, GeneratorTypes.THE_END, true, false,
                 false, false, LanternDimensionEnd::new));
-        types.add(new LanternDimensionType<>("minecraft", "overworld", 0, LanternDimensionOverworld.class, GeneratorTypes.OVERWORLD, true, false,
+        this.register(new LanternDimensionType<>("minecraft", "overworld", 0, LanternDimensionOverworld.class, GeneratorTypes.OVERWORLD, true, false,
                 true, true, LanternDimensionOverworld::new));
-        types.add(new LanternDimensionType<>("minecraft", "nether", 1, LanternDimensionNether.class, GeneratorTypes.NETHER, true, true,
+        this.register(new LanternDimensionType<>("minecraft", "nether", 1, LanternDimensionNether.class, GeneratorTypes.NETHER, true, true,
                 false, false, LanternDimensionNether::new));
-
-        for (DimensionType type : types) {
-            this.dimensionTypes.put(type.getId(), type);
-        }
     }
-
-    @Override
-    public Optional<DimensionType> getById(String id) {
-        if (checkNotNull(id).indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.dimensionTypes.get(id.toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<DimensionType> getAll() {
-        return ImmutableSet.copyOf(this.dimensionTypes.values());
-    }
-
 }

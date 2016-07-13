@@ -91,10 +91,11 @@ import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModu
 import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
-import org.lanternpowered.server.game.registry.type.data.EnumValueRegistryModule;
+import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
@@ -189,6 +190,7 @@ import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.SandstoneTypes;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
+import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.SlabTypes;
 import org.spongepowered.api.data.type.StoneType;
@@ -216,9 +218,6 @@ import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.dismount.DismountType;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCause;
@@ -367,6 +366,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SlabType.class, new EnumValueRegistryModule<>(LanternSlabType.class, SlabTypes.class))
                 .registerModule(TreeType.class, new EnumValueRegistryModule<>(LanternTreeType.class, TreeTypes.class))
                 .registerModule(WallType.class, new EnumValueRegistryModule<>(LanternWallType.class, WallTypes.class))
+                .registerModule(SkinPart.class, new SkinPartRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
@@ -911,11 +911,13 @@ public class LanternGameRegistry implements GameRegistry {
         return null;
     }
 
+    @Deprecated
     @Override
     public TextSerializerFactory getTextSerializerFactory() {
         return this.getRegistryModule(TextSerializersRegistryModule.class).get().getTextSerializerFactory();
     }
 
+    @Deprecated
     @Override
     public LanternSelectorFactory getSelectorFactory() {
         return this.getRegistryModule(SelectorFactoryRegistryModule.class).get().getFactory();

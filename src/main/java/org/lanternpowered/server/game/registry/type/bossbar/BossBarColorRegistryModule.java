@@ -25,49 +25,25 @@
  */
 package org.lanternpowered.server.game.registry.type.bossbar;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.bossbar.LanternBossBarColor;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarColors;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+public final class BossBarColorRegistryModule extends AdditionalPluginCatalogRegistryModule<BossBarColor> {
 
-public final class BossBarColorRegistryModule implements CatalogRegistryModule<BossBarColor> {
-
-    @RegisterCatalog(BossBarColors.class)
-    private final Map<String, BossBarColor> bossBarColors = new HashMap<>();
+    public BossBarColorRegistryModule() {
+        super(BossBarColors.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<BossBarColor> types = new ArrayList<>();
-        types.add(new LanternBossBarColor("pink", 0));
-        types.add(new LanternBossBarColor("blue", 1));
-        types.add(new LanternBossBarColor("red", 2));
-        types.add(new LanternBossBarColor("green", 3));
-        types.add(new LanternBossBarColor("yellow", 4));
-        types.add(new LanternBossBarColor("purple", 5));
-        types.add(new LanternBossBarColor("white", 6));
-        types.forEach(type -> this.bossBarColors.put(type.getId(), type));
+        this.register(new LanternBossBarColor("minecraft", "pink", 0));
+        this.register(new LanternBossBarColor("minecraft", "blue", 1));
+        this.register(new LanternBossBarColor("minecraft", "red", 2));
+        this.register(new LanternBossBarColor("minecraft", "green", 3));
+        this.register(new LanternBossBarColor("minecraft", "yellow", 4));
+        this.register(new LanternBossBarColor("minecraft", "purple", 5));
+        this.register(new LanternBossBarColor("minecraft", "white", 6));
     }
-
-    @Override
-    public Optional<BossBarColor> getById(String id) {
-        return Optional.ofNullable(this.bossBarColors.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<BossBarColor> getAll() {
-        return ImmutableSet.copyOf(this.bossBarColors.values());
-    }
-
 }

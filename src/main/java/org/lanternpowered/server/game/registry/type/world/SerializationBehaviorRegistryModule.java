@@ -25,44 +25,22 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.lanternpowered.server.world.LanternSerializationBehavior;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.SerializationBehaviors;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class SerializationBehaviorRegistryModule extends PluginCatalogRegistryModule<SerializationBehavior> {
 
-public final class SerializationBehaviorRegistryModule implements CatalogRegistryModule<SerializationBehavior> {
-
-    @RegisterCatalog(SerializationBehaviors.class) private final Map<String, SerializationBehavior> serializationBehaviors = new HashMap<>();
+    public SerializationBehaviorRegistryModule() {
+        super(SerializationBehaviors.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<SerializationBehavior> types = Lists.newArrayList();
-        types.add(new LanternSerializationBehavior("automatic", "Automatic"));
-        types.add(new LanternSerializationBehavior("manual", "Manual"));
-        types.add(new LanternSerializationBehavior("none", "None"));
-        types.forEach(type -> this.serializationBehaviors.put(type.getId(), type));
+        this.register(new LanternSerializationBehavior("minecraft", "automatic", "Automatic"));
+        this.register(new LanternSerializationBehavior("minecraft", "manual", "Manual"));
+        this.register(new LanternSerializationBehavior("minecraft", "none", "None"));
     }
-
-    @Override
-    public Optional<SerializationBehavior> getById(String id) {
-        return Optional.ofNullable(this.serializationBehaviors.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<SerializationBehavior> getAll() {
-        return ImmutableSet.copyOf(this.serializationBehaviors.values());
-    }
-
 }
 

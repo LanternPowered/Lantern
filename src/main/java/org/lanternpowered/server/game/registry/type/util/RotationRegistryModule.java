@@ -25,49 +25,29 @@
  */
 package org.lanternpowered.server.game.registry.type.util;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.lanternpowered.server.util.rotation.LanternRotation;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.util.rotation.Rotation;
 import org.spongepowered.api.util.rotation.Rotations;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-public final class RotationRegistryModule implements CatalogRegistryModule<Rotation> {
+public final class RotationRegistryModule extends SimpleCatalogRegistryModule<Rotation> {
 
-    @RegisterCatalog(Rotations.class)
-    private final Map<String, Rotation> rotations = Maps.newHashMap();
+    public RotationRegistryModule() {
+        super(Rotations.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<Rotation> types = Lists.newArrayList();
-        types.add(new LanternRotation("top", 0));
-        types.add(new LanternRotation("top_right", 45));
-        types.add(new LanternRotation("right", 90));
-        types.add(new LanternRotation("bottom_right", 135));
-        types.add(new LanternRotation("bottom", 180));
-        types.add(new LanternRotation("bottom_left", 225));
-        types.add(new LanternRotation("left", 270));
-        types.add(new LanternRotation("top_left", 315));
-        types.forEach(type -> this.rotations.put(type.getId(), type));
-    }
-
-    @Override
-    public Optional<Rotation> getById(String id) {
-        return Optional.ofNullable(this.rotations.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<Rotation> getAll() {
-        return ImmutableSet.copyOf(this.rotations.values());
+        this.register(new LanternRotation("top", 0));
+        this.register(new LanternRotation("top_right", 45));
+        this.register(new LanternRotation("right", 90));
+        this.register(new LanternRotation("bottom_right", 135));
+        this.register(new LanternRotation("bottom", 180));
+        this.register(new LanternRotation("bottom_left", 225));
+        this.register(new LanternRotation("left", 270));
+        this.register(new LanternRotation("top_left", 315));
     }
 
     public Optional<Rotation> getRotationFromDegree(int degrees) {
@@ -78,12 +58,11 @@ public final class RotationRegistryModule implements CatalogRegistryModule<Rotat
             degrees -= 360;
         }
         int angle = Math.round(degrees / 360 * 8) * 45;
-        for (Rotation rotation : this.rotations.values()) {
+        for (Rotation rotation : this.getAll()) {
             if (rotation.getAngle() == angle) {
                 return Optional.of(rotation);
             }
         }
         return Optional.empty();
     }
-
 }

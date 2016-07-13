@@ -29,8 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.block.LanternBlockType.DEFAULT_ITEM_TYPE_BUILDER;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
@@ -57,29 +55,22 @@ import org.lanternpowered.server.block.type.BlockStoneSlab1;
 import org.lanternpowered.server.block.type.BlockStoneSlab2;
 import org.lanternpowered.server.block.type.BlockStoneSlabBase;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public final class BlockRegistryModule implements BlockRegistry, AlternateCatalogRegistryModule<BlockType> {
+public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry {
 
     private static final BlockRegistryModule INSTANCE = new BlockRegistryModule();
 
     public static BlockRegistryModule get() {
         return INSTANCE;
     }
-
-    @RegisterCatalog(BlockTypes.class)
-    private final Map<String, BlockType> blockTypes = new HashMap<>();
 
     private final Short2ObjectMap<BlockType> blockTypeByInternalId = new Short2ObjectOpenHashMap<>();
     private final Object2ShortMap<BlockType> internalIdByBlockType = new Object2ShortOpenHashMap<>();
@@ -90,7 +81,8 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
     // The counter for custom block ids. (Non vanilla ones.)
     private int blockIdCounter = 1024;
 
-    private BlockRegistryModule() {
+    public BlockRegistryModule() {
+        super(BlockTypes.class);
     }
 
     @Override
@@ -98,28 +90,13 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
         return this.blockStateByPackedType.size();
     }
 
-    @Override
-    public Map<String, BlockType> provideCatalogMap() {
-        Map<String, BlockType> mappings = Maps.newHashMap();
-        for (Map.Entry<String, BlockType> entry : this.blockTypes.entrySet()) {
-            String identifier = entry.getKey();
-            if (identifier.startsWith("minecraft:")) {
-                mappings.put(identifier.replace("minecraft:", ""), entry.getValue());
-            }
-        }
-        return mappings;
-    }
-
     private void register0(int internalId, LanternBlockType blockType, Function<BlockState, Byte> stateToDataConverter) {
         checkNotNull(stateToDataConverter, "stateToDataConverter");
-        final String id = checkNotNull(blockType, "blockType").getId().toLowerCase();
-        checkState(!this.blockTypes.containsValue(checkNotNull(blockType, "blockType")), "The block type (" + id + ") is already registered.");
-        checkState(!this.blockTypes.containsKey(id), "The identifier (" + id + ") is already used.");
-        checkState(internalId >= 0, "Internal id cannot be negative.");
-        checkState(internalId <= 0xfff, "Exceeded the internal id limit. (" + 0xfff + ")");
+        checkState(internalId >= 0, "The internal id cannot be negative: %s", internalId);
+        checkState(internalId <= 0xfff, "The internal id exceeded the internal id limit: %s > %s", internalId, 0xfff);
         final short internalId0 = (short) internalId;
-        checkState(!this.blockTypeByInternalId.containsKey(internalId0), "Internal id (" + internalId + ") is already used!");
-        this.blockTypes.put(id, blockType);
+        checkState(!this.blockTypeByInternalId.containsKey(internalId0), "The internal id is already used: %s", internalId);
+        super.register(blockType);
         this.blockTypeByInternalId.put(internalId0, blockType);
         this.internalIdByBlockType.put(blockType, internalId0);
         Byte2ObjectMap<BlockState> usedValues = new Byte2ObjectOpenHashMap<>();
@@ -154,7 +131,7 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
         }
         BlockStateRegistryModule blockStateRegistryModule = Lantern.getRegistry()
                 .getRegistryModule(BlockStateRegistryModule.class).get();
-        blockType.getAllStates().forEach(blockStateRegistryModule::put);
+        blockType.getAllStates().forEach(blockStateRegistryModule::registerState);
         blockType.getItem().ifPresent(itemType -> ItemRegistryModule.get().register(internalId, itemType));
     }
 
@@ -229,19 +206,6 @@ public final class BlockRegistryModule implements BlockRegistry, AlternateCatalo
     @Override
     public int getPackedVersion(int internalId, byte data) {
         return ((internalId & 0xfff) << 4) | (data & 0xf);
-    }
-
-    @Override
-    public Optional<BlockType> getById(String id) {
-        if (checkNotNull(id, "identifier").indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.blockTypes.get(id.toLowerCase()));
-    }
-
-    @Override
-    public Collection<BlockType> getAll() {
-        return ImmutableSet.copyOf(this.blockTypes.values());
     }
 
     @Override

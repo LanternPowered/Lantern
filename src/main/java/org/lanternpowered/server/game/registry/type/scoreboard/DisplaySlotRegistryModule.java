@@ -25,67 +25,51 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
-public final class DisplaySlotRegistryModule implements CatalogRegistryModule<DisplaySlot> {
+public final class DisplaySlotRegistryModule extends AdditionalPluginCatalogRegistryModule<DisplaySlot> {
 
-    @RegisterCatalog(DisplaySlots.class)
-    private final Map<String, DisplaySlot> objectiveDisplayModes = Maps.newHashMap();
+    private final Int2ObjectMap<DisplaySlot> byInternalIds = new Int2ObjectOpenHashMap<>();
 
-    private final Int2ObjectMap<DisplaySlot> displaySlotByInternalIds = new Int2ObjectOpenHashMap<>();
+    public DisplaySlotRegistryModule() {
+        super(DisplaySlots.class);
+    }
+
+    @Override
+    protected void register(DisplaySlot catalogType, boolean disallowInbuiltPluginIds) {
+        super.register(catalogType, disallowInbuiltPluginIds);
+        this.byInternalIds.putIfAbsent(((LanternDisplaySlot) catalogType).getInternalId(), catalogType);
+    }
 
     @Override
     public void registerDefaults() {
-        Map<String, DisplaySlot> types = new HashMap<>();
-        types.put("list", new LanternDisplaySlot("list", null, 0));
-        types.put("sidebar", new LanternDisplaySlot("sidebar", null, 1));
-        types.put("below_name", new LanternDisplaySlot("belowName", null, 2));
+        this.register(new LanternDisplaySlot("minecraft", "list", null, 0));
+        this.register(new LanternDisplaySlot("minecraft", "sidebar", null, 1));
+        this.register(new LanternDisplaySlot("minecraft", "below_name", "belowName", null, 2));
         for (TextColor textColor : Sponge.getRegistry().getAllOf(TextColor.class)) {
             // There is not mapping for "none"
             if (textColor == TextColors.NONE) {
                 continue;
             }
-            char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.get(textColor);
-            types.put("below_name_" + textColor.getId(), new LanternDisplaySlot("sidebar.team." + textColor.getId(), textColor, 3 + character));
+            final char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.get(textColor);
+            final String id = "below_name_" + textColor.getId();
+            final String name = "sidebar.team." + textColor.getId();
+            this.register(new LanternDisplaySlot("minecraft", id, name, textColor, 3 + character));
         }
-        types.entrySet().forEach(entry -> {
-            this.objectiveDisplayModes.put(entry.getKey(), entry.getValue());
-            this.objectiveDisplayModes.put(entry.getValue().getId(), entry.getValue());
-            this.displaySlotByInternalIds.put(((LanternDisplaySlot) entry.getValue()).getInternalId(), entry.getValue());
-        });
-    }
-
-    @Override
-    public Optional<DisplaySlot> getById(String id) {
-        return Optional.ofNullable(this.objectiveDisplayModes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<DisplaySlot> getAll() {
-        return ImmutableSet.copyOf(this.objectiveDisplayModes.values());
     }
 
     public Optional<DisplaySlot> getByInternalId(int internalId) {
-        return Optional.ofNullable(this.displaySlotByInternalIds.get(internalId));
+        return Optional.ofNullable(this.byInternalIds.get(internalId));
     }
-
 }

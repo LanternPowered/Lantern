@@ -25,54 +25,28 @@
  */
 package org.lanternpowered.server.game.registry.type.effect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.effect.sound.LanternSoundCategory;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.effect.sound.SoundCategory;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class SoundCategoryRegistryModule extends PluginCatalogRegistryModule<SoundCategory> {
 
-public final class SoundCategoryRegistryModule implements CatalogRegistryModule<SoundCategory> {
-
-    @RegisterCatalog(SoundCategories.class)
-    private final Map<String, SoundCategory> soundCategoryTypes = Maps.newHashMap();
+    public SoundCategoryRegistryModule() {
+        super(SoundCategories.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<SoundCategory> types = Lists.newArrayList();
-        types.add(new LanternSoundCategory("minecraft", "master", 0));
-        types.add(new LanternSoundCategory("minecraft", "music", 1));
-        types.add(new LanternSoundCategory("minecraft", "record", 2));
-        types.add(new LanternSoundCategory("minecraft", "weather", 3));
-        types.add(new LanternSoundCategory("minecraft", "block", 4));
-        types.add(new LanternSoundCategory("minecraft", "hostile", 5));
-        types.add(new LanternSoundCategory("minecraft", "neutral", 6));
-        types.add(new LanternSoundCategory("minecraft", "player", 7));
-        types.add(new LanternSoundCategory("minecraft", "ambient", 8));
-        types.add(new LanternSoundCategory("minecraft", "voice", 9));
-        types.forEach(type -> {
-            this.soundCategoryTypes.put(type.getId(), type);
-            this.soundCategoryTypes.put(type.getName(), type);
-        });
+        this.register(new LanternSoundCategory("minecraft", "master", 0));
+        this.register(new LanternSoundCategory("minecraft", "music", 1));
+        this.register(new LanternSoundCategory("minecraft", "record", 2));
+        this.register(new LanternSoundCategory("minecraft", "weather", 3));
+        this.register(new LanternSoundCategory("minecraft", "block", 4));
+        this.register(new LanternSoundCategory("minecraft", "hostile", 5));
+        this.register(new LanternSoundCategory("minecraft", "neutral", 6));
+        this.register(new LanternSoundCategory("minecraft", "player", 7));
+        this.register(new LanternSoundCategory("minecraft", "ambient", 8));
+        this.register(new LanternSoundCategory("minecraft", "voice", 9));
     }
-
-    @Override
-    public Optional<SoundCategory> getById(String id) {
-        return Optional.ofNullable(this.soundCategoryTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<SoundCategory> getAll() {
-        return ImmutableSet.copyOf(this.soundCategoryTypes.values());
-    }
-
 }

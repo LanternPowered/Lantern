@@ -35,6 +35,10 @@ public final class LanternWeather extends PluginCatalogType.Base implements Weat
     private final float lightningRate;
     private final float thunderRate;
 
+    public LanternWeather(String pluginId, String name, float rainStrength, float darkness,
+            float lightningRate, float thunderRate) {
+        this(pluginId, name, name, rainStrength, darkness, lightningRate, thunderRate);
+    }
     /**
      * Creates a new weather instance.
      * 
@@ -48,9 +52,9 @@ public final class LanternWeather extends PluginCatalogType.Base implements Weat
      * @param lightningRate the lightning strike rate
      * @param thunderRate the thunder (sound) rate
      */
-    public LanternWeather(String pluginId, String name, float rainStrength, float darkness,
+    public LanternWeather(String pluginId, String id, String name, float rainStrength, float darkness,
             float lightningRate, float thunderRate) {
-        super(pluginId, name);
+        super(pluginId, id, name);
 
         this.lightningRate = lightningRate;
         this.rainStrength = rainStrength;

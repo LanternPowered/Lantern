@@ -25,23 +25,15 @@
  */
 package org.lanternpowered.server.game.registry.type.data;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.type.LanternNotePitch;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.NotePitches;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
-public final class NotePitchRegistryModule implements CatalogRegistryModule<NotePitch> {
+public final class NotePitchRegistryModule extends SimpleCatalogRegistryModule<NotePitch> {
 
     private static final String[] SORTED_NOTE_PITCHES = {
             "F_SHARP0",
@@ -71,30 +63,20 @@ public final class NotePitchRegistryModule implements CatalogRegistryModule<Note
             "F_SHARP2",
     };
 
-    @RegisterCatalog(NotePitches.class)
-    private final Map<String, NotePitch> notePitches = Maps.newHashMap();
+    public NotePitchRegistryModule() {
+        super(NotePitches.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<LanternNotePitch> entries = Lists.newArrayList();
+        final List<LanternNotePitch> entries = new ArrayList<>(SORTED_NOTE_PITCHES.length);
         for (String noteName : SORTED_NOTE_PITCHES) {
-            LanternNotePitch notePitch = new LanternNotePitch(noteName, entries.size());
-            this.notePitches.put(noteName.toLowerCase(), notePitch);
+            final LanternNotePitch notePitch = new LanternNotePitch(noteName, entries.size());
             entries.add(notePitch);
+            this.register(notePitch);
         }
         for (int i = 0; i < entries.size(); i++) {
             entries.get(i).setNext(entries.get((i + 1) % entries.size()));
         }
     }
-
-    @Override
-    public Optional<NotePitch> getById(String id) {
-        return Optional.ofNullable(this.notePitches.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<NotePitch> getAll() {
-        return ImmutableSet.copyOf(this.notePitches.values());
-    }
-
 }

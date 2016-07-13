@@ -23,35 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player.gamemode;
+package org.lanternpowered.server.game.registry;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 
-public class LanternGameMode extends PluginCatalogType.Base.Translatable implements GameMode {
+import java.util.function.Function;
 
-    private final byte internalId;
+import javax.annotation.Nullable;
 
-    public LanternGameMode(String pluginId, String name, Translation translation, int internalId) {
-        super(pluginId, name, translation);
-        this.internalId = (byte) internalId;
+public class AdditionalPluginCatalogRegistryModule<T extends CatalogType> extends PluginCatalogRegistryModule<T>
+        implements AdditionalCatalogRegistryModule<T> {
+
+    public AdditionalPluginCatalogRegistryModule(@Nullable Class<?> catalogClass) {
+        super(catalogClass);
     }
 
-    public LanternGameMode(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, "gameMode." + name);
-        this.internalId = (byte) internalId;
+    public AdditionalPluginCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
+        super(catalogClass, mappingProvider);
     }
 
-    public LanternGameMode(String pluginId, String name, int internalId) {
-        super(pluginId, name, "gameMode." + name);
-        this.internalId = (byte) internalId;
-    }
-
-    public byte getInternalId() {
-        return this.internalId;
+    @Override
+    public void registerAdditionalCatalog(T extraCatalog) {
+        this.register(extraCatalog, true);
     }
 }

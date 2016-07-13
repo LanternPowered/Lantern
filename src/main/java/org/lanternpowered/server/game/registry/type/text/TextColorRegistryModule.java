@@ -25,63 +25,61 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.format.LanternTextColor;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Color;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+public final class TextColorRegistryModule extends SimpleCatalogRegistryModule<TextColor> {
 
-public final class TextColorRegistryModule implements CatalogRegistryModule<TextColor> {
-
-    @RegisterCatalog(TextColors.class) private final Map<String, TextColor> chatColors = Maps.newHashMap();
+    public TextColorRegistryModule() {
+        super(TextColors.class);
+    }
 
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        List<TextColor> types = Lists.newArrayList();
-        types.add(new LanternTextColor("black", Color.BLACK, TextConstants.BLACK));
-        types.add(new LanternTextColor("dark_blue", Color.ofRgb(0x0000AA), TextConstants.DARK_BLUE));
-        types.add(new LanternTextColor("dark_green", Color.ofRgb(0x00AA00), TextConstants.DARK_GREEN));
-        types.add(new LanternTextColor("dark_aqua", Color.ofRgb(0x00AAAA), TextConstants.DARK_AQUA));
-        types.add(new LanternTextColor("dark_red", Color.ofRgb(0xAA0000), TextConstants.DARK_RED));
-        types.add(new LanternTextColor("dark_purple", Color.ofRgb(0xAA00AA), TextConstants.DARK_PURPLE));
-        types.add(new LanternTextColor("gold", Color.ofRgb(0xFFAA00), TextConstants.GOLD));
-        types.add(new LanternTextColor("gray", Color.ofRgb(0xAAAAAA), TextConstants.GRAY));
-        types.add(new LanternTextColor("dark_gray", Color.ofRgb(0x555555), TextConstants.DARK_GRAY));
-        types.add(new LanternTextColor("blue", Color.ofRgb(0x5555FF), TextConstants.BLUE));
-        types.add(new LanternTextColor("green", Color.ofRgb(0x55FF55), TextConstants.GREEN));
-        types.add(new LanternTextColor("aqua", Color.ofRgb(0x55FFFF), TextConstants.AQUA));
-        types.add(new LanternTextColor("red", Color.ofRgb(0xFF5555), TextConstants.RED));
-        types.add(new LanternTextColor("light_purple", Color.ofRgb(0xFF55FF), TextConstants.LIGHT_PURPLE));
-        types.add(new LanternTextColor("yellow", Color.ofRgb(0xFFFF55), TextConstants.YELLOW));
-        types.add(new LanternTextColor("white", Color.WHITE, TextConstants.WHITE));
-        types.add(new LanternTextColor("reset", Color.WHITE, TextConstants.RESET));
-        types.add(TextColors.NONE);
-        types.forEach(type -> this.chatColors.put(type.getId(), type));
-    }
+        this.register(new LanternTextColor("black", Color.BLACK, TextConstants.BLACK));
+        this.register(new LanternTextColor("dark_blue", Color.ofRgb(0x0000AA), TextConstants.DARK_BLUE));
+        this.register(new LanternTextColor("dark_green", Color.ofRgb(0x00AA00), TextConstants.DARK_GREEN));
+        this.register(new LanternTextColor("dark_aqua", Color.ofRgb(0x00AAAA), TextConstants.DARK_AQUA));
+        this.register(new LanternTextColor("dark_red", Color.ofRgb(0xAA0000), TextConstants.DARK_RED));
+        this.register(new LanternTextColor("dark_purple", Color.ofRgb(0xAA00AA), TextConstants.DARK_PURPLE));
+        this.register(new LanternTextColor("gold", Color.ofRgb(0xFFAA00), TextConstants.GOLD));
+        this.register(new LanternTextColor("gray", Color.ofRgb(0xAAAAAA), TextConstants.GRAY));
+        this.register(new LanternTextColor("dark_gray", Color.ofRgb(0x555555), TextConstants.DARK_GRAY));
+        this.register(new LanternTextColor("blue", Color.ofRgb(0x5555FF), TextConstants.BLUE));
+        this.register(new LanternTextColor("green", Color.ofRgb(0x55FF55), TextConstants.GREEN));
+        this.register(new LanternTextColor("aqua", Color.ofRgb(0x55FFFF), TextConstants.AQUA));
+        this.register(new LanternTextColor("red", Color.ofRgb(0xFF5555), TextConstants.RED));
+        this.register(new LanternTextColor("light_purple", Color.ofRgb(0xFF55FF), TextConstants.LIGHT_PURPLE));
+        this.register(new LanternTextColor("yellow", Color.ofRgb(0xFFFF55), TextConstants.YELLOW));
+        this.register(new LanternTextColor("white", Color.WHITE, TextConstants.WHITE));
+        this.register(new LanternTextColor("reset", Color.WHITE, TextConstants.RESET));
+        // Replacing the api class, ids may not be uppercase
+        this.register(new TextColor() {
+            @Override
+            public String getId() {
+                return "none";
+            }
 
-    @Override
-    public Optional<TextColor> getById(String id) {
-        return Optional.ofNullable(this.chatColors.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
-    }
+            @Override
+            public String getName() {
+                return this.getId();
+            }
 
-    @Override
-    public Collection<TextColor> getAll() {
-        return ImmutableSet.copyOf(this.chatColors.values());
-    }
+            @Override
+            public Color getColor() {
+                return Color.BLACK;
+            }
 
+            @Override
+            public String toString() {
+                return this.getId();
+            }
+        });
+    }
 }

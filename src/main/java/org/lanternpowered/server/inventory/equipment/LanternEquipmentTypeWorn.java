@@ -34,11 +34,11 @@ import javax.annotation.Nullable;
 
 public class LanternEquipmentTypeWorn extends LanternEquipmentType implements EquipmentTypeWorn {
 
-    public LanternEquipmentTypeWorn(String identifier) {
-        super(identifier);
+    public LanternEquipmentTypeWorn(String pluginId, String name) {
+        super(pluginId, name);
     }
 
-    public LanternEquipmentTypeWorn(String identifier, @Nullable Predicate<EquipmentType> childChecker) {
-        super(identifier, childChecker);
+    public LanternEquipmentTypeWorn(String pluginId, String name, @Nullable Predicate<EquipmentType> childChecker) {
+        super(pluginId, name, childChecker);
     }
 }

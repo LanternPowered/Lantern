@@ -25,51 +25,27 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.format.LanternTextStyle;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.text.format.TextStyle;
 import org.spongepowered.api.text.format.TextStyles;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+public final class TextStyleRegistryModule extends SimpleCatalogRegistryModule<TextStyle.Base> {
 
-public final class TextStyleRegistryModule implements CatalogRegistryModule<TextStyle.Base> {
-
-    @RegisterCatalog(TextStyles.class)
-    private final Map<String, TextStyle.Base> chatStyles = Maps.newHashMap();
+    public TextStyleRegistryModule() {
+        super(TextStyles.class);
+    }
 
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        List<TextStyle.Base> types = Lists.newArrayList();
-        types.add(new LanternTextStyle("bold", true, null, null, null, null, TextConstants.BOLD));
-        types.add(new LanternTextStyle("italic", null, true, null, null, null, TextConstants.ITALIC));
-        types.add(new LanternTextStyle("underline", null, null, true, null, null, TextConstants.UNDERLINE));
-        types.add(new LanternTextStyle("strikethrough", null, null, null, true, null, TextConstants.STRIKETHROUGH));
-        types.add(new LanternTextStyle("obfuscated", null, null, null, null, true, TextConstants.OBFUSCATED));
-        types.add(new LanternTextStyle("reset", false, false, false, false, false, TextConstants.RESET));
-        types.forEach(type -> this.chatStyles.put(type.getId(), type));
+        this.register(new LanternTextStyle("bold", true, null, null, null, null, TextConstants.BOLD));
+        this.register(new LanternTextStyle("italic", null, true, null, null, null, TextConstants.ITALIC));
+        this.register(new LanternTextStyle("underline", null, null, true, null, null, TextConstants.UNDERLINE));
+        this.register(new LanternTextStyle("strikethrough", null, null, null, true, null, TextConstants.STRIKETHROUGH));
+        this.register(new LanternTextStyle("obfuscated", null, null, null, null, true, TextConstants.OBFUSCATED));
+        this.register(new LanternTextStyle("reset", false, false, false, false, false, TextConstants.RESET));
     }
-
-    @Override
-    public Optional<TextStyle.Base> getById(String id) {
-        return Optional.ofNullable(this.chatStyles.get(checkNotNull(id).toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<TextStyle.Base> getAll() {
-        return ImmutableSet.copyOf(this.chatStyles.values());
-    }
-
 }

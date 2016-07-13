@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.data;
+package org.lanternpowered.server.game.registry;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 

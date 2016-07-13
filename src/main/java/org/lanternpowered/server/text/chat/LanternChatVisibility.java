@@ -27,23 +27,23 @@ package org.lanternpowered.server.text.chat;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 
 import java.util.function.Predicate;
 
-public final class LanternChatVisibility extends SimpleCatalogType.Base.Translatable implements ChatVisibility {
+public final class LanternChatVisibility extends PluginCatalogType.Base.Translatable implements ChatVisibility {
 
     private final static Int2ObjectMap<LanternChatVisibility> lookup = new Int2ObjectOpenHashMap<>();
 
     private final Predicate<ChatType> chatTypePredicate;
     private final int internalId;
 
-    public LanternChatVisibility(int internalId, String identifier, Predicate<ChatType> chatTypePredicate) {
-        super(identifier, Lantern.getGame().getRegistry().getTranslationManager().get(
-                "options.chat.visibility." + identifier));
+    public LanternChatVisibility(String pluginId, String name, int internalId, Predicate<ChatType> chatTypePredicate) {
+        super(pluginId, name, Lantern.getGame().getRegistry().getTranslationManager().get(
+                "options.chat.visibility." + name));
         this.internalId = internalId;
         this.chatTypePredicate = chatTypePredicate;
         lookup.put(internalId, this);

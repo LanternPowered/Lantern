@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.text.format.TextColor;
 
@@ -33,13 +33,18 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternDisplaySlot extends SimpleCatalogType.Base implements DisplaySlot {
+public class LanternDisplaySlot extends PluginCatalogType.Base implements DisplaySlot {
 
     private final Optional<TextColor> teamColor;
     private final int internalId;
 
-    public LanternDisplaySlot(String identifier, @Nullable TextColor teamColor, int internalId) {
-        super(identifier);
+    public LanternDisplaySlot(String pluginId, String name, @Nullable TextColor teamColor, int internalId) {
+        this(pluginId, name, name, teamColor, internalId);
+    }
+
+    public LanternDisplaySlot(String pluginId, String id, String name,
+            @Nullable TextColor teamColor, int internalId) {
+        super(pluginId, id, name);
         this.teamColor = Optional.ofNullable(teamColor);
         this.internalId = internalId;
     }

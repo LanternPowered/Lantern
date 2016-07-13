@@ -25,13 +25,16 @@
  */
 package org.lanternpowered.server.text.selector;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.text.selector.SelectorType;
 
-public class LanternSelectorType extends SimpleCatalogType.Base implements SelectorType {
+public class LanternSelectorType extends PluginCatalogType.Base implements SelectorType {
 
-    public LanternSelectorType(String identifier) {
-        super(identifier);
+    public LanternSelectorType(String pluginId, String name) {
+        super(pluginId, name);
     }
 
+    public LanternSelectorType(String pluginId, String id, String name) {
+        super(pluginId, id, name);
+    }
 }

@@ -25,11 +25,15 @@
  */
 package org.lanternpowered.server.scoreboard;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 
-public class LanternCollisionRule extends SimpleCatalogType.Base {
+public class LanternCollisionRule extends PluginCatalogType.Base {
 
-    public LanternCollisionRule(String identifier) {
-        super(identifier);
+    public LanternCollisionRule(String pluginId, String name) {
+        super(pluginId, name);
+    }
+
+    public LanternCollisionRule(String pluginId, String id, String name) {
+        super(pluginId, id, name);
     }
 }

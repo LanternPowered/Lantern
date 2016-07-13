@@ -60,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -103,7 +104,7 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
             Joiner joiner = Joiner.on(',');
             List<String> propertyValues = new ArrayList<>();
             for (Map.Entry<BlockTrait<?>, Comparable<?>> entry : traitValues.entrySet()) {
-                propertyValues.add(entry.getKey().getName() + "=" + entry.getValue());
+                propertyValues.add(entry.getKey().getName() + "=" + entry.getValue().toString().toLowerCase(Locale.ENGLISH));
             }
             idBuilder.append(joiner.join(propertyValues));
             idBuilder.append(']');

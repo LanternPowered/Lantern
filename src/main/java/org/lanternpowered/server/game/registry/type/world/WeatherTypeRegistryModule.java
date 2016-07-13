@@ -25,45 +25,21 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.world.LanternWeather;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
+public final class WeatherTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<Weather> {
 
-public final class WeatherTypeRegistryModule implements CatalogRegistryModule<Weather> {
-
-    @RegisterCatalog(Weathers.class) private final Map<String, Weather> weathers = Maps.newHashMap();
+    public WeatherTypeRegistryModule() {
+        super(Weathers.class);
+    }
 
     @Override
     public void registerDefaults() {
-        Map<String, LanternWeather> mappings = Maps.newHashMap();
-        mappings.put("clear", new LanternWeather("minecraft", "clear", 0f, 0f, 0f, 0f));
-        mappings.put("rain", new LanternWeather("minecraft", "rain", 1f, 0f, 0f, 0f));
-        mappings.put("thunder_storm", new LanternWeather("minecraft", "thunderStorm", 1f, 1f, 0.00001f, 0.00001f));
-        mappings.forEach((key, value) -> {
-            this.weathers.put(key, value);
-            this.weathers.put(value.getId(), value);
-            this.weathers.put(value.getName(), value);
-        });
+        this.register(new LanternWeather("minecraft", "clear", 0f, 0f, 0f, 0f));
+        this.register(new LanternWeather("minecraft", "rain", 1f, 0f, 0f, 0f));
+        this.register(new LanternWeather("minecraft", "thunder_storm", "thunderStorm", 1f, 1f, 0.00001f, 0.00001f));
     }
-
-    @Override
-    public Optional<Weather> getById(String id) {
-        return Optional.ofNullable(this.weathers.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<Weather> getAll() {
-        return ImmutableSet.copyOf(this.weathers.values());
-    }
-
 }

@@ -25,43 +25,21 @@
  */
 package org.lanternpowered.server.game.registry.type.data.persistence;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import org.lanternpowered.server.data.persistence.HoconDataFormat;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.spongepowered.api.data.persistence.DataFormat;
 import org.spongepowered.api.data.persistence.DataFormats;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<DataFormat> {
 
-public final class DataFormatRegistryModule implements CatalogRegistryModule<DataFormat> {
-
-    @RegisterCatalog(DataFormats.class) private final Map<String, DataFormat> dataFormats = Maps.newHashMap();
+    public DataFormatRegistryModule() {
+        super(DataFormats.class);
+    }
 
     @Override
     public void registerDefaults() {
-        List<DataFormat> formats = Lists.newArrayList();
-        formats.add(new HoconDataFormat("hocon"));
-        formats.add(new NbtDataFormat("nbt"));
-        formats.forEach(format -> this.dataFormats.put(format.getId(), format));
+        this.register(new HoconDataFormat("hocon"));
+        this.register(new NbtDataFormat("nbt"));
     }
-
-    @Override
-    public Optional<DataFormat> getById(String id) {
-        return Optional.ofNullable(this.dataFormats.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<DataFormat> getAll() {
-        return ImmutableSet.copyOf(this.dataFormats.values());
-    }
-
 }

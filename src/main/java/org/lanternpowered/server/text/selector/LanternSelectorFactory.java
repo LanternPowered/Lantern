@@ -314,7 +314,7 @@ public class LanternSelectorFactory implements SelectorFactory {
         Stream<String> choices;
         if (!selector.contains("[")) {
             // No arguments yet
-            choices = Sponge.getRegistry().getAllOf(SelectorType.class).stream().map(type -> "@" + type.getId());
+            choices = Sponge.getRegistry().getAllOf(SelectorType.class).stream().map(type -> "@" + type.getName());
         } else {
             int keyStart = Math.max(selector.indexOf("["), selector.lastIndexOf(",")) + 1;
             int valueStart = selector.lastIndexOf("=") + 1;

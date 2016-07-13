@@ -25,43 +25,21 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternCollisionRule;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 
 // TODO: Use the api class once available
-public final class CollisionRuleRegistryModule implements CatalogRegistryModule<LanternCollisionRule> {
+public final class CollisionRuleRegistryModule extends AdditionalPluginCatalogRegistryModule<LanternCollisionRule> {
 
-    private final Map<String, LanternCollisionRule> collisionRules = Maps.newHashMap();
+    public CollisionRuleRegistryModule() {
+        super(null); // TODO
+    }
 
     @Override
     public void registerDefaults() {
-        Map<String, LanternCollisionRule> types = Maps.newHashMap();
-        types.put("always", new LanternCollisionRule("always"));
-        types.put("push_own_team", new LanternCollisionRule("pushOwnTeam"));
-        types.put("push_other_teams", new LanternCollisionRule("pushOtherTeams"));
-        types.put("never", new LanternCollisionRule("never"));
-        types.entrySet().forEach(entry -> {
-            this.collisionRules.put(entry.getValue().getId(), entry.getValue());
-            this.collisionRules.put(entry.getKey(), entry.getValue());
-        });
+        this.register(new LanternCollisionRule("minecraft", "always"));
+        this.register(new LanternCollisionRule("minecraft", "push_own_team", "pushOwnTeam"));
+        this.register(new LanternCollisionRule("minecraft", "push_other_teams", "pushOtherTeams"));
+        this.register(new LanternCollisionRule("minecraft", "never"));
     }
-
-    @Override
-    public Optional<LanternCollisionRule> getById(String id) {
-        return Optional.ofNullable(this.collisionRules.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<LanternCollisionRule> getAll() {
-        return ImmutableSet.copyOf(this.collisionRules.values());
-    }
-
 }

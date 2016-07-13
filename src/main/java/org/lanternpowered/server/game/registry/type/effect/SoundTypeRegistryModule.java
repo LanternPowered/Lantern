@@ -25,53 +25,31 @@
  */
 package org.lanternpowered.server.game.registry.type.effect;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
 
-public final class SoundTypeRegistryModule implements CatalogRegistryModule<SoundType> {
+public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
 
-    @RegisterCatalog(SoundTypes.class)
-    private final Map<String, SoundType> soundTypes = Maps.newHashMap();
+    public SoundTypeRegistryModule() {
+        super(SoundTypes.class);
+    }
 
     @Override
     public void registerDefaults() {
         final Gson gson = new Gson();
         final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
                 .getResourceAsStream("/assets/lantern/internal/sound-events.json"))), JsonArray.class);
-
         for (int i = 0; i < array.size(); i++) {
-            String name = array.get(i).getAsString();
-            LanternSoundType soundType = new LanternSoundType(name, i);
-            this.soundTypes.put(name, soundType);
-            String field = name.replaceAll("\\.", "_");
-            this.soundTypes.put(field, soundType);
-            this.soundTypes.put("minecraft:" + field, soundType);
+            final String name = array.get(i).getAsString();
+            final String id = name.replaceAll("\\.", "_");
+            this.register(new LanternSoundType("minecraft", id, name, i));
         }
     }
-
-    @Override
-    public Optional<SoundType> getById(String id) {
-        return Optional.ofNullable(this.soundTypes.get(checkNotNull(id).toLowerCase()));
-    }
-
-    @Override
-    public Collection<SoundType> getAll() {
-        return ImmutableSet.copyOf(this.soundTypes.values());
-    }
-
 }

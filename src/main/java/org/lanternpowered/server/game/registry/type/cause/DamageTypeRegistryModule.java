@@ -25,79 +25,33 @@
  */
 package org.lanternpowered.server.game.registry.type.cause;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
-import static org.lanternpowered.server.game.registry.RegistryModuleHelper.validateIdentifier;
-
-import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.cause.entity.damage.LanternDamageType;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
-import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
-import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
-import org.spongepowered.api.registry.util.RegisterCatalog;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
+public class DamageTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<DamageType> {
 
-public class DamageTypeRegistryModule implements AdditionalCatalogRegistryModule<DamageType>,
-        AlternateCatalogRegistryModule<DamageType> {
-
-    @RegisterCatalog(DamageTypes.class)
-    private final Map<String, DamageType> damageTypes = new HashMap<>();
-
-    @Override
-    public Map<String, DamageType> provideCatalogMap() {
-        Map<String, DamageType> provided = new HashMap<>();
-        for (Map.Entry<String, DamageType> entry : this.damageTypes.entrySet()) {
-            provided.put(entry.getKey().replace("minecraft:", ""), entry.getValue());
-        }
-        return provided;
-    }
-
-    @Override
-    public void registerAdditionalCatalog(DamageType damageType) {
-        checkNotNull(damageType, "damageType");
-        final String id = damageType.getId();
-        validateIdentifier(id);
-        checkState(!this.damageTypes.containsKey(id),
-                "There is already a damage type registered with the id. (" + id + ")");
-        this.damageTypes.put(id, damageType);
+    public DamageTypeRegistryModule() {
+        super(DamageTypes.class);
     }
 
     @Override
     public void registerDefaults() {
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "attack"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "contact"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "custom"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "drown"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "explosive"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "fall"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "fire"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "generic"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "hunger"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "magic"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "magma"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "projectile"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "suffocate"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "sweeping_attack"));
-        this.registerAdditionalCatalog(new LanternDamageType("minecraft", "void"));
+        this.register(new LanternDamageType("minecraft", "attack"));
+        this.register(new LanternDamageType("minecraft", "contact"));
+        this.register(new LanternDamageType("minecraft", "custom"));
+        this.register(new LanternDamageType("minecraft", "drown"));
+        this.register(new LanternDamageType("minecraft", "explosive"));
+        this.register(new LanternDamageType("minecraft", "fall"));
+        this.register(new LanternDamageType("minecraft", "fire"));
+        this.register(new LanternDamageType("minecraft", "generic"));
+        this.register(new LanternDamageType("minecraft", "hunger"));
+        this.register(new LanternDamageType("minecraft", "magic"));
+        this.register(new LanternDamageType("minecraft", "magma"));
+        this.register(new LanternDamageType("minecraft", "projectile"));
+        this.register(new LanternDamageType("minecraft", "suffocate"));
+        this.register(new LanternDamageType("minecraft", "sweeping_attack"));
+        this.register(new LanternDamageType("minecraft", "void"));
     }
-
-    @Override
-    public Optional<DamageType> getById(String id) {
-        if (checkNotNull(id).indexOf(':') == -1) {
-            id = "minecraft:" + id;
-        }
-        return Optional.ofNullable(this.damageTypes.get(id.toLowerCase(Locale.ENGLISH)));
-    }
-
-    @Override
-    public Collection<DamageType> getAll() {
-        return ImmutableSet.copyOf(this.damageTypes.values());
-    }
-
 }

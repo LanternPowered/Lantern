@@ -88,6 +88,7 @@ import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModu
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.EnumValueRegistryModule;
@@ -218,6 +219,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.cause.entity.dismount.DismountType;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.EntitySpawnCause;
@@ -337,6 +339,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BossBarColor.class, new BossBarColorRegistryModule())
                 .registerModule(BossBarOverlay.class, new BossBarOverlayRegistryModule())
                 .registerModule(DamageType.class, new DamageTypeRegistryModule())
+                .registerModule(DismountType.class, new DismountTypeRegistryModule())
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(TeleportType.class, new TeleportTypeRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())

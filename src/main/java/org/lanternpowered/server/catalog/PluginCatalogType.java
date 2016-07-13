@@ -59,9 +59,13 @@ public interface PluginCatalogType extends CatalogType {
         private final String name;
 
         public Base(String pluginId, String name) {
+            this(pluginId, name, name);
+        }
+
+        public Base(String pluginId, String id, String name) {
             this.pluginId = checkNotNullOrEmpty(pluginId, "pluginId").toLowerCase(Locale.ENGLISH);
             this.name = checkNotNullOrEmpty(name, "name");
-            this.id = this.pluginId + ':' + name.toLowerCase(Locale.ENGLISH);
+            this.id = this.pluginId + ':' + checkNotNullOrEmpty(id, "id").toLowerCase(Locale.ENGLISH);
         }
 
         @Override
@@ -89,6 +93,15 @@ public interface PluginCatalogType extends CatalogType {
 
             public Translatable(String pluginId, String name, Translation translation) {
                 super(pluginId, name);
+                this.translation = checkNotNull(translation, "translation");
+            }
+
+            public Translatable(String pluginId, String id, String name, String translation) {
+                this(pluginId, id, name, Lantern.getRegistry().getTranslationManager().get(translation));
+            }
+
+            public Translatable(String pluginId, String id, String name, Translation translation) {
+                super(pluginId, id, name);
                 this.translation = checkNotNull(translation, "translation");
             }
 

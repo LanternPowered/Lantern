@@ -136,7 +136,7 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
 
     @Override
     public BlockState withExtendedProperties(Location<World> location) {
-        return this.baseState.getBlockType().getExtendedState(this, checkNotNull(location, "location"));
+        return this.baseState.getBlockType().getExtendedBlockStateProvider().get(this, checkNotNull(location, "location"), null);
     }
 
     @Override
@@ -309,7 +309,8 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
     public BlockSnapshot snapshotFor(Location<World> location) {
         final World world = location.getExtent();
         final Vector3i pos = location.getBlockPosition();
-        return new LanternBlockSnapshot(location, this, world.getNotifier(pos), world.getCreator(pos));
+        return new LanternBlockSnapshot(location, this, this,
+                world.getCreator(pos), world.getNotifier(pos));
     }
 
     @Override
@@ -385,7 +386,7 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
                 return Optional.empty();
             }
         }
-        if (!this.supportsTraitValue(trait, value)) {
+        if (!supportsTraitValue(trait, value)) {
             return Optional.empty();
         }
         if (this.traitValues.get(trait) == value) {

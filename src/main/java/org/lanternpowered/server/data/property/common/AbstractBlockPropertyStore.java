@@ -66,20 +66,20 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
     private Optional<T> getFor0(PropertyHolder propertyHolder, @Nullable Direction direction) {
         checkNotNull(propertyHolder, "propertyHolder");
         if (propertyHolder instanceof BlockState) {
-            return this.getFor((BlockState) propertyHolder, null, direction);
+            return getFor((BlockState) propertyHolder, null, direction);
         } else if (propertyHolder instanceof BlockType) {
-            return this.getFor(((BlockType) propertyHolder).getDefaultState(), null, direction);
+            return getFor(((BlockType) propertyHolder).getDefaultState(), null, direction);
         } else if (propertyHolder instanceof Location) {
-            return this.getFor0((Location<World>) propertyHolder, direction);
+            return getFor0((Location<World>) propertyHolder, direction);
         } else if (propertyHolder instanceof ItemType) {
             Optional<BlockType> type = ((ItemType) propertyHolder).getBlock();
             if (type.isPresent()) {
-                return this.getFor(type.get().getDefaultState(), null, direction);
+                return getFor(type.get().getDefaultState(), null, direction);
             }
         } else if (propertyHolder instanceof ItemStack) {
             Optional<BlockType> type = ((ItemStack) propertyHolder).getItem().getBlock();
             if (type.isPresent()) {
-                return this.getFor(((LanternBlockType) type.get()).getStateFromItemStack((ItemStack) propertyHolder), null, direction);
+                return getFor(((LanternBlockType) type.get()).getStateFromItemStack((ItemStack) propertyHolder), null, direction);
             }
         }
         return Optional.empty();
@@ -87,7 +87,7 @@ public abstract class AbstractBlockPropertyStore<T extends Property<?, ?>> exten
 
     private Optional<T> getFor0(Location<World> propertyHolder, @Nullable Direction direction) {
         try {
-            return this.getFor(propertyHolder.getBlock(), propertyHolder, direction);
+            return getFor(propertyHolder.getBlock(), propertyHolder, direction);
         // Can be thrown if the extent is gc
         } catch (IllegalStateException e) {
             return Optional.empty();

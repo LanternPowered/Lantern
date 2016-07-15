@@ -238,7 +238,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
 
     @SuppressWarnings("unchecked")
     default <E, V extends BaseValue<E>> Optional<V> getValueWith(Key<? extends BaseValue<E>> key, ValueProcessor<BaseValue<E>, E> processor) {
-        return (Optional) ((TriFunction) processor.getValueRetrieveHandler()).apply(key, this, processor);
+        return (Optional) ((BiFunction) processor.getValueRetrieveHandler()).apply(key, this);
     }
 
     @SuppressWarnings("unchecked")

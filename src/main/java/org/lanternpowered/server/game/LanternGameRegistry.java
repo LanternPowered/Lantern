@@ -43,8 +43,8 @@ import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternOperation;
+import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
-import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.boss.LanternBossBarBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceBuilder;
@@ -404,6 +404,8 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     public void registerDefaults() {
+        // All enum value enumerations must extend registry class, because very strange things
+        // are happening. Without this, all the dummy fields are never updated???
         this.registerModule(LanternOperation.class, new AttributeOperationRegistryModule())
                 .registerModule(LanternAttribute.class, new AttributeRegistryModule())
                 .registerModule(new AttributeTargetRegistryModule())
@@ -416,13 +418,20 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SpawnType.class, new SpawnTypeRegistryModule())
                 .registerModule(TeleportType.class, new TeleportTypeRegistryModule())
                 .registerModule(DataFormat.class, new DataFormatRegistryModule())
-                .registerModule(BigMushroomType.class, new EnumValueRegistryModule<>(LanternBigMushroomType.class, BigMushroomTypes.class))
-                .registerModule(BrickType.class, new EnumValueRegistryModule<>(LanternBrickType.class, BrickTypes.class))
-                .registerModule(ComparatorType.class, new EnumValueRegistryModule<>(LanternComparatorType.class, ComparatorTypes.class))
-                .registerModule(DirtType.class, new EnumValueRegistryModule<>(LanternDirtType.class, DirtTypes.class))
-                .registerModule(DisguisedBlockType.class, new EnumValueRegistryModule<>(LanternDisguisedBlockType.class, DisguisedBlockTypes.class))
-                .registerModule(LanternDoorHalf.class, new EnumValueRegistryModule<>(LanternDoorHalf.class, null))
-                .registerModule(DoublePlantType.class, new EnumValueRegistryModule<>(LanternDoublePlantType.class, DoublePlantTypes.class))
+                .registerModule(BigMushroomType.class,
+                        new EnumValueRegistryModule<BigMushroomType>(LanternBigMushroomType.class, BigMushroomTypes.class) {})
+                .registerModule(BrickType.class,
+                        new EnumValueRegistryModule<BrickType>(LanternBrickType.class, BrickTypes.class) {})
+                .registerModule(ComparatorType.class,
+                        new EnumValueRegistryModule<ComparatorType>(LanternComparatorType.class, ComparatorTypes.class) {})
+                .registerModule(DirtType.class,
+                        new EnumValueRegistryModule<DirtType>(LanternDirtType.class, DirtTypes.class) {})
+                .registerModule(DisguisedBlockType.class,
+                        new EnumValueRegistryModule<DisguisedBlockType>(LanternDisguisedBlockType.class, DisguisedBlockTypes.class) {})
+                .registerModule(LanternDoorHalf.class,
+                        new EnumValueRegistryModule<LanternDoorHalf>(LanternDoorHalf.class, null) {})
+                .registerModule(DoublePlantType.class,
+                        new EnumValueRegistryModule<DoublePlantType>(LanternDoublePlantType.class, DoublePlantTypes.class) {})
                 .registerModule(Art.class, new ArtRegistryModule())
                 .registerModule(Career.class, new CareerRegistryModule())
                 .registerModule(HandType.class, new HandTypeRegistryModule())
@@ -430,27 +439,39 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(HorseColor.class, new HorseColorRegistryModule())
                 .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
                 .registerModule(InstrumentType.class, new InstrumentTypeRegistryModule())
-                .registerModule(Hinge.class, new EnumValueRegistryModule<>(LanternHinge.class, Hinges.class))
+                .registerModule(Hinge.class,
+                        new EnumValueRegistryModule<Hinge>(LanternHinge.class, Hinges.class) {})
                 .registerModule(Key.class, KeyRegistryModule.get())
-                .registerModule(LogAxis.class, new EnumValueRegistryModule<>(LanternLogAxis.class, LogAxes.class))
+                .registerModule(PortionType.class, new EnumValueRegistryModule<PortionType>(LanternPortionType.class, PortionTypes.class) {})
+                .registerModule(LogAxis.class,
+                        new EnumValueRegistryModule<LogAxis>(LanternLogAxis.class, LogAxes.class) {})
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
                 .registerModule(Profession.class, new ProfessionRegistryModule())
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
                 .registerModule(ToolType.class, new ToolTypeRegistryModule())
                 .registerModule(ArmorType.class, new ArmorTypeRegistryModule())
-                .registerModule(PistonType.class, new EnumValueRegistryModule<>(LanternPistonType.class, PistonTypes.class))
-                .registerModule(PlantType.class, new EnumValueRegistryModule<>(LanternPlantType.class, PlantTypes.class))
-                .registerModule(PortionType.class, new EnumValueRegistryModule<>(LanternPortionType.class, PortionTypes.class))
-                .registerModule(PrismarineType.class, new EnumValueRegistryModule<>(LanternPrismarineType.class, PrismarineTypes.class))
-                .registerModule(QuartzType.class, new EnumValueRegistryModule<>(LanternQuartzType.class, QuartzTypes.class))
-                .registerModule(SandstoneType.class, new EnumValueRegistryModule<>(LanternSandstoneType.class, SandstoneTypes.class))
-                .registerModule(SandType.class, new EnumValueRegistryModule<>(LanternSandType.class, SandTypes.class))
-                .registerModule(ShrubType.class, new EnumValueRegistryModule<>(LanternShrubType.class, ShrubTypes.class))
-                .registerModule(StoneType.class, new EnumValueRegistryModule<>(LanternStoneType.class, StoneTypes.class))
-                .registerModule(SlabType.class, new EnumValueRegistryModule<>(LanternSlabType.class, SlabTypes.class))
+                .registerModule(PistonType.class,
+                        new EnumValueRegistryModule<PistonType>(LanternPistonType.class, PistonTypes.class) {})
+                .registerModule(PlantType.class,
+                        new EnumValueRegistryModule<PlantType>(LanternPlantType.class, PlantTypes.class) {})
+                .registerModule(PrismarineType.class,
+                        new EnumValueRegistryModule<PrismarineType>(LanternPrismarineType.class, PrismarineTypes.class) {})
+                .registerModule(QuartzType.class,
+                        new EnumValueRegistryModule<QuartzType>(LanternQuartzType.class, QuartzTypes.class) {})
+                .registerModule(SandstoneType.class,
+                        new EnumValueRegistryModule<SandstoneType>(LanternSandstoneType.class, SandstoneTypes.class) {})
+                .registerModule(SandType.class,
+                        new EnumValueRegistryModule<SandType>(LanternSandType.class, SandTypes.class) {})
+                .registerModule(ShrubType.class,
+                        new EnumValueRegistryModule<ShrubType>(LanternShrubType.class, ShrubTypes.class) {})
+                .registerModule(StoneType.class,
+                        new EnumValueRegistryModule<StoneType>(LanternStoneType.class, StoneTypes.class) {})
+                .registerModule(SlabType.class,
+                        new EnumValueRegistryModule<SlabType>(LanternSlabType.class, SlabTypes.class) {})
                 .registerModule(TreeType.class, TreeTypeRegistryModule.get())
-                .registerModule(WallType.class, new EnumValueRegistryModule<>(LanternWallType.class, WallTypes.class))
+                .registerModule(WallType.class,
+                        new EnumValueRegistryModule<WallType>(LanternWallType.class, WallTypes.class) {})
                 .registerModule(SkinPart.class, new SkinPartRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
@@ -510,8 +531,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(IntValueProviderType.class, IntValueProviderTypeRegistryModule.get())
                 ;
         this.registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
-                .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
                 .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
+                .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
                 .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)

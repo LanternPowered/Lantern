@@ -59,7 +59,7 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
 
     public LanternItemStackSnapshot(ItemType itemType, int quantity) {
         this(itemType, quantity, new HashMap<>());
-        ((LanternItemType) itemType).registerKeysFor(this);
+        ((LanternItemType) itemType).getKeysProvider().accept(this);
     }
 
     LanternItemStackSnapshot(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap) {

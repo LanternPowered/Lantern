@@ -35,17 +35,20 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.item.ItemTypeBuilder;
+import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.LanternItemType;
-import org.lanternpowered.server.item.type.CoalItemType;
-import org.lanternpowered.server.item.type.FireworkChargeItemType;
-import org.lanternpowered.server.item.type.FireworksItemType;
-import org.lanternpowered.server.item.type.GoldenAppleItemType;
+import org.lanternpowered.server.item.TranslationProvider;
 import org.lanternpowered.server.util.ReflectionHelper;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.CoalTypes;
+import org.spongepowered.api.data.type.GoldenApples;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
+import java.util.Collections;
 import java.util.Optional;
 
 @RegistrationDependency(BlockRegistryModule.class)
@@ -96,17 +99,54 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
 
     @Override
     public void registerDefaults() {
-        final LanternItemType none = new LanternItemType("minecraft", "none");
+        final LanternItemType none = builder().build("minecraft", "none");
         register(0, none);
-        register(263, new CoalItemType("minecraft", "coal", "coal"));
-        register(322, new GoldenAppleItemType("minecraft", "golden_apple", "appleGold"));
-        register(401, new FireworksItemType("minecraft", "fireworks", "fireworks"));
-        register(402, new FireworkChargeItemType("minecraft", "firework_charge", "fireworksCharge"));
+        ///////////////////
+        ///    Coal     ///
+        ///////////////////
+        register(263, builder()
+                .translation(TranslationProvider.of(CoalTypes.COAL, Keys.COAL_TYPE))
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.COAL_TYPE, CoalTypes.COAL)
+                )
+                .build("minecraft", "coal"));
+        ////////////////////
+        /// Golden Apple ///
+        ////////////////////
+        register(322, builder()
+                .translation("item.appleGold.name")
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.GOLDEN_APPLE_TYPE, GoldenApples.GOLDEN_APPLE)
+                )
+                .build("minecraft", "golden_apple"));
+        ////////////////////
+        ///  Fireworks   ///
+        ////////////////////
+        register(401, builder()
+                .translation("item.fireworks.name")
+                .keysProvider(valueContainer -> {
+                    valueContainer.registerKey(Keys.FIREWORK_EFFECTS, Collections.emptyList());
+                    valueContainer.registerKey(Keys.FIREWORK_FLIGHT_MODIFIER, 1);
+                })
+                .build("minecraft", "fireworks"));
+        ///////////////////////
+        /// Firework Charge ///
+        ///////////////////////
+        register(402, builder()
+                .translation("item.fireworksCharge.name")
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.FIREWORK_EFFECTS, Collections.emptyList())
+                )
+                .build("minecraft", "firework_charge"));
         try {
             ReflectionHelper.setField(ItemStackSnapshot.class.getDeclaredField("NONE"), null,
                     new LanternItemStack(none, 0).createSnapshot());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private ItemTypeBuilder builder() {
+        return new ItemTypeBuilderImpl();
     }
 }

@@ -40,14 +40,14 @@ import javax.annotation.Nullable;
 
 public final class TrackerIdAllocator {
 
-    private static final int INVALID_INDEX = -1;
+    public static final int INVALID_ID = -1;
 
     private final List<UUID> uniqueIdsByIndex = new ArrayList<>();
     private final Object2IntMap<UUID> uniqueIds = new Object2IntOpenHashMap<>();
     private final StampedLock lock = new StampedLock();
 
     {
-        this.uniqueIds.defaultReturnValue(INVALID_INDEX);
+        this.uniqueIds.defaultReturnValue(INVALID_ID);
     }
 
     public Optional<UUID> get(int trackingId) {
@@ -57,12 +57,12 @@ public final class TrackerIdAllocator {
         long stamp = this.lock.tryOptimisticRead();
         UUID uniqueId = null;
         if (stamp != 0L) {
-            uniqueId = this.getUniqueIdFromIndex(trackingId);
+            uniqueId = getUniqueIdFromIndex(trackingId);
         }
         if (stamp == 0L || !this.lock.validate(stamp)) {
             stamp = this.lock.readLock();
             try {
-                uniqueId = this.getUniqueIdFromIndex(trackingId);
+                uniqueId = getUniqueIdFromIndex(trackingId);
             } finally {
                 this.lock.unlockRead(stamp);
             }
@@ -84,14 +84,14 @@ public final class TrackerIdAllocator {
     public int get(UUID uniqueId) {
         checkNotNull(uniqueId, "uniqueId");
         long stamp = this.lock.tryOptimisticRead();
-        int index = stamp == 0L ? 0 : this.uniqueIds.get(uniqueId);
+        int index = stamp == 0L ? 0 : this.uniqueIds.getInt(uniqueId);
         // Optimistic read failed, now just
         // acquire a read lock.
         if (stamp == 0L || !this.lock.validate(stamp)) {
             stamp = this.lock.readLock();
             index = this.uniqueIds.get(uniqueId);
             // Check if the index is valid
-            if (index == INVALID_INDEX) {
+            if (index == INVALID_ID) {
                 // Try to convert the read lock to a write lock
                 long stamp1 = this.lock.tryConvertToWriteLock(stamp);
                 // Could not convert the lock, release the old
@@ -99,8 +99,8 @@ public final class TrackerIdAllocator {
                 if (stamp1 == 0L) {
                     this.lock.unlockRead(stamp);
                     stamp1 = this.lock.writeLock();
-                    index = this.uniqueIds.get(uniqueId);
-                    if (index != INVALID_INDEX) {
+                    index = this.uniqueIds.getInt(uniqueId);
+                    if (index != INVALID_ID) {
                         // Release the write lock
                         this.lock.unlockWrite(stamp1);
                         return index;
@@ -108,7 +108,7 @@ public final class TrackerIdAllocator {
                 }
                 try {
                     // Get the next free index
-                    return this.getNewIndex(uniqueId);
+                    return getNewIndex(uniqueId);
                 } finally {
                     // Release the write lock
                     this.lock.unlockWrite(stamp1);
@@ -118,11 +118,11 @@ public final class TrackerIdAllocator {
                 this.lock.unlockRead(stamp);
             }
         // Check if the index is valid
-        } else if (index == INVALID_INDEX) {
+        } else if (index == INVALID_ID) {
             // Acquire a write lock and get the next free index
             stamp = this.lock.writeLock();
             try {
-                return this.getNewIndex(uniqueId);
+                return getNewIndex(uniqueId);
             } finally {
                 this.lock.unlockWrite(stamp);
             }

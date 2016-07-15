@@ -25,18 +25,18 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.data.type.HandType;
 
 public final class MessagePlayInPlayerSwingArm implements Message {
 
-    private final ItemInteractionType interactionType;
+    private final HandType handType;
 
-    public MessagePlayInPlayerSwingArm(ItemInteractionType interactionType) {
-        this.interactionType = interactionType;
+    public MessagePlayInPlayerSwingArm(HandType handType) {
+        this.handType = handType;
     }
 
-    public ItemInteractionType getInteractionType() {
-        return this.interactionType;
+    public HandType getHandType() {
+        return this.handType;
     }
 }

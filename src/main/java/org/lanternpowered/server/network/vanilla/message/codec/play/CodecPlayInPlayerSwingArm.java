@@ -26,16 +26,16 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
+import org.spongepowered.api.data.type.HandTypes;
 
 public final class CodecPlayInPlayerSwingArm implements Codec<MessagePlayInPlayerSwingArm> {
 
     @Override
     public MessagePlayInPlayerSwingArm decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        return new MessagePlayInPlayerSwingArm(ItemInteractionType.values()[buf.readVarInt()]);
+        return new MessagePlayInPlayerSwingArm(buf.readVarInt() == 0 ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND);
     }
 }

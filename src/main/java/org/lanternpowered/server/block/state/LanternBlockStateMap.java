@@ -127,7 +127,7 @@ public final class LanternBlockStateMap {
         });
 
         this.blockStates.stream().map(state -> (LanternBlockState) state)
-                .forEach(state -> state.extended = blockType.isExtendedState(state));
+                .forEach(state -> state.extended = blockType.getExtendedBlockStateProvider().remove(state) != state);
     }
 
     public LanternBlockType getBlockType() {
@@ -148,5 +148,4 @@ public final class LanternBlockStateMap {
         }
         return Optional.empty();
     }
-
 }

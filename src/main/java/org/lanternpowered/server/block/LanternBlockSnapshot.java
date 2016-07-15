@@ -28,14 +28,15 @@ package org.lanternpowered.server.block;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.world.WeakWorldReference;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -48,64 +49,102 @@ import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
-public class LanternBlockSnapshot implements BlockSnapshot {
+import javax.annotation.Nullable;
+
+public class LanternBlockSnapshot implements BlockSnapshot, AbstractPropertyHolder {
 
     private static Cause RESTORE_CAUSE = Cause.of(NamedCause.of("EMPTY", "EMPTY"));
 
-    private final WeakWorldReference world;
-    private final Vector3i position;
+    /**
+     * Represents the {@link Location} of a block.
+     */
+    static final class BlockLocation {
+
+        final WeakWorldReference world;
+        final Vector3i position;
+
+        public BlockLocation(Location<World> location) {
+            this(new WeakWorldReference(location.getExtent()), location.getBlockPosition());
+        }
+
+        public BlockLocation(World world, Vector3i position) {
+            this(new WeakWorldReference(world), position);
+        }
+
+        public BlockLocation(UUID worldUUID, Vector3i position) {
+            this(new WeakWorldReference(worldUUID), position);
+        }
+
+        private BlockLocation(WeakWorldReference world, Vector3i position) {
+            this.position = checkNotNull(position, "position");
+            this.world = world;
+        }
+    }
+
+    @Nullable final BlockLocation location;
     private final BlockState state;
+    @Nullable private final BlockState extendedState;
     private final Optional<UUID> notifier;
     private final Optional<UUID> creator;
 
-    public LanternBlockSnapshot(Location<World> location, BlockState blockState,
-            Optional<UUID> notifier, Optional<UUID> creator) {
-        this(new WeakWorldReference(checkNotNull(location, "location").getExtent()),
-                location.getBlockPosition(), blockState, notifier, creator);
+    public LanternBlockSnapshot(Location<World> location, BlockState blockState, @Nullable BlockState extendedState,
+            Optional<UUID> creator, Optional<UUID> notifier) {
+        this(new BlockLocation(checkNotNull(location, "location")), blockState, extendedState, creator, notifier);
     }
 
-    public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState,
-            Optional<UUID> notifier, Optional<UUID> creator) {
-        this(new WeakWorldReference(checkNotNull(worldUUID, "worldUUID")), position, blockState, notifier, creator);
+    public LanternBlockSnapshot(UUID worldUUID, Vector3i position, BlockState blockState, @Nullable BlockState extendedState,
+            Optional<UUID> creator, Optional<UUID> notifier) {
+        this(new BlockLocation(worldUUID, position), blockState, extendedState, creator, notifier);
     }
 
-    private LanternBlockSnapshot(WeakWorldReference world, Vector3i position,
-            BlockState blockState, Optional<UUID> notifier, Optional<UUID> creator) {
+    public LanternBlockSnapshot(BlockState blockState, @Nullable BlockState extendedState,
+            Optional<UUID> notifier, Optional<UUID> creator) {
+        this((BlockLocation) null, blockState, extendedState, creator, notifier);
+    }
+
+    LanternBlockSnapshot(@Nullable BlockLocation location, BlockState blockState,
+            @Nullable BlockState extendedState, Optional<UUID> creator, Optional<UUID> notifier) {
+        this.extendedState = extendedState;
         this.notifier = checkNotNull(notifier, "notifier");
         this.creator = checkNotNull(creator, "creator");
         this.state = checkNotNull(blockState, "blockState");
-        this.position = checkNotNull(position, "position");
-        this.world = world;
+        this.location = location;
+    }
+
+    public boolean isPositionless() {
+        return this.location == null;
     }
 
     @Override
     public int getContentVersion() {
-        return 0;
+        return 1;
     }
 
     @Override
     public DataContainer toContainer() {
-        return new MemoryDataContainer()
-            .set(Queries.WORLD_ID, this.world.getUniqueId().toString())
-            .createView(DataQueries.SNAPSHOT_WORLD_POSITION)
-                .set(Queries.POSITION_X, this.position.getX())
-                .set(Queries.POSITION_Y, this.position.getY())
-                .set(Queries.POSITION_Z, this.position.getZ())
-            .getContainer()
+        final DataContainer container = new MemoryDataContainer()
             .set(DataQueries.BLOCK_STATE, this.state);
+        if (this.location != null) {
+            container.set(Queries.WORLD_ID, this.location.world.getUniqueId());
+            final DataView positionView = container.createView(DataQueries.SNAPSHOT_WORLD_POSITION);
+            positionView.set(Queries.POSITION_X, this.location.position.getX());
+            positionView.set(Queries.POSITION_Y, this.location.position.getY());
+            positionView.set(Queries.POSITION_Z, this.location.position.getZ());
+        }
+        this.notifier.ifPresent(notifier -> container.set(Queries.NOTIFIER_ID, notifier));
+        this.creator.ifPresent(creator -> container.set(Queries.CREATOR_ID, creator));
+        return container;
     }
 
     @Override
     public BlockState getExtendedState() {
-        // TODO Auto-generated method stub
-        return this.state;
+        return this.extendedState == null ? this.state : this.extendedState;
     }
 
     @Override
@@ -115,19 +154,19 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public LanternBlockSnapshot copy() {
-        return new LanternBlockSnapshot(this.world == null ? null : this.world.copy(), this.position, this.state, notifier, creator);
+        return new LanternBlockSnapshot(this.location, this.state, extendedState, this.creator, this.notifier);
     }
 
     @Override
     public Optional<Location<World>> getLocation() {
-        if (this.world == null) {
+        if (this.location == null) {
             return Optional.empty();
         }
-        Optional<World> world = this.world.getWorld();
+        Optional<World> world = this.location.world.getWorld();
         if (!world.isPresent()) {
             return Optional.empty();
         }
-        return Optional.of(new Location<>(world.get(), this.position));
+        return Optional.of(new Location<>(world.get(), this.location.position));
     }
 
     @Override
@@ -246,37 +285,44 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public UUID getWorldUniqueId() {
-        return this.world.getUniqueId();
+        if (this.location == null) {
+            throw new IllegalStateException("This BlockSnapshot doesn't have a location.");
+        }
+        return this.location.world.getUniqueId();
     }
 
     @Override
     public Vector3i getPosition() {
-        return this.position;
+        if (this.location == null) {
+            throw new IllegalStateException("This BlockSnapshot doesn't have a location.");
+        }
+        return this.location.position;
     }
 
     @Override
     public BlockSnapshot withLocation(Location<World> location) {
         checkNotNull(location, "location");
-        return new LanternBlockSnapshot(new WeakWorldReference(location.getExtent()),
-                location.getBlockPosition(), this.state, notifier, creator);
+        return new LanternBlockSnapshot(location, this.state, extendedState, this.creator, this.notifier);
     }
 
     @Override
     public BlockSnapshot withContainer(DataContainer container) {
-        // TODO Auto-generated method stub
-        return null;
+        return new LanternBlockSnapshotBuilder().build(container).get();
     }
 
     @Override
     public boolean restore(boolean force, BlockChangeFlag flag) {
+        if (this.location == null) {
+            throw new IllegalStateException("This BlockSnapshot doesn't have a location.");
+        }
         Location<World> loc = this.getLocation().orElse(null);
         if (loc == null || (!force && loc.getBlockType() != this.state.getType())) {
             return false;
         }
         loc.setBlock(this.state, flag, RESTORE_CAUSE);
         final World world = loc.getExtent();
-        world.setCreator(this.position, this.creator.orElse(null));
-        world.setNotifier(this.position, this.notifier.orElse(null));
+        world.setCreator(this.location.position, this.creator.orElse(null));
+        world.setNotifier(this.location.position, this.notifier.orElse(null));
         return true;
     }
 
@@ -292,18 +338,6 @@ public class LanternBlockSnapshot implements BlockSnapshot {
 
     @Override
     public Optional<TileEntityArchetype> createArchetype() {
-        return null;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

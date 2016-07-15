@@ -43,11 +43,12 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
+import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
+import org.lanternpowered.server.block.TileEntityProvider;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.block.type.IBlockContainer;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
@@ -58,6 +59,7 @@ import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryMod
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.TrackerIdAllocator;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
@@ -104,7 +106,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -916,6 +917,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             final LanternTileEntity tileEntity = section.tileEntities.get((short) index);
             boolean remove = false;
             boolean refresh = false;
+            final Optional<TileEntityProvider> tileEntityProvider = ((LanternBlockType) block.getType()).getTileEntityProvider();
             if (tileEntity != null) {
                 if (oldType == 0 || type1 == 0) {
                     remove = true;
@@ -926,19 +928,20 @@ public class LanternChunk implements AbstractExtent, Chunk {
                     remove = true;
                     refresh = true;
                 }
-                if (refresh && !(block.getType() instanceof IBlockContainer)) {
+                if (refresh && !tileEntityProvider.isPresent()) {
                     refresh = false;
                 }
-            } else if (block.getType() instanceof IBlockContainer) {
+            } else if (tileEntityProvider.isPresent()) {
                 refresh = true;
             }
             if (remove) {
                 tileEntity.setValid(false);
             }
             if (refresh) {
-                final LanternTileEntity newTileEntity = (LanternTileEntity) ((IBlockContainer) block.getType()).createTile(block);
+                final Location<World> location = tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z);
+                final LanternTileEntity newTileEntity = (LanternTileEntity) tileEntityProvider.get().get(block, location, null);
                 section.tileEntities.put((short) index, newTileEntity);
-                newTileEntity.setLocation(tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z));
+                newTileEntity.setLocation(location);
                 newTileEntity.setValid(true);
             } else if (remove) {
                 section.tileEntities.remove((short) index);
@@ -1024,9 +1027,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
-        checkVolumeBounds(x, y, z);
-        return new LanternBlockSnapshot(new Location<>(this.world, x, y, z), getBlock(x, y, z),
-                getNotifier(x, y, z), getCreator(x, y, z));
+        final BlockState state = getBlock(x, y, z);
+        final Location<World> loc = new Location<>(this.world, x, y, z);
+        return new LanternBlockSnapshot(loc, state, ((LanternBlockType) state.getType()).getExtendedBlockStateProvider().get(state, loc, null),
+                getCreator(x, y, z), getNotifier(x, y, z));
     }
 
     @Override
@@ -1130,17 +1134,21 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Optional<UUID> getCreator(int x, int y, int z) {
         checkVolumeBounds(x, y, z);
-        final int creatorId = this.trackerData.work(y >> 4, trackerDataMap ->
-                trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf)).creatorId, false);
-        return this.world.getProperties().getTrackerIdAllocator().get(creatorId);
+        final int creatorId = this.trackerData.work(y >> 4, trackerDataMap -> {
+            final TrackerData trackerData = trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf));
+            return trackerData == null ? TrackerIdAllocator.INVALID_ID : trackerData.creatorId;
+        }, false);
+        return creatorId == TrackerIdAllocator.INVALID_ID ? Optional.empty() : this.world.getProperties().getTrackerIdAllocator().get(creatorId);
     }
 
     @Override
     public Optional<UUID> getNotifier(int x, int y, int z) {
         checkVolumeBounds(x, y, z);
-        final int notifierId = this.trackerData.work(y >> 4, trackerDataMap ->
-                trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf)).notifierId, false);
-        return this.world.getProperties().getTrackerIdAllocator().get(notifierId);
+        final int notifierId = this.trackerData.work(y >> 4, trackerDataMap -> {
+            final TrackerData trackerData = trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf));
+            return trackerData == null ? TrackerIdAllocator.INVALID_ID : trackerData.notifierId;
+        }, false);
+        return notifierId == TrackerIdAllocator.INVALID_ID ? Optional.empty() : this.world.getProperties().getTrackerIdAllocator().get(notifierId);
     }
 
     @Override
@@ -1527,14 +1535,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
             return Optional.empty();
         }
         final Location<World> location = new Location<>(this.world, x, y, z);
-        Optional<T> property = Optional.empty();
-        final Optional<PropertyStore<T>> store = LanternPropertyRegistry.getInstance().getStore(propertyClass);
-        if (store.isPresent()) {
-            if (direction != null) {
-                property = AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
-            } else {
-                property = AbstractPropertyHolder.getPropertyFor(location, propertyClass);
-            }
+        Optional<T> property;
+        if (direction != null) {
+            property = AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
+        } else {
+            property = AbstractPropertyHolder.getPropertyFor(location, propertyClass);
         }
         if (direction == null && !property.isPresent()) {
             final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);

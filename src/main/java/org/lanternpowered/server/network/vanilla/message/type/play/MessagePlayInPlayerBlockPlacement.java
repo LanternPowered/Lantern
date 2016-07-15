@@ -27,8 +27,8 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.util.Direction;
 
 public final class MessagePlayInPlayerBlockPlacement implements Message {
@@ -36,12 +36,12 @@ public final class MessagePlayInPlayerBlockPlacement implements Message {
     private final Vector3i position;
     private final Vector3d clickOffset;
     private final Direction face;
-    private final ItemInteractionType interactionType;
+    private final HandType handType;
 
-    public MessagePlayInPlayerBlockPlacement(Vector3i position, Vector3d clickOffset, Direction face, ItemInteractionType interactionType) {
-        this.interactionType = interactionType;
+    public MessagePlayInPlayerBlockPlacement(Vector3i position, Vector3d clickOffset, Direction face, HandType handType) {
         this.clickOffset = clickOffset;
         this.position = position;
+        this.handType = handType;
         this.face = face;
     }
 
@@ -57,7 +57,7 @@ public final class MessagePlayInPlayerBlockPlacement implements Message {
         return this.face;
     }
 
-    public ItemInteractionType getInteractionType() {
-        return this.interactionType;
+    public HandType getHandType() {
+        return this.handType;
     }
 }

@@ -36,16 +36,18 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
 
 import java.util.Optional;
 
-public class LanternBlockStateBuilder implements BlockState.Builder {
+public class LanternBlockStateBuilder extends AbstractDataBuilder<BlockState> implements BlockState.Builder {
 
     private BlockState blockState;
 
-    public LanternBlockStateBuilder() {
+    protected LanternBlockStateBuilder() {
+        super(BlockState.class, 1);
         this.reset();
     }
 
@@ -97,7 +99,7 @@ public class LanternBlockStateBuilder implements BlockState.Builder {
     }
 
     @Override
-    public Optional<BlockState> build(DataView container) throws InvalidDataException {
+    protected Optional<BlockState> buildContent(DataView container) throws InvalidDataException {
         if (!container.contains(DataQueries.BLOCK_STATE)) {
             return Optional.empty();
         }

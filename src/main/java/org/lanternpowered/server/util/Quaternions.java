@@ -26,7 +26,9 @@
 package org.lanternpowered.server.util;
 
 import com.flowpowered.math.imaginary.Quaterniond;
+import com.flowpowered.math.imaginary.Quaternionf;
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3f;
 
 public final class Quaternions {
 
@@ -50,6 +52,16 @@ public final class Quaternions {
      */
     public static Quaterniond fromAxesAnglesDeg(double pitch, double yaw, double roll) {
         return Quaterniond.fromAxesAnglesDeg(pitch, yaw, roll);
+    }
+
+    /**
+     * Creates a new quaternion from the float angles in degrees around the x, y and z axes.
+     *
+     * @param vector3f The rotation vector
+     * @return The quaternion defined by the rotations around the axes
+     */
+    public static Quaternionf fromAxesAnglesDeg(Vector3f vector3f) {
+        return Quaternionf.fromAxesAnglesDeg(vector3f.getX(), vector3f.getY(), vector3f.getZ());
     }
 
     private Quaternions() {

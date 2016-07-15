@@ -1,0 +1,80 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package org.lanternpowered.server.item.behavior.simple;
+
+import org.lanternpowered.server.behavior.Behavior;
+import org.lanternpowered.server.behavior.BehaviorContext;
+import org.lanternpowered.server.behavior.BehaviorResult;
+import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
+import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
+import org.spongepowered.api.data.property.block.ReplaceableProperty;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import java.util.Optional;
+
+public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
+
+    @Override
+    public BehaviorResult tryInteract(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
+        final Optional<Location<World>> optLocation = context.get(Parameters.INTERACTION_LOCATION);
+        if (!optLocation.isPresent()) {
+            return BehaviorResult.CONTINUE;
+        }
+
+        final Direction blockFace = context.get(Parameters.INTERACTION_FACE).get();
+        Location<World> location = optLocation.get();
+        //noinspection ConstantConditions
+        if (!location.getProperty(ReplaceableProperty.class).get().getValue()) {
+            location = location.add(blockFace.getOpposite().asBlockOffset());
+        }
+        context.set(Parameters.BLOCK_LOCATION, location);
+
+        final LanternBlockType blockType = (LanternBlockType) context.get(Parameters.ITEM_TYPE).get().getBlock().get();
+        context.set(Parameters.BLOCK_TYPE, blockType);
+
+        // Continue processing through the placement pipeline
+        final boolean success = context.process(blockType.getPipeline().pipeline(PlaceBlockBehavior.class),
+                (context1, behavior1) -> behavior1.tryPlace(pipeline, context1));
+
+        if (success) {
+            final Optional<ItemStack> optItemStack = context.get(Parameters.USED_ITEM_STACK);
+            if (optItemStack.isPresent()) {
+                final ItemStack itemStack = optItemStack.get().copy();
+                itemStack.setQuantity(itemStack.getQuantity() - 1);
+                context.set(Parameters.RESULT_ITEM_STACK, itemStack);
+            }
+            return BehaviorResult.SUCCESS;
+        }
+
+        return BehaviorResult.PASS;
+    }
+}

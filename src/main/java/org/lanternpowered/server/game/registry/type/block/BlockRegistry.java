@@ -48,7 +48,7 @@ public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
      * @param blockType the block type
      * @param stateToDataConverter the block state to data value converter
      */
-    void register(int internalId, BlockType blockType, Function<BlockState, Byte> stateToDataConverter);
+    void register(int internalId, BlockType blockType, BlockState2DataFunction stateToDataConverter);
 
     /**
      * Registers a new catalog type in the registry with a predefined internal id.
@@ -79,7 +79,7 @@ public interface BlockRegistry extends CatalogRegistryModule<BlockType> {
      * @param blockType the block type
      * @param stateToDataConverter the block state to data value converter
      */
-    void register(BlockType blockType, Function<BlockState, Byte> stateToDataConverter);
+    void register(BlockType blockType, BlockState2DataFunction stateToDataConverter);
 
     /**
      * Gets the block state by using it's internal id.

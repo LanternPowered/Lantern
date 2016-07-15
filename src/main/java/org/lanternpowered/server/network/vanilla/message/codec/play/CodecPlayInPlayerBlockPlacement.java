@@ -30,12 +30,13 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.util.Direction;
 
 public final class CodecPlayInPlayerBlockPlacement implements Codec<MessagePlayInPlayerBlockPlacement> {
@@ -44,7 +45,7 @@ public final class CodecPlayInPlayerBlockPlacement implements Codec<MessagePlayI
     public MessagePlayInPlayerBlockPlacement decode(CodecContext context, ByteBuffer buf) throws CodecException {
         final Vector3i position = buf.read(Types.VECTOR_3_I);
         final Direction face = fromFace(buf.readVarInt());
-        final ItemInteractionType hand = ItemInteractionType.values()[buf.readVarInt()];
+        final HandType hand = buf.readVarInt() == 0 ? HandTypes.MAIN_HAND : HandTypes.OFF_HAND;
         final double ox = buf.readFloat();
         final double oy = buf.readFloat();
         final double oz = buf.readFloat();

@@ -39,7 +39,16 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
+import org.lanternpowered.server.behavior.Behavior;
+import org.lanternpowered.server.behavior.BehaviorContext;
+import org.lanternpowered.server.behavior.BehaviorContextImpl;
+import org.lanternpowered.server.behavior.Parameter;
+import org.lanternpowered.server.behavior.Parameters;
+import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.action.BlockAction;
+import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
+import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
@@ -110,7 +119,6 @@ import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
@@ -664,7 +672,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public BlockType getBlockType(int x, int y, int z) {
-        return this.getBlock(x, y, z).getType();
+        return getBlock(x, y, z).getType();
     }
 
     @Override
@@ -1318,32 +1326,52 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public boolean placeBlock(int x, int y, int z, BlockState block, Direction direction, Cause cause) {
-        return false;
-    }
-
-    @Override
     public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+        cause = Cause.builder().from(cause).named(Parameters.USED_ITEM_STACK.getName(), itemStack).build();
+        return interactBlock(x, y, z, side, cause, ctx -> ctx.set(Parameters.USED_ITEM_STACK, itemStack));
+    }
+
+    @Override
+    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
+        return interactBlock(x, y, z, side, cause, ctx -> {});
+    }
+
+    public boolean interactBlock(int x, int y, int z, Direction side, Cause cause, Consumer<BehaviorContext> consumer) {
+        final LanternBlockType blockType = ((LanternBlockType) getBlockType(x, y, z));
+        final BehaviorPipeline<Behavior> pipeline = blockType.getPipeline();
+        final BehaviorContextImpl context = new BehaviorContextImpl(cause);
+        context.set(Parameters.INTERACTION_FACE, side);
+        context.set(Parameters.BLOCK_LOCATION, new Location<>(this, x, y, z));
+        context.set(Parameters.BLOCK_TYPE, blockType);
+        consumer.accept(context);
+        // Just pass an object trough to make sure that a value is present when successful
+        return context.process(pipeline.pipeline(InteractWithBlockBehavior.class),
+                (ctx, behavior) -> behavior.tryInteract(pipeline, ctx));
+    }
+
+    @Override
+    public boolean placeBlock(int x, int y, int z, BlockState block, Direction side, Cause cause) {
+        cause = Cause.builder().from(cause).named(Parameters.USED_BLOCK_STATE.getName(), block).build();
+        final LanternBlockType blockType = ((LanternBlockType) getBlockType(x, y, z));
+        final BehaviorPipeline<Behavior> pipeline = blockType.getPipeline();
+        final BehaviorContextImpl context = new BehaviorContextImpl(cause);
+        context.set(Parameters.INTERACTION_FACE, side);
+        context.set(Parameters.BLOCK_LOCATION, new Location<>(this, x, y, z));
+        context.set(Parameters.BLOCK_TYPE, blockType);
+        // Just pass an object trough to make sure that a value is present when successful
+        return context.process(pipeline.pipeline(PlaceBlockBehavior.class),
+                (ctx, behavior) -> behavior.tryPlace(pipeline, ctx));
     }
 
     @Override
     public boolean digBlock(int x, int y, int z, Cause cause) {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Override
     public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
+        cause = Cause.builder().from(cause).named(Parameters.USED_ITEM_STACK.getName(), itemStack).build();
+        return digBlock(x, y, z, cause);
     }
 
     @Override
@@ -1361,7 +1389,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     public void addBlockAction(Vector3i position, BlockType blockType, BlockAction blockAction) {
-        this.addBlockAction(position.getX(), position.getY(), position.getZ(), blockType, blockAction);
+        addBlockAction(position.getX(), position.getY(), position.getZ(), blockType, blockAction);
     }
 
     public void addBlockAction(int x, int y, int z, BlockType blockType, BlockAction blockAction) {

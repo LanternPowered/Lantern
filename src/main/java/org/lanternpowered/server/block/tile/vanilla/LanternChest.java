@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.type.BlockChest;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -63,6 +61,7 @@ public class LanternChest extends LanternContainer<TileChestInventory> implement
             return Optional.empty();
         }
         final Location<World> location = this.getLocation();
+        /*
         for (Direction directionToCheck : BlockChest.HORIZONTAL_DIRECTIONS) {
             final Location<World> loc = location.getRelative(directionToCheck);
             if (loc.getBlock().getType() != this.getBlock().getType()) {
@@ -78,7 +77,7 @@ public class LanternChest extends LanternContainer<TileChestInventory> implement
                             ((LanternChest) optTileEntity.get()).inventory, this.inventory));
                 }
             }
-        }
+        }*/
         return Optional.empty();
     }
 

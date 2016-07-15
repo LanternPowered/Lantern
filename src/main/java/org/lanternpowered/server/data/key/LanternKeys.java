@@ -29,6 +29,8 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBo
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
+import org.lanternpowered.server.data.type.LanternBedPart;
+import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.SkinPart;
@@ -62,6 +64,12 @@ public final class LanternKeys {
             makeSetKey(SkinPart.class, DataQuery.of("DisplayedSkinParts"), "lantern:displayed_skin_parts");
     public static final Key<Value<Double>> GRAVITY_FACTOR =
             makeValueKey(Double.class, DataQuery.of("GravityFactor"), "lantern:gravity_factor");
+    public static final Key<Value<LanternDoorHalf>> DOOR_HALF =
+            makeValueKey(LanternDoorHalf.class, DataQuery.of("DoorHalf"), "lantern:door_half");
+    public static final Key<Value<Boolean>> CHECK_DECAY =
+            makeValueKey(Boolean.class, DataQuery.of("CheckDecay"), "lantern:check_decay");
+    public static final Key<Value<LanternBedPart>> BED_PART =
+            makeValueKey(LanternBedPart.class, DataQuery.of("BedPart"), "lantern:bed_part");
 
     private LanternKeys() {
     }

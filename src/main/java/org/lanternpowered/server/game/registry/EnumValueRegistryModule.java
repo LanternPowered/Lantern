@@ -29,12 +29,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
-import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.registry.CatalogRegistryModule;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,7 +41,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-public class EnumValueRegistryModule<V extends CatalogType>
+import javax.annotation.Nullable;
+
+public abstract class EnumValueRegistryModule<V extends CatalogType>
         implements CatalogRegistryModule<V>, CatalogMappingDataHolder {
 
     private final Map<String, V> values = new HashMap<>();

@@ -175,6 +175,7 @@ public class PlayerContainerSession {
                     Sponge.getEventManager().post(event);
                     if (event.isCancelled()) {
                         this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
+                        container.removeViewer(this.player, container);
                         return false;
                     }
                     final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();

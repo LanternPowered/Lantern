@@ -64,7 +64,7 @@ public class LanternPropertyRegistry implements PropertyRegistry {
     public void registerBlockPropertyStores(PropertyProviderCollection collection) {
         for (Class<? extends Property> entry : collection.keys()) {
             if (!this.propertyStoreMap.containsKey(entry)) {
-                this.register(entry, new BlockPropertyStore(entry));
+                register(entry, new BlockPropertyStore(entry));
             }
         }
     }

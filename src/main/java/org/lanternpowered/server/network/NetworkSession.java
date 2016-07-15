@@ -527,6 +527,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (!this.channel.isActive()) {
             return promise;
         }
+        promise.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         // Don't bother checking if we are in the event loop,
         // there is only one message.
         if (messages.length == 1) {
@@ -572,6 +573,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (!this.channel.isActive()) {
             return promise;
         }
+        promise.addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE);
         Message message = it.next();
         // Don't bother checking if we are in the event loop,
         // there is only one message.

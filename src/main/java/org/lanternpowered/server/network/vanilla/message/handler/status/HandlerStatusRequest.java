@@ -30,10 +30,10 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
 import org.lanternpowered.server.status.LanternFavicon;
@@ -45,7 +45,6 @@ import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
-import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
@@ -62,53 +61,53 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         final LanternServer server = session.getServer();
         final Gson gson = new Gson();
 
-        MinecraftVersion version0 = Lantern.getGame().getPlatform().getMinecraftVersion();
-        Text description = server.getMotd();
+        final LanternMinecraftVersion serverVersion = Lantern.getGame().getPlatform().getMinecraftVersion();
+        final Text description = server.getMotd();
 
-        InetSocketAddress address = session.getAddress();
-        InetSocketAddress virtualAddress = session.getVirtualHost();
+        final InetSocketAddress address = session.getAddress();
+        final InetSocketAddress virtualAddress = session.getVirtualHost();
 
-        int protocol = session.getProtocolVersion();
+        final int protocol = session.getProtocolVersion();
+        final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol, false);
+        if (clientVersion == LanternMinecraftVersion.UNKNOWN) {
+            Lantern.getLogger().debug("Client with unknown protocol version {} pinged the server.", protocol);
+        }
 
-        LanternMinecraftVersion version = new LanternMinecraftVersion(String.valueOf(protocol), protocol, false);
-        LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
-        ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
-        LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon(), description, players);
+        final LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress);
+        final ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
+        final LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
 
-        ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
+        final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
 
         // Cancelled, we are done here
         if (event.isCancelled()) {
+            context.getChannel().close();
             return;
         }
 
-        description = response.getDescription();
-        int online = players.getOnline();
-        int max = players.getMax();
-
-        JsonObject rootObject = new JsonObject();
-        JsonObject versionObject = new JsonObject();
+        final JsonObject rootObject = new JsonObject();
+        final JsonObject versionObject = new JsonObject();
 
         versionObject.addProperty("name", Lantern.getGame().getPlatform().getMinecraftVersion().getName());
-        versionObject.addProperty("protocol", ((LanternMinecraftVersion) version0).getProtocol());
+        versionObject.addProperty("protocol", serverVersion.getProtocol());
 
         if (response.getPlayers().isPresent()) {
-            JsonObject playersObject = new JsonObject();
-            playersObject.addProperty("max", max);
-            playersObject.addProperty("online", online);
+            final JsonObject playersObject = new JsonObject();
+            playersObject.addProperty("max", players.getMax());
+            playersObject.addProperty("online", players.getOnline());
 
             List<GameProfile> profiles = players.getProfiles();
             if (!profiles.isEmpty()) {
-                JsonArray array = new JsonArray();
+                final JsonArray array = new JsonArray();
                 for (GameProfile profile : profiles) {
                     Optional<String> optName = profile.getName();
                     if (!optName.isPresent()) {
                         continue;
                     }
-                    JsonObject object3 = new JsonObject();
-                    object3.addProperty("name", optName.get());
-                    object3.addProperty("id", profile.getUniqueId().toString());
-                    array.add(object3);
+                    final JsonObject profileObject = new JsonObject();
+                    profileObject.addProperty("name", optName.get());
+                    profileObject.addProperty("id", profile.getUniqueId().toString());
+                    array.add(profileObject);
                 }
                 playersObject.add("sample", array);
             }
@@ -116,14 +115,11 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         }
 
         rootObject.add("version", versionObject);
-        rootObject.add("description", ((LanternJsonTextSerializer) TextSerializers.JSON).getGson().toJsonTree(description));
+        rootObject.add("description", ((LanternJsonTextSerializer) TextSerializers.JSON).getGson().toJsonTree(response.getDescription()));
 
-        Optional<Favicon> icon = response.getFavicon();
-        if (icon.isPresent()) {
-            rootObject.addProperty("favicon", ((LanternFavicon) icon.get()).getEncoded());
-        }
+        response.getFavicon().ifPresent(icon -> rootObject.addProperty("favicon", ((LanternFavicon) icon).getEncoded()));
 
-        JsonObject fmlObject = new JsonObject();
+        final JsonObject fmlObject = new JsonObject();
         // Trick the client that the server is fml, we support fml channels anyway
         fmlObject.addProperty("type", "FML");
         // The client shouldn't know the plugins (mods) list

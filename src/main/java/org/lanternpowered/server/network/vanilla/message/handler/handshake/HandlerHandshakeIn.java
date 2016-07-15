@@ -34,7 +34,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.message.Async;

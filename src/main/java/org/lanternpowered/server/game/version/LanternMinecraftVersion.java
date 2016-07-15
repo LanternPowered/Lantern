@@ -23,20 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game;
+package org.lanternpowered.server.game.version;
 
 import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.protocol.Protocol;
 import org.spongepowered.api.MinecraftVersion;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public class LanternMinecraftVersion implements MinecraftVersion {
 
-    public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion(LanternGame.MINECRAFT_VERSION, 210, false);
+    private static final String UNKNOWN_NAME = "unknown";
 
-    public static final LanternMinecraftVersion V1_3 = new LanternMinecraftVersion("<=1.3", 39, true);
-    public static final LanternMinecraftVersion V1_5 = new LanternMinecraftVersion("1.4-1.5", 61, true);
-    public static final LanternMinecraftVersion V1_6 = new LanternMinecraftVersion("1.6", 78, true);
+    public static final LanternMinecraftVersion UNKNOWN = new LanternMinecraftVersion(
+            UNKNOWN_NAME, -1, false);
+    public static final LanternMinecraftVersion UNKNOWN_LEGACY = new LanternMinecraftVersion(
+            UNKNOWN_NAME, -1, true);
+
+    public static final LanternMinecraftVersion CURRENT = new LanternMinecraftVersion(
+            LanternGame.MINECRAFT_VERSION, Protocol.CURRENT_VERSION, false);
 
     private final String name;
     private final int protocol;
@@ -88,8 +92,8 @@ public class LanternMinecraftVersion implements MinecraftVersion {
         if (!(o instanceof LanternMinecraftVersion)) {
             return false;
         }
-        LanternMinecraftVersion that = (LanternMinecraftVersion) o;
-        return this.getProtocol() == that.getProtocol();
+        final LanternMinecraftVersion that = (LanternMinecraftVersion) o;
+        return this.protocol == that.protocol && this.legacy == that.legacy && this.name.equals(that.name);
     }
 
     @Override
@@ -108,5 +112,4 @@ public class LanternMinecraftVersion implements MinecraftVersion {
                 .add("protocol", this.protocol)
                 .toString();
     }
-
 }

@@ -33,7 +33,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.status.LanternStatusClient;
 import org.lanternpowered.server.status.LanternStatusHelper;
@@ -52,6 +52,9 @@ import java.nio.charset.StandardCharsets;
 
 @SuppressWarnings("deprecation")
 public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
+
+    private static final int V1_3_2_PROTOCOL = 39;
+    private static final int V1_5_2_PROTOCOL = 61;
 
     private final NetworkSession session;
 
@@ -74,7 +77,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
             // Old client's are not so smart, make sure that
             // they don't attempt to login
             if (messageId == 0x02) {
-                buf.readByte(); // Protocol version
+                int protocol = buf.readByte(); // Protocol version
                 int value = buf.readShort();
                 // Check the length
                 if (value < 0 || value > 16) {
@@ -94,6 +97,13 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                 legacy = true;
                 sendDisconnectMessage(ctx, LanternTexts.toPlain(t("handshake.outdated.client",
                         Lantern.getGame().getPlatform().getMinecraftVersion().getName())));
+                final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol, true);
+                if (clientVersion == LanternMinecraftVersion.UNKNOWN_LEGACY) {
+                    Lantern.getLogger().debug("Client with unknown legacy protocol version {} attempted to join the server.", protocol);
+                } else {
+                    Lantern.getLogger().debug("Client with legacy protocol version {} (mc-version {}) attempted to join the server.", protocol,
+                            clientVersion.getName());
+                }
                 return;
             }
 
@@ -106,7 +116,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
             boolean full = false;
 
             // The version used to ping the server
-            MinecraftVersion version = LanternMinecraftVersion.V1_3;
+            int protocol = V1_3_2_PROTOCOL;
 
             // Versions 1.4 - 1.5.x + 1.6 - Can request full data.
             if (readable > 0) {
@@ -115,7 +125,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                     return;
                 }
                 full = true;
-                version = LanternMinecraftVersion.V1_5;
+                protocol = V1_5_2_PROTOCOL;
             }
 
             // The virtual address that was used to join the server
@@ -135,8 +145,11 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                 // Not used
                 buf.readShort();
 
+                // The protocol version is present
+                protocol = buf.readUnsignedByte();
+
                 // There is extra host and port data
-                if (buf.readUnsignedByte() >= 73) {
+                if (protocol >= 73) {
                     bytes = new byte[buf.readShort() << 1];
                     buf.readBytes(bytes);
 
@@ -150,20 +163,23 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                 if (readable > 0) {
                     Lantern.getLogger().warn("Trailing bytes on a legacy ping message: {}b", readable);
                 }
+            }
 
-                version = LanternMinecraftVersion.V1_6;
+            final MinecraftVersion clientVersion = Lantern.getGame().getMinecraftVersionCache().getVersionOrUnknown(protocol, true);
+            if (clientVersion == LanternMinecraftVersion.UNKNOWN) {
+                Lantern.getLogger().debug("Client with unknown legacy protocol version {} pinged the server.", protocol);
             }
 
             // The message was successfully decoded as a legacy one
             legacy = true;
 
-            MinecraftVersion version0 = Lantern.getGame().getPlatform().getMinecraftVersion();
+            MinecraftVersion serverVersion = Lantern.getGame().getPlatform().getMinecraftVersion();
             Text description = server.getMotd();
 
             InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
-            LanternStatusClient client = new LanternStatusClient(address, version, virtualAddress);
+            LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress);
             ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
-            LanternStatusResponse response = new LanternStatusResponse(version0, server.getFavicon(), description, players);
+            LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
 
             ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
             Sponge.getEventManager().post(event);

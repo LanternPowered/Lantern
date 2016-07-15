@@ -28,7 +28,7 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandSpec;

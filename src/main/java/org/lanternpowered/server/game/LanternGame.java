@@ -77,7 +77,10 @@ import org.lanternpowered.server.config.user.ban.BanConfig;
 import org.lanternpowered.server.data.LanternDataManager;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.event.LanternEventManager;
+import org.lanternpowered.server.game.version.LanternMinecraftVersion;
+import org.lanternpowered.server.game.version.MinecraftVersionCache;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
+import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.LanternServerContainer;
 import org.lanternpowered.server.plugin.MinecraftPluginContainer;
@@ -98,7 +101,6 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
-import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.api.command.CommandManager;
@@ -149,7 +151,7 @@ public class LanternGame implements Game {
 
     public static final String MINECRAFT_ID = "minecraft";
     public static final String MINECRAFT_NAME = "Minecraft";
-    public static final String MINECRAFT_VERSION = "1.10";
+    public static final String MINECRAFT_VERSION = "1.10.2";
 
     // The name of the config folder
     public static final String CONFIG_FOLDER = "config";
@@ -274,6 +276,9 @@ public class LanternGame implements Game {
     // The ban config
     private BanConfig banConfig;
 
+    // The minecraft version cache
+    private MinecraftVersionCache minecraftVersionCache;
+
     // The current game state
     private GameState gameState = GameState.CONSTRUCTION;
 
@@ -301,6 +306,15 @@ public class LanternGame implements Game {
         this.implContainer = new LanternServerContainer();
         this.platform = new LanternPlatform(this.apiContainer, this.implContainer);
         this.assetManager = new LanternAssetManager();
+
+        this.minecraftVersionCache = new MinecraftVersionCache();
+        this.minecraftVersionCache.load();
+
+        final LanternMinecraftVersion versionCacheEntry = this.minecraftVersionCache.getVersionOrUnknown(Protocol.CURRENT_VERSION, false);
+        if (!LanternMinecraftVersion.CURRENT.equals(versionCacheEntry)) {
+            throw new RuntimeException("The current version and version in the cache don't match: " +
+                    LanternMinecraftVersion.CURRENT + " != " + versionCacheEntry);
+        }
 
         // Pre register some game objects
         this.gameRegistry = new LanternGameRegistry(this);
@@ -623,7 +637,7 @@ public class LanternGame implements Game {
     }
 
     @Override
-    public Platform getPlatform() {
+    public LanternPlatform getPlatform() {
         return this.platform;
     }
 
@@ -695,5 +709,9 @@ public class LanternGame implements Game {
 
     public SpongeExecutorService getSyncExecutorService() {
         return this.syncExecutorService;
+    }
+
+    public MinecraftVersionCache getMinecraftVersionCache() {
+        return this.minecraftVersionCache;
     }
 }

@@ -37,7 +37,7 @@ import org.lanternpowered.server.console.LanternConsoleSource;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternMinecraftVersion;
+import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.game.LanternPlatform;
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.ProxyType;

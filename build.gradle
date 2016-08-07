@@ -13,7 +13,7 @@ buildscript {
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
         maven {
-            url = 'http://repo.lanternpowered.org:8070/artifactory/libs'
+            url = 'http://artifactory.lanternpowered.org/artifactory/libs'
         }
     }
     dependencies {

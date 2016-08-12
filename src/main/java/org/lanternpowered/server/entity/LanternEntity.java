@@ -39,6 +39,7 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
@@ -50,6 +51,7 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Location;
@@ -206,6 +208,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public boolean transferToWorld(World world, Vector3d position) {
         return this.setPositionAndWorld(checkNotNull(world, "world"), position);
+    }
+
+    @Override
+    public Optional<AABB> getBoundingBox() {
+        return Optional.empty();
     }
 
     @Override
@@ -372,6 +379,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
+    public <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E value, Cause cause) {
+        return null;
+    }
+
+    @Override
     public <E> DataTransactionResult offer(BaseValue<E> value) {
         // TODO Auto-generated method stub
         return null;
@@ -386,6 +398,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public DataTransactionResult offer(org.spongepowered.api.data.manipulator.DataManipulator<?, ?> valueContainer, MergeFunction function) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function, Cause cause) {
         return null;
     }
 

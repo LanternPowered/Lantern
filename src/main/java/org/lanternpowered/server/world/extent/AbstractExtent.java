@@ -49,10 +49,12 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform2;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
@@ -79,8 +81,8 @@ public interface AbstractExtent extends Extent {
     }
 
     @Override
-    default MutableBlockVolumeWorker<? extends Extent> getBlockWorker() {
-        return new LanternMutableBlockVolumeWorker<>(this);
+    default MutableBlockVolumeWorker<? extends Extent> getBlockWorker(Cause cause) {
+        return new LanternMutableBlockVolumeWorker<>(this, cause);
     }
 
     @Override
@@ -89,10 +91,10 @@ public interface AbstractExtent extends Extent {
     }
 
     @Override
-    default boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
+    default boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
+        final Location<World> location = checkNotNull(snapshot, "snapshot").getLocation().orElse(null);
         checkArgument(location != null, "location is not present in snapshot");
-        return this.restoreSnapshot(location.getBlockPosition(), snapshot, force, notifyNeighbors);
+        return this.restoreSnapshot(location.getBlockPosition(), snapshot, force, flag, cause);
     }
 
     @Override

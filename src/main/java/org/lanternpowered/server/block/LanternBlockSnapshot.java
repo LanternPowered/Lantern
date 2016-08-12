@@ -41,6 +41,9 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -52,6 +55,8 @@ import java.util.UUID;
 import java.util.function.Function;
 
 public class LanternBlockSnapshot implements BlockSnapshot {
+
+    private static Cause RESTORE_CAUSE = Cause.of(NamedCause.of("EMPTY", "EMPTY"));
 
     private final WeakWorldReference world;
     private final Vector3i position;
@@ -262,12 +267,12 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     }
 
     @Override
-    public boolean restore(boolean force, boolean notifyNeighbors) {
+    public boolean restore(boolean force, BlockChangeFlag flag) {
         Location<World> loc = this.getLocation().orElse(null);
         if (loc == null || (!force && loc.getBlockType() != this.state.getType())) {
             return false;
         }
-        loc.setBlock(this.state, notifyNeighbors);
+        loc.setBlock(this.state, flag, RESTORE_CAUSE);
         final World world = loc.getExtent();
         world.setCreator(this.position, this.creator.orElse(null));
         world.setNotifier(this.position, this.notifier.orElse(null));

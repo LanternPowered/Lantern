@@ -1064,11 +1064,11 @@ public final class LanternChunkManager {
         private final short[][] types = new short[CHUNK_SECTIONS][CHUNK_SECTION_VOLUME];
         private final int[] nonAirCount = new int[CHUNK_SECTIONS];
 
-        protected ChunkBlockBuffer() {
+        ChunkBlockBuffer() {
             super(Vector3i.ZERO, CHUNK_SIZE);
         }
 
-        public void reuse(Vector3i start) {
+        void reuse(Vector3i start) {
             this.start = checkNotNull(start, "start");
             this.end = this.start.add(this.size).sub(Vector3i.ONE);
             for (int i = 0; i < CHUNK_SECTIONS; i++) {
@@ -1078,7 +1078,7 @@ public final class LanternChunkManager {
         }
 
         @Override
-        public void setBlock(int x, int y, int z, BlockState block) {
+        public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
             checkNotNull(block, "blockState");
             this.checkRange(x, y, z);
             final int sy = y >> 4;
@@ -1091,11 +1091,12 @@ public final class LanternChunkManager {
                 this.nonAirCount[sy]++;
             }
             types[index] = type;
+            return true;
         }
 
         @Override
-        public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
-            return new LanternMutableBlockVolumeWorker<>(this);
+        public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
+            return new LanternMutableBlockVolumeWorker<>(this, cause);
         }
 
         @Override

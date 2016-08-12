@@ -255,7 +255,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
      */
     private static class CachedParticleEffect {
 
-        public static final CachedParticleEffect EMPTY = new CachedParticleEffect(Collections.emptyList(), null);
+        static final CachedParticleEffect EMPTY = new CachedParticleEffect(Collections.emptyList(), null);
 
         /**
          * If the offset isn't null, it means that all the returned messages should have

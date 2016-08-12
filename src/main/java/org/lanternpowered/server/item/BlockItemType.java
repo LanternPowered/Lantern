@@ -34,6 +34,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.World;
@@ -67,7 +68,7 @@ public class BlockItemType extends LanternItemType {
         if (blockState.isPresent()) {
             itemStack = itemStack.copy();
             itemStack.setQuantity(itemStack.getQuantity() - 1);
-            world.setBlock(clickedBlock, blockState.get());
+            world.setBlock(clickedBlock, blockState.get(), Cause.source(player == null ? itemStack : player).build());
             return ItemInteractionResult.builder()
                     .type(ItemInteractionResult.Type.SUCCESS)
                     .resultItem(itemStack.createSnapshot())

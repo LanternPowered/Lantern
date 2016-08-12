@@ -31,6 +31,7 @@ import org.lanternpowered.server.world.extent.MutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBlockVolumeWrapper;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
@@ -47,18 +48,18 @@ public abstract class AbstractMutableBlockBuffer extends AbstractBlockBuffer imp
     }
 
     @Override
-    public void setBlock(Vector3i position, BlockState block) {
-        this.setBlock(position.getX(), position.getY(), position.getZ(), block);
+    public boolean setBlock(Vector3i position, BlockState block, Cause cause) {
+        return this.setBlock(position.getX(), position.getY(), position.getZ(), block, cause);
     }
 
     @Override
-    public void setBlockType(Vector3i position, BlockType type) {
-        this.setBlockType(position.getX(), position.getY(), position.getZ(), type);
+    public boolean setBlockType(Vector3i position, BlockType type, Cause cause) {
+        return this.setBlockType(position.getX(), position.getY(), position.getZ(), type, cause);
     }
 
     @Override
-    public void setBlockType(int x, int y, int z, BlockType type) {
-        this.setBlock(x, y, z, type.getDefaultState());
+    public boolean setBlockType(int x, int y, int z, BlockType type, Cause cause) {
+        return this.setBlock(x, y, z, type.getDefaultState(), cause);
     }
 
     @Override

@@ -77,10 +77,12 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -94,6 +96,7 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -1010,8 +1013,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        // TODO Auto-generated method stub
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
         return false;
     }
 
@@ -1030,6 +1032,21 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
         return false;
+    }
+
+    @Override
+    public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        return null;
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d end, Predicate<EntityHit> filter) {
+        return null;
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d direction, double distance, Predicate<EntityHit> filter) {
+        return null;
     }
 
     @Override
@@ -1098,8 +1115,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends Chunk> getBlockWorker() {
-        return new LanternMutableBlockVolumeWorker<>(this);
+    public MutableBlockVolumeWorker<? extends Chunk> getBlockWorker(Cause cause) {
+        return new LanternMutableBlockVolumeWorker<>(this, cause);
     }
 
     @Override
@@ -1122,6 +1139,21 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     }
 
+    @Override
+    public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
+        return null;
+    }
+
+    @Override
+    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
+        return null;
+    }
+
+    @Override
+    public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
+        return null;
+    }
+
     public Optional<Entity> getEntity(UUID uniqueId) {
         return Optional.empty();
     }
@@ -1139,15 +1171,15 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
+    public Entity createEntity(EntityType type, Vector3d position) {
         // TODO Auto-generated method stub
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3i position) {
+    public Entity createEntity(EntityType type, Vector3i position) {
         // TODO Auto-generated method stub
-        return Optional.empty();
+        return null;
     }
 
     @Override
@@ -1180,11 +1212,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return Optional.empty();
     }
 
-    @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        this.setType(x, y, z, BlockRegistryModule.get().getStateInternalIdAndData(block));
-    }
-
     private void checkAreaBounds(int x, int z) {
         if (!this.containsBiome(x, z)) {
             throw new PositionOutOfBoundsException(new Vector2i(x, z), this.areaMin, this.areaMax);
@@ -1213,15 +1240,17 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        this.setBlock(x, y, z, block);
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+        this.setType(x, y, z, BlockRegistryModule.get().getStateInternalIdAndData(block));
         // TODO: Events
+        return true;
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
-        this.setBlock(x, y, z, blockState);
+    public boolean setBlock(int x, int y, int z, BlockState blockState, BlockChangeFlag flag, Cause cause) {
+        this.setBlock(x, y, z, blockState, cause);
         // TODO: Events
+        return true;
     }
 
     @Override
@@ -1408,6 +1437,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value, Cause cause) {
+        return null;
+    }
+
+    @Override
     public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
         // TODO Auto-generated method stub
         return null;
@@ -1422,6 +1456,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function, Cause cause) {
         return null;
     }
 

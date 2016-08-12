@@ -34,6 +34,7 @@ import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.World;
@@ -109,7 +110,7 @@ public class BlockItemSlab extends BlockItemType {
             }
             itemStack = itemStack.copy();
             itemStack.setQuantity(itemStack.getQuantity() - 1);
-            world.setBlock(clickedBlock, blockState);
+            world.setBlock(clickedBlock, blockState, Cause.source(player == null ? itemStack : player).build());
             return ItemInteractionResult.builder()
                     .type(ItemInteractionResult.Type.SUCCESS)
                     .resultItem(itemStack.createSnapshot())

@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -53,11 +51,12 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
@@ -182,20 +181,20 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     @Override
     public BlockType getBlockType(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getBlockType(x, y, z);
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getBlock(x, y, z);
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        checkRange(x, y, z);
-        this.extent.setBlock(x, y, z, block);
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.setBlock(x, y, z, block, cause);
     }
 
     @Override
@@ -209,190 +208,197 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        checkRange(x, y, z);
-        this.extent.setBlock(x, y, z, block, notifyNeighbors);
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
-        checkArgument(cause.root() instanceof PluginContainer, "PluginContainer must be at the ROOT of a cause!");
-        this.extent.setBlock(x, y, z, blockState, notifyNeighbors, cause);
+    public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.setBlock(x, y, z, block, flag, cause);
     }
 
     @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.createSnapshot(x, y, z);
     }
 
     @Override
-    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
         final Vector3i position = snapshot.getPosition();
-        checkRange(position.getX(), position.getY(), position.getZ());
-        return this.extent.restoreSnapshot(snapshot, force, notifyNeighbors);
+        this.checkRange(position.getX(), position.getY(), position.getZ());
+        return this.extent.restoreSnapshot(snapshot, force, flag, cause);
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        checkRange(x, y, z);
-        return this.extent.restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot,
+            boolean force, BlockChangeFlag flag, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.restoreSnapshot(x, y, z, snapshot, force, flag, cause);
     }
 
     @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getScheduledUpdates(x, y, z);
     }
 
     @Override
     public ScheduledBlockUpdate addScheduledUpdate(int x, int y, int z, int priority, int ticks) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.addScheduledUpdate(x, y, z, priority, ticks);
     }
 
     @Override
     public void removeScheduledUpdate(int x, int y, int z, ScheduledBlockUpdate update) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         this.extent.removeScheduledUpdate(x, y, z, update);
     }
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getProperty(x, y, z, propertyClass);
     }
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getProperty(x, y, z, direction, propertyClass);
     }
 
     @Override
     public Collection<Property<?, ?>> getProperties(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getProperties(x, y, z);
     }
 
     @Override
     public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getFacesWithProperty(x, y, z, propertyClass);
     }
 
     @Override
     public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.get(x, y, z, key);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> get(int x, int y, int z, Class<T> manipulatorClass) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.get(x, y, z, manipulatorClass);
     }
 
     @Override
     public Set<ImmutableValue<?>> getValues(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getValues(x, y, z);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(int x, int y, int z, Class<T> manipulatorClass) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getOrCreate(x, y, z, manipulatorClass);
     }
 
     @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getValue(x, y, z, key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Key<?> key) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.supports(x, y, z, key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.supports(x, y, z, manipulatorClass);
     }
 
     @Override
     public Set<Key<?>> getKeys(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getKeys(x, y, z);
     }
 
     @Override
     public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.offer(x, y, z, key, value);
     }
 
     @Override
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.offer(x, y, z, key, value, cause);
+    }
+
+    @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.offer(x, y, z, manipulator, function);
     }
 
     @Override
+    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.offer(x, y, z, manipulator, function, cause);
+    }
+
+    @Override
     public DataTransactionResult remove(int x, int y, int z, Key<?> key) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.remove(x, y, z, key);
     }
 
     @Override
     public DataTransactionResult remove(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.remove(x, y, z, manipulatorClass);
     }
 
     @Override
     public DataTransactionResult undo(int x, int y, int z, DataTransactionResult result) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.undo(x, y, z, result);
     }
 
     @Override
     public Collection<DataManipulator<?, ?>> getManipulators(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getManipulators(x, y, z);
     }
 
     @Override
     public boolean validateRawData(int x, int y, int z, DataView container) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.validateRawData(x, y, z, container);
     }
 
     @Override
     public void setRawData(int x, int y, int z, DataView container) throws InvalidDataException {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         this.extent.setRawData(x, y, z, container);
     }
 
     @Override
     public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, DataHolder from) {
-        checkRange(xTo, yTo, zTo);
+        this.checkRange(xTo, yTo, zTo);
         return this.extent.copyFrom(xTo, yTo, zTo, from);
     }
 
     @Override
     public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, DataHolder from, MergeFunction function) {
-        checkRange(xTo, yTo, zTo);
+        this.checkRange(xTo, yTo, zTo);
         return this.extent.copyFrom(xTo, yTo, zTo, from, function);
     }
 
     @Override
     public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, int xFrom, int yFrom, int zFrom, MergeFunction function) {
-        checkRange(xTo, yTo, zTo);
-        checkRange(xFrom, yFrom, zFrom);
+        this.checkRange(xTo, yTo, zTo);
+        this.checkRange(xFrom, yFrom, zFrom);
         return this.extent.copyFrom(xTo, yTo, zTo, xFrom, yFrom, zFrom, function);
     }
 
@@ -420,20 +426,45 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getTileEntity(x, y, z);
     }
 
     @Override
     public boolean spawnEntity(Entity entity, Cause cause) {
         final Location<World> location = entity.getLocation();
-        checkRange(location.getX(), location.getY(), location.getZ());
+        this.checkRange(location.getX(), location.getY(), location.getZ());
         return this.extent.spawnEntity(entity, cause);
     }
 
-    @Override public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
+    @Override
+    public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
         // TODO 1.9 gabizou this is for you
         return false;
+    }
+
+    @Override
+    public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        checkRange(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ());
+        checkRange(box.getMax().getX(), box.getMax().getY(), box.getMax().getZ());
+        return this.extent.getIntersectingEntities(box, filter);
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d end, Predicate<EntityHit> filter) {
+        // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
+        final Vector3i max = this.blockMax.add(Vector3i.ONE);
+        return this.extent.getIntersectingEntities(start, end,
+                Functional.predicateAnd(hit -> VecHelper.inBounds(hit.getEntity().getLocation().getPosition(), this.blockMin, max), filter));
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d direction, double distance,
+            Predicate<EntityHit> filter) {
+        // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
+        final Vector3i max = this.blockMax.add(Vector3i.ONE);
+        return this.extent.getIntersectingEntities(start, direction, distance,
+                Functional.predicateAnd(hit -> VecHelper.inBounds(hit.getEntity().getLocation().getPosition(), this.blockMin, max), filter));
     }
 
     @Override
@@ -465,8 +496,8 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
-        checkRange(position.getX(), position.getY(), position.getZ());
+    public Entity createEntity(EntityType type, Vector3d position) {
+        this.checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.createEntity(type, position);
     }
 
@@ -479,13 +510,13 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     @Override
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
-        checkRange(position.getX(), position.getY(), position.getZ());
+        this.checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.createEntity(entityContainer, position);
     }
 
     @Override
     public Optional<Entity> restoreSnapshot(EntitySnapshot snapshot, Vector3d position) {
-        checkRange(position.getX(), position.getY(), position.getZ());
+        this.checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.restoreSnapshot(snapshot, position);
     }
 
@@ -497,8 +528,8 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     @Override
     public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
-        checkSoftRange(newMin.getX(), newMin.getY(), newMin.getZ());
-        checkSoftRange(newMax.getX(), newMax.getY(), newMax.getZ());
+        this.checkSoftRange(newMin.getX(), newMin.getY(), newMin.getZ());
+        this.checkSoftRange(newMax.getX(), newMax.getY(), newMax.getZ());
         return new SoftBufferExtentViewDownsize(this.extent, newMin, newMax, newMin.add(this.hardBlockMin.sub(this.blockMin)),
                 newMax.add(this.hardBlockMax.sub(this.blockMax)));
     }
@@ -510,63 +541,87 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
 
     @Override
     public Optional<UUID> getCreator(int x, int y, int z) {
+        this.checkRange(x, y, z);
         return this.extent.getCreator(x, y, z);
     }
 
     @Override
     public Optional<UUID> getNotifier(int x, int y, int z) {
+        this.checkRange(x, y, z);
         return this.extent.getNotifier(x, y, z);
     }
 
     @Override
     public void setCreator(int x, int y, int z, @Nullable UUID uuid) {
+        this.checkRange(x, y, z);
         this.extent.setCreator(x, y, z, uuid);
     }
 
     @Override
     public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
+        this.checkRange(x, y, z);
         this.extent.setNotifier(x, y, z, uuid);
     }
 
     @Override
+    public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
+        this.checkRange(x, y, z);
+        return this.extent.getBlockSelectionBox(x, y, z);
+    }
+
+    @Override
+    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
+        this.checkRange(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ());
+        this.checkRange(box.getMax().getX(), box.getMax().getY(), box.getMax().getZ());
+        return this.extent.getIntersectingBlockCollisionBoxes(box);
+    }
+
+    @Override
+    public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
+        this.checkRange(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ());
+        this.checkRange(box.getMax().getX(), box.getMax().getY(), box.getMax().getZ());
+        return this.extent.getIntersectingCollisionBoxes(owner, box);
+    }
+
+    @Override
     public boolean hitBlock(int x, int y, int z, Direction side, Cause cause) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.hitBlock(x, y, z, side, cause);
     }
 
     @Override
     public boolean interactBlock(int x, int y, int z, Direction side, Cause cause) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.interactBlock(x, y, z, side, cause);
     }
 
     @Override
     public boolean interactBlockWith(int x, int y, int z, ItemStack itemStack, Direction side, Cause cause) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.interactBlockWith(x, y, z, itemStack, side, cause);
     }
 
     @Override
     public boolean placeBlock(int x, int y, int z, BlockState block, Direction side, Cause cause) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.placeBlock(x, y, z, block, side, cause);
     }
 
     @Override
     public boolean digBlock(int x, int y, int z, Cause cause) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.digBlock(x, y, z, cause);
     }
 
     @Override
     public boolean digBlockWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.digBlockWith(x, y, z, itemStack, cause);
     }
 
     @Override
     public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
-        checkRange(x, y, z);
+        this.checkRange(x, y, z);
         return this.extent.getBlockDigTimeWith(x, y, z, itemStack, cause);
     }
 

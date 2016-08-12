@@ -39,6 +39,7 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -103,6 +104,11 @@ public class LanternTileEntity extends BaseComponentHolder implements TileEntity
     }
 
     @Override
+    public <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E value, Cause cause) {
+        return null;
+    }
+
+    @Override
     public <E> DataTransactionResult offer(BaseValue<E> value) {
         // TODO Auto-generated method stub
         return null;
@@ -117,6 +123,11 @@ public class LanternTileEntity extends BaseComponentHolder implements TileEntity
     @Override
     public DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public DataTransactionResult offer(DataManipulator<?, ?> valueContainer, MergeFunction function, Cause cause) {
         return null;
     }
 

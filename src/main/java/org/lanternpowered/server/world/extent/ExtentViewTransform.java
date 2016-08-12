@@ -31,8 +31,6 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Preconditions;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.util.VecHelper;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -54,15 +52,15 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
-import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -257,8 +255,8 @@ public class ExtentViewTransform implements AbstractExtent {
 
     @Override
     public boolean containsBlock(int x, int y, int z) {
-        return this.extent.containsBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-            .transformZ(x, y, z));
+        return this.extent.containsBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
@@ -268,8 +266,8 @@ public class ExtentViewTransform implements AbstractExtent {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return this.extent.getBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-            .transformZ(x, y, z));
+        return this.extent.getBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
@@ -285,21 +283,15 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
-        this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-                .transformZ(x, y, z), block, notifyNeighbors);
+    public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag blockChangeFlag, Cause cause) {
+        return this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), block, blockChangeFlag, cause);
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
-        this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-                .transformZ(x, y, z), blockState, notifyNeighbors, cause);
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z), this.inverseTransform
-            .transformZ(x, y, z), block);
+    public boolean setBlock(int x, int y, int z, BlockState blockState, Cause cause) {
+        return this.extent.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), blockState, cause);
     }
 
     @Override
@@ -309,9 +301,15 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
+        return this.extent.restoreSnapshot(this.inverseTransform(snapshot.getPosition().toDouble()).toInt(), snapshot, force, flag, cause);
+    }
+
+    @Override
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force,
+            BlockChangeFlag blockChangeFlag, Cause cause) {
         return this.extent.restoreSnapshot(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-                this.inverseTransform.transformZ(x, y, z), snapshot, force, notifyNeighbors);
+                this.inverseTransform.transformZ(x, y, z), snapshot, force, blockChangeFlag, cause);
     }
 
     @Override
@@ -322,7 +320,7 @@ public class ExtentViewTransform implements AbstractExtent {
     @Override
     public boolean spawnEntity(Entity entity, Cause cause) {
         final Location<World> location = entity.getLocation();
-        entity.setLocation(new Location<World>(location.getExtent(), this.inverseTransform(location.getPosition())));
+        entity.setLocation(new Location<>(location.getExtent(), this.inverseTransform(location.getPosition())));
         return this.extent.spawnEntity(entity, cause);
     }
 
@@ -332,141 +330,177 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
+    public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        box = new AABB(this.inverseTransform(box.getMin()), this.inverseTransform(box.getMax()));
+        return this.extent.getIntersectingEntities(box, filter);
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d direction, double distance, Predicate<EntityHit> filter) {
+        final Vector3d startT = this.inverseTransform(start);
+        final Vector3d directionT = this.inverseTransform(direction.normalize().mul(distance).add(start)).sub(startT);
+        final Vector3i max = this.blockMax.add(Vector3i.ONE);
+        // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
+        return this.extent.getIntersectingEntities(startT, directionT, distance,
+                Functional.predicateAnd(hit -> VecHelper.inBounds(hit.getEntity().getLocation().getPosition(), this.blockMin, max), filter));
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d end, Predicate<EntityHit> filter) {
+        final Vector3i max = this.blockMax.add(Vector3i.ONE);
+        // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
+        return this.extent.getIntersectingEntities(this.inverseTransform(start), this.inverseTransform(end),
+                Functional.predicateAnd(hit -> VecHelper.inBounds(hit.getEntity().getLocation().getPosition(), this.blockMin, max), filter));
+    }
+
+    @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         return this.extent.getScheduledUpdates(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
     public ScheduledBlockUpdate addScheduledUpdate(int x, int y, int z, int priority, int ticks) {
         return this.extent.addScheduledUpdate(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), priority, ticks);
+                this.inverseTransform.transformZ(x, y, z), priority, ticks);
     }
 
     @Override
     public void removeScheduledUpdate(int x, int y, int z, ScheduledBlockUpdate update) {
         this.extent.removeScheduledUpdate(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), update);
+                this.inverseTransform.transformZ(x, y, z), update);
     }
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
         return this.extent.getProperty(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), propertyClass);
+                this.inverseTransform.transformZ(x, y, z), propertyClass);
     }
 
     @Override
     public Collection<Property<?, ?>> getProperties(int x, int y, int z) {
         return this.extent.getProperties(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
     public <E> Optional<E> get(int x, int y, int z, Key<? extends BaseValue<E>> key) {
         return this.extent.get(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), key);
+                this.inverseTransform.transformZ(x, y, z), key);
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> get(int x, int y, int z, Class<T> manipulatorClass) {
         return this.extent.get(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulatorClass);
+                this.inverseTransform.transformZ(x, y, z), manipulatorClass);
     }
 
     @Override
     public Set<ImmutableValue<?>> getValues(int x, int y, int z) {
         return this.extent.getValues(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
     public <T extends DataManipulator<?, ?>> Optional<T> getOrCreate(int x, int y, int z, Class<T> manipulatorClass) {
         return this.extent.getOrCreate(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulatorClass);
+                this.inverseTransform.transformZ(x, y, z), manipulatorClass);
     }
 
     @Override
     public <E> E getOrNull(int x, int y, int z, Key<? extends BaseValue<E>> key) {
         return this.extent.getOrNull(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), key);
+                this.inverseTransform.transformZ(x, y, z), key);
     }
 
     @Override
     public <E> E getOrElse(int x, int y, int z, Key<? extends BaseValue<E>> key, E defaultValue) {
         return this.extent.getOrElse(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), key, defaultValue);
+                this.inverseTransform.transformZ(x, y, z), key, defaultValue);
     }
 
     @Override
     public <E, V extends BaseValue<E>> Optional<V> getValue(int x, int y, int z, Key<V> key) {
         return this.extent.getValue(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), key);
+                this.inverseTransform.transformZ(x, y, z), key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Key<?> key) {
         return this.extent.supports(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), key);
+                this.inverseTransform.transformZ(x, y, z), key);
     }
 
     @Override
     public boolean supports(int x, int y, int z, BaseValue<?> value) {
         return this.extent.supports(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), value);
+                this.inverseTransform.transformZ(x, y, z), value);
     }
 
     @Override
     public boolean supports(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
         return this.extent.supports(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulatorClass);
+                this.inverseTransform.transformZ(x, y, z), manipulatorClass);
     }
 
     @Override
     public boolean supports(int x, int y, int z, DataManipulator<?, ?> manipulator) {
         return this.extent.supports(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulator);
+                this.inverseTransform.transformZ(x, y, z), manipulator);
     }
 
     @Override
     public Set<Key<?>> getKeys(int x, int y, int z) {
         return this.extent.getKeys(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
     public <E> DataTransactionResult transform(int x, int y, int z, Key<? extends BaseValue<E>> key, Function<E, E> function) {
         return this.extent.transform(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), key, function);
+                this.inverseTransform.transformZ(x, y, z), key, function);
     }
 
     @Override
     public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
         return this.extent.offer(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), value);
+                this.inverseTransform.transformZ(x, y, z), value);
     }
 
     @Override
     public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value) {
         return this.extent.offer(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z),key, value);
+                this.inverseTransform.transformZ(x, y, z),key, value);
+    }
+
+    @Override
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value, Cause cause) {
+        return this.extent.offer(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), key, value, cause);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator) {
         return this.extent.offer(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulator);
+                this.inverseTransform.transformZ(x, y, z), manipulator);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
         return this.extent.offer(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulator, function);
+                this.inverseTransform.transformZ(x, y, z), manipulator, function);
+    }
+
+    @Override
+    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function, Cause cause) {
+        return this.extent.offer(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), manipulator, function, cause);
     }
 
     @Override
     public DataTransactionResult offer(int x, int y, int z, Iterable<DataManipulator<?, ?>> manipulators) {
         return this.extent.offer(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulators);
+                this.inverseTransform.transformZ(x, y, z), manipulators);
     }
 
     @Override
@@ -477,43 +511,43 @@ public class ExtentViewTransform implements AbstractExtent {
     @Override
     public DataTransactionResult remove(int x, int y, int z, Key<?> key) {
         return this.extent.remove(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), key);
+                this.inverseTransform.transformZ(x, y, z), key);
     }
 
     @Override
     public DataTransactionResult remove(int x, int y, int z, Class<? extends DataManipulator<?, ?>> manipulatorClass) {
         return this.extent.remove(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), manipulatorClass);
+                this.inverseTransform.transformZ(x, y, z), manipulatorClass);
     }
 
     @Override
     public DataTransactionResult undo(int x, int y, int z, DataTransactionResult result) {
         return this.extent.undo(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), result);
+                this.inverseTransform.transformZ(x, y, z), result);
     }
 
     @Override
     public Collection<DataManipulator<?, ?>> getManipulators(int x, int y, int z) {
         return this.extent.getManipulators(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z));
+                this.inverseTransform.transformZ(x, y, z));
     }
 
     @Override
     public boolean validateRawData(int x, int y, int z, DataView container) {
         return this.extent.validateRawData(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), container);
+                this.inverseTransform.transformZ(x, y, z), container);
     }
 
     @Override
     public void setRawData(int x, int y, int z, DataView container) throws InvalidDataException {
         this.extent.setRawData(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-            this.inverseTransform.transformZ(x, y, z), container);
+                this.inverseTransform.transformZ(x, y, z), container);
     }
 
     @Override
     public DataTransactionResult copyFrom(int xTo, int yTo, int zTo, DataHolder from) {
         return this.extent.copyFrom(this.inverseTransform.transformX(xTo, yTo, zTo), this.inverseTransform.transformY(xTo, yTo, zTo),
-            this.inverseTransform.transformZ(xTo, yTo, zTo), from);
+                this.inverseTransform.transformZ(xTo, yTo, zTo), from);
     }
 
     @Override
@@ -563,7 +597,7 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3i position) {
+    public Entity createEntity(EntityType type, Vector3i position) {
         return this.extent.createEntity(type, this.inverseTransform.transform(position));
     }
 
@@ -606,7 +640,7 @@ public class ExtentViewTransform implements AbstractExtent {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
+    public Entity createEntity(EntityType type, Vector3d position) {
         return this.extent.createEntity(type, inverseTransform(position));
     }
 
@@ -659,6 +693,24 @@ public class ExtentViewTransform implements AbstractExtent {
     public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
         this.extent.setNotifier(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
                 this.inverseTransform.transformZ(x, y, z), uuid);
+    }
+
+    @Override
+    public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
+        return this.extent.getBlockSelectionBox(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z));
+    }
+
+    @Override
+    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
+        box = new AABB(this.inverseTransform(box.getMin()), this.inverseTransform(box.getMax()));
+        return this.extent.getIntersectingBlockCollisionBoxes(box);
+    }
+
+    @Override
+    public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
+        box = new AABB(this.inverseTransform(box.getMin()), this.inverseTransform(box.getMax()));
+        return this.extent.getIntersectingCollisionBoxes(owner, box);
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {

@@ -101,9 +101,11 @@ import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.Location;
@@ -419,8 +421,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends World> getBlockWorker() {
-        return new LanternMutableBlockVolumeWorker<>(this);
+    public MutableBlockVolumeWorker<? extends World> getBlockWorker(Cause cause) {
+        return new LanternMutableBlockVolumeWorker<>(this, cause);
     }
 
     @Override
@@ -436,6 +438,21 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
         return false;
+    }
+
+    @Override
+    public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d end, Predicate<EntityHit> filter) {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d direction, double distance, Predicate<EntityHit> filter) {
+        return Collections.emptySet();
     }
 
     @Override
@@ -459,6 +476,21 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
+        return null;
+    }
+
+    @Override
+    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
+        return null;
+    }
+
+    @Override
+    public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
+        return null;
+    }
+
+    @Override
     public Collection<Entity> getEntities() {
         // TODO Auto-generated method stub
         return Collections.emptyList();
@@ -471,15 +503,15 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
+    public Entity createEntity(EntityType type, Vector3d position) {
         // TODO Auto-generated method stub
-        return Optional.empty();
+        return null;
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3i position) {
+    public Entity createEntity(EntityType type, Vector3i position) {
         // TODO Auto-generated method stub
-        return Optional.empty();
+        return null;
     }
 
     @Override
@@ -509,11 +541,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getTileEntity(x, y, z);
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, block);
     }
 
     @Override
@@ -577,13 +604,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, notifyNeighbors);
+    public boolean setBlock(int x, int y, int z, BlockState blockState, Cause cause) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, cause);
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, notifyNeighbors, cause);
+    public boolean setBlock(int x, int y, int z, BlockState blockState, BlockChangeFlag flag, Cause cause) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBlock(x, y, z, blockState, flag, cause);
     }
 
     @Override
@@ -592,8 +619,17 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force,
+            BlockChangeFlag flag, Cause cause) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4)
+                .restoreSnapshot(x, y, z, snapshot, force, flag, cause);
+    }
+
+    @Override
+    public boolean restoreSnapshot(BlockSnapshot snapshot, boolean force, BlockChangeFlag flag, Cause cause) {
+        final Vector3i pos = checkNotNull(snapshot, "snapshot").getPosition();
+        return this.chunkManager.getOrLoadChunk(pos.getX() >> 4, pos.getZ() >> 4)
+                .restoreSnapshot(pos.getX(), pos.getY(), pos.getZ(), snapshot, force, flag, cause);
     }
 
     @Override
@@ -687,6 +723,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value, Cause cause) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, key, value, cause);
+    }
+
+    @Override
     public <E> DataTransactionResult offer(int x, int y, int z, BaseValue<E> value) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, value);
     }
@@ -699,6 +740,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
         return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, manipulator, function);
+    }
+
+    @Override
+    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function, Cause cause) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).offer(x, y, z, manipulator, function, cause);
     }
 
     @Override

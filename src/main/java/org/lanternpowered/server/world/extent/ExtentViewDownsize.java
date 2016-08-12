@@ -51,16 +51,19 @@ import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
+import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.extent.Extent;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -248,21 +251,15 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block, boolean notifyNeighbors) {
+    public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag, Cause cause) {
         this.checkRange(x, y, z);
-        this.extent.setBlock(x, y, z, block, notifyNeighbors);
+        return this.extent.setBlock(x, y, z, block, flag, cause);
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState blockState, boolean notifyNeighbors, Cause cause) {
+    public boolean setBlock(int x, int y, int z, BlockState blockState, Cause cause) {
         this.checkRange(x, y, z);
-        this.extent.setBlock(x, y, z, blockState, notifyNeighbors, cause);
-    }
-
-    @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        this.checkRange(x, y, z);
-        this.extent.setBlock(x, y, z, block);
+        return this.extent.setBlock(x, y, z, blockState, cause);
     }
 
     @Override
@@ -272,9 +269,10 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force, boolean notifyNeighbors) {
+    public boolean restoreSnapshot(int x, int y, int z, BlockSnapshot snapshot, boolean force,
+            BlockChangeFlag flag, Cause cause) {
         this.checkRange(x, y, z);
-        return this.extent.restoreSnapshot(x, y, z, snapshot, force, notifyNeighbors);
+        return this.extent.restoreSnapshot(x, y, z, snapshot, force, flag, cause);
     }
 
     @Override
@@ -285,14 +283,41 @@ public class ExtentViewDownsize implements AbstractExtent {
 
     @Override
     public boolean spawnEntity(Entity entity, Cause cause) {
-        Vector3d position = entity.getLocation().getPosition();
-        this.checkRange(position.getX(), position.getY(), position.getZ());
+        final Vector3d pos = entity.getLocation().getPosition();
+        this.checkRange(pos.getX(), pos.getY(), pos.getZ());
         return this.extent.spawnEntity(entity, cause);
     }
 
     @Override
     public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
-        return false;
+        for (Entity entity : entities) {
+            final Vector3d pos = entity.getLocation().getPosition();
+            this.checkRange(pos.getX(), pos.getY(), pos.getZ());
+        }
+        return this.extent.spawnEntities(entities, cause);
+    }
+
+    @Override
+    public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        this.checkRange(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ());
+        this.checkRange(box.getMax().getX(), box.getMax().getY(), box.getMax().getZ());
+        return this.extent.getIntersectingEntities(box, filter);
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d direction, double distance, Predicate<EntityHit> filter) {
+        // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
+        final Vector3i max = this.blockMax.add(Vector3i.ONE);
+        return this.extent.getIntersectingEntities(start, direction, distance,
+                Functional.predicateAnd(hit -> VecHelper.inBounds(hit.getEntity().getLocation().getPosition(), this.blockMin, max), filter));
+    }
+
+    @Override
+    public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d end, Predicate<EntityHit> filter) {
+        // Order matters! Bounds filter before the argument filter so it doesn't see out of bounds entities
+        final Vector3i max = this.blockMax.add(Vector3i.ONE);
+        return this.extent.getIntersectingEntities(start, end,
+                Functional.predicateAnd(hit -> VecHelper.inBounds(hit.getEntity().getLocation().getPosition(), this.blockMin, max), filter));
     }
 
     @Override
@@ -416,6 +441,12 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
+    public <E> DataTransactionResult offer(int x, int y, int z, Key<? extends BaseValue<E>> key, E value, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.offer(x, y, z, key, value, cause);
+    }
+
+    @Override
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator) {
         this.checkRange(x, y, z);
         return this.extent.offer(x, y, z, manipulator);
@@ -425,6 +456,12 @@ public class ExtentViewDownsize implements AbstractExtent {
     public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function) {
         this.checkRange(x, y, z);
         return this.extent.offer(x, y, z, manipulator, function);
+    }
+
+    @Override
+    public DataTransactionResult offer(int x, int y, int z, DataManipulator<?, ?> manipulator, MergeFunction function, Cause cause) {
+        this.checkRange(x, y, z);
+        return this.extent.offer(x, y, z, manipulator, function, cause);
     }
 
     @Override
@@ -528,7 +565,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3i position) {
+    public Entity createEntity(EntityType type, Vector3i position) {
         this.checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.createEntity(type, position);
     }
@@ -568,7 +605,7 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Optional<Entity> createEntity(EntityType type, Vector3d position) {
+    public Entity createEntity(EntityType type, Vector3d position) {
         this.checkRange(position.getX(), position.getY(), position.getZ());
         return this.extent.createEntity(type, position);
     }
@@ -625,6 +662,26 @@ public class ExtentViewDownsize implements AbstractExtent {
     public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
         this.checkRange(x, y, z);
         this.extent.setNotifier(x, y, z, uuid);
+    }
+
+    @Override
+    public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
+        this.checkRange(x, y, z);
+        return this.extent.getBlockSelectionBox(x, y, z);
+    }
+
+    @Override
+    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
+        this.checkRange(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ());
+        this.checkRange(box.getMax().getX(), box.getMax().getY(), box.getMax().getZ());
+        return this.extent.getIntersectingBlockCollisionBoxes(box);
+    }
+
+    @Override
+    public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
+        this.checkRange(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ());
+        this.checkRange(box.getMax().getX(), box.getMax().getY(), box.getMax().getZ());
+        return this.extent.getIntersectingCollisionBoxes(owner, box);
     }
 
     private static class EntityInBounds implements Predicate<Entity> {

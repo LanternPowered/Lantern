@@ -32,6 +32,7 @@ import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
@@ -104,8 +105,8 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
     }
 
     @Override
-    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker() {
-        return new LanternBlockVolumeWorker<>(this);
+    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker(Cause cause) {
+        return new LanternBlockVolumeWorker<>(this, cause);
     }
 
     /**

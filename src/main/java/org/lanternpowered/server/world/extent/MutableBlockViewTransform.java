@@ -28,6 +28,7 @@ package org.lanternpowered.server.world.extent;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
@@ -40,9 +41,9 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
-        this.volume.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
-                this.inverseTransform.transformZ(x, y, z), block);
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+        return this.volume.setBlock(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z), block, cause);
     }
 
     @Override
@@ -57,8 +58,8 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
-        return new LanternMutableBlockVolumeWorker<>(this);
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
+        return new LanternMutableBlockVolumeWorker<>(this, cause);
     }
 
     @Override

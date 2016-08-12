@@ -35,6 +35,7 @@ import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -51,6 +52,9 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
 
     // The barrier plane (the bottom of the world)
     private static final int BARRIER_PLANE = 60;
+
+    // The cause used to populate chunks
+    private final Cause cause = Cause.source(this).build();
 
     // All the block states that should be used
     private final BlockState[] blockStateCache;
@@ -86,12 +90,12 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
         for (int x = min.getX(); x <= max.getX(); x++) {
             for (int z = min.getZ(); z <= max.getZ(); z++) {
                 if (placeBarriers) {
-                    buffer.setBlock(x, BARRIER_PLANE, z, BlockTypes.BARRIER.getDefaultState());
+                    buffer.setBlock(x, BARRIER_PLANE, z, BlockTypes.BARRIER.getDefaultState(), this.cause);
                 }
                 if (placeBlocks && x > 0 && z > 0 && x % 2 != 0 && z % 2 != 0) {
                     int index = (x / 2) * this.size + (z / 2);
                     if (index >= 0 && index < this.blockStateCache.length) {
-                        buffer.setBlock(x, BLOCKS_PLANE, z, this.blockStateCache[index]);
+                        buffer.setBlock(x, BLOCKS_PLANE, z, this.blockStateCache[index], this.cause);
                     }
                 }
             }

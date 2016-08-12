@@ -31,6 +31,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -39,6 +40,9 @@ import org.spongepowered.api.world.gen.GenerationPopulator;
 import java.util.List;
 
 public final class FlatGenerationPopulator implements GenerationPopulator {
+
+    // The cause to populate chunks
+    private final Cause cause = Cause.source(this).build();
 
     // Using a cache to increase generation performance
     private final BlockState[] blockStateCache;
@@ -77,7 +81,7 @@ public final class FlatGenerationPopulator implements GenerationPopulator {
                     if (y >= height) {
                         break;
                     }
-                    buffer.setBlock(x, y, z, this.blockStateCache[y]);
+                    buffer.setBlock(x, y, z, this.blockStateCache[y], this.cause);
                 }
             }
         }

@@ -41,6 +41,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.block.HardnessProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.World;
 
@@ -187,7 +188,8 @@ public final class PlayerInteractionHandler {
     }
 
     private void handleBrokenBlock() {
-        this.player.getWorld().setBlock(this.diggingBlock, BlockTypes.AIR.getDefaultState());
+        this.player.getWorld().setBlock(this.diggingBlock, BlockTypes.AIR.getDefaultState(),
+                Cause.source(this.player).build());
         if (this.lastBreakState != -1) {
             this.sendBreakUpdate(-1);
         }

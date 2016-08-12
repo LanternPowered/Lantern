@@ -66,8 +66,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import javax.annotation.Nullable;
@@ -81,6 +83,7 @@ public class LanternCommandManager implements CommandManager {
     private final Logger log;
     private final SimpleDispatcher dispatcher;
     private final Multimap<PluginContainer, CommandMapping> owners = HashMultimap.create();
+    private final Map<CommandMapping, PluginContainer> reverseOwners = new ConcurrentHashMap<>();
     private final Object lock = new Object();
 
     /**
@@ -136,6 +139,7 @@ public class LanternCommandManager implements CommandManager {
             Optional<CommandMapping> mapping = this.dispatcher.register(callable, aliasesWithPrefix, callback);
             if (mapping.isPresent()) {
                 this.owners.put(container, mapping.get());
+                this.reverseOwners.put(mapping.get(), container);
             }
 
             return mapping;
@@ -188,6 +192,11 @@ public class LanternCommandManager implements CommandManager {
         synchronized (this.lock) {
             return ImmutableSet.copyOf(this.owners.get(container.get()));
         }
+    }
+
+    @Override
+    public Optional<PluginContainer> getOwner(CommandMapping mapping) {
+        return Optional.ofNullable(this.reverseOwners.get(checkNotNull(mapping, "mapping")));
     }
 
     @Override

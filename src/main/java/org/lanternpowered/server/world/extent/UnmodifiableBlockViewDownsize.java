@@ -27,6 +27,7 @@ package org.lanternpowered.server.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
@@ -51,8 +52,8 @@ public class UnmodifiableBlockViewDownsize extends AbstractBlockViewDownsize<Blo
     }
 
     @Override
-    public BlockVolumeWorker<? extends UnmodifiableBlockVolume> getBlockWorker() {
-        return new LanternBlockVolumeWorker<>(this);
+    public BlockVolumeWorker<? extends UnmodifiableBlockVolume> getBlockWorker(Cause cause) {
+        return new LanternBlockVolumeWorker<>(this, cause);
     }
 
 }

@@ -30,6 +30,7 @@ import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -52,14 +53,15 @@ public class ShortArrayMutableBlockBuffer extends AbstractMutableBlockBuffer {
     }
 
     @Override
-    public void setBlock(int x, int y, int z, BlockState block) {
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
         this.checkRange(x, y, z);
         this.blocks[this.index(x, y, z)] = BlockRegistryModule.get().getStateInternalIdAndData(block);
+        return true;
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker() {
-        return new LanternMutableBlockVolumeWorker<>(this);
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
+        return new LanternMutableBlockVolumeWorker<>(this, cause);
     }
 
     @Override

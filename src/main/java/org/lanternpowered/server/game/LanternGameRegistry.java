@@ -42,6 +42,9 @@ import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.bossbar.LanternBossBarBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceBuilder;
+import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageSourceBuilder;
+import org.lanternpowered.server.cause.entity.damage.source.LanternFallingBlockDamageSourceBuilder;
+import org.lanternpowered.server.cause.entity.damage.source.LanternIndirectEntityDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternBlockSpawnCauseBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternBreedingSpawnCauseBuilder;
 import org.lanternpowered.server.cause.entity.spawn.LanternEntitySpawnCauseBuilder;
@@ -218,6 +221,9 @@ import org.spongepowered.api.entity.living.player.tab.TabListEntry;
 import org.spongepowered.api.event.cause.entity.damage.DamageType;
 import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.FallingBlockDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.dismount.DismountType;
 import org.spongepowered.api.event.cause.entity.spawn.BlockSpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.BreedingSpawnCause;
@@ -431,9 +437,9 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(TeleportCause.Builder.class, LanternTeleportCauseBuilder::new)
                 .registerBuilderSupplier(BlockDamageSource.Builder.class, LanternBlockDamageSourceBuilder::new)
                 .registerBuilderSupplier(DamageSource.Builder.class, LanternDamageSourceBuilder::new)
-                //.registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
-                //.registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
-                //.registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
+                .registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
+                .registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
+                .registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
                 ;
         this.registerFactories();
     }

@@ -50,7 +50,6 @@ import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.util.FastSoftThreadLocal;
-import org.lanternpowered.server.util.SoftThreadLocal;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
@@ -285,7 +284,7 @@ public final class LanternChunkManager {
             return;
         }
         // Chunk may be null if's already being loaded by a different thread.
-        final LanternChunk chunk = getOrCreateChunk(coords, () -> {
+        getOrCreateChunk(coords, () -> {
             // Build the cause only if the chunk isn't already loaded
             return Cause.source(world).named("tickets", tickets.toArray(new Object[tickets.size()])).build();
         }, true, false);
@@ -699,7 +698,7 @@ public final class LanternChunkManager {
         // Finally, create a new chunk if needed
         chunk = this.loadedChunks.computeIfAbsent(coords, coords0 -> {
             newChunk[0] = true;
-            return new LanternChunk(this.world, coords.getX(), coords.getY());
+            return new LanternChunk(this.world, coords0.getX(), coords0.getY());
         });
         // This method call was too late
         if (!newChunk[0]) {
@@ -1317,7 +1316,7 @@ public final class LanternChunkManager {
             LanternChunkQueueTask task = this.chunkQueueTasks.get(coords);
             if (task == null || !(task.runnable instanceof LanternChunkLoadTask)) {
                 this.chunkQueueTasks.computeIfAbsent(coords, coords1 ->
-                        this.queueTask(coords, new LanternChunkLoadTask(coords)));
+                        this.queueTask(coords1, new LanternChunkLoadTask(coords1)));
             }
         }
         if  (callEvents) {

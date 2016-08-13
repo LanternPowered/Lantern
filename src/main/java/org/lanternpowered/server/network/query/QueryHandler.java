@@ -66,7 +66,6 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.World;
 
 import java.net.InetSocketAddress;
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.LinkedHashMap;
@@ -167,7 +166,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
         writeString(buf, event.getMap());
         writeString(buf, String.valueOf(event.getPlayerCount()));
         writeString(buf, String.valueOf(event.getMaxPlayerCount()));
-        buf.order(ByteOrder.LITTLE_ENDIAN).writeShort(address.getPort());
+        buf.writeShortLE(address.getPort());
         writeString(buf, address.getHostString());
         ctx.write(new DatagramPacket(buf, packet.sender()));
     }

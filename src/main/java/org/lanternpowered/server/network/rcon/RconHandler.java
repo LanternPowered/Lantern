@@ -58,7 +58,6 @@ import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.network.rcon.RconConnectionEvent;
 
-import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
 public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
@@ -80,13 +79,12 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ByteBuf buf) throws Exception {
-        buf = buf.order(ByteOrder.LITTLE_ENDIAN);
         if (buf.readableBytes() < 8) {
             return;
         }
 
-        int requestId = buf.readInt();
-        int type = buf.readInt();
+        int requestId = buf.readIntLE();
+        int type = buf.readIntLE();
 
         byte[] payloadData = new byte[buf.readableBytes() - 2];
         buf.readBytes(payloadData);
@@ -158,9 +156,9 @@ public class RconHandler extends SimpleChannelInboundHandler<ByteBuf> {
     }
 
     private static void sendResponse(ChannelHandlerContext ctx, int requestId, int type, String payload) {
-        ByteBuf buf = ctx.alloc().buffer().order(ByteOrder.LITTLE_ENDIAN);
-        buf.writeInt(requestId);
-        buf.writeInt(type);
+        ByteBuf buf = ctx.alloc().buffer();
+        buf.writeIntLE(requestId);
+        buf.writeIntLE(type);
         buf.writeBytes(payload.getBytes(StandardCharsets.UTF_8));
         buf.writeByte(0);
         buf.writeByte(0);

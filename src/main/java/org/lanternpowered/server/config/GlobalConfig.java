@@ -105,7 +105,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         private String password = "";
 
         @Setting(value = "port", comment = "The port that should be bound.")
-        private int port = 25564;
+        private int port = 25575;
 
         @Setting(value = "use-epoll-when-available", comment = "Enables epoll if it's supported by the os.")
         private boolean useEpollWhenAvailable = true;

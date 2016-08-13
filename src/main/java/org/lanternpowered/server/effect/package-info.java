@@ -23,24 +23,4 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect;
-
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.effect.Viewer;
-import org.spongepowered.api.effect.sound.SoundCategory;
-import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-public interface AbstractViewer extends Viewer {
-
-    @Override
-    default void playSound(SoundType sound, SoundCategory category, Vector3d position, double volume) {
-        this.playSound(sound, category, position, volume, 1.0);
-    }
-
-    @Override
-    default void playSound(SoundType sound, SoundCategory category, Vector3d position, double volume, double pitch) {
-        this.playSound(sound, category, position, volume, pitch, 0.0);
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.effect;

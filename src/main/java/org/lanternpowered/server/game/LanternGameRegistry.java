@@ -78,6 +78,7 @@ import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
 import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
+import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
@@ -102,6 +103,7 @@ import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
@@ -210,6 +212,8 @@ import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleType;
 import org.spongepowered.api.effect.particle.ResizableParticle;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.entity.EntityType;
@@ -375,6 +379,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SkinPart.class, new SkinPartRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
+                .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.getInstance())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
                 .registerModule(GameMode.class, GameModeRegistryModule.getInstance())
@@ -418,6 +423,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(ColoredParticle.Builder.class, LanternParticleEffectBuilder.Colorable::new)
                 .registerBuilderSupplier(ItemParticle.Builder.class, LanternParticleEffectBuilder.Item::new)
                 .registerBuilderSupplier(BlockParticle.Builder.class, LanternParticleEffectBuilder.Block::new)
+                .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)
                 .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(Lantern.getGame().getScheduler()))
                 .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
                 .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)

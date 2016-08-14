@@ -117,6 +117,7 @@ import java.util.concurrent.locks.StampedLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -1246,6 +1247,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return this.getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Entity createEntity(EntityType type, Vector3d position) {
         checkNotNull(position, "position");

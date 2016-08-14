@@ -39,10 +39,9 @@ public final class CodecPlayOutEntityVelocity implements Codec<MessagePlayOutEnt
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityVelocity message) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        Vector3d velocity = message.getVelocity();
-        buf.writeShort((short) Math.min(velocity.getX() * 8000d, Short.MAX_VALUE));
-        buf.writeShort((short) Math.min(velocity.getY() * 8000d, Short.MAX_VALUE));
-        buf.writeShort((short) Math.min(velocity.getZ() * 8000d, Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(message.getX() * 8000.0, Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(message.getY() * 8000.0, Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(message.getZ() * 8000.0, Short.MAX_VALUE));
         return buf;
     }
 }

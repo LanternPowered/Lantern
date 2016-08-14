@@ -23,9 +23,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player;
+package org.lanternpowered.server.network.entity.vanilla;
 
-public enum HandType {
-    LEFT,
-    RIGHT,
+import org.lanternpowered.server.data.type.LanternRabbitType;
+import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.RabbitTypes;
+
+public class RabbitEntityProtocol<E extends LanternEntityLiving> extends AgeableEntityProtocol<E> {
+
+    private int lastType;
+
+    public RabbitEntityProtocol(E entity) {
+        super(entity);
+    }
+
+    private int getTypeId() {
+        return ((LanternRabbitType) this.entity.get(Keys.RABBIT_TYPE).orElse(RabbitTypes.WHITE)).getInternalId();
+    }
+
+    @Override
+    protected int getMobType() {
+        return 101;
+    }
+
+    @Override
+    protected void spawn(ParameterList parameterList) {
+        super.spawn(parameterList);
+        parameterList.add(EntityParameters.Rabbit.VARIANT, this.getTypeId());
+    }
+
+    @Override
+    protected void update(ParameterList parameterList) {
+        super.update(parameterList);
+        final int type = this.getTypeId();
+        if (type != this.lastType) {
+            parameterList.add(EntityParameters.Rabbit.VARIANT, type);
+            this.lastType = type;
+        }
+    }
 }

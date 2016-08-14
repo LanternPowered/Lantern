@@ -36,6 +36,6 @@ public final class EmptyAction implements Action {
     }
 
     @Override
-    public void run(@Parameter("context") ScriptContext scriptContext) {
+    public void run(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext) {
     }
 }

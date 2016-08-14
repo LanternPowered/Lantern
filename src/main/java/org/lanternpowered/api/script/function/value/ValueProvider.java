@@ -37,7 +37,7 @@ public interface ValueProvider<T> {
         return new Constant<>(checkNotNull(value, "value"));
     }
 
-    T get(@Parameter("context") ScriptContext scriptContext);
+    T get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext);
 
     final class Constant<T> implements ValueProvider<T> {
 
@@ -48,7 +48,7 @@ public interface ValueProvider<T> {
         }
 
         @Override
-        public T get(@Parameter("context") ScriptContext scriptContext) {
+        public T get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext) {
             return this.value;
         }
     }

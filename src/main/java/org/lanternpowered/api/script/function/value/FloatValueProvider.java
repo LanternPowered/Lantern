@@ -40,7 +40,7 @@ public interface FloatValueProvider {
         return new Range(min, max);
     }
 
-    float get(@Parameter("context") ScriptContext scriptContext);
+    float get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext);
 
     final class Constant implements FloatValueProvider {
 
@@ -51,7 +51,7 @@ public interface FloatValueProvider {
         }
 
         @Override
-        public float get(@Parameter("context") ScriptContext context) {
+        public float get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext context) {
             return this.value;
         }
     }
@@ -67,7 +67,7 @@ public interface FloatValueProvider {
         }
 
         @Override
-        public float get(@Parameter("context") ScriptContext scriptContext) {
+        public float get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext) {
             return LanternRandom.$random.range(this.min, this.max);
         }
 

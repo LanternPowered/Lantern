@@ -93,6 +93,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnExperienceOrb;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnMob;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnObject;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnPainting;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnParticle;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnPlayer;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnThunderbolt;
@@ -198,6 +199,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPainting;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSound;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTheEnd;
@@ -345,7 +347,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x01, CodecPlayOutSpawnExperienceOrb.class, MessagePlayOutSpawnExperienceOrb.class);
         outbound.bind(0x02, CodecPlayOutSpawnThunderbolt.class, MessagePlayOutSpawnThunderbolt.class);
         outbound.bind(0x03, CodecPlayOutSpawnMob.class, MessagePlayOutSpawnMob.class);
-        // 0x04
+        outbound.bind(0x04, CodecPlayOutSpawnPainting.class, MessagePlayOutSpawnPainting.class);
         outbound.bind(0x05, CodecPlayOutSpawnPlayer.class, MessagePlayOutSpawnPlayer.class);
         // 0x06
         outbound.bind(0x07, CodecPlayOutStatistics.class, MessagePlayOutStatistics.class);

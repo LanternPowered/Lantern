@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import org.spongepowered.api.util.Direction;
 
-final class CodecUtils {
+public final class CodecUtils {
 
     public static Direction fromFace(int face) {
         switch (face) {
@@ -48,14 +48,14 @@ final class CodecUtils {
      * @param angle the angle
      * @return the byte
      */
-    public static byte wrapAngle(float angle) {
-        while (angle >= 360f) {
-            angle -= 360f;
+    public static byte wrapAngle(double angle) {
+        while (angle >= 360d) {
+            angle -= 360d;
         }
         while (angle < 0) {
-            angle += 360f;
+            angle += 360d;
         }
-        return (byte) ((angle / 360f) * 256f);
+        return (byte) ((angle / 360d) * 256d);
     }
 
     /**

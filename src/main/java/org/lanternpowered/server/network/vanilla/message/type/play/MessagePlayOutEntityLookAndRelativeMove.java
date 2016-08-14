@@ -25,10 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutEntityLookAndRelativeMove implements Message {
@@ -36,18 +32,21 @@ public final class MessagePlayOutEntityLookAndRelativeMove implements Message {
     private final int entityId;
     private final boolean onGround;
 
-    private final float yaw;
-    private final float pitch;
+    private final int yaw;
+    private final int pitch;
 
-    private final Vector3d delta;
+    private final int deltaX;
+    private final int deltaY;
+    private final int deltaZ;
 
-    public MessagePlayOutEntityLookAndRelativeMove(int entityId, Vector3d delta, float yaw, float pitch, boolean onGround) {
-        checkNotNull(delta, "delta");
-        checkArgument(Math.abs(delta.getX()) < 7 && Math.abs(delta.getY()) < 7 && Math.abs(delta.getZ()) < 7, "delta must be smaller then 7.0");
+    public MessagePlayOutEntityLookAndRelativeMove(int entityId, int deltaX, int deltaY, int deltaZ,
+            int yaw, int pitch, boolean onGround) {
 
         this.onGround = onGround;
         this.entityId = entityId;
-        this.delta = delta;
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
+        this.deltaZ = deltaZ;
         this.pitch = pitch;
         this.yaw = yaw;
     }
@@ -56,15 +55,11 @@ public final class MessagePlayOutEntityLookAndRelativeMove implements Message {
         return this.entityId;
     }
 
-    public Vector3d getDelta() {
-        return this.delta;
-    }
-
-    public float getYaw() {
+    public int getYaw() {
         return this.yaw;
     }
 
-    public float getPitch() {
+    public int getPitch() {
         return this.pitch;
     }
 
@@ -72,4 +67,15 @@ public final class MessagePlayOutEntityLookAndRelativeMove implements Message {
         return this.onGround;
     }
 
+    public int getDeltaX() {
+        return this.deltaX;
+    }
+
+    public int getDeltaY() {
+        return this.deltaY;
+    }
+
+    public int getDeltaZ() {
+        return this.deltaZ;
+    }
 }

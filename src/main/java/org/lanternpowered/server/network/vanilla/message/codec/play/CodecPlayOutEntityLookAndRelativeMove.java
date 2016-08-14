@@ -25,9 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
-
-import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -40,12 +37,11 @@ public final class CodecPlayOutEntityLookAndRelativeMove implements Codec<Messag
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityLookAndRelativeMove message) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        Vector3d delta = message.getDelta();
-        buf.writeShort((short) (delta.getX() * 4096.0));
-        buf.writeShort((short) (delta.getY() * 4096.0));
-        buf.writeShort((short) (delta.getZ() * 4096.0));
-        buf.writeByte(wrapAngle(message.getYaw()));
-        buf.writeByte(wrapAngle(message.getPitch()));
+        buf.writeShort((short) message.getDeltaX());
+        buf.writeShort((short) message.getDeltaY());
+        buf.writeShort((short) message.getDeltaZ());
+        buf.writeByte((byte) message.getYaw());
+        buf.writeByte((byte) message.getPitch());
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

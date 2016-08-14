@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.pipeline;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageEncoder;
+import io.netty.util.ReferenceCounted;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -66,6 +67,9 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
             for (Processor processor : processors) {
                 // The processor should handle the output messages
                 processor.process(this.codecContext, message, output);
+            }
+            if (message instanceof ReferenceCounted && !output.contains(message)) {
+                ((ReferenceCounted) message).release();
             }
         } else {
             // Add the message to the output

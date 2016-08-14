@@ -33,11 +33,104 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.UUID;
 import java.util.function.Function;
 
 public final class LanternEntityType extends PluginCatalogType.Base.Translatable implements EntityType {
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, String translation,
+            Class<E> entityClass, Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, id, name, translation, entityClass, entityConstructor);
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, Translation translation,
+            Class<E> entityClass, Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, id, name, translation, entityClass, entityConstructor);
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, String translation,
+            Class<E> entityClass, Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, name, translation, entityClass, entityConstructor);
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, Translation translation,
+            Class<E> entityClass, Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, name, translation, entityClass, entityConstructor);
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, String translation,
+            Class<E> entityClass) {
+        return new LanternEntityType(pluginId, id, name, translation, entityClass, getEntityConstructor(entityClass));
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, Translation translation,
+            Class<E> entityClass) {
+        return new LanternEntityType(pluginId, id, name, translation, entityClass, getEntityConstructor(entityClass));
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, String translation,
+            Class<E> entityClass) {
+        return new LanternEntityType(pluginId, name, translation, entityClass, getEntityConstructor(entityClass));
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, Translation translation,
+            Class<E> entityClass) {
+        return new LanternEntityType(pluginId, name, translation, entityClass, getEntityConstructor(entityClass));
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, String translation,
+            Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, id, name, translation, getEntityClass(entityConstructor), entityConstructor);
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String id, String name, Translation translation,
+            Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, id, name, translation, getEntityClass(entityConstructor), entityConstructor);
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, String translation,
+            Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, name, translation, getEntityClass(entityConstructor), entityConstructor);
+    }
+
+    public static <E extends LanternEntity> LanternEntityType of(String pluginId, String name, Translation translation,
+            Function<UUID, E> entityConstructor) {
+        return new LanternEntityType(pluginId, name, translation, getEntityClass(entityConstructor), entityConstructor);
+    }
+
+    private static <E extends LanternEntity> Function<UUID, E> getEntityConstructor(Class<E> entityClass) {
+        checkNotNull(entityClass, "entityClass");
+        final Constructor<E> constructor;
+        try {
+            constructor = entityClass.getDeclaredConstructor(UUID.class);
+            constructor.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new IllegalArgumentException("The entity class is missing the constructor: "
+                    + entityClass.getSimpleName() + "(UUID uniqueId)");
+        }
+        return uuid -> {
+            try {
+                return constructor.newInstance(uuid);
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                throw new RuntimeException(e);
+            }
+        };
+    }
+
+    private static <E extends LanternEntity> Class<E> getEntityClass(Function<UUID, E> entityConstructor) {
+        try {
+            BYPASS_FIELD.set(null, true);
+            //noinspection unchecked
+            final Class<E> clazz = (Class<E>) entityConstructor.apply(UUID.randomUUID()).getClass();
+            BYPASS_FIELD.set(null, false);
+            return clazz;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private static final Field BYPASS_FIELD;
 
@@ -51,77 +144,37 @@ public final class LanternEntityType extends PluginCatalogType.Base.Translatable
     }
 
     private final Class<? extends Entity> entityClass;
-    private final Function<UUID, Entity> entityConstructor;
+    private final Function<UUID, ? extends Entity> entityConstructor;
 
-    public LanternEntityType(String pluginId, String name, String translation,
-            Function<UUID, Entity> entityConstructor) {
+    private LanternEntityType(String pluginId, String name, String translation,
+            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
         super(pluginId, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = getEntityClass(entityConstructor);
+        this.entityClass = checkNotNull(entityClass, "entityClass");
     }
 
-    public LanternEntityType(String pluginId, String name, Translation translation,
-            Function<UUID, Entity> entityConstructor) {
+    private LanternEntityType(String pluginId, String name, Translation translation,
+            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
         super(pluginId, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = getEntityClass(entityConstructor);
+        this.entityClass = checkNotNull(entityClass, "entityClass");
     }
 
-    public LanternEntityType(String pluginId, String id, String name, String translation,
-            Function<UUID, Entity> entityConstructor) {
+    private LanternEntityType(String pluginId, String id, String name, String translation,
+            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
         super(pluginId, id, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = getEntityClass(entityConstructor);
+        this.entityClass = checkNotNull(entityClass, "entityClass");
     }
 
-    public LanternEntityType(String pluginId, String id, String name, Translation translation,
-            Function<UUID, Entity> entityConstructor) {
+    private LanternEntityType(String pluginId, String id, String name, Translation translation,
+            Class<? extends Entity> entityClass, Function<UUID, ? extends Entity> entityConstructor) {
         super(pluginId, id, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = getEntityClass(entityConstructor);
+        this.entityClass = checkNotNull(entityClass, "entityClass");
     }
 
-    public LanternEntityType(String pluginId, String id, String translation,
-            Class<? extends Entity> entityClass) {
-        super(pluginId, id, translation);
-        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
-        this.entityClass = entityClass;
-    }
-
-    public LanternEntityType(String pluginId, String id, Translation translation,
-            Class<? extends Entity> entityClass) {
-        super(pluginId, id, translation);
-        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
-        this.entityClass = entityClass;
-    }
-
-    public LanternEntityType(String pluginId, String id, String name, String translation,
-            Class<? extends Entity> entityClass) {
-        super(pluginId, id, name, translation);
-        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
-        this.entityClass = entityClass;
-    }
-
-    public LanternEntityType(String pluginId, String id, String name, Translation translation,
-            Class<? extends Entity> entityClass) {
-        super(pluginId, id, name, translation);
-        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
-        this.entityClass = entityClass;
-    }
-
-    private static Class<? extends Entity> getEntityClass(Function<UUID, ? extends Entity> entityConstructor) {
-        try {
-            BYPASS_FIELD.set(null, true);
-            //noinspection unchecked
-            final Class<? extends Entity> clazz = entityConstructor.apply(UUID.randomUUID()).getClass();
-            BYPASS_FIELD.set(null, false);
-            return clazz;
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public Function<UUID, Entity> getEntityConstructor() {
+    public Function<UUID, ? extends Entity> getEntityConstructor() {
         return this.entityConstructor;
     }
 

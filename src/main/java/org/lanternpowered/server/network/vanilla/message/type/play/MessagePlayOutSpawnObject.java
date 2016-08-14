@@ -37,12 +37,12 @@ public final class MessagePlayOutSpawnObject implements Message {
     private final int objectType;
     private final int objectData;
     private final Vector3d position;
-    private final float yaw;
-    private final float pitch;
+    private final int yaw;
+    private final int pitch;
     private final Vector3d velocity;
 
     public MessagePlayOutSpawnObject(int entityId, UUID uniqueId, int objectType, int objectData,
-            Vector3d position, float yaw, float pitch, Vector3d velocity) {
+            Vector3d position, int yaw, int pitch, Vector3d velocity) {
         this.entityId = entityId;
         this.uniqueId = uniqueId;
         this.objectType = objectType;
@@ -73,11 +73,11 @@ public final class MessagePlayOutSpawnObject implements Message {
         return this.position;
     }
 
-    public float getYaw() {
+    public int getYaw() {
         return this.yaw;
     }
 
-    public float getPitch() {
+    public int getPitch() {
         return this.pitch;
     }
 

@@ -25,27 +25,35 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutEntityVelocity implements Message {
 
     private final int entityId;
-    private final Vector3d velocity;
+    private final double x;
+    private final double y;
+    private final double z;
 
-    public MessagePlayOutEntityVelocity(int entityId, Vector3d velocity) {
-        this.velocity = checkNotNull(velocity, "velocity");
+    public MessagePlayOutEntityVelocity(int entityId, double x, double y, double z) {
         this.entityId = entityId;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public int getEntityId() {
         return this.entityId;
     }
 
-    public Vector3d getVelocity() {
-        return this.velocity;
+    public double getX() {
+        return this.x;
     }
 
+    public double getY() {
+        return this.y;
+    }
+
+    public double getZ() {
+        return this.z;
+    }
 }

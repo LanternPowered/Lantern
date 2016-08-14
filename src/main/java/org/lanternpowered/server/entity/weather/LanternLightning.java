@@ -23,33 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.objects;
+package org.lanternpowered.server.entity.weather;
 
-/**
- * This is a parameter that will be used for the entity
- * metadata that is send to the client.
- */
-public final class Parameter<T> {
+import org.lanternpowered.server.entity.LanternEntity;
 
-    private final ParameterType<T> parameterType;
-    private final T object;
-    private final int index;
+import java.util.UUID;
 
-    public Parameter(ParameterType<T> parameterType, int index, T object) {
-        this.parameterType = parameterType;
-        this.object = object;
-        this.index = index;
-    }
+public class LanternLightning extends LanternEntity implements AbstractLightning {
 
-    public int getIndex() {
-        return this.index;
-    }
-
-    public T getObject() {
-        return this.object;
-    }
-
-    public ParameterType<T> getParameterType() {
-        return this.parameterType;
+    public LanternLightning(UUID uniqueId) {
+        super(uniqueId);
     }
 }

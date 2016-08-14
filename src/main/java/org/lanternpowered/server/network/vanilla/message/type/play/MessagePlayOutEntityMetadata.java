@@ -25,27 +25,24 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.Parameter;
-
-import java.util.List;
 
 public final class MessagePlayOutEntityMetadata implements Message {
 
     private final int entityId;
-    private final List<Parameter<?>> parameters;
+    private final ParameterList parameterList;
 
-    public MessagePlayOutEntityMetadata(int entityId, List<Parameter<?>> parameters) {
-        this.parameters = ImmutableList.copyOf(parameters);
+    public MessagePlayOutEntityMetadata(int entityId, ParameterList parameterList) {
+        this.parameterList = parameterList;
         this.entityId = entityId;
-    }
-
-    public List<Parameter<?>> getParameters() {
-        return this.parameters;
     }
 
     public int getEntityId() {
         return this.entityId;
+    }
+
+    public ParameterList getParameterList() {
+        return this.parameterList;
     }
 }

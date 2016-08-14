@@ -19,7 +19,7 @@
                 "action": {
                     "condition": [
                         "@ $random.range(0.0, 1.0) < 0.000001",
-                        "@ $<minecraft:weather/utils.scr>.testDarkness(context, 0.8)"
+                        "@ $<minecraft:weather/utils.scr>.testDarkness($context, 0.8)"
                     ],
                     "action": {
                         "type": "play_sound",

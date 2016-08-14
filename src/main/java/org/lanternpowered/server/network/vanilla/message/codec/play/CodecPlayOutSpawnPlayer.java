@@ -25,14 +25,12 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
-
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.entity.parameter.AbstractParameterList;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
 
 public final class CodecPlayOutSpawnPlayer implements Codec<MessagePlayOutSpawnPlayer> {
@@ -46,9 +44,9 @@ public final class CodecPlayOutSpawnPlayer implements Codec<MessagePlayOutSpawnP
         buf.writeDouble(vector.getX());
         buf.writeDouble(vector.getY());
         buf.writeDouble(vector.getZ());
-        buf.writeByte(wrapAngle(message.getYaw()));
-        buf.writeByte(wrapAngle(message.getPitch()));
-        buf.write(Types.PARAMETERS, message.getParameters());
+        buf.writeByte((byte) message.getYaw());
+        buf.writeByte((byte) message.getPitch());
+        ((AbstractParameterList) message.getParameterList()).write(buf);
         return buf;
     }
 }

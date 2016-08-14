@@ -70,7 +70,8 @@ public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegis
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternEntityType("minecraft", "player", "entity.player.name", LanternPlayer.class));
-        this.register(new LanternEntityType("minecraft", "item", "entity.Item.name", LanternItem::new));
+        this.register(LanternEntityType.of("minecraft", "player", "entity.player.name", LanternPlayer.class,
+                uuid -> { throw new UnsupportedOperationException("You cannot construct a Player."); }));
+        this.register(LanternEntityType.of("minecraft", "item", "entity.Item.name", LanternItem::new));
     }
 }

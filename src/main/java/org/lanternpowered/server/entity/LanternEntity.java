@@ -31,7 +31,6 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.AbstractDataHolder;
@@ -39,6 +38,7 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
+import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.util.IdAllocator;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
@@ -114,10 +114,14 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     private Vector3d scale = Vector3d.ONE;
 
     /**
+     * The entity protocol type of this entity.
+     */
+    @Nullable private EntityProtocolType<?> entityProtocolType;
+
+    /**
      * The state of the removal of this entity.
      */
-    @Nullable
-    private RemoveState removeState;
+    @Nullable private RemoveState removeState;
 
     private boolean onGround;
 
@@ -158,10 +162,29 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         this.registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).nonRemovableAttachedValueProcessor();
     }
 
+    /**
+     * Gets the {@link Direction} that the entity is looking in the horizontal plane.
+     *
+     * @param division The division
+     * @return The direction
+     */
     public Direction getHorizontalDirection(Direction.Division division) {
         final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
         final Vector3d direction = Quaternions.fromAxesAnglesDeg(rotation.mul(0, 1, 0)).getDirection().mul(-1, 0, 1);
         return Direction.getClosest(direction, division);
+    }
+
+    @Nullable
+    public EntityProtocolType<?> getEntityProtocolType() {
+        return this.entityProtocolType;
+    }
+
+    public void setEntityProtocolType(@Nullable EntityProtocolType<?> entityProtocolType) {
+        if (entityProtocolType != null) {
+            checkArgument(entityProtocolType.getEntityType().isInstance(this),
+                    "The protocol type %s is not applicable to this entity.");
+        }
+        this.entityProtocolType = entityProtocolType;
     }
 
     @Override
@@ -268,8 +291,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public EntityType getType() {
-        // TODO Auto-generated method stub
-        return null;
+        return this.entityType;
     }
 
     @Override

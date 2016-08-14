@@ -25,26 +25,22 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutEntityRelativeMove implements Message {
 
     private final int entityId;
     private final boolean onGround;
+    private final int deltaX;
+    private final int deltaY;
+    private final int deltaZ;
 
-    private final Vector3d delta;
-
-    public MessagePlayOutEntityRelativeMove(int entityId, Vector3d delta, boolean onGround) {
-        checkNotNull(delta, "delta");
-        checkArgument(Math.abs(delta.getX()) < 7 && Math.abs(delta.getY()) < 7 && Math.abs(delta.getZ()) < 7, "delta must be smaller then 7.0");
-
+    public MessagePlayOutEntityRelativeMove(int entityId, int deltaX, int deltaY, int deltaZ, boolean onGround) {
         this.onGround = onGround;
         this.entityId = entityId;
-        this.delta = delta;
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
+        this.deltaZ = deltaZ;
     }
 
     public int getEntityId() {
@@ -55,8 +51,15 @@ public final class MessagePlayOutEntityRelativeMove implements Message {
         return this.onGround;
     }
 
-    public Vector3d getDelta() {
-        return this.delta;
+    public int getDeltaX() {
+        return this.deltaX;
     }
 
+    public int getDeltaY() {
+        return this.deltaY;
+    }
+
+    public int getDeltaZ() {
+        return this.deltaZ;
+    }
 }

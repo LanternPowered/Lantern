@@ -23,19 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.objects;
+package org.lanternpowered.server.network.entity.vanilla;
 
-import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.entity.LanternEntityLiving;
 
-public final class ParameterType<T> {
+public class ZombieEntityProtocol<E extends LanternEntityLiving> extends AbstractZombieEntityProtocol<E> {
 
-    private final TypeToken<T> type;
-
-    public ParameterType(TypeToken<T> type) {
-        this.type = type;
+    public ZombieEntityProtocol(E entity) {
+        super(entity);
     }
 
-    public TypeToken getType() {
-        return this.type;
+    @Override
+    protected int getMobType() {
+        return 54;
     }
 }

@@ -26,6 +26,7 @@
 package org.lanternpowered.server.network.buffer;
 
 import io.netty.handler.codec.DecoderException;
+import io.netty.util.ReferenceCounted;
 import org.lanternpowered.server.network.buffer.objects.Type;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.network.ChannelBuf;
@@ -36,7 +37,19 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-public interface ByteBuffer extends ChannelBuf {
+public interface ByteBuffer extends ChannelBuf, ReferenceCounted {
+
+    @Override
+    ByteBuffer retain();
+
+    @Override
+    ByteBuffer retain(int increment);
+
+    @Override
+    ByteBuffer touch();
+
+    @Override
+    ByteBuffer touch(Object hint);
 
     @Override
     ByteBuffer order(ByteOrder order);
@@ -309,14 +322,6 @@ public interface ByteBuffer extends ChannelBuf {
      * @return This stream for chaining
      */
     ByteBuffer ensureWritable(int minWritableBytes);
-
-    /**
-     * Decreases the reference count by 1 and deallocates this object
-     * if the reference count reaches at 0.
-     *
-     * @return If the reference count became 0 and this object has been deallocated
-     */
-    boolean release();
 
     ByteBuffer copy();
 }

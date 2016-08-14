@@ -40,7 +40,7 @@ public interface DoubleValueProvider {
         return new Range(min, max);
     }
 
-    double get(@Parameter("context") ScriptContext scriptContext);
+    double get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext);
 
     final class Constant implements DoubleValueProvider {
 
@@ -51,7 +51,7 @@ public interface DoubleValueProvider {
         }
 
         @Override
-        public double get(@Parameter("context") ScriptContext scriptContext) {
+        public double get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext) {
             return this.value;
         }
     }
@@ -67,7 +67,7 @@ public interface DoubleValueProvider {
         }
 
         @Override
-        public double get(@Parameter("context") ScriptContext scriptContext) {
+        public double get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext) {
             return LanternRandom.$random.range(this.min, this.max);
         }
 

@@ -27,9 +27,9 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.entity.parameter.AbstractParameterList;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 
 public final class CodecPlayOutEntityMetadata implements Codec<MessagePlayOutEntityMetadata> {
@@ -38,7 +38,7 @@ public final class CodecPlayOutEntityMetadata implements Codec<MessagePlayOutEnt
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityMetadata message) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        buf.write(Types.PARAMETERS, message.getParameters());
+        ((AbstractParameterList) message.getParameterList()).write(buf);
         return buf;
     }
 }

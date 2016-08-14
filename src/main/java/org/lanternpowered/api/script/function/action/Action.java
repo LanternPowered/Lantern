@@ -51,6 +51,6 @@ public interface Action {
         return new MultiAction(ImmutableList.copyOf(actions));
     }
 
-    void run(@Parameter("context") ScriptContext scriptContext);
+    void run(@Parameter("$context") ScriptContext scriptContext);
 
 }

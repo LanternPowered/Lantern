@@ -35,32 +35,32 @@ public final class MessagePlayOutEntityTeleport implements Message {
     private final int entityId;
     private final boolean onGround;
 
-    private final float yaw;
-    private final float pitch;
+    private final int yaw;
+    private final int pitch;
 
-    private final Vector3d position;
+    private final double x;
+    private final double y;
+    private final double z;
 
-    public MessagePlayOutEntityTeleport(int entityId, Vector3d position, float yaw, float pitch, boolean onGround) {
-        this.position = checkNotNull(position, "position");
+    public MessagePlayOutEntityTeleport(int entityId, double x, double y, double z, int yaw, int pitch, boolean onGround) {
         this.onGround = onGround;
         this.entityId = entityId;
         this.pitch = pitch;
         this.yaw = yaw;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
 
     public int getEntityId() {
         return this.entityId;
     }
 
-    public Vector3d getPosition() {
-        return this.position;
-    }
-
-    public float getYaw() {
+    public int getYaw() {
         return this.yaw;
     }
 
-    public float getPitch() {
+    public int getPitch() {
         return this.pitch;
     }
 
@@ -68,4 +68,15 @@ public final class MessagePlayOutEntityTeleport implements Message {
         return this.onGround;
     }
 
+    public double getX() {
+        return this.x;
+    }
+
+    public double getY() {
+        return this.y;
+    }
+
+    public double getZ() {
+        return this.z;
+    }
 }

@@ -33,6 +33,8 @@ import java.util.Optional;
 
 public interface ScriptContext {
 
+    String CONTEXT_PARAMETER = "$context";
+
     boolean contains(ContextParameter<?> parameter);
 
     boolean containsValueType(Class<?> valueType);

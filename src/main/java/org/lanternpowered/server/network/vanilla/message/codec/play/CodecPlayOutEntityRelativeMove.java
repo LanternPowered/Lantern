@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -38,10 +37,9 @@ public final class CodecPlayOutEntityRelativeMove implements Codec<MessagePlayOu
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityRelativeMove message) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        Vector3d delta = message.getDelta();
-        buf.writeShort((short) (delta.getX() * 4096.0));
-        buf.writeShort((short) (delta.getY() * 4096.0));
-        buf.writeShort((short) (delta.getZ() * 4096.0));
+        buf.writeShort((short) message.getDeltaX());
+        buf.writeShort((short) message.getDeltaY());
+        buf.writeShort((short) message.getDeltaZ());
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

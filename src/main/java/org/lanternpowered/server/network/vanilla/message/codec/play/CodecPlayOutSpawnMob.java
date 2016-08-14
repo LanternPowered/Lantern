@@ -25,14 +25,12 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
-
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.entity.parameter.AbstractParameterList;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
 
 public final class CodecPlayOutSpawnMob implements Codec<MessagePlayOutSpawnMob> {
@@ -47,14 +45,14 @@ public final class CodecPlayOutSpawnMob implements Codec<MessagePlayOutSpawnMob>
         buf.writeDouble(vector.getX());
         buf.writeDouble(vector.getY());
         buf.writeDouble(vector.getZ());
-        buf.writeByte(wrapAngle(message.getYaw()));
-        buf.writeByte(wrapAngle(message.getPitch()));
-        buf.writeByte(wrapAngle(message.getHeadPitch()));
+        buf.writeByte((byte) message.getYaw());
+        buf.writeByte((byte) message.getPitch());
+        buf.writeByte((byte) message.getHeadPitch());
         vector = message.getVelocity();
         buf.writeShort((short) Math.min(vector.getX() * 8000.0, Short.MAX_VALUE));
         buf.writeShort((short) Math.min(vector.getY() * 8000.0, Short.MAX_VALUE));
         buf.writeShort((short) Math.min(vector.getZ() * 8000.0, Short.MAX_VALUE));
-        buf.write(Types.PARAMETERS, message.getParameters());
+        ((AbstractParameterList) message.getParameterList()).write(buf);
         return buf;
     }
 }

@@ -49,6 +49,8 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.network.entity.EntityProtocolManager;
+import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
@@ -220,6 +222,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
      */
     private MessageChannel messageChannel = MessageChannel.world(this);
 
+    /**
+     * The entity protocol manager.
+     */
+    private EntityProtocolManager entityProtocolManager = new EntityProtocolManager();
+
     public LanternWorld(LanternGame game, WorldConfig worldConfig, Path directory,
             Scoreboard scoreboard, LanternWorldProperties properties) {
         this.directory = directory;
@@ -351,6 +358,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     public void addPlayer(LanternPlayer player) {
         this.players.add(player);
+        checkArgument(this.addEntity(player) == null);
     }
 
     public void removePlayer(LanternPlayer player) {
@@ -1026,7 +1034,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         checkArgument(!entity.isRemoved(), "The entity may not be removed.");
         checkArgument(entity.getWorld() == this, "The entity is not be located in this world.");
         checkNotNull(cause, "cause");
-        final LanternEntity entity1 = this.entitiesByUniqueId.putIfAbsent(entity.getUniqueId(), (LanternEntity) entity);
+        final LanternEntity entity1 = this.addEntity((LanternEntity) entity);
         if (entity1 != null) {
             if (entity == entity1) {
                 throw new IllegalArgumentException("The entity is already spawned.");
@@ -1043,8 +1051,22 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     public void addEntities(Iterable<Entity> entities) {
         for (Entity entity : entities) {
-            this.entitiesByUniqueId.put(entity.getUniqueId(), (LanternEntity) entity);
+            this.addEntity((LanternEntity) entity);
         }
+    }
+
+    @Nullable
+    private LanternEntity addEntity(LanternEntity entity) {
+        LanternEntity entity1 = this.entitiesByUniqueId.putIfAbsent(entity.getUniqueId(), entity);
+        if (entity1 != null) {
+            return entity1;
+        }
+        final EntityProtocolType entityProtocolType = entity.getEntityProtocolType();
+        if (entityProtocolType != null) {
+            //noinspection unchecked
+            this.entityProtocolManager.add(entity, entityProtocolType);
+        }
+        return null;
     }
 
     private void pulseEntities() {
@@ -1060,6 +1082,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
                         chunk.removeEntity(entity);
                     }
                 }
+                this.entityProtocolManager.remove(entity);
                 iterator.remove();
             } else {
                 final Vector2i lastChunk = entity.getLastChunkCoords();
@@ -1172,14 +1195,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         if (this.weatherUniverse != null) {
             this.weatherUniverse.pulse();
         }
-        // TODO: This is temporarily, pulses will be given to all
-        // entities in the future and it will be chunk based
-        this.players.forEach(LanternPlayer::pulse);
-        // TODO: Maybe async?
-        this.observedChunkManager.pulse();
 
         // Pulse the entities
         this.pulseEntities();
+
+        // TODO: Maybe async?
+        this.observedChunkManager.pulse();
+        this.entityProtocolManager.updateTrackers(this.players);
     }
 
     public void broadcast(Supplier<Message> message) {

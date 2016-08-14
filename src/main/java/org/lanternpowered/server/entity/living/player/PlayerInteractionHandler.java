@@ -233,7 +233,6 @@ public final class PlayerInteractionHandler {
         if (itemInteractionType == ItemInteractionType.OFF) {
             return;
         }
-        // TODO: Send updates if something failed, events, ...
 
         // Try the action of the hotbar item first
         final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();

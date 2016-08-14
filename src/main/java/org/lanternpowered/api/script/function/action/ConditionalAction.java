@@ -40,7 +40,7 @@ public final class ConditionalAction implements Action {
     }
 
     @Override
-    public void run(@Parameter("context") ScriptContext context) {
+    public void run(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext context) {
         if (!this.condition.test(context)) {
             return;
         }

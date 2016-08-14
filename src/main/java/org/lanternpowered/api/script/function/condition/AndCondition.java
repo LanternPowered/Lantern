@@ -39,7 +39,7 @@ public final class AndCondition implements Condition {
     }
 
     @Override
-    public boolean test(@Parameter("context") ScriptContext context) {
+    public boolean test(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext context) {
         for (Condition condition : this.conditions) {
             if (!condition.test(context)) {
                 return false;

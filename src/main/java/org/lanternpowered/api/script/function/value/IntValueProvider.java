@@ -40,7 +40,7 @@ public interface IntValueProvider {
         return new Range(min, max);
     }
 
-    int get(@Parameter("context") ScriptContext scriptContext);
+    int get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext);
 
     final class Constant implements IntValueProvider {
 
@@ -51,7 +51,7 @@ public interface IntValueProvider {
         }
 
         @Override
-        public int get(@Parameter("context") ScriptContext scriptContext) {
+        public int get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext) {
             return this.value;
         }
     }
@@ -67,7 +67,7 @@ public interface IntValueProvider {
         }
 
         @Override
-        public int get(@Parameter("context") ScriptContext scriptContext) {
+        public int get(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext) {
             return LanternRandom.$random.range(this.min, this.max);
         }
 

@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
-
 import com.flowpowered.math.vector.Vector3d;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
@@ -46,8 +44,8 @@ public final class CodecPlayOutSpawnObject implements Codec<MessagePlayOutSpawnO
         buf.writeDouble(vector.getX());
         buf.writeDouble(vector.getY());
         buf.writeDouble(vector.getZ());
-        buf.writeByte(wrapAngle(message.getPitch()));
-        buf.writeByte(wrapAngle(message.getYaw()));
+        buf.writeByte((byte) message.getPitch());
+        buf.writeByte((byte) message.getYaw());
         buf.writeInteger(message.getObjectData());
         vector = message.getVelocity();
         buf.writeShort((short) Math.min(vector.getX() * 8000.0, Short.MAX_VALUE));

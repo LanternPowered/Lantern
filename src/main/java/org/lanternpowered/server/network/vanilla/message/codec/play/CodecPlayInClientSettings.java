@@ -26,8 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.entity.living.player.HandType;
 import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
+import org.lanternpowered.server.entity.living.player.HandSide;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -45,7 +45,7 @@ public final class CodecPlayInClientSettings implements Codec<MessagePlayInClien
         ChatVisibility visibility = ChatVisibilityRegistryModule.get().getByInternalId(buf.readByte()).get();
         boolean enableColors = buf.readBoolean();
         int skinPartsBitPattern = buf.readByte() & 0xff;
-        HandType mainHand = HandType.values()[buf.readVarInt()];
+        HandSide mainHand = HandSide.values()[buf.readVarInt()];
         return new MessagePlayInClientSettings(locale, viewDistance, visibility, mainHand, enableColors, skinPartsBitPattern);
     }
 }

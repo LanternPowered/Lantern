@@ -26,10 +26,9 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.Parameter;
 
-import java.util.List;
 import java.util.UUID;
 
 public final class MessagePlayOutSpawnMob implements Message {
@@ -38,14 +37,14 @@ public final class MessagePlayOutSpawnMob implements Message {
     private final UUID uniqueId;
     private final int mobType;
     private final Vector3d position;
-    private final float yaw;
-    private final float pitch;
-    private final float headPitch;
+    private final int yaw;
+    private final int pitch;
+    private final int headPitch;
     private final Vector3d velocity;
-    private final List<Parameter<?>> parameters;
+    private final ParameterList parameterList;
 
-    public MessagePlayOutSpawnMob(int entityId, UUID uniqueId, int mobType, Vector3d position, float yaw, float pitch,
-            float headPitch, Vector3d velocity, List<Parameter<?>> parameters) {
+    public MessagePlayOutSpawnMob(int entityId, UUID uniqueId, int mobType, Vector3d position, int yaw, int pitch,
+            int headPitch, Vector3d velocity, ParameterList parameterList) {
         this.entityId = entityId;
         this.uniqueId = uniqueId;
         this.mobType = mobType;
@@ -54,7 +53,7 @@ public final class MessagePlayOutSpawnMob implements Message {
         this.pitch = pitch;
         this.headPitch = headPitch;
         this.velocity = velocity;
-        this.parameters = parameters;
+        this.parameterList = parameterList;
     }
 
     public int getEntityId() {
@@ -73,15 +72,15 @@ public final class MessagePlayOutSpawnMob implements Message {
         return this.position;
     }
 
-    public float getYaw() {
+    public int getYaw() {
         return this.yaw;
     }
 
-    public float getPitch() {
+    public int getPitch() {
         return this.pitch;
     }
 
-    public float getHeadPitch() {
+    public int getHeadPitch() {
         return this.headPitch;
     }
 
@@ -89,7 +88,7 @@ public final class MessagePlayOutSpawnMob implements Message {
         return this.velocity;
     }
 
-    public List<Parameter<?>> getParameters() {
-        return this.parameters;
+    public ParameterList getParameterList() {
+        return this.parameterList;
     }
 }

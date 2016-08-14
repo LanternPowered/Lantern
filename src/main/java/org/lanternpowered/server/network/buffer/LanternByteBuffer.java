@@ -75,6 +75,35 @@ public class LanternByteBuffer implements ByteBuffer {
     @SuppressWarnings("deprecation")
     @Deprecated
     @Override
+    public int refCnt() {
+        return this.buf.refCnt();
+    }
+
+    @Override
+    public ByteBuffer retain() {
+        this.buf.retain();
+        return this;
+    }
+
+    @Override
+    public ByteBuffer retain(int increment) {
+        this.buf.retain(increment);
+        return this;
+    }
+
+    @Override
+    public ByteBuffer touch() {
+        this.buf.touch();
+        return this;
+    }
+
+    @Override
+    public ByteBuffer touch(Object hint) {
+        this.buf.touch(hint);
+        return this;
+    }
+
+    @Override
     public LanternByteBuffer order(ByteOrder order) {
         if (this.buf.order().equals(order)) {
             return this;
@@ -766,6 +795,11 @@ public class LanternByteBuffer implements ByteBuffer {
     @Override
     public boolean release() {
         return this.buf.release();
+    }
+
+    @Override
+    public boolean release(int decrement) {
+        return this.buf.release(decrement);
     }
 
     @Override

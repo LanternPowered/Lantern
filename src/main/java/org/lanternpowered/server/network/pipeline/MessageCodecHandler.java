@@ -35,6 +35,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.DecoderException;
 import io.netty.handler.codec.EncoderException;
 import io.netty.handler.codec.MessageToMessageCodec;
+import io.netty.util.ReferenceCountUtil;
+import io.netty.util.ReferenceCounted;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.LanternByteBuffer;
@@ -83,7 +85,12 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         writeVarInt(opcode, codecRegistration.getOpcode());
 
         final Codec codec = codecRegistration.getCodec();
-        final ByteBuffer content = codec.encode(this.codecContext, message);
+        final ByteBuffer content;
+        try {
+            content = codec.encode(this.codecContext, message);
+        } finally {
+            ReferenceCountUtil.release(message);
+        }
 
         // Add the buffer to the output
         output.add(Unpooled.wrappedBuffer(opcode, ((LanternByteBuffer) content).getDelegate()));

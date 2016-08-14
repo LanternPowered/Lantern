@@ -25,10 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
-
-import com.flowpowered.math.vector.Vector3d;
-import io.netty.buffer.ByteBuf;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
@@ -41,12 +37,11 @@ public final class CodecPlayOutEntityTeleport implements Codec<MessagePlayOutEnt
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityTeleport message) throws CodecException {
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        Vector3d position = message.getPosition();
-        buf.writeDouble(position.getX());
-        buf.writeDouble(position.getY());
-        buf.writeDouble(position.getZ());
-        buf.writeByte(wrapAngle(message.getYaw()));
-        buf.writeByte(wrapAngle(message.getPitch()));
+        buf.writeDouble(message.getX());
+        buf.writeDouble(message.getY());
+        buf.writeDouble(message.getZ());
+        buf.writeByte((byte) message.getYaw());
+        buf.writeByte((byte) message.getPitch());
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

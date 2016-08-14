@@ -26,10 +26,9 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.Parameter;
 
-import java.util.List;
 import java.util.UUID;
 
 public final class MessagePlayOutSpawnPlayer implements Message {
@@ -37,13 +36,13 @@ public final class MessagePlayOutSpawnPlayer implements Message {
     private final int entityId;
     private final UUID uniqueId;
     private final Vector3d position;
-    private final float yaw;
-    private final float pitch;
-    private final List<Parameter<?>> parameters;
+    private final int yaw;
+    private final int pitch;
+    private final ParameterList parameterList;
 
-    public MessagePlayOutSpawnPlayer(int entityId, UUID uniqueId, Vector3d position, float yaw, float pitch,
-            List<Parameter<?>> parameters) {
-        this.parameters = parameters;
+    public MessagePlayOutSpawnPlayer(int entityId, UUID uniqueId, Vector3d position, int yaw, int pitch,
+            ParameterList parameterList) {
+        this.parameterList = parameterList;
         this.entityId = entityId;
         this.uniqueId = uniqueId;
         this.position = position;
@@ -63,15 +62,15 @@ public final class MessagePlayOutSpawnPlayer implements Message {
         return this.position;
     }
 
-    public float getYaw() {
+    public int getYaw() {
         return this.yaw;
     }
 
-    public float getPitch() {
+    public int getPitch() {
         return this.pitch;
     }
 
-    public List<Parameter<?>> getParameters() {
-        return this.parameters;
+    public ParameterList getParameterList() {
+        return this.parameterList;
     }
 }

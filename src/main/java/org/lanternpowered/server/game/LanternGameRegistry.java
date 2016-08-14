@@ -155,6 +155,8 @@ import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryMod
 import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
+import org.lanternpowered.server.network.entity.EntityProtocolType;
+import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
@@ -459,6 +461,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())
                 .registerModule(EntityType.class, EntityTypeRegistryModule.get())
                 .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
+                .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 // Script registry modules
                 .registerModule(ContextParameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

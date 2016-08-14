@@ -39,7 +39,7 @@ public final class MultiAction implements Action {
     }
 
     @Override
-    public void run(@Parameter("context") ScriptContext context) {
+    public void run(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext context) {
         this.actions.forEach(action -> action.run(context));
     }
 

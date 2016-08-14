@@ -58,6 +58,6 @@ public interface Condition {
      * @param scriptContext The script context
      * @return The result
      */
-    boolean test(@Parameter("context") ScriptContext scriptContext);
+    boolean test(@Parameter(ScriptContext.CONTEXT_PARAMETER) ScriptContext scriptContext);
 
 }

@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
@@ -49,6 +50,6 @@ public final class HandlerPlayInClientSettings implements Handler<MessagePlayInC
         player.setSkinParts(event.getDisplayedSkinParts());
         player.setChatVisibility(event.getChatVisibility());
         player.setChatColorsEnabled(message.getEnableColors());
-        player.setMainHand(message.getMainHand());
+        player.offer(LanternKeys.DOMINANT_HAND, message.getMainHand());
     }
 }

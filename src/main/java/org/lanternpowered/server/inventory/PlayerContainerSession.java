@@ -48,7 +48,6 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
-import org.spongepowered.api.event.item.inventory.CreativeInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
@@ -181,18 +180,19 @@ public class PlayerContainerSession {
         ItemStack itemStack = LanternItemStack.toNullable(message.getItemStack());
         int slotIndex = message.getSlot();
         if (slotIndex < 0) {
-            Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
+            final Cause cause = Cause.builder().named("SpawnCause", SpawnCause.builder()
                     .type(SpawnTypes.DROPPED_ITEM).build()).named(NamedCause.SOURCE, this.player).build();
 
-            List<Entity> entities = new ArrayList<>();
-            World world = this.player.getWorld();
+            final List<Entity> entities = new ArrayList<>();
+            // TODO: Add item entity
+            final World world = this.player.getWorld();
 
-            Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(
-                    LanternItemStack.toSnapshot(itemStack), ItemStackSnapshot.NONE);
+            final SpawnEntityEvent event = SpongeEventFactory.createSpawnEntityEvent(cause, entities, world);
+            Sponge.getEventManager().post(event);
 
-            CreativeInventoryEvent.Drop event = SpongeEventFactory.createCreativeInventoryEventDrop(
-                    cause, cursorTransaction, entities, this.openContainer, world, new ArrayList<>());
-            this.finishInventoryEvent(event);
+            if (!event.isCancelled()) {
+                this.finishSpawnEntityEvent(event);
+            }
         } else {
             Optional<LanternSlot> optSlot = this.openContainer.humanInventory.getSlotAt(slotIndex);
             if (optSlot.isPresent()) {
@@ -206,7 +206,7 @@ public class PlayerContainerSession {
                 Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(
                         LanternItemStack.toSnapshot(itemStack), ItemStackSnapshot.NONE);
 
-                CreativeInventoryEvent.Click event = SpongeEventFactory.createCreativeInventoryEventClick(
+                ClickInventoryEvent.Creative event = SpongeEventFactory.createClickInventoryEventCreative(
                         cause, cursorTransaction, this.openContainer, result.getTransactions());
                 this.finishInventoryEvent(event);
             } else {
@@ -662,11 +662,15 @@ public class PlayerContainerSession {
         }
     }
 
+    private void finishSpawnEntityEvent(SpawnEntityEvent event) {
+        // TODO
+    }
+
     private void finishInventoryEvent(ClickInventoryEvent event) {
         List<SlotTransaction> slotTransactions = event.getTransactions();
         Sponge.getEventManager().post(event);
         if (!event.isCancelled()) {
-            if (!(event instanceof CreativeInventoryEvent.Click)) {
+            if (!(event instanceof ClickInventoryEvent.Creative)) {
                 Transaction<ItemStackSnapshot> cursorTransaction = event.getCursorTransaction();
                 if (!cursorTransaction.isValid()) {
                     this.updateCursorItem();
@@ -683,7 +687,7 @@ public class PlayerContainerSession {
                 }
             }
             if (event instanceof SpawnEntityEvent) {
-                // TODO: Spawn entities
+                this.finishSpawnEntityEvent((SpawnEntityEvent) event);
             }
         } else {
             this.updateCursorItem();

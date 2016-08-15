@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.key;
 
-import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSingleKey;
 
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;

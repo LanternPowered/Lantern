@@ -28,6 +28,7 @@ package org.lanternpowered.server.asset;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
+import org.lanternpowered.api.asset.Asset;
 
 import java.util.Collection;
 import java.util.List;

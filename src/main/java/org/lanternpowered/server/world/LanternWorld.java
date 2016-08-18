@@ -68,6 +68,7 @@ import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
 import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.rules.RuleTypes;
+import org.lanternpowered.server.world.weather.LanternWeather;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -821,11 +822,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public Weather getWeather() {
+    public LanternWeather getWeather() {
         if (this.weatherUniverse != null) {
             return this.weatherUniverse.getWeather();
         }
-        return Weathers.CLEAR;
+        return (LanternWeather) Weathers.CLEAR;
     }
 
     @Override

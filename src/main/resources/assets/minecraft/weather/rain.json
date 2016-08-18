@@ -1,0 +1,9 @@
+{
+    "name": "Rain",
+    "aliases": [
+        "rainy"
+    ],
+    "options": {
+        "rain_strength": 1.0
+    }
+}

@@ -29,6 +29,7 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.weather.LanternWeather;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -41,6 +42,7 @@ import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.WeatherUniverse;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public final class CommandWeather extends CommandProvider {
 
@@ -62,15 +64,28 @@ public final class CommandWeather extends CommandProvider {
                                 ImmutableList.Builder<String> builder = ImmutableList.builder();
                                 for (Weather weather : weathers) {
                                     builder.add(weather.getId());
-                                    builder.add(weather.getName());
+                                    builder.addAll(((LanternWeather) weather).getAliases());
                                 }
                                 return builder.build();
                             }
 
                             @Override
                             protected Object getValue(String choice) throws IllegalArgumentException {
-                                return Sponge.getRegistry().getType(Weather.class, choice).orElseThrow(
-                                        () -> new IllegalArgumentException("Invalid input " + choice + " was found"));
+                                final Optional<Weather> optWeather = Sponge.getRegistry().getType(Weather.class, choice);
+                                if (!optWeather.isPresent()) {
+                                    return Sponge.getRegistry().getAllOf(Weather.class).stream()
+                                            .filter(weather -> {
+                                                for (String alias : ((LanternWeather) weather).getAliases()) {
+                                                    if (alias.equalsIgnoreCase(choice)) {
+                                                        return true;
+                                                    }
+                                                }
+                                                return false;
+                                            })
+                                            .findAny()
+                                            .orElseThrow(() -> new IllegalArgumentException("Invalid input " + choice + " was found"));
+                                }
+                                return optWeather.get();
                             }
                         },
                         GenericArguments.optional(GenericArguments.integer(Text.of("duration")))

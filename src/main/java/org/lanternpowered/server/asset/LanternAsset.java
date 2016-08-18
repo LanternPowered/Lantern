@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.asset;
 
+import org.lanternpowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.net.URL;

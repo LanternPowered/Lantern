@@ -49,7 +49,7 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
         this.register(new FlatGeneratorType("minecraft", "flat"));
         this.register(new DebugGeneratorType("minecraft", "debug"));
         this.register(new SkylandsGeneratorType("sponge", "skylands"));
-        // TODO: Add the other generator types
+        // TODO: Add the misc generator types
         this.register(new FlatGeneratorType("minecraft", "default"));
         this.register(new FlatGeneratorType("minecraft", "overworld"));
         this.register(new FlatGeneratorType("minecraft", "the_end"));

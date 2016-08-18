@@ -1,0 +1,34 @@
+{
+    "name": "Thunder Storm",
+    "aliases": [
+        "storm",
+        "thunderStorm"
+    ],
+    "options": {
+        "rain_strength": 1.0,
+        "sky_darkness": 1.0
+    },
+    "action": [
+        {
+            "type": "random_chunk_action",
+            "data": {
+                "actions-per-chunk": 2,
+                "action": {
+                    "condition": [
+                        "@ random.range(0.0, 1.0) < 0.000001",
+                        "@ $<minecraft:weather/utils.scr>.testDarkness(context, 0.8)"
+                    ],
+                    "action": {
+                        "type": "play_sound",
+                        "data": {
+                            "type": "minecraft:entity_lightning_thunder",
+                            "category": "minecraft:weather",
+                            "pitch": 1.0,
+                            "volume": 2.0
+                        }
+                    }
+                }
+            }
+        }
+    ]
+}

@@ -33,6 +33,8 @@ import org.lanternpowered.server.component.Component;
 import org.lanternpowered.server.component.Locked;
 import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
+import org.lanternpowered.server.world.weather.LanternWeather;
+import org.lanternpowered.server.world.weather.WeatherOptions;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.WeatherUniverse;
 import org.spongepowered.api.world.weather.Weathers;
@@ -76,7 +78,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         if (!this.world.properties.raining) {
             return;
         }
-        if (this.weather.getRainStrength() > 0f) {
+        if (this.weather.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0) {
             this.duration += time;
             this.remaining += time;
         } else {
@@ -97,7 +99,8 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         if (!this.world.properties.raining || !this.world.properties.thundering) {
             return;
         }
-        if (this.weather.getThunderRate() > 0f) {
+        //if (this.weather.getThunderRate() > 0f) { TODO
+        if (this.weather.getId().contains("thunder")) {
             this.duration += time;
             this.remaining += time;
         } else {
@@ -197,9 +200,9 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
 
     @Override
     public void setWeather(Weather weather, long duration) {
-        LanternWeather weather0 = (LanternWeather) checkNotNull(weather, "weather");
-        boolean rain = weather0.getRainStrength() > 0f;
-        boolean thunder = weather0.getThunderRate() > 0f;
+        final LanternWeather weather0 = (LanternWeather) checkNotNull(weather, "weather");
+        boolean rain = weather0.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0f;
+        boolean thunder = this.weather.getId().contains("thunder"); // weather0.getThunderRate() > 0f; TODO
         this.world.properties.raining = rain;
         // Lets just assume for now that it won't throw errors
         this.world.properties.rainTime = rain ? (int) duration : 0;
@@ -213,8 +216,12 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
             this.duration = duration;
             this.remaining = duration;
         }
-        this.darknessTarget = weather0.getDarkness();
-        this.rainStrengthTarget = weather0.getRainStrength();
+        this.darknessTarget = weather0.getOptions().getOrDefault(WeatherOptions.SKY_DARKNESS).get().floatValue();
+        this.rainStrengthTarget = weather0.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get().floatValue();
+    }
+
+    public float getDarkness() {
+        return this.darkness;
     }
 
 }

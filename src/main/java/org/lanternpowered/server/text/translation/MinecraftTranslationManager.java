@@ -25,10 +25,9 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import org.lanternpowered.server.asset.Asset;
+import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.asset.ReloadListener;
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 

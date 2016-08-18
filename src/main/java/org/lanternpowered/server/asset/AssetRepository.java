@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.asset;
 
+import org.lanternpowered.api.asset.Asset;
 import org.spongepowered.api.plugin.Plugin;
-import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -44,15 +44,12 @@ public interface AssetRepository {
     Optional<Asset> get(Object plugin, String name);
 
     /**
-     * Returns the {@link Asset} of the specified name within the domain of the
-     * implementation. This method will typically call
-     * {@link #get(Object, String)} using a dummy
-     * {@link PluginContainer} for the SpongeAPI implementation.
+     * Returns the {@link Asset} of the specified id.
      *
-     * @param name Name of resource to retrieve
+     * @param id Id of resource to retrieve
      * @return Asset if present, empty otherwise
      */
-    Optional<Asset> get(String name);
+    Optional<Asset> get(String id);
 
     /**
      * Gets the loaded {@link Asset}s.

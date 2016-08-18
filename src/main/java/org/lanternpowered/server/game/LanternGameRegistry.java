@@ -33,6 +33,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import org.lanternpowered.api.script.context.ContextParameter;
+import org.lanternpowered.api.script.function.action.ActionType;
+import org.lanternpowered.api.script.function.condition.ConditionType;
+import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
+import org.lanternpowered.api.script.function.value.FloatValueProviderType;
+import org.lanternpowered.api.script.function.value.IntValueProviderType;
 import org.lanternpowered.server.attribute.LanternAttribute;
 import org.lanternpowered.server.attribute.LanternAttributeBuilder;
 import org.lanternpowered.server.attribute.LanternAttributeCalculator;
@@ -56,6 +62,7 @@ import org.lanternpowered.server.cause.entity.teleport.LanternPortalTeleportCaus
 import org.lanternpowered.server.cause.entity.teleport.LanternTeleportCauseBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
+import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.type.LanternBigMushroomType;
 import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternComparatorType;
@@ -152,6 +159,12 @@ import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder;
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder;
+import org.lanternpowered.server.script.context.ContextParameterRegistryModule;
+import org.lanternpowered.server.script.function.action.ActionTypeRegistryModule;
+import org.lanternpowered.server.script.function.condition.ConditionTypeRegistryModule;
+import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
+import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
+import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
 import org.lanternpowered.server.status.LanternFavicon;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
@@ -386,7 +399,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
                 .registerModule(InstrumentType.class, new InstrumentTypeRegistryModule())
                 .registerModule(Hinge.class, new EnumValueRegistryModule<>(LanternHinge.class, Hinges.class))
-                .registerModule(new KeyRegistryModule())
+                .registerModule(LanternKey.class, KeyRegistryModule.get())
                 .registerModule(LogAxis.class, new EnumValueRegistryModule<>(LanternLogAxis.class, LogAxes.class))
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
@@ -441,6 +454,13 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SerializationBehavior.class, new SerializationBehaviorRegistryModule())
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())
+                // Script registry modules
+                .registerModule(ContextParameter.class, new ContextParameterRegistryModule())
+                .registerModule(ActionType.class, ActionTypeRegistryModule.get())
+                .registerModule(ConditionType.class, ConditionTypeRegistryModule.get())
+                .registerModule(DoubleValueProviderType.class, DoubleValueProviderTypeRegistryModule.get())
+                .registerModule(FloatValueProviderType.class, FloatValueProviderTypeRegistryModule.get())
+                .registerModule(IntValueProviderType.class, IntValueProviderTypeRegistryModule.get())
                 ;
         this.registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
                 .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)

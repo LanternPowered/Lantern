@@ -26,6 +26,7 @@
 package org.lanternpowered.server.data.key;
 
 import com.google.common.reflect.TypeToken;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 
@@ -36,7 +37,7 @@ import org.spongepowered.api.data.value.BaseValue;
  * @param <V> The value type
  * @param <E> The element type
  */
-public interface LanternKey<V extends BaseValue<E>, E> extends Key<V> {
+public interface LanternKey<V extends BaseValue<E>, E> extends CatalogType, Key<V> {
 
     /**
      * Gets the type of the element.

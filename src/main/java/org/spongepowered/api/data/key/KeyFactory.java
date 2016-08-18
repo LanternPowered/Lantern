@@ -26,6 +26,7 @@
 package org.spongepowered.api.data.key;
 
 import org.lanternpowered.server.data.key.LanternKeyFactory;
+import org.lanternpowered.server.util.IdGenerator;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
@@ -42,25 +43,27 @@ public final class KeyFactory {
 
     private KeyFactory() {}
 
+    // TODO: Use proper ids for the keys
+
     public static <E, T extends BaseValue, V extends BaseValue<E>> Key<V> makeSingleKey(
             final Class<E> elementClass, final Class<T> valueClass, final DataQuery query) {
-        return LanternKeyFactory.makeSingleKey(elementClass, valueClass, query);
+        return LanternKeyFactory.makeSingleKey(elementClass, valueClass, query, "unknown", IdGenerator.generate(query.toString()));
     }
 
     public static <E> Key<ListValue<E>> makeListKey(final Class<E> elementClass, final DataQuery query) {
-        return LanternKeyFactory.makeListKey(elementClass, query);
+        return LanternKeyFactory.makeListKey(elementClass, query, "unknown", IdGenerator.generate(query.toString()));
     }
 
     public static <E> Key<SetValue<E>> makeSetKey(final Class<E> elementClass, final DataQuery query) {
-        return LanternKeyFactory.makeSetKey(elementClass, query);
+        return LanternKeyFactory.makeSetKey(elementClass, query, "unknown", IdGenerator.generate(query.toString()));
     }
 
     public static <K, V> Key<MapValue<K, V>> makeMapKey(final Class<K> keyClass, final Class<V> valueclass, final DataQuery query) {
-        return LanternKeyFactory.makeMapKey(keyClass, valueclass, query);
+        return LanternKeyFactory.makeMapKey(keyClass, valueclass, query, "unknown", IdGenerator.generate(query.toString()));
     }
 
     public static <E> Key<OptionalValue<E>> makeOptionalKey(final Class<E> elementClass, final DataQuery query) {
-        return LanternKeyFactory.makeOptionalKey(elementClass, query);
+        return LanternKeyFactory.makeOptionalKey(elementClass, query, "unknown", IdGenerator.generate(query.toString()));
     }
 
     static <E, V extends BaseValue<E>> Key<V> fake(final String keyName) {

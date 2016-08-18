@@ -1,0 +1,78 @@
+/*
+ * This file is part of LanternServer, licensed under the MIT License (MIT).
+ *
+ * Copyright (c) LanternPowered <https://github.com/LanternPowered>
+ * Copyright (c) SpongePowered <https://www.spongepowered.org>
+ * Copyright (c) Contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the Software), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package org.lanternpowered.server.script.function.value.json;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import org.lanternpowered.api.script.function.value.DoubleValueProvider;
+import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
+import org.lanternpowered.api.script.function.value.FloatValueProvider;
+import org.lanternpowered.server.script.AbstractObjectTypeRegistryModule;
+import org.lanternpowered.server.script.ScriptFunction;
+import org.lanternpowered.server.script.json.ObjectTypeAdapterFactory;
+
+import java.io.IOException;
+
+public class DoubleValueProviderTypeAdapterFactory extends ObjectTypeAdapterFactory<DoubleValueProvider, DoubleValueProviderType> {
+
+    public DoubleValueProviderTypeAdapterFactory(AbstractObjectTypeRegistryModule<DoubleValueProvider, DoubleValueProviderType> registry,
+            TypeToken<DoubleValueProvider> type) {
+        super(registry, type);
+    }
+
+    @Override
+    protected JsonElement serialize(TypeToken<DoubleValueProvider> type, DoubleValueProvider value, Gson gson) throws IOException {
+        if (value instanceof DoubleValueProvider.Range) {
+            return gson.getDelegateAdapter(this, TypeToken.get(DoubleValueProvider.Range.class))
+                    .toJsonTree((DoubleValueProvider.Range) value);
+        } else if (value instanceof DoubleValueProvider.Constant) {
+            return gson.getDelegateAdapter(this, TypeToken.get(DoubleValueProvider.Constant.class))
+                    .toJsonTree((DoubleValueProvider.Constant) value);
+        } else if (value instanceof ScriptFunction) {
+            return gson.getDelegateAdapter(this, TypeToken.get(ScriptFunction.class))
+                    .toJsonTree((ScriptFunction) value);
+        }
+        return super.serialize(type, value, gson);
+    }
+
+    @Override
+    protected DoubleValueProvider deserialize(TypeToken<DoubleValueProvider> type, JsonElement element, Gson gson) {
+        final Class<? super DoubleValueProvider> raw = type.getRawType();
+        if (FloatValueProvider.Constant.class.isAssignableFrom(raw)) {
+            return gson.getDelegateAdapter(this, TypeToken.get(DoubleValueProvider.Constant.class)).fromJsonTree(element);
+        } else if (FloatValueProvider.Range.class.isAssignableFrom(raw)) {
+            return gson.getDelegateAdapter(this, TypeToken.get(DoubleValueProvider.Range.class)).fromJsonTree(element);
+        } else if (raw == DoubleValueProvider.class) {
+            // The actual condition type isn't provided, we will try
+            // to assume the right type based in the json format
+            if (element.isJsonPrimitive()) {
+                return gson.getDelegateAdapter(this, TypeToken.get(DoubleValueProvider.Constant.class)).fromJsonTree(element);
+            }
+        }
+        return super.deserialize(type, element, gson);
+    }
+}

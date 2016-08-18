@@ -28,7 +28,7 @@ package org.lanternpowered.server.text.translation;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.asset.Asset;
+import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.asset.ReloadListener;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;

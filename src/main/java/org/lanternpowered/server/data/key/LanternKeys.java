@@ -34,10 +34,14 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 public class LanternKeys {
 
-    public static final Key<Value<Boolean>> INVULNERABLE = makeSingleKey(Boolean.class, Value.class, DataQuery.of("Invulnerable"));
-    public static final Key<Value<Integer>> PORTAL_COOLDOWN_TICKS = makeSingleKey(Integer.class, Value.class, DataQuery.of("PortalCooldownTicks"));
-    public static final Key<Value<Integer>> SCORE = makeSingleKey(Integer.class, Value.class, DataQuery.of("Score"));
-    public static final Key<MutableBoundedValue<Double>> ABSORPTION_AMOUNT = makeSingleKey(Double.class, MutableBoundedValue.class,
-            DataQuery.of("AbsorptionAmount"));
-    public static final Key<Value<Boolean>> CAN_PICK_UP_LOOT = makeSingleKey(Boolean.class, Value.class, DataQuery.of("CanPickUpLoot"));
+    public static final Key<Value<Boolean>> INVULNERABLE =
+            makeSingleKey(Boolean.class, Value.class, DataQuery.of("Invulnerable"), "invulnerability");
+    public static final Key<Value<Integer>> PORTAL_COOLDOWN_TICKS =
+            makeSingleKey(Integer.class, Value.class, DataQuery.of("PortalCooldownTicks"), "portal_cooldown_ticks");
+    public static final Key<Value<Integer>> SCORE =
+            makeSingleKey(Integer.class, Value.class, DataQuery.of("Score"), "score");
+    public static final Key<MutableBoundedValue<Double>> ABSORPTION_AMOUNT =
+            makeSingleKey(Double.class, MutableBoundedValue.class, DataQuery.of("AbsorptionAmount"), "absorption_amount");
+    public static final Key<Value<Boolean>> CAN_PICK_UP_LOOT =
+            makeSingleKey(Boolean.class, Value.class, DataQuery.of("CanPickupLoot"), "can_pickup_loot");
 }

@@ -23,59 +23,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world;
+package org.lanternpowered.server.world.weather;
 
+import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.util.option.OptionValueMap;
 import org.spongepowered.api.world.weather.Weather;
+
+import java.util.Set;
 
 public final class LanternWeather extends PluginCatalogType.Base implements Weather {
 
-    private final float darkness;
-    private final float rainStrength;
-    private final float lightningRate;
-    private final float thunderRate;
-
-    public LanternWeather(String pluginId, String name, float rainStrength, float darkness,
-            float lightningRate, float thunderRate) {
-        this(pluginId, name, name, rainStrength, darkness, lightningRate, thunderRate);
+    public static WeatherBuilder builder() {
+        return new WeatherBuilder();
     }
-    /**
-     * Creates a new weather instance.
-     * 
-     * <p>The rates of the thunder and lightning are the chance that they occur
-     * every tick, but this is called for all the loaded chunks across the world.</p>
-     * 
-     * @param pluginId the plugin id
-     * @param name the name
-     * @param rainStrength the rain strength
-     * @param darkness the darkness
-     * @param lightningRate the lightning strike rate
-     * @param thunderRate the thunder (sound) rate
-     */
-    public LanternWeather(String pluginId, String id, String name, float rainStrength, float darkness,
-            float lightningRate, float thunderRate) {
+
+    private final Action action;
+    private final Set<String> aliases;
+    private final OptionValueMap options;
+
+    LanternWeather(String pluginId, String name, Action action, Set<String> aliases, OptionValueMap options) {
+        super(pluginId, name);
+        this.action = action;
+        this.aliases = aliases;
+        this.options = options;
+    }
+
+    LanternWeather(String pluginId, String id, String name, Action action, Set<String> aliases, OptionValueMap options) {
         super(pluginId, id, name);
-
-        this.lightningRate = lightningRate;
-        this.rainStrength = rainStrength;
-        this.thunderRate = thunderRate;
-        this.darkness = darkness;
+        this.action = action;
+        this.aliases = aliases;
+        this.options = options;
     }
 
-    public float getLightningRate() {
-        return this.lightningRate;
+    public Action getAction() {
+        return this.action;
     }
 
-    public float getThunderRate() {
-        return this.thunderRate;
+    public Set<String> getAliases() {
+        return this.aliases;
     }
 
-    public float getDarkness() {
-        return this.darkness;
+    public OptionValueMap getOptions() {
+        return this.options;
     }
-
-    public float getRainStrength() {
-        return this.rainStrength;
-    }
-
 }

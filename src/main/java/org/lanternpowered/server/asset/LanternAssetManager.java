@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.asset;
 
-import org.spongepowered.api.asset.*;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.asset.AssetManager;
 
 import java.util.Optional;
 
@@ -47,6 +48,6 @@ public class LanternAssetManager implements AssetManager {
     @SuppressWarnings("unchecked")
     @Override
     public Optional<Asset> getAsset(String name) {
-        return (Optional) this.assetRepository.get(name);
+        return (Optional) this.assetRepository.get(Lantern.getMinecraftPlugin(), name);
     }
 }

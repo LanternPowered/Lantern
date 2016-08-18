@@ -23,19 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.asset;
+package org.lanternpowered.server.script.context;
 
-public interface Asset extends org.spongepowered.api.asset.Asset {
+import org.lanternpowered.api.script.context.ContextParameter;
+import org.lanternpowered.api.script.context.ContextParameters;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
+import org.spongepowered.api.world.Location;
 
-    /**
-     * Gets the id that represents the resource.
-     *
-     * <p>In the vanilla resource system this would
-     * return 'plugin:path/to/resource.json'.
-     * For example: 'minecraft:lang/en_US.properties'
-     * <p/>
-     *
-     * @return The resource key
-     */
-    String getId();
+public class ContextParameterRegistryModule extends SimpleCatalogRegistryModule<ContextParameter> {
+
+    public ContextParameterRegistryModule() {
+        super(ContextParameters.class);
+    }
+
+    @Override
+    public void registerDefaults() {
+        this.register(new ContextParameterImpl<>("target_location", Location.class));
+    }
 }

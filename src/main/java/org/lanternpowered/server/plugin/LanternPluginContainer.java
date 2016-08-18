@@ -40,6 +40,8 @@ import javax.annotation.Nullable;
 
 public final class LanternPluginContainer extends AbstractPluginContainer {
 
+    public static final String ID_REGEX = "[a-z][a-z0-9-_.]{0,63}";
+
     private final String id;
 
     private final Optional<String> name;

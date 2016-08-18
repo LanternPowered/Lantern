@@ -27,6 +27,7 @@ package org.lanternpowered.server.asset;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -67,11 +68,11 @@ public abstract class AbstractAssetRepository implements AssetRepository {
             pluginContainer = Sponge.getPluginManager().fromInstance(plugin).get();
             pluginId = pluginContainer.getId();
         }
+        final String id = pluginId + ':' + name;
         pluginId = pluginId.replace('.', File.separatorChar);
         if (!pluginId.endsWith(File.separator)) {
             pluginId += File.separator;
         }
-        final String id = pluginId + ':' + name;
         final Path path = Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId).resolve(name);
         return this.loadedAssets.computeIfAbsent(path, path1 -> {
             final URL url = this.getAssetURL(pluginContainer, path1);
@@ -83,8 +84,13 @@ public abstract class AbstractAssetRepository implements AssetRepository {
     }
 
     @Override
-    public Optional<Asset> get(String name) {
-        return this.get(Lantern.getMinecraftPlugin(), name);
+    public Optional<Asset> get(String id) {
+        int index = id.indexOf(':');
+        if (index == -1) {
+            return this.get(Lantern.getMinecraftPlugin(), id);
+        } else {
+            return this.get(id.substring(0, index), id.substring(index + 1));
+        }
     }
 
     @Nullable

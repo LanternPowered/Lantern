@@ -124,6 +124,7 @@ dependencies {
     compile 'com.flowpowered:flow-math:1.0.1'
     compile 'com.flowpowered:flow-noise:1.0.1-SNAPSHOT'
     compile 'io.netty:netty-all:4.1.1.Final'
+    compile 'org.codehaus.groovy:groovy-all:2.4.7'
     fastutil 'it.unimi.dsi:fastutil:7.0.12'
     compile 'ninja.leaping.configurate:configurate-core:3.1.1'
     compile 'ninja.leaping.configurate:configurate-gson:3.1.1'
@@ -255,6 +256,7 @@ shadowJar {
         include dependency('com.github.ben-manes.caffeine:guava')
         include dependency('org.apache.commons:commons-lang3')
         include dependency('io.netty:netty-all')
+        include dependency('org.codehaus.groovy:groovy-all')
 
         // Bytecode
         include dependency('org.ow2.asm:asm-all')

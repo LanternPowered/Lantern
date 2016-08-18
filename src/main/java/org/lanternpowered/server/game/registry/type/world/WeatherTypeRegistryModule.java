@@ -26,10 +26,24 @@
 package org.lanternpowered.server.game.registry.type.world;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.world.LanternWeather;
+import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
+import org.lanternpowered.server.script.LanternScriptGameRegistry;
+import org.lanternpowered.server.script.function.action.ActionTypeRegistryModule;
+import org.lanternpowered.server.script.function.condition.ConditionTypeRegistryModule;
+import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
+import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
+import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
+import org.lanternpowered.server.world.weather.WeatherOptions;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.api.world.weather.Weathers;
 
+// TODO: Move the script based registry modules to a different phase too
+// avoid all these dependencies, and growing depending on which actions are added.
+@RegistrationDependency({ ActionTypeRegistryModule.class, ConditionTypeRegistryModule.class, DoubleValueProviderTypeRegistryModule.class,
+        FloatValueProviderTypeRegistryModule.class, IntValueProviderTypeRegistryModule.class, SoundTypeRegistryModule.class,
+        SoundCategoryRegistryModule.class })
 public final class WeatherTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<Weather> {
 
     public WeatherTypeRegistryModule() {
@@ -38,8 +52,10 @@ public final class WeatherTypeRegistryModule extends AdditionalPluginCatalogRegi
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternWeather("minecraft", "clear", 0f, 0f, 0f, 0f));
-        this.register(new LanternWeather("minecraft", "rain", 1f, 0f, 0f, 0f));
-        this.register(new LanternWeather("minecraft", "thunder_storm", "thunderStorm", 1f, 1f, 0.00001f, 0.00001f));
+        WeatherOptions.init();
+        final LanternScriptGameRegistry scriptGameRegistry = LanternScriptGameRegistry.get();
+        this.register(scriptGameRegistry.construct("minecraft", "weather/clear.json", "clear", Weather.class));
+        this.register(scriptGameRegistry.construct("minecraft", "weather/rain.json", "rain", Weather.class));
+        this.register(scriptGameRegistry.construct("minecraft", "weather/thunder_storm.json", "thunder_storm", Weather.class));
     }
 }

@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import org.lanternpowered.server.asset.Asset;
+import org.lanternpowered.api.asset.Asset;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Locale;

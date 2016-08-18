@@ -27,6 +27,7 @@ package org.lanternpowered.server.asset;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.net.MalformedURLException;

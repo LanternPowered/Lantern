@@ -27,6 +27,7 @@ package org.lanternpowered.server.data.key;
 
 import com.google.common.reflect.TypeParameter;
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
@@ -52,6 +53,50 @@ import java.util.Set;
 
 public final class LanternKeyFactory {
 
+    private static class SimpleKey<V extends BaseValue<E>, E> extends PluginCatalogType.Base implements LanternKey<V, E> {
+
+        final Class<V> valueClass;
+        final TypeToken<E> elementType;
+        final DataQuery query;
+        private final int hash;
+        private final String string;
+
+        SimpleKey(String pluginId, String name, Class<V> valueClass, TypeToken<E> elementType, DataQuery query,
+                int hash, String string) {
+            super(pluginId, name);
+            this.valueClass = valueClass;
+            this.elementType = elementType;
+            this.query = query;
+            this.hash = hash;
+            this.string = string;
+        }
+
+        @Override
+        public TypeToken<E> getElementType() {
+            return this.elementType;
+        }
+
+        @Override
+        public Class<V> getValueClass() {
+            return this.valueClass;
+        }
+
+        @Override
+        public DataQuery getQuery() {
+            return this.query;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.hash;
+        }
+
+        @Override
+        public String toString() {
+            return this.string;
+        }
+    }
+
     /**
      * Creates a new {@link Key} with the provided <code>E</code> element
      * class and <code>V</code> {@link Value} class along with the provided
@@ -69,39 +114,18 @@ public final class LanternKeyFactory {
      * @param <V> The inferred return type
      * @return The generated key
      */
-    public static <E, T extends BaseValue, V extends BaseValue<E>> Key<V> makeSingleKey(final Class<E> elementClass, final Class<T> valueClass,
-            final DataQuery query) {
-        return new LanternKey<V, E>() {
+    @SuppressWarnings("unchecked")
+    public static <E, T extends BaseValue, V extends BaseValue<E>> LanternKey<V, E> makeSingleKey(
+            Class<E> elementClass, Class<T> valueClass, DataQuery query, String pluginId, String name) {
+        final TypeToken<E> typeToken = TypeToken.of(elementClass);
+        final String toString = String.format("Key{Value:%s<%s>,Query:%s}", valueClass.getSimpleName(), typeToken, query);
+        final int hash = Objects.hash(elementClass, valueClass, query);
+        return new SimpleKey<>(pluginId, name, (Class) valueClass, typeToken, query, hash, toString);
+    }
 
-            private final int hash = Objects.hash(elementClass, valueClass, query);
-            private final TypeToken<E> elementType = TypeToken.of(elementClass);
-
-            @Override
-            public TypeToken<E> getElementType() {
-                return this.elementType;
-            }
-
-            @SuppressWarnings({ "unchecked", "rawtypes"})
-            @Override
-            public Class<V> getValueClass() {
-                return (Class<V>) (Class) valueClass;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:" + valueClass.getSimpleName() + "<" + elementClass.getSimpleName() + ">, Query: " + query.toString() + "}";
-            }
-        };
+    public static <E, T extends BaseValue, V extends BaseValue<E>> LanternKey<V, E> makeSingleKey(
+            Class<E> elementClass, Class<T> valueClass, DataQuery query, String name) {
+        return makeSingleKey(elementClass, valueClass, query, "minecraft", name);
     }
 
     /**
@@ -113,39 +137,18 @@ public final class LanternKeyFactory {
      * @param <E> The type of element
      * @return The generated key
      */
-    public static <E> Key<ListValue<E>> makeListKey(final Class<E> elementClass, final DataQuery query) {
-        return new LanternKey<ListValue<E>, List<E>>() {
+    @SuppressWarnings("unchecked")
+    public static <E> LanternKey<ListValue<E>, List<E>> makeListKey(
+            Class<E> elementClass, DataQuery query, String pluginId, String name) {
+        final TypeToken<List<E>> typeToken = new TypeToken<List<E>>() {}.where(new TypeParameter<E>() {}, elementClass);
+        final String toString = String.format("Key{Value:ListValue<%s>,Query:%s}", typeToken, query);
+        final int hash = Objects.hash(ListValue.class, elementClass, query);
+        return new SimpleKey<>(pluginId, name, (Class) ListValue.class, typeToken, query, hash, toString);
+    }
 
-            private final int hash = Objects.hash(ListValue.class, elementClass, query);
-            private final TypeToken<List<E>> elementType = new TypeToken<List<E>>() {}
-                    .where(new TypeParameter<E>() {}, elementClass);
-
-            @Override
-            public TypeToken<List<E>> getElementType() {
-                return this.elementType;
-            }
-
-            @SuppressWarnings({ "unchecked", "rawtypes"})
-            @Override
-            public Class<ListValue<E>> getValueClass() {
-                return (Class<ListValue<E>>) (Class) ListValue.class;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:ListValue<" + elementClass.getSimpleName() + ">, Query: " + query.toString() + "}";
-            }
-        };
+    public static <E> LanternKey<ListValue<E>, List<E>> makeListKey(
+            Class<E> elementClass, DataQuery query, String name) {
+        return makeListKey(elementClass, query, "minecraft", name);
     }
 
     /**
@@ -157,39 +160,18 @@ public final class LanternKeyFactory {
      * @param <E> The type of element
      * @return The generated key
      */
-    public static <E> Key<SetValue<E>> makeSetKey(final Class<E> elementClass, final DataQuery query) {
-        return new LanternKey<SetValue<E>, Set<E>>() {
+    @SuppressWarnings("unchecked")
+    public static <E> LanternKey<SetValue<E>, Set<E>> makeSetKey(
+            Class<E> elementClass, DataQuery query, String pluginId, String name) {
+        final TypeToken<Set<E>> typeToken = new TypeToken<Set<E>>() {}.where(new TypeParameter<E>() {}, elementClass);
+        final String toString = String.format("Key{Value:SetValue<%s>,Query:%s}", typeToken, query);
+        final int hash = Objects.hash(SetValue.class, elementClass, query);
+        return new SimpleKey<>(pluginId, name, (Class) SetValue.class, typeToken, query, hash, toString);
+    }
 
-            private final int hash = Objects.hash(SetValue.class, elementClass, query);
-            private final TypeToken<Set<E>> elementType = new TypeToken<Set<E>>() {}
-                    .where(new TypeParameter<E>() {}, elementClass);
-
-            @Override
-            public TypeToken<Set<E>> getElementType() {
-                return this.elementType;
-            }
-
-            @SuppressWarnings({ "unchecked", "rawtypes"})
-            @Override
-            public Class<SetValue<E>> getValueClass() {
-                return (Class<SetValue<E>>) (Class) SetValue.class;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:SetValue<" + elementClass.getSimpleName() + ">, Query: " + query.toString() + "}";
-            }
-        };
+    public static <E> LanternKey<SetValue<E>, Set<E>> makeSetKey(
+            Class<E> elementClass, DataQuery query, String name) {
+        return makeSetKey(elementClass, query, "minecraft", name);
     }
 
     /**
@@ -204,40 +186,20 @@ public final class LanternKeyFactory {
      * @param <V> The type of values
      * @return The generated key
      */
-    public static <K, V> Key<MapValue<K, V>> makeMapKey(final Class<K> keyClass, final Class<V> valueClass, final DataQuery query) {
-        return new LanternKey<MapValue<K, V>, Map<K, V>>() {
+    @SuppressWarnings("unchecked")
+    public static <K, V> LanternKey<MapValue<K, V>, Map<K, V>> makeMapKey(
+            Class<K> keyClass, Class<V> valueClass, DataQuery query, String pluginId, String name) {
+        final TypeToken<Map<K, V>> typeToken = new TypeToken<Map<K, V>>() {}
+                .where(new TypeParameter<K>() {}, keyClass)
+                .where(new TypeParameter<V>() {}, valueClass);
+        final String toString = String.format("Key{Value:MapValue<%s,%s>,Query:%s}", keyClass.getName(), valueClass.getName(), query);
+        final int hash = Objects.hash(keyClass, valueClass, query);
+        return new SimpleKey<>(pluginId, name, (Class) MapValue.class, typeToken, query, hash, toString);
+    }
 
-            private final int hash = Objects.hash(keyClass, valueClass, query);
-            private final TypeToken<Map<K, V>> elementType = new TypeToken<Map<K, V>>() {}
-                    .where(new TypeParameter<K>() {}, keyClass)
-                    .where(new TypeParameter<V>() {}, valueClass);
-
-            @Override
-            public TypeToken<Map<K, V>> getElementType() {
-                return this.elementType;
-            }
-
-            @SuppressWarnings({ "unchecked", "rawtypes"})
-            @Override
-            public Class<MapValue<K, V>> getValueClass() {
-                return (Class<MapValue<K, V>>) (Class) MapValue.class;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:MapValue<" + keyClass.getSimpleName() + "," + valueClass.getSimpleName() + ">, Query: " + query.toString() + "}";
-            }
-        };
+    public static <K, V> LanternKey<MapValue<K, V>, Map<K, V>> makeMapKey(
+            Class<K> keyClass, Class<V> valueClass, DataQuery query, String name) {
+        return makeMapKey(keyClass, valueClass, query, "minecraft", name);
     }
 
     /**
@@ -250,39 +212,18 @@ public final class LanternKeyFactory {
      * @param <E> The element type
      * @return The generated key
      */
-    public static <E> Key<OptionalValue<E>> makeOptionalKey(final Class<E> elementClass, final DataQuery query) {
-        return new LanternKey<OptionalValue<E>, Optional<E>>() {
+    @SuppressWarnings("unchecked")
+    public static <E> LanternKey<OptionalValue<E>, Optional<E>> makeOptionalKey(
+            Class<E> elementClass, DataQuery query, String pluginId, String name) {
+        final TypeToken<Optional<E>> typeToken = new TypeToken<Optional<E>>() {}.where(new TypeParameter<E>() {}, elementClass);
+        final String toString = String.format("Key{Value:OptionalValue<%s>,Query:%s}", elementClass.getName(), query);
+        final int hash = Objects.hash(Optional.class, elementClass, query);
+        return new SimpleKey<>(pluginId, name, (Class) OptionalValue.class, typeToken, query, hash, toString);
+    }
 
-            private final int hash = Objects.hash(Optional.class, elementClass, query);
-            private final TypeToken<Optional<E>> elementType = new TypeToken<Optional<E>>() {}
-                    .where(new TypeParameter<E>() {}, elementClass);
-
-            @Override
-            public TypeToken<Optional<E>> getElementType() {
-                return this.elementType;
-            }
-
-            @SuppressWarnings({ "unchecked", "rawtypes"})
-            @Override
-            public Class<OptionalValue<E>> getValueClass() {
-                return (Class<OptionalValue<E>>) (Class<?>) OptionalValue.class;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:OptionalValue<" + elementClass.getSimpleName() + ">, Query: " + query.toString() + "}";
-            }
-        };
+    public static <E> LanternKey<OptionalValue<E>, Optional<E>> makeOptionalKey(
+            Class<E> elementClass, DataQuery query, String name) {
+        return makeOptionalKey(elementClass, query, "minecraft", name);
     }
 
     /**
@@ -291,37 +232,15 @@ public final class LanternKeyFactory {
      * @param query The query to access the data
      * @return The generated key
      */
-    public static Key<PatternListValue> makePatternListKey(final DataQuery query) {
-        return new LanternKey<PatternListValue, List<PatternLayer>>() {
+    public static LanternKey<PatternListValue, List<PatternLayer>> makePatternListKey(DataQuery query, String pluginId, String name) {
+        final TypeToken<List<PatternLayer>> typeToken = new TypeToken<List<PatternLayer>>() {};
+        final String toString = String.format("Key{Value:PatternListValue,Query:%s}", query);
+        final int hash = Objects.hash(PatternListValue.class, query);
+        return new SimpleKey<>(pluginId, name, PatternListValue.class, typeToken, query, hash, toString);
+    }
 
-            private final int hash = Objects.hash(PatternListValue.class, query);
-            private final TypeToken<List<PatternLayer>> elementType = new TypeToken<List<PatternLayer>>() {};
-
-            @Override
-            public Class<PatternListValue> getValueClass() {
-                return PatternListValue.class;
-            }
-
-            @Override
-            public TypeToken<List<PatternLayer>> getElementType() {
-                return this.elementType;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:PatternListValue, Query: " + query.toString() + "}";
-            }
-        };
+    public static LanternKey<PatternListValue, List<PatternLayer>> makePatternListKey(DataQuery query, String name) {
+        return makePatternListKey(query, "minecraft", name);
     }
 
     /**
@@ -331,39 +250,18 @@ public final class LanternKeyFactory {
      * @param query The query to access the data
      * @return The generated key
      */
-    public static <E> Key<WeightedCollectionValue<E>> makeWeightedCollectionKey(final Class<E> elementClass, final DataQuery query) {
-        return new LanternKey<WeightedCollectionValue<E>, WeightedTable<E>>() {
+    @SuppressWarnings("unchecked")
+    public static <E> LanternKey<WeightedCollectionValue<E>, WeightedTable<E>> makeWeightedCollectionKey(
+            Class<E> elementClass, DataQuery query, String pluginId, String name) {
+        final TypeToken<WeightedTable<E>> typeToken = new TypeToken<WeightedTable<E>>() {}.where(new TypeParameter<E>() {}, elementClass);
+        final String toString = String.format("Key{Value:WeightedCollectionValue<%s>,Query:%s}", elementClass.getName(), query);
+        final int hash = Objects.hash(PatternListValue.class, query);
+        return new SimpleKey<>(pluginId, name, (Class) WeightedCollectionValue.class, typeToken, query, hash, toString);
+    }
 
-            private final int hash = Objects.hash(WeightedCollectionValue.class, elementClass, query);
-            private final TypeToken<WeightedTable<E>> elementType = new TypeToken<WeightedTable<E>>() {}
-                    .where(new TypeParameter<E>() {}, elementClass);
-
-            @Override
-            public TypeToken<WeightedTable<E>> getElementType() {
-                return this.elementType;
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            public Class<WeightedCollectionValue<E>> getValueClass() {
-                return (Class) WeightedCollectionValue.class;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:WeightedCollectionValue<" + elementClass.getSimpleName() + ">, Query: " + query.toString() + "}";
-            }
-        };
+    public static <E> LanternKey<WeightedCollectionValue<E>, WeightedTable<E>> makeWeightedCollectionKey(
+            Class<E> elementClass, DataQuery query, String name) {
+        return makeWeightedCollectionKey(elementClass, query, "minecraft", name);
     }
 
     /**
@@ -372,38 +270,17 @@ public final class LanternKeyFactory {
      * @param query The query to access the data
      * @return The generated key
      */
-    public static Key<MobSpawnerData.NextEntityToSpawnValue> makeNextEntityToSpawnKey(final DataQuery query) {
-        return new LanternKey<MobSpawnerData.NextEntityToSpawnValue, WeightedSerializableObject<EntitySnapshot>>() {
+    public static LanternKey<MobSpawnerData.NextEntityToSpawnValue, WeightedSerializableObject<EntitySnapshot>> makeNextEntityToSpawnKey(
+            DataQuery query, String pluginId, String name) {
+        final TypeToken<WeightedSerializableObject<EntitySnapshot>> typeToken = new TypeToken<WeightedSerializableObject<EntitySnapshot>>() {};
+        final String toString = String.format("Key{Value:MobSpawnerData.NextEntityToSpawnValue,Query:%s}", query);
+        final int hash = Objects.hash(PatternListValue.class, query);
+        return new SimpleKey<>(pluginId, name, MobSpawnerData.NextEntityToSpawnValue.class, typeToken, query, hash, toString);
+    }
 
-            private final TypeToken<WeightedSerializableObject<EntitySnapshot>> elementType = new TypeToken<WeightedSerializableObject<EntitySnapshot>>() {};
-            private final int hash = Objects.hash(MobSpawnerData.NextEntityToSpawnValue.class, query);
-
-            @Override
-            public TypeToken<WeightedSerializableObject<EntitySnapshot>> getElementType() {
-                return this.elementType;
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            public Class<MobSpawnerData.NextEntityToSpawnValue> getValueClass() {
-                return MobSpawnerData.NextEntityToSpawnValue.class;
-            }
-
-            @Override
-            public DataQuery getQuery() {
-                return query;
-            }
-
-            @Override
-            public int hashCode() {
-                return this.hash;
-            }
-
-            @Override
-            public String toString() {
-                return "Key{Value:MobSpawnerData.NextEntityToSpawnValue, Query: " + query.toString() + "}";
-            }
-        };
+    public static LanternKey<MobSpawnerData.NextEntityToSpawnValue, WeightedSerializableObject<EntitySnapshot>> makeNextEntityToSpawnKey(
+            DataQuery query, String name) {
+        return makeNextEntityToSpawnKey(query, "minecraft", name);
     }
 
     private LanternKeyFactory() {

@@ -32,7 +32,7 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Sets;
-import org.lanternpowered.server.asset.Asset;
+import org.lanternpowered.api.asset.Asset;
 import org.lanternpowered.server.asset.ReloadListener;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.translation.ResourceBundleTranslation;

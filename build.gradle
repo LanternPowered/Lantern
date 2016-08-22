@@ -13,12 +13,12 @@ buildscript {
             url = "https://oss.sonatype.org/content/repositories/snapshots/"
         }
         maven {
-            url = 'http://artifactory.lanternpowered.org/artifactory/libs'
+            url = 'https://dl.bintray.com/lanternpowered/maven/'
         }
     }
     dependencies {
         classpath 'org.spongepowered:spongegradle:0.3.1-SNAPSHOT'
-        classpath 'org.lanternpowered:lanterngradle:1.0.0-SNAPSHOT'
+        classpath 'org.lanternpowered:lanterngradle:1.0.0'
         classpath 'org.apache.logging.log4j:log4j-core:2.5'
         classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:4.4.0'
     }
@@ -113,11 +113,11 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-api:2.5'
     compile 'org.ow2.asm:asm-all:5.0.3'
     compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'org.mariadb.jdbc:mariadb-java-client:1.4.3'
+    compile 'org.mariadb.jdbc:mariadb-java-client:1.4.6'
     compile 'org.fusesource.jansi:jansi:1.12'
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
     compile 'com.h2database:h2:1.4.192'
-    compile 'com.zaxxer:HikariCP:2.4.6'
+    compile 'com.zaxxer:HikariCP:2.4.7'
     compile 'com.google.guava:guava:18.0'
     compile 'com.google.inject:guice:4.0'
     compile 'com.google.code.gson:gson:2.3.1'
@@ -251,6 +251,8 @@ shadowJar {
 
         include dependency('com.google.guava:guava')
         include dependency('com.google.code.findbugs:jsr305')
+        include dependency('com.github.ben-manes.caffeine:caffeine')
+        include dependency('com.github.ben-manes.caffeine:guava')
         include dependency('org.apache.commons:commons-lang3')
         include dependency('io.netty:netty-all')
 

@@ -42,8 +42,8 @@ public class MinecraftVersionCache {
     private final Int2ObjectMap<LanternMinecraftVersion> legacyVersionsByProtocol = new Int2ObjectOpenHashMap<>();
 
     public void load() {
-        this.load(MinecraftVersionCache.class.getResourceAsStream("/assets/lantern/internal/mc-versions.json"), false);
-        this.load(MinecraftVersionCache.class.getResourceAsStream("/assets/lantern/internal/mc-legacy-versions.json"), true);
+        this.load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-versions.json"), false);
+        this.load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-legacy-versions.json"), true);
     }
 
     public void load(InputStream inputStream, boolean legacy) {

@@ -25,34 +25,43 @@
  */
 package org.lanternpowered.server.text.translation;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.lanternpowered.server.asset.Asset;
+import org.lanternpowered.server.asset.ReloadListener;
+import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.translation.ResourceBundleTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
-public final class LanternTranslationManager implements TranslationManager {
+public final class LanternTranslationManager implements TranslationManager, ReloadListener {
 
     private static class ResourceKey {
 
         private final String name;
         @Nullable private final Locale locale;
 
-        public ResourceKey(String name, @Nullable Locale locale) {
+        ResourceKey(String name, @Nullable Locale locale) {
             this.name = name;
             this.locale = locale;
         }
@@ -89,26 +98,43 @@ public final class LanternTranslationManager implements TranslationManager {
 
             });
 
-    private final ConcurrentMap<Locale, Set<ResourceBundle>> bundles = Maps.newConcurrentMap();
+    private final ConcurrentMap<Locale, Set<ResourceBundle>> bundles = new ConcurrentHashMap<>();
+    private final Map<Asset, Locale> entries = new HashMap<>();
 
     @Override
-    public void addResourceBundle(String resourceBundle, Locale locale) {
-        // We cannot allow the resource bundle instance to be directly
-        // added to the translation manager, because for some strange
-        // reasons the "getLocale" always a empty object returns (no name)
-        // and doesn't match the one in the constructor
-        ResourceBundle bundle = ResourceBundle.getBundle(checkNotNull(resourceBundle, "resourceBundle"));
-        this.bundles.computeIfAbsent(locale, locale0 -> Sets.newConcurrentHashSet()).add(bundle);
-
-        Set<ResourceKey> refresh = Sets.newHashSet();
-        for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
-            Locale locale1 = key.locale == null ? Locale.ENGLISH : key.locale;
-            if (locale1.equals(locale) && bundle.containsKey(key.name)) {
-                refresh.add(key);
-            }
+    public void addResourceBundle(Asset asset, Locale locale) {
+        checkNotNull(asset, "asset");
+        checkNotNull(locale, "locale");
+        synchronized (this.entries) {
+            checkArgument(!this.entries.containsKey(asset), "The asset %s is already added to this translation manager.", asset.getId());
+            this.entries.put(asset, locale);
+            this.loadAssetBundle(asset, locale, true);
         }
-        if (!refresh.isEmpty()) {
-            this.resourceBundlesCache.invalidateAll(refresh);
+    }
+
+    private void loadAssetBundle(Asset asset, Locale locale, boolean refresh) {
+        try {
+            final InputStream inputStream = asset.getUrl().openStream();
+            try {
+                final ResourceBundle bundle = new PropertyResourceBundle(inputStream);
+                this.bundles.computeIfAbsent(locale, locale0 -> Sets.newConcurrentHashSet()).add(bundle);
+                if (refresh) {
+                    final Set<ResourceKey> refreshKeys = Sets.newHashSet();
+                    for (ResourceKey key : this.resourceBundlesCache.asMap().keySet()) {
+                        Locale locale1 = key.locale == null ? Locale.ENGLISH : key.locale;
+                        if (locale1.equals(locale) && bundle.containsKey(key.name)) {
+                            refreshKeys.add(key);
+                        }
+                    }
+                    if (!refreshKeys.isEmpty()) {
+                        this.resourceBundlesCache.invalidateAll(refreshKeys);
+                    }
+                }
+            } catch (IOException e) {
+                Lantern.getLogger().warn("Unable to create the resource bundle for: " + asset.getId(), e);
+            }
+        } catch (IOException e) {
+            Lantern.getLogger().warn("Unable to open the asset stream for: " + asset.getId(), e);
         }
     }
 
@@ -134,5 +160,16 @@ public final class LanternTranslationManager implements TranslationManager {
             throw new RuntimeException(e);
         }
         return Optional.empty();
+    }
+
+    @Override
+    public void onReload() {
+        synchronized (this.entries) {
+            this.bundles.clear();
+            this.resourceBundlesCache.invalidateAll();
+            for (Map.Entry<Asset, Locale> entry : this.entries.entrySet()) {
+                this.loadAssetBundle(entry.getKey(), entry.getValue(), false);
+            }
+        }
     }
 }

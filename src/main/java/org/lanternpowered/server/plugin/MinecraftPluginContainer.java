@@ -55,7 +55,7 @@ public final class MinecraftPluginContainer extends AbstractPluginContainer {
 
     @Override
     public Optional<Object> getInstance() {
-        return Optional.of(this.game.getServer());
+        return Optional.ofNullable(this.game.getServer());
     }
 
 }

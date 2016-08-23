@@ -28,6 +28,8 @@ package org.lanternpowered.server.text.translation;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.asset.Asset;
+import org.lanternpowered.server.asset.ReloadListener;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -38,7 +40,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class CombinedTranslationManager implements TranslationManager {
+public final class CombinedTranslationManager implements TranslationManager, ReloadListener {
 
     // The primary translation manager that will be used
     private final List<TranslationManager> translationManagers = new ArrayList<>();
@@ -91,10 +93,10 @@ public final class CombinedTranslationManager implements TranslationManager {
     }
 
     @Override
-    public void addResourceBundle(String resourceBundle, Locale locale) {
-        TranslationManager manager = this.getDelegateManager();
+    public void addResourceBundle(Asset asset, Locale locale) {
+        final TranslationManager manager = this.getDelegateManager();
         if (manager != null) {
-            manager.addResourceBundle(resourceBundle, locale);
+            manager.addResourceBundle(asset, locale);
         }
     }
 
@@ -121,4 +123,10 @@ public final class CombinedTranslationManager implements TranslationManager {
         return Optional.empty();
     }
 
+    @Override
+    public void onReload() {
+        this.translationManagers.stream()
+                .filter(manager -> manager instanceof ReloadListener)
+                .forEach(manager -> ((ReloadListener) manager).onReload());
+    }
 }

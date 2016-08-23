@@ -29,9 +29,13 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.apache.logging.log4j.util.PropertiesUtil;
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.asset.LanternAssetManager;
+import org.lanternpowered.server.asset.json.AssetRepositoryJsonDeserializer;
 import org.lanternpowered.server.command.CommandBan;
 import org.lanternpowered.server.command.CommandBanIp;
 import org.lanternpowered.server.command.CommandBorder;
@@ -131,9 +135,14 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.TeleportHelper;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -248,8 +257,10 @@ public class LanternGame implements Game {
     // The serialization service 
     private LanternDataManager dataManager;
 
+    // The asset repository
+    private AssetRepository assetRepository;
     // The asset manager
-    private LanternAssetManager assetManager;
+    private AssetManager assetManager;
 
     // The config manager
     private ConfigManager configManager;
@@ -295,17 +306,52 @@ public class LanternGame implements Game {
         }
     }
 
+    private static InputStream extractAndGet(String path, String targetDir) throws IOException {
+        final Path dir = Paths.get(targetDir);
+        if (!Files.exists(dir)) {
+            Files.createDirectories(dir);
+        }
+        final Path file = dir.resolve(path);
+        if (!Files.exists(file)) {
+            final InputStream is = LanternGame.class.getResourceAsStream('/' + path);
+            if (is == null) {
+                throw new IllegalArgumentException("The resource \"" + path + "\" doesn't exist.");
+            }
+            try {
+                Files.copy(is, file);
+            } finally {
+                is.close();
+            }
+        }
+        return Files.newInputStream(file);
+    }
+
+    private void loadAssetRepository() {
+        final Gson gson = new GsonBuilder().registerTypeAdapter(AssetRepository.class, new AssetRepositoryJsonDeserializer()).create();
+
+        try {
+            final InputStream is = extractAndGet("assets-repo.json", CONFIG_FOLDER);
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                this.assetRepository = gson.fromJson(reader, AssetRepository.class);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        this.assetManager = new LanternAssetManager(this.assetRepository);
+    }
+
     public void preInitialize() throws IOException {
-        final Path root = new File("").toPath();
-        this.configFolder = root.resolve(CONFIG_FOLDER);
-        this.pluginsFolder = root.resolve(PLUGINS_FOLDER);
+        this.configFolder = Paths.get(CONFIG_FOLDER);
+        this.pluginsFolder = Paths.get(PLUGINS_FOLDER);
+
+        // Load the asset repository
+        this.loadAssetRepository();
 
         // Create the inbuilt plugin containers and platform
         this.minecraft = new MinecraftPluginContainer(this);
         this.apiContainer = new SpongeApiContainer();
         this.implContainer = new LanternServerContainer();
         this.platform = new LanternPlatform(this.apiContainer, this.implContainer);
-        this.assetManager = new LanternAssetManager();
 
         this.minecraftVersionCache = new MinecraftVersionCache();
         this.minecraftVersionCache.load();
@@ -315,6 +361,13 @@ public class LanternGame implements Game {
             throw new RuntimeException("The current version and version in the cache don't match: " +
                     LanternMinecraftVersion.CURRENT + " != " + versionCacheEntry);
         }
+
+        // Create the plugin manager instance
+        this.pluginManager = new LanternPluginManager(this, this.pluginsFolder);
+        this.pluginManager.registerPlugin(this.implContainer);
+        this.pluginManager.registerPlugin(this.apiContainer);
+        this.pluginManager.registerPlugin(this.minecraft);
+        this.pluginManager.registerPluginInstances();
 
         // Pre register some game objects
         this.gameRegistry = new LanternGameRegistry(this);
@@ -341,6 +394,8 @@ public class LanternGame implements Game {
     }
 
     public void initialize(LanternServer server, RconService rconService, Path rootWorldFolder) {
+        this.pluginManager.registerPluginInstances();
+
         this.rootWorldFolder = rootWorldFolder;
         this.server = server;
 
@@ -352,10 +407,6 @@ public class LanternGame implements Game {
 
         // Register the game objects
         this.gameDictionary = new LanternGameDictionary();
-
-        // Create the plugin manager instance
-        this.pluginManager = new LanternPluginManager(this, this.pluginsFolder, this.minecraft,
-                this.apiContainer, this.implContainer);
 
         // Create the event manager instance
         this.eventManager = new LanternEventManager();
@@ -609,6 +660,10 @@ public class LanternGame implements Game {
     @Override
     public AssetManager getAssetManager() {
         return this.assetManager;
+    }
+
+    public AssetRepository getAssetRepository() {
+        return this.assetRepository;
     }
 
     @Override

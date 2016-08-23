@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.text.translation;
 
+import org.lanternpowered.server.asset.Asset;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Locale;
@@ -35,10 +36,11 @@ public interface TranslationManager {
 
     /**
      * Adds a resource bundle to the translation manager.
-     * 
-     * @param resourceBundle the resource bundle
+     *
+     * @param asset The resource bundle asset to add
+     * @param locale The locale of the resource bundle
      */
-    void addResourceBundle(String resourceBundle, Locale locale);
+    void addResourceBundle(Asset asset, Locale locale);
 
     /**
      * Gets a {@link Translation} for the specified key.

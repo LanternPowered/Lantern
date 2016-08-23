@@ -25,19 +25,23 @@
  */
 package org.lanternpowered.server.asset;
 
-import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.plugin.PluginContainer;
 
 import java.net.URL;
+import java.nio.file.Path;
 
 public final class LanternAsset implements Asset {
 
-    final PluginContainer plugin;
-    final URL url;
+    private final PluginContainer plugin;
+    private final String id;
+    final Path path;
+    private final URL url;
 
-    protected LanternAsset(PluginContainer plugin, URL url) {
+    LanternAsset(PluginContainer plugin, String id, Path path, URL url) {
         this.plugin = plugin;
+        this.path = path;
         this.url = url;
+        this.id = id;
     }
 
     @Override
@@ -50,4 +54,8 @@ public final class LanternAsset implements Asset {
         return this.url;
     }
 
+    @Override
+    public String getId() {
+        return this.id;
+    }
 }

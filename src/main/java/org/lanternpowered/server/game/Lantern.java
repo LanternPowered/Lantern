@@ -26,6 +26,7 @@
 package org.lanternpowered.server.game;
 
 import org.lanternpowered.server.LanternServer;
+import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.world.LanternWorldManager;
 import org.slf4j.Logger;
@@ -48,6 +49,10 @@ public class Lantern {
 
     public static PluginContainer getImplementationPlugin() {
         return LanternGame.game.getImplementationPlugin();
+    }
+
+    public static AssetRepository getAssetRepository() {
+        return LanternGame.game.getAssetRepository();
     }
 
     public static LanternGame getGame() {

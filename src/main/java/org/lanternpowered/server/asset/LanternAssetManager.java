@@ -25,44 +25,28 @@
  */
 package org.lanternpowered.server.asset;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.asset.*;
 import org.spongepowered.api.asset.Asset;
-import org.spongepowered.api.asset.AssetManager;
-import org.spongepowered.api.plugin.PluginContainer;
 
-import java.io.File;
-import java.net.URL;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
-public final class LanternAssetManager implements AssetManager {
+public class LanternAssetManager implements AssetManager {
 
-    public static final String DEFAULT_ASSET_DIR = "assets";
-    public static final ClassLoader CLASS_LOADER = Sponge.class.getClassLoader();
+    private final AssetRepository assetRepository;
 
-    @Override
-    public Optional<Asset> getAsset(Object instance, String name) {
-        checkNotNull(instance, "plugin instance");
-        checkNotNull(name, "name");
-        checkArgument(!name.isEmpty(), "name cannot be empty");
-        PluginContainer plugin = Sponge.getPluginManager().fromInstance(instance).get();
-        Path assetDir = plugin.getAssetDirectory().orElse(Paths.get(DEFAULT_ASSET_DIR)
-                .resolve(plugin.getId().replace('.', '/')));
-        URL url = CLASS_LOADER.getResource(assetDir.resolve(name).toString().replace(File.separatorChar, '/'));
-        if (url == null) {
-            return Optional.empty();
-        }
-        return Optional.of(new LanternAsset(plugin, url));
+    public LanternAssetManager(AssetRepository assetRepository) {
+        this.assetRepository = assetRepository;
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public Optional<Asset> getAsset(Object plugin, String name) {
+        return (Optional) this.assetRepository.get(plugin, name);
+    }
+
+    @SuppressWarnings("unchecked")
     @Override
     public Optional<Asset> getAsset(String name) {
-        return this.getAsset(Lantern.getMinecraftPlugin(), name);
+        return (Optional) this.assetRepository.get(name);
     }
-
 }

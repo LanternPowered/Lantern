@@ -23,35 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.asset;
 
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.plugin.PluginContainer;
 
-import java.util.Optional;
+import java.io.File;
+import java.net.URL;
+import java.nio.file.Path;
 
-public final class LanternServerContainer extends AbstractPluginContainer {
+import javax.annotation.Nullable;
+
+public class ClassLoaderAssetRepository extends AbstractAssetRepository {
+
+    private static final ClassLoader CLASS_LOADER = Sponge.class.getClassLoader();
+
+    @Nullable
+    @Override
+    protected URL getAssetURL(PluginContainer plugin, Path path) {
+        return CLASS_LOADER.getResource(path.toString().replace(File.separatorChar, '/'));
+    }
+
+    // The class loader assets cannot be reloaded
 
     @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
+    public void reload() {
     }
 
     @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
+    public void addReloadListener(ReloadListener reloadListener) {
     }
 
     @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
+    public void removeReloadListener(ReloadListener reloadListener) {
     }
-
-    @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.ofNullable(Lantern.getGame().getServer());
-    }
-
 }

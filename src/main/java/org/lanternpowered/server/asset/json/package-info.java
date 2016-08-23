@@ -23,35 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
-
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
-
-import java.util.Optional;
-
-public final class LanternServerContainer extends AbstractPluginContainer {
-
-    @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
-    }
-
-    @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
-    }
-
-    @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
-    }
-
-    @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.ofNullable(Lantern.getGame().getServer());
-    }
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.asset.json;

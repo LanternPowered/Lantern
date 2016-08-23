@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
+import org.lanternpowered.server.asset.AssetRepository;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
 import org.lanternpowered.server.text.translation.CombinedTranslationManager;
 import org.lanternpowered.server.text.translation.LanternTranslationManager;
@@ -34,7 +36,6 @@ import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 @RegistrationDependency(LocaleRegistryModule.class)
 public final class TranslationManagerRegistryModule implements RegistryModule {
@@ -45,11 +46,16 @@ public final class TranslationManagerRegistryModule implements RegistryModule {
     @Override
     public void registerDefaults() {
         this.translationManager = new CombinedTranslationManager();
-        final MinecraftTranslationManager minecraftTranslationManager = new MinecraftTranslationManager(
-                ResourceBundle.getBundle("assets/minecraft/lang/en_US"));
+        // Get the asset repository
+        final AssetRepository assetRepository = Lantern.getAssetRepository();
+        // Add the translation manager as a reload listener
+        assetRepository.addReloadListener(this.translationManager);
+        // Add the minecraft language file for defaults and
+        // the client translations
+        this.translationManager.addManager(new MinecraftTranslationManager());
         final LanternTranslationManager lanternTranslationManager = new LanternTranslationManager();
-        lanternTranslationManager.addResourceBundle("assets/lantern/lang/en_US", Locale.ENGLISH);
-        this.translationManager.addManager(minecraftTranslationManager);
+        // Add the lantern languages
+        lanternTranslationManager.addResourceBundle(assetRepository.get("lantern", "lang/en_US.properties").get(), Locale.ENGLISH);
         this.translationManager.addManager(lanternTranslationManager);
         this.translationManager.setDelegateManager(lanternTranslationManager);
     }

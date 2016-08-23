@@ -25,26 +25,32 @@
  */
 package org.lanternpowered.server.text.translation;
 
-import com.google.common.collect.Maps;
+import org.lanternpowered.server.asset.Asset;
+import org.lanternpowered.server.asset.ReloadListener;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
+import java.util.concurrent.ConcurrentHashMap;
 
-public final class MinecraftTranslationManager implements TranslationManager {
+public final class MinecraftTranslationManager implements TranslationManager, ReloadListener {
 
-    private final Map<String, Translation> translations = Maps.newConcurrentMap();
-    private final ResourceBundle resourceBundle;
+    private final Map<String, Translation> translations = new ConcurrentHashMap<>();
+    @SuppressWarnings("NullableProblems") private ResourceBundle resourceBundle;
 
-    public MinecraftTranslationManager(ResourceBundle resourceBundle) {
-        this.resourceBundle = resourceBundle;
+    public MinecraftTranslationManager() {
+        this.onReload();
     }
 
     @Override
-    public void addResourceBundle(String resourceBundle, Locale locale) {
+    public void addResourceBundle(Asset asset, Locale locale) {
     }
 
     @Override
@@ -60,4 +66,14 @@ public final class MinecraftTranslationManager implements TranslationManager {
         return Optional.empty();
     }
 
+    @Override
+    public void onReload() {
+        final Asset asset = Lantern.getAssetRepository().get("minecraft", "lang/en_US.properties").orElseThrow(
+                () -> new IllegalStateException("The minecraft language file is missing!"));
+        try {
+            this.resourceBundle = new PropertyResourceBundle(asset.getUrl().openStream());
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to create the minecraft language resource bundle!", e);
+        }
+    }
 }

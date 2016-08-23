@@ -59,7 +59,7 @@ public class PaginationCalculator {
 
     static {
         ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader.builder()
-                .setURL(PaginationCalculator.class.getResource("/assets/lantern/internal/font-sizes.json"))
+                .setURL(PaginationCalculator.class.getResource("/internal/font-sizes.json"))
                 .setPreservesHeader(false).build();
         try {
             ConfigurationNode node = loader.load();

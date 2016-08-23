@@ -61,21 +61,20 @@ public final class LanternPluginManager implements PluginManager {
     private final LanternGame game;
     private final Path pluginsFolder;
 
-    public LanternPluginManager(LanternGame game, Path pluginsFolder,
-            PluginContainer... preInstalledPlugins) {
+    public LanternPluginManager(LanternGame game, Path pluginsFolder) {
         this.pluginsFolder = checkNotNull(pluginsFolder, "pluginsFolder");
         this.game = checkNotNull(game, "game");
-
-        // Register the inbuilt plugins
-        for (PluginContainer pluginContainer : preInstalledPlugins) {
-            this.registerPlugin(checkNotNull(pluginContainer, "pluginContainer"));
-        }
     }
 
-    private void registerPlugin(PluginContainer plugin) {
+    public void registerPlugin(PluginContainer plugin) {
+        checkNotNull(plugin, "plugin");
         this.plugins.put(plugin.getId(), plugin);
-        // Plugin instances shouldn't be null
-        this.pluginInstances.put(plugin.getInstance().get(), plugin);
+    }
+
+    public void registerPluginInstances() {
+        for (Map.Entry<String, PluginContainer> entry : this.plugins.entrySet()) {
+            entry.getValue().getInstance().ifPresent(obj -> this.pluginInstances.put(obj, entry.getValue()));
+        }
     }
 
     public void loadPlugins(boolean scanClasspath) throws IOException {

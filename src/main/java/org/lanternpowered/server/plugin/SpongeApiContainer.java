@@ -50,7 +50,7 @@ public final class SpongeApiContainer extends AbstractPluginContainer {
 
     @Override
     public Optional<Object> getInstance() {
-        return Optional.of(Lantern.getGame());
+        return Optional.ofNullable(Lantern.getGame());
     }
 
 }

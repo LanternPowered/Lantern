@@ -27,10 +27,10 @@ package org.lanternpowered.server.data.persistence;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import org.lanternpowered.server.data.translator.ConfigurateTranslator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataFormatException;
-import org.spongepowered.api.data.translator.ConfigurateTranslator;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -52,12 +52,12 @@ public final class HoconDataFormat extends AbstractDataFormat {
                 .setSource(() -> new BufferedReader(new InputStreamReader(input)))
                 .build();
         ConfigurationNode node = loader.load();
-        return ConfigurateTranslator.instance().translateFrom(node);
+        return ConfigurateTranslator.instance().translate(node);
     }
 
     @Override
     public void writeTo(OutputStream output, DataView data) throws IOException {
-        ConfigurationNode node = ConfigurateTranslator.instance().translateData(data);
+        ConfigurationNode node = ConfigurateTranslator.instance().translate(data);
         HoconConfigurationLoader loader = HoconConfigurationLoader.builder()
                 .setSink(() -> new BufferedWriter(new OutputStreamWriter(output)))
                 .build();

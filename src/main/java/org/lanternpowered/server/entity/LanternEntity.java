@@ -40,6 +40,7 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -47,6 +48,7 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
@@ -170,13 +172,13 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public boolean validateRawData(DataContainer container) {
+    public boolean validateRawData(DataView dataView) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public void setRawData(DataContainer container) throws InvalidDataException {
+    public void setRawData(DataView dataView) throws InvalidDataException {
         // TODO Auto-generated method stub
         
     }
@@ -446,6 +448,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public DataHolder copy() {
+        return null;
+    }
+
+    @Override
+    public EntityArchetype createArchetype() {
         return null;
     }
 }

@@ -26,7 +26,7 @@
 package org.lanternpowered.server.data.persistence;
 
 import com.google.common.reflect.TypeToken;
-import org.spongepowered.api.data.persistence.DataSerializer;
+import org.spongepowered.api.data.persistence.DataTranslator;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -36,12 +36,11 @@ public interface DataTypeSerializerCollection {
     DataTypeSerializerCollection registerTypeSerializerFactory(Function<TypeToken<?>, Optional<DataTypeSerializer<?,?>>> factory);
 
     /**
-     * Registers a {@link DataViewTypeSerializer} for the desired {@link TypeToken}.
+     * Registers a {@link DataTranslator}.
      *
-     * @param serializer The serializer for the desired class object
-     * @param <T> The type of object
+     * @param translator The translator to register
      */
-    <T> DataTypeSerializerCollection registerSerializer(DataSerializer<T> serializer);
+    <T> DataTypeSerializerCollection registerTranslator(DataTranslator<T> translator);
 
     /**
      * Registers a {@link DataViewTypeSerializer} for the desired {@link TypeToken}.
@@ -75,22 +74,22 @@ public interface DataTypeSerializerCollection {
     }
 
     /**
-     * Gets the desired {@link DataSerializer} for the provided type token.
+     * Gets the desired {@link DataTranslator} for the provided type token.
      *
      * @param objectType The type of the object
      * @param <T> The type of object
      * @return The data serializer, if available
      */
-    <T> Optional<DataSerializer<T>> getSerializer(TypeToken<T> objectType);
+    <T> Optional<DataTranslator<T>> getTranslator(TypeToken<T> objectType);
 
     /**
-     * Gets the desired {@link DataSerializer} for the provided class.
+     * Gets the desired {@link DataTranslator} for the provided class.
      *
      * @param objectClass The class of the object
      * @param <T> The type of object
      * @return The data serializer, if available
      */
-    default <T> Optional<DataSerializer<T>> getSerializer(Class<T> objectClass) {
-        return this.getSerializer(TypeToken.of(objectClass));
+    default <T> Optional<DataTranslator<T>> getTranslator(Class<T> objectClass) {
+        return this.getTranslator(TypeToken.of(objectClass));
     }
 }

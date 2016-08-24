@@ -30,12 +30,12 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMapper;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import org.lanternpowered.server.data.translator.ConfigurateTranslator;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataManager;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.persistence.DataBuilder;
-import org.spongepowered.api.data.translator.ConfigurateTranslator;
 
 import java.util.Optional;
 
@@ -48,12 +48,12 @@ public final class DataSerializableTypeSerializer implements TypeSerializer<Data
     @SuppressWarnings({"rawtypes", "unchecked"})
     @Override
     public DataSerializable deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        DataManager dataManager = Sponge.getDataManager();
-        Optional<DataBuilder<?>> builderOpt = (Optional) dataManager.getBuilder(type.getRawType().asSubclass(DataSerializable.class));
+        final DataManager dataManager = Sponge.getDataManager();
+        final Optional<DataBuilder<?>> builderOpt = (Optional) dataManager.getBuilder(type.getRawType().asSubclass(DataSerializable.class));
         if (!builderOpt.isPresent()) {
             throw new ObjectMappingException("No data builder is registered for " + type);
         }
-        Optional<? extends DataSerializable> built = builderOpt.get().build(ConfigurateTranslator.instance().translateFrom(value));
+        final Optional<? extends DataSerializable> built = builderOpt.get().build(ConfigurateTranslator.instance().translate(value));
         if (!built.isPresent()) {
             throw new ObjectMappingException("Unable to build instance of " + type);
         }
@@ -62,8 +62,8 @@ public final class DataSerializableTypeSerializer implements TypeSerializer<Data
 
     @Override
     public void serialize(TypeToken<?> type, DataSerializable obj, ConfigurationNode value) throws ObjectMappingException {
-        DataContainer container = obj.toContainer();
-        value.setValue(ConfigurateTranslator.instance().translateData(container));
+        final DataContainer container = obj.toContainer();
+        value.setValue(ConfigurateTranslator.instance().translate(container));
     }
 
 }

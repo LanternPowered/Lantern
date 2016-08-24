@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data;
 
-import org.lanternpowered.server.data.persistence.DataSerializers;
+import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
@@ -49,7 +49,7 @@ public class DataRegistrar {
         // Register the data type serializers
         DataTypeSerializers.registerSerializers(dataManager);
         // Register the data serializers
-        DataSerializers.registerSerializers(dataManager);
+        DataTranslators.registerSerializers(dataManager);
 
         // Register the data builders
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());

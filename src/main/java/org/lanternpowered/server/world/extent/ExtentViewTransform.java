@@ -60,6 +60,7 @@ import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
 
 import java.util.Collection;
@@ -711,6 +712,22 @@ public class ExtentViewTransform implements AbstractExtent {
     public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
         box = new AABB(this.inverseTransform(box.getMin()), this.inverseTransform(box.getMax()));
         return this.extent.getIntersectingCollisionBoxes(owner, box);
+    }
+
+    private Vector3i tranformVector(Vector3i vector) {
+        final int x = vector.getX();
+        final int y = vector.getY();
+        final int z = vector.getZ();
+        return new Vector3i(this.inverseTransform.transformX(x, y, z), this.inverseTransform.transformY(x, y, z),
+                this.inverseTransform.transformZ(x, y, z));
+    }
+
+    @Override
+    public ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin) {
+        min = this.tranformVector(min);
+        max = this.tranformVector(max);
+        origin = this.tranformVector(origin);
+        return this.extent.createArchetypeVolume(min, max, origin);
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {

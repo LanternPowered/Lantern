@@ -366,7 +366,7 @@ public final class LanternWorldPropertiesIO {
                     if (!options.isEmpty()) {
                         try {
                             JsonObject json = GSON.fromJson(options, JsonObject.class);
-                            generatorSettings = JsonTranslator.instance().translateFrom(json).copy();
+                            generatorSettings = JsonTranslator.instance().translate(json).copy();
                         } catch (Exception e) {
                             Lantern.getLogger().warn("Unknown generator settings format \"{}\" for type {}, using defaults...",
                                     options, genName);
@@ -439,7 +439,7 @@ public final class LanternWorldPropertiesIO {
         // The flat world generator has a different settings format
         if (generatorId.equalsIgnoreCase("flat")) {
             dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings().getString(FlatGeneratorType.SETTINGS).get());
-            dataView.set(GENERATOR_OPTIONS_EXTRA, GSON.toJson(JsonTranslator.instance().translateData(
+            dataView.set(GENERATOR_OPTIONS_EXTRA, GSON.toJson(JsonTranslator.instance().translate(
                     properties.getGeneratorSettings().copy().remove(FlatGeneratorType.SETTINGS))));
         } else {
             dataView.set(GENERATOR_OPTIONS, properties.getGeneratorSettings());

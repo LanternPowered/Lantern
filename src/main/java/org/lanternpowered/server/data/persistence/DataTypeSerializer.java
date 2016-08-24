@@ -42,7 +42,7 @@ public interface DataTypeSerializer<T, D> {
      * @param data The data to deserialize the object from
      * @return The deserialized object, if available
      */
-    Optional<T> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, D data) throws InvalidDataException;
+    T deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, D data) throws InvalidDataException;
 
     /**
      * Serializes the provided object to a {@link DataContainer}.

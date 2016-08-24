@@ -23,24 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.config.serializer;
+package org.lanternpowered.server.util;
 
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.lanternpowered.server.data.translator.ConfigurateTranslator;
-import org.spongepowered.api.data.DataView;
+public final class IdGenerator {
 
-public final class DataViewTypeSerializer implements TypeSerializer<DataView> {
+    public static String generate(String name) {
+        final StringBuilder builder = new StringBuilder();
 
-    @Override
-    public DataView deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return ConfigurateTranslator.instance().translate(value);
+        for (char c : name.toCharArray()) {
+            if (Character.isUpperCase(c)) {
+                builder.append('_');
+                builder.append(Character.toLowerCase(c));
+            } else if (c == '.') {
+                builder.append('_');
+            } else {
+                builder.append(c);
+            }
+        }
+
+        return builder.toString();
     }
 
-    @Override
-    public void serialize(TypeToken<?> type, DataView obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(ConfigurateTranslator.instance().translate(obj));
+    private IdGenerator() {
     }
 }

@@ -72,7 +72,7 @@ public final class DataQueries {
     public static final DataQuery Z_POS = of("z");
     public static final DataQuery W_POS = of("w");
 
-    // Java API Queries for DataSerializers
+    // Java API Queries for DataTranslators
     public static final DataQuery LOCAL_TIME_HOUR = of("LocalTimeHour");
     public static final DataQuery LOCAL_TIME_MINUTE = of("LocalTimeMinute");
     public static final DataQuery LOCAL_TIME_SECOND = of("LocalTimeSecond");

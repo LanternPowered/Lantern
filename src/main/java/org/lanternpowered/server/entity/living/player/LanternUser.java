@@ -33,6 +33,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
@@ -71,13 +72,13 @@ public class LanternUser extends AbstractSubjectBase implements AbstractProperty
     }
 
     @Override
-    public boolean validateRawData(DataContainer container) {
+    public boolean validateRawData(DataView dataView) {
         // TODO Auto-generated method stub
         return false;
     }
 
     @Override
-    public void setRawData(DataContainer container) throws InvalidDataException {
+    public void setRawData(DataView dataView) throws InvalidDataException {
         // TODO Auto-generated method stub
         
     }

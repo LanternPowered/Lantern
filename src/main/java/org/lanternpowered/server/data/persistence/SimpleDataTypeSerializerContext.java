@@ -23,24 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.config.serializer;
+package org.lanternpowered.server.data.persistence;
 
-import com.google.common.reflect.TypeToken;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.lanternpowered.server.data.translator.ConfigurateTranslator;
-import org.spongepowered.api.data.DataView;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public final class DataViewTypeSerializer implements TypeSerializer<DataView> {
+import org.lanternpowered.server.data.persistence.DataTypeSerializerCollection;
+import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 
-    @Override
-    public DataView deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        return ConfigurateTranslator.instance().translate(value);
+public class SimpleDataTypeSerializerContext implements DataTypeSerializerContext {
+
+    private final DataTypeSerializerCollection serializers;
+
+    public SimpleDataTypeSerializerContext(DataTypeSerializerCollection serializers) {
+        this.serializers = checkNotNull(serializers, "serializers");
     }
 
     @Override
-    public void serialize(TypeToken<?> type, DataView obj, ConfigurationNode value) throws ObjectMappingException {
-        value.setValue(ConfigurateTranslator.instance().translate(obj));
+    public DataTypeSerializerCollection getSerializers() {
+        return this.serializers;
     }
 }

@@ -60,10 +60,10 @@ import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -682,6 +682,13 @@ public class ExtentViewDownsize implements AbstractExtent {
         this.checkRange(box.getMin().getX(), box.getMin().getY(), box.getMin().getZ());
         this.checkRange(box.getMax().getX(), box.getMax().getY(), box.getMax().getZ());
         return this.extent.getIntersectingCollisionBoxes(owner, box);
+    }
+
+    @Override
+    public ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin) {
+        this.checkRange(min.getX(), min.getY(), min.getZ());
+        this.checkRange(max.getX(), max.getY(), max.getZ());
+        return this.extent.createArchetypeVolume(min, max, origin);
     }
 
     private static class EntityInBounds implements Predicate<Entity> {

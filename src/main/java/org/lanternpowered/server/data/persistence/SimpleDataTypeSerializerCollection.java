@@ -31,11 +31,12 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.util.IdGenerator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.persistence.DataSerializer;
+import org.spongepowered.api.data.persistence.DataTranslator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.Collections;
@@ -55,52 +56,56 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
      */
     private final DataTypeSerializerContext context = () -> SimpleDataTypeSerializerCollection.this;
 
-    private class WrappedDataSerializer<T> implements DataSerializer<T> {
+    private class WrappedDataSerializer<T> extends AbstractDataTranslator<T> {
 
         private final DataViewTypeSerializer<T> serializer;
-        private final TypeToken<T> typeToken;
 
-        private WrappedDataSerializer(TypeToken<T> typeToken, DataViewTypeSerializer<T> serializer) {
+        public WrappedDataSerializer(String pluginId, String name, TypeToken<T> typeToken, DataViewTypeSerializer<T> serializer) {
+            super(pluginId, name, typeToken);
             this.serializer = serializer;
-            this.typeToken = typeToken;
         }
 
         @Override
-        public TypeToken<T> getToken() {
-            return this.typeToken;
-        }
-
-        @Override
-        public Optional<T> deserialize(DataView view) throws InvalidDataException {
+        public T translate(DataView view) throws InvalidDataException {
             return this.serializer.deserialize(this.typeToken, context, view);
         }
 
         @Override
-        public DataContainer serialize(T obj) throws InvalidDataException {
-            DataView dataView = this.serializer.serialize(this.typeToken, context, obj);
+        public DataContainer translate(T obj) throws InvalidDataException {
+            final DataView dataView = this.serializer.serialize(this.typeToken, context, obj);
             return dataView instanceof DataContainer ? (DataContainer) dataView : dataView.copy();
         }
     }
 
     /**
      * Wraps around a regular {@link DataTypeSerializer}, so not extending {@link DataViewTypeSerializer}
-     * and is used to be compatible with the {@link DataSerializer} api, it serializes the object that isn't a {@link DataView}
+     * and is used to be compatible with the {@link DataTranslator} api, it serializes the object that isn't a {@link DataView}
      * and puts it inside a newly created {@link DataContainer}.
      */
-    private class WrappedContextualDataViewTypeSerializer<T, D> implements DataViewTypeSerializer<T>, DataSerializer<T> {
+    private class WrappedContextualDataViewTypeSerializer<T, D> extends AbstractDataTranslator<T> implements DataViewTypeSerializer<T> {
 
         private final DataTypeSerializer<T, D> serializer;
-        private final TypeToken<T> typeToken;
 
-        private WrappedContextualDataViewTypeSerializer(TypeToken<T> typeToken, DataTypeSerializer<T, D> serializer) {
+        public WrappedContextualDataViewTypeSerializer(String pluginId, String name, TypeToken<T> typeToken,
+                DataTypeSerializer<T, D> serializer) {
+            super(pluginId, name, typeToken);
             this.serializer = serializer;
-            this.typeToken = typeToken;
+        }
+
+        public WrappedContextualDataViewTypeSerializer(String pluginId, String id, String name, TypeToken<T> typeToken,
+                DataTypeSerializer<T, D> serializer) {
+            super(pluginId, id, name, typeToken);
+            this.serializer = serializer;
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<T> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView dataView) throws InvalidDataException {
-            return dataView.get(WRAPPED_VALUE).flatMap(v -> this.serializer.deserialize(type, ctx, (D) v));
+        public T deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView dataView) throws InvalidDataException {
+            final Optional<Object> optObj = dataView.get(WRAPPED_VALUE);
+            if (optObj.isPresent()) {
+                throw new InvalidDataException("The wrapped value object is missing");
+            }
+            return this.serializer.deserialize(type, ctx, (D) optObj.get());
         }
 
         @Override
@@ -109,44 +114,39 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
         }
 
         @Override
-        public TypeToken<T> getToken() {
-            return this.typeToken;
-        }
-
-        @Override
-        public Optional<T> deserialize(DataView view) throws InvalidDataException {
+        public T translate(DataView view) throws InvalidDataException {
             return this.deserialize(this.typeToken, context, view);
         }
 
         @Override
-        public DataContainer serialize(T obj) throws InvalidDataException {
-            DataView dataView = this.serialize(this.typeToken, context, obj);
+        public DataContainer translate(T obj) throws InvalidDataException {
+            final DataView dataView = this.serialize(this.typeToken, context, obj);
             return dataView instanceof DataContainer ? (DataContainer) dataView : dataView.copy();
         }
     }
 
     private class DataSerializerToDataTypeSerializer<T> implements DataViewTypeSerializer<T> {
 
-        private final DataSerializer<T> dataSerializer;
+        private final DataTranslator<T> dataTranslator;
 
-        private DataSerializerToDataTypeSerializer(DataSerializer<T> dataSerializer) {
-            this.dataSerializer = dataSerializer;
+        private DataSerializerToDataTypeSerializer(DataTranslator<T> dataTranslator) {
+            this.dataTranslator = dataTranslator;
         }
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<T> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView dataView) throws InvalidDataException {
-            return this.dataSerializer.deserialize(dataView);
+        public T deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView dataView) throws InvalidDataException {
+            return this.dataTranslator.translate(dataView);
         }
 
         @Override
         public DataView serialize(TypeToken<?> type, DataTypeSerializerContext ctx, T obj) throws InvalidDataException {
-            return this.dataSerializer.serialize(obj);
+            return this.dataTranslator.translate(obj);
         }
     }
 
     private final Map<TypeToken<?>, DataTypeSerializer<?,?>> dataTypeSerializers = new ConcurrentHashMap<>();
-    private final Map<TypeToken<?>, DataSerializer<?>> dataSerializers = new ConcurrentHashMap<>();
+    private final Map<TypeToken<?>, DataTranslator<?>> dataSerializers = new ConcurrentHashMap<>();
     private final Set<Function<TypeToken<?>, Optional<DataTypeSerializer<?,?>>>> serializerFactories =
             Collections.newSetFromMap(new ConcurrentHashMap<>());
 
@@ -161,13 +161,14 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
                         }
                     }
                     for (Function<TypeToken<?>, Optional<DataTypeSerializer<?,?>>> function : serializerFactories) {
-                        DataTypeSerializer<?,?> serializer = function.apply(key).orElse(null);
+                        final DataTypeSerializer<?,?> serializer = function.apply(key).orElse(null);
                         if (serializer != null) {
-                            Optional<DataSerializer<?>> dataSerializer = dataSerializersCache.getIfPresent(key);
+                            final Optional<DataTranslator<?>> dataSerializer = dataTranslatorsCache.getIfPresent(key);
                             if (dataSerializer == null) {
-                                dataSerializersCache.put(key, Optional.of(serializer instanceof DataViewTypeSerializer ?
-                                        new WrappedDataSerializer((TypeToken) key, (DataViewTypeSerializer<?>) serializer) :
-                                        new WrappedContextualDataViewTypeSerializer<>((TypeToken) key, serializer)));
+                                final String id = IdGenerator.generate(key.getRawType().getName());
+                                dataTranslatorsCache.put(key, Optional.of(serializer instanceof DataViewTypeSerializer ?
+                                        new WrappedDataSerializer("lantern", id, (TypeToken) key, (DataViewTypeSerializer<?>) serializer) :
+                                        new WrappedContextualDataViewTypeSerializer<>("lantern", id, (TypeToken) key, serializer)));
                             }
                             return Optional.of(serializer);
                         }
@@ -176,12 +177,12 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
                 }
             });
 
-    private final LoadingCache<TypeToken<?>, Optional<DataSerializer<?>>> dataSerializersCache =
-            CacheBuilder.newBuilder().build(new CacheLoader<TypeToken<?>, Optional<DataSerializer<?>>>() {
+    private final LoadingCache<TypeToken<?>, Optional<DataTranslator<?>>> dataTranslatorsCache =
+            CacheBuilder.newBuilder().build(new CacheLoader<TypeToken<?>, Optional<DataTranslator<?>>>() {
                 @SuppressWarnings("unchecked")
                 @Override
-                public Optional<DataSerializer<?>> load(TypeToken<?> key) throws Exception {
-                    for (Map.Entry<TypeToken<?>, DataSerializer<?>> entry : dataSerializers.entrySet()) {
+                public Optional<DataTranslator<?>> load(TypeToken<?> key) throws Exception {
+                    for (Map.Entry<TypeToken<?>, DataTranslator<?>> entry : dataSerializers.entrySet()) {
                         if (entry.getKey().isAssignableFrom(key)) {
                             return Optional.of(entry.getValue());
                         }
@@ -193,9 +194,10 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
                             if (dataTypeSerializer == null) {
                                 dataTypeSerializersCache.put(key, Optional.of(serializer));
                             }
+                            final String id = IdGenerator.generate(key.getRawType().getName());
                             return Optional.of(serializer instanceof DataViewTypeSerializer ?
-                                    new WrappedDataSerializer((TypeToken) key, (DataViewTypeSerializer<?>) serializer) :
-                                    new WrappedContextualDataViewTypeSerializer<>((TypeToken) key, serializer));
+                                    new WrappedDataSerializer("lantern", id, (TypeToken) key, (DataViewTypeSerializer<?>) serializer) :
+                                    new WrappedContextualDataViewTypeSerializer<>("lantern", id, (TypeToken) key, serializer));
                         }
                     }
                     return Optional.empty();
@@ -205,18 +207,18 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
     @Override
     public DataTypeSerializerCollection registerTypeSerializerFactory(Function<TypeToken<?>, Optional<DataTypeSerializer<?, ?>>> factory) {
         this.serializerFactories.add(checkNotNull(factory, "factory"));
-        this.dataSerializersCache.invalidateAll();
+        this.dataTranslatorsCache.invalidateAll();
         this.dataTypeSerializersCache.invalidateAll();
         return this;
     }
 
     @Override
-    public <T> DataTypeSerializerCollection registerSerializer(DataSerializer<T> serializer) {
+    public <T> DataTypeSerializerCollection registerTranslator(DataTranslator<T> serializer) {
         checkNotNull(serializer, "serializer");
         TypeToken<T> typeToken = checkNotNull(serializer.getToken(), "typeToken");
         this.dataTypeSerializers.put(typeToken, new DataSerializerToDataTypeSerializer<>(serializer));
         this.dataSerializers.put(typeToken, serializer);
-        this.dataSerializersCache.invalidateAll();
+        this.dataTranslatorsCache.invalidateAll();
         this.dataTypeSerializersCache.invalidateAll();
         return this;
     }
@@ -227,10 +229,11 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
         checkNotNull(objectType, "objectType");
         this.dataTypeSerializers.put(objectType, serializer);
         // Register the proper wrapped data serializer for the object
+        final String id = IdGenerator.generate(objectType.getRawType().getName());
         this.dataSerializers.put(objectType, serializer instanceof DataViewTypeSerializer ?
-                new WrappedDataSerializer<>(objectType, (DataViewTypeSerializer<T>) serializer) :
-                new WrappedContextualDataViewTypeSerializer<>(objectType, serializer));
-        this.dataSerializersCache.invalidateAll();
+                new WrappedDataSerializer<>("lantern", id, objectType, (DataViewTypeSerializer<T>) serializer) :
+                new WrappedContextualDataViewTypeSerializer<>("lantern", id, objectType, serializer));
+        this.dataTranslatorsCache.invalidateAll();
         this.dataTypeSerializersCache.invalidateAll();
         return this;
     }
@@ -247,9 +250,9 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> Optional<DataSerializer<T>> getSerializer(TypeToken<T> objectType) {
+    public <T> Optional<DataTranslator<T>> getTranslator(TypeToken<T> objectType) {
         try {
-            return (Optional) this.dataSerializersCache.get(checkNotNull(objectType, "objectType"));
+            return (Optional) this.dataTranslatorsCache.get(checkNotNull(objectType, "objectType"));
         } catch (ExecutionException e) {
             throw new RuntimeException(e);
         }

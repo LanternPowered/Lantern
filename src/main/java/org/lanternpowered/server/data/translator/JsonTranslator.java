@@ -26,16 +26,18 @@
 package org.lanternpowered.server.data.translator;
 
 import com.google.common.collect.Lists;
+import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.lanternpowered.server.data.persistence.AbstractDataTranslator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.translator.DataTranslator;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.util.List;
 import java.util.Map;
@@ -44,17 +46,9 @@ import java.util.regex.Pattern;
 
 import javax.annotation.Nullable;
 
-public class JsonTranslator implements DataTranslator<JsonObject> {
+public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
 
     private static final JsonTranslator INSTANCE = new JsonTranslator();
-
-    private static final Pattern DOUBLE = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[dD]$");
-    private static final Pattern DOUBLE_UNTYPED = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+$");
-    private static final Pattern FLOAT = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[fF]$");
-    private static final Pattern LONG = Pattern.compile("^[-+]?[0-9]+[lL]$");
-    private static final Pattern BYTE = Pattern.compile("^[-+]?[0-9]+[bB]$");
-    private static final Pattern SHORT = Pattern.compile("^[-+]?[0-9]+[sS]$");
-    private static final Pattern INTEGER = Pattern.compile("^[-+]?[0-9]+$");
 
     /**
      * Get the instance of this translator.
@@ -65,28 +59,32 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
         return INSTANCE;
     }
 
+    private static final Pattern DOUBLE = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[dD]$");
+    private static final Pattern DOUBLE_UNTYPED = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+$");
+    private static final Pattern FLOAT = Pattern.compile("^[-+]?[0-9]*\\.?[0-9]+[fF]$");
+    private static final Pattern LONG = Pattern.compile("^[-+]?[0-9]+[lL]$");
+    private static final Pattern BYTE = Pattern.compile("^[-+]?[0-9]+[bB]$");
+    private static final Pattern SHORT = Pattern.compile("^[-+]?[0-9]+[sS]$");
+    private static final Pattern INTEGER = Pattern.compile("^[-+]?[0-9]+$");
+
     private JsonTranslator() {
+        super("lantern", "json", TypeToken.of(JsonObject.class));
     }
 
     @Override
-    public JsonObject translateData(DataView container) {
-        return this.toJson(container.getValues(false)).getAsJsonObject();
+    public JsonObject translate(DataView view) throws InvalidDataException {
+        return this.toJson(view.getValues(false)).getAsJsonObject();
     }
 
     @Override
-    public void translateContainerToData(JsonObject node, DataView container) {
-        this.toJson(node, container.getValues(false));
-    }
-
-    @Override
-    public DataContainer translateFrom(JsonObject node) {
-        return (DataContainer) this.fromJson(null, node);
+    public DataContainer translate(JsonObject obj) throws InvalidDataException {
+        return (DataContainer) this.fromJson(null, obj);
     }
 
     private Object fromJson(@Nullable DataView container, JsonElement json) {
         if (json.isJsonObject()) {
             if (container == null) {
-                container = new MemoryDataContainer();
+                container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
             }
             for (Entry<String, JsonElement> en : json.getAsJsonObject().entrySet()) {
                 String key = en.getKey();
@@ -212,5 +210,4 @@ public class JsonTranslator implements DataTranslator<JsonObject> {
         }
         return json;
     }
-
 }

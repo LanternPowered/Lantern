@@ -23,23 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.persistence.nbt;
+package org.lanternpowered.server.data.persistence;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.google.common.reflect.TypeToken;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.data.persistence.DataTranslator;
 
-import org.lanternpowered.server.data.persistence.DataTypeSerializerCollection;
-import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
+public abstract class AbstractDataTranslator<T> extends PluginCatalogType.Base implements DataTranslator<T> {
 
-public class SimpleDataTypeSerializerContext implements DataTypeSerializerContext {
+    protected final TypeToken<T> typeToken;
 
-    private final DataTypeSerializerCollection serializers;
+    public AbstractDataTranslator(String pluginId, String name, TypeToken<T> typeToken) {
+        super(pluginId, name);
+        this.typeToken = typeToken;
+    }
 
-    public SimpleDataTypeSerializerContext(DataTypeSerializerCollection serializers) {
-        this.serializers = checkNotNull(serializers, "serializers");
+    public AbstractDataTranslator(String pluginId, String id, String name, TypeToken<T> typeToken) {
+        super(pluginId, id, name);
+        this.typeToken = typeToken;
     }
 
     @Override
-    public DataTypeSerializerCollection getSerializers() {
-        return this.serializers;
+    public TypeToken<T> getToken() {
+        return this.typeToken;
     }
 }

@@ -73,6 +73,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -246,7 +247,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         int regionX = x & REGION_MASK;
         int regionZ = z & REGION_MASK;
 
-        DataContainer root = new MemoryDataContainer();
+        DataContainer root = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         DataView levelTags = root.createView(LEVEL);
 
         // Core properties
@@ -259,7 +260,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
         // Chunk sections
         ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(true);
-        List<DataView> sectionTags = Lists.newArrayList();
+        List<DataView> sectionTags = new ArrayList<>();
 
         for (byte i = 0; i < sections.length; ++i) {
             ChunkSectionSnapshot section = sections[i];
@@ -267,7 +268,7 @@ public class AnvilChunkIOService implements ChunkIOService {
                 continue;
             }
 
-            DataContainer sectionTag = new MemoryDataContainer();
+            DataContainer sectionTag = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
             sectionTag.set(Y, i);
 
             byte[] rawTypes = new byte[section.types.length];

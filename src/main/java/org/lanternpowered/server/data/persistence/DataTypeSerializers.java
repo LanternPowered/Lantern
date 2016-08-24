@@ -72,11 +72,11 @@ public final class DataTypeSerializers {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<DataSerializable> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView data) throws InvalidDataException {
+        public DataSerializable deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView data) throws InvalidDataException {
             DataBuilder<DataSerializable> dataBuilder = (DataBuilder<DataSerializable>) LanternDataManager.getInstance()
                     .getBuilder((Class<? extends DataSerializable>) type.getRawType())
-                    .orElseThrow(() -> new IllegalStateException("Wasn't able to find a DataBuilder for the DataSerializable: " + type.toString()));
-            return dataBuilder.build(data);
+                    .orElseThrow(() -> new IllegalStateException("Wasn't able to find a DataBuilder for the DataSerializable: " + type));
+            return dataBuilder.build(data).orElseThrow(() -> new InvalidDataException("Unable to deserializer the " + type));
         }
 
         @Override
@@ -89,12 +89,12 @@ public final class DataTypeSerializers {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<CatalogType> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
+        public CatalogType deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
             Optional<CatalogType> catalogType = Sponge.getRegistry().getType((Class<CatalogType>) type.getRawType(), data);
             if (!catalogType.isPresent()) {
                 throw new InvalidDataException("The catalog type " + data + " of type " + type.toString() + " is missing.");
             }
-            return catalogType;
+            return catalogType.get();
         }
 
         @Override
@@ -114,7 +114,7 @@ public final class DataTypeSerializers {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<Multimap<?, ?>> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<DataView> entries) throws InvalidDataException {
+        public Multimap<?, ?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<DataView> entries) throws InvalidDataException {
             TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
             TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
             DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
@@ -139,7 +139,7 @@ public final class DataTypeSerializers {
                     map.put(key, value);
                 }
             }
-            return Optional.of(map);
+            return map;
         }
 
         @SuppressWarnings("unchecked")
@@ -177,7 +177,7 @@ public final class DataTypeSerializers {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<Map<?, ?>> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<DataView> entries) throws InvalidDataException {
+        public Map<?, ?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<DataView> entries) throws InvalidDataException {
             TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
             TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
             DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
@@ -192,7 +192,7 @@ public final class DataTypeSerializers {
                         .orElseThrow(() -> new InvalidDataException("Entry is missing a value.")));
                 map.put(key, value);
             }
-            return Optional.of(map);
+            return map;
         }
 
         @SuppressWarnings("unchecked")
@@ -216,13 +216,13 @@ public final class DataTypeSerializers {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<List<?>> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<Object> data) throws InvalidDataException {
+        public List<?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<Object> data) throws InvalidDataException {
             TypeToken<?> elementType = type.resolveType(this.typeVariable);
             DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
-            return Optional.of((List) data.stream()
-                    .map(object -> elementSerial.deserialize(elementType, ctx, object).get())
-                    .collect((Collector) Collectors.toList()));
+            return (List) data.stream()
+                    .map(object -> elementSerial.deserialize(elementType, ctx, object))
+                    .collect((Collector) Collectors.toList());
         }
 
         @SuppressWarnings("unchecked")
@@ -241,13 +241,13 @@ public final class DataTypeSerializers {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<Set<?>> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<Object> data) throws InvalidDataException {
+        public Set<?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<Object> data) throws InvalidDataException {
             TypeToken<?> elementType = type.resolveType(this.typeVariable);
             DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
-            return Optional.of((Set) data.stream()
-                    .map(object -> elementSerial.deserialize(elementType, ctx, object).get())
-                    .collect((Collector) Collectors.toSet()));
+            return (Set) data.stream()
+                    .map(object -> elementSerial.deserialize(elementType, ctx, object))
+                    .collect((Collector) Collectors.toSet());
         }
 
         @SuppressWarnings("unchecked")
@@ -264,7 +264,7 @@ public final class DataTypeSerializers {
 
         @SuppressWarnings("unchecked")
         @Override
-        public Optional<Enum> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
+        public Enum deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
             // Enum values should be uppercase
             data = data.toUpperCase();
 
@@ -275,7 +275,7 @@ public final class DataTypeSerializers {
                 throw new InvalidDataException("Invalid enum constant, expected a value of enum " + type + ", got " + data);
             }
 
-            return Optional.of(ret);
+            return ret;
         }
 
         @Override
@@ -290,23 +290,23 @@ public final class DataTypeSerializers {
         private static final DataQuery VALUE = DataQuery.of("Value");
 
         @Override
-        public Optional<Number> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Object data) throws InvalidDataException {
+        public Number deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Object data) throws InvalidDataException {
             if (data instanceof DataView) {
-                DataView view = (DataView) data;
+                final DataView view = (DataView) data;
                 if (view.contains(TYPE) && view.contains(VALUE)) {
                     String numberType = view.getString(TYPE).get();
                     String value = view.getString(VALUE).get();
                     if (numberType.equals(BigDecimal.class.getSimpleName())) {
-                        return Optional.of(new BigDecimal(value));
+                        return new BigDecimal(value);
                     } else if (numberType.equals(BigInteger.class.getSimpleName())) {
-                        return Optional.of(new BigInteger(value));
+                        return new BigInteger(value);
                     } else {
                         throw new InvalidDataException("Unsupported number type: " + numberType);
                     }
                 }
-                return Optional.empty();
+                throw new InvalidDataException("Unsupported number format: " + view);
             } else if (data instanceof Number) {
-                return Optional.of((Number) data);
+                return (Number) data;
             }
             throw new InvalidDataException("Unsupported data type: " + data.getClass().getName());
         }
@@ -325,8 +325,8 @@ public final class DataTypeSerializers {
     private static class BooleanSerializer implements DataTypeSerializer<Boolean, Boolean> {
 
         @Override
-        public Optional<Boolean> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Boolean data) throws InvalidDataException {
-            return Optional.of(data);
+        public Boolean deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Boolean data) throws InvalidDataException {
+            return data;
         }
 
         @Override
@@ -338,8 +338,8 @@ public final class DataTypeSerializers {
     private static class StringSerializer implements DataTypeSerializer<String, String> {
 
         @Override
-        public Optional<String> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
-            return Optional.of(data);
+        public String deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
+            return data;
         }
 
         @Override

@@ -45,7 +45,7 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.DataContentUpdater;
-import org.spongepowered.api.data.persistence.DataSerializer;
+import org.spongepowered.api.data.persistence.DataTranslator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -209,17 +209,17 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
     }
 
     @Override
-    public <T> void registerSerializer(Class<T> objectClass, DataSerializer<T> serializer) {
+    public <T> void registerTranslator(Class<T> objectClass, DataTranslator<T> serializer) {
         checkState(this.allowRegistrations, "Registrations are no longer allowed");
         checkNotNull(objectClass, "objectClass");
         checkNotNull(serializer, "serializer");
         checkArgument(serializer.getToken().isAssignableFrom(objectClass),
-                "DataSerializer is not compatible with the target object class: " +objectClass);
-        this.registerSerializer(serializer);
+                "DataTranslator is not compatible with the target object class: " +objectClass);
+        this.registerTranslator(serializer);
     }
 
     @Override
-    public <T> Optional<DataSerializer<T>> getSerializer(Class<T> objectClass) {
-        return super.getSerializer(objectClass);
+    public <T> Optional<DataTranslator<T>> getTranslator(Class<T> objectClass) {
+        return super.getTranslator(objectClass);
     }
 }

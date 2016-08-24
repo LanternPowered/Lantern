@@ -68,7 +68,7 @@ public final class PlayerIO {
     public static void save(Path dataFolder, LanternPlayer player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
 
-        DataContainer dataContainer = new MemoryDataContainer();
+        DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
         objectStore.serialize(player, dataContainer);
 

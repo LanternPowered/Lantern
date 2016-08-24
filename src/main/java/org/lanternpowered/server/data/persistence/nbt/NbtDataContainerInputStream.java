@@ -178,7 +178,7 @@ public class NbtDataContainerInputStream implements Closeable, DataContainerInpu
             return array;
         } else if (type == COMPOUND) {
             if (container == null) {
-                container = new MemoryDataContainer();
+                container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
             }
             Entry entry;
             final int depth1 = depth + 1;

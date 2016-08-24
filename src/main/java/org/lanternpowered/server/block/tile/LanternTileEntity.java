@@ -31,9 +31,11 @@ import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.world.Location;
@@ -47,12 +49,12 @@ public class LanternTileEntity extends BaseComponentHolder implements TileEntity
     private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
 
     @Override
-    public boolean validateRawData(DataContainer container) {
+    public boolean validateRawData(DataView dataView) {
         return false;
     }
 
     @Override
-    public void setRawData(DataContainer container) throws InvalidDataException {
+    public void setRawData(DataView dataView) throws InvalidDataException {
     }
 
     @Override
@@ -77,6 +79,11 @@ public class LanternTileEntity extends BaseComponentHolder implements TileEntity
 
     @Override
     public BlockState getBlock() {
+        return null;
+    }
+
+    @Override
+    public TileEntityArchetype createArchetype() {
         return null;
     }
 

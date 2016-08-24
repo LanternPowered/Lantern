@@ -115,6 +115,7 @@ import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.Explosion;
+import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
@@ -416,12 +417,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public MutableBiomeAreaWorker<? extends World> getBiomeWorker() {
+    public MutableBiomeAreaWorker<World> getBiomeWorker() {
         return new LanternMutableBiomeAreaWorker<>(this);
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends World> getBlockWorker(Cause cause) {
+    public MutableBlockVolumeWorker<World> getBlockWorker(Cause cause) {
         return new LanternMutableBlockVolumeWorker<>(this, cause);
     }
 
@@ -482,6 +483,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
+        return null;
+    }
+
+    @Override
+    public ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin) {
         return null;
     }
 

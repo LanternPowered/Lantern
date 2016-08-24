@@ -32,6 +32,7 @@ import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.world.WeakWorldReference;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Property;
@@ -287,6 +288,11 @@ public class LanternBlockSnapshot implements BlockSnapshot {
     @Override
     public Optional<UUID> getNotifier() {
         return this.notifier;
+    }
+
+    @Override
+    public Optional<TileEntityArchetype> createArchetype() {
+        return null;
     }
 
     @Override

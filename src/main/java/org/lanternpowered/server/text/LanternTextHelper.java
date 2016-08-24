@@ -120,7 +120,7 @@ public final class LanternTextHelper {
             case "show_item":
                 return null; // TODO
             case "show_entity":
-                DataView dataView = JsonTranslator.instance().translateFrom(GSON.fromJson(value, JsonObject.class));
+                DataView dataView = JsonTranslator.instance().translate(GSON.fromJson(value, JsonObject.class));
 
                 UUID uuid = UUID.fromString(dataView.getString(SHOW_ENTITY_ID).get());
                 String name = dataView.getString(SHOW_ENTITY_NAME).get();
@@ -173,7 +173,7 @@ public final class LanternTextHelper {
             dataContainer.set(SHOW_ENTITY_NAME, ref.getName());
             ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, ((LanternEntityType) type).getMinecraftId()));
 
-            return new RawAction("show_entity", GSON.toJson(JsonTranslator.instance().translateData(dataContainer)));
+            return new RawAction("show_entity", GSON.toJson(JsonTranslator.instance().translate(dataContainer)));
         } else if (hoverAction instanceof HoverAction.ShowItem) {
             return null; // TODO
         } else {

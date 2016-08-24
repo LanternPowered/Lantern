@@ -30,9 +30,13 @@ public final class IdGenerator {
     public static String generate(String name) {
         final StringBuilder builder = new StringBuilder();
 
-        for (char c : name.toCharArray()) {
+        final char[] chars = name.toCharArray();
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
             if (Character.isUpperCase(c)) {
-                builder.append('_');
+                if (i != 0) {
+                    builder.append('_');
+                }
                 builder.append(Character.toLowerCase(c));
             } else if (c == '.') {
                 builder.append('_');

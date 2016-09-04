@@ -33,6 +33,7 @@ public final class EmptyIterator<E> implements Iterator<E> {
     private static final EmptyIterator<Object> INSTANCE = new EmptyIterator<>();
 
     public static <E> Iterator<E> get() {
+        //noinspection unchecked
         return (Iterator<E>) INSTANCE;
     }
 

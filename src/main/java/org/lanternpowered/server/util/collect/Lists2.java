@@ -54,6 +54,7 @@ public final class Lists2 {
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createExpirableValueListWithPredicate(
             Predicate<V> expirationChecker) {
         // Casting weirdness...
+        //noinspection unchecked
         return new ExpirableValueListImpl<>(Lists.newArrayList(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
     }
 
@@ -64,6 +65,7 @@ public final class Lists2 {
     public static <V, B extends ExpirableValue<V>> ExpirableValueList<V, B> createCopyOnWriteExpirableValueListWithPredicate(
             Predicate<V> expirationChecker) {
         // Casting weirdness...
+        //noinspection unchecked
         return new ExpirableValueListImpl<>(Lists.newArrayList(), value -> (B) new PredicateExpirableValue(value, expirationChecker));
     }
 

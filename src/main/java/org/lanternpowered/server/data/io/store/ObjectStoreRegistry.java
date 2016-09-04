@@ -27,9 +27,8 @@ package org.lanternpowered.server.data.io.store;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.lanternpowered.server.data.io.store.entity.EntityStore;
 import org.lanternpowered.server.data.io.store.entity.LivingStore;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
@@ -40,7 +39,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 public final class ObjectStoreRegistry {
 
@@ -51,27 +49,26 @@ public final class ObjectStoreRegistry {
     }
 
     private final Map<Class<?>, ObjectStore> objectsStores = new HashMap<>();
-    private final LoadingCache<Class<?>, Optional<ObjectStore>> objectStoreCache = CacheBuilder.newBuilder()
-            .build(new CacheLoader<Class<?>, Optional<ObjectStore>>() {
-                @Override
-                public Optional<ObjectStore> load(Class<?> key) throws Exception {
-                    ObjectStore store;
-                    while (key != Object.class) {
-                        store = objectsStores.get(key);
-                        if (store != null) {
-                            return Optional.of(store);
-                        }
-                        for (Class<?> interf : key.getInterfaces()) {
-                            store = objectsStores.get(interf);
-                            if (store != null) {
-                                return Optional.of(store);
-                            }
-                        }
-                        key = key.getSuperclass();
-                    }
-                    return Optional.empty();
+    private final LoadingCache<Class<?>, Optional<ObjectStore>> objectStoreCache =
+            Caffeine.newBuilder().build(this::findStore);
+
+    private Optional<ObjectStore> findStore(Class<?> key) {
+        ObjectStore store;
+        while (key != Object.class) {
+            store = objectsStores.get(key);
+            if (store != null) {
+                return Optional.of(store);
+            }
+            for (Class<?> interf : key.getInterfaces()) {
+                store = objectsStores.get(interf);
+                if (store != null) {
+                    return Optional.of(store);
                 }
-            });
+            }
+            key = key.getSuperclass();
+        }
+        return Optional.empty();
+    }
 
     public ObjectStoreRegistry() {
         this.register(LanternEntity.class, new EntityStore<>());
@@ -101,10 +98,6 @@ public final class ObjectStoreRegistry {
      */
     @SuppressWarnings("unchecked")
     public <T> Optional<ObjectStore<T>> get(Class<? extends T> objectType) {
-        try {
-            return (Optional) this.objectStoreCache.get(objectType);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return (Optional) this.objectStoreCache.get(objectType);
     }
 }

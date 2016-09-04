@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.service.sql;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -104,24 +104,21 @@ public class LanternSqlService implements SqlService, Closeable {
     }
 
     private final LoadingCache<ConnectionInfo, HikariDataSource> connectionCache =
-            CacheBuilder.newBuilder().removalListener(new RemovalListener<ConnectionInfo, HikariDataSource>() {
-                @Override
-                public void onRemoval(RemovalNotification<ConnectionInfo, HikariDataSource> notification) {
-                    HikariDataSource source = notification.getValue();
-                    if (source != null) {
-                        source.close();
-                    }
+            Caffeine.newBuilder().removalListener((RemovalListener<ConnectionInfo, HikariDataSource>) (key, value, cause) -> {
+                if (value != null) {
+                    value.close();
                 }
             }).build(new CacheLoader<ConnectionInfo, HikariDataSource>() {
+
                 @Override
                 public HikariDataSource load(@Nonnull ConnectionInfo key) throws Exception {
-                    HikariConfig config = new HikariConfig();
+                    final HikariConfig config = new HikariConfig();
                     config.setUsername(key.getUser());
                     config.setPassword(key.getPassword());
                     config.setDriverClassName(key.getDriverClassName());
                     // https://github.com/brettwooldridge/HikariCP/wiki/About-Pool-Sizing for info on pool sizing
                     config.setMaximumPoolSize((Runtime.getRuntime().availableProcessors() * 2) + 1);
-                    Properties driverSpecificProperties = PROTOCOL_SPECIFIC_PROPS.get(key.getDriverClassName());
+                    final Properties driverSpecificProperties = PROTOCOL_SPECIFIC_PROPS.get(key.getDriverClassName());
                     if (driverSpecificProperties != null) {
                         config.setDataSourceProperties(driverSpecificProperties);
                     }
@@ -144,12 +141,8 @@ public class LanternSqlService implements SqlService, Closeable {
                     "The provided plugin object does not have an associated plugin container"
                             + " (in other words, is 'plugin' actually your plugin object?"));
         }
-        ConnectionInfo info = ConnectionInfo.fromUrl(container, jdbcConnection);
-        try {
-            return this.connectionCache.get(info);
-        } catch (ExecutionException e) {
-            throw new SQLException(e);
-        }
+        final ConnectionInfo info = ConnectionInfo.fromUrl(container, jdbcConnection);
+        return this.connectionCache.get(info);
     }
 
     @Override
@@ -212,7 +205,7 @@ public class LanternSqlService implements SqlService, Closeable {
             if (o == null || getClass() != o.getClass()) {
                 return false;
             }
-            ConnectionInfo that = (ConnectionInfo) o;
+            final ConnectionInfo that = (ConnectionInfo) o;
             return Objects.equals(this.user, that.user)
                     && Objects.equals(this.password, that.password)
                     && Objects.equals(this.driverClassName, that.driverClassName)

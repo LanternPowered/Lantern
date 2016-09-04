@@ -27,11 +27,10 @@ package org.lanternpowered.server.text.action;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalListener;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.action.TextActions;
 
@@ -54,7 +53,7 @@ public final class LanternClickActionCallbacks {
      * The pattern of a valid {@link TextActions#executeCallback(Consumer)} command line.
      */
     public static final Pattern COMMAND_PATTERN = Pattern.compile(
-        "^\\/lantern:textclickcallback ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$");
+        "^/lantern:textclickcallback ([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$");
 
     private static final LanternClickActionCallbacks INSTANCE = new LanternClickActionCallbacks();
 
@@ -63,21 +62,13 @@ public final class LanternClickActionCallbacks {
     }
 
     private final Map<UUID, Consumer<CommandSource>> reverseMap = new ConcurrentHashMap<>();
-    private final LoadingCache<Consumer<CommandSource>, UUID> callbackCache = CacheBuilder.newBuilder()
+    private final LoadingCache<Consumer<CommandSource>, UUID> callbackCache = Caffeine.newBuilder()
             .expireAfterAccess(10, TimeUnit.MINUTES)
-            .removalListener(new RemovalListener<Consumer<CommandSource>, UUID>() {
-                @Override
-                public void onRemoval(RemovalNotification<Consumer<CommandSource>, UUID> notification) {
-                    reverseMap.remove(notification.getValue(), notification.getKey());
-                }
-            })
-            .build(new CacheLoader<Consumer<CommandSource>, UUID>() {
-                @Override
-                public UUID load(Consumer<CommandSource> key) throws Exception {
-                    UUID ret = UUID.randomUUID();
-                    reverseMap.putIfAbsent(ret, key);
-                    return ret;
-                }
+            .removalListener((RemovalListener<Consumer<CommandSource>, UUID>) (key, value, cause) -> this.reverseMap.remove(value, key))
+            .build((CacheLoader<Consumer<CommandSource>, UUID>) key -> {
+                final UUID ret = UUID.randomUUID();
+                this.reverseMap.putIfAbsent(ret, key);
+                return ret;
             });
 
     /**
@@ -87,7 +78,7 @@ public final class LanternClickActionCallbacks {
      * @return The unique id
      */
     public UUID getOrCreateIdForCallback(Consumer<CommandSource> callback) {
-        return this.callbackCache.getUnchecked(checkNotNull(callback, "callback"));
+        return this.callbackCache.get(checkNotNull(callback, "callback"));
     }
 
     /**

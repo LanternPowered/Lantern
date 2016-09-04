@@ -25,24 +25,15 @@
  */
 package org.lanternpowered.server.text;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-import java.util.concurrent.ExecutionException;
-
 public final class LanternTextSerializerFactory implements TextSerializerFactory {
 
-    private final LoadingCache<Character, FormattingCodeTextSerializer> cache = CacheBuilder.newBuilder()
-            .maximumSize(53)
-            .build(new CacheLoader<Character, FormattingCodeTextSerializer>() {
-                @Override
-                public FormattingCodeTextSerializer load(Character key) throws Exception {
-                    return new FormattingCodeTextSerializer(key);
-                }
-            });
+    private final LoadingCache<Character, FormattingCodeTextSerializer> cache =
+            Caffeine.newBuilder().maximumSize(53).build(FormattingCodeTextSerializer::new);
 
     @Override
     public org.spongepowered.api.text.serializer.FormattingCodeTextSerializer getFormattingCodeTextSerializer(char formattingChar) {
@@ -51,11 +42,7 @@ public final class LanternTextSerializerFactory implements TextSerializerFactory
         } else if (formattingChar == TextSerializers.FORMATTING_CODE.getCharacter()) {
             return TextSerializers.FORMATTING_CODE;
         } else {
-            try {
-                return cache.get(formattingChar);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }
+            return cache.get(formattingChar);
         }
     }
 }

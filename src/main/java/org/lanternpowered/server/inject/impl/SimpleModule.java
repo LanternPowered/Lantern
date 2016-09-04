@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.inject.impl;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -51,7 +51,7 @@ final class SimpleModule implements Module {
     private final Map<Class<?>, Supplier<?>> suppliers;
     private final Map<Class<?>, List<Binding<?>>> bindings;
     private final LoadingCache<ParameterSpec<?>, Binding<?>> cache =
-            CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES)
+            Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES)
                     .build(new CacheLoader<ParameterSpec<?>, Binding<?>>() {
                 @Override
                 public Binding<?> load(ParameterSpec<?> key) throws Exception {
@@ -104,19 +104,14 @@ final class SimpleModule implements Module {
                 Lists.newCopyOnWriteArrayList()).add(binding);
         }
         this.methodBindings = ImmutableList.copyOf(methodBindings);
-        this.bindings = (Map) ImmutableMap.copyOf(Maps.transformValues(map,
-                value -> ImmutableList.copyOf(value)));
+        this.bindings = (Map) ImmutableMap.copyOf(Maps.transformValues(map, ImmutableList::copyOf));
         this.suppliers = ImmutableMap.copyOf(suppliers);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Binding<T> getBinding(ParameterSpec<? extends T> spec) {
-        try {
-            return (Binding<T>) this.cache.get(spec);
-        } catch (ExecutionException e) {
-            throw new RuntimeException();
-        }
+        return (Binding<T>) this.cache.get(spec);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

@@ -25,9 +25,8 @@
  */
 package org.lanternpowered.server.inject.impl.reflect;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -52,7 +51,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
@@ -62,12 +60,7 @@ final class ReflectInjector implements Injector {
 
     private final Module module;
     private final LoadingCache<Class<?>, TypeInjector> cache =
-            CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Class<?>, TypeInjector>() {
-                @Override
-                public TypeInjector load(Class<?> key) throws Exception {
-                    return new TypeInjector(key);
-                }
-            });
+            Caffeine.newBuilder().weakKeys().build(TypeInjector::new);
 
     public ReflectInjector(Module module) {
         this.module = module;
@@ -76,15 +69,11 @@ final class ReflectInjector implements Injector {
     @SuppressWarnings("unchecked")
     @Override
     public <T> T instantiate(Class<T> objectType) {
-        return (T) getInjector(objectType).supplier.get();
+        return (T) this.getInjector(objectType).supplier.get();
     }
 
     private TypeInjector getInjector(Class<?> key) {
-        try {
-            return this.cache.get(key);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return this.cache.get(key);
     }
 
     @Override

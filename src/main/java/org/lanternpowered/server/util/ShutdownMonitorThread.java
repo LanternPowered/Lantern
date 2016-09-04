@@ -40,7 +40,7 @@ public class ShutdownMonitorThread extends Thread {
     private static final int DELAY = 8000;
 
     public ShutdownMonitorThread() {
-        this.setName("ShutdownMonitorThread");
+        this.setName("shutdown-monitor");
         this.setDaemon(true);
     }
 

@@ -23,27 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
-
-public final class FastMath {
-
-    public static int floor(float value) {
-        return (int) (value + bigEnoughFloor) - bigEnoughInt;
-    }
-
-    public static int round(float value) {
-        return (int) (value + bigEnoughRound) - bigEnoughInt;
-    }
-
-    public static int ceil(float value) {
-        return (int) (value + bigEnoughCeil) - bigEnoughInt;
-    }
-
-    private static final int bigEnoughInt = 16 * 1024;
-    private static final double bigEnoughFloor = bigEnoughInt;
-    private static final double bigEnoughRound = bigEnoughInt + 0.5;
-    private static final double bigEnoughCeil = bigEnoughInt + 0.9999;
-
-    private FastMath() {
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.event;

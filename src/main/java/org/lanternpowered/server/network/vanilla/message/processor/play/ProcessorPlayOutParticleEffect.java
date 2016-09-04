@@ -26,9 +26,8 @@
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
 import com.flowpowered.math.vector.Vector3f;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.data.type.LanternNotePitch;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
@@ -59,7 +58,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
@@ -71,12 +69,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
      * Using a cache to bring the amount of operations down for spawning particles.
      */
     private final LoadingCache<ParticleEffect, CachedParticleEffect> cache =
-            CacheBuilder.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(new CacheLoader<ParticleEffect, CachedParticleEffect>() {
-                @Override
-                public CachedParticleEffect load(ParticleEffect key) throws Exception {
-                    return preProcess(key);
-                }
-            });
+            Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(this::preProcess);
 
     private CachedParticleEffect preProcess(ParticleEffect effect) {
         LanternParticleType type = (LanternParticleType) effect.getType();
@@ -216,37 +209,33 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
 
     @Override
     public void process(CodecContext context, MessagePlayOutParticleEffect message, List<Message> output) throws CodecException {
-        try {
-            final CachedParticleEffect cached = this.cache.get(message.getParticleEffect());
-            final Vector3f position = message.getPosition().toFloat();
+        final CachedParticleEffect cached = this.cache.get(message.getParticleEffect());
+        final Vector3f position = message.getPosition().toFloat();
 
-            if (cached.offset == null) {
-                for (MessagePlayOutSpawnParticle message0 : cached.messages) {
-                    output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), position, message0.getOffset(),
-                            message0.getData(), message0.getCount(), message0.getExtra()));
-                }
-            } else {
-                Random random = new Random();
-
-                float px = position.getX();
-                float py = position.getY();
-                float pz = position.getZ();
-
-                float ox = cached.offset.getX();
-                float oy = cached.offset.getY();
-                float oz = cached.offset.getZ();
-
-                for (MessagePlayOutSpawnParticle message0 : cached.messages) {
-                    double px0 = px + (random.nextFloat() * 2f - 1f) * ox;
-                    double py0 = py + (random.nextFloat() * 2f - 1f) * oy;
-                    double pz0 = pz + (random.nextFloat() * 2f - 1f) * oz;
-
-                    output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), new Vector3f(px0, py0, pz0), message0.getOffset(),
-                            message0.getData(), message0.getCount(), message0.getExtra()));
-                }
+        if (cached.offset == null) {
+            for (MessagePlayOutSpawnParticle message0 : cached.messages) {
+                output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), position, message0.getOffset(),
+                        message0.getData(), message0.getCount(), message0.getExtra()));
             }
-        } catch (ExecutionException e) {
-            throw new CodecException(e);
+        } else {
+            Random random = new Random();
+
+            float px = position.getX();
+            float py = position.getY();
+            float pz = position.getZ();
+
+            float ox = cached.offset.getX();
+            float oy = cached.offset.getY();
+            float oz = cached.offset.getZ();
+
+            for (MessagePlayOutSpawnParticle message0 : cached.messages) {
+                double px0 = px + (random.nextFloat() * 2f - 1f) * ox;
+                double py0 = py + (random.nextFloat() * 2f - 1f) * oy;
+                double pz0 = pz + (random.nextFloat() * 2f - 1f) * oz;
+
+                output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), new Vector3f(px0, py0, pz0), message0.getOffset(),
+                        message0.getData(), message0.getCount(), message0.getExtra()));
+            }
         }
     }
 

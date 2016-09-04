@@ -27,9 +27,8 @@ package org.lanternpowered.server.service.permission;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.game.Lantern;
@@ -59,38 +58,35 @@ public class LanternContextCalculator implements ContextCalculator<Subject> {
 
     private LoadingCache<RemoteSource, Set<Context>> buildAddressCache(final String contextKey,
             final Function<RemoteSource, InetAddress> function) {
-        return CacheBuilder.newBuilder()
+        return Caffeine.newBuilder()
             .weakKeys()
-            .build(new CacheLoader<RemoteSource, Set<Context>>() {
-                @Override
-                public Set<Context> load(RemoteSource key) throws Exception {
-                    ImmutableSet.Builder<Context> builder = ImmutableSet.builder();
-                    final InetAddress addr = checkNotNull(function.apply(key), "addr");
-                    builder.add(new Context(contextKey, addr.getHostAddress()));
-                    for (String set : Maps.filterValues(Lantern.getGame().getGlobalConfig().getIpSets(), input -> {
-                        return input.apply(addr);
-                    }).keySet()) {
-                        builder.add(new Context(contextKey, set));
-                    }
-                    return builder.build();
+            .build(key -> {
+                final ImmutableSet.Builder<Context> builder = ImmutableSet.builder();
+                final InetAddress addr = checkNotNull(function.apply(key), "addr");
+                builder.add(new Context(contextKey, addr.getHostAddress()));
+                //noinspection Guava,ConstantConditions
+                for (String set : Maps.filterValues(Lantern.getGame().getGlobalConfig().getIpSets(),
+                        input -> input.apply(addr)).keySet()) {
+                    builder.add(new Context(contextKey, set));
                 }
+                return builder.build();
             });
     }
 
     @Override
     public void accumulateContexts(Subject subject, Set<Context> accumulator) {
-        Optional<CommandSource> subjSource = subject.getCommandSource();
+        final Optional<CommandSource> subjSource = subject.getCommandSource();
         if (subjSource.isPresent()) {
-            CommandSource source = subjSource.get();
+            final CommandSource source = subjSource.get();
             if (source instanceof Locatable) {
-                World currentExt = ((Locatable) source).getWorld();
+                final World currentExt = ((Locatable) source).getWorld();
                 accumulator.add(currentExt.getContext());
                 accumulator.add((currentExt.getDimension().getContext()));
             }
             if (source instanceof RemoteSource) {
-                RemoteSource rem = (RemoteSource) source;
-                accumulator.addAll(this.remoteIpCache.getUnchecked(rem));
-                accumulator.addAll(this.localIpCache.getUnchecked(rem));
+                final RemoteSource rem = (RemoteSource) source;
+                accumulator.addAll(this.remoteIpCache.get(rem));
+                accumulator.addAll(this.localIpCache.get(rem));
                 accumulator.add(new Context(Context.LOCAL_PORT_KEY, String.valueOf(rem.getConnection().getVirtualHost().getPort())));
                 accumulator.add(new Context(Context.LOCAL_HOST_KEY, rem.getConnection().getVirtualHost().getHostName()));
             }
@@ -99,11 +95,11 @@ public class LanternContextCalculator implements ContextCalculator<Subject> {
 
     @Override
     public boolean matches(Context context, Subject subject) {
-        Optional<CommandSource> subjSource = subject.getCommandSource();
+        final Optional<CommandSource> subjSource = subject.getCommandSource();
         if (subjSource.isPresent()) {
-            CommandSource source = subjSource.get();
+            final CommandSource source = subjSource.get();
             if (source instanceof Locatable) {
-                Locatable located = (Locatable) source;
+                final Locatable located = (Locatable) source;
                 if (context.getType().equals(Context.WORLD_KEY)) {
                     return located.getWorld().getContext().equals(context);
                 } else if (context.getType().equals(Context.DIMENSION_KEY)) {
@@ -111,15 +107,15 @@ public class LanternContextCalculator implements ContextCalculator<Subject> {
                 }
             }
             if (source instanceof RemoteSource) {
-                RemoteSource remote = (RemoteSource) source;
+                final RemoteSource remote = (RemoteSource) source;
                 if (context.getType().equals(Context.LOCAL_HOST_KEY)) {
                     return context.getValue().equals(remote.getConnection().getVirtualHost().getHostName());
                 } else if (context.getType().equals(Context.LOCAL_PORT_KEY)) {
                     return context.getValue().equals(String.valueOf(remote.getConnection().getVirtualHost().getPort()));
                 } else if (context.getType().equals(Context.LOCAL_IP_KEY)) {
-                    return this.localIpCache.getUnchecked(remote).contains(context);
+                    return this.localIpCache.get(remote).contains(context);
                 } else if (context.getType().equals(Context.REMOTE_IP_KEY)) {
-                    return this.remoteIpCache.getUnchecked(remote).contains(context);
+                    return this.remoteIpCache.get(remote).contains(context);
                 }
             }
         }

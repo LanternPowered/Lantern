@@ -59,6 +59,7 @@ import org.lanternpowered.server.event.filter.delegate.ParameterFilterSourceDele
 import org.lanternpowered.server.event.filter.delegate.RootCauseFilterSourceDelegate;
 import org.lanternpowered.server.event.filter.delegate.SubtypeFilterDelegate;
 import org.lanternpowered.server.event.filter.delegate.SupportsDataFilterDelegate;
+import org.lanternpowered.server.game.Lantern;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -81,17 +82,19 @@ import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.Tuple;
 import org.spongepowered.api.util.generator.event.factory.ClassGenerator;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class FilterGenerator {
 
-    public static final boolean FILTER_DEBUG = Boolean.parseBoolean(System.getProperty("sponge.filter.debug", "false"));
+    private static final boolean FILTER_DEBUG = Boolean.parseBoolean(System.getProperty("sponge.filter.debug", "false"));
 
     public static FilterGenerator getInstance() {
         return Holder.INSTANCE;
@@ -224,18 +227,22 @@ public class FilterGenerator {
             mv.visitEnd();
         }
         cw.visitEnd();
-        byte[] data = cw.toByteArray();
+        final byte[] data = cw.toByteArray();
 
         if (FILTER_DEBUG) {
-            File outDir = new File(".sponge.debug.out");
-            File outFile = new File(outDir, name + ".class");
-            if (!outFile.getParentFile().exists()) {
-                outFile.getParentFile().mkdirs();
+            final Path outDir = Paths.get(".sponge.debug.out");
+            final Path outFile = outDir.resolve(name + ".class");
+            if (!Files.exists(outFile.getParent())) {
+                try {
+                    Files.createDirectories(outFile.getParent());
+                } catch (IOException e) {
+                    Lantern.getLogger().warn("Unable to create the filter debug directory.", e);
+                }
             }
-            try (FileOutputStream out = new FileOutputStream(outFile)) {
+            try (final OutputStream out = Files.newOutputStream(outFile)) {
                 out.write(data);
-            } catch (IOException ignored) {
-                ignored.printStackTrace();
+            } catch (IOException e) {
+                Lantern.getLogger().warn("Unable to create the filter debug class.", e);
             }
         }
 

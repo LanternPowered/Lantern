@@ -29,9 +29,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.asset.Asset;
 import org.lanternpowered.server.asset.ReloadListener;
@@ -50,7 +49,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
@@ -72,31 +70,26 @@ public final class LanternTranslationManager implements TranslationManager, Relo
         }
     }
 
-    private final LoadingCache<ResourceKey, Optional<ResourceBundle>> resourceBundlesCache = 
-            CacheBuilder.newBuilder().build(new CacheLoader<ResourceKey, Optional<ResourceBundle>>() {
-
-                @Override
-                public Optional<ResourceBundle> load(ResourceKey key) throws Exception {
-                    Locale locale = key.locale == null ? Locale.ENGLISH : key.locale;
-                    Optional<ResourceBundle> optBundle = this.load(key.name, locale);
-                    if (!optBundle.isPresent() && locale != Locale.ENGLISH) {
-                        optBundle = this.load(key.name, Locale.ENGLISH);
-                    }
-                    return optBundle;
+    private final LoadingCache<ResourceKey, Optional<ResourceBundle>> resourceBundlesCache =
+            Caffeine.newBuilder().build(key -> {
+                final Locale locale = key.locale == null ? Locale.ENGLISH : key.locale;
+                Optional<ResourceBundle> optBundle = this.load(key.name, locale);
+                if (!optBundle.isPresent() && locale != Locale.ENGLISH) {
+                    optBundle = this.load(key.name, Locale.ENGLISH);
                 }
-
-                private Optional<ResourceBundle> load(String name, Locale locale) throws Exception {
-                    if (bundles.containsKey(locale)) {
-                        for (ResourceBundle resourceBundle : bundles.get(locale)) {
-                            if (resourceBundle.containsKey(name)) {
-                                return Optional.of(resourceBundle);
-                            }
-                        }
-                    }
-                    return Optional.empty();
-                }
-
+                return optBundle;
             });
+
+    private Optional<ResourceBundle> load(String name, Locale locale) throws Exception {
+        if (this.bundles.containsKey(locale)) {
+            for (ResourceBundle resourceBundle : this.bundles.get(locale)) {
+                if (resourceBundle.containsKey(name)) {
+                    return Optional.of(resourceBundle);
+                }
+            }
+        }
+        return Optional.empty();
+    }
 
     private final ConcurrentMap<Locale, Set<ResourceBundle>> bundles = new ConcurrentHashMap<>();
     private final Map<Asset, Locale> entries = new HashMap<>();
@@ -140,24 +133,15 @@ public final class LanternTranslationManager implements TranslationManager, Relo
 
     @Override
     public Translation get(final String key) {
-        return new ResourceBundleTranslation(checkNotNullOrEmpty(key, "key"), locale -> {
-            try {
-                return this.resourceBundlesCache.get(new ResourceKey(key, locale)).orElse(null);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        return new ResourceBundleTranslation(checkNotNullOrEmpty(key, "key"),
+                locale -> this.resourceBundlesCache.get(new ResourceKey(key, locale)).orElse(null));
     }
 
     @Override
     public Optional<Translation> getIfPresent(String key) {
         checkNotNullOrEmpty(key, "key");
-        try {
-            if (this.resourceBundlesCache.get(new ResourceKey(key, null)).isPresent()) {
-                return Optional.of(this.get(key));
-            }
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
+        if (this.resourceBundlesCache.get(new ResourceKey(key, null)).isPresent()) {
+            return Optional.of(this.get(key));
         }
         return Optional.empty();
     }

@@ -25,14 +25,12 @@
  */
 package org.lanternpowered.server.util;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.apache.commons.lang3.LocaleUtils;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 @NonnullByDefault
 public final class LanguageUtil {
@@ -40,20 +38,9 @@ public final class LanguageUtil {
     private LanguageUtil() {
     }
 
-    public static final LoadingCache<String, Locale> LOCALE_CACHE = CacheBuilder.newBuilder()
-            .build(new CacheLoader<String, Locale>() {
-                @Override
-                public Locale load(String key) throws Exception {
-                    return LocaleUtils.toLocale(key);
-                }
-            });
+    public static final LoadingCache<String, Locale> LOCALE_CACHE = Caffeine.newBuilder().build(LocaleUtils::toLocale);
 
     public static Locale get(String name) {
-        try {
-            return LOCALE_CACHE.get(name);
-        } catch (ExecutionException e) {
-            throw new IllegalArgumentException(e);
-        }
+        return LOCALE_CACHE.get(name);
     }
-
 }

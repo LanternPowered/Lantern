@@ -27,14 +27,11 @@ package org.lanternpowered.server.inject.impl.reflect;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.lanternpowered.server.inject.Injector;
 import org.lanternpowered.server.inject.InjectorFactory;
 import org.lanternpowered.server.inject.Module;
-
-import java.util.concurrent.ExecutionException;
 
 public final class ReflectInjectorFactory implements InjectorFactory {
 
@@ -45,20 +42,11 @@ public final class ReflectInjectorFactory implements InjectorFactory {
     }
 
     private final LoadingCache<Module, Injector> cache =
-            CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Module, Injector>() {
-                @Override
-                public Injector load(Module module) throws Exception {
-                    return new ReflectInjector(module);
-                }
-            });
+            Caffeine.newBuilder().weakKeys().build(ReflectInjector::new);
 
     @Override
     public Injector create(Module module) {
         checkNotNull(module, "module");
-        try {
-            return this.cache.get(module);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return this.cache.get(module);
     }
 }

@@ -25,9 +25,8 @@
  */
 package org.lanternpowered.server.text.title;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.network.message.Message;
@@ -42,17 +41,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
 public final class LanternTitles {
 
-    private final static LoadingCache<Title, CacheValue> messagesCache = 
-            CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Title, CacheValue>() {
-                @Override
-                public CacheValue load(Title key) throws Exception {
-                    return createValue(key);
-                }
-            });
+    private final static LoadingCache<Title, CacheValue> messagesCache =
+            Caffeine.newBuilder().weakKeys().build(LanternTitles::createValue);
 
     private static CacheValue createValue(Title title) {
         final ImmutableList.Builder<Message> builder = ImmutableList.builder();
@@ -79,7 +72,7 @@ public final class LanternTitles {
 
         final List<Message> messages;
 
-        public CacheValue(List<Message> messages) {
+        CacheValue(List<Message> messages) {
             this.messages = messages;
         }
 
@@ -94,7 +87,7 @@ public final class LanternTitles {
         private final WeakReference<Title> title;
         private final Map<Locale, List<Message>> cache = Maps.newConcurrentMap();
 
-        public LocaleCacheValue(List<Message> baseMessages, Title title) {
+        LocaleCacheValue(List<Message> baseMessages, Title title) {
             super(baseMessages);
             this.title = new WeakReference<>(title);
         }
@@ -122,11 +115,7 @@ public final class LanternTitles {
     }
 
     public static List<Message> getMessages(Title title, Locale locale) {
-        try {
-            return messagesCache.get(title).getMessages(locale);
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return messagesCache.get(title).getMessages(locale);
     }
 
     public static List<Message> getMessages(Title title) {

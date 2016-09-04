@@ -27,9 +27,9 @@ package org.lanternpowered.server.data.persistence;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.CacheLoader;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.github.benmanes.caffeine.cache.LoadingCache;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.util.IdGenerator;
 import org.spongepowered.api.data.DataContainer;
@@ -44,7 +44,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 
 public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCollection {
@@ -151,7 +150,7 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
             Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private final LoadingCache<TypeToken<?>, Optional<DataTypeSerializer<?,?>>> dataTypeSerializersCache =
-            CacheBuilder.newBuilder().build(new CacheLoader<TypeToken<?>, Optional<DataTypeSerializer<?,?>>>() {
+            Caffeine.newBuilder().build(new CacheLoader<TypeToken<?>, Optional<DataTypeSerializer<?,?>>>() {
                 @SuppressWarnings("unchecked")
                 @Override
                 public Optional<DataTypeSerializer<?,?>> load(TypeToken<?> key) throws Exception {
@@ -178,7 +177,7 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
             });
 
     private final LoadingCache<TypeToken<?>, Optional<DataTranslator<?>>> dataTranslatorsCache =
-            CacheBuilder.newBuilder().build(new CacheLoader<TypeToken<?>, Optional<DataTranslator<?>>>() {
+            Caffeine.newBuilder().build(new CacheLoader<TypeToken<?>, Optional<DataTranslator<?>>>() {
                 @SuppressWarnings("unchecked")
                 @Override
                 public Optional<DataTranslator<?>> load(TypeToken<?> key) throws Exception {
@@ -241,21 +240,13 @@ public class SimpleDataTypeSerializerCollection implements DataTypeSerializerCol
     @SuppressWarnings("unchecked")
     @Override
     public <T, D> Optional<DataTypeSerializer<T, D>> getTypeSerializer(TypeToken<T> objectType) {
-        try {
-            return (Optional) this.dataTypeSerializersCache.get(checkNotNull(objectType, "objectType"));
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return (Optional) this.dataTypeSerializersCache.get(checkNotNull(objectType, "objectType"));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T> Optional<DataTranslator<T>> getTranslator(TypeToken<T> objectType) {
-        try {
-            return (Optional) this.dataTranslatorsCache.get(checkNotNull(objectType, "objectType"));
-        } catch (ExecutionException e) {
-            throw new RuntimeException(e);
-        }
+        return (Optional) this.dataTranslatorsCache.get(checkNotNull(objectType, "objectType"));
     }
 
     public DataTypeSerializerContext getTypeSerializerContext() {

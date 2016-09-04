@@ -38,6 +38,7 @@ public final class CodecPlayOutEntityCollectItem implements Codec<MessagePlayOut
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getCollectedId());
         buf.writeVarInt(message.getCollectorId());
+        buf.writeVarInt(message.getCollectItemCount());
         return buf;
     }
 }

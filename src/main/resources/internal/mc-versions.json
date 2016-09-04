@@ -458,5 +458,21 @@
     {
         "version": 210,
         "name": "1.10.2"
+    },
+    {
+        "version": 301,
+        "name": "16w32a"
+    },
+    {
+        "version": 302,
+        "name": "16w32b"
+    },
+    {
+        "version": 303,
+        "name": "16w33a"
+    },
+    {
+        "version": 304,
+        "name": "16w35a"
     }
 ]

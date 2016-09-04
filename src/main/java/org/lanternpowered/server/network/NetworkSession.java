@@ -63,6 +63,7 @@ import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.Sponge;
@@ -322,7 +323,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.leavePlayer();
         }
         Lantern.getLogger().info("{} ({}) disconnected. Reason: {}", this.gameProfile == null ? "???" : this.gameProfile.getName().orElse("???"),
-                this.channel.remoteAddress(), TextSerializers.LEGACY_FORMATTING_CODE.serialize(this.disconnectReason));
+                this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
     }
 
     @Override

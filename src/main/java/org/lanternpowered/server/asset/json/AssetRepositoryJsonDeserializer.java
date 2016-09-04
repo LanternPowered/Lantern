@@ -60,11 +60,6 @@ public class AssetRepositoryJsonDeserializer implements JsonDeserializer<AssetRe
                 // Currently only directory asset repositories
                 case "directory":
                     final Path path = Paths.get(obj.get("path").getAsString());
-                    // Using Path#toFile().isDirectory() here, because Files#isDirectory expects
-                    // the directory to exist, and we want to check if the provided path is valid
-                    if (!path.toFile().isDirectory()) {
-                        throw new JsonParseException("The directory repository path isn't a directory: " + path.toString());
-                    }
                     final DirectoryAssetRepository repo = new DirectoryAssetRepository(path);
                     if (!Files.exists(path)) {
                         try {

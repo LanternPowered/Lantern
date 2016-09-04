@@ -31,34 +31,23 @@ public final class MessagePlayOutEntityCollectItem implements Message {
 
     private final int collectorId;
     private final int collectedId;
+    private final int collectItemCount;
 
-    /**
-     * Creates a collect item message.
-     * 
-     * @param collectorId the collector id
-     * @param collectedId the collected id
-     */
-    public MessagePlayOutEntityCollectItem(int collectorId, int collectedId) {
+    public MessagePlayOutEntityCollectItem(int collectorId, int collectedId, int collectItemCount) {
         this.collectorId = collectorId;
         this.collectedId = collectedId;
+        this.collectItemCount = collectItemCount;
     }
 
-    /**
-     * Gets the id of the entity that will collect the collected entity.
-     * 
-     * @return the collector id
-     */
     public int getCollectorId() {
         return this.collectorId;
     }
 
-    /**
-     * Gets the id of the entity that will be collected by the collector entity..
-     * 
-     * @return the collected id
-     */
     public int getCollectedId() {
         return this.collectedId;
     }
 
+    public int getCollectItemCount() {
+        return this.collectItemCount;
+    }
 }

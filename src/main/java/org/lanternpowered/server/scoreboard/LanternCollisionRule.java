@@ -26,8 +26,9 @@
 package org.lanternpowered.server.scoreboard;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.scoreboard.CollisionRule;
 
-public class LanternCollisionRule extends PluginCatalogType.Base {
+public class LanternCollisionRule extends PluginCatalogType.Base implements CollisionRule {
 
     public LanternCollisionRule(String pluginId, String name) {
         super(pluginId, name);

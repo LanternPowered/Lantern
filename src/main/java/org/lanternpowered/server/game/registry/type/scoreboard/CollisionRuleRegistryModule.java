@@ -27,12 +27,13 @@ package org.lanternpowered.server.game.registry.type.scoreboard;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternCollisionRule;
+import org.spongepowered.api.scoreboard.CollisionRule;
+import org.spongepowered.api.scoreboard.CollisionRules;
 
-// TODO: Use the api class once available
-public final class CollisionRuleRegistryModule extends AdditionalPluginCatalogRegistryModule<LanternCollisionRule> {
+public final class CollisionRuleRegistryModule extends AdditionalPluginCatalogRegistryModule<CollisionRule> {
 
     public CollisionRuleRegistryModule() {
-        super(null); // TODO
+        super(CollisionRules.class);
     }
 
     @Override

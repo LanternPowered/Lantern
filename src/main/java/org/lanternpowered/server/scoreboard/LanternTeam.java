@@ -32,6 +32,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTeams;
 import org.lanternpowered.server.text.LanternTexts;
+import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.Visibility;
@@ -64,11 +65,11 @@ public class LanternTeam implements Team {
     private boolean canSeeFriendlyInvisibles;
     private Visibility nameTagVisibility;
     private Visibility deathMessageVisibility;
-    private LanternCollisionRule collisionRule;
+    private CollisionRule collisionRule;
 
     LanternTeam(String name, TextColor color, Text displayName, Text prefix, Text suffix,
                 boolean allowFriendlyFire, boolean canSeeFriendlyInvisibles, Visibility nameTagVisibility,
-                Visibility deathMessageVisibility, LanternCollisionRule collisionRule) {
+                Visibility deathMessageVisibility, CollisionRule collisionRule) {
         this.displayName = displayName;
         this.legacyDisplayName = LanternTexts.toLegacy(displayName);
         this.prefix = prefix;
@@ -105,8 +106,18 @@ public class LanternTeam implements Team {
         }
     }
 
-    public LanternCollisionRule getCollisionRule() {
+    @Override
+    public CollisionRule getCollisionRule() {
         return this.collisionRule;
+    }
+
+    @Override
+    public void setCollisionRule(CollisionRule rule) {
+        final boolean update = !checkNotNull(rule, "rule").equals(this.collisionRule);
+        this.collisionRule = rule;
+        if (update) {
+            this.sendUpdate();
+        }
     }
 
     @Override
@@ -125,10 +136,10 @@ public class LanternTeam implements Team {
 
     @Override
     public void setDisplayName(Text displayName) throws IllegalArgumentException {
-        String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
+        final String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
         checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
                 legacyDisplayName.length());
-        boolean update = !this.legacyDisplayName.equals(legacyDisplayName);
+        final boolean update = !this.legacyDisplayName.equals(legacyDisplayName);
         this.legacyDisplayName = legacyDisplayName;
         this.displayName = displayName;
         if (update) {
@@ -143,7 +154,7 @@ public class LanternTeam implements Team {
 
     @Override
     public void setColor(TextColor color) throws IllegalArgumentException {
-        boolean update = !this.color.equals(checkNotNull(color, "color"));
+        final boolean update = !this.color.equals(checkNotNull(color, "color"));
         this.color = color;
         if (update) {
             this.sendUpdate();
@@ -161,10 +172,10 @@ public class LanternTeam implements Team {
 
     @Override
     public void setPrefix(Text prefix) throws IllegalArgumentException {
-        String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
+        final String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
         checkArgument(legacyPrefix.length() <= 16, "Prefix is %s characters long! It must be at most 16.",
                 legacyPrefix.length());
-        boolean update = !this.legacyPrefix.equals(legacyPrefix);
+        final boolean update = !this.legacyPrefix.equals(legacyPrefix);
         this.legacyPrefix = legacyPrefix;
         this.prefix = prefix;
         if (update) {
@@ -183,10 +194,10 @@ public class LanternTeam implements Team {
 
     @Override
     public void setSuffix(Text suffix) throws IllegalArgumentException {
-        String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
+        final String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
         checkArgument(legacySuffix.length() <= 16, "Suffix is %s characters long! It must be at most 16.",
                 legacySuffix.length());
-        boolean update = !this.legacySuffix.equals(legacySuffix);
+        final boolean update = !this.legacySuffix.equals(legacySuffix);
         this.legacySuffix = legacySuffix;
         this.suffix = suffix;
         if (update) {
@@ -201,7 +212,7 @@ public class LanternTeam implements Team {
 
     @Override
     public void setAllowFriendlyFire(boolean enabled) {
-        boolean update = enabled != this.allowFriendlyFire;
+        final boolean update = enabled != this.allowFriendlyFire;
         this.allowFriendlyFire = enabled;
         if (update) {
             this.sendUpdate();
@@ -215,7 +226,7 @@ public class LanternTeam implements Team {
 
     @Override
     public void setCanSeeFriendlyInvisibles(boolean enabled) {
-        boolean update = enabled != this.canSeeFriendlyInvisibles;
+        final boolean update = enabled != this.canSeeFriendlyInvisibles;
         this.canSeeFriendlyInvisibles = enabled;
         if (update) {
             this.sendUpdate();
@@ -229,7 +240,7 @@ public class LanternTeam implements Team {
 
     @Override
     public void setNameTagVisibility(Visibility visibility) {
-        boolean update = !checkNotNull(visibility, "visibility").equals(this.nameTagVisibility);
+        final boolean update = !checkNotNull(visibility, "visibility").equals(this.nameTagVisibility);
         this.nameTagVisibility = visibility;
         if (update) {
             this.sendUpdate();
@@ -243,7 +254,7 @@ public class LanternTeam implements Team {
 
     @Override
     public void setDeathMessageVisibility(Visibility visibility) {
-        boolean update = !checkNotNull(visibility, "visibility").equals(this.deathMessageVisibility);
+        final boolean update = !checkNotNull(visibility, "visibility").equals(this.deathMessageVisibility);
         this.deathMessageVisibility = visibility;
         if (update) {
             this.sendUpdate();

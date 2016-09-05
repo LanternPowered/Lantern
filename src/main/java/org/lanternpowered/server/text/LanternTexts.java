@@ -30,6 +30,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 
 public class LanternTexts {
 
+    @SuppressWarnings("deprecation")
     public static String toLegacy(Text text) {
         return TextSerializers.LEGACY_FORMATTING_CODE.serialize(text);
     }
@@ -38,6 +39,7 @@ public class LanternTexts {
         return TextSerializers.PLAIN.serialize(text);
     }
 
+    @SuppressWarnings("deprecation")
     public static Text fromLegacy(String text) {
         return TextSerializers.LEGACY_FORMATTING_CODE.deserialize(text);
     }

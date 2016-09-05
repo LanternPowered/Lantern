@@ -26,7 +26,7 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.scoreboard.LanternCollisionRule;
+import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.Visibility;
 import org.spongepowered.api.text.format.TextColor;
 
@@ -56,7 +56,7 @@ public abstract class MessagePlayOutTeams implements Message {
         private final List<String> players;
 
         public Create(String teamName, String displayName, String prefix, String suffix, Visibility nameTagVisibility,
-                LanternCollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles,
+                CollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles,
                 List<String> players) {
             super(teamName, displayName, prefix, suffix, nameTagVisibility, collisionRule, color, friendlyFire, seeFriendlyInvisibles);
             this.players = players;
@@ -71,7 +71,7 @@ public abstract class MessagePlayOutTeams implements Message {
     public static final class Update extends CreateOrUpdate {
 
         public Update(String teamName, String displayName, String prefix, String suffix, Visibility nameTagVisibility,
-                LanternCollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles) {
+                CollisionRule collisionRule,  TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles) {
             super(teamName, displayName, prefix, suffix, nameTagVisibility, collisionRule, color, friendlyFire, seeFriendlyInvisibles);
         }
     }
@@ -82,13 +82,13 @@ public abstract class MessagePlayOutTeams implements Message {
         private final String prefix;
         private final String suffix;
         private final Visibility nameTagVisibility;
-        private final LanternCollisionRule collisionRule;
+        private final CollisionRule collisionRule;
         private final TextColor color;
         private final boolean friendlyFire;
         private final boolean seeFriendlyInvisibles;
 
         CreateOrUpdate(String teamName, String displayName, String prefix, String suffix, Visibility nameTagVisibility,
-                LanternCollisionRule collisionRule, TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles) {
+                CollisionRule collisionRule, TextColor color, boolean friendlyFire, boolean seeFriendlyInvisibles) {
             super(teamName);
             this.displayName = displayName;
             this.prefix = prefix;
@@ -116,7 +116,7 @@ public abstract class MessagePlayOutTeams implements Message {
             return this.nameTagVisibility;
         }
 
-        public LanternCollisionRule getCollisionRule() {
+        public CollisionRule getCollisionRule() {
             return this.collisionRule;
         }
 

@@ -53,7 +53,7 @@ public class LanternByteBuffer implements ByteBuffer {
     @Nullable
     private LanternByteBuffer opposite;
 
-    public LanternByteBuffer(ByteBuf buf) {
+    LanternByteBuffer(ByteBuf buf) {
         this.buf = buf;
     }
 
@@ -71,6 +71,9 @@ public class LanternByteBuffer implements ByteBuffer {
         return this.buf.readableBytes();
     }
 
+    // TODO: Deprecate in the api
+    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
     public LanternByteBuffer order(ByteOrder order) {
         if (this.buf.order().equals(order)) {
@@ -84,6 +87,8 @@ public class LanternByteBuffer implements ByteBuffer {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
     public ByteOrder getByteOrder() {
         return this.buf.order();

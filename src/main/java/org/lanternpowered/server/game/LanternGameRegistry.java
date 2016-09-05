@@ -84,6 +84,7 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBui
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
 import org.lanternpowered.server.game.registry.EarlyRegistration;
+import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.factory.ResourcePackFactoryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeOperationRegistryModule;
 import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryModule;
@@ -96,7 +97,6 @@ import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModu
 import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
-import org.lanternpowered.server.game.registry.EnumValueRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
@@ -140,7 +140,6 @@ import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryMod
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
-import org.lanternpowered.server.scoreboard.LanternCollisionRule;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
 import org.lanternpowered.server.scoreboard.LanternScoreboardBuilder;
 import org.lanternpowered.server.scoreboard.LanternTeamBuilder;
@@ -259,6 +258,7 @@ import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePackFactory;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.scoreboard.CollisionRule;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.Visibility;
@@ -329,7 +329,7 @@ public class LanternGameRegistry implements GameRegistry {
     private final Map<Class<? extends CatalogType>, CatalogRegistryModule<?>> catalogRegistryMap = Maps.newIdentityHashMap();
     private final Map<Class<? extends RegistryModule>, RegistryModule> classMap = Maps.newIdentityHashMap();
     private final Map<Class<?>, Supplier<?>> builderSupplierMap = Maps.newIdentityHashMap();
-    private List<Class<? extends RegistryModule>> orderedModules = new ArrayList<>();
+    private final List<Class<? extends RegistryModule>> orderedModules = new ArrayList<>();
     private final Set<RegistryModule> registryModules = new HashSet<>();
 
     // The phase of the registrations, this starts at null to define the early state.
@@ -387,7 +387,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(GameMode.class, GameModeRegistryModule.getInstance())
                 .registerModule(EquipmentType.class, new EquipmentTypeRegistryModule())
                 .registerModule(ItemType.class, ItemRegistryModule.get())
-                .registerModule(LanternCollisionRule.class, new CollisionRuleRegistryModule()) // TODO: Use the api class once available
+                .registerModule(CollisionRule.class, new CollisionRuleRegistryModule())
                 .registerModule(Criterion.class, new CriterionRegistryModule())
                 .registerModule(DisplaySlot.class, new DisplaySlotRegistryModule())
                 .registerModule(ObjectiveDisplayMode.class, new ObjectiveDisplayModeRegistryModule())

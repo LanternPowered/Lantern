@@ -28,19 +28,19 @@ package org.lanternpowered.server.data.io;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
-import org.lanternpowered.server.scoreboard.LanternCollisionRule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 import org.lanternpowered.server.scoreboard.LanternObjective;
 import org.lanternpowered.server.scoreboard.LanternScore;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.scoreboard.LanternTeam;
-import org.lanternpowered.server.scoreboard.LanternTeamBuilder;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.scoreboard.CollisionRule;
+import org.spongepowered.api.scoreboard.CollisionRules;
 import org.spongepowered.api.scoreboard.Score;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.scoreboard.Team;
@@ -177,24 +177,23 @@ public class ScoreboardIO {
                     .prefix(LanternTexts.fromLegacy(entry.getString(PREFIX).get()))
                     .suffix(LanternTexts.fromLegacy(entry.getString(SUFFIX).get()))
                     .members(entry.getStringList(MEMBERS).get().stream().map(LanternTexts::fromLegacy).collect(Collectors.toSet()));
-            entry.getString(NAME_TAG_VISIBILITY).ifPresent(value -> builder.nameTagVisibility(Sponge.getRegistry().getType(
-                    Visibility.class, value).orElseGet(() -> {
+            entry.getString(NAME_TAG_VISIBILITY).ifPresent(value -> builder.nameTagVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
+                    .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
                 Lantern.getLogger().warn("Unable to find a name tag visibility with id: {}, default to always.",
                         entry.getString(NAME_TAG_VISIBILITY).get());
-                return Visibilities.ALL;
+                return Visibilities.ALWAYS;
             })));
-            entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent(value -> builder.deathTextVisibility(Sponge.getRegistry().getType(
-                    Visibility.class, value).orElseGet(() -> {
+            entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent(value -> builder.deathTextVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
+                    .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
                 Lantern.getLogger().warn("Unable to find a death message visibility with id: {}, default to always.",
                         entry.getString(DEATH_MESSAGE_VISIBILITY).get());
-                return Visibilities.ALL;
+                return Visibilities.ALWAYS;
             })));
-            // TODO: Use the api class once available
-            entry.getString(COLLISION_RULE).ifPresent(value -> ((LanternTeamBuilder) builder).collisionRule(Sponge.getRegistry().getType(
-                    LanternCollisionRule.class, value).orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a collision rule with id: {}, default to always.",
+            entry.getString(COLLISION_RULE).ifPresent(value -> builder.collisionRule(Sponge.getRegistry().getAllOf(CollisionRule.class)
+                    .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
+                Lantern.getLogger().warn("Unable to find a collision rule with id: {}, default to never.",
                         entry.getString(COLLISION_RULE).get());
-                return Sponge.getRegistry().getType(LanternCollisionRule.class, "always").get();
+                return CollisionRules.NEVER;
             })));
             entry.getString(TEAM_COLOR).ifPresent(color -> {
                 TextColor textColor = Sponge.getRegistry().getType(TextColor.class, color).orElseGet(() -> {
@@ -276,11 +275,11 @@ public class ScoreboardIO {
             DataView container = new MemoryDataContainer()
                     .set(ALLOW_FRIENDLY_FIRE, (byte) (team.allowFriendlyFire() ? 1 : 0))
                     .set(CAN_SEE_FRIENDLY_INVISIBLES, (byte) (team.canSeeFriendlyInvisibles() ? 1 : 0))
-                    .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getId())
+                    .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getName())
                     .set(NAME, team.getName())
                     .set(DISPLAY_NAME, ((LanternTeam) team).getLegacyDisplayName())
-                    .set(DEATH_MESSAGE_VISIBILITY, team.getDeathMessageVisibility().getId())
-                    .set(COLLISION_RULE, ((LanternTeam) team).getCollisionRule().getId())
+                    .set(DEATH_MESSAGE_VISIBILITY, team.getDeathMessageVisibility().getName())
+                    .set(COLLISION_RULE, team.getCollisionRule().getName())
                     .set(PREFIX, ((LanternTeam) team).getLegacyPrefix())
                     .set(SUFFIX, ((LanternTeam) team).getLegacySuffix());
             TextColor teamColor = team.getColor();

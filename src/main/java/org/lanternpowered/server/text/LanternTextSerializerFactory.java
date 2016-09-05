@@ -35,6 +35,7 @@ public final class LanternTextSerializerFactory implements TextSerializerFactory
     private final LoadingCache<Character, FormattingCodeTextSerializer> cache =
             Caffeine.newBuilder().maximumSize(53).build(FormattingCodeTextSerializer::new);
 
+    @SuppressWarnings("deprecation")
     @Override
     public org.spongepowered.api.text.serializer.FormattingCodeTextSerializer getFormattingCodeTextSerializer(char formattingChar) {
         if (formattingChar == TextSerializers.LEGACY_FORMATTING_CODE.getCharacter()) {

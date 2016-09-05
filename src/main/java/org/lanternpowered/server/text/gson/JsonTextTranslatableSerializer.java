@@ -110,6 +110,7 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
         return builder.build();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public JsonElement serialize(TranslatableText src, Type typeOfSrc, JsonSerializationContext context) {
         final Translation translation = src.getTranslation();
@@ -119,15 +120,12 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
             final Locale locale = currentLocale.get();
             for (int i = 0; i < rawArguments.length; i++) {
                 Object object = rawArguments[i];
-                if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
-                    if (object instanceof Text) {
-                        // Ignore
-                    } else if (object instanceof Text.Builder) {
-                        object = ((Text.Builder) object).build();
-                    } else {
+                if (object instanceof TextRepresentable) {
+                    if (!(object instanceof Text)) {
                         object = ((TextRepresentable) object).toText();
                     }
-                    rawArguments[i] = ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE).serialize((Text) object, locale);
+                    rawArguments[i] = ((LanternTextSerializer) TextSerializers.LEGACY_FORMATTING_CODE)
+                            .serialize((Text) object, locale);
                 } else {
                     rawArguments[i] = object.toString();
                 }
@@ -143,12 +141,8 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
             for (Object object : arguments) {
                 // Only primitive strings and text json is allowed,
                 // so we need to convert the objects if possible
-                if (object instanceof Text || object instanceof Text.Builder || object instanceof TextRepresentable) {
-                    if (object instanceof Text) {
-                        // Ignore
-                    } else if (object instanceof Text.Builder) {
-                        object = ((Text.Builder) object).build();
-                    } else {
+                if (object instanceof TextRepresentable) {
+                    if (!(object instanceof Text)) {
                         object = ((TextRepresentable) object).toText();
                     }
                     argumentsArray.add(context.serialize(object, Text.class));

@@ -109,7 +109,7 @@ public enum LanternLogAxis implements LogAxis, SimpleCatalogType, InternalCatalo
      * @return the log axis
      */
     public static LanternLogAxis fromDirection(Direction direction) {
-        return fromAxis(Axis.getClosest(direction.toVector3d()));
+        return fromAxis(Axis.getClosest(direction.asOffset()));
     }
 
 }

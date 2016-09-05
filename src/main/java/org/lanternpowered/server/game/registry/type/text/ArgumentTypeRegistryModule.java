@@ -50,6 +50,7 @@ public final class ArgumentTypeRegistryModule implements RegistryModule {
 
     @Override
     public void registerDefaults() {
+        @SuppressWarnings("deprecation")
         final LanternSelectorFactory factory = Lantern.getGame().getRegistry().getSelectorFactory();
 
         // POSITION
@@ -107,5 +108,4 @@ public final class ArgumentTypeRegistryModule implements RegistryModule {
         // ENTITY_TYPE
         this.argumentTypeMap.put("entity_type", factory.createInvertibleArgumentType("type", EntityType.class));
     }
-
 }

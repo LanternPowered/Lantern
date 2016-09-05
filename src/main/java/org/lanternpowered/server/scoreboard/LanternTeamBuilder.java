@@ -30,7 +30,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import org.lanternpowered.server.text.LanternTexts;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.scoreboard.CollisionRule;
+import org.spongepowered.api.scoreboard.CollisionRules;
 import org.spongepowered.api.scoreboard.Team;
 import org.spongepowered.api.scoreboard.Visibilities;
 import org.spongepowered.api.scoreboard.Visibility;
@@ -52,7 +53,7 @@ public class LanternTeamBuilder implements Team.Builder {
     private boolean showFriendlyInvisibles;
     private Visibility nameTagVisibility;
     private Visibility deathMessageVisibility;
-    private LanternCollisionRule collisionRule;
+    private CollisionRule collisionRule;
     private Set<Text> members;
 
     public LanternTeamBuilder() {
@@ -85,7 +86,7 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Override
     public LanternTeamBuilder displayName(Text displayName) throws IllegalArgumentException {
-        String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
+        final String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
         checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
                 legacyDisplayName.length());
         this.displayName = checkNotNull(displayName, "displayName");
@@ -94,7 +95,7 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Override
     public LanternTeamBuilder prefix(Text prefix) {
-        String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
+        final String legacyPrefix = LanternTexts.toLegacy(checkNotNull(prefix, "prefix"));
         checkArgument(legacyPrefix.length() <= 16, "Prefix is %s characters long! It must be at most 16.",
                 legacyPrefix.length());
         this.prefix = checkNotNull(prefix, "prefix");
@@ -103,7 +104,7 @@ public class LanternTeamBuilder implements Team.Builder {
 
     @Override
     public LanternTeamBuilder suffix(Text suffix) {
-        String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
+        final String legacySuffix = LanternTexts.toLegacy(checkNotNull(suffix, "suffix"));
         checkArgument(legacySuffix.length() <= 16, "Suffix is %s characters long! It must be at most 16.",
                 legacySuffix.length());
         this.suffix = checkNotNull(suffix, "suffix");
@@ -131,6 +132,12 @@ public class LanternTeamBuilder implements Team.Builder {
     @Override
     public LanternTeamBuilder deathTextVisibility(Visibility visibility) {
         this.deathMessageVisibility = checkNotNull(visibility, "visibility");
+        return this;
+    }
+
+    @Override
+    public Team.Builder collisionRule(CollisionRule rule) {
+        this.collisionRule = checkNotNull(rule, "rule");
         return this;
     }
 
@@ -164,10 +171,9 @@ public class LanternTeamBuilder implements Team.Builder {
         this.suffix = Text.of();
         this.allowFriendlyFire = false;
         this.showFriendlyInvisibles = false;
-        this.nameTagVisibility = Visibilities.ALL;
-        this.deathMessageVisibility = Visibilities.ALL;
-        // TODO: Use the static field once the api class is available
-        this.collisionRule = Sponge.getRegistry().getType(LanternCollisionRule.class, "always").get();
+        this.nameTagVisibility = Visibilities.ALWAYS;
+        this.deathMessageVisibility = Visibilities.ALWAYS;
+        this.collisionRule = CollisionRules.NEVER;
         this.members = new HashSet<>();
         return this;
     }
@@ -177,7 +183,7 @@ public class LanternTeamBuilder implements Team.Builder {
         checkState(this.name != null, "name is not set");
         checkState(this.displayName != null, "displayName is not set");
 
-        LanternTeam team = new LanternTeam(this.name, this.color, this.displayName, this.prefix, this.suffix,
+        final LanternTeam team = new LanternTeam(this.name, this.color, this.displayName, this.prefix, this.suffix,
                 this.allowFriendlyFire, this.showFriendlyInvisibles, this.nameTagVisibility, this.deathMessageVisibility,
                 this.collisionRule);
         this.members.forEach(team::addMember);

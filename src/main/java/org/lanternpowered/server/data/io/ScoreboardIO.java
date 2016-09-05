@@ -179,20 +179,17 @@ public class ScoreboardIO {
                     .members(entry.getStringList(MEMBERS).get().stream().map(LanternTexts::fromLegacy).collect(Collectors.toSet()));
             entry.getString(NAME_TAG_VISIBILITY).ifPresent(value -> builder.nameTagVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
                     .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a name tag visibility with id: {}, default to always.",
-                        entry.getString(NAME_TAG_VISIBILITY).get());
+                Lantern.getLogger().warn("Unable to find a name tag visibility with id: {}, default to always.", value);
                 return Visibilities.ALWAYS;
             })));
             entry.getString(DEATH_MESSAGE_VISIBILITY).ifPresent(value -> builder.deathTextVisibility(Sponge.getRegistry().getAllOf(Visibility.class)
                     .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a death message visibility with id: {}, default to always.",
-                        entry.getString(DEATH_MESSAGE_VISIBILITY).get());
+                Lantern.getLogger().warn("Unable to find a death message visibility with id: {}, default to always.", value);
                 return Visibilities.ALWAYS;
             })));
             entry.getString(COLLISION_RULE).ifPresent(value -> builder.collisionRule(Sponge.getRegistry().getAllOf(CollisionRule.class)
                     .stream().filter(visibility -> visibility.getName().equals(value)).findFirst().orElseGet(() -> {
-                Lantern.getLogger().warn("Unable to find a collision rule with id: {}, default to never.",
-                        entry.getString(COLLISION_RULE).get());
+                Lantern.getLogger().warn("Unable to find a collision rule with id: {}, default to never.", value);
                 return CollisionRules.NEVER;
             })));
             entry.getString(TEAM_COLOR).ifPresent(color -> {

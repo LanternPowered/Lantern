@@ -938,7 +938,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                     if (oldType == 0) {
                         section.nonAirCount++;
                     }
-                } else if (oldType != 0) {
+                } else {
                     section.nonAirCount--;
                 }
             }

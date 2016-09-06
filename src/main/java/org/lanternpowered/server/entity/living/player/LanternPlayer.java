@@ -167,9 +167,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     // The loading ticket that will force the chunks to be loaded
     @Nullable private ChunkTicketManager.PlayerEntityLoadingTicket loadingTicket;
 
-    // All the resource packs that are send to the client
-    // and are waiting for a response
-    private final List<ResourcePack> pendingResourcePacksForStatus = new ArrayList<>();
+    private final ResourcePackSendQueue resourcePackSendQueue = new ResourcePackSendQueue(this);
 
     /**
      * The inventory of the {@link Player}.
@@ -764,24 +762,13 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         return this.session;
     }
 
-    public Optional<ResourcePack> pollPendingResourcePackForStatus() {
-        synchronized (this.pendingResourcePacksForStatus) {
-            if (this.pendingResourcePacksForStatus.isEmpty()) {
-                return Optional.empty();
-            }
-            return Optional.of(this.pendingResourcePacksForStatus.remove(0));
-        }
+    public ResourcePackSendQueue getResourcePackSendQueue() {
+        return this.resourcePackSendQueue;
     }
 
     @Override
     public void sendResourcePack(ResourcePack resourcePack) {
-        checkNotNull(resourcePack, "resourcePack");
-        final String hash = resourcePack.getHash().orElse(resourcePack.getId());
-        final String location = resourcePack.getUri().toString();
-        this.session.send(new MessagePlayOutSendResourcePack(location, hash));
-        synchronized (this.pendingResourcePacksForStatus) {
-            this.pendingResourcePacksForStatus.add(resourcePack);
-        }
+        this.resourcePackSendQueue.offer(resourcePack);
     }
 
     @Override

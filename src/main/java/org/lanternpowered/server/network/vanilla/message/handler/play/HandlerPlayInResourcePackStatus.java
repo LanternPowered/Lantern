@@ -41,8 +41,8 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
 
     @Override
     public void handle(NetworkContext context, MessagePlayInResourcePackStatus message) {
-        Optional<ResourcePack> resourcePack = context.getSession().getPlayer().pollPendingResourcePackForStatus();
-        LanternPlayer player = context.getSession().getPlayer();
+        final Optional<ResourcePack> resourcePack = context.getSession().getPlayer().getResourcePackSendQueue().poll();
+        final LanternPlayer player = context.getSession().getPlayer();
         if (!resourcePack.isPresent()) {
             Lantern.getLogger().warn("{} received a unexpected resource pack status message, no resource pack was pending",
                     player.getName());

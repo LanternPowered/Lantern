@@ -97,9 +97,16 @@ import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModu
 import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.HorseStyleRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
@@ -165,6 +172,7 @@ import org.spongepowered.api.data.type.BigMushroomType;
 import org.spongepowered.api.data.type.BigMushroomTypes;
 import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.BrickTypes;
+import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.ComparatorType;
 import org.spongepowered.api.data.type.ComparatorTypes;
 import org.spongepowered.api.data.type.DirtType;
@@ -176,9 +184,13 @@ import org.spongepowered.api.data.type.DoublePlantTypes;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.Hinges;
+import org.spongepowered.api.data.type.HorseColor;
+import org.spongepowered.api.data.type.HorseStyle;
+import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.data.type.LogAxes;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
+import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.PistonType;
 import org.spongepowered.api.data.type.PistonTypes;
 import org.spongepowered.api.data.type.PlantType;
@@ -187,8 +199,10 @@ import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.data.type.PrismarineType;
 import org.spongepowered.api.data.type.PrismarineTypes;
+import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.data.type.QuartzTypes;
+import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.data.type.SandTypes;
 import org.spongepowered.api.data.type.SandstoneType;
@@ -361,11 +375,18 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DisguisedBlockType.class, new EnumValueRegistryModule<>(LanternDisguisedBlockType.class, DisguisedBlockTypes.class))
                 .registerModule(LanternDoorHalf.class, new EnumValueRegistryModule<>(LanternDoorHalf.class, null))
                 .registerModule(DoublePlantType.class, new EnumValueRegistryModule<>(LanternDoublePlantType.class, DoublePlantTypes.class))
+                .registerModule(Career.class, new CareerRegistryModule())
                 .registerModule(HandType.class, new HandTypeRegistryModule())
+                .registerModule(HorseColor.class, new HorseColorRegistryModule())
+                .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
+                .registerModule(InstrumentType.class, new InstrumentTypeRegistryModule())
                 .registerModule(Hinge.class, new EnumValueRegistryModule<>(LanternHinge.class, Hinges.class))
                 .registerModule(new KeyRegistryModule())
                 .registerModule(LogAxis.class, new EnumValueRegistryModule<>(LanternLogAxis.class, LogAxes.class))
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
+                .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
+                .registerModule(Profession.class, new ProfessionRegistryModule())
+                .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
                 .registerModule(PistonType.class, new EnumValueRegistryModule<>(LanternPistonType.class, PistonTypes.class))
                 .registerModule(PlantType.class, new EnumValueRegistryModule<>(LanternPlantType.class, PlantTypes.class))
                 .registerModule(PortionType.class, new EnumValueRegistryModule<>(LanternPortionType.class, PortionTypes.class))

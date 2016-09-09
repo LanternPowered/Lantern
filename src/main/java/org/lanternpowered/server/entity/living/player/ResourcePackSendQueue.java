@@ -62,6 +62,8 @@ public final class ResourcePackSendQueue {
             final ResourcePack resourcePack = this.waitingForResponse;
             if (!this.queue.isEmpty()) {
                 this.send(this.queue.remove(0));
+            } else {
+                this.waitingForResponse = null;
             }
             return Optional.ofNullable(resourcePack);
         }

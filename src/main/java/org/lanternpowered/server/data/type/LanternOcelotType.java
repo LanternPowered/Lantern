@@ -28,17 +28,13 @@ package org.lanternpowered.server.data.type;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.type.OcelotType;
 
-public class LanternOcelotType extends PluginCatalogType.Base implements OcelotType {
-
-    private final int internalId;
+public class LanternOcelotType extends PluginCatalogType.Base.Internal implements OcelotType {
 
     public LanternOcelotType(String pluginId, String name, int internalId) {
-        super(pluginId, name);
-        this.internalId = internalId;
+        super(pluginId, name, internalId);
     }
 
     public LanternOcelotType(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name);
-        this.internalId = internalId;
+        super(pluginId, id, name, internalId);
     }
 }

@@ -25,31 +25,12 @@
  */
 package org.lanternpowered.server.economy;
 
-import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
-
-import javax.annotation.Nullable;
 
 public class LanternTransactionType extends PluginCatalogType.Base implements TransactionType {
 
     public LanternTransactionType(String pluginId, String name) {
         super(pluginId, name);
-    }
-
-    @Override
-    public boolean equals(@Nullable Object other) {
-        if (other == null || !(other instanceof TransactionType)) {
-            return false;
-        }
-        return ((TransactionType) other).getId().equals(this.getId());
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", this.getId())
-                .toString();
     }
 }

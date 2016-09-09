@@ -34,20 +34,17 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-public class LanternProfession extends PluginCatalogType.Base implements Profession {
+public class LanternProfession extends PluginCatalogType.Base.Internal implements Profession {
 
-    private final int internalId;
     private final Set<Career> careers = new HashSet<>();
     private final Set<Career> unmodifiableCareers = Collections.unmodifiableSet(this.careers);
 
     public LanternProfession(String pluginId, String name, int internalId) {
-        super(pluginId, name);
-        this.internalId = internalId;
+        super(pluginId, name, internalId);
     }
 
     public LanternProfession(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name);
-        this.internalId = internalId;
+        super(pluginId, id, name, internalId);
     }
 
     void addCareer(Career career) {
@@ -57,9 +54,5 @@ public class LanternProfession extends PluginCatalogType.Base implements Profess
     @Override
     public Collection<Career> getCareers() {
         return this.unmodifiableCareers;
-    }
-
-    public int getInternalId() {
-        return this.internalId;
     }
 }

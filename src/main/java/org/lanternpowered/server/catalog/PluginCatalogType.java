@@ -28,6 +28,7 @@ package org.lanternpowered.server.catalog;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.translation.Translation;
@@ -52,7 +53,7 @@ public interface PluginCatalogType extends CatalogType {
      */
     String getPluginId();
 
-    abstract class Base implements PluginCatalogType {
+    abstract class Base extends AbstractCatalogType implements PluginCatalogType {
 
         private final String id;
         private final String pluginId;
@@ -108,6 +109,66 @@ public interface PluginCatalogType extends CatalogType {
             @Override
             public Translation getTranslation() {
                 return this.translation;
+            }
+
+            public static abstract class Internal extends Translatable implements InternalCatalogType {
+
+                private final int internalId;
+
+                public Internal(String pluginId, String name, String translation, int internalId) {
+                    super(pluginId, name, translation);
+                    this.internalId = internalId;
+                }
+
+                public Internal(String pluginId, String name, Translation translation, int internalId) {
+                    super(pluginId, name, translation);
+                    this.internalId = internalId;
+                }
+
+                public Internal(String pluginId, String id, String name, String translation, int internalId) {
+                    super(pluginId, id, name, translation);
+                    this.internalId = internalId;
+                }
+
+                public Internal(String pluginId, String id, String name, Translation translation, int internalId) {
+                    super(pluginId, id, name, translation);
+                    this.internalId = internalId;
+                }
+
+                @Override
+                public int getInternalId() {
+                    return this.internalId;
+                }
+
+                @Override
+                protected MoreObjects.ToStringHelper toStringHelper() {
+                    return super.toStringHelper().add("internalId", this.internalId);
+                }
+            }
+        }
+
+        public static abstract class Internal extends Base implements InternalCatalogType {
+
+            private final int internalId;
+
+            public Internal(String pluginId, String name, int internalId) {
+                super(pluginId, name);
+                this.internalId = internalId;
+            }
+
+            public Internal(String pluginId, String id, String name, int internalId) {
+                super(pluginId, id, name);
+                this.internalId = internalId;
+            }
+
+            @Override
+            public int getInternalId() {
+                return this.internalId;
+            }
+
+            @Override
+            protected MoreObjects.ToStringHelper toStringHelper() {
+                return super.toStringHelper().add("internalId", this.internalId);
             }
         }
     }

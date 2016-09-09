@@ -23,18 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.data.type.HorseStyle;
+import org.lanternpowered.server.data.type.LanternToolType;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.spongepowered.api.data.type.ToolType;
+import org.spongepowered.api.data.type.ToolTypes;
 
-public class LanternHorseStyle extends PluginCatalogType.Base.Internal implements HorseStyle {
+public final class ToolTypeRegistryModule extends PluginCatalogRegistryModule<ToolType> {
 
-    public LanternHorseStyle(String pluginId, String name, int internalId) {
-        super(pluginId, name, internalId);
+    public ToolTypeRegistryModule() {
+        super(ToolTypes.class);
     }
 
-    public LanternHorseStyle(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, internalId);
+    @Override
+    public void registerDefaults() {
+        this.register(new LanternToolType("minecraft", "diamond"));
+        this.register(new LanternToolType("minecraft", "gold"));
+        this.register(new LanternToolType("minecraft", "iron"));
+        this.register(new LanternToolType("minecraft", "stone"));
+        this.register(new LanternToolType("minecraft", "wood"));
     }
 }

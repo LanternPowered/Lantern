@@ -26,15 +26,15 @@
 package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.data.type.HorseStyle;
+import org.spongepowered.api.data.type.ToolType;
 
-public class LanternHorseStyle extends PluginCatalogType.Base.Internal implements HorseStyle {
+public class LanternToolType extends PluginCatalogType.Base implements ToolType {
 
-    public LanternHorseStyle(String pluginId, String name, int internalId) {
-        super(pluginId, name, internalId);
+    public LanternToolType(String pluginId, String name) {
+        super(pluginId, name);
     }
 
-    public LanternHorseStyle(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, internalId);
+    public LanternToolType(String pluginId, String id, String name) {
+        super(pluginId, id, name);
     }
 }

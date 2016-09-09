@@ -97,6 +97,7 @@ import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModu
 import org.lanternpowered.server.game.registry.type.cause.DismountTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.ArtRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
@@ -108,6 +109,7 @@ import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
@@ -168,6 +170,7 @@ import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.ServerBossBar;
 import org.spongepowered.api.data.persistence.DataFormat;
+import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.BigMushroomType;
 import org.spongepowered.api.data.type.BigMushroomTypes;
 import org.spongepowered.api.data.type.BrickType;
@@ -214,6 +217,7 @@ import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.SlabTypes;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.StoneTypes;
+import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.TreeTypes;
 import org.spongepowered.api.data.type.WallType;
@@ -375,6 +379,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DisguisedBlockType.class, new EnumValueRegistryModule<>(LanternDisguisedBlockType.class, DisguisedBlockTypes.class))
                 .registerModule(LanternDoorHalf.class, new EnumValueRegistryModule<>(LanternDoorHalf.class, null))
                 .registerModule(DoublePlantType.class, new EnumValueRegistryModule<>(LanternDoublePlantType.class, DoublePlantTypes.class))
+                .registerModule(Art.class, new ArtRegistryModule())
                 .registerModule(Career.class, new CareerRegistryModule())
                 .registerModule(HandType.class, new HandTypeRegistryModule())
                 .registerModule(HorseColor.class, new HorseColorRegistryModule())
@@ -387,6 +392,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
                 .registerModule(Profession.class, new ProfessionRegistryModule())
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
+                .registerModule(ToolType.class, new ToolTypeRegistryModule())
                 .registerModule(PistonType.class, new EnumValueRegistryModule<>(LanternPistonType.class, PistonTypes.class))
                 .registerModule(PlantType.class, new EnumValueRegistryModule<>(LanternPlantType.class, PlantTypes.class))
                 .registerModule(PortionType.class, new EnumValueRegistryModule<>(LanternPortionType.class, PortionTypes.class))

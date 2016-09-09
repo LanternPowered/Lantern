@@ -23,18 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.catalog;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.data.type.HorseStyle;
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.CatalogType;
 
-public class LanternHorseStyle extends PluginCatalogType.Base.Internal implements HorseStyle {
+abstract class AbstractCatalogType implements CatalogType {
 
-    public LanternHorseStyle(String pluginId, String name, int internalId) {
-        super(pluginId, name, internalId);
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", this.getId())
+                .add("name", this.getName());
     }
 
-    public LanternHorseStyle(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, internalId);
+    @Override
+    public String toString() {
+        return this.toStringHelper().toString();
     }
 }

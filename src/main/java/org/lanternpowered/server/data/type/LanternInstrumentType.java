@@ -28,21 +28,13 @@ package org.lanternpowered.server.data.type;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.data.type.InstrumentType;
 
-public class LanternInstrumentType extends PluginCatalogType.Base implements InstrumentType {
-
-    private final int internalId;
+public class LanternInstrumentType extends PluginCatalogType.Base.Internal implements InstrumentType {
 
     public LanternInstrumentType(String pluginId, String name, int internalId) {
-        super(pluginId, name);
-        this.internalId = internalId;
+        super(pluginId, name, internalId);
     }
 
     public LanternInstrumentType(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name);
-        this.internalId = internalId;
-    }
-
-    public int getInternalId() {
-        return this.internalId;
+        super(pluginId, id, name, internalId);
     }
 }

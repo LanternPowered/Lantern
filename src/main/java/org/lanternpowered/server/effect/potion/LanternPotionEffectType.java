@@ -32,10 +32,9 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.text.translation.Translation;
 
-public class LanternPotionEffectType extends PluginCatalogType.Base.Translatable implements PotionEffectType {
+public class LanternPotionEffectType extends PluginCatalogType.Base.Translatable.Internal implements PotionEffectType {
 
     private final Translation potionTranslation;
-    private final int internalId;
 
     public LanternPotionEffectType(String pluginId, String id, int internalId, String translationKey) {
         this(pluginId, id, id, internalId, translationKey);
@@ -54,9 +53,8 @@ public class LanternPotionEffectType extends PluginCatalogType.Base.Translatable
 
     public LanternPotionEffectType(String pluginId, String id, String name, int internalId,
             Translation translation, Translation potionTranslation) {
-        super(pluginId, id, name, translation);
+        super(pluginId, id, name, translation, internalId);
         this.potionTranslation = checkNotNull(potionTranslation, "potionTranslation");
-        this.internalId = internalId;
     }
 
     @Override
@@ -67,9 +65,5 @@ public class LanternPotionEffectType extends PluginCatalogType.Base.Translatable
     @Override
     public Translation getPotionTranslation() {
         return this.potionTranslation;
-    }
-
-    public int getInternalId() {
-        return this.internalId;
     }
 }

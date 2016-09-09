@@ -25,16 +25,41 @@
  */
 package org.lanternpowered.server.data.type;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.data.type.HorseStyle;
+import org.spongepowered.api.data.type.Art;
 
-public class LanternHorseStyle extends PluginCatalogType.Base.Internal implements HorseStyle {
+public class LanternArt extends PluginCatalogType.Base implements Art {
 
-    public LanternHorseStyle(String pluginId, String name, int internalId) {
-        super(pluginId, name, internalId);
+    private final int width;
+    private final int height;
+
+    public LanternArt(String pluginId, String name, int width, int height) {
+        super(pluginId, name);
+        this.width = width;
+        this.height = height;
     }
 
-    public LanternHorseStyle(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, internalId);
+    public LanternArt(String pluginId, String id, String name, int width, int height) {
+        super(pluginId, id, name);
+        this.width = width;
+        this.height = height;
+    }
+
+    @Override
+    public int getHeight() {
+        return this.height;
+    }
+
+    @Override
+    public int getWidth() {
+        return this.width;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("width", this.width)
+                .add("height", this.height);
     }
 }

@@ -32,7 +32,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.translation.Translation;
 
-public abstract class CatalogTypeBase implements CatalogType {
+public abstract class CatalogTypeBase extends AbstractCatalogType implements CatalogType {
 
     protected final String identifier;
     protected final String name;

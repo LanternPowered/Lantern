@@ -40,7 +40,6 @@ public abstract class AbstractPluginContainer implements PluginContainer {
                 .add("name", this.getName())
                 .add("version", this.getVersion().orElse(null))
                 .add("description", this.getDescription().orElse(null))
-                .add("assets", this.getAssetDirectory().orElse(null))
                 .add("url", this.getUrl().orElse(null))
                 .add("authors", this.getAuthors().isEmpty() ? null : this.getAuthors())
                 .add("source", this.getSource().orElse(null));

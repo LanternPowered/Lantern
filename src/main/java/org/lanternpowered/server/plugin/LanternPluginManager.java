@@ -35,7 +35,6 @@ import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.plugin.meta.PluginMetadata;
-import org.spongepowered.plugin.meta.SpongeExtension;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -176,11 +175,9 @@ public final class LanternPluginManager implements PluginManager {
         final String version = firstNonNull(metadata.getVersion(), "unknown");
 
         try {
-            Class<?> pluginClass = Class.forName(candidate.getPluginClass());
-            SpongeExtension spongeExtension =  metadata.getExtension(PluginCandidate.SPONGE_META_EXTENSION);
-            String assetDir = spongeExtension == null ? null : spongeExtension.getAssetDirectory();
-            PluginContainer container = new LanternPluginContainer(id, pluginClass, metadata.getName(), metadata.getVersion(),
-                    metadata.getDescription(), metadata.getUrl(), assetDir, metadata.getAuthors(), candidate.getSource());
+            final Class<?> pluginClass = Class.forName(candidate.getPluginClass());
+            final PluginContainer container = new LanternPluginContainer(id, pluginClass, metadata.getName(), metadata.getVersion(),
+                    metadata.getDescription(), metadata.getUrl(), metadata.getAuthors(), candidate.getSource());
             this.registerPlugin(container);
             this.game.getEventManager().registerListeners(container, container.getInstance().get());
 

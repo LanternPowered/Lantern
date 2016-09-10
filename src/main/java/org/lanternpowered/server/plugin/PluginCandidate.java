@@ -48,8 +48,6 @@ import javax.annotation.Nullable;
 
 public final class PluginCandidate {
 
-    public static final String SPONGE_META_EXTENSION = "sponge";
-
     private final String id;
     private final String pluginClass;
     private final Optional<Path> source;

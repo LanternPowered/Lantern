@@ -72,7 +72,7 @@ public abstract class AbstractAssetRepository implements AssetRepository {
             pluginId += File.separator;
         }
         final String id = pluginId + ':' + name;
-        final Path path = pluginContainer.getAssetDirectory().orElse(Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId).resolve(name));
+        final Path path = Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId).resolve(name);
         return this.loadedAssets.computeIfAbsent(path, path1 -> {
             final URL url = this.getAssetURL(pluginContainer, path1);
             if (url == null) {

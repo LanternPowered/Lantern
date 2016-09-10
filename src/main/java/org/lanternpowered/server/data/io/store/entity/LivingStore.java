@@ -29,13 +29,21 @@ import org.lanternpowered.server.entity.LanternEntityLiving;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 
+import java.util.List;
+import java.util.Optional;
+
 public class LivingStore<T extends LanternEntityLiving> extends EntityStore<T> {
 
-    private static final DataQuery HEAD_ROTATION = DataQuery.of("HeadRotation"); // Lantern
+    protected static final DataQuery HEAD_ROTATION = DataQuery.of("HeadRotation"); // Lantern
 
     @Override
     public void deserialize(T entity, DataContainer dataContainer) {
-        entity.setHeadRotation(fromDoubleList(dataContainer.getDoubleList(HEAD_ROTATION).get()));
+        final Optional<List<Double>> optValues = dataContainer.getDoubleList(HEAD_ROTATION);
+        if (optValues.isPresent()) {
+            entity.setHeadRotation(fromDoubleList(optValues.get()));
+        } else {
+            entity.setHeadRotation(entity.getRotation());
+        }
         super.deserialize(entity, dataContainer);
     }
 

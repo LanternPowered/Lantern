@@ -25,13 +25,10 @@
  */
 package org.lanternpowered.server.world.gen;
 
-import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.world.gen.PopulatorType;
-
-import javax.annotation.Nullable;
 
 public final class LanternPopulatorType extends PluginCatalogType.Base.Translatable implements PopulatorType {
 
@@ -45,28 +42,5 @@ public final class LanternPopulatorType extends PluginCatalogType.Base.Translata
 
     public LanternPopulatorType(String pluginId, String name, Translation translation) {
         super(pluginId, name, translation);
-    }
-
-    @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == null || this.getClass() != obj.getClass()) {
-            return false;
-        }
-        final LanternPopulatorType other = (LanternPopulatorType) obj;
-        return this.getId().equals(other.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return this.getId().hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", this.getId())
-                .add("name", this.getName())
-                .add("pluginId", this.getPluginId())
-                .toString();
     }
 }

@@ -29,17 +29,9 @@ import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
-public final class LanternDifficulty extends PluginCatalogType.Base.Translatable implements Difficulty {
-
-    private final byte internalId;
+public final class LanternDifficulty extends PluginCatalogType.Base.Translatable.Internal implements Difficulty {
 
     public LanternDifficulty(String pluginId, String name, int internalId) {
-        super(pluginId, name, Lantern.getGame().getRegistry().getTranslationManager().get(
-                "options.difficulty." + name));
-        this.internalId = (byte) internalId;
-    }
-
-    public byte getInternalId() {
-        return this.internalId;
+        super(pluginId, name, Lantern.getGame().getRegistry().getTranslationManager().get("options.difficulty." + name), internalId);
     }
 }

@@ -85,11 +85,10 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     @Override
     public void deserialize(LanternPlayer player, DataContainer dataContainer) {
         super.deserialize(player, dataContainer);
-
-        int dimension = dataContainer.getInt(DIMENSION).orElse(0);
+        final int dimension = dataContainer.getInt(DIMENSION).orElse(0);
         Lantern.getWorldManager().getWorldProperties(dimension).ifPresent(worldProperties -> {
-            LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
-            Optional<LanternWorld> optWorld = worldProperties0.getWorld();
+            final LanternWorldProperties worldProperties0 = (LanternWorldProperties) worldProperties;
+            final Optional<LanternWorld> optWorld = worldProperties0.getWorld();
             if (optWorld.isPresent()) {
                 player.setRawWorld(optWorld.get());
             } else {
@@ -101,23 +100,23 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     @Override
     public void serialize(LanternPlayer entity, DataContainer dataContainer) {
         super.serialize(entity, dataContainer);
-
+        dataContainer.remove(HEAD_ROTATION);
         dataContainer.set(DIMENSION, Lantern.getWorldManager().getWorldDimensionId(entity.getWorld().getUniqueId()).orElse(0));
     }
 
     @Override
     public void serializeValues(LanternPlayer player, SimpleValueContainer valueContainer, DataContainer dataContainer) {
-        DataView abilities = dataContainer.createView(ABILITIES);
+        final DataView abilities = dataContainer.createView(ABILITIES);
         abilities.set(FLYING, (byte) (valueContainer.remove(Keys.IS_FLYING).orElse(false) ? 1 : 0));
         abilities.set(FLYING_SPEED, valueContainer.remove(Keys.FLYING_SPEED).orElse(0.1).floatValue());
         abilities.set(CAN_FLY, (byte) (valueContainer.remove(Keys.CAN_FLY).orElse(false) ? 1 : 0));
-        DataView spongeData = getOrCreateView(dataContainer, DataQueries.EXTENDED_SPONGE_DATA);
+        final DataView spongeData = getOrCreateView(dataContainer, DataQueries.EXTENDED_SPONGE_DATA);
         spongeData.set(FIRST_DATE_PLAYED, valueContainer.remove(Keys.FIRST_DATE_PLAYED).orElse(Instant.now()).toEpochMilli());
         spongeData.set(LAST_DATE_PLAYED, valueContainer.remove(Keys.LAST_DATE_PLAYED).orElse(Instant.now()).toEpochMilli());
         spongeData.set(UNIQUE_ID, player.getUniqueId().toString());
         spongeData.set(Queries.CONTENT_VERSION, 1);
-        Map<UUID, RespawnLocation> respawnLocations = valueContainer.remove(Keys.RESPAWN_LOCATIONS).get();
-        List<DataView> respawnLocationViews = new ArrayList<>();
+        final Map<UUID, RespawnLocation> respawnLocations = valueContainer.remove(Keys.RESPAWN_LOCATIONS).get();
+        final List<DataView> respawnLocationViews = new ArrayList<>();
         for (RespawnLocation respawnLocation : respawnLocations.values()) {
             Lantern.getWorldManager().getWorldDimensionId(respawnLocation.getWorldUniqueId()).ifPresent(dimensionId -> {
                 // Overworld respawn location is saved in the root container
@@ -135,7 +134,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     }
 
     private static DataView serializeRespawnLocationTo(DataView dataView, RespawnLocation respawnLocation) {
-        Vector3d position = respawnLocation.getPosition();
+        final Vector3d position = respawnLocation.getPosition();
         return dataView
                 .set(RESPAWN_LOCATIONS_X, position.getX())
                 .set(RESPAWN_LOCATIONS_Y, position.getY())

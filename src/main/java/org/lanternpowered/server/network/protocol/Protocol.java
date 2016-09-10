@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.message.MessageRegistry;
 
 public interface Protocol {
 
-    int CURRENT_VERSION = 304;
+    int CURRENT_VERSION = 305;
 
     /**
      * Gets the inbound message registry.

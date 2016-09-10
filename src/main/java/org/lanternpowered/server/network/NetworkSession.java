@@ -78,7 +78,6 @@ import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.serializer.TextSerializers;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.world.World;
 
@@ -797,13 +796,14 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 worldProperties = (LanternWorldProperties) Lantern.getServer().getDefaultWorld().get();
                 fixSpawnLocation = true;
             }
-            Optional<World> optWorld = Lantern.getWorldManager().loadWorld(worldProperties);
+            final Optional<World> optWorld = Lantern.getWorldManager().loadWorld(worldProperties);
             // Use the raw method to avoid triggering any network messages
             this.player.setRawWorld((LanternWorld) optWorld.get());
             this.player.setTempWorld(null);
             if (fixSpawnLocation) {
                 // TODO: Use a proper spawn position
                 this.player.setRawPosition(new Vector3d(0, 100, 0));
+                this.player.setRawRotation(new Vector3d(0, 0, 0));
             }
         }
 
@@ -820,9 +820,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             }
         }
         if (optBanEntry.isPresent()) {
-            BanEntry banEntry = optBanEntry.get();
-            Optional<Instant> optExpirationDate = banEntry.getExpirationDate();
-            Optional<Text> optReason = banEntry.getReason();
+            final BanEntry banEntry = optBanEntry.get();
+            final Optional<Instant> optExpirationDate = banEntry.getExpirationDate();
+            final Optional<Text> optReason = banEntry.getReason();
 
             // Generate the kick message
             Text.Builder builder = Text.builder();
@@ -848,12 +848,12 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             kickReason = Text.of("The server is full!");
         }
 
-        MessageEvent.MessageFormatter messageFormatter = new MessageEvent.MessageFormatter(
+        final MessageEvent.MessageFormatter messageFormatter = new MessageEvent.MessageFormatter(
                 kickReason != null ? kickReason : t("disconnect.notAllowedToJoin"));
 
-        Cause cause = Cause.source(this.player).build();
-        Transform<World> fromTransform = this.player.getTransform();
-        ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
+        final Cause cause = Cause.source(this.player).build();
+        final Transform<World> fromTransform = this.player.getTransform();
+        final ClientConnectionEvent.Login loginEvent = SpongeEventFactory.createClientConnectionEventLogin(cause,
                 fromTransform, fromTransform, this, messageFormatter, this.gameProfile, this.player, false);
 
         if (kickReason != null) {
@@ -867,15 +867,15 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         // Update the first join and last played data
-        Instant lastJoined = Instant.now();
+        final Instant lastJoined = Instant.now();
         this.player.offer(Keys.LAST_DATE_PLAYED, lastJoined);
         if (!this.player.get(Keys.FIRST_DATE_PLAYED).isPresent()) {
             this.player.offer(Keys.FIRST_DATE_PLAYED, lastJoined);
         }
 
-        Transform<World> toTransform = loginEvent.getToTransform();
+        final Transform<World> toTransform = loginEvent.getToTransform();
         world = (LanternWorld) toTransform.getExtent();
-        WorldConfig config = world.getProperties().getConfig();
+        final WorldConfig config = world.getProperties().getConfig();
 
         // Update the game mode if necessary
         if (config.isGameModeForced() || this.player.get(Keys.GAME_MODE).get().equals(GameModes.NOT_SET)) {
@@ -888,10 +888,10 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // network messages to be send
         this.player.setTransform(toTransform);
 
-        MessageChannel messageChannel = this.player.getMessageChannel();
-        Text joinMessage = t("multiplayer.player.joined", this.player.getName());
+        final MessageChannel messageChannel = this.player.getMessageChannel();
+        final Text joinMessage = t("multiplayer.player.joined", this.player.getName());
 
-        ClientConnectionEvent.Join joinEvent = SpongeEventFactory.createClientConnectionEventJoin(cause, messageChannel,
+        final ClientConnectionEvent.Join joinEvent = SpongeEventFactory.createClientConnectionEventJoin(cause, messageChannel,
                 Optional.of(messageChannel), new MessageEvent.MessageFormatter(joinMessage), this.player, false);
 
         Sponge.getEventManager().post(joinEvent);

@@ -112,6 +112,10 @@ public class LanternEntityLiving extends LanternEntity implements Living {
                 .build().asImmutable();
     }
 
+    protected void setRawHeadRotation(Vector3d rotation) {
+        this.headRotation = checkNotNull(rotation, "rotation");
+    }
+
     @Override
     public Vector3d getHeadRotation() {
         return this.headRotation;
@@ -119,7 +123,7 @@ public class LanternEntityLiving extends LanternEntity implements Living {
 
     @Override
     public void setHeadRotation(Vector3d rotation) {
-        this.headRotation = checkNotNull(rotation, "rotation");
+        this.setRawHeadRotation(rotation);
     }
 
     @Override

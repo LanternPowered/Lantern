@@ -61,15 +61,6 @@ public abstract class LanternGeneratorType extends PluginCatalogType.Base implem
     }
 
     @Override
-    public boolean equals(@Nullable Object obj) {
-        if (obj == null || this.getClass() != obj.getClass()) {
-            return false;
-        }
-        final LanternGeneratorType other = (LanternGeneratorType) obj;
-        return this.getId().equals(other.getId());
-    }
-
-    @Override
     public int hashCode() {
         return this.getId().hashCode();
     }

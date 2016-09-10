@@ -54,6 +54,7 @@ import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.PortalAgentTypes;
+import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.difficulty.Difficulties;
 
 import java.io.DataInputStream;
@@ -137,6 +138,7 @@ public final class LanternWorldPropertiesIO {
     private final static DataQuery KEEP_SPAWN_LOADED = DataQuery.of("keepSpawnLoaded");
     private final static DataQuery LOAD_ON_STARTUP = DataQuery.of("loadOnStartup");
     private final static DataQuery GENERATE_BONUS_CHEST = DataQuery.of("GenerateBonusChest");
+    private final static DataQuery SERIALIZATION_BEHAVIOR = DataQuery.of("serializationBehavior");
 
     // Extra generator options for the flat world generator type
     private final static DataQuery GENERATOR_OPTIONS_EXTRA = DataQuery.of("generatorOptionsExtra");
@@ -150,14 +152,14 @@ public final class LanternWorldPropertiesIO {
     }
 
     static LevelData read(Path directory, @Nullable String worldName, @Nullable UUID uniqueId) throws IOException {
-        DataView rootDataView = IOHelper.read(directory.resolve(LEVEL_DATA), file -> NbtStreamUtils.read(Files.newInputStream(file), true))
+        final DataView rootDataView = IOHelper.read(directory.resolve(LEVEL_DATA), file -> NbtStreamUtils.read(Files.newInputStream(file), true))
                 .orElseThrow(() -> new FileNotFoundException("Unable to find " + LEVEL_DATA + "!"));
-        DataView dataView = rootDataView.getView(DATA).get();
+        final DataView dataView = rootDataView.getView(DATA).get();
 
         if (worldName == null) {
             worldName = dataView.getString(NAME).get();
         }
-        DataView spongeRootDataView = IOHelper.read(directory.resolve(SPONGE_LEVEL_DATA),
+        final DataView spongeRootDataView = IOHelper.read(directory.resolve(SPONGE_LEVEL_DATA),
                 file -> NbtStreamUtils.read(Files.newInputStream(file), true)).orElse(null);
         DataView spongeContainer = null;
         if (spongeRootDataView != null) {
@@ -234,33 +236,15 @@ public final class LanternWorldPropertiesIO {
         properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
         properties.setInitialized(dataView.getInt(INITIALIZED).get() > 0);
         dataView.getInt(DIFFICULTY_LOCKED).ifPresent(v -> properties.setDifficultyLocked(v > 0));
-        if (dataView.contains(BORDER_CENTER_X)) {
-            properties.borderCenterX = dataView.getDouble(BORDER_CENTER_X).get();
-        }
-        if (dataView.contains(BORDER_CENTER_Z)) {
-            properties.borderCenterZ = dataView.getDouble(BORDER_CENTER_Z).get();
-        }
-        if (dataView.contains(BORDER_SIZE_START)) {
-            properties.borderDiameterStart = dataView.getDouble(BORDER_SIZE_START).get();
-        }
-        if (dataView.contains(BORDER_SIZE_END)) {
-            properties.borderDiameterEnd = dataView.getDouble(BORDER_SIZE_END).get();
-        }
-        if (dataView.contains(BORDER_SIZE_LERP_TIME)) {
-            properties.borderLerpTime = dataView.getLong(BORDER_SIZE_LERP_TIME).get();
-        }
-        if (dataView.contains(BORDER_DAMAGE)) {
-            properties.borderDamage = dataView.getDouble(BORDER_DAMAGE).get();
-        }
-        if (dataView.contains(BORDER_DAMAGE_THRESHOLD)) {
-            properties.borderDamage = dataView.getDouble(BORDER_DAMAGE_THRESHOLD).get();
-        }
-        if (dataView.contains(BORDER_WARNING_BLOCKS)) {
-            properties.borderWarningDistance = dataView.getInt(BORDER_WARNING_BLOCKS).get();
-        }
-        if (dataView.contains(BORDER_WARNING_TIME)) {
-            properties.borderWarningTime = dataView.getInt(BORDER_WARNING_TIME).get();
-        }
+        dataView.getDouble(BORDER_CENTER_X).ifPresent(v -> properties.borderCenterX = v);
+        dataView.getDouble(BORDER_CENTER_Z).ifPresent(v -> properties.borderCenterZ = v);
+        dataView.getDouble(BORDER_SIZE_START).ifPresent(v -> properties.borderDiameterStart = v);
+        dataView.getDouble(BORDER_SIZE_END).ifPresent(v -> properties.borderDiameterEnd = v);
+        dataView.getLong(BORDER_SIZE_LERP_TIME).ifPresent(v -> properties.borderLerpTime = v);
+        dataView.getDouble(BORDER_DAMAGE).ifPresent(v -> properties.borderDamage = v);
+        dataView.getDouble(BORDER_DAMAGE_THRESHOLD).ifPresent(v -> properties.borderDamageThreshold = v);
+        dataView.getInt(BORDER_WARNING_BLOCKS).ifPresent(v -> properties.borderWarningDistance = v);
+        dataView.getInt(BORDER_WARNING_TIME).ifPresent(v -> properties.borderWarningTime = v);
 
         if (spongeRootDataView != null) {
             properties.setAdditionalProperties(spongeRootDataView.copy().remove(DataQueries.SPONGE_DATA));
@@ -306,6 +290,8 @@ public final class LanternWorldPropertiesIO {
             }
 
             spongeDataView.getInt(GENERATE_BONUS_CHEST).ifPresent(v -> properties.setGenerateBonusChest(v > 0));
+            spongeDataView.getInt(SERIALIZATION_BEHAVIOR).ifPresent(v -> properties.setSerializationBehavior(
+                    v == 0 ? SerializationBehaviors.MANUAL : v == 1 ? SerializationBehaviors.AUTOMATIC : SerializationBehaviors.NONE));
         }
 
         // Get the spawn position
@@ -473,6 +459,13 @@ public final class LanternWorldPropertiesIO {
                         .set(UUID_MOST, uuid.getMostSignificantBits())
                         .set(UUID_LEAST, uuid.getLeastSignificantBits()))
                 .collect(Collectors.toList()));
+        short serializationBehaviorId = 1;
+        if (properties.getSerializationBehavior() == SerializationBehaviors.MANUAL) {
+            serializationBehaviorId = 0;
+        } else if (properties.getSerializationBehavior() == SerializationBehaviors.NONE) {
+            serializationBehaviorId = -1;
+        }
+        spongeContainer.set(SERIALIZATION_BEHAVIOR, serializationBehaviorId);
         return new LevelData(properties.getWorldName(), properties.getUniqueId(), rootContainer,
                 spongeRootContainer, dimensionId, dimensionMap);
     }

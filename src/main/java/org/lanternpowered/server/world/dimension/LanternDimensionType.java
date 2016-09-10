@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world.dimension;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.service.context.Context;
@@ -34,7 +35,7 @@ import org.spongepowered.api.world.GeneratorType;
 
 import java.util.function.BiFunction;
 
-public final class LanternDimensionType<T extends LanternDimension> extends PluginCatalogType.Base implements DimensionType {
+public final class LanternDimensionType<T extends LanternDimension> extends PluginCatalogType.Base.Internal implements DimensionType {
 
     private final BiFunction<LanternWorld, LanternDimensionType<T>, T> supplier;
     private final GeneratorType defaultGeneratorType;
@@ -43,24 +44,21 @@ public final class LanternDimensionType<T extends LanternDimension> extends Plug
     private final boolean waterEvaporates;
     private final boolean allowsPlayerRespawns;
     private final boolean hasSky;
-    private final int internalId;
     private final Context dimContext;
 
     public LanternDimensionType(String pluginId, String name, int internalId, Class<T> dimensionClass,
             GeneratorType defaultGeneratorType, boolean keepSpawnLoaded, boolean waterEvaporates,
             boolean hasSky, boolean allowsPlayerRespawns, BiFunction<LanternWorld, LanternDimensionType<T>, T> supplier) {
-        super(pluginId, name);
+        super(pluginId, name, internalId);
         this.dimContext = new Context(Context.DIMENSION_KEY, this.getId());
         this.defaultGeneratorType = defaultGeneratorType;
         this.allowsPlayerRespawns = allowsPlayerRespawns;
         this.keepSpawnLoaded = keepSpawnLoaded;
         this.waterEvaporates = waterEvaporates;
         this.dimensionClass = dimensionClass;
-        this.internalId = internalId;
         this.supplier = supplier;
         this.hasSky = hasSky;
     }
-
 
     /**
      * Gets the shared {@link Context} for all the {@link Dimension}s of this type.
@@ -112,7 +110,8 @@ public final class LanternDimensionType<T extends LanternDimension> extends Plug
         return this.hasSky;
     }
 
-    public int getInternalId() {
-        return this.internalId;
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("dimensionClass", this.dimensionClass);
     }
 }

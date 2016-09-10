@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world.portal;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.world.PortalAgent;
@@ -57,5 +58,10 @@ public class LanternPortalAgentType<T extends PortalAgent> extends PluginCatalog
     @Override
     public Class<? extends PortalAgent> getPortalAgentClass() {
         return this.portalAgentClass;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("portalAgentClass", this.portalAgentClass);
     }
 }

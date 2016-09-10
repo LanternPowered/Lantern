@@ -367,7 +367,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public boolean setPositionAndWorld(World world, Vector3d position) {
-        LanternWorld oldWorld = this.getWorld();
+        final LanternWorld oldWorld = this.getWorld();
         boolean success = super.setPositionAndWorld(world, position);
         if (success && world == oldWorld) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
@@ -378,7 +378,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Override
     public void setPosition(Vector3d position) {
         super.setPosition(position);
-        LanternWorld world = this.getWorld();
+        final LanternWorld world = this.getWorld();
         if (world != null) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
         }
@@ -387,14 +387,30 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Override
     public void setRotation(Vector3d rotation) {
         super.setRotation(rotation);
-        LanternWorld world = this.getWorld();
+        final LanternWorld world = this.getWorld();
         if (world != null) {
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(0, 0, 0, (float) rotation.getX(), (float) rotation.getY(),
-                    RELATIVE_POSITION, 0));
+            this.session.send(new MessagePlayOutPlayerPositionAndLook(0, 0, 0,
+                    (float) rotation.getX(), (float) rotation.getY(), RELATIVE_POSITION, 0));
         }
     }
 
+    @Override
+    public void setHeadRotation(Vector3d rotation) {
+        this.setRotation(rotation);
+    }
+
+    @Override
+    public Vector3d getHeadRotation() {
+        return super.getRotation();
+    }
+
+    @Override
     public void setRawRotation(Vector3d rotation) {
+        super.setRawRotation(rotation);
+    }
+
+    @Override
+    protected void setRawHeadRotation(Vector3d rotation) {
         super.setRawRotation(rotation);
     }
 
@@ -432,6 +448,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         return success;
     }
 
+    @Override
     public void setRawPosition(Vector3d position) {
         super.setRawPosition(position);
     }

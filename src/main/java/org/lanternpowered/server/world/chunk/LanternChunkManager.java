@@ -97,6 +97,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1455,12 +1456,12 @@ public final class LanternChunkManager {
             ImmutableListMultimap<UUID, LoadingTicket> playerLoadedTickets = null;
             ImmutableList<LoadingTicket> nonPlayerLoadedTickets = null;
 
-            final List<LoadingTicket> resultPlayerLoadedTickets = loadedTickets.stream()
+            final Set<LoadingTicket> resultPlayerLoadedTickets = loadedTickets.stream()
                     .filter(ticket -> ticket instanceof PlayerLoadingTicket)
-                    .collect(Collectors.toList());
-            final List<LoadingTicket> resultNonPlayerLoadedTickets = loadedTickets.stream()
+                    .collect(Collectors.toSet());
+            final Set<LoadingTicket> resultNonPlayerLoadedTickets = loadedTickets.stream()
                     .filter(ticket -> !(ticket instanceof PlayerLoadingTicket))
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toSet());
 
             final int maxTickets = this.chunkLoadService.getMaxTicketsById(entry.getKey());
 
@@ -1494,6 +1495,16 @@ public final class LanternChunkManager {
             final List<LoadingTicket> resultLoadedTickets = new ArrayList<>();
             resultLoadedTickets.addAll(resultPlayerLoadedTickets);
             resultLoadedTickets.addAll(resultNonPlayerLoadedTickets);
+
+            // Lets see how many plugins attempted to add loading tickets
+            final int sizeA = resultLoadedTickets.size();
+            resultLoadedTickets.retainAll(loadedTickets);
+            final int sizeB = resultLoadedTickets.size();
+
+            if (sizeA != sizeB) {
+                Lantern.getLogger().warn("The plugin {} attempted to add LoadingTicket's that were previously not present.", entry.getKey());
+            }
+
             // Remove all the tickets that are already released
             resultLoadedTickets.removeIf(ticket -> ((ChunkLoadingTicket) ticket).isReleased());
 
@@ -1501,15 +1512,6 @@ public final class LanternChunkManager {
                 Lantern.getLogger().warn("The plugin {} has too many open chunk loading tickets {}. "
                         + "Excess will be dropped", entry.getKey(), tickets.size());
                 resultLoadedTickets.subList(maxTickets, resultLoadedTickets.size()).clear();
-            }
-
-            final int sizeA = resultLoadedTickets.size();
-            // Lets see how many plugins attempted to add loading tickets
-            resultLoadedTickets.retainAll(loadedTickets);
-            final int sizeB = resultLoadedTickets.size();
-
-            if (sizeA != sizeB) {
-                Lantern.getLogger().warn("The plugin {} attempted to add LoadingTicket's that were previously not present.", entry.getKey());
             }
 
             // Release all the tickets that were no longer usable

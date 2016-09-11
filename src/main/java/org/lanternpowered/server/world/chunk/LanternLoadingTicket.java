@@ -74,10 +74,12 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     /**
      * Gets whether there no entries are inside the ticket.
      * 
-     * @return is empty
+     * @return Is empty
      */
     public boolean isEmpty() {
-        return this.queue.isEmpty();
+        synchronized (this.queue) {
+            return this.queue.isEmpty();
+        }
     }
 
     @Override
@@ -103,8 +105,10 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public synchronized int getNumChunks() {
-        return this.numChunks;
+    public int getNumChunks() {
+        synchronized (this.queue) {
+            return this.numChunks;
+        }
     }
 
     @Override
@@ -118,7 +122,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public synchronized ImmutableSet<Vector3i> getChunkList() {
+    public ImmutableSet<Vector3i> getChunkList() {
         synchronized (this.queue) {
             if (this.released) {
                 return ImmutableSet.of();
@@ -134,7 +138,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public synchronized boolean forceChunk(Vector2i chunk) {
+    public boolean forceChunk(Vector2i chunk) {
         checkNotNull(chunk, "chunk");
         synchronized (this.queue) {
             if (this.released) {
@@ -196,7 +200,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public synchronized void prioritizeChunk(Vector3i chunk) {
+    public void prioritizeChunk(Vector3i chunk) {
         checkNotNull(chunk, "chunk");
         synchronized (this.queue) {
             if (this.released) {

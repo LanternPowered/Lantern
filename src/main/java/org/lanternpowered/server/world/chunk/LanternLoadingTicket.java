@@ -81,22 +81,24 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public synchronized boolean setNumChunks(int numChunks) {
+    public boolean setNumChunks(int numChunks) {
         checkArgument(numChunks >= 0, "numChunks may not be negative");
-        if (numChunks > this.maxChunks) {
-            return false;
-        }
-        // Remove the oldest chunks that cannot be loaded anymore
-        if (!this.released && numChunks < this.numChunks) {
-            int size = this.queue.size();
+        synchronized (this.queue) {
+            if (numChunks > this.maxChunks) {
+                return false;
+            }
+            // Remove the oldest chunks that cannot be loaded anymore
+            if (!this.released && numChunks < this.numChunks) {
+                int size = this.queue.size();
 
-            if (numChunks < size) {
-                for (int i = 0; i < size - numChunks; i++) {
-                    this.chunkManager.unforce(this, this.queue.poll(), true);
+                if (numChunks < size) {
+                    for (int i = 0; i < size - numChunks; i++) {
+                        this.chunkManager.unforce(this, this.queue.poll(), true);
+                    }
                 }
             }
+            this.numChunks = numChunks;
         }
-        this.numChunks = numChunks;
         return true;
     }
 
@@ -117,11 +119,13 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
 
     @Override
     public synchronized ImmutableSet<Vector3i> getChunkList() {
-        if (this.released) {
-            return ImmutableSet.of();
+        synchronized (this.queue) {
+            if (this.released) {
+                return ImmutableSet.of();
+            }
+            return this.queue.stream().map(v -> new Vector3i(v.getX(), 0, v.getY()))
+                    .collect(GuavaCollectors.toImmutableSet());
         }
-        return this.queue.stream().map(v -> new Vector3i(v.getX(), 0, v.getY()))
-                .collect(GuavaCollectors.toImmutableSet());
     }
 
     @Override
@@ -132,20 +136,22 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     @Override
     public synchronized boolean forceChunk(Vector2i chunk) {
         checkNotNull(chunk, "chunk");
-        if (this.released) {
-            Lantern.getLogger().warn("The plugin {} attempted to force load a chunk with an invalid ticket. "
-                    + "This is not permitted.", this.plugin);
-            return false;
-        }
-        // Only force if not done before
-        if (!this.queue.contains(chunk)) {
-            // Remove the oldest chunk if necessary
-            if (this.queue.size() >= this.numChunks) {
-                this.chunkManager.unforce(this, this.queue.poll(), true);
+        synchronized (this.queue) {
+            if (this.released) {
+                Lantern.getLogger().warn("The plugin {} attempted to force load a chunk with an invalid ticket. "
+                        + "This is not permitted.", this.plugin);
+                return false;
             }
-            this.queue.add(chunk);
-            this.chunkManager.force(this, chunk);
-            return true;
+            // Only force if not done before
+            if (!this.queue.contains(chunk)) {
+                // Remove the oldest chunk if necessary
+                if (this.queue.size() >= this.numChunks) {
+                    this.chunkManager.unforce(this, this.queue.poll(), true);
+                }
+                this.queue.add(chunk);
+                this.chunkManager.force(this, chunk);
+                return true;
+            }
         }
         return false;
     }
@@ -156,50 +162,60 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     }
 
     @Override
-    public synchronized boolean unforceChunk(Vector2i chunk) {
+    public boolean unforceChunk(Vector2i chunk) {
         final Vector2i chunk0 = checkNotNull(chunk, "chunk");
-        if (this.released) {
-            return false;
-        }
-        if (this.queue.remove(chunk0)) {
-            this.chunkManager.unforce(this, chunk0, true);
-            return true;
+        synchronized (this.queue) {
+            if (this.released) {
+                return false;
+            }
+            if (this.queue.remove(chunk0)) {
+                this.chunkManager.unforce(this, chunk0, true);
+                return true;
+            }
         }
         return false;
     }
 
     @Override
-    public synchronized void unforceChunks() {
-        if (this.released) {
-            return;
-        }
-        while (!this.queue.isEmpty()) {
-            this.chunkManager.unforce(this, this.queue.poll(), true);
+    public void unforceChunks() {
+        synchronized (this.queue) {
+            if (this.released) {
+                return;
+            }
+            while (!this.queue.isEmpty()) {
+                this.chunkManager.unforce(this, this.queue.poll(), true);
+            }
         }
     }
 
     @Override
-    public synchronized boolean isReleased() {
-        return this.released;
+    public boolean isReleased() {
+        synchronized (this.queue) {
+            return this.released;
+        }
     }
 
     @Override
     public synchronized void prioritizeChunk(Vector3i chunk) {
         checkNotNull(chunk, "chunk");
-        if (this.released) {
-            return;
-        }
-        final Vector2i chunk0 = chunk.toVector2(true);
-        // Move the chunk to the bottom of the queue if found
-        if (this.queue.remove(chunk0)) {
-            this.queue.add(chunk0);
+        synchronized (this.queue) {
+            if (this.released) {
+                return;
+            }
+            final Vector2i chunk0 = chunk.toVector2(true);
+            // Move the chunk to the bottom of the queue if found
+            if (this.queue.remove(chunk0)) {
+                this.queue.add(chunk0);
+            }
         }
     }
 
     @Override
-    public synchronized void release() {
-        this.unforceChunks();
-        this.chunkManager.release(this);
-        this.released = true;
+    public void release() {
+        synchronized (this.queue) {
+            this.unforceChunks();
+            this.chunkManager.release(this);
+            this.released = true;
+        }
     }
 }

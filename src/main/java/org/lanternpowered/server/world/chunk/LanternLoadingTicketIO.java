@@ -27,7 +27,6 @@ package org.lanternpowered.server.world.chunk;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
 import org.lanternpowered.server.game.Lantern;
@@ -39,11 +38,10 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
@@ -55,7 +53,7 @@ import java.util.UUID;
  * they are saved in the same format as forge to allow maximum
  * compatibility.
  */
-public class LanternLoadingTicketIO {
+class LanternLoadingTicketIO {
 
     private static final String TICKETS_FILE = "forcedchunks.dat";
 
@@ -64,8 +62,7 @@ public class LanternLoadingTicketIO {
     private static final DataQuery TICKETS = DataQuery.of("Tickets");
     private static final DataQuery TICKET_TYPE = DataQuery.of("Type");
     private static final DataQuery CHUNK_LIST_DEPTH = DataQuery.of("ChunkListDepth");
-    // Lantern property
-    private static final DataQuery CHUNK_NUMBER = DataQuery.of("ChunksNum");
+    private static final DataQuery CHUNK_NUMBER = DataQuery.of("ChunksNum"); // Lantern property
     private static final DataQuery CHUNK_X = DataQuery.of("chunkX");
     private static final DataQuery CHUNK_Z = DataQuery.of("chunkZ");
     private static final DataQuery MOD_ID = DataQuery.of("ModId");
@@ -78,32 +75,32 @@ public class LanternLoadingTicketIO {
     private static final byte TYPE_ENTITY = 1;
 
     static void save(Path worldFolder, Set<LanternLoadingTicket> tickets) throws IOException {
-        Path file = worldFolder.resolve(TICKETS_FILE);
+        final Path file = worldFolder.resolve(TICKETS_FILE);
         if (!Files.exists(file)) {
             Files.createFile(file);
         }
 
-        Multimap<String, LanternLoadingTicket> sortedByPlugin = HashMultimap.create();
+        final Multimap<String, LanternLoadingTicket> sortedByPlugin = HashMultimap.create();
         for (LanternLoadingTicket ticket : tickets) {
             sortedByPlugin.put(ticket.getPlugin(), ticket);
         }
 
-        List<DataView> ticketHolders = Lists.newArrayList();
+        final List<DataView> ticketHolders = new ArrayList<>();
         for (Entry<String, Collection<LanternLoadingTicket>> entry : sortedByPlugin.asMap().entrySet()) {
-            Collection<LanternLoadingTicket> tickets0 = entry.getValue();
+            final Collection<LanternLoadingTicket> tickets0 = entry.getValue();
 
-            List<DataView> ticketEntries = Lists.newArrayList();
+            final List<DataView> ticketEntries = new ArrayList<>();
             for (LanternLoadingTicket ticket0 : tickets0) {
-                DataContainer ticketData = new MemoryDataContainer();
+                final DataContainer ticketData = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
                 ticketData.set(TICKET_TYPE, ticket0 instanceof EntityLoadingTicket ? TYPE_ENTITY : TYPE_NORMAL);
-                int numChunks = ticket0.getNumChunks();
+                final int numChunks = ticket0.getNumChunks();
                 // Store the list depth for backwards compatible or something,
                 // the current forge version doesn't use it either
                 ticketData.set(CHUNK_LIST_DEPTH, (byte) Math.min(numChunks, 127));
                 // Storing the chunks number, this number is added by us
                 ticketData.set(CHUNK_NUMBER, numChunks);
                 if (ticket0 instanceof PlayerLoadingTicket) {
-                    PlayerLoadingTicket ticket1 = (PlayerLoadingTicket) ticket0;
+                    final PlayerLoadingTicket ticket1 = (PlayerLoadingTicket) ticket0;
                     // This is a bit strange, since it already added,
                     // but if forge uses it...
                     ticketData.set(MOD_ID, entry.getKey());
@@ -113,10 +110,10 @@ public class LanternLoadingTicketIO {
                     ticketData.set(MOD_DATA, ticket0.extraData);
                 }
                 if (ticket0 instanceof EntityChunkLoadingTicket) {
-                    EntityChunkLoadingTicket ticket1 = (EntityChunkLoadingTicket) ticket0;
+                    final EntityChunkLoadingTicket ticket1 = (EntityChunkLoadingTicket) ticket0;
                     ticket1.getOrCreateEntityReference().ifPresent(ref -> {
-                        Vector2i position = ref.getChunkCoords();
-                        UUID uniqueId = ref.getUniqueId();
+                        final Vector2i position = ref.getChunkCoords();
+                        final UUID uniqueId = ref.getUniqueId();
                         ticketData.set(CHUNK_X, position.getX());
                         ticketData.set(CHUNK_Z, position.getY());
                         ticketData.set(ENTITY_UUID_MOST, uniqueId.getMostSignificantBits());
@@ -131,27 +128,26 @@ public class LanternLoadingTicketIO {
                     .set(TICKETS, ticketEntries));
         }
 
-        DataContainer dataContainer = new MemoryDataContainer()
+        final DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
                 .set(HOLDER_LIST, ticketHolders);
-
-        NbtStreamUtils.write(dataContainer, new FileOutputStream(file.toFile()), true);
+        NbtStreamUtils.write(dataContainer, Files.newOutputStream(file), true);
     }
 
-    static Multimap<String, LanternLoadingTicket> load(Path worldFolder, LanternChunkManager chunkManager, LanternChunkTicketManager service)
-            throws IOException {
-        Multimap<String, LanternLoadingTicket> tickets = HashMultimap.create();
+    static Multimap<String, LanternLoadingTicket> load(Path worldFolder, LanternChunkManager chunkManager,
+            LanternChunkTicketManager service) throws IOException {
+        final Multimap<String, LanternLoadingTicket> tickets = HashMultimap.create();
 
-        Path file = worldFolder.resolve(TICKETS_FILE);
+        final Path file = worldFolder.resolve(TICKETS_FILE);
         if (!Files.exists(file)) {
             return tickets;
         }
 
-        DataContainer dataContainer = NbtStreamUtils.read(new FileInputStream(file.toFile()), true);
-        Set<String> callbacks = service.getCallbacks().keySet();
+        final DataContainer dataContainer = NbtStreamUtils.read(Files.newInputStream(file), true);
+        final Set<String> callbacks = service.getCallbacks().keySet();
 
-        List<DataView> ticketHolders = dataContainer.getViewList(HOLDER_LIST).get();
+        final List<DataView> ticketHolders = dataContainer.getViewList(HOLDER_LIST).get();
         for (DataView ticketHolder : ticketHolders) {
-            String holderName = ticketHolder.getString(HOLDER_NAME).get();
+            final String holderName = ticketHolder.getString(HOLDER_NAME).get();
 
             if (!Sponge.getPluginManager().isLoaded(holderName)) {
                 Lantern.getLogger().warn("Found chunk loading data for plugin {} which is currently not available or active"
@@ -167,9 +163,9 @@ public class LanternLoadingTicketIO {
 
             final int maxNumChunks = chunkManager.getMaxChunksForPluginTicket(holderName);
 
-            List<DataView> ticketEntries = ticketHolder.getViewList(TICKETS).get();
+            final List<DataView> ticketEntries = ticketHolder.getViewList(TICKETS).get();
             for (DataView ticketEntry : ticketEntries) {
-                int type = ticketEntry.getInt(TICKET_TYPE).get();
+                final int type = ticketEntry.getInt(TICKET_TYPE).get();
 
                 UUID playerUUID = null;
                 if (ticketEntry.contains(PLAYER_UUID)) {
@@ -183,7 +179,7 @@ public class LanternLoadingTicketIO {
                     numChunks = ticketEntry.getInt(CHUNK_LIST_DEPTH).get();
                 }
 
-                LanternLoadingTicket ticket;
+                final LanternLoadingTicket ticket;
                 if (type == TYPE_NORMAL) {
                     if (playerUUID != null) {
                         ticket = new LanternPlayerLoadingTicket(holderName, chunkManager, playerUUID, maxNumChunks, numChunks);
@@ -191,18 +187,18 @@ public class LanternLoadingTicketIO {
                         ticket = new LanternLoadingTicket(holderName, chunkManager, maxNumChunks, numChunks);
                     }
                 } else if (type == TYPE_ENTITY) {
-                    LanternEntityLoadingTicket ticket0;
+                    final LanternEntityLoadingTicket ticket0;
                     if (playerUUID != null) {
                         ticket0 = new LanternPlayerEntityLoadingTicket(holderName, chunkManager, playerUUID, maxNumChunks, numChunks);
                     } else {
                         ticket0 = new LanternEntityLoadingTicket(holderName, chunkManager, maxNumChunks, numChunks);
                     }
-                    int chunkX = ticketEntry.getInt(CHUNK_X).get();
-                    int chunkZ = ticketEntry.getInt(CHUNK_Z).get();
-                    long uuidMost = ticketEntry.getLong(ENTITY_UUID_MOST).get();
-                    long uuidLeast = ticketEntry.getLong(ENTITY_UUID_LEAST).get();
-                    Vector2i chunkCoords = new Vector2i(chunkX, chunkZ);
-                    UUID uuid = new UUID(uuidMost, uuidLeast);
+                    final int chunkX = ticketEntry.getInt(CHUNK_X).get();
+                    final int chunkZ = ticketEntry.getInt(CHUNK_Z).get();
+                    final long uuidMost = ticketEntry.getLong(ENTITY_UUID_MOST).get();
+                    final long uuidLeast = ticketEntry.getLong(ENTITY_UUID_LEAST).get();
+                    final Vector2i chunkCoords = new Vector2i(chunkX, chunkZ);
+                    final UUID uuid = new UUID(uuidMost, uuidLeast);
                     ticket0.setEntityReference(new EntityReference(chunkCoords, uuid));
                     ticket = ticket0;
                 } else {
@@ -213,6 +209,7 @@ public class LanternLoadingTicketIO {
                     ticket.extraData = ticketEntry.getView(MOD_DATA).get().copy();
                 }
                 tickets.put(holderName, ticket);
+                chunkManager.attach(ticket);
             }
         }
 

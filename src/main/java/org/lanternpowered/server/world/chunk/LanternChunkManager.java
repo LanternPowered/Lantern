@@ -47,6 +47,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.util.FastSoftThreadLocal;
@@ -93,6 +94,7 @@ import org.spongepowered.api.world.gen.WorldGenerator;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
@@ -112,6 +114,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -1365,6 +1368,10 @@ public final class LanternChunkManager {
         this.tickets.remove(ticket);
     }
 
+    void attach(LanternLoadingTicket ticket) {
+        this.tickets.add(ticket);
+    }
+
     public void save() {
         try {
             LanternLoadingTicketIO.save(this.worldFolder, this.tickets);
@@ -1417,17 +1424,17 @@ public final class LanternChunkManager {
     }
 
     public void loadTickets() throws IOException {
-        Multimap<String, LanternLoadingTicket> tickets = LanternLoadingTicketIO.load(this.worldFolder, this, this.chunkLoadService);
-        Iterator<Entry<String, LanternLoadingTicket>> it = tickets.entries().iterator();
+        final Multimap<String, LanternLoadingTicket> tickets = LanternLoadingTicketIO.load(this.worldFolder, this, this.chunkLoadService);
+        final Iterator<Entry<String, LanternLoadingTicket>> it = tickets.entries().iterator();
         while (it.hasNext()) {
-            LanternLoadingTicket ticket = (LanternLoadingTicket) it.next();
+            final LanternLoadingTicket ticket = it.next().getValue();
             if (ticket instanceof LanternEntityLoadingTicket) {
-                LanternEntityLoadingTicket ticket0 = (LanternEntityLoadingTicket) ticket;
-                EntityReference ref = ticket0.getEntityReference().orElse(null);
+                final LanternEntityLoadingTicket ticket0 = (LanternEntityLoadingTicket) ticket;
+                final EntityReference ref = ticket0.getEntityReference().orElse(null);
                 if (ref != null) {
-                    LanternChunk chunk = this.getOrCreateChunk(ref.getChunkCoords(),
+                    final LanternChunk chunk = this.getOrCreateChunk(ref.getChunkCoords(),
                             () -> Cause.source(ticket0).owner(this.world).build(), true, true);
-                    Entity entity = chunk.getEntity(ref.getUniqueId()).orElse(null);
+                    final Entity entity = chunk.getEntity(ref.getUniqueId()).orElse(null);
                     if (entity != null) {
                         ticket0.bindToEntity(entity);
                     } else {
@@ -1440,36 +1447,79 @@ public final class LanternChunkManager {
                 }
             }
         }
-        for (Entry<String, Collection<LanternLoadingTicket>> ticket : tickets.asMap().entrySet()) {
-            Collection<ChunkTicketManager.Callback> callbacks = this.chunkLoadService.getCallbacks().get(ticket.getKey());
-            ImmutableList<LoadingTicket> tickets0 = ImmutableList.copyOf(ticket.getValue());
-            ImmutableListMultimap<UUID, LoadingTicket> map = null;
+        for (Entry<String, Collection<LanternLoadingTicket>> entry : tickets.asMap().entrySet()) {
+            final Collection<ChunkTicketManager.Callback> callbacks = this.chunkLoadService.getCallbacks().get(entry.getKey());
+            ImmutableList<LoadingTicket> loadedTickets = ImmutableList.copyOf(entry.getValue());
+
+            // These maps will be loaded lazily
+            ImmutableListMultimap<UUID, LoadingTicket> playerLoadedTickets = null;
+            ImmutableList<LoadingTicket> nonPlayerLoadedTickets = null;
+
+            final List<LoadingTicket> resultPlayerLoadedTickets = loadedTickets.stream()
+                    .filter(ticket -> ticket instanceof PlayerLoadingTicket)
+                    .collect(Collectors.toList());
+            final List<LoadingTicket> resultNonPlayerLoadedTickets = loadedTickets.stream()
+                    .filter(ticket -> !(ticket instanceof PlayerLoadingTicket))
+                    .collect(Collectors.toList());
+
+            final int maxTickets = this.chunkLoadService.getMaxTicketsById(entry.getKey());
+
             for (ChunkTicketManager.Callback callback : callbacks) {
                 if (callback instanceof ChunkTicketManager.OrderedCallback) {
-                    List<LoadingTicket> result = ((ChunkTicketManager.OrderedCallback) callback).onLoaded(
-                            tickets0, this.world, this.chunkLoadService.getMaxTicketsById(ticket.getKey()));
-                    if (result == null) {
-                        throw new IllegalStateException("The OrderedCallback#onLoaded method may not return null, error caused by (plugin="
-                                + ticket.getKey() + ", clazz=" + callback.getClass().getName() + ")");
+                    if (nonPlayerLoadedTickets == null) {
+                        nonPlayerLoadedTickets = ImmutableList.copyOf(resultNonPlayerLoadedTickets);
+                        resultNonPlayerLoadedTickets.clear();
                     }
-                    tickets0 = ImmutableList.copyOf(result);
+                    final List<LoadingTicket> result = ((ChunkTicketManager.OrderedCallback) callback).onLoaded(
+                            nonPlayerLoadedTickets, this.world, maxTickets);
+                    checkNotNull(result, "The OrderedCallback#onLoaded method may not return null, "
+                            + "error caused by (plugin=%s, clazz=%s)", entry.getKey(), callback.getClass().getName());
+                    resultNonPlayerLoadedTickets.addAll(result);
                 }
                 if (callback instanceof ChunkTicketManager.PlayerOrderedCallback) {
-                    if (map == null) {
-                        ImmutableListMultimap.Builder<UUID, LoadingTicket> mapBuilder = ImmutableListMultimap.builder();
-                        tickets0.stream().filter(ticket0 -> ticket0 instanceof PlayerLoadingTicket).forEach(ticket0 ->
-                                mapBuilder.put(((PlayerLoadingTicket) ticket0).getPlayerUniqueId(), ticket0));
-                        map = mapBuilder.build();
+                    if (playerLoadedTickets == null) {
+                        final ImmutableListMultimap.Builder<UUID, LoadingTicket> mapBuilder = ImmutableListMultimap.builder();
+                        resultPlayerLoadedTickets.forEach(ticket -> mapBuilder.put(((PlayerLoadingTicket) ticket).getPlayerUniqueId(), ticket));
+                        resultPlayerLoadedTickets.clear();
+                        playerLoadedTickets = mapBuilder.build();
                     }
-                    ListMultimap<UUID, LoadingTicket> result = ((ChunkTicketManager.PlayerOrderedCallback) callback)
-                            .onPlayerLoaded(map, this.world);
-                    if (result == null) {
-                        throw new IllegalStateException("The PlayerOrderedCallback#onPlayerLoaded method may not return null, "
-                                + "error caused by (plugin=" + ticket.getKey() + ", clazz=" + callback.getClass().getName() + ")");
-                    }
-                    map = ImmutableListMultimap.copyOf(result);
+                    final ListMultimap<UUID, LoadingTicket> result = ((ChunkTicketManager.PlayerOrderedCallback) callback)
+                            .onPlayerLoaded(playerLoadedTickets, this.world);
+                    checkNotNull(result, "The PlayerOrderedCallback#onPlayerLoaded method may not return null, "
+                            + "error caused by (plugin=%s, clazz=%s)", entry.getKey(), callback.getClass().getName());
+                    resultPlayerLoadedTickets.addAll(result.values());
                 }
-                callback.onLoaded(tickets0, this.world);
+            }
+
+            final List<LoadingTicket> resultLoadedTickets = new ArrayList<>();
+            resultLoadedTickets.addAll(resultPlayerLoadedTickets);
+            resultLoadedTickets.addAll(resultNonPlayerLoadedTickets);
+            // Remove all the tickets that are already released
+            resultLoadedTickets.removeIf(ticket -> ((ChunkLoadingTicket) ticket).isReleased());
+
+            if (resultLoadedTickets.size() > maxTickets) {
+                Lantern.getLogger().warn("The plugin {} has too many open chunk loading tickets {}. "
+                        + "Excess will be dropped", entry.getKey(), tickets.size());
+                resultLoadedTickets.subList(maxTickets, resultLoadedTickets.size()).clear();
+            }
+
+            final int sizeA = resultLoadedTickets.size();
+            // Lets see how many plugins attempted to add loading tickets
+            resultLoadedTickets.retainAll(loadedTickets);
+            final int sizeB = resultLoadedTickets.size();
+
+            if (sizeA != sizeB) {
+                Lantern.getLogger().warn("The plugin {} attempted to add LoadingTicket's that were previously not present.", entry.getKey());
+            }
+
+            // Release all the tickets that were no longer usable
+            final List<LoadingTicket> removedTickets = new ArrayList<>(loadedTickets);
+            removedTickets.removeAll(resultLoadedTickets);
+            removedTickets.forEach(LoadingTicket::release);
+
+            loadedTickets = ImmutableList.copyOf(resultLoadedTickets);
+            for (ChunkTicketManager.Callback callback : callbacks) {
+                callback.onLoaded(loadedTickets, this.world);
             }
         }
     }

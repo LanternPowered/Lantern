@@ -23,38 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard;
+package org.lanternpowered.server.data.io.store;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
-import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.util.Identifiable;
 
-import java.util.Optional;
+import java.util.UUID;
 
-import javax.annotation.Nullable;
+public interface IdentifiableObjectStore<T extends Identifiable> extends ObjectStore<T> {
 
-public class LanternDisplaySlot extends PluginCatalogType.Base.Internal implements DisplaySlot {
+    /**
+     * Deserializes the {@link UUID} that will be used to the {@link Identifiable}.
+     *
+     * @param dataView The data view
+     * @return The unique id
+     */
+    UUID deserializeUniqueId(DataView dataView);
 
-    private final Optional<TextColor> teamColor;
-
-    public LanternDisplaySlot(String pluginId, String name, @Nullable TextColor teamColor, int internalId) {
-        this(pluginId, name, name, teamColor, internalId);
-    }
-
-    public LanternDisplaySlot(String pluginId, String id, String name,
-            @Nullable TextColor teamColor, int internalId) {
-        super(pluginId, id, name, internalId);
-        this.teamColor = Optional.ofNullable(teamColor);
-    }
-
-    @Override
-    public Optional<TextColor> getTeamColor() {
-        return this.teamColor;
-    }
-
-    @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().omitNullValues().add("teamColor", this.teamColor.orElse(null));
-    }
+    /**
+     * Serializes the {@link UUID} for the {@link Identifiable}.
+     *
+     * @param dataView The data view
+     * @param uniqueId The unique id
+     */
+    void serializeUniqueId(DataView dataView, UUID uniqueId);
 }

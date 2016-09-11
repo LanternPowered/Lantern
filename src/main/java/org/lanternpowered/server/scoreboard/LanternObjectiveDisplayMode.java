@@ -26,7 +26,6 @@
 package org.lanternpowered.server.scoreboard;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 
 public class LanternObjectiveDisplayMode extends PluginCatalogType.Base implements ObjectiveDisplayMode {

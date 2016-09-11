@@ -27,11 +27,12 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.entity.living.player.HandType;
+import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
-import org.lanternpowered.server.text.chat.LanternChatVisibility;
+import org.spongepowered.api.text.chat.ChatVisibility;
 
 import java.util.Locale;
 
@@ -41,7 +42,7 @@ public final class CodecPlayInClientSettings implements Codec<MessagePlayInClien
     public MessagePlayInClientSettings decode(CodecContext context, ByteBuffer buf) throws CodecException {
         Locale locale = Locale.forLanguageTag(buf.readString());
         int viewDistance = buf.readByte();
-        LanternChatVisibility visibility = LanternChatVisibility.fromInternalId(buf.readByte());
+        ChatVisibility visibility = ChatVisibilityRegistryModule.get().getByInternalId(buf.readByte()).get();
         boolean enableColors = buf.readBoolean();
         int skinPartsBitPattern = buf.readByte() & 0xff;
         HandType mainHand = HandType.values()[buf.readVarInt()];

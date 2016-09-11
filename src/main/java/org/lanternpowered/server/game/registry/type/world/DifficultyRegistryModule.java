@@ -25,24 +25,20 @@
  */
 package org.lanternpowered.server.game.registry.type.world;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.spongepowered.api.world.difficulty.Difficulties;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
-import java.util.Optional;
+public final class DifficultyRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<Difficulty> {
 
-public final class DifficultyRegistryModule extends AdditionalPluginCatalogRegistryModule<Difficulty> {
+    private static final DifficultyRegistryModule instance = new DifficultyRegistryModule();
 
-    public static DifficultyRegistryModule getInstance() {
-        return Holder.INSTANCE;
+    public static DifficultyRegistryModule get() {
+        return instance;
     }
 
-    private final Int2ObjectMap<Difficulty> byInternalId = new Int2ObjectOpenHashMap<>();
-
-    public DifficultyRegistryModule() {
+    private DifficultyRegistryModule() {
         super(Difficulties.class);
     }
 
@@ -52,19 +48,5 @@ public final class DifficultyRegistryModule extends AdditionalPluginCatalogRegis
         this.register(new LanternDifficulty("minecraft", "easy", 1));
         this.register(new LanternDifficulty("minecraft", "normal", 2));
         this.register(new LanternDifficulty("minecraft", "hard", 3));
-    }
-
-    @Override
-    protected void register(Difficulty catalogType, boolean disallowInbuiltPluginIds) {
-        super.register(catalogType, disallowInbuiltPluginIds);
-        this.byInternalId.putIfAbsent((int) ((LanternDifficulty) catalogType).getInternalId(), catalogType);
-    }
-
-    public Optional<Difficulty> getByInternalId(int internalId) {
-        return Optional.ofNullable(this.byInternalId.get(internalId));
-    }
-
-    private static final class Holder {
-        private static final DifficultyRegistryModule INSTANCE = new DifficultyRegistryModule();
     }
 }

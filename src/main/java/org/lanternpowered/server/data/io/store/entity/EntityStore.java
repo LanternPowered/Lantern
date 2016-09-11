@@ -31,6 +31,7 @@ import static org.lanternpowered.server.data.util.DataUtil.getSerializedManipula
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Lists;
+import org.lanternpowered.server.data.io.store.IdentifiableObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -41,7 +42,6 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.text.LanternTexts;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> {
+public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> implements IdentifiableObjectStore<T> {
 
     private static final DataQuery SPONGE_DATA = DataQueries.FORGE_DATA.then(DataQueries.SPONGE_DATA);
     private static final DataQuery POSITION = DataQuery.of("Pos");
@@ -107,19 +107,19 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> {
     private static final int CURRENT_DATA_VERSION = 158;
 
     @Override
-    public void deserialize(T entity, DataContainer dataContainer) {
-        Optional<Long> uuidMost = dataContainer.getLong(OLD_UNIQUE_ID_MOST);
-        Optional<Long> uuidLeast = dataContainer.getLong(OLD_UNIQUE_ID_LEAST);
+    public UUID deserializeUniqueId(DataView dataView) {
+        Optional<Long> uuidMost = dataView.getLong(OLD_UNIQUE_ID_MOST);
+        Optional<Long> uuidLeast = dataView.getLong(OLD_UNIQUE_ID_LEAST);
         UUID uuid;
         if (uuidMost.isPresent() && uuidLeast.isPresent()) {
             uuid = new UUID(uuidMost.get(), uuidLeast.get());
         } else {
-            uuidMost = dataContainer.getLong(UNIQUE_ID_MOST);
-            uuidLeast = dataContainer.getLong(UNIQUE_ID_LEAST);
+            uuidMost = dataView.getLong(UNIQUE_ID_MOST);
+            uuidLeast = dataView.getLong(UNIQUE_ID_LEAST);
             if (uuidMost.isPresent() && uuidLeast.isPresent()) {
                 uuid = new UUID(uuidMost.get(), uuidLeast.get());
             } else {
-                Optional<String> uuidString = dataContainer.getString(UNIQUE_ID);
+                Optional<String> uuidString = dataView.getString(UNIQUE_ID);
                 if (uuidString.isPresent()) {
                     uuid = UUID.fromString(uuidString.get());
                 } else {
@@ -127,30 +127,38 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> {
                 }
             }
         }
-        entity.setPosition(fromDoubleList(dataContainer.getDoubleList(POSITION).get()));
-        entity.setVelocity(fromDoubleList(dataContainer.getDoubleList(VELOCITY).get()));
-        dataContainer.getDoubleList(SCALE).ifPresent(list -> entity.setScale(fromDoubleList(list)));
-        final List<Float> rotationList = dataContainer.getFloatList(ROTATION).get();
-        // Yaw, Pitch, Roll (X, Y, Z) - Index 0 and 1 are swapped!
-        entity.setRotation(new Vector3d(rotationList.get(1), rotationList.get(0), rotationList.size() > 2 ? rotationList.get(2) : 0));
-        entity.setOnGround(dataContainer.getInt(ON_GROUND).orElse(0) > 0);
-        super.deserialize(entity, dataContainer);
+        return uuid;
     }
 
     @Override
-    public void serialize(T entity, DataContainer dataContainer) {
-        dataContainer.set(DATA_VERSION, CURRENT_DATA_VERSION);
-        dataContainer.set(POSITION, toDoubleList(entity.getPosition()));
-        dataContainer.set(VELOCITY, toDoubleList(entity.getVelocity()));
+    public void serializeUniqueId(DataView dataView, UUID uniqueId) {
+        dataView.set(UNIQUE_ID_MOST, uniqueId.getMostSignificantBits());
+        dataView.set(UNIQUE_ID_LEAST, uniqueId.getLeastSignificantBits());
+    }
+
+    @Override
+    public void deserialize(T entity, DataView dataView) {
+        entity.setPosition(fromDoubleList(dataView.getDoubleList(POSITION).get()));
+        entity.setVelocity(fromDoubleList(dataView.getDoubleList(VELOCITY).get()));
+        dataView.getDoubleList(SCALE).ifPresent(list -> entity.setScale(fromDoubleList(list)));
+        final List<Float> rotationList = dataView.getFloatList(ROTATION).get();
+        // Yaw, Pitch, Roll (X, Y, Z) - Index 0 and 1 are swapped!
+        entity.setRotation(new Vector3d(rotationList.get(1), rotationList.get(0), rotationList.size() > 2 ? rotationList.get(2) : 0));
+        entity.setOnGround(dataView.getInt(ON_GROUND).orElse(0) > 0);
+        super.deserialize(entity, dataView);
+    }
+
+    @Override
+    public void serialize(T entity, DataView dataView) {
+        dataView.set(DATA_VERSION, CURRENT_DATA_VERSION);
+        dataView.set(POSITION, toDoubleList(entity.getPosition()));
+        dataView.set(VELOCITY, toDoubleList(entity.getVelocity()));
         final Vector3d rotation = entity.getRotation();
         // Yaw, Pitch, Roll (X, Y, Z) - Index 0 and 1 are swapped!
-        dataContainer.set(ROTATION, Lists.newArrayList((float) rotation.getY(), (float) rotation.getX(), (float) rotation.getZ()));
-        dataContainer.set(SCALE, toDoubleList(entity.getScale()));
-        dataContainer.set(ON_GROUND, (byte) (entity.isOnGround() ? 1 : 0));
-        final UUID uuid = entity.getUniqueId();
-        dataContainer.set(UNIQUE_ID_MOST, uuid.getMostSignificantBits());
-        dataContainer.set(UNIQUE_ID_LEAST, uuid.getLeastSignificantBits());
-        super.serialize(entity, dataContainer);
+        dataView.set(ROTATION, Lists.newArrayList((float) rotation.getY(), (float) rotation.getX(), (float) rotation.getZ()));
+        dataView.set(SCALE, toDoubleList(entity.getScale()));
+        dataView.set(ON_GROUND, (byte) (entity.isOnGround() ? 1 : 0));
+        super.serialize(entity, dataView);
     }
 
     static Vector3d fromDoubleList(List<Double> doubleList) {
@@ -162,111 +170,111 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> {
     }
 
     @Override
-    public void serializeValues(T object, SimpleValueContainer valueContainer, DataContainer dataContainer) {
+    public void serializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
         // Here will we remove all the vanilla properties and delegate the
         // rest through the default serialization system
-        valueContainer.remove(Keys.FIRE_TICKS).ifPresent(v -> dataContainer.set(FIRE_TICKS, v));
-        valueContainer.remove(Keys.FALL_DISTANCE).ifPresent(v -> dataContainer.set(FALL_DISTANCE, v));
-        valueContainer.remove(Keys.HEALTH).ifPresent(v -> dataContainer.set(HEALTH, v.floatValue()));
-        valueContainer.remove(Keys.REMAINING_AIR).ifPresent(v -> dataContainer.set(REMAINING_AIR, v));
-        valueContainer.remove(LanternKeys.ABSORPTION_AMOUNT).ifPresent(v -> dataContainer.set(ABSORPTION_AMOUNT, v.floatValue()));
-        DataView spongeView = getOrCreateView(dataContainer, SPONGE_DATA);
+        valueContainer.remove(Keys.FIRE_TICKS).ifPresent(v -> dataView.set(FIRE_TICKS, v));
+        valueContainer.remove(Keys.FALL_DISTANCE).ifPresent(v -> dataView.set(FALL_DISTANCE, v));
+        valueContainer.remove(Keys.HEALTH).ifPresent(v -> dataView.set(HEALTH, v.floatValue()));
+        valueContainer.remove(Keys.REMAINING_AIR).ifPresent(v -> dataView.set(REMAINING_AIR, v));
+        valueContainer.remove(LanternKeys.ABSORPTION_AMOUNT).ifPresent(v -> dataView.set(ABSORPTION_AMOUNT, v.floatValue()));
+        DataView spongeView = getOrCreateView(dataView, SPONGE_DATA);
         valueContainer.remove(Keys.MAX_AIR).ifPresent(v -> spongeView.set(MAX_AIR, v));
         valueContainer.remove(Keys.CAN_GRIEF).ifPresent(v -> spongeView.set(CAN_GRIEF, (byte) (v ? 1 : 0)));
-        valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataContainer.set(DISPLAY_NAME, LanternTexts.toLegacy(v)));
-        valueContainer.remove(Keys.CUSTOM_NAME_VISIBLE).ifPresent(v -> dataContainer.set(CUSTOM_NAME_VISIBLE, (byte) (v ? 1 : 0)));
-        valueContainer.remove(LanternKeys.INVULNERABLE).ifPresent(v -> dataContainer.set(INVULNERABLE, (byte) (v ? 1 : 0)));
-        valueContainer.remove(LanternKeys.PORTAL_COOLDOWN_TICKS).ifPresent(v -> dataContainer.set(PORTAL_COOLDOWN_TICKS, v));
-        valueContainer.remove(Keys.AI_ENABLED).ifPresent(v -> dataContainer.set(NO_AI, (byte) (v ? 0 : 1)));
-        valueContainer.remove(Keys.PERSISTS).ifPresent(v -> dataContainer.set(PERSISTS, (byte) (v ? 1 : 0)));
-        valueContainer.remove(LanternKeys.CAN_PICK_UP_LOOT).ifPresent(v -> dataContainer.set(CAN_PICK_UP_LOOT, (byte) (v ? 1 : 0)));
-        valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataContainer.set(CUSTOM_NAME, LanternTexts.toLegacy(v)));
+        valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataView.set(DISPLAY_NAME, LanternTexts.toLegacy(v)));
+        valueContainer.remove(Keys.CUSTOM_NAME_VISIBLE).ifPresent(v -> dataView.set(CUSTOM_NAME_VISIBLE, (byte) (v ? 1 : 0)));
+        valueContainer.remove(LanternKeys.INVULNERABLE).ifPresent(v -> dataView.set(INVULNERABLE, (byte) (v ? 1 : 0)));
+        valueContainer.remove(LanternKeys.PORTAL_COOLDOWN_TICKS).ifPresent(v -> dataView.set(PORTAL_COOLDOWN_TICKS, v));
+        valueContainer.remove(Keys.AI_ENABLED).ifPresent(v -> dataView.set(NO_AI, (byte) (v ? 0 : 1)));
+        valueContainer.remove(Keys.PERSISTS).ifPresent(v -> dataView.set(PERSISTS, (byte) (v ? 1 : 0)));
+        valueContainer.remove(LanternKeys.CAN_PICK_UP_LOOT).ifPresent(v -> dataView.set(CAN_PICK_UP_LOOT, (byte) (v ? 1 : 0)));
+        valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataView.set(CUSTOM_NAME, LanternTexts.toLegacy(v)));
         valueContainer.remove(Keys.POTION_EFFECTS).ifPresent(v -> {
             if (v.isEmpty()) {
                 return;
             }
             // TODO: Allow out impl to use integers as amplifier and use a string as effect id,
             // without breaking the official format
-            dataContainer.set(POTION_EFFECTS, v.stream().map(effect -> new MemoryDataContainer()
+            dataView.set(POTION_EFFECTS, v.stream().map(effect -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(POTION_EFFECT_ID, (byte) ((LanternPotionEffectType) effect.getType()).getInternalId())
                     .set(POTION_EFFECT_AMPLIFIER, (byte) effect.getAmplifier())
                     .set(POTION_EFFECT_DURATION, effect.getDuration())
                     .set(POTION_EFFECT_AMBIENT, (byte) (effect.isAmbient() ? 1 : 0))
                     .set(POTION_EFFECT_SHOW_PARTICLES, (byte) (effect.getShowParticles() ? 1 : 0))));
         });
-        valueContainer.remove(Keys.FOOD_LEVEL).ifPresent(v -> dataContainer.set(FOOD_LEVEL, v));
-        valueContainer.remove(Keys.EXHAUSTION).ifPresent(v -> dataContainer.set(EXHAUSTION, v.floatValue()));
-        valueContainer.remove(Keys.SATURATION).ifPresent(v -> dataContainer.set(SATURATION, v.floatValue()));
+        valueContainer.remove(Keys.FOOD_LEVEL).ifPresent(v -> dataView.set(FOOD_LEVEL, v));
+        valueContainer.remove(Keys.EXHAUSTION).ifPresent(v -> dataView.set(EXHAUSTION, v.floatValue()));
+        valueContainer.remove(Keys.SATURATION).ifPresent(v -> dataView.set(SATURATION, v.floatValue()));
 
-        super.serializeValues(object, valueContainer, dataContainer);
+        super.serializeValues(object, valueContainer, dataView);
     }
 
     @Override
-    public void deserializeValues(T object, SimpleValueContainer valueContainer, DataContainer dataContainer) {
-        dataContainer.getInt(FIRE_TICKS).ifPresent(v -> valueContainer.set(Keys.FIRE_TICKS, v));
-        dataContainer.getDouble(FALL_DISTANCE).ifPresent(v -> valueContainer.set(Keys.FALL_DISTANCE, v.floatValue()));
-        dataContainer.getInt(REMAINING_AIR).ifPresent(v -> valueContainer.set(Keys.REMAINING_AIR, v));
-        Optional<Double> health = dataContainer.getDouble(HEALTH);
+    public void deserializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
+        dataView.getInt(FIRE_TICKS).ifPresent(v -> valueContainer.set(Keys.FIRE_TICKS, v));
+        dataView.getDouble(FALL_DISTANCE).ifPresent(v -> valueContainer.set(Keys.FALL_DISTANCE, v.floatValue()));
+        dataView.getInt(REMAINING_AIR).ifPresent(v -> valueContainer.set(Keys.REMAINING_AIR, v));
+        Optional<Double> health = dataView.getDouble(HEALTH);
         // Try for the old health data
         if (!health.isPresent()) {
-            health = dataContainer.getDouble(HEALTH_OLD);
+            health = dataView.getDouble(HEALTH_OLD);
         }
         health.ifPresent(v -> valueContainer.set(Keys.HEALTH, v));
-        dataContainer.getString(DISPLAY_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));
-        dataContainer.getInt(CUSTOM_NAME_VISIBLE).ifPresent(v -> valueContainer.set(Keys.CUSTOM_NAME_VISIBLE, v > 0));
-        dataContainer.getInt(INVULNERABLE).ifPresent(v -> valueContainer.set(LanternKeys.INVULNERABLE, v > 0));
-        dataContainer.getInt(PORTAL_COOLDOWN_TICKS).ifPresent(v -> valueContainer.set(LanternKeys.PORTAL_COOLDOWN_TICKS, v));
-        dataContainer.getInt(NO_AI).ifPresent(v -> valueContainer.set(Keys.AI_ENABLED, v == 0));
-        dataContainer.getInt(PERSISTS).ifPresent(v -> valueContainer.set(Keys.PERSISTS, v > 0));
-        dataContainer.getView(SPONGE_DATA).ifPresent(view -> {
+        dataView.getString(DISPLAY_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));
+        dataView.getInt(CUSTOM_NAME_VISIBLE).ifPresent(v -> valueContainer.set(Keys.CUSTOM_NAME_VISIBLE, v > 0));
+        dataView.getInt(INVULNERABLE).ifPresent(v -> valueContainer.set(LanternKeys.INVULNERABLE, v > 0));
+        dataView.getInt(PORTAL_COOLDOWN_TICKS).ifPresent(v -> valueContainer.set(LanternKeys.PORTAL_COOLDOWN_TICKS, v));
+        dataView.getInt(NO_AI).ifPresent(v -> valueContainer.set(Keys.AI_ENABLED, v == 0));
+        dataView.getInt(PERSISTS).ifPresent(v -> valueContainer.set(Keys.PERSISTS, v > 0));
+        dataView.getView(SPONGE_DATA).ifPresent(view -> {
             view.getInt(MAX_AIR).ifPresent(v -> valueContainer.set(Keys.MAX_AIR, v));
             view.getInt(CAN_GRIEF).ifPresent(v -> valueContainer.set(Keys.CAN_GRIEF, v > 0));
         });
-        dataContainer.getDouble(ABSORPTION_AMOUNT).ifPresent(v -> valueContainer.set(LanternKeys.ABSORPTION_AMOUNT, v));
-        dataContainer.getDouble(CAN_PICK_UP_LOOT).ifPresent(v -> valueContainer.set(LanternKeys.CAN_PICK_UP_LOOT, v > 0));
-        dataContainer.getString(CUSTOM_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));
-        dataContainer.getViewList(POTION_EFFECTS).ifPresent(v -> {
+        dataView.getDouble(ABSORPTION_AMOUNT).ifPresent(v -> valueContainer.set(LanternKeys.ABSORPTION_AMOUNT, v));
+        dataView.getDouble(CAN_PICK_UP_LOOT).ifPresent(v -> valueContainer.set(LanternKeys.CAN_PICK_UP_LOOT, v > 0));
+        dataView.getString(CUSTOM_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));
+        dataView.getViewList(POTION_EFFECTS).ifPresent(v -> {
             if (v.isEmpty()) {
                 return;
             }
-            PotionEffectTypeRegistryModule module = Lantern.getRegistry().getRegistryModule(PotionEffectTypeRegistryModule.class).get();
-            List<PotionEffect> potionEffects = new ArrayList<>();
+            final PotionEffectTypeRegistryModule module = Lantern.getRegistry().getRegistryModule(PotionEffectTypeRegistryModule.class).get();
+            final List<PotionEffect> potionEffects = new ArrayList<>();
             for (DataView view : v) {
-                int internalId = view.getInt(POTION_EFFECT_ID).get() & 0xff;
-                PotionEffectType type = module.getByInternalId(internalId).orElse(null);
+                final int internalId = view.getInt(POTION_EFFECT_ID).get() & 0xff;
+                final PotionEffectType type = module.getByInternalId(internalId).orElse(null);
                 if (type == null) {
                     Lantern.getLogger().warn("Deserialized a potion effect type with unknown id: " + internalId);
                     continue;
                 }
-                int amplifier = view.getInt(POTION_EFFECT_AMPLIFIER).get() & 0xff;
-                int duration = view.getInt(POTION_EFFECT_DURATION).get();
-                boolean ambient = view.getInt(POTION_EFFECT_AMBIENT).orElse(0) > 0;
-                boolean showParticles = view.getInt(POTION_EFFECT_SHOW_PARTICLES).orElse(0) > 0;
+                final int amplifier = view.getInt(POTION_EFFECT_AMPLIFIER).get() & 0xff;
+                final int duration = view.getInt(POTION_EFFECT_DURATION).get();
+                final boolean ambient = view.getInt(POTION_EFFECT_AMBIENT).orElse(0) > 0;
+                final boolean showParticles = view.getInt(POTION_EFFECT_SHOW_PARTICLES).orElse(0) > 0;
                 potionEffects.add(new LanternPotionEffect(type, duration, amplifier, ambient, showParticles));
             }
             if (!potionEffects.isEmpty()) {
                 valueContainer.set(Keys.POTION_EFFECTS, potionEffects);
             }
         });
-        dataContainer.getInt(FOOD_LEVEL).ifPresent(v -> valueContainer.set(Keys.FOOD_LEVEL, v));
-        dataContainer.getDouble(EXHAUSTION).ifPresent(v -> valueContainer.set(Keys.EXHAUSTION, v));
-        dataContainer.getDouble(SATURATION).ifPresent(v -> valueContainer.set(Keys.SATURATION, v));
+        dataView.getInt(FOOD_LEVEL).ifPresent(v -> valueContainer.set(Keys.FOOD_LEVEL, v));
+        dataView.getDouble(EXHAUSTION).ifPresent(v -> valueContainer.set(Keys.EXHAUSTION, v));
+        dataView.getDouble(SATURATION).ifPresent(v -> valueContainer.set(Keys.SATURATION, v));
 
-        super.deserializeValues(object, valueContainer, dataContainer);
+        super.deserializeValues(object, valueContainer, dataView);
     }
 
     @Override
-    public void serializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataContainer dataContainer) {
-        DataView spongeData = getOrCreateView(dataContainer, SPONGE_DATA);
+    public void serializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
+        DataView spongeData = getOrCreateView(dataView, SPONGE_DATA);
         if (!manipulators.isEmpty()) {
             spongeData.set(DataQueries.CUSTOM_MANIPULATORS, getSerializedManipulatorList(manipulators));
         }
     }
 
     @Override
-    public void deserializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataContainer dataContainer) {
+    public void deserializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
         try {
-            dataContainer.getView(SPONGE_DATA).ifPresent(view -> dataContainer.getViewList(DataQueries.CUSTOM_MANIPULATORS)
+            dataView.getView(SPONGE_DATA).ifPresent(view -> dataView.getViewList(DataQueries.CUSTOM_MANIPULATORS)
                     .ifPresent(views -> manipulators.addAll(deserializeManipulatorList(views))));
         } catch (InvalidDataException e) {
             Lantern.getLogger().error("Could not deserialize custom plugin data! ", e);

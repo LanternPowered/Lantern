@@ -26,32 +26,20 @@
 package org.lanternpowered.server.entity.living.player.gamemode;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-public class LanternGameMode extends PluginCatalogType.Base.Translatable implements GameMode {
-
-    private final byte internalId;
+public class LanternGameMode extends PluginCatalogType.Base.Translatable.Internal implements GameMode {
 
     public LanternGameMode(String pluginId, String name, Translation translation, int internalId) {
-        super(pluginId, name, translation);
-        this.internalId = (byte) internalId;
+        super(pluginId, name, translation, internalId);
     }
 
     public LanternGameMode(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, "gameMode." + name);
-        this.internalId = (byte) internalId;
+        super(pluginId, id, name, "gameMode." + name, internalId);
     }
 
     public LanternGameMode(String pluginId, String name, int internalId) {
-        super(pluginId, name, "gameMode." + name);
-        this.internalId = (byte) internalId;
-    }
-
-    public byte getInternalId() {
-        return this.internalId;
+        super(pluginId, name, "gameMode." + name, internalId);
     }
 }

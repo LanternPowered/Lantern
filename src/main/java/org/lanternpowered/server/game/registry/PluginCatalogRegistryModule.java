@@ -139,6 +139,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
             }
             mappings.put(mapping, new Tuple<>(type, priority));
         }
+        //noinspection ConstantConditions
         return Maps.transformEntries(mappings, (key, value) -> value.getFirst());
     }
 

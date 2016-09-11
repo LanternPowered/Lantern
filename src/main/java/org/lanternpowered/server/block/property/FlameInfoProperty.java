@@ -40,6 +40,7 @@ public final class FlameInfoProperty extends AbstractProperty<String, FlameInfo>
 
     @Override
     public int compareTo(Property<?, ?> o) {
+        //noinspection ConstantConditions
         return o == null ?  0 : this.getValue().compareTo((FlameInfo) o.getValue());
     }
 }

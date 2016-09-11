@@ -38,7 +38,7 @@ public final class CodecPlayOutPlayerRespawn implements Codec<MessagePlayOutPlay
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeInteger(message.getDimensionType().getInternalId());
         buf.writeByte((byte) message.getDifficulty().getInternalId());
-        buf.writeByte(message.getGameMode().getInternalId());
+        buf.writeByte((byte) message.getGameMode().getInternalId());
         buf.writeString("default"); // Not used
         return buf;
     }

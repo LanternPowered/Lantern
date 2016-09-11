@@ -26,8 +26,8 @@
 package org.lanternpowered.server.data.io.store.entity;
 
 import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,19 +37,19 @@ public class LivingStore<T extends LanternEntityLiving> extends EntityStore<T> {
     protected static final DataQuery HEAD_ROTATION = DataQuery.of("HeadRotation"); // Lantern
 
     @Override
-    public void deserialize(T entity, DataContainer dataContainer) {
-        final Optional<List<Double>> optValues = dataContainer.getDoubleList(HEAD_ROTATION);
+    public void deserialize(T entity, DataView dataView) {
+        final Optional<List<Double>> optValues = dataView.getDoubleList(HEAD_ROTATION);
         if (optValues.isPresent()) {
             entity.setHeadRotation(fromDoubleList(optValues.get()));
         } else {
             entity.setHeadRotation(entity.getRotation());
         }
-        super.deserialize(entity, dataContainer);
+        super.deserialize(entity, dataView);
     }
 
     @Override
-    public void serialize(T entity, DataContainer dataContainer) {
-        dataContainer.set(HEAD_ROTATION, toDoubleList(entity.getHeadRotation()));
-        super.serialize(entity, dataContainer);
+    public void serialize(T entity, DataView dataView) {
+        dataView.set(HEAD_ROTATION, toDoubleList(entity.getHeadRotation()));
+        super.serialize(entity, dataView);
     }
 }

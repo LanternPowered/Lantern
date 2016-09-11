@@ -25,10 +25,13 @@
  */
 package org.lanternpowered.server.block;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.block.ScheduledBlockUpdate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.util.Arrays;
 
 public class LanternScheduledBlockUpdate implements ScheduledBlockUpdate, Comparable<LanternScheduledBlockUpdate> {
 
@@ -88,5 +91,15 @@ public class LanternScheduledBlockUpdate implements ScheduledBlockUpdate, Compar
             return 1;
         }
         return 0;
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("entryId", this.entryId)
+                .add("location", this.location)
+                .add("ticks", this.getTicks())
+                .add("priority", this.priority)
+                .toString();
     }
 }

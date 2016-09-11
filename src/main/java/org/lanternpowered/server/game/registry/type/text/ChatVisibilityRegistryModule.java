@@ -25,16 +25,27 @@
  */
 package org.lanternpowered.server.game.registry.type.text;
 
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.text.chat.LanternChatVisibility;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 
-public final class ChatVisibilityRegistryModule extends AdditionalPluginCatalogRegistryModule<ChatVisibility> {
+public final class ChatVisibilityRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<ChatVisibility> {
 
-    public ChatVisibilityRegistryModule() {
+    private static final ChatVisibilityRegistryModule instance = new ChatVisibilityRegistryModule();
+
+    public static ChatVisibilityRegistryModule get() {
+        return instance;
+    }
+
+    private ChatVisibilityRegistryModule() {
         super(ChatVisibilities.class);
+    }
+
+    @Override
+    protected boolean isDuplicateInternalIdAllowed() {
+        return true;
     }
 
     @Override

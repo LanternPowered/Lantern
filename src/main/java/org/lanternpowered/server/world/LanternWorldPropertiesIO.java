@@ -319,10 +319,10 @@ public final class LanternWorldPropertiesIO {
 
         if (copyLevelSettingsToConfig) {
             worldConfig.getGeneration().setSeed(dataView.getLong(SEED).get());
-            worldConfig.setGameMode(GameModeRegistryModule.getInstance().getByInternalId(dataView.getInt(GAME_MODE).get())
+            worldConfig.setGameMode(GameModeRegistryModule.get().getByInternalId(dataView.getInt(GAME_MODE).get())
                     .orElse(GameModes.SURVIVAL));
             worldConfig.setHardcore(dataView.getInt(HARDCORE).get() > 0);
-            worldConfig.setDifficulty(DifficultyRegistryModule.getInstance().getByInternalId(dataView.getInt(DIFFICULTY).get())
+            worldConfig.setDifficulty(DifficultyRegistryModule.get().getByInternalId(dataView.getInt(DIFFICULTY).get())
                     .orElse(Difficulties.NORMAL));
 
             if (dataView.contains(GENERATOR_NAME)) {

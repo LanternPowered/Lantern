@@ -23,38 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard;
+package org.lanternpowered.server.data.io.store;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
-import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 
-import java.util.Optional;
+import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+final class SimpleObjectSerializer<T> implements ObjectSerializer<T> {
 
-public class LanternDisplaySlot extends PluginCatalogType.Base.Internal implements DisplaySlot {
+    private final ObjectStore<T> objectStore;
+    private final Supplier<T> objectBuilder;
 
-    private final Optional<TextColor> teamColor;
-
-    public LanternDisplaySlot(String pluginId, String name, @Nullable TextColor teamColor, int internalId) {
-        this(pluginId, name, name, teamColor, internalId);
-    }
-
-    public LanternDisplaySlot(String pluginId, String id, String name,
-            @Nullable TextColor teamColor, int internalId) {
-        super(pluginId, id, name, internalId);
-        this.teamColor = Optional.ofNullable(teamColor);
+    SimpleObjectSerializer(ObjectStore<T> objectStore, Supplier<T> objectBuilder) {
+        this.objectBuilder = objectBuilder;
+        this.objectStore = objectStore;
     }
 
     @Override
-    public Optional<TextColor> getTeamColor() {
-        return this.teamColor;
+    public T deserialize(DataView dataView) throws InvalidDataException {
+        final T object = this.objectBuilder.get();
+        this.objectStore.deserialize(object, dataView);
+        return object;
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().omitNullValues().add("teamColor", this.teamColor.orElse(null));
+    public DataView serialize(T object) {
+        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        this.objectStore.serialize(object, dataView);
+        return dataView;
     }
 }

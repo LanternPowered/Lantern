@@ -41,7 +41,7 @@ public final class CodecPlayOutPlayerJoinGame implements Codec<MessagePlayOutPla
         context.getChannel().attr(PLAYER_ENTITY_ID).set(message.getEntityId());
         ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeInteger(message.getEntityId());
-        byte gameMode = message.getGameMode().getInternalId();
+        byte gameMode = (byte) message.getGameMode().getInternalId();
         if (message.isHardcore()) {
             gameMode |= 0x8;
         }

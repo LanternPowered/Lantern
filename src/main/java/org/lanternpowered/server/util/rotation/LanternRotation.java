@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.util.rotation;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.rotation.Rotation;
@@ -44,4 +45,8 @@ public final class LanternRotation extends SimpleCatalogType.Base implements Rot
         return this.angle;
     }
 
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("angle", this.angle);
+    }
 }

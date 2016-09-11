@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.text.chat;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.chat.ChatType;
@@ -34,38 +32,18 @@ import org.spongepowered.api.text.chat.ChatVisibility;
 
 import java.util.function.Predicate;
 
-public final class LanternChatVisibility extends PluginCatalogType.Base.Translatable implements ChatVisibility {
-
-    private final static Int2ObjectMap<LanternChatVisibility> lookup = new Int2ObjectOpenHashMap<>();
+public final class LanternChatVisibility extends PluginCatalogType.Base.Translatable.Internal implements ChatVisibility {
 
     private final Predicate<ChatType> chatTypePredicate;
-    private final int internalId;
 
     public LanternChatVisibility(String pluginId, String name, int internalId, Predicate<ChatType> chatTypePredicate) {
         super(pluginId, name, Lantern.getGame().getRegistry().getTranslationManager().get(
-                "options.chat.visibility." + name));
-        this.internalId = internalId;
+                "options.chat.visibility." + name), internalId);
         this.chatTypePredicate = chatTypePredicate;
-        lookup.put(internalId, this);
-    }
-
-    public int getInternalId() {
-        return this.internalId;
     }
 
     @Override
     public boolean isVisible(ChatType chatType) {
         return this.chatTypePredicate.test(chatType);
     }
-
-    /**
-     * Gets the {@link ChatVisibility} by using it's internal id.
-     *
-     * @param internalId the internal id
-     * @return the chat visibility
-     */
-    public static LanternChatVisibility fromInternalId(int internalId) {
-        return lookup.get(internalId);
-    }
-
 }

@@ -62,7 +62,7 @@ public class FastSoftThreadLocal<T> {
         this(new FastThreadLocal<>());
     }
 
-    FastSoftThreadLocal(FastThreadLocal<SoftReference<T>> threadLocal) {
+    private FastSoftThreadLocal(FastThreadLocal<SoftReference<T>> threadLocal) {
         this.threadLocal = threadLocal;
     }
 
@@ -106,7 +106,7 @@ public class FastSoftThreadLocal<T> {
         return null;
     }
 
-    static final class SuppliedSoftThreadLocal<T> extends FastSoftThreadLocal<T> {
+    private static final class SuppliedSoftThreadLocal<T> extends FastSoftThreadLocal<T> {
 
         private final Supplier<? extends T> supplier;
 

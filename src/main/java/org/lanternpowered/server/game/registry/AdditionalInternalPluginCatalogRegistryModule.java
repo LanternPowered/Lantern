@@ -23,38 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard;
+package org.lanternpowered.server.game.registry;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
-import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
 
-import java.util.Optional;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class LanternDisplaySlot extends PluginCatalogType.Base.Internal implements DisplaySlot {
+public class AdditionalInternalPluginCatalogRegistryModule<T extends CatalogType> extends InternalPluginCatalogRegistryModule<T>
+        implements AdditionalCatalogRegistryModule<T> {
 
-    private final Optional<TextColor> teamColor;
-
-    public LanternDisplaySlot(String pluginId, String name, @Nullable TextColor teamColor, int internalId) {
-        this(pluginId, name, name, teamColor, internalId);
+    public AdditionalInternalPluginCatalogRegistryModule(@Nullable Class<?> catalogClass) {
+        super(catalogClass);
     }
 
-    public LanternDisplaySlot(String pluginId, String id, String name,
-            @Nullable TextColor teamColor, int internalId) {
-        super(pluginId, id, name, internalId);
-        this.teamColor = Optional.ofNullable(teamColor);
+    public AdditionalInternalPluginCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
+        super(catalogClass, mappingProvider);
     }
 
     @Override
-    public Optional<TextColor> getTeamColor() {
-        return this.teamColor;
-    }
-
-    @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().omitNullValues().add("teamColor", this.teamColor.orElse(null));
+    public void registerAdditionalCatalog(T extraCatalog) {
+        this.register(extraCatalog, true);
     }
 }

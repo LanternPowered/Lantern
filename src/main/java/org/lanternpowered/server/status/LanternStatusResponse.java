@@ -27,6 +27,7 @@ package org.lanternpowered.server.status;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
@@ -88,4 +89,15 @@ public class LanternStatusResponse implements ClientPingServerEvent.Response {
         return this.hidePlayers ? Optional.empty() : Optional.of(this.players);
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("version", this.version)
+                .add("description", this.description)
+                .add("players", this.players)
+                .add("hidePlayers", this.hidePlayers)
+                .add("favicon", this.favicon.orElse(null))
+                .toString();
+    }
 }

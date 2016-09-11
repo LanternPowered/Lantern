@@ -60,7 +60,7 @@ public final class PlayerIO {
                 dataContainer.set(DataQueries.EXTENDED_SPONGE_DATA, spongeDataContainer);
             }
 
-            ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
+            final ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
             objectStore.deserialize(player, dataContainer);
         }
     }
@@ -68,11 +68,11 @@ public final class PlayerIO {
     public static void save(Path dataFolder, LanternPlayer player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
 
-        DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-        ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
+        final DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
         objectStore.serialize(player, dataContainer);
 
-        Optional<DataView> optSpongeData = dataContainer.getView(DataQueries.EXTENDED_SPONGE_DATA);
+        final Optional<DataView> optSpongeData = dataContainer.getView(DataQueries.EXTENDED_SPONGE_DATA);
         dataContainer.remove(DataQueries.EXTENDED_SPONGE_DATA);
 
         Path dataFolder0 = dataFolder.resolve(PLAYER_DATA_FOLDER);

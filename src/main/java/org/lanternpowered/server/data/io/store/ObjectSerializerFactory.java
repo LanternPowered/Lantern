@@ -23,38 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.scoreboard;
+package org.lanternpowered.server.data.io.store;
 
-import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
-import org.spongepowered.api.text.format.TextColor;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Optional;
+import org.spongepowered.api.util.Identifiable;
 
-import javax.annotation.Nullable;
+import java.util.UUID;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
-public class LanternDisplaySlot extends PluginCatalogType.Base.Internal implements DisplaySlot {
+public final class ObjectSerializerFactory {
 
-    private final Optional<TextColor> teamColor;
-
-    public LanternDisplaySlot(String pluginId, String name, @Nullable TextColor teamColor, int internalId) {
-        this(pluginId, name, name, teamColor, internalId);
+    public static <T extends Identifiable> ObjectSerializer<T> of(Class<T> type, Function<UUID, T> objectConstructor) {
+        checkNotNull(type, "type");
+        checkNotNull(objectConstructor, "objectConstructor");
+        return new IdentifiableObjectSerializer<>(ObjectStoreRegistry.get().get(type)
+                .orElseThrow(() -> new IllegalArgumentException("There is no object registry for " + type)), objectConstructor);
     }
 
-    public LanternDisplaySlot(String pluginId, String id, String name,
-            @Nullable TextColor teamColor, int internalId) {
-        super(pluginId, id, name, internalId);
-        this.teamColor = Optional.ofNullable(teamColor);
+    public static <T> ObjectSerializer<T> of(Class<T> type, Supplier<T> objectConstructor) {
+        checkNotNull(type, "type");
+        checkNotNull(objectConstructor, "objectConstructor");
+        return new SimpleObjectSerializer<>(ObjectStoreRegistry.get().get(type)
+                .orElseThrow(() -> new IllegalArgumentException("There is no object registry for " + type)), objectConstructor);
     }
 
-    @Override
-    public Optional<TextColor> getTeamColor() {
-        return this.teamColor;
-    }
-
-    @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().omitNullValues().add("teamColor", this.teamColor.orElse(null));
+    private ObjectSerializerFactory() {
     }
 }

@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -900,5 +901,17 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         this.player.resetIdleTimeoutCounter();
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("address", this.getAddress())
+                .add("virtualHost", this.virtualHostAddress)
+                .add("profile", this.gameProfile)
+                .add("protocolVersion", this.protocolVersion)
+                .add("protocolState", this.protocolState)
+                .toString();
     }
 }

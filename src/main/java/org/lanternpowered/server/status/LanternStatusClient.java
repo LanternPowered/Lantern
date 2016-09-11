@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.status;
 
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.network.status.StatusClient;
 
@@ -60,4 +61,13 @@ public class LanternStatusClient implements StatusClient {
         return this.virtualHost;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("address", this.address)
+                .add("virtualHost", this.virtualHost.orElse(null))
+                .add("version", this.version)
+                .toString();
+    }
 }

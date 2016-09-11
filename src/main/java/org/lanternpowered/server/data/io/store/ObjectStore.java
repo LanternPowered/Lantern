@@ -25,26 +25,26 @@
  */
 package org.lanternpowered.server.data.io.store;
 
-import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 
 public interface ObjectStore<T> {
 
     /**
-     * Deserializes a {@link DataContainer} and provides
+     * Deserializes a {@link DataView} and provides
      * the data to the object {@link T}.
      *
      * @param object The object
-     * @param dataContainer The data container
+     * @param dataView The data view
      */
-    void deserialize(T object, DataContainer dataContainer);
+    void deserialize(T object, DataView dataView);
 
     /**
      * Serializes the object {@link T} and attaches the data
-     * to the {@link DataContainer}.
+     * to the {@link DataView}.
      *
      * @param object The object
-     * @param dataContainer The data container
+     * @param dataView The data view
      */
-    void serialize(T object, DataContainer dataContainer);
+    void serialize(T object, DataView dataView);
 
 }

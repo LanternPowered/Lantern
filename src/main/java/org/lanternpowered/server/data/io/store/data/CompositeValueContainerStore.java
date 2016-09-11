@@ -31,7 +31,7 @@ import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -45,14 +45,14 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
 
     @SuppressWarnings("unchecked")
     @Override
-    public void deserialize(T object, DataContainer dataContainer) {
+    public void deserialize(T object, DataView dataView) {
         if (object instanceof AbstractValueContainer) {
-            AbstractValueContainer<S> valueContainer = (AbstractValueContainer) object;
-            SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
+            final AbstractValueContainer<S> valueContainer = (AbstractValueContainer) object;
+            final SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
 
-            this.deserializeValues(object, simpleValueContainer, dataContainer);
+            this.deserializeValues(object, simpleValueContainer, dataView);
             for (Map.Entry<Key<?>, Object> entry : simpleValueContainer.getValues().entrySet()) {
-                ElementHolder elementHolder = valueContainer.getElementHolder((Key) entry.getKey());
+                final ElementHolder elementHolder = valueContainer.getElementHolder((Key) entry.getKey());
                 if (elementHolder != null) {
                     elementHolder.set(entry.getValue());
                 } else {
@@ -61,9 +61,9 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 }
             }
 
-            List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
+            final List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
             if (additionalManipulators != null) {
-                this.deserializeAdditionalData(object, additionalManipulators, dataContainer);
+                this.deserializeAdditionalData(object, additionalManipulators, dataView);
             }
         } else {
             // Not sure what to do
@@ -72,26 +72,26 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
 
     @SuppressWarnings("unchecked")
     @Override
-    public void serialize(T object, DataContainer dataContainer) {
+    public void serialize(T object, DataView dataView) {
         if (object instanceof AbstractValueContainer) {
-            AbstractValueContainer<S> valueContainer = (AbstractValueContainer) object;
-            SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
+            final AbstractValueContainer<S> valueContainer = (AbstractValueContainer) object;
+            final SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
 
             for (Map.Entry<Key<?>, KeyRegistration> entry : valueContainer.getRawValueMap().entrySet()) {
-                Object value = entry.getValue();
+                final Object value = entry.getValue();
                 if (value instanceof ElementHolder) {
-                    Object element = ((ElementHolder) value).get();
+                    final Object element = ((ElementHolder) value).get();
                     if (element != null) {
                         simpleValueContainer.set((Key) entry.getKey(), element);
                     }
                 }
             }
 
-            this.serializeValues(object, simpleValueContainer, dataContainer);
+            this.serializeValues(object, simpleValueContainer, dataView);
 
-            List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
+            final List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
             if (additionalManipulators != null) {
-                this.serializeAdditionalData(object, additionalManipulators, dataContainer);
+                this.serializeAdditionalData(object, additionalManipulators, dataView);
             }
         } else {
             // Not sure what to do
@@ -100,41 +100,41 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
 
     /**
      * Serializes all the {@link DataManipulator}s and puts
-     * them into the {@link DataContainer}.
+     * them into the {@link DataView}.
      *
      * @param manipulators The data manipulators
-     * @param dataContainer The data container
+     * @param dataView The data view
      */
-    public void serializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataContainer dataContainer) {
+    public void serializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
     }
 
     /**
-     * Deserializes all the {@link DataManipulator}s from the {@link DataContainer}
+     * Deserializes all the {@link DataManipulator}s from the {@link DataView}
      * and puts them into the {@link List}.
      *
      * @param manipulators The data manipulators
-     * @param dataContainer The data container
+     * @param dataView The data view
      */
-    public void deserializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataContainer dataContainer) {
+    public void deserializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
     }
 
     /**
      * Serializes all the values of the {@link SimpleValueContainer} and puts
-     * them into the {@link DataContainer}.
+     * them into the {@link DataView}.
      *
      * @param valueContainer The value container
-     * @param dataContainer The data container
+     * @param dataView The data view
      */
-    public void serializeValues(T object, SimpleValueContainer valueContainer, DataContainer dataContainer) {
+    public void serializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
     }
 
     /**
-     * Deserializers all the values from the {@link DataContainer}
+     * Deserializers all the values from the {@link DataView}
      * into the {@link SimpleValueContainer}.
      *
      * @param valueContainer The value container
-     * @param dataContainer The data container
+     * @param dataView The data view
      */
-    public void deserializeValues(T object, SimpleValueContainer valueContainer, DataContainer dataContainer) {
+    public void deserializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
     }
 }

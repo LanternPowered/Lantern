@@ -25,31 +25,21 @@
  */
 package org.lanternpowered.server.game.registry.type.entity.player;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
-import java.util.Optional;
+public final class GameModeRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<GameMode> {
 
-public final class GameModeRegistryModule extends AdditionalPluginCatalogRegistryModule<GameMode> {
+    private static final GameModeRegistryModule instance = new GameModeRegistryModule();
 
-    public static GameModeRegistryModule getInstance() {
-        return Holder.INSTANCE;
+    public static GameModeRegistryModule get() {
+        return instance;
     }
-
-    private final Int2ObjectMap<GameMode> byInternalId = new Int2ObjectOpenHashMap<>();
 
     public GameModeRegistryModule() {
         super(GameModes.class);
-    }
-
-    @Override
-    protected void register(GameMode catalogType, boolean disallowInbuiltPluginIds) {
-        super.register(catalogType, disallowInbuiltPluginIds);
-        this.byInternalId.putIfAbsent((int) ((LanternGameMode) catalogType).getInternalId(), catalogType);
     }
 
     @Override
@@ -59,13 +49,5 @@ public final class GameModeRegistryModule extends AdditionalPluginCatalogRegistr
         this.register(new LanternGameMode("minecraft", "creative", 1));
         this.register(new LanternGameMode("minecraft", "adventure", 2));
         this.register(new LanternGameMode("minecraft", "spectator", 3));
-    }
-
-    public Optional<GameMode> getByInternalId(int internalId) {
-        return Optional.ofNullable(this.byInternalId.get(internalId));
-    }
-
-    private static final class Holder {
-        private static final GameModeRegistryModule INSTANCE = new GameModeRegistryModule();
     }
 }

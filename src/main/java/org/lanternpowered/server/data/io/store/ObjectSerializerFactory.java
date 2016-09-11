@@ -25,10 +25,12 @@
  */
 package org.lanternpowered.server.data.io.store;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.spongepowered.api.util.Identifiable;
 
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -38,15 +40,17 @@ public final class ObjectSerializerFactory {
     public static <T extends Identifiable> ObjectSerializer<T> of(Class<T> type, Function<UUID, T> objectConstructor) {
         checkNotNull(type, "type");
         checkNotNull(objectConstructor, "objectConstructor");
-        return new IdentifiableObjectSerializer<>(ObjectStoreRegistry.get().get(type)
-                .orElseThrow(() -> new IllegalArgumentException("There is no object registry for " + type)), objectConstructor);
+        final Optional<ObjectStore<T>> optObjectStore = ObjectStoreRegistry.get().get(type);
+        checkArgument(optObjectStore.isPresent(), "There is no object registry for %s", type);
+        return new IdentifiableObjectSerializer<>(optObjectStore.get(), objectConstructor);
     }
 
     public static <T> ObjectSerializer<T> of(Class<T> type, Supplier<T> objectConstructor) {
         checkNotNull(type, "type");
         checkNotNull(objectConstructor, "objectConstructor");
-        return new SimpleObjectSerializer<>(ObjectStoreRegistry.get().get(type)
-                .orElseThrow(() -> new IllegalArgumentException("There is no object registry for " + type)), objectConstructor);
+        final Optional<ObjectStore<T>> optObjectStore = ObjectStoreRegistry.get().get(type);
+        checkArgument(optObjectStore.isPresent(), "There is no object registry for %s", type);
+        return new SimpleObjectSerializer<>(optObjectStore.get(), objectConstructor);
     }
 
     private ObjectSerializerFactory() {

@@ -49,49 +49,48 @@ import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 
-public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<ScoreText>, JsonDeserializer<ScoreText> {
+final class JsonTextScoreSerializer extends JsonTextBaseSerializer implements JsonSerializer<ScoreText>, JsonDeserializer<ScoreText> {
 
     private final boolean networkingFormat;
 
-    public JsonTextScoreSerializer(boolean networkingFormat) {
+    JsonTextScoreSerializer(boolean networkingFormat) {
         this.networkingFormat = networkingFormat;
     }
 
     @Override
-    public ScoreText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonObject json0 = json.getAsJsonObject();
-        Text name = LanternTexts.fromLegacy(json0.get(SCORE_NAME).getAsString());
+    public ScoreText deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        final JsonObject obj = element.getAsJsonObject();
+        final Text name = LanternTexts.fromLegacy(obj.get(SCORE_NAME).getAsString());
         // Try to parse the value
-        int value;
+        int value = 0;
         try {
-            value = Integer.parseInt(json0.get(SCORE_VALUE).getAsString());
-        } catch (NumberFormatException e) {
-            value = 0;
+            value = Integer.parseInt(obj.get(SCORE_VALUE).getAsString());
+        } catch (NumberFormatException ignored) {
         }
-        String baseObjective = json0.get(SCORE_MAIN_OBJECTIVE).getAsString();
-        Set<Objective> objectives = new HashSet<>();
+        final String baseObjective = obj.get(SCORE_MAIN_OBJECTIVE).getAsString();
+        final Set<Objective> objectives = new HashSet<>();
         if (!baseObjective.isEmpty()) {
             this.tryAddObjective(baseObjective, objectives);
         }
-        if (json0.has(SCORE_EXTRA_OBJECTIVES)) {
-            JsonArray array = json0.getAsJsonArray(SCORE_EXTRA_OBJECTIVES);
+        if ((element = obj.get(SCORE_EXTRA_OBJECTIVES)) != null) {
+            final JsonArray array = element.getAsJsonArray();
             for (JsonElement jsonElement : array) {
                 this.tryAddObjective(jsonElement.getAsString(), objectives);
             }
         }
         String override = null;
-        if (json0.has(SCORE_OVERRIDE)) {
-            override = json0.get(SCORE_OVERRIDE).getAsString();
+        if ((element = obj.get(SCORE_OVERRIDE)) != null) {
+            override = element.getAsString();
         }
 
-        Score score = new LanternScore(name);
+        final Score score = new LanternScore(name);
         // TODO: How to handle the objectives?
         // We cannot add them to the score without attaching the
         // score to the objective
         score.setScore(value);
 
-        ScoreText.Builder builder = Text.builder(score).override(override);
-        deserialize(json0, builder, context);
+        final ScoreText.Builder builder = Text.builder(score).override(override);
+        deserialize(obj, builder, context);
         return builder.build();
     }
 
@@ -104,7 +103,7 @@ public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implem
         // Lantern:
         // This is a field added by sponge to be able to override
         // the text provided by this component.
-        Optional<String> override = src.getOverride();
+        final Optional<String> override = src.getOverride();
         // If we are using the networking format and there is an override present, just use
         // the override as a literal text object
         if (this.networkingFormat && override.isPresent()) {
@@ -113,34 +112,34 @@ public final class JsonTextScoreSerializer extends JsonTextBaseSerializer implem
         // There are here some extra fields to represent the (lantern/sponge) score text object,
         // while they are not supported by sponge itself, it seems worth it to provide this
         // This will still remain compatible with vanilla.
-        JsonObject json = new JsonObject();
-        Score score = src.getScore();
-        json.addProperty(SCORE_NAME, LanternTexts.toLegacy(score.getName()));
-        Iterator<Objective> it = score.getObjectives().iterator();
+        final JsonObject obj = new JsonObject();
+        final Score score = src.getScore();
+        obj.addProperty(SCORE_NAME, LanternTexts.toLegacy(score.getName()));
+        final Iterator<Objective> it = score.getObjectives().iterator();
         if (it.hasNext()) {
-            json.addProperty(SCORE_MAIN_OBJECTIVE, it.next().getName());
+            obj.addProperty(SCORE_MAIN_OBJECTIVE, it.next().getName());
             // Lantern:
             // Provide a list with all the extra objectives that
             // are attached to the score.
             // There is no need to send this to the client.
             if (!this.networkingFormat) {
                 if (it.hasNext()) {
-                    JsonArray json0 = new JsonArray();
+                    final JsonArray array = new JsonArray();
                     while (it.hasNext()) {
-                        json0.add(new JsonPrimitive(it.next().getName()));
+                        array.add(new JsonPrimitive(it.next().getName()));
                     }
-                    json.add(SCORE_EXTRA_OBJECTIVES, json0);
+                    obj.add(SCORE_EXTRA_OBJECTIVES, array);
                 }
             }
         } else {
             // This field must always be specified to be valid score json,
             // making it empty will prevent issues
-            json.addProperty(SCORE_MAIN_OBJECTIVE, "");
+            obj.addProperty(SCORE_MAIN_OBJECTIVE, "");
         }
-        override.ifPresent(v -> json.addProperty(SCORE_OVERRIDE, override.get()));
-        json.addProperty(SCORE_VALUE, Integer.toString(score.getScore()));
-        serialize(json, src, context);
-        return json;
+        override.ifPresent(v -> obj.addProperty(SCORE_OVERRIDE, override.get()));
+        obj.addProperty(SCORE_VALUE, Integer.toString(score.getScore()));
+        serialize(obj, src, context);
+        return obj;
     }
 
 }

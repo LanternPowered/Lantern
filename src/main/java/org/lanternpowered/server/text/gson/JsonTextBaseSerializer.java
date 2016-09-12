@@ -29,6 +29,7 @@ import static org.lanternpowered.server.text.gson.TextConstants.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
@@ -52,68 +53,69 @@ import javax.annotation.Nullable;
 abstract class JsonTextBaseSerializer {
 
     public static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context) throws JsonParseException {
-        deserialize(json, builder, context, json.has(CHILDREN) ? json.getAsJsonArray(CHILDREN) : null);
+        deserialize(json, builder, context, json.getAsJsonArray(CHILDREN));
     }
 
     public static void deserialize(JsonObject json, Text.Builder builder, JsonDeserializationContext context, @Nullable JsonArray children)
             throws JsonParseException {
-        if (json.has(COLOR)) {
-            Sponge.getRegistry().getType(TextColor.class, json.get(COLOR).getAsString()).ifPresent(builder::color);
+        JsonElement element;
+        if ((element = json.get(COLOR)) != null) {
+            Sponge.getRegistry().getType(TextColor.class, element.getAsString()).ifPresent(builder::color);
         }
         TextStyle style = builder.getStyle();
-        if (json.has(BOLD)) {
-            style = style.bold(json.get(BOLD).getAsBoolean());
+        if ((element = json.get(BOLD)) != null) {
+            style = style.bold(element.getAsBoolean());
         }
-        if (json.has(ITALIC)) {
-            style = style.italic(json.get(ITALIC).getAsBoolean());
+        if ((element = json.get(ITALIC)) != null) {
+            style = style.italic(element.getAsBoolean());
         }
-        if (json.has(UNDERLINE)) {
-            style = style.underline(json.get(UNDERLINE).getAsBoolean());
+        if ((element = json.get(UNDERLINE)) != null) {
+            style = style.underline(element.getAsBoolean());
         }
-        if (json.has(STRIKETHROUGH)) {
-            style = style.strikethrough(json.get(STRIKETHROUGH).getAsBoolean());
+        if ((element = json.get(STRIKETHROUGH)) != null) {
+            style = style.strikethrough(element.getAsBoolean());
         }
-        if (json.has(OBFUSCATED)) {
-            style = style.obfuscated(json.get(OBFUSCATED).getAsBoolean());
+        if ((element = json.get(OBFUSCATED)) != null) {
+            style = style.obfuscated(element.getAsBoolean());
         }
         builder.style(style);
         if (children != null) {
             builder.append((Text[]) context.deserialize(children, Text[].class));
         }
-        if (json.has(CLICK_EVENT)) {
-            JsonObject json0 = json.getAsJsonObject(CLICK_EVENT);
-            if (json0 != null) {
-                JsonPrimitive json1 = json0.getAsJsonPrimitive(EVENT_ACTION);
-                JsonPrimitive json2 = json0.getAsJsonPrimitive(EVENT_VALUE);
-                if (json1 != null && json2 != null) {
-                    String action = json1.getAsString();
-                    String value = json2.getAsString();
+        if ((element = json.get(CLICK_EVENT)) != null) {
+            final JsonObject jsonClickEvent = element.getAsJsonObject();
+            if (jsonClickEvent != null) {
+                final JsonPrimitive jsonEventAction = jsonClickEvent.getAsJsonPrimitive(EVENT_ACTION);
+                final JsonPrimitive jsonEventValue = jsonClickEvent.getAsJsonPrimitive(EVENT_VALUE);
+                if (jsonEventAction != null && jsonEventValue != null) {
+                    final String action = jsonEventAction.getAsString();
+                    final String value = jsonEventValue.getAsString();
 
-                    ClickAction<?> clickAction = LanternTextHelper.parseClickAction(action, value);
+                    final ClickAction<?> clickAction = LanternTextHelper.parseClickAction(action, value);
                     if (clickAction != null) {
                         builder.onClick(clickAction);
                     }
                 }
             }
         }
-        if (json.has(HOVER_EVENT)) {
-            JsonObject json0 = json.getAsJsonObject(HOVER_EVENT);
-            if (json0 != null) {
-                JsonPrimitive json1 = json0.getAsJsonPrimitive(EVENT_ACTION);
-                JsonPrimitive json2 = json0.getAsJsonPrimitive(EVENT_VALUE);
-                if (json1 != null && json2 != null) {
-                    String action = json1.getAsString();
-                    String value = json2.getAsString();
+        if ((element = json.get(HOVER_EVENT)) != null) {
+            final JsonObject jsonHoverEvent = element.getAsJsonObject();
+            if (jsonHoverEvent != null) {
+                final JsonPrimitive jsonEventAction = jsonHoverEvent.getAsJsonPrimitive(EVENT_ACTION);
+                final JsonPrimitive jsonEventValue = jsonHoverEvent.getAsJsonPrimitive(EVENT_VALUE);
+                if (jsonEventAction != null && jsonEventValue != null) {
+                    final String action = jsonEventAction.getAsString();
+                    final String value = jsonEventValue.getAsString();
 
-                    HoverAction<?> hoverAction = LanternTextHelper.parseHoverAction(action, value);
+                    final HoverAction<?> hoverAction = LanternTextHelper.parseHoverAction(action, value);
                     if (hoverAction != null) {
                         builder.onHover(hoverAction);
                     }
                 }
             }
         }
-        if (json.has(INSERTION)) {
-            builder.onShiftClick(TextActions.insertText(json.getAsString()));
+        if ((element = json.get(INSERTION)) != null) {
+            builder.onShiftClick(TextActions.insertText(element.getAsString()));
         }
     }
 
@@ -122,11 +124,11 @@ abstract class JsonTextBaseSerializer {
     }
 
     public static void serialize(JsonObject json, Text text, JsonSerializationContext context, List<Text> children) {
-        TextColor color = text.getColor();
+        final TextColor color = text.getColor();
         if (color != TextColors.NONE) {
             json.addProperty(COLOR, color.getId());
         }
-        TextStyle style = text.getStyle();
+        final TextStyle style = text.getStyle();
         style.isBold().ifPresent(v -> json.addProperty(BOLD, v));
         style.isItalic().ifPresent(v -> json.addProperty(ITALIC, v));
         style.hasUnderline().ifPresent(v -> json.addProperty(UNDERLINE, v));
@@ -136,22 +138,23 @@ abstract class JsonTextBaseSerializer {
             json.add(CHILDREN, context.serialize(children.toArray(new Text[children.size()]), Text[].class));
         }
         text.getClickAction().ifPresent(clickAction -> {
-            RawAction raw = LanternTextHelper.raw(clickAction);
+            final RawAction raw = LanternTextHelper.raw(clickAction);
 
-            JsonObject json0 = new JsonObject();
-            json0.addProperty(EVENT_ACTION, raw.getAction());
-            json0.addProperty(EVENT_VALUE, raw.getValueAsString());
+            final JsonObject jsonEvent = new JsonObject();
+            jsonEvent.addProperty(EVENT_ACTION, raw.getAction());
+            jsonEvent.addProperty(EVENT_VALUE, raw.getValueAsString());
 
-            json.add(CLICK_EVENT, json0);
+            json.add(CLICK_EVENT, jsonEvent);
         });
         text.getHoverAction().ifPresent(clickAction -> {
-            RawAction raw = LanternTextHelper.raw(clickAction);
+            final RawAction raw = LanternTextHelper.raw(clickAction);
 
-            JsonObject json0 = new JsonObject();
-            json0.addProperty(EVENT_ACTION, raw.getAction());
-            json0.addProperty(EVENT_VALUE, raw.getValueAsString());
+            final JsonObject jsonEvent = new JsonObject();
+            //noinspection ConstantConditions
+            jsonEvent.addProperty(EVENT_ACTION, raw.getAction());
+            jsonEvent.addProperty(EVENT_VALUE, raw.getValueAsString());
 
-            json.add(HOVER_EVENT, json0);
+            json.add(HOVER_EVENT, jsonEvent);
         });
         text.getShiftClickAction().ifPresent(shiftClickAction -> {
             if (shiftClickAction instanceof ShiftClickAction.InsertText) {

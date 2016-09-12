@@ -56,14 +56,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
  * the protocol is basically just a limited play protocol version with all
  * the message types and processors needed for the forge handshake.
  */
-public final class ProtocolForgeHandshake extends ProtocolBase {
+final class ProtocolForgeHandshake extends ProtocolBase {
 
     ProtocolForgeHandshake() {
-        MessageRegistry inbound = this.inbound();
-        MessageRegistry outbound = this.outbound();
+        final MessageRegistry inbound = this.inbound();
+        final MessageRegistry outbound = this.outbound();
 
         inbound.bind(0x0b, CodecInOutPing.class, MessageInOutKeepAlive.class);
-        CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayInCustomPayloadRegistration =
+        final CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayInCustomPayloadRegistration =
                 inbound.bind(0x09, CodecPlayInOutCustomPayload.class);
         codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class).bindHandler(new HandlerPlayInChannelPayload());
         codecPlayInCustomPayloadRegistration.bind(MessageForgeHandshakeInOutAck.class).bindHandler(new HandlerForgeHandshakeInAck());
@@ -74,7 +74,7 @@ public final class ProtocolForgeHandshake extends ProtocolBase {
         codecPlayInCustomPayloadRegistration.bind(MessagePlayInOutUnregisterChannels.class).bindHandler(new HandlerPlayInUnregisterChannels());
 
         outbound.bind(0x1f, CodecInOutPing.class, MessageInOutKeepAlive.class);
-        CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayOutCustomPayloadRegistration =
+        final CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayOutCustomPayloadRegistration =
                 outbound.bind(0x18, CodecPlayInOutCustomPayload.class);
         codecPlayOutCustomPayloadRegistration.bind(MessagePlayInOutChannelPayload.class);
         codecPlayOutCustomPayloadRegistration.bind(MessageForgeHandshakeInOutAck.class);

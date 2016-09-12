@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.protocol;
 
 import org.lanternpowered.server.network.message.MessageRegistry;
 
-public class ProtocolBase implements Protocol {
+class ProtocolBase implements Protocol {
 
     private final MessageRegistry inbound = new MessageRegistry();
     private final MessageRegistry outbound = new MessageRegistry();

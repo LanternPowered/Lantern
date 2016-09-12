@@ -60,7 +60,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
@@ -162,7 +161,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     private final PlayerInteractionHandler interactionHandler;
 
     // The chunk position since the last #pulseChunkChanges call
-    private Vector2i lastChunkPos = null;
+    @Nullable private Vector2i lastChunkPos = null;
 
     // The loading ticket that will force the chunks to be loaded
     @Nullable private ChunkTicketManager.PlayerEntityLoadingTicket loadingTicket;
@@ -598,7 +597,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public Optional<Player> getPlayer() {
-        return Optional.<Player>of(this);
+        return Optional.of(this);
     }
 
     @Override

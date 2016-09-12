@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world.chunk;
 
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 
 import java.util.UUID;
@@ -50,4 +51,8 @@ class LanternPlayerLoadingTicket extends LanternLoadingTicket implements PlayerL
         return this.uniqueId;
     }
 
+    @Override
+    MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().omitNullValues().add("player", this.uniqueId);
+    }
 }

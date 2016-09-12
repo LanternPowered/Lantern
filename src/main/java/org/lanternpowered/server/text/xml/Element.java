@@ -82,7 +82,7 @@ public abstract class Element {
 
     @XmlElementRef(type = Element.class)
     @XmlMixed
-    protected List<Object> mixedContent = Lists.newArrayList();
+    List<Object> mixedContent = Lists.newArrayList();
 
     protected abstract void modifyBuilder(Text.Builder builder);
 
@@ -110,7 +110,7 @@ public abstract class Element {
         return builder;
     }
 
-    protected Text.Builder builderFromObject(Object o) throws Exception {
+    Text.Builder builderFromObject(Object o) throws Exception {
         if (o instanceof String) {
             return Text.builder(String.valueOf(o).replace('\u000B', ' '));
         } else if (o instanceof Element) {
@@ -120,7 +120,7 @@ public abstract class Element {
         }
     }
 
-    protected void applyTextActions(Text.Builder builder) throws Exception {
+    void applyTextActions(Text.Builder builder) throws Exception {
         if (this.onClick != null) {
             Matcher matcher = FUNCTION_PATTERN.matcher(this.onClick);
             if (!matcher.matches()) {
@@ -186,11 +186,11 @@ public abstract class Element {
         }
     }
 
-    public static Element fromText(Text text, Locale locale) {
+    static Element fromText(Text text, Locale locale) {
         final AtomicReference<Element> fixedRoot = new AtomicReference<>();
         Element currentElement = null;
         if (text.getColor() != TextColors.NONE) {
-            currentElement = update(fixedRoot, currentElement, new Color.C(text.getColor()));
+            currentElement = update(fixedRoot, null, new Color.C(text.getColor()));
         }
         if (text.getStyle().contains(TextStyles.BOLD)) {
             currentElement = update(fixedRoot, currentElement, new B());
@@ -214,7 +214,7 @@ public abstract class Element {
                 if (currentElement == null) {
                     fixedRoot.set(currentElement = new Span());
                 }
-                RawAction raw = LanternTextHelper.raw(text.getClickAction().get());
+                final RawAction raw = LanternTextHelper.raw(text.getClickAction().get());
                 currentElement.onClick = raw.getAction() + "('" + ((LanternTextSerializer) TextSerializers.TEXT_XML)
                         .serialize(raw.getValueAsText(), locale) + "')";
             }
@@ -225,13 +225,14 @@ public abstract class Element {
         }
 
         if (text.getHoverAction().isPresent()) {
-            RawAction raw = LanternTextHelper.raw(text.getHoverAction().get());
+            final RawAction raw = LanternTextHelper.raw(text.getHoverAction().get());
+            //noinspection ConstantConditions
             currentElement.onHover = raw.getAction() + "('" + ((LanternTextSerializer) TextSerializers.TEXT_XML)
                     .serialize(raw.getValueAsText(), locale) + "')";
         }
 
         if (text.getShiftClickAction().isPresent()) {
-            ShiftClickAction<?> action = text.getShiftClickAction().get();
+            final ShiftClickAction<?> action = text.getShiftClickAction().get();
             if (!(action instanceof ShiftClickAction.InsertText)) {
                 throw new IllegalArgumentException("Shift-click action is not an insertion. Currently not supported!");
             }
@@ -241,8 +242,8 @@ public abstract class Element {
         if (text instanceof LiteralText) {
             currentElement.mixedContent.add(((LiteralText) text).getContent());
         } else if (text instanceof TranslatableText) {
-            Translation transl = ((TranslatableText) text).getTranslation();
-            currentElement = update(fixedRoot, currentElement, new Tr(transl.getId()));
+            final Translation translation = ((TranslatableText) text).getTranslation();
+            currentElement = update(fixedRoot, currentElement, new Tr(translation.getId()));
             for (Object o : ((TranslatableText) text).getArguments()) {
                 if (o instanceof Text) {
                     currentElement.mixedContent.add(Element.fromText(((Text) o), locale));

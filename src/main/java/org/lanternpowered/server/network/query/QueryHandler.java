@@ -79,7 +79,7 @@ import java.util.stream.Collectors;
  * @see QueryServer
  * @see <a href="http://wiki.vg/Query">Protocol Specifications</a>
  */
-public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
+class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
 
     private static final byte ACTION_HANDSHAKE = 9;
     private static final byte ACTION_STATS = 0;
@@ -90,7 +90,7 @@ public class QueryHandler extends SimpleChannelInboundHandler<DatagramPacket> {
     // Whether the a plugin list should be included in responses
     private boolean showPlugins;
 
-    public QueryHandler(QueryServer queryServer, boolean showPlugins) {
+    QueryHandler(QueryServer queryServer, boolean showPlugins) {
         this.queryServer = queryServer;
         this.showPlugins = showPlugins;
     }

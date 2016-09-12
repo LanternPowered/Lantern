@@ -123,7 +123,7 @@ class LanternLoadingTicketIO {
                 ticketEntries.add(ticketData);
             }
 
-            ticketHolders.add(new MemoryDataContainer()
+            ticketHolders.add(new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(HOLDER_NAME, entry.getKey())
                     .set(TICKETS, ticketEntries));
         }

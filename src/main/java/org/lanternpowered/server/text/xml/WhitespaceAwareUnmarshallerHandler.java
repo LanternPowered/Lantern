@@ -42,7 +42,7 @@ class WhitespaceAwareUnmarshallerHandler implements ContentHandler {
 
     private final UnmarshallerHandler uh;
 
-    public WhitespaceAwareUnmarshallerHandler(UnmarshallerHandler uh) {
+    WhitespaceAwareUnmarshallerHandler(UnmarshallerHandler uh) {
         this.uh = uh;
     }
 

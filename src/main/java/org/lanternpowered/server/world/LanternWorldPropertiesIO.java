@@ -71,7 +71,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public final class LanternWorldPropertiesIO {
+final class LanternWorldPropertiesIO {
 
     private final static Gson GSON = new Gson();
 
@@ -161,22 +161,19 @@ public final class LanternWorldPropertiesIO {
         }
         final DataView spongeRootDataView = IOHelper.read(directory.resolve(SPONGE_LEVEL_DATA),
                 file -> NbtStreamUtils.read(Files.newInputStream(file), true)).orElse(null);
-        DataView spongeContainer = null;
-        if (spongeRootDataView != null) {
-            spongeContainer = spongeRootDataView.getView(DataQueries.SPONGE_DATA).orElse(null);
-        }
+        final DataView spongeContainer = spongeRootDataView != null ? spongeRootDataView.getView(DataQueries.SPONGE_DATA).orElse(null) : null;
 
         if (uniqueId == null) {
             // Try for the sponge (lantern) storage format
             if (spongeContainer != null) {
-                Long most = spongeContainer.getLong(UUID_MOST).orElse(null);
-                Long least = spongeContainer.getLong(UUID_LEAST).orElse(null);
+                final Long most = spongeContainer.getLong(UUID_MOST).orElse(null);
+                final Long least = spongeContainer.getLong(UUID_LEAST).orElse(null);
                 if (most != null && least != null) {
                     uniqueId = new UUID(most, least);
                 }
             }
             // The uuid storage bukkit used, try this one first
-            Path uuidFile;
+            final Path uuidFile;
             if (uniqueId == null && Files.exists((uuidFile = directory.resolve(BUKKIT_UUID_DATA)))) {
                 try (DataInputStream in = new DataInputStream(Files.newInputStream(uuidFile))) {
                     uniqueId = new UUID(in.readLong(), in.readLong());
@@ -204,11 +201,7 @@ public final class LanternWorldPropertiesIO {
             }
         }
 
-        Integer dimensionId = null;
-        if (spongeContainer != null) {
-            dimensionId = spongeContainer.getInt(DIMENSION_INDEX).orElse(null);
-        }
-
+        final Integer dimensionId = spongeContainer != null ? spongeContainer.getInt(DIMENSION_INDEX).orElse(null) : null;
         return new LevelData(worldName, uniqueId, rootDataView, spongeRootDataView, dimensionId, dimensionMap);
     }
 
@@ -327,14 +320,9 @@ public final class LanternWorldPropertiesIO {
 
             if (dataView.contains(GENERATOR_NAME)) {
                 final String genName0 = dataView.getString(GENERATOR_NAME).get();
-                String genName = genName0;
-                if (genName.indexOf(':') == -1) {
-                    genName = "minecraft:" + genName;
-                }
-                GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, genName).orElse(null);
-                if (generatorType == null) {
-                    generatorType = properties.getDimensionType().getDefaultGeneratorType();
-                }
+                final String genName = genName0.indexOf(':') == -1 ? "minecraft:" + genName0 : genName0;
+                final GeneratorType generatorType = Sponge.getRegistry().getType(GeneratorType.class, genName)
+                        .orElse(properties.getDimensionType().getDefaultGeneratorType());
                 DataContainer generatorSettings = null;
                 if (dataView.contains(GENERATOR_OPTIONS)) {
                     String options = dataView.getString(GENERATOR_OPTIONS).get();
@@ -385,7 +373,7 @@ public final class LanternWorldPropertiesIO {
                     properties.updateWorldGenModifiers(modifiers);
                 });
             } else {
-                LanternDimensionType dimensionType = properties.getDimensionType();
+                final LanternDimensionType dimensionType = properties.getDimensionType();
                 worldConfig.setKeepSpawnLoaded(dimensionType.doesKeepSpawnLoaded());
                 worldConfig.setDoesWaterEvaporate(dimensionType.doesWaterEvaporate());
             }

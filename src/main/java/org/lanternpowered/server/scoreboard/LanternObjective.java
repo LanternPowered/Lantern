@@ -44,6 +44,7 @@ import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMo
 import org.spongepowered.api.text.Text;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,10 +91,10 @@ public class LanternObjective implements Objective {
 
     @Override
     public void setDisplayName(Text displayName) throws IllegalArgumentException {
-        String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
+        final String legacyDisplayName = LanternTexts.toLegacy(checkNotNull(displayName, "displayName"));
         checkArgument(legacyDisplayName.length() <= 32, "Display name is %s characters long! It must be at most 32.",
                 legacyDisplayName.length());
-        boolean update = !legacyDisplayName.equals(this.legacyDisplayName);
+        final boolean update = !legacyDisplayName.equals(this.legacyDisplayName);
         this.legacyDisplayName = legacyDisplayName;
         this.displayName = displayName;
         if (update) {
@@ -103,8 +104,8 @@ public class LanternObjective implements Objective {
 
     private void sendObjectiveUpdate() {
         if (!this.scoreboards.isEmpty()) {
-            List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardObjective.Update(this.name,
-                    this.legacyDisplayName, this.displayMode));
+            final List<Message> message = Collections.singletonList(new MessagePlayOutScoreboardObjective.Update(
+                    this.name, this.legacyDisplayName, this.displayMode));
             for (Scoreboard scoreboard : this.scoreboards) {
                 ((LanternScoreboard) scoreboard).sendToPlayers(() -> message);
             }
@@ -123,7 +124,7 @@ public class LanternObjective implements Objective {
 
     @Override
     public void setDisplayMode(ObjectiveDisplayMode displayMode) {
-        boolean update = !checkNotNull(displayMode, "displayMode").equals(this.displayMode);
+        final boolean update = !checkNotNull(displayMode, "displayMode").equals(this.displayMode);
         this.displayMode = displayMode;
         if (update) {
             this.sendObjectiveUpdate();
@@ -164,7 +165,7 @@ public class LanternObjective implements Objective {
     @Override
     public Score getOrCreateScore(Text name) {
         return this.scores.computeIfAbsent(name, name1 -> {
-            LanternScore score = new LanternScore(name1);
+            final LanternScore score = new LanternScore(name1);
             score.addObjective(this);
             this.sendScoreToClient(score);
             return score;
@@ -182,7 +183,7 @@ public class LanternObjective implements Objective {
     }
 
     private void updateClientAfterRemove(Score score) {
-        Map<Objective, Message> messages = Maps.newHashMap();
+        final Map<Objective, Message> messages = new HashMap<>();
         for (Scoreboard scoreboard : this.scoreboards) {
             ((LanternScoreboard) scoreboard).sendToPlayers(() -> Collections.singletonList(
                     messages.computeIfAbsent(this, obj -> new MessagePlayOutScoreboardScore.Remove(
@@ -192,7 +193,7 @@ public class LanternObjective implements Objective {
 
     @Override
     public boolean removeScore(Text name) {
-        Score score = this.scores.remove(checkNotNull(name, "name"));
+        final Score score = this.scores.remove(checkNotNull(name, "name"));
         if (score != null) {
             ((LanternScore) score).removeObjective(this);
             this.updateClientAfterRemove(score);

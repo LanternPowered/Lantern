@@ -27,7 +27,6 @@ package org.lanternpowered.server.scoreboard;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutScoreboardScore;
@@ -38,6 +37,7 @@ import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.text.Text;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -74,14 +74,14 @@ public final class LanternScore implements Score {
             return;
         }
         this.score = score;
-        Multimap<Scoreboard, Objective> scoreboards = HashMultimap.create();
+        final Multimap<Scoreboard, Objective> scoreboards = HashMultimap.create();
         for (Objective objective : this.objectives) {
             for (Scoreboard scoreboard : ((LanternObjective) objective).scoreboards) {
                 scoreboards.put(scoreboard, objective);
             }
         }
         if (!scoreboards.isEmpty()) {
-            Map<Objective, Message> messages = Maps.newHashMap();
+            final Map<Objective, Message> messages = new HashMap<>();
             for (Map.Entry<Scoreboard, Objective> entry : scoreboards.entries()) {
                 ((LanternScoreboard) entry.getKey()).sendToPlayers(() -> Collections.singletonList(
                         messages.computeIfAbsent(entry.getValue(), obj -> new MessagePlayOutScoreboardScore.CreateOrUpdate(

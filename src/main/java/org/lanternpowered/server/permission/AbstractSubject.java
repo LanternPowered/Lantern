@@ -57,10 +57,7 @@ public interface AbstractSubject extends Subject {
     }
 
     default void findPermissionSubject() {
-        Optional<PermissionService> service = Sponge.getServiceManager().provide(PermissionService.class);
-        if (service.isPresent()) {
-            new SubjectSettingCallback(this).test(service.get());
-        }
+        Sponge.getServiceManager().provide(PermissionService.class).ifPresent(service -> SubjectSettingCallback.apply(this, service));
     }
 
     @Override

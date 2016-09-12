@@ -42,11 +42,11 @@ import java.lang.reflect.Type;
 
 import static org.lanternpowered.server.text.gson.TextConstants.*;
 
-public final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<LiteralText>, JsonDeserializer<LiteralText> {
+final class JsonTextLiteralSerializer extends JsonTextBaseSerializer implements JsonSerializer<LiteralText>, JsonDeserializer<LiteralText> {
 
     private final boolean removeComplexity;
 
-    public JsonTextLiteralSerializer(boolean removeComplexity) {
+    JsonTextLiteralSerializer(boolean removeComplexity) {
         this.removeComplexity = removeComplexity;
     }
 

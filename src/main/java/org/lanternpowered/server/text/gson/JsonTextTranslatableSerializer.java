@@ -86,27 +86,27 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
     private final boolean networkingFormat;
     private final boolean removeComplexity;
 
-    public JsonTextTranslatableSerializer(TranslationManager translationManager, boolean networkingFormat, boolean removeComplexity) {
+    JsonTextTranslatableSerializer(TranslationManager translationManager, boolean networkingFormat, boolean removeComplexity) {
         this.translationManager = translationManager;
         this.networkingFormat = networkingFormat;
         this.removeComplexity = removeComplexity;
     }
 
     @Override
-    public TranslatableText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonObject json0 = json.getAsJsonObject();
-        String name = json0.get(TRANSLATABLE).getAsString();
-        Translation translation = this.translationManager.get(name);
-        Object[] arguments;
-        if (json0.has(TRANSLATABLE_ARGS)) {
-            Text[] with = context.deserialize(json0.get(TRANSLATABLE_ARGS), Text[].class);
+    public TranslatableText deserialize(JsonElement element, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+        final JsonObject obj = element.getAsJsonObject();
+        final String name = obj.get(TRANSLATABLE).getAsString();
+        final Translation translation = this.translationManager.get(name);
+        final Object[] arguments;
+        if ((element = obj.get(TRANSLATABLE_ARGS)) != null) {
+            final Text[] with = context.deserialize(element, Text[].class);
             arguments = new Object[with.length];
             System.arraycopy(with, 0, arguments, 0, with.length);
         } else {
             arguments = new Object[0];
         }
-        TranslatableText.Builder builder = Text.builder(translation, arguments);
-        deserialize(json0, builder, context);
+        final TranslatableText.Builder builder = Text.builder(translation, arguments);
+        deserialize(obj, builder, context);
         return builder.build();
     }
 
@@ -130,14 +130,14 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
                     rawArguments[i] = object.toString();
                 }
             }
-            String content = src.getTranslation().get(locale, rawArguments);
+            final String content = src.getTranslation().get(locale, rawArguments);
             return JsonTextLiteralSerializer.serializeLiteralText(src, content, context, this.removeComplexity);
         }
-        JsonObject json = new JsonObject();
-        json.addProperty(TRANSLATABLE, src.getTranslation().getId());
-        ImmutableList<Object> arguments = src.getArguments();
+        final JsonObject obj = new JsonObject();
+        obj.addProperty(TRANSLATABLE, src.getTranslation().getId());
+        final ImmutableList<Object> arguments = src.getArguments();
         if (!arguments.isEmpty()) {
-            JsonArray argumentsArray = new JsonArray();
+            final JsonArray argumentsArray = new JsonArray();
             for (Object object : arguments) {
                 // Only primitive strings and text json is allowed,
                 // so we need to convert the objects if possible
@@ -150,10 +150,10 @@ public final class JsonTextTranslatableSerializer extends JsonTextBaseSerializer
                     argumentsArray.add(new JsonPrimitive(object.toString()));
                 }
             }
-            json.add(TRANSLATABLE_ARGS, argumentsArray);
+            obj.add(TRANSLATABLE_ARGS, argumentsArray);
         }
-        serialize(json, src, context);
-        return json;
+        serialize(obj, src, context);
+        return obj;
     }
 
 }

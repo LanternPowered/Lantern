@@ -30,18 +30,20 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.util.GuavaCollectors;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 import javax.annotation.Nullable;
 
 class LanternLoadingTicket implements ChunkLoadingTicket {
 
-    private final LinkedList<Vector2i> queue = new LinkedList<>();
+    final LinkedList<Vector2i> queue = new LinkedList<>();
     private final LanternChunkManager chunkManager;
     private final String plugin;
 
@@ -221,5 +223,21 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
             this.chunkManager.release(this);
             this.released = true;
         }
+    }
+
+    MoreObjects.ToStringHelper toStringHelper() {
+        synchronized (this.queue) {
+            return MoreObjects.toStringHelper(this)
+                    .add("plugin", this.plugin)
+                    .add("maxChunks", this.maxChunks)
+                    .add("numChunks", this.numChunks)
+                    .add("released", this.released)
+                    .add("chunks", Arrays.toString(this.queue.toArray(new Vector2i[this.queue.size()])));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return this.toStringHelper().toString();
     }
 }

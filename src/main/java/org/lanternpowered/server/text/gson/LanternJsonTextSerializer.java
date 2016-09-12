@@ -65,5 +65,4 @@ public final class LanternJsonTextSerializer implements TextSerializer {
             throw new TextParseException(e);
         }
     }
-
 }

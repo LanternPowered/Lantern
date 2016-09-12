@@ -35,7 +35,7 @@ import org.lanternpowered.server.network.vanilla.message.type.status.MessageStat
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusInRequest;
 import org.lanternpowered.server.network.vanilla.message.type.status.MessageStatusOutResponse;
 
-public final class ProtocolStatus extends ProtocolBase {
+final class ProtocolStatus extends ProtocolBase {
 
     ProtocolStatus() {
         MessageRegistry inbound = this.inbound();

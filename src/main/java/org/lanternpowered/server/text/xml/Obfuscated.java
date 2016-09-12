@@ -31,6 +31,7 @@ import org.spongepowered.api.text.format.TextStyles;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 
+@SuppressWarnings("WeakerAccess")
 @XmlSeeAlso(Obfuscated.O.class)
 @XmlRootElement
 public class Obfuscated extends Element {

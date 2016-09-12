@@ -237,11 +237,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
 
-public final class ProtocolPlay extends ProtocolBase {
+final class ProtocolPlay extends ProtocolBase {
 
-    public ProtocolPlay() {
-        MessageRegistry inbound = this.inbound();
-        MessageRegistry outbound = this.outbound();
+    ProtocolPlay() {
+        final MessageRegistry inbound = this.inbound();
+        final MessageRegistry outbound = this.outbound();
 
         // Register the processors
         outbound.bindProcessor(MessagePlayOutTheEnd.class, new ProcessorPlayOutTheEnd());
@@ -250,7 +250,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.bindProcessor(MessagePlayOutWorldSky.class, new ProcessorPlayOutWorldSky());
         outbound.bindProcessor(MessagePlayOutTabListEntries.class, new ProcessorPlayOutTabListEntries());
 
-        HandlerPlayInAllPlayerMovement playerMovementHandler = new HandlerPlayInAllPlayerMovement();
+        final HandlerPlayInAllPlayerMovement playerMovementHandler = new HandlerPlayInAllPlayerMovement();
 
         // Register the codecs and handlers of the default messages
         inbound.bind(0x00, CodecPlayInTeleportConfirm.class, MessagePlayInTeleportConfirm.class); // TODO: Handler
@@ -349,7 +349,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x09, CodecPlayOutUpdateTileEntity.class, MessagePlayOutUpdateTileEntity.class);
         // ...
         outbound.bind(0x0b, CodecPlayOutBlockChange.class, MessagePlayOutBlockChange.class);
-        CodecRegistration<MessagePlayOutBossBar, CodecPlayOutBossBar> codecPlayOutBossBar = outbound.bind(0x0c, CodecPlayOutBossBar.class);
+        final CodecRegistration<MessagePlayOutBossBar, CodecPlayOutBossBar> codecPlayOutBossBar = outbound.bind(0x0c, CodecPlayOutBossBar.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.Add.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.Remove.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.UpdatePercent.class);
@@ -367,7 +367,7 @@ public final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x15, CodecPlayOutWindowProperty.class, MessagePlayOutWindowProperty.class);
         outbound.bind(0x16, CodecPlayOutSetWindowSlot.class, MessagePlayOutSetWindowSlot.class);
         outbound.bind(0x17, CodecPlayOutSetCooldown.class, MessagePlayOutSetCooldown.class);
-        CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayInOutCustomPayload = outbound.bind(
+        final CodecRegistration<Message, CodecPlayInOutCustomPayload> codecPlayInOutCustomPayload = outbound.bind(
                 0x18, CodecPlayInOutCustomPayload.class);
         codecPlayInOutCustomPayload.bind(MessagePlayInOutChannelPayload.class);
         codecPlayInOutCustomPayload.bind(MessagePlayOutOpenBook.class);
@@ -375,7 +375,7 @@ public final class ProtocolPlay extends ProtocolBase {
         codecPlayInOutCustomPayload.bind(MessagePlayOutStopSound.class);
         outbound.bind(0x19, CodecPlayOutSoundEffect.class, MessagePlayOutNamedSoundEffect.class);
         outbound.bind(0x1a, CodecOutDisconnect.class, MessageOutDisconnect.class);
-        CodecRegistration<Message, CodecPlayOutEntityStatus> codecPlayOutEntityStatus = outbound.bind(0x1b, CodecPlayOutEntityStatus.class);
+        final CodecRegistration<Message, CodecPlayOutEntityStatus> codecPlayOutEntityStatus = outbound.bind(0x1b, CodecPlayOutEntityStatus.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutSetOpLevel.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutSetReducedDebug.class);
         // 0x1c
@@ -400,7 +400,7 @@ public final class ProtocolPlay extends ProtocolBase {
         // ...
         outbound.bind(0x33, CodecPlayOutPlayerRespawn.class, MessagePlayOutPlayerRespawn.class);
         outbound.bind(0x34, CodecPlayOutEntityHeadLook.class, MessagePlayOutEntityHeadLook.class);
-        CodecRegistration<MessagePlayOutWorldBorder, CodecPlayOutWorldBorder> codecPlayOutWorldBorder =
+        final CodecRegistration<MessagePlayOutWorldBorder, CodecPlayOutWorldBorder> codecPlayOutWorldBorder =
                 outbound.bind(0x35, CodecPlayOutWorldBorder.class);
         codecPlayOutWorldBorder.bind(MessagePlayOutWorldBorder.Initialize.class);
         codecPlayOutWorldBorder.bind(MessagePlayOutWorldBorder.UpdateCenter.class);
@@ -417,26 +417,26 @@ public final class ProtocolPlay extends ProtocolBase {
         // 0x3c
         outbound.bind(0x3d, CodecPlayOutSetExperience.class, MessagePlayOutSetExperience.class);
         outbound.bind(0x3e, CodecPlayOutPlayerHealthUpdate.class, MessagePlayOutPlayerHealthUpdate.class);
-        CodecRegistration<MessagePlayOutScoreboardObjective, CodecPlayOutScoreboardObjective> codecPlayOutScoreboardObjective = outbound.bind(
+        final CodecRegistration<MessagePlayOutScoreboardObjective, CodecPlayOutScoreboardObjective> codecPlayOutScoreboardObjective = outbound.bind(
                 0x3f, CodecPlayOutScoreboardObjective.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Create.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Update.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Remove.class);
         // ...
-        CodecRegistration<MessagePlayOutTeams, CodecPlayOutTeams> codecPlayOutTeams = outbound.bind(
+        final CodecRegistration<MessagePlayOutTeams, CodecPlayOutTeams> codecPlayOutTeams = outbound.bind(
                 0x41, CodecPlayOutTeams.class);
         codecPlayOutTeams.bind(MessagePlayOutTeams.AddPlayers.class);
         codecPlayOutTeams.bind(MessagePlayOutTeams.Create.class);
         codecPlayOutTeams.bind(MessagePlayOutTeams.Update.class);
         codecPlayOutTeams.bind(MessagePlayOutTeams.Remove.class);
         codecPlayOutTeams.bind(MessagePlayOutTeams.RemovePlayers.class);
-        CodecRegistration<MessagePlayOutScoreboardScore, CodecPlayOutScoreboardScore> codecPlayOutScoreboardScore = outbound.bind(
+        final CodecRegistration<MessagePlayOutScoreboardScore, CodecPlayOutScoreboardScore> codecPlayOutScoreboardScore = outbound.bind(
                 0x42, CodecPlayOutScoreboardScore.class);
         codecPlayOutScoreboardScore.bind(MessagePlayOutScoreboardScore.CreateOrUpdate.class);
         codecPlayOutScoreboardScore.bind(MessagePlayOutScoreboardScore.Remove.class);
         outbound.bind(0x43, CodecPlayOutPlayerSpawnPosition.class, MessagePlayOutPlayerSpawnPosition.class);
         outbound.bind(0x44, CodecPlayOutWorldTime.class, MessagePlayOutWorldTime.class);
-        CodecRegistration<MessagePlayOutTitle, CodecPlayOutTitle> codecPlayOutTitle = outbound.bind(0x45, CodecPlayOutTitle.class);
+        final CodecRegistration<MessagePlayOutTitle, CodecPlayOutTitle> codecPlayOutTitle = outbound.bind(0x45, CodecPlayOutTitle.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.Clear.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.Reset.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetSubtitle.class);

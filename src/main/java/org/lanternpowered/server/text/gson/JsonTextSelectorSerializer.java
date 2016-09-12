@@ -39,24 +39,24 @@ import org.spongepowered.api.text.selector.Selector;
 
 import java.lang.reflect.Type;
 
-public final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<SelectorText>,
+final class JsonTextSelectorSerializer extends JsonTextBaseSerializer implements JsonSerializer<SelectorText>,
         JsonDeserializer<SelectorText> {
 
     @Override
     public SelectorText deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-        JsonObject json0 = json.getAsJsonObject();
-        Selector selector = Selector.parse(json0.get(SELECTOR).getAsString());
-        SelectorText.Builder builder = SelectorText.builder(selector);
-        deserialize(json0, builder, context);
+        final JsonObject obj = json.getAsJsonObject();
+        final Selector selector = Selector.parse(obj.get(SELECTOR).getAsString());
+        final SelectorText.Builder builder = SelectorText.builder(selector);
+        deserialize(obj, builder, context);
         return builder.build();
     }
 
     @Override
     public JsonElement serialize(SelectorText src, Type typeOfSrc, JsonSerializationContext context) {
-        JsonObject json = new JsonObject();
-        json.addProperty(SELECTOR, src.getSelector().toPlain());
-        serialize(json, src, context);
-        return json;
+        final JsonObject obj = new JsonObject();
+        obj.addProperty(SELECTOR, src.getSelector().toPlain());
+        serialize(obj, src, context);
+        return obj;
     }
 
 }

@@ -28,6 +28,7 @@ package org.lanternpowered.server.profile;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
@@ -112,6 +113,7 @@ public final class LanternGameProfile implements GameProfile {
 
     @Override
     public UUID getUniqueId() {
+        //noinspection ConstantConditions
         checkState(this.uniqueId != null, "Invalid game profile, the unique id is null!");
         return this.uniqueId;
     }
@@ -181,6 +183,15 @@ public final class LanternGameProfile implements GameProfile {
     @Override
     public int hashCode() {
         return Objects.hash(this.uniqueId, this.name, this.properties);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("uniqueId", this.uniqueId)
+                .add("name", this.name)
+                .toString();
     }
 
     /*

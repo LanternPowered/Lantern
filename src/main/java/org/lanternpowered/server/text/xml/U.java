@@ -30,6 +30,7 @@ import org.spongepowered.api.text.format.TextStyles;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+@SuppressWarnings("WeakerAccess")
 @XmlRootElement
 public class U extends Element {
 

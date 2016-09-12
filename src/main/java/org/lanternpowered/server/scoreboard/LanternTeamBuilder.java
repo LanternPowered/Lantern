@@ -60,11 +60,6 @@ public class LanternTeamBuilder implements Team.Builder {
         this.reset();
     }
 
-    public LanternTeamBuilder collisionRule(LanternCollisionRule collisionRule) {
-        this.collisionRule = checkNotNull(collisionRule, "collisionRule");
-        return this;
-    }
-
     @Override
     public LanternTeamBuilder name(String name) {
         this.name = checkNotNull(name, "name");
@@ -136,7 +131,7 @@ public class LanternTeamBuilder implements Team.Builder {
     }
 
     @Override
-    public Team.Builder collisionRule(CollisionRule rule) {
+    public LanternTeamBuilder collisionRule(CollisionRule rule) {
         this.collisionRule = checkNotNull(rule, "rule");
         return this;
     }

@@ -88,14 +88,14 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
         if (json.isJsonPrimitive()) {
             return context.deserialize(json, LiteralText.class);
         }
-        JsonObject json0 = json.getAsJsonObject();
-        if (json0.has(TEXT)) {
+        final JsonObject obj = json.getAsJsonObject();
+        if (obj.has(TEXT)) {
             return context.deserialize(json, LiteralText.class);
-        } else if (json0.has(TRANSLATABLE)) {
+        } else if (obj.has(TRANSLATABLE)) {
             return context.deserialize(json, TranslatableText.class);
-        } else if (json0.has(SCORE_VALUE)) {
+        } else if (obj.has(SCORE_VALUE)) {
             return context.deserialize(json, ScoreText.class);
-        } else if (json0.has(SELECTOR)) {
+        } else if (obj.has(SELECTOR)) {
             return context.deserialize(json, SelectorText.class);
         } else {
             throw new JsonParseException("Unknown text format: " + json.toString());

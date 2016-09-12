@@ -33,6 +33,8 @@ import org.spongepowered.api.world.ChunkTicketManager.PlayerEntityLoadingTicket;
 
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implements PlayerEntityLoadingTicket {
 
     private final UUID uniqueId;
@@ -48,7 +50,7 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
     }
 
     @Override
-    public synchronized void bindToEntity(Entity entity) {
+    public void bindToEntity(Entity entity) {
         checkNotNull(entity, "entity");
         checkArgument(entity.getUniqueId().equals(this.uniqueId),
                 "Only a player with the uuid (" + this.uniqueId + ") can be applied to this ticket!");
@@ -60,4 +62,9 @@ class LanternPlayerEntityLoadingTicket extends LanternEntityLoadingTicket implem
         return this.uniqueId;
     }
 
+    @Nullable
+    @Override
+    UUID getEntityUniqueId() {
+        return this.uniqueId;
+    }
 }

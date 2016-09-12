@@ -43,11 +43,11 @@ import org.lanternpowered.server.network.vanilla.message.type.login.MessageLogin
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 
-public final class ProtocolLogin extends ProtocolBase {
+final class ProtocolLogin extends ProtocolBase {
 
     ProtocolLogin() {
-        MessageRegistry inbound = this.inbound();
-        MessageRegistry outbound = this.outbound();
+        final MessageRegistry inbound = this.inbound();
+        final MessageRegistry outbound = this.outbound();
 
         inbound.bind(0x00, CodecLoginInStart.class, MessageLoginInStart.class).bindHandler(new HandlerLoginStart());
         inbound.bind(0x01, CodecLoginInEncryptionResponse.class, MessageLoginInEncryptionResponse.class)

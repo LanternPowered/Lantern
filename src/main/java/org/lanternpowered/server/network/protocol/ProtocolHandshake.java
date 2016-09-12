@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.handshake.CodecHa
 import org.lanternpowered.server.network.vanilla.message.handler.handshake.HandlerHandshakeIn;
 import org.lanternpowered.server.network.vanilla.message.type.handshake.MessageHandshakeIn;
 
-public final class ProtocolHandshake extends ProtocolBase {
+final class ProtocolHandshake extends ProtocolBase {
 
     ProtocolHandshake() {
         this.inbound().bind(0x00, CodecHandshakeIn.class, MessageHandshakeIn.class).bindHandler(new HandlerHandshakeIn());

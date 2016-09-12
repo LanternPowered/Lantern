@@ -30,8 +30,6 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.world.GeneratorType;
 
-import javax.annotation.Nullable;
-
 public abstract class LanternGeneratorType extends PluginCatalogType.Base implements GeneratorType {
 
     // The maximum height the generator will generate the world,
@@ -60,16 +58,11 @@ public abstract class LanternGeneratorType extends PluginCatalogType.Base implem
         return new MemoryDataContainer();
     }
 
-    @Override
-    public int hashCode() {
-        return this.getId().hashCode();
-    }
-
     /**
      * Gets the minimal spawn height that is required with
      * this generator type.
      * 
-     * @return the minimal spawn height
+     * @return The minimal spawn height
      */
     public int getMinimalSpawnHeight() {
         return this.minimalSpawnHeight;
@@ -79,7 +72,7 @@ public abstract class LanternGeneratorType extends PluginCatalogType.Base implem
      * Gets the maximum height that will generator type will
      * generate.
      * 
-     * @return the generator height
+     * @return The generator height
      */
     public int getGeneratorHeight() {
         return this.generatorHeight;

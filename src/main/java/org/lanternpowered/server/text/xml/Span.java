@@ -29,6 +29,7 @@ import org.spongepowered.api.text.Text;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+@SuppressWarnings("WeakerAccess")
 @XmlRootElement
 public class Span extends Element {
 

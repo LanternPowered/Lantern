@@ -36,26 +36,30 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-public class SubjectSettingCallback implements Predicate<PermissionService> {
+class SubjectSettingCallback implements Predicate<PermissionService> {
 
     private final WeakReference<AbstractSubject> ref;
 
-    public SubjectSettingCallback(AbstractSubject ref) {
+    SubjectSettingCallback(AbstractSubject ref) {
         this.ref = new WeakReference<>(ref);
     }
 
     @Override
     public boolean test(@Nullable PermissionService input) {
-        AbstractSubject ref = this.ref.get();
+        return apply(this.ref.get(), input);
+    }
+
+    public static boolean apply(@Nullable AbstractSubject ref, @Nullable PermissionService input) {
         if (ref == null) {
             return false;
         }
         if (input == null) {
             return true;
         }
-        SubjectCollection userSubjects = input.getSubjects(ref.getSubjectCollectionIdentifier());
+        final SubjectCollection userSubjects = input.getSubjects(ref.getSubjectCollectionIdentifier());
+        //noinspection ConstantConditions
         if (userSubjects != null) {
-            Subject subject;
+            final Subject subject;
             if (ref instanceof User && userSubjects instanceof UserCollection) {
                 // GameProfile is already resolved, use it directly
                 subject = ((UserCollection) userSubjects).get(((User) ref).getProfile());

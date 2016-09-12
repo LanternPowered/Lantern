@@ -32,7 +32,6 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -51,6 +50,7 @@ import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
 import org.spongepowered.api.scoreboard.objective.Objective;
 import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -71,7 +71,7 @@ public class LanternScoreboard implements Scoreboard {
 
     void sendToPlayers(Supplier<List<Message>> messageSupplier) {
         if (!this.players.isEmpty()) {
-            List<Message> messages = messageSupplier.get();
+            final List<Message> messages = messageSupplier.get();
             this.players.forEach(player -> player.getConnection().send(messages));
         }
     }
@@ -126,7 +126,7 @@ public class LanternScoreboard implements Scoreboard {
     }
 
     private List<Message> createObjectiveInitMessages(Objective objective) {
-        List<Message> messages = Lists.newArrayList();
+        final List<Message> messages = new ArrayList<>();
         messages.add(new MessagePlayOutScoreboardObjective.Create(
                 objective.getName(), ((LanternObjective) objective).getLegacyDisplayName(), objective.getDisplayMode()));
         for (Score score : ((LanternObjective) objective).scores.values()) {
@@ -140,7 +140,7 @@ public class LanternScoreboard implements Scoreboard {
     public void updateDisplaySlot(@Nullable Objective objective, DisplaySlot displaySlot) throws IllegalStateException {
         checkNotNull(displaySlot, "displaySlot");
         if (objective == null) {
-            Objective oldObjective = this.objectivesInSlot.remove(displaySlot);
+            final Objective oldObjective = this.objectivesInSlot.remove(displaySlot);
             if (oldObjective != null) {
                 // Clear the display slot on the client
                 this.sendToPlayers(() -> Collections.singletonList(
@@ -172,9 +172,9 @@ public class LanternScoreboard implements Scoreboard {
         if (this.objectives.remove(checkNotNull(objective, "objective").getName(), objective)) {
             ((LanternObjective) objective).removeScoreboard(this);
             this.objectivesByCriterion.remove(objective.getCriterion(), objective);
-            Iterator<Map.Entry<DisplaySlot, Objective>> it = this.objectivesInSlot.entrySet().iterator();
+            final Iterator<Map.Entry<DisplaySlot, Objective>> it = this.objectivesInSlot.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry<DisplaySlot, Objective> entry = it.next();
+                final Map.Entry<DisplaySlot, Objective> entry = it.next();
                 if (entry.getValue().equals(objective)) {
                     it.remove();
                 }
@@ -185,7 +185,7 @@ public class LanternScoreboard implements Scoreboard {
 
     @Override
     public Set<Score> getScores() {
-        ImmutableSet.Builder<Score> scores = ImmutableSet.builder();
+        final ImmutableSet.Builder<Score> scores = ImmutableSet.builder();
         for (Objective objective : this.objectives.values()) {
             scores.addAll(((LanternObjective) objective).scores.values());
         }
@@ -195,7 +195,7 @@ public class LanternScoreboard implements Scoreboard {
     @Override
     public Set<Score> getScores(Text name) {
         checkNotNull(name, "name");
-        ImmutableSet.Builder<Score> scores = ImmutableSet.builder();
+        final ImmutableSet.Builder<Score> scores = ImmutableSet.builder();
         for (Objective objective : this.objectives.values()) {
             objective.getScore(name).ifPresent(scores::add);
         }

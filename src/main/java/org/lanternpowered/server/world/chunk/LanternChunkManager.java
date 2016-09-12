@@ -97,7 +97,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -1450,16 +1449,15 @@ public final class LanternChunkManager {
         }
         for (Entry<String, Collection<LanternLoadingTicket>> entry : tickets.asMap().entrySet()) {
             final Collection<ChunkTicketManager.Callback> callbacks = this.chunkLoadService.getCallbacks().get(entry.getKey());
-            ImmutableList<LoadingTicket> loadedTickets = ImmutableList.copyOf(entry.getValue());
 
             // These maps will be loaded lazily
             ImmutableListMultimap<UUID, LoadingTicket> playerLoadedTickets = null;
             ImmutableList<LoadingTicket> nonPlayerLoadedTickets = null;
 
-            final Set<LoadingTicket> resultPlayerLoadedTickets = loadedTickets.stream()
+            final Set<LoadingTicket> resultPlayerLoadedTickets = entry.getValue().stream()
                     .filter(ticket -> ticket instanceof PlayerLoadingTicket)
                     .collect(Collectors.toSet());
-            final Set<LoadingTicket> resultNonPlayerLoadedTickets = loadedTickets.stream()
+            final Set<LoadingTicket> resultNonPlayerLoadedTickets = entry.getValue().stream()
                     .filter(ticket -> !(ticket instanceof PlayerLoadingTicket))
                     .collect(Collectors.toSet());
 
@@ -1498,7 +1496,7 @@ public final class LanternChunkManager {
 
             // Lets see how many plugins attempted to add loading tickets
             final int sizeA = resultLoadedTickets.size();
-            resultLoadedTickets.retainAll(loadedTickets);
+            resultLoadedTickets.retainAll(entry.getValue());
             final int sizeB = resultLoadedTickets.size();
 
             if (sizeA != sizeB) {
@@ -1510,16 +1508,16 @@ public final class LanternChunkManager {
 
             if (resultLoadedTickets.size() > maxTickets) {
                 Lantern.getLogger().warn("The plugin {} has too many open chunk loading tickets {}. "
-                        + "Excess will be dropped", entry.getKey(), tickets.size());
+                        + "Excess will be dropped", entry.getKey(), resultLoadedTickets.size());
                 resultLoadedTickets.subList(maxTickets, resultLoadedTickets.size()).clear();
             }
 
             // Release all the tickets that were no longer usable
-            final List<LoadingTicket> removedTickets = new ArrayList<>(loadedTickets);
+            final List<LoadingTicket> removedTickets = new ArrayList<>(entry.getValue());
             removedTickets.removeAll(resultLoadedTickets);
             removedTickets.forEach(LoadingTicket::release);
 
-            loadedTickets = ImmutableList.copyOf(resultLoadedTickets);
+            final ImmutableList<LoadingTicket> loadedTickets = ImmutableList.copyOf(resultLoadedTickets);
             for (ChunkTicketManager.Callback callback : callbacks) {
                 callback.onLoaded(loadedTickets, this.world);
             }

@@ -62,6 +62,8 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.Nullable;
+
 /**
  * Implementation of a server for the minecraft server query protocol.
  * @see <a href="http://wiki.vg/Query">Protocol Specifications</a>
@@ -84,7 +86,7 @@ public class QueryServer extends ServerBase {
     private Random random = new Random();
 
     // The task used to invalidate all challenge tokens every 30 seconds
-    private Task flushTask;
+    @Nullable private Task flushTask;
 
     private final boolean showPlugins;
 
@@ -123,7 +125,7 @@ public class QueryServer extends ServerBase {
      * @param address the sender address
      * @return the generated valid token
      */
-    public int generateChallengeToken(InetSocketAddress address) {
+    int generateChallengeToken(InetSocketAddress address) {
         int token = this.random.nextInt();
         this.challengeTokens.put(address, token);
         return token;
@@ -136,14 +138,14 @@ public class QueryServer extends ServerBase {
      * @param token the token
      * @return whether the token is valid
      */
-    public boolean verifyChallengeToken(InetSocketAddress address, int token) {
+    boolean verifyChallengeToken(InetSocketAddress address, int token) {
         return Objects.equals(this.challengeTokens.get(address), token);
     }
 
     /**
      * Invalidates all challenge tokens.
      */
-    public void flushChallengeTokens() {
+    private void flushChallengeTokens() {
         this.challengeTokens.clear();
     }
 

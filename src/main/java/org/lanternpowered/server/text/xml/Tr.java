@@ -33,6 +33,7 @@ import org.spongepowered.api.text.translation.Translation;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+@SuppressWarnings("WeakerAccess")
 @XmlRootElement
 public class Tr extends Element {
 

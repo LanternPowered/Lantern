@@ -23,29 +23,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.launch;
+package org.lanternpowered.server.console.launch;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.net.URLClassLoader;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.Logger;
 
-@NonnullByDefault
-final class Launch {
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
-    public static void main(String[] args) {
-        // Setup the launch class loader
-        ClassLoader classLoader = new LaunchClassLoader(((URLClassLoader) Launch.class.getClassLoader()).getURLs());
-        Thread.currentThread().setContextClassLoader(classLoader);
+final class LoggingOutputStream extends ByteArrayOutputStream {
 
-        // Initialize the class transformers
-        ClassTransformers.init();
+    private static final String SEPARATOR = System.getProperty("line.separator");
 
-        try {
-            // Start the server instance
-            Class.forName("org.lanternpowered.server.LanternServer", true, classLoader)
-                    .getMethod("main", String[].class).invoke(null, new Object[] { args });
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
+    private final Logger logger;
+    private final Level level;
+
+    boolean flush = true;
+
+    LoggingOutputStream(Logger logger, Level level) {
+        this.logger = checkNotNull(logger, "logger");
+        this.level = checkNotNull(level, "level");
+    }
+
+    @Override
+    public void flush() throws IOException {
+        if (!this.flush) {
+            return;
+        }
+
+        String message = this.toString();
+        this.reset();
+
+        if (this.logger.isEnabled(this.level) && !message.isEmpty() && !message.equals(SEPARATOR)) {
+            if (message.endsWith(SEPARATOR)) {
+                message = message.substring(0, message.length() - SEPARATOR.length());
+            }
+
+            if (message.charAt(message.length() - 1) == '\n') {
+                message = message.substring(0, message.length() - 1);
+            }
+
+            this.logger.log(this.level, message);
         }
     }
 

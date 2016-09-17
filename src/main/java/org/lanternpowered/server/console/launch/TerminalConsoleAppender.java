@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.launch.console;
+package org.lanternpowered.server.console.launch;
 
 import static org.apache.logging.log4j.core.util.Booleans.parseBoolean;
 import static jline.console.ConsoleReader.RESET_LINE;
@@ -31,6 +31,7 @@ import static org.fusesource.jansi.Ansi.Color.RED;
 import static org.fusesource.jansi.Ansi.Color.YELLOW;
 import static org.fusesource.jansi.Ansi.Color.DEFAULT;
 
+import jline.console.ConsoleReader;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.Filter;
 import org.apache.logging.log4j.core.Layout;
@@ -59,7 +60,7 @@ public class TerminalConsoleAppender extends AbstractAppender {
 
     private static final PrintStream out = System.out;
 
-    protected TerminalConsoleAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions) {
+    private TerminalConsoleAppender(String name, Filter filter, Layout<? extends Serializable> layout, boolean ignoreExceptions) {
         super(name, filter, layout, ignoreExceptions);
     }
 
@@ -70,6 +71,7 @@ public class TerminalConsoleAppender extends AbstractAppender {
             @PluginElement("Layout") @Nullable Layout<? extends Serializable> layout,
             @PluginAttribute("ignoreExceptions") String ignore) {
 
+        //noinspection ConstantConditions
         if (name == null) {
             LOGGER.error("No name provided for TerminalConsoleAppender");
             return null;
@@ -78,7 +80,7 @@ public class TerminalConsoleAppender extends AbstractAppender {
             layout = PatternLayout.newBuilder().build();
         }
 
-        boolean ignoreExceptions = parseBoolean(ignore, true);
+        final boolean ignoreExceptions = parseBoolean(ignore, true);
 
         // This is handled by jline
         System.setProperty("log4j.skipJansi", "true");
@@ -100,14 +102,15 @@ public class TerminalConsoleAppender extends AbstractAppender {
             return;
         }
 
-        if (ConsoleLaunch.reader != null) {
+        final ConsoleReader reader = ConsoleLaunch.reader;
+        if (reader != null) {
             try {
-                Writer out = ConsoleLaunch.reader.getOutput();
+                final Writer out = reader.getOutput();
                 out.write(RESET_LINE);
                 out.write(this.formatEvent(event));
 
-                ConsoleLaunch.reader.drawLine();
-                ConsoleLaunch.reader.flush();
+                reader.drawLine();
+                reader.flush();
             } catch (IOException ignored) {
             }
         } else {
@@ -115,8 +118,8 @@ public class TerminalConsoleAppender extends AbstractAppender {
         }
     }
 
-    protected String formatEvent(LogEvent event) {
-        String formatted = ConsoleLaunch.formatter.apply(this.getLayout().toSerializable(event).toString());
+    private String formatEvent(LogEvent event) {
+        final String formatted = ConsoleLaunch.formatter.apply(this.getLayout().toSerializable(event).toString());
         if (ConsoleLaunch.reader != null) {
             // Colorize log messages if supported
             final int level = event.getLevel().intLevel();

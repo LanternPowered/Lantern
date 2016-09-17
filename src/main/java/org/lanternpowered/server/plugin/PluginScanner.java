@@ -89,7 +89,7 @@ final class PluginScanner {
     }
 
     void scanClassPath(URLClassLoader loader) {
-        Set<URI> sources = new HashSet<>();
+        final Set<URI> sources = new HashSet<>();
 
         for (URL url : loader.getURLs()) {
             if (!url.getProtocol().equals("file")) {
@@ -111,12 +111,12 @@ final class PluginScanner {
             }
 
             if (sources.add(source)) {
-                Path path = Paths.get(source);
+                final Path path = Paths.get(source);
                 if (Files.exists(path)) {
                     if (Files.isDirectory(path)) {
-                        scanClasspathDirectory(path);
+                        this.scanClasspathDirectory(path);
                     } else if (JAR_FILE.matches(path)) {
-                        scanJar(path, true);
+                        this.scanJar(path, true);
                     }
                 }
             }

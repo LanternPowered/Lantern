@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.launch.console;
+package org.lanternpowered.server.console.launch;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
@@ -32,15 +32,15 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Locale;
 
-class LoggingPrintStream extends PrintStream {
+final class LoggingPrintStream extends PrintStream {
 
     private final LoggingOutputStream out;
 
-    public LoggingPrintStream(Logger logger, Level level) {
+    LoggingPrintStream(Logger logger, Level level) {
         this(new LoggingOutputStream(logger, level));
     }
 
-    public LoggingPrintStream(LoggingOutputStream out) {
+    private LoggingPrintStream(LoggingOutputStream out) {
         super(out, true);
         this.out = out;
     }

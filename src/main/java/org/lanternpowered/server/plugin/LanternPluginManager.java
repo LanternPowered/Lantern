@@ -29,7 +29,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.launch.LaunchClassLoader;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -37,7 +36,10 @@ import org.spongepowered.api.plugin.PluginManager;
 import org.spongepowered.plugin.meta.PluginMetadata;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -83,11 +85,12 @@ public final class LanternPluginManager implements PluginManager {
         if (scanClasspath) {
             Lantern.getLogger().info("Scanning classpath for plugins...");
 
-            ClassLoader loader = LaunchClassLoader.class.getClassLoader();
+            final ClassLoader loader = LanternPluginManager.class.getClassLoader();
             if (loader instanceof URLClassLoader) {
                 pluginScanner.scanClassPath((URLClassLoader) loader);
             } else {
-                this.game.getLogger().error("Cannot search for plugins on classpath: Unsupported class loader: {}", loader.getClass());
+                this.game.getLogger().error("Cannot search for plugins on classpath: Unsupported class loader: {}",
+                        loader.getClass().getName());
             }
         }
 
@@ -159,12 +162,32 @@ public final class LanternPluginManager implements PluginManager {
         return successfulCandidates;
     }
 
+    private static final Method ADD_CLASS_LOADER_URL;
+
+    static {
+        try {
+            ADD_CLASS_LOADER_URL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+            ADD_CLASS_LOADER_URL.setAccessible(true);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void addClassLoaderURL(URLClassLoader classLoader, URL url) {
+        try {
+            ADD_CLASS_LOADER_URL.invoke(classLoader, url);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private void loadPlugin(PluginCandidate candidate) {
         final String id = candidate.getId();
 
         if (candidate.getSource().isPresent()) {
             try {
-                ((LaunchClassLoader) this.getClass().getClassLoader()).addURL(candidate.getSource().get().toUri().toURL());
+                addClassLoaderURL((URLClassLoader) LanternPluginManager.class.getClassLoader(),
+                        candidate.getSource().get().toUri().toURL());
             } catch (MalformedURLException e) {
                 throw new RuntimeException("Failed to add plugin '" + id + "' from " + candidate.getDisplaySource() + " to classpath", e);
             }

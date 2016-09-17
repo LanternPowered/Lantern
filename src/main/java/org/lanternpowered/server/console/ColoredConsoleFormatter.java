@@ -35,12 +35,10 @@ import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Attribute;
 import org.fusesource.jansi.Ansi.Color;
 import org.lanternpowered.server.text.TextConstants;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.function.Function;
 
-@NonnullByDefault
-public class ColoredConsoleFormatter implements Function<String, String> {
+final class ColoredConsoleFormatter implements Function<String, String> {
 
     private static final String reset = ansi().reset().toString();
     private static final Int2ObjectMap<String> replacements = new Int2ObjectOpenHashMap<>();

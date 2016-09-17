@@ -26,7 +26,7 @@
 package org.lanternpowered.server.console;
 
 import jline.console.ConsoleReader;
-import org.lanternpowered.launch.console.ConsoleLaunch;
+import org.lanternpowered.server.console.launch.ConsoleLaunch;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -57,7 +57,7 @@ public final class ConsoleManager {
         reader.addCompleter(new ConsoleCommandCompleter());
 
         // Start the command reader thread
-        Thread thread = new Thread(this::commandReaderTask);
+        final Thread thread = new Thread(this::commandReaderTask);
         thread.setName("console");
         thread.setDaemon(true);
         thread.start();
@@ -74,14 +74,15 @@ public final class ConsoleManager {
         final ConsoleReader reader = ConsoleLaunch.getReader();
         while (this.active) {
             try {
+                //noinspection ConstantConditions
                 String command = reader.readLine("> ");
                 if (command != null) {
                     command = command.trim();
                     if (!command.isEmpty()) {
                         final String runCommand = command.startsWith("/") ? command.substring(1) : command;
-                        Sponge.getScheduler().createTaskBuilder().execute(() -> {
-                            Sponge.getCommandManager().process(LanternConsoleSource.INSTANCE, runCommand);
-                        }).submit(Lantern.getMinecraftPlugin());
+                        Sponge.getScheduler().createTaskBuilder()
+                                .execute(() -> Sponge.getCommandManager().process(LanternConsoleSource.INSTANCE, runCommand))
+                                .submit(Lantern.getMinecraftPlugin());
                     }
                 }
             } catch (IOException e) {

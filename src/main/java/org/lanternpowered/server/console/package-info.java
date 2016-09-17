@@ -23,12 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.launch;
-
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-@NonnullByDefault
-public interface ClassTransformer {
-
-    byte[] transform(ClassLoader loader, String className, byte[] byteCode);
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.console;

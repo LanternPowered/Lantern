@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.launch.console;
+package org.lanternpowered.server.console.launch;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static jline.TerminalFactory.OFF;
@@ -59,7 +59,7 @@ public final class ConsoleLaunch {
     private static final boolean FORCE_JLINE = PropertiesUtil.getProperties().getBooleanProperty("jline.force", false);
 
     static Function<String, String> formatter = Function.identity();
-    static ConsoleReader reader;
+    @Nullable static ConsoleReader reader;
 
     // Whether the console is initialized
     static boolean initialized;
@@ -73,6 +73,7 @@ public final class ConsoleLaunch {
      *
      * @return the console reader
      */
+    @Nullable
     public static ConsoleReader getReader() {
         return reader;
     }
@@ -84,10 +85,6 @@ public final class ConsoleLaunch {
      */
     public static void setFormatter(@Nullable Function<String, String> format) {
         formatter = format != null ? format : Function.identity();
-    }
-
-    public static boolean isInitialized() {
-        return initialized;
     }
 
     /**

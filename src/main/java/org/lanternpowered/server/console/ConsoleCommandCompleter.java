@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class ConsoleCommandCompleter implements Completer {
+final class ConsoleCommandCompleter implements Completer {
 
     @Override
     public int complete(String buffer, int cursor, List<CharSequence> candidates) {

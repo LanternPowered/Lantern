@@ -37,12 +37,10 @@ import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Map;
 import java.util.Optional;
 
-@NonnullByDefault
 public final class LanternConsoleSource extends AbstractSubjectBase implements ConsoleSource {
 
     public static final String NAME = "Server";

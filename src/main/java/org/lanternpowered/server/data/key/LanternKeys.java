@@ -35,13 +35,13 @@ import org.spongepowered.api.data.value.mutable.Value;
 public class LanternKeys {
 
     public static final Key<Value<Boolean>> INVULNERABLE =
-            makeSingleKey(Boolean.class, Value.class, DataQuery.of("Invulnerable"), "invulnerability");
+            makeSingleKey(Boolean.class, Value.class, DataQuery.of("Invulnerable"), "lantern:invulnerability");
     public static final Key<Value<Integer>> PORTAL_COOLDOWN_TICKS =
-            makeSingleKey(Integer.class, Value.class, DataQuery.of("PortalCooldownTicks"), "portal_cooldown_ticks");
+            makeSingleKey(Integer.class, Value.class, DataQuery.of("PortalCooldownTicks"), "lantern:portal_cooldown_ticks");
     public static final Key<Value<Integer>> SCORE =
-            makeSingleKey(Integer.class, Value.class, DataQuery.of("Score"), "score");
+            makeSingleKey(Integer.class, Value.class, DataQuery.of("Score"), "lantern:score");
     public static final Key<MutableBoundedValue<Double>> ABSORPTION_AMOUNT =
-            makeSingleKey(Double.class, MutableBoundedValue.class, DataQuery.of("AbsorptionAmount"), "absorption_amount");
+            makeSingleKey(Double.class, MutableBoundedValue.class, DataQuery.of("AbsorptionAmount"), "lantern:absorption_amount");
     public static final Key<Value<Boolean>> CAN_PICK_UP_LOOT =
-            makeSingleKey(Boolean.class, Value.class, DataQuery.of("CanPickupLoot"), "can_pickup_loot");
+            makeSingleKey(Boolean.class, Value.class, DataQuery.of("CanPickupLoot"), "lantern:can_pickup_loot");
 }

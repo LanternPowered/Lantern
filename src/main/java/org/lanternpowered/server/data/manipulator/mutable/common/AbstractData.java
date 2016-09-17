@@ -176,11 +176,6 @@ public class AbstractData<M extends DataManipulator<M, I>, I extends ImmutableDa
     }
 
     @Override
-    public int compareTo(M o) {
-        return 0;
-    }
-
-    @Override
     public int getContentVersion() {
         return 1;
     }

@@ -62,7 +62,6 @@ import org.lanternpowered.server.cause.entity.teleport.LanternPortalTeleportCaus
 import org.lanternpowered.server.cause.entity.teleport.LanternTeleportCauseBuilder;
 import org.lanternpowered.server.config.user.ban.BanBuilder;
 import org.lanternpowered.server.data.DataRegistrar;
-import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.type.LanternBigMushroomType;
 import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternComparatorType;
@@ -182,6 +181,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.ServerBossBar;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.DataFormat;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.data.type.BigMushroomType;
@@ -399,7 +399,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(HorseStyle.class, new HorseStyleRegistryModule())
                 .registerModule(InstrumentType.class, new InstrumentTypeRegistryModule())
                 .registerModule(Hinge.class, new EnumValueRegistryModule<>(LanternHinge.class, Hinges.class))
-                .registerModule(LanternKey.class, KeyRegistryModule.get())
+                .registerModule(Key.class, KeyRegistryModule.get())
                 .registerModule(LogAxis.class, new EnumValueRegistryModule<>(LanternLogAxis.class, LogAxes.class))
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())

@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.LanternDataManager;
-import org.lanternpowered.server.data.key.LanternKey;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
@@ -57,11 +56,8 @@ public final class ManipulatorHelper {
                 continue;
             }
             Key<?> key = entry.getKey();
-            if (!(key instanceof LanternKey)) {
-                throw new IllegalStateException("Unsupported key: " + key.toString() + ", it does not extend LanternKey");
-            }
             DataQuery dataQuery = key.getQuery();
-            TypeToken<?> typeToken = ((LanternKey) key).getElementType();
+            TypeToken<?> typeToken = key.getElementToken();
             DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.getInstance().getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
             DataTypeSerializerContext context = LanternDataManager.getInstance().getTypeSerializerContext();
@@ -83,11 +79,8 @@ public final class ManipulatorHelper {
                 continue;
             }
             Key<?> key = entry.getKey();
-            if (!(key instanceof LanternKey)) {
-                throw new IllegalStateException("Unsupported key: " + key.toString() + ", it does not extend LanternKey");
-            }
             DataQuery dataQuery = key.getQuery();
-            TypeToken<?> typeToken = ((LanternKey) key).getElementType();
+            TypeToken<?> typeToken = key.getElementToken();
             Object data = container.get(dataQuery).orElseThrow(
                     () -> new InvalidDataException("Key query (" + dataQuery.toString() + ") is missing."));
             DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.getInstance().getTypeSerializer(typeToken)

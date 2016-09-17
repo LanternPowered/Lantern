@@ -69,11 +69,6 @@ public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M e
     }
 
     @Override
-    public int compareTo(I o) {
-        return 0;
-    }
-
-    @Override
     public int getContentVersion() {
         return 1;
     }

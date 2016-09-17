@@ -832,6 +832,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.sleepingIgnored = sleepingIgnored;
     }
 
+    @Override
+    public Inventory getEnderChestInventory() {
+        return null;
+    }
+
     public PlayerInteractionHandler getInteractionHandler() {
         return this.interactionHandler;
     }

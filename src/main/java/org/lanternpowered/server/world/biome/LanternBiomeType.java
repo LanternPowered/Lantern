@@ -26,6 +26,8 @@
 package org.lanternpowered.server.world.biome;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 
 public class LanternBiomeType extends PluginCatalogType.Base implements BiomeType {
@@ -49,10 +51,15 @@ public class LanternBiomeType extends PluginCatalogType.Base implements BiomeTyp
         return this.humidity;
     }
 
+    @Override
+    public BiomeGenerationSettings createDefaultGenerationSettings(World world) {
+        return this.defaultSettings.copy();
+    }
+
     /**
      * Gets the default biome generation settings.
      * 
-     * @return the default biome generation settings
+     * @return The default biome generation settings
      */
     public LanternBiomeGenerationSettings getDefaultGenerationSettings() {
         return this.defaultSettings;

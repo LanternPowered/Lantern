@@ -33,11 +33,14 @@ import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.mutable.MobSpawnerData;
 import org.spongepowered.api.data.meta.PatternLayer;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
+import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.OptionalValue;
 import org.spongepowered.api.data.value.mutable.PatternListValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
+import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.data.value.mutable.WeightedCollectionValue;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.util.weighted.WeightedSerializableObject;
@@ -50,41 +53,90 @@ import java.util.Set;
 
 public final class LanternKeyFactory {
 
+    public static <E> Key<Value<E>> makeValueKey(TypeToken<E> elementToken,
+            DataQuery query, String id, String name) {
+        final TypeToken<Value<E>> valueToken = new TypeToken<Value<E>>() {}
+                .where(new TypeParameter<E>() {}, elementToken);
+        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
+    }
+
+    public static <E> Key<Value<E>> makeValueKey(TypeToken<E> elementToken,
+            DataQuery query, String id) {
+        return makeValueKey(elementToken, query, id, query.last().toString());
+    }
+
+    public static <E> Key<Value<E>> makeValueKey(Class<E> elementType,
+            DataQuery query, String id, String name) {
+        return makeValueKey(elementType, query, id, name);
+    }
+
+    public static <E> Key<Value<E>> makeValueKey(Class<E> elementType,
+            DataQuery query, String id) {
+        return makeValueKey(TypeToken.of(elementType), query, id, query.last().toString());
+    }
+
+    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(TypeToken<E> elementToken,
+            DataQuery query, String id, String name) {
+        final TypeToken<MutableBoundedValue<E>> valueToken = new TypeToken<MutableBoundedValue<E>>() {}
+                .where(new TypeParameter<E>() {}, elementToken);
+        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
+    }
+
+    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(TypeToken<E> elementToken,
+            DataQuery query, String id) {
+        return makeMutableBoundedValueKey(elementToken, query, id, query.last().toString());
+    }
+
+    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(Class<E> elementType,
+            DataQuery query, String id, String name) {
+        return makeMutableBoundedValueKey(elementType, query, id, name);
+    }
+
+    public static <E> Key<MutableBoundedValue<E>> makeMutableBoundedValueKey(Class<E> elementType,
+            DataQuery query, String id) {
+        return makeMutableBoundedValueKey(TypeToken.of(elementType), query, id, query.last().toString());
+    }
+
+    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(TypeToken<E> elementToken,
+            DataQuery query, String id, String name) {
+        final TypeToken<ImmutableBoundedValue<E>> valueToken = new TypeToken<ImmutableBoundedValue<E>>() {}
+                .where(new TypeParameter<E>() {}, elementToken);
+        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
+    }
+
+    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(TypeToken<E> elementToken,
+            DataQuery query, String id) {
+        return makeImmutableBoundedValueKey(elementToken, query, id, query.last().toString());
+    }
+
+    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(Class<E> elementType,
+            DataQuery query, String id, String name) {
+        return makeImmutableBoundedValueKey(elementType, query, id, name);
+    }
+
+    public static <E> Key<ImmutableBoundedValue<E>> makeImmutableBoundedValueKey(Class<E> elementType,
+            DataQuery query, String id) {
+        return makeImmutableBoundedValueKey(TypeToken.of(elementType), query, id, query.last().toString());
+    }
+
     public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(TypeToken<E> elementToken, TypeToken<V> valueToken,
             DataQuery query, String id, String name) {
         return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, name);
     }
 
-    public static <E, T extends BaseValue, V extends BaseValue<E>> Key<V> makeSingleKey(TypeToken<E> elementToken, Class<T> valueType,
-            DataQuery query, String id, String name) {
-        //noinspection unchecked
-        final TypeToken<V> valueToken = TypeToken.of((Class<V>) valueType)
-                .where(new TypeParameter<E>() {}, elementToken);
-        return makeSingleKey(elementToken, valueToken, query, id, name);
-    }
-
-    public static <E, T extends BaseValue, V extends BaseValue<E>> Key<V> makeSingleKey(Class<E> elementType, Class<T> valueType,
-            DataQuery query, String id, String name) {
-        //noinspection unchecked
-        return makeSingleKey(TypeToken.of(elementType), valueType, query, id, name);
-    }
-
     public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(TypeToken<E> elementToken, TypeToken<V> valueToken,
             DataQuery query, String id) {
-        return KeyFactory.makeSingleKey(elementToken, valueToken, query, id, query.last().toString());
-    }
-
-    public static <E, T extends BaseValue, V extends BaseValue<E>> Key<V> makeSingleKey(TypeToken<E> elementToken, Class<T> valueType,
-            DataQuery query, String id) {
-        //noinspection unchecked
-        final TypeToken<V> valueToken = TypeToken.of((Class<V>) valueType)
-                .where(new TypeParameter<E>() {}, elementToken);
         return makeSingleKey(elementToken, valueToken, query, id, query.last().toString());
     }
 
-    public static <E, T extends BaseValue, V extends BaseValue<E>> Key<V> makeSingleKey(Class<E> elementType, Class<T> valueType,
+    public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(Class<E> elementType, TypeToken<V> valueToken,
+            DataQuery query, String id, String name) {
+        return makeSingleKey(TypeToken.of(elementType), valueToken, query, id, name);
+    }
+
+    public static <E, V extends BaseValue<E>> Key<V> makeSingleKey(Class<E> elementType, TypeToken<V> valueToken,
             DataQuery query, String id) {
-        return makeSingleKey(TypeToken.of(elementType), valueType, query, id, query.last().toString());
+        return makeSingleKey(TypeToken.of(elementType), valueToken, query, id, query.last().toString());
     }
 
     public static <E> Key<ListValue<E>> makeListKey(TypeToken<? extends List<E>> elementToken, TypeToken<ListValue<E>> valueToken,

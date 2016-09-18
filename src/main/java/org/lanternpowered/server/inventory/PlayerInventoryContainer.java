@@ -23,29 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.handler.play;
+package org.lanternpowered.server.inventory;
 
+import com.google.common.collect.Sets;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.lanternpowered.server.network.NetworkContext;
-import org.lanternpowered.server.network.message.handler.Handler;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSwapHandItems;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.text.translation.Translation;
 
-public final class HandlerPlayInSwapHandItems implements Handler<MessagePlayInSwapHandItems> {
+import java.util.Set;
+
+import javax.annotation.Nullable;
+
+public class PlayerInventoryContainer extends LanternContainer {
+
+    public PlayerInventoryContainer(@Nullable Translation name, LanternPlayerInventory playerInventory) {
+        super(name, playerInventory, null);
+    }
 
     @Override
-    public void handle(NetworkContext context, MessagePlayInSwapHandItems message) {
-        final LanternPlayerInventory inventory = context.getSession().getPlayer().getInventory();
+    protected void openInventoryFor(LanternPlayer viewer) {
+    }
 
-        final LanternSlot hotbarSlot = inventory.getHotbar().getSelectedSlot();
-        final Slot offHandSlot = inventory.getOffhand();
+    @Override
+    void queueSlotChange(Slot slot, boolean silent) {
+        this.queueHumanSlotChange(slot, silent);
+    }
 
-        final ItemStack hotbarItem = hotbarSlot.peek().orElse(null);
-        final ItemStack offHandItem = offHandSlot.peek().orElse(null);
-
-        hotbarSlot.set(offHandItem);
-        offHandSlot.set(hotbarItem);
+    @Override
+    Set<Player> getRawViewers() {
+        final Player player = this.playerInventory.getCarrier().orElse(null);
+        if (player != null) {
+            final Set<Player> viewers = Sets.newHashSet(this.viewers);
+            viewers.add(player);
+            return viewers;
+        }
+        return this.viewers;
     }
 }

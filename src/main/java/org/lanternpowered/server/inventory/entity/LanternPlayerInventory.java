@@ -36,10 +36,13 @@ import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.slot.LanternCraftingInput;
 import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.inventory.slot.LanternEquipmentSlot;
-import org.spongepowered.api.entity.living.Humanoid;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.entity.HumanInventory;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.ref.WeakReference;
@@ -52,16 +55,20 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternHumanInventory extends LanternOrderedInventory implements HumanInventory {
+public class LanternPlayerInventory extends LanternOrderedInventory implements PlayerInventory {
 
-    @Nullable private final WeakReference<Humanoid> humanoid;
+    @Nullable private final WeakReference<Player> player;
+
     private LanternHotbar hotbar;
+    private final LanternEquipmentInventory equipmentInventory;
+    private final HumanMainInventory mainInventory;
+    private final OffHandSlot offHandSlot;
 
     private final Map<HumanInventoryView, InventoryBase> inventoryViews = new EnumMap<>(HumanInventoryView.class);
 
-    public LanternHumanInventory(@Nullable Inventory parent, @Nullable Translation name, @Nullable Humanoid humanoid) {
+    public LanternPlayerInventory(@Nullable Inventory parent, @Nullable Translation name, @Nullable Player player) {
         super(parent, name);
-        this.humanoid = humanoid == null ? null : new WeakReference<>(humanoid);
+        this.player = player == null ? null : new WeakReference<>(player);
 
         this.registerChild(new LanternCraftingInventory(this) {
             {
@@ -79,7 +86,7 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                 this.finalizeContent();
             }
         });
-        final LanternEquipmentInventory equipmentInventory = this.registerChild(new LanternEquipmentInventory(this, humanoid) {
+        this.equipmentInventory = this.registerChild(new LanternEquipmentInventory(this, player) {
             {
                 this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.HEADWEAR));
                 this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.CHESTPLATE));
@@ -88,7 +95,7 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                 this.finalizeContent();
             }
         });
-        final HumanMainInventory mainInventory = this.registerChild(new HumanMainInventory(this, null) {
+        this.mainInventory = this.registerChild(new HumanMainInventory(this, null) {
             {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 9; x++) {
@@ -107,7 +114,7 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
                 this.prioritizeChild(hotbar);
             }
         });
-        final OffHandSlot offHandSlot = this.registerChild(new OffHandSlot(this, null));
+        this.offHandSlot = this.registerChild(new OffHandSlot(this, null));
 
         // Generate inventory views
         this.inventoryViews.put(HumanInventoryView.MAIN,
@@ -196,7 +203,22 @@ public class LanternHumanInventory extends LanternOrderedInventory implements Hu
     }
 
     @Override
-    public Optional<Humanoid> getCarrier() {
-        return this.humanoid == null ? Optional.empty() : Optional.ofNullable(this.humanoid.get());
+    public HumanMainInventory getMain() {
+        return this.mainInventory;
+    }
+
+    @Override
+    public LanternEquipmentInventory getEquipment() {
+        return this.equipmentInventory;
+    }
+
+    @Override
+    public OffHandSlot getOffhand() {
+        return this.offHandSlot;
+    }
+
+    @Override
+    public Optional<Player> getCarrier() {
+        return this.player == null ? Optional.empty() : Optional.ofNullable(this.player.get());
     }
 }

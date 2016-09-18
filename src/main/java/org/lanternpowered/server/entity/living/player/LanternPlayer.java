@@ -47,10 +47,10 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBui
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.inventory.HumanInventoryContainer;
+import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
-import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
@@ -171,12 +171,12 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     /**
      * The inventory of the {@link Player}.
      */
-    private final LanternHumanInventory inventory;
+    private final LanternPlayerInventory inventory;
 
     /**
      * The {@link LanternContainer} of the players inventory.
      */
-    private final HumanInventoryContainer inventoryContainer;
+    private final PlayerInventoryContainer inventoryContainer;
 
     /**
      * The container session of this {@link Player}.
@@ -203,8 +203,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public LanternPlayer(LanternGameProfile gameProfile, NetworkSession session) {
         super(checkNotNull(gameProfile, "gameProfile").getUniqueId());
         this.interactionHandler = new PlayerInteractionHandler(this);
-        this.inventory = new LanternHumanInventory(null, null, this);
-        this.inventoryContainer = new HumanInventoryContainer(null, this.inventory);
+        this.inventory = new LanternPlayerInventory(null, null, this);
+        this.inventoryContainer = new PlayerInventoryContainer(null, this.inventory);
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
         this.gameProfile = gameProfile;
@@ -842,7 +842,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public LanternHumanInventory getInventory() {
+    public LanternPlayerInventory getInventory() {
         return this.inventory;
     }
 
@@ -855,7 +855,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         return this.containerSession;
     }
 
-    public HumanInventoryContainer getInventoryContainer() {
+    public PlayerInventoryContainer getInventoryContainer() {
         return this.inventoryContainer;
     }
 }

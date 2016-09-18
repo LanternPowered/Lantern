@@ -23,43 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.world.biome;
 
-import com.google.common.collect.Sets;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.text.translation.Translation;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-import java.util.Set;
+import com.google.common.base.MoreObjects;
+import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.VirtualBiomeType;
 
-import javax.annotation.Nullable;
+public class LanternVirtualBiomeType extends LanternBiomeType implements VirtualBiomeType {
 
-public class HumanInventoryContainer extends LanternContainer {
+    private final BiomeType persistedType;
 
-    public HumanInventoryContainer(@Nullable Translation name, LanternHumanInventory humanInventory) {
-        super(name, humanInventory, null);
+    public LanternVirtualBiomeType(String pluginId, String identifier, BiomeType persistedType) {
+        super(pluginId, identifier);
+        checkNotNull(persistedType, "persistedType");
+        checkArgument(!(persistedType instanceof VirtualBiomeType), "The persisted type may not be virtual.");
+        this.persistedType = persistedType;
     }
 
     @Override
-    protected void openInventoryFor(LanternPlayer viewer) {
+    public BiomeType getPersistedType() {
+        return this.persistedType;
     }
 
     @Override
-    void queueSlotChange(Slot slot, boolean silent) {
-        this.queueHumanSlotChange(slot, silent);
-    }
-
-    @Override
-    Set<Player> getRawViewers() {
-        Humanoid humanoid = this.humanInventory.getCarrier().orElse(null);
-        if (humanoid instanceof Player) {
-            final Set<Player> viewers = Sets.newHashSet(this.viewers);
-            viewers.add((Player) humanoid);
-            return viewers;
-        }
-        return this.viewers;
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("persistedType", this.persistedType);
     }
 }

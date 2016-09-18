@@ -31,7 +31,7 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.entity.HumanInventoryView;
 import org.lanternpowered.server.inventory.entity.HumanMainInventory;
-import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
@@ -41,7 +41,7 @@ import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.entity.HumanInventory;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.type.OrderedInventory;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -60,27 +60,27 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     private static int windowIdCounter = 1;
 
     final Set<Player> viewers = new HashSet<>();
-    final Map<LanternSlot, Boolean> dirtySlots = new HashMap<>();
+    private final Map<LanternSlot, Boolean> dirtySlots = new HashMap<>();
 
     protected final int windowId;
 
     protected final LanternOrderedInventory openInventory;
-    final LanternHumanInventory humanInventory;
+    final LanternPlayerInventory playerInventory;
 
     /**
-     * Creates a new {@link LanternContainer}, the specified {@link HumanInventory} is
+     * Creates a new {@link LanternContainer}, the specified {@link PlayerInventory} is
      * used as the bottom inventory and also as top inventory if {@code null} is provided
      * for the inventory that should be opened.
      *
      * @param name The name of the container
-     * @param humanInventory The human inventory
+     * @param playerInventory The player inventory
      * @param openInventory The inventory to open
      */
     public LanternContainer(@Nullable Translation name,
-            LanternHumanInventory humanInventory, @Nullable OrderedInventory openInventory) {
+            LanternPlayerInventory playerInventory, @Nullable OrderedInventory openInventory) {
         super(null, name);
-        this.humanInventory = humanInventory;
-        HumanMainInventory mainInventory = humanInventory.query(HumanMainInventory.class).first();
+        this.playerInventory = playerInventory;
+        HumanMainInventory mainInventory = playerInventory.query(HumanMainInventory.class).first();
         if (openInventory != null) {
             this.registerChild(openInventory);
             this.registerChild(mainInventory);
@@ -90,8 +90,8 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             }
             this.openInventory = (LanternOrderedInventory) openInventory;
         } else {
-            this.registerChild(humanInventory);
-            this.openInventory = humanInventory;
+            this.registerChild(playerInventory);
+            this.openInventory = playerInventory;
             this.windowId = 0;
         }
         for (LanternSlot slot : this.slots) {
@@ -177,7 +177,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     }
 
     void queueHumanSlotChange(Slot slot, boolean silent) {
-        int index = this.humanInventory.getSlotIndex(slot);
+        int index = this.playerInventory.getSlotIndex(slot);
         if (index != -1) {
             this.dirtySlots.put((LanternSlot) slot, silent);
         }
@@ -198,7 +198,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
                 // The silent slot index, is different....
                 // Try the raw inventory slots first
                 if (entry.getValue()) {
-                    index = ((LanternOrderedInventory) this.humanInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY))
+                    index = ((LanternOrderedInventory) this.playerInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY))
                             .getSlotIndex(entry.getKey());
                     // Silent updates use the window id -2, this is not
                     // supported for all slot though

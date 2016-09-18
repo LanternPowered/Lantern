@@ -26,9 +26,9 @@
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.HumanInventoryContainer;
+import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
-import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
@@ -39,7 +39,7 @@ public final class HandlerPlayInPickItem implements Handler<MessagePlayInPickIte
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPickItem message) {
-        final LanternHumanInventory humanInventory = context.getSession().getPlayer().getInventory();
+        final LanternPlayerInventory humanInventory = context.getSession().getPlayer().getInventory();
         final LanternSlot slot = humanInventory.getSlotAt(message.getSlot()).orElse(null);
         if (slot != null) {
             final LanternHotbar hotbar = humanInventory.getHotbar();
@@ -55,7 +55,7 @@ public final class HandlerPlayInPickItem implements Handler<MessagePlayInPickIte
             hotbarSlot.set(slotItem);
             slot.set(hotbarItem);
 
-            final HumanInventoryContainer inventoryContainer = context.getSession().getPlayer().getInventoryContainer();
+            final PlayerInventoryContainer inventoryContainer = context.getSession().getPlayer().getInventoryContainer();
             inventoryContainer.queueSilentSlotChange(slot);
             inventoryContainer.queueSilentSlotChange(hotbarSlot);
             hotbar.setSelectedSlotIndex(hotbar.getSlotIndex(hotbarSlot));

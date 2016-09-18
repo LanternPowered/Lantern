@@ -68,7 +68,7 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
         checkArgument(index >= 0 && index < this.slots.size(), "The index %s may not be smaller then 0 or greater then %s",
                 index, this.slots.size() - 1);
         Inventory inventory = this;
-        while (!(inventory instanceof LanternHumanInventory)) {
+        while (!(inventory instanceof LanternPlayerInventory)) {
             Inventory inventory1 = inventory.parent();
             if (inventory == inventory1) {
                 inventory = null;
@@ -77,7 +77,7 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
             inventory = inventory1;
         }
         if (inventory != null) {
-            ((LanternHumanInventory) inventory).getCarrier().filter(human -> human instanceof Player)
+            ((LanternPlayerInventory) inventory).getCarrier().filter(human -> human instanceof Player)
                     .ifPresent(player -> ((LanternPlayer) player).getConnection().send(new MessagePlayInOutHeldItemChange(index)));
         }
         this.setRawSelectedSlotIndex(index);

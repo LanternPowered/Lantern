@@ -28,13 +28,13 @@ package org.lanternpowered.server.inventory.container;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.block.ChestInventory;
-import org.lanternpowered.server.inventory.entity.LanternHumanInventory;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
 import org.spongepowered.api.text.Text;
 
 public class ChestInventoryContainer extends LanternContainer {
 
-    public ChestInventoryContainer(LanternHumanInventory humanInventory, ChestInventory openInventory) {
+    public ChestInventoryContainer(LanternPlayerInventory humanInventory, ChestInventory openInventory) {
         super(openInventory.getName(), humanInventory, openInventory);
     }
 

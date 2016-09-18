@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.data.key;
 
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSingleKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBoundedValueKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
@@ -35,13 +36,13 @@ import org.spongepowered.api.data.value.mutable.Value;
 public class LanternKeys {
 
     public static final Key<Value<Boolean>> INVULNERABLE =
-            makeSingleKey(Boolean.class, Value.class, DataQuery.of("Invulnerable"), "lantern:invulnerability");
+            makeValueKey(Boolean.class, DataQuery.of("Invulnerable"), "lantern:invulnerability");
     public static final Key<Value<Integer>> PORTAL_COOLDOWN_TICKS =
-            makeSingleKey(Integer.class, Value.class, DataQuery.of("PortalCooldownTicks"), "lantern:portal_cooldown_ticks");
+            makeValueKey(Integer.class, DataQuery.of("PortalCooldownTicks"), "lantern:portal_cooldown_ticks");
     public static final Key<Value<Integer>> SCORE =
-            makeSingleKey(Integer.class, Value.class, DataQuery.of("Score"), "lantern:score");
+            makeValueKey(Integer.class, DataQuery.of("Score"), "lantern:score");
     public static final Key<MutableBoundedValue<Double>> ABSORPTION_AMOUNT =
-            makeSingleKey(Double.class, MutableBoundedValue.class, DataQuery.of("AbsorptionAmount"), "lantern:absorption_amount");
+            makeMutableBoundedValueKey(Double.class, DataQuery.of("AbsorptionAmount"), "lantern:absorption_amount");
     public static final Key<Value<Boolean>> CAN_PICK_UP_LOOT =
-            makeSingleKey(Boolean.class, Value.class, DataQuery.of("CanPickupLoot"), "lantern:can_pickup_loot");
+            makeValueKey(Boolean.class, DataQuery.of("CanPickupLoot"), "lantern:can_pickup_loot");
 }

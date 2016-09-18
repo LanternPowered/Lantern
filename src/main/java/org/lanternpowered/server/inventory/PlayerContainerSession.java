@@ -143,7 +143,7 @@ public class PlayerContainerSession {
             if (this.openContainer != null) {
                 if (container == null && this.cursorItem != null) {
                     // TODO: Drop the cursor item
-                    this.openContainer.humanInventory.getInventoryView(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR)
+                    this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR)
                             .offer(this.cursorItem);
                     this.cursorItem = null;
                 }
@@ -194,7 +194,7 @@ public class PlayerContainerSession {
                 this.finishSpawnEntityEvent(event);
             }
         } else {
-            Optional<LanternSlot> optSlot = this.openContainer.humanInventory.getSlotAt(slotIndex);
+            Optional<LanternSlot> optSlot = this.openContainer.playerInventory.getSlotAt(slotIndex);
             if (optSlot.isPresent()) {
                 final Cause cause = Cause.builder().named(NamedCause.SOURCE, this.player).build();
                 final LanternSlot slot = optSlot.get();
@@ -426,23 +426,22 @@ public class PlayerContainerSession {
                 if (itemStack != null) {
                     InventoryBase inventory;
 
-                    HumanMainInventory mainInventory = this.openContainer.humanInventory
-                            .query(HumanMainInventory.class).first();
+                    final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
                     if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
                             (windowId == 0 && !mainInventory.isChild(slot))) {
                         if (slot.isReverseShiftClickOfferOrder()) {
-                            inventory = this.openContainer.humanInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
+                            inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
                         } else {
-                            inventory = this.openContainer.humanInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
+                            inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
                         }
                     } else {
                         inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
                                 ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
                         if (!inventory.isValidItem(itemStack)) {
                             if (slot.parent() instanceof LanternHotbar) {
-                                inventory = this.openContainer.humanInventory.getInventoryView(HumanInventoryView.MAIN);
+                                inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN);
                             } else {
-                                inventory = this.openContainer.humanInventory.getHotbar();
+                                inventory = this.openContainer.playerInventory.getHotbar();
                             }
                         }
                     }
@@ -491,10 +490,10 @@ public class PlayerContainerSession {
                         InventoryBase inventory;
                         if (windowId != 0) {
                             inventory = new ChildrenInventoryBase(null, null, Arrays.asList(
-                                    this.openContainer.openInventory, this.openContainer.humanInventory
+                                    this.openContainer.openInventory, this.openContainer.playerInventory
                                             .getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR)));
                         } else {
-                            inventory = this.openContainer.humanInventory
+                            inventory = this.openContainer.playerInventory
                                     .getInventoryView(HumanInventoryView.ALL_PRIORITY_MAIN);
                         }
 
@@ -534,8 +533,8 @@ public class PlayerContainerSession {
             if (optSlot.isPresent()) {
                 final LanternSlot slot = optSlot.get();
 
-                LanternHotbar hotbar = this.openContainer.humanInventory.query(LanternHotbar.class).first();
-                Optional<LanternSlot> optHotbarSlot = hotbar.getSlotAt(button);
+                final LanternHotbar hotbar = this.openContainer.playerInventory.getHotbar();
+                final Optional<LanternSlot> optHotbarSlot = hotbar.getSlotAt(button);
                 if (optHotbarSlot.isPresent()) {
                     final LanternSlot hotbarSlot = optHotbarSlot.get();
 

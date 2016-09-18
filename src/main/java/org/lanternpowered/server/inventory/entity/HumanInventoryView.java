@@ -29,7 +29,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 
 /**
  * The different kind of {@link Inventory} views that can be
- * used for the {@link LanternHumanInventory}. This mainly
+ * used for the {@link LanternPlayerInventory}. This mainly
  * modifies the insertion/poll order of item stacks. And the
  * which sub {@link Inventory}s are available.
  */

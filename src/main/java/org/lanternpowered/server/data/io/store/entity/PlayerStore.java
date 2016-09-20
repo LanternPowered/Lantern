@@ -68,8 +68,11 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static final DataQuery CAN_FLY = DataQuery.of("mayfly");
     private static final DataQuery SCORE = DataQuery.of("Score");
     private static final DataQuery GAME_MODE = DataQuery.of("playerGameType");
-
+    private static final DataQuery SELECTED_ITEM_SLOT = DataQuery.of("SelectedItemSlot");
     private static final DataQuery DIMENSION = DataQuery.of("Dimension");
+
+    private static final DataQuery BUKKIT_FIRST_DATE_PLAYED = DataQuery.of("bukkit.firstPlayed");
+    private static final DataQuery BUKKIT_LAST_DATE_PLAYED = DataQuery.of("bukkit.lastPlayed");
 
     private static final DataQuery FIRST_DATE_PLAYED = DataQuery.of("FirstJoin");
     private static final DataQuery LAST_DATE_PLAYED = DataQuery.of("LastPlayed");
@@ -129,6 +132,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         }
         dataView.set(RESPAWN_LOCATIONS, respawnLocationViews);
         dataView.set(GAME_MODE, ((LanternGameMode) valueContainer.remove(Keys.GAME_MODE).orElse(GameModes.NOT_SET)).getInternalId());
+        dataView.set(SELECTED_ITEM_SLOT, player.getInventory().getHotbar().getSelectedSlotIndex());
         super.serializeValues(player, valueContainer, dataView);
     }
 
@@ -143,14 +147,18 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
 
     @Override
     public void deserializeValues(LanternPlayer player, SimpleValueContainer valueContainer, DataView dataView) {
+        // Try to convert old bukkit values first
+        dataView.getLong(BUKKIT_FIRST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.FIRST_DATE_PLAYED, Instant.ofEpochMilli(v)));
+        dataView.getLong(BUKKIT_LAST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.LAST_DATE_PLAYED, Instant.ofEpochMilli(v)));
+        // Deserialize sponge data
+        dataView.getView(DataQueries.EXTENDED_SPONGE_DATA).ifPresent(view -> {
+            view.getLong(FIRST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.FIRST_DATE_PLAYED, Instant.ofEpochMilli(v)));
+            view.getLong(LAST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.LAST_DATE_PLAYED, Instant.ofEpochMilli(v)));
+        });
         dataView.getView(ABILITIES).ifPresent(view -> {
             view.getInt(FLYING).ifPresent(v -> valueContainer.set(Keys.IS_FLYING, v > 0));
             view.getDouble(FLYING_SPEED).ifPresent(v -> valueContainer.set(Keys.FLYING_SPEED, v));
             view.getInt(CAN_FLY).ifPresent(v -> valueContainer.set(Keys.CAN_FLY, v > 0));
-        });
-        dataView.getView(DataQueries.EXTENDED_SPONGE_DATA).ifPresent(view -> {
-            view.getLong(FIRST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.FIRST_DATE_PLAYED, Instant.ofEpochMilli(v)));
-            view.getLong(LAST_DATE_PLAYED).ifPresent(v -> valueContainer.set(Keys.LAST_DATE_PLAYED, Instant.ofEpochMilli(v)));
         });
         final Map<UUID, RespawnLocation> respawnLocations = new HashMap<>();
         // Overworld respawn location is saved in the root container
@@ -177,6 +185,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         final GameMode gameMode = dataView.getInt(GAME_MODE)
                 .flatMap(v -> GameModeRegistryModule.get().getByInternalId(v)).orElse(GameModes.NOT_SET);
         valueContainer.set(Keys.GAME_MODE, gameMode);
+        player.getInventory().getHotbar().setRawSelectedSlotIndex(dataView.getInt(SELECTED_ITEM_SLOT).orElse(0));
         super.deserializeValues(player, valueContainer, dataView);
     }
 

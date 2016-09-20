@@ -77,8 +77,8 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
             inventory = inventory1;
         }
         if (inventory != null) {
-            ((LanternPlayerInventory) inventory).getCarrier().filter(human -> human instanceof Player)
-                    .ifPresent(player -> ((LanternPlayer) player).getConnection().send(new MessagePlayInOutHeldItemChange(index)));
+            ((LanternPlayerInventory) inventory).getCarrier().ifPresent(
+                    player -> ((LanternPlayer) player).getConnection().send(new MessagePlayInOutHeldItemChange(index)));
         }
         this.setRawSelectedSlotIndex(index);
     }

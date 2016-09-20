@@ -27,8 +27,8 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.EncoderException;
-import org.lanternpowered.server.bossbar.LanternBossBarColor;
-import org.lanternpowered.server.bossbar.LanternBossBarOverlay;
+import org.lanternpowered.server.boss.LanternBossBarColor;
+import org.lanternpowered.server.boss.LanternBossBarOverlay;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;

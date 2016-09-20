@@ -29,7 +29,6 @@ import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 public interface AbstractViewer extends Viewer {
 

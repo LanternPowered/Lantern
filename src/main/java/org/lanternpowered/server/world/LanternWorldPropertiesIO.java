@@ -383,7 +383,7 @@ final class LanternWorldPropertiesIO {
     }
 
     static LevelData convert(LanternWorldProperties properties, @Nullable Integer dimensionId, @Nullable BitSet dimensionMap) {
-        final DataContainer rootContainer = new MemoryDataContainer();
+        final DataContainer rootContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         final DataView dataView = rootContainer.createView(DATA);
 
         dataView.set(SEED, properties.getSeed());
@@ -443,7 +443,7 @@ final class LanternWorldPropertiesIO {
         spongeContainer.set(GENERATOR_MODIFIERS, properties.generatorModifiers.stream().map(
                 CatalogType::getId).collect(Collectors.toList()));
         spongeContainer.set(PLAYER_UUID_TABLE, properties.pendingUniqueIds.stream().map(
-                uuid -> new MemoryDataContainer()
+                uuid -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
                         .set(UUID_MOST, uuid.getMostSignificantBits())
                         .set(UUID_LEAST, uuid.getLeastSignificantBits()))
                 .collect(Collectors.toList()));
@@ -466,7 +466,7 @@ final class LanternWorldPropertiesIO {
         if (levelData.dimensionMap != null) {
             final BitSet dimensionMap = levelData.dimensionMap;
             final DataView dimensionData = rootDataView.createView(FORGE).createView(DIMENSION_DATA);
-            int[] data = new int[(dimensionMap.length() + Integer.SIZE - 1) / Integer.SIZE];
+            final int[] data = new int[(dimensionMap.length() + Integer.SIZE - 1) / Integer.SIZE];
             for (int i = 0; i < data.length; i++) {
                 int val = 0;
                 for (int j = 0; j < Integer.SIZE; j++) {
@@ -480,7 +480,8 @@ final class LanternWorldPropertiesIO {
             NbtStreamUtils.write(rootDataView, Files.newOutputStream(file), true);
             return true;
         });
-        final DataView spongeRootContainer = levelData.spongeWorldData == null ? new MemoryDataContainer() : levelData.spongeWorldData;
+        final DataView spongeRootContainer = levelData.spongeWorldData == null ?
+                new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED) : levelData.spongeWorldData;
         final DataView spongeContainer = spongeRootContainer.getView(DataQueries.SPONGE_DATA)
                 .orElseGet(() -> spongeRootContainer.createView(DataQueries.SPONGE_DATA));
         spongeContainer.set(UUID_MOST, levelData.uniqueId.getMostSignificantBits());

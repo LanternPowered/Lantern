@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.bossbar;
 
-import org.lanternpowered.server.bossbar.LanternBossBarColor;
+import org.lanternpowered.server.boss.LanternBossBarColor;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarColors;

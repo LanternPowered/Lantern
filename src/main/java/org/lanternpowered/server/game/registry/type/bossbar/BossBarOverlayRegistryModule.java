@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.game.registry.type.bossbar;
 
-import org.lanternpowered.server.bossbar.LanternBossBarOverlay;
+import org.lanternpowered.server.boss.LanternBossBarOverlay;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.BossBarOverlays;

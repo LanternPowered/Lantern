@@ -23,7 +23,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.status;
+package org.lanternpowered.server.network.status;
 
 import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -39,7 +39,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LanternStatusHelper {
+public final class LanternStatusHelper {
 
     /**
      * The maximum amount of players that are by default displayed in the status ping.
@@ -48,10 +48,10 @@ public class LanternStatusHelper {
 
     public static ClientPingServerEvent.Response.Players createPlayers(LanternServer server) {
         // Get the online players
-        Collection<LanternPlayer> players = server.getRawOnlinePlayers();
+        final Collection<LanternPlayer> players = server.getRawOnlinePlayers();
 
-        int online = players.size();
-        int max = server.getMaxPlayers();
+        final int online = players.size();
+        final int max = server.getMaxPlayers();
 
         // Create a list with the players
         List<LanternPlayer> playersList = new ArrayList<>(players);
@@ -65,8 +65,8 @@ public class LanternStatusHelper {
         }
 
         // Get all the game profiles and create a copy
-        List<GameProfile> gameProfiles = Lists2.nonNullOf(playersList.stream()
-                .map(player -> ((LanternGameProfile) player.getProfile()).copy())
+        final List<GameProfile> gameProfiles = Lists2.nonNullOf(playersList.stream()
+                .map(player -> ((LanternGameProfile) player.getProfile()).copyWithoutProperties())
                 .collect(Collectors.toList()));
 
         return SpongeEventFactory.createClientPingServerEventResponsePlayers(gameProfiles, max, online);

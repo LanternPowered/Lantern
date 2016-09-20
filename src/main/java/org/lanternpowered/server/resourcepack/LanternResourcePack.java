@@ -25,14 +25,13 @@
  */
 package org.lanternpowered.server.resourcepack;
 
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.resourcepack.ResourcePack;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.net.URI;
 import java.util.Optional;
 
-@NonnullByDefault
-public final class LanternResourcePack implements ResourcePack {
+final class LanternResourcePack implements ResourcePack {
 
     private final URI uri;
     private final String name;
@@ -66,4 +65,14 @@ public final class LanternResourcePack implements ResourcePack {
         return this.hash;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .omitNullValues()
+                .add("uri", this.uri)
+                .add("id", this.id)
+                .add("name", this.name)
+                .add("hash", this.hash.orElse(null))
+                .toString();
+    }
 }

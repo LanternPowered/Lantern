@@ -23,4 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.entity.living.player.tab;
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.entity.living.player.tab;

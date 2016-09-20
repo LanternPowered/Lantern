@@ -45,7 +45,7 @@ import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockStateBuilder;
-import org.lanternpowered.server.bossbar.LanternBossBarBuilder;
+import org.lanternpowered.server.boss.LanternBossBarBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternEntityDamageSourceBuilder;
@@ -164,7 +164,7 @@ import org.lanternpowered.server.script.function.condition.ConditionTypeRegistry
 import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
-import org.lanternpowered.server.status.LanternFavicon;
+import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;

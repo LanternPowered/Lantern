@@ -44,7 +44,7 @@ import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.EmptyRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
-import org.lanternpowered.server.status.LanternFavicon;
+import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;

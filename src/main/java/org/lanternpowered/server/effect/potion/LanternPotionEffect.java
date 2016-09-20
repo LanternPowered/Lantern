@@ -27,6 +27,7 @@ package org.lanternpowered.server.effect.potion;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.spongepowered.api.data.DataContainer;
@@ -90,5 +91,16 @@ public class LanternPotionEffect implements PotionEffect, AbstractPropertyHolder
                 .set(DataQueries.POTION_AMPLIFIER, this.amplifier)
                 .set(DataQueries.POTION_AMBIANCE, this.ambient)
                 .set(DataQueries.POTION_SHOWS_PARTICLES, this.showParticles);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("effectType", this.effectType.getId())
+                .add("duration", this.duration)
+                .add("amplifier", this.amplifier)
+                .add("ambient", this.ambient)
+                .add("showParticles", this.showParticles)
+                .toString();
     }
 }

@@ -23,21 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.bossbar;
-
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.boss.BossBarColor;
-
-public final class LanternBossBarColor extends PluginCatalogType.Base implements BossBarColor {
-
-    private final int internalId;
-
-    public LanternBossBarColor(String pluginId, String name, int internalId) {
-        super(pluginId, name);
-        this.internalId = internalId;
-    }
-
-    public int getInternalId() {
-        return this.internalId;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.boss;

@@ -34,8 +34,13 @@ import org.lanternpowered.server.component.Locked;
 import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
+import org.lanternpowered.server.world.rules.RuleTypes;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.SpongeEventFactory;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.world.ChangeWorldWeatherEvent;
 import org.spongepowered.api.util.weighted.WeightedTable;
 import org.spongepowered.api.world.weather.Weather;
 
@@ -75,13 +80,28 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
      * Pulses the weather.
      */
     void pulse() {
+        this.pulseWeather();
+        this.pulseSky();
+    }
+
+    private void pulseWeather() {
+        if (!this.world.getOrCreateRule(RuleTypes.DO_WEATHER_CYLCE).getValue()) {
+            return;
+        }
         this.weatherData.setRunningDuration(this.weatherData.getRunningDuration() + 1);
         final long remaining = this.weatherData.getRemainingDuration() - 1;
         if (remaining <= 0) {
-            this.setWeather(this.nextWeather());
+            if (this.setWeather(this.nextWeather(), randomDuration(this.random), true)) {
+                // If the event is cancelled, continue the current weather for
+                // a random amount of time, maybe more luck next time
+                this.weatherData.setRemainingDuration(randomDuration(this.random));
+            }
         } else {
             this.weatherData.setRemainingDuration(remaining);
         }
+    }
+
+    private void pulseSky() {
         boolean updateSky = false;
         if (this.darkness != this.darknessTarget) {
             if (Math.abs(this.darkness - this.darknessTarget) < FADE_SPEED) {
@@ -155,13 +175,30 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
 
     @Override
     public void setWeather(Weather weather) {
-        this.setWeather(weather, (300 + this.random.nextInt(600)) * 20);
+        this.setWeather(weather, randomDuration(this.random));
     }
 
     @Override
     public void setWeather(Weather weather, long duration) {
-        final LanternWeather weather0 = (LanternWeather) checkNotNull(weather, "weather");
+        this.setWeather(weather, duration, false);
+    }
+
+    private boolean setWeather(Weather weather, long duration, boolean doEvent) {
+        System.out.println(duration);
+        checkNotNull(weather, "weather");
+        final Cause cause = Cause.source(this.world).build();
         final LanternWeather current = this.weatherData.getWeather();
+        if (doEvent) {
+            final ChangeWorldWeatherEvent event = SpongeEventFactory.createChangeWorldWeatherEvent(
+                    cause, (int) duration, (int) duration, current, weather, weather, this.world);
+            Sponge.getEventManager().post(event);
+            if (event.isCancelled()) {
+                return true;
+            }
+            weather = event.getWeather();
+            duration = event.getDuration();
+        }
+        final LanternWeather weather0 = (LanternWeather) weather;
         this.weatherData.setRemainingDuration(duration);
         if (current != weather) {
             this.weatherData.setRunningDuration(0);
@@ -169,6 +206,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         }
         this.darknessTarget = weather0.getOptions().getOrDefault(WeatherOptions.SKY_DARKNESS).get().floatValue();
         this.rainStrengthTarget = weather0.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get().floatValue();
+        return false;
     }
 
     @Override
@@ -176,4 +214,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         return this.darkness;
     }
 
+    static int randomDuration(Random random) {
+        return (300 + random.nextInt(600)) * 20;
+    }
 }

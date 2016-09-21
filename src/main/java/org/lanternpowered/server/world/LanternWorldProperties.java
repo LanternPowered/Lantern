@@ -27,6 +27,7 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.world.LanternWeatherUniverse.randomDuration;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -430,7 +431,7 @@ public final class LanternWorldProperties implements WorldProperties {
         final boolean raining = ((LanternWeather) weather).getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0;
         if (raining != state) {
             this.weatherData.setWeather((LanternWeather) (state ? Weathers.RAIN : Weathers.CLEAR));
-            this.weatherData.setRemainingDuration((300 + RANDOM.nextInt(600)) * 20);
+            this.weatherData.setRemainingDuration(randomDuration(RANDOM));
             this.weatherData.setRunningDuration(0);
         }
     }
@@ -461,7 +462,7 @@ public final class LanternWorldProperties implements WorldProperties {
         final boolean thunderStorm = weather == Weathers.THUNDER_STORM;
         if (thunderStorm != state) {
             this.weatherData.setWeather((LanternWeather) (state ? Weathers.THUNDER_STORM : Weathers.CLEAR));
-            this.weatherData.setRemainingDuration((300 + RANDOM.nextInt(600)) * 20);
+            this.weatherData.setRemainingDuration(randomDuration(RANDOM));
             this.weatherData.setRunningDuration(0);
         }
     }

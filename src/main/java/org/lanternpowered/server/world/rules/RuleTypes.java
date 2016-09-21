@@ -63,6 +63,10 @@ public final class RuleTypes {
             RuleType.create(DefaultGameRules.SPAWN_RADIUS, RuleDataTypes.INTEGER, 10);
     public static final RuleType<Boolean> DISABLE_ELYTRA_MOVEMENT_CHECK =
             RuleType.create(DefaultGameRules.DISABLE_ELYTRA_MOVEMENT_CHECK, RuleDataTypes.BOOLEAN, false);
+    public static final RuleType<Boolean> DO_WEATHER_CYLCE =
+            RuleType.create("doWeatherCycle", RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<Integer> MAX_ENTITY_CRAMMING =
+            RuleType.create("maxEntityCramming", RuleDataTypes.INTEGER, 24);
 
     private RuleTypes() {
     }

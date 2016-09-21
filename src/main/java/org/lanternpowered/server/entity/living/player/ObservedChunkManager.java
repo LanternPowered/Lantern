@@ -285,7 +285,7 @@ public final class ObservedChunkManager {
                     // There seems to be a weird issue, some blocks are not rendered
                     // on the client (bedrock with the flat generator) and it cannot
                     // be placed in creative
-                    if (false && bitsPerValue <= 8) {
+                    if (bitsPerValue <= 8) {
                         // The vanilla client/server will not go lower then 4 bits
                         if (bitsPerValue < 4) {
                             bitsPerValue = 4;

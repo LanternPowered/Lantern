@@ -42,6 +42,7 @@ import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.gen.flat.FlatGeneratorType;
 import org.lanternpowered.server.world.rules.RuleDataTypes;
 import org.lanternpowered.server.world.rules.RuleType;
+import org.lanternpowered.server.world.weather.LanternWeather;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -56,6 +57,8 @@ import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehaviors;
 import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.weather.Weather;
+import org.spongepowered.api.world.weather.Weathers;
 
 import java.io.DataInputStream;
 import java.io.FileNotFoundException;
@@ -143,6 +146,12 @@ final class LanternWorldPropertiesIO {
     // Extra generator options for the flat world generator type
     private final static DataQuery GENERATOR_OPTIONS_EXTRA = DataQuery.of("generatorOptionsExtra");
 
+    private final static DataQuery LANTERN = DataQuery.of("LanternData");
+    private final static DataQuery WEATHER = DataQuery.of("weather");
+    private final static DataQuery WEATHER_TYPE = DataQuery.of("type");
+    private final static DataQuery WEATHER_RUNNING_DURATION = DataQuery.of("running");
+    private final static DataQuery WEATHER_REMAINING_DURATION = DataQuery.of("remaining");
+
     // Provider class names in vanilla
     private final static String OVERWORLD = "net.minecraft.world.WorldProviderSurface";
     private final static String NETHER = "net.minecraft.world.WorldProviderHell";
@@ -221,11 +230,6 @@ final class LanternWorldPropertiesIO {
         properties.age = dataView.getLong(AGE).get();
         properties.time = dataView.getLong(TIME).orElse(properties.age % 24000);
         properties.setLastPlayedTime(dataView.getLong(LAST_PLAYED).get());
-        properties.raining = dataView.getInt(RAINING).get() > 0;
-        properties.rainTime = dataView.getInt(RAIN_TIME).get();
-        properties.thundering = dataView.getInt(THUNDERING).get() > 0;
-        properties.thunderTime = dataView.getInt(THUNDER_TIME).get();
-        properties.clearWeatherTime = dataView.getInt(CLEAR_WEATHER_TIME).get();
         properties.mapFeatures = dataView.getInt(MAP_FEATURES).get() > 0;
         properties.setInitialized(dataView.getInt(INITIALIZED).get() > 0);
         dataView.getInt(DIFFICULTY_LOCKED).ifPresent(v -> properties.setDifficultyLocked(v > 0));
@@ -242,6 +246,9 @@ final class LanternWorldPropertiesIO {
         if (spongeRootDataView != null) {
             properties.setAdditionalProperties(spongeRootDataView.copy().remove(DataQueries.SPONGE_DATA));
         }
+
+        final WeatherData weatherData = properties.getWeatherData();
+        boolean weatherLoaded = false;
 
         // Get the sponge properties
         if (spongeDataView != null) {
@@ -285,6 +292,40 @@ final class LanternWorldPropertiesIO {
             spongeDataView.getInt(GENERATE_BONUS_CHEST).ifPresent(v -> properties.setGenerateBonusChest(v > 0));
             spongeDataView.getInt(SERIALIZATION_BEHAVIOR).ifPresent(v -> properties.setSerializationBehavior(
                     v == 0 ? SerializationBehaviors.MANUAL : v == 1 ? SerializationBehaviors.AUTOMATIC : SerializationBehaviors.NONE));
+
+            final DataView lanternDataView = spongeDataView.getView(LANTERN).orElse(null);
+            if (lanternDataView != null) {
+                final DataView weatherView = lanternDataView.getView(WEATHER).get();
+
+                final String weatherTypeId = weatherView.getString(WEATHER_TYPE).get();
+                final Optional<Weather> weatherType = Sponge.getRegistry().getType(Weather.class, weatherTypeId);
+                if (weatherType.isPresent()) {
+                    weatherData.setWeather((LanternWeather) weatherType.get());
+                } else {
+                    Lantern.getLogger().info("Unknown weather type: {}, the server will default to {}",
+                            weatherTypeId, weatherData.getWeather().getId());
+                }
+                weatherData.setRunningDuration(weatherView.getLong(WEATHER_RUNNING_DURATION).get());
+                weatherData.setRemainingDuration(weatherView.getLong(WEATHER_REMAINING_DURATION).get());
+                weatherLoaded = true;
+            }
+        }
+
+        if (!weatherLoaded) {
+            final boolean raining = dataView.getInt(RAINING).get() > 0;
+            final long rainTime = dataView.getLong(RAIN_TIME).get();
+            final boolean thundering = dataView.getInt(THUNDERING).get() > 0;
+            final long thunderTime = dataView.getLong(THUNDER_TIME).get();
+            final long clearWeatherTime = dataView.getLong(CLEAR_WEATHER_TIME).get();
+            if (thundering) {
+                weatherData.setWeather((LanternWeather) Weathers.THUNDER_STORM);
+                weatherData.setRemainingDuration(thunderTime);
+            } else if (raining) {
+                weatherData.setWeather((LanternWeather) Weathers.RAIN);
+                weatherData.setRemainingDuration(rainTime);
+            } else {
+                weatherData.setRemainingDuration(clearWeatherTime);
+            }
         }
 
         // Get the spawn position
@@ -367,7 +408,7 @@ final class LanternWorldPropertiesIO {
                         .orElse(properties.getDimensionType().doesKeepSpawnLoaded()));
                 spongeDataView.getInt(LOAD_ON_STARTUP).ifPresent(v -> worldConfig.setKeepSpawnLoaded(v > 0));
                 spongeDataView.getStringList(GENERATOR_MODIFIERS).ifPresent(v -> {
-                    List<String> modifiers = worldConfig.getGeneration().getGenerationModifiers();
+                    final List<String> modifiers = worldConfig.getGeneration().getGenerationModifiers();
                     modifiers.clear();
                     modifiers.addAll(v);
                     properties.updateWorldGenModifiers(modifiers);
@@ -394,12 +435,17 @@ final class LanternWorldPropertiesIO {
         }
         dataView.set(AGE, properties.age);
         dataView.set(TIME, properties.time);
-        dataView.set(RAINING, (byte) (properties.raining ? 1 : 0));
-        dataView.set(RAIN_TIME, properties.rainTime);
-        dataView.set(THUNDERING, (byte) (properties.thundering ? 1 : 0));
-        dataView.set(THUNDER_TIME, properties.thunderTime);
+
+        final WeatherData weatherData = properties.getWeatherData();
+        final boolean raining = properties.isRaining();
+        final boolean thunderStorm = properties.isThundering();
+        dataView.set(RAINING, (byte) (properties.isRaining() ? 1 : 0));
+        dataView.set(RAIN_TIME, properties.getRainTime());
+        dataView.set(THUNDERING, (byte) (properties.isThundering() ? 1 : 0));
+        dataView.set(THUNDER_TIME, properties.getThunderTime());
         dataView.set(HARDCORE, (byte) (properties.isHardcore() ? 1 : 0));
-        dataView.set(CLEAR_WEATHER_TIME, properties.clearWeatherTime);
+        dataView.set(CLEAR_WEATHER_TIME, raining || thunderStorm ? 0 : weatherData.getRemainingDuration());
+
         dataView.set(LAST_PLAYED, properties.getLastPlayedTime());
         dataView.set(SIZE_ON_DISK, 0L);
         dataView.set(INITIALIZED, (byte) (properties.isInitialized() ? 1 : 0));
@@ -454,6 +500,11 @@ final class LanternWorldPropertiesIO {
             serializationBehaviorId = -1;
         }
         spongeContainer.set(SERIALIZATION_BEHAVIOR, serializationBehaviorId);
+        final DataView lanternDataView = spongeContainer.createView(LANTERN);
+        final DataView weatherView = lanternDataView.createView(WEATHER);
+        weatherView.set(WEATHER_TYPE, weatherData.getWeather().getId());
+        weatherView.set(WEATHER_REMAINING_DURATION, weatherData.getRemainingDuration());
+        weatherView.set(WEATHER_RUNNING_DURATION, weatherData.getRunningDuration());
         return new LevelData(properties.getWorldName(), properties.getUniqueId(), rootContainer,
                 spongeRootContainer, dimensionId, dimensionMap);
     }

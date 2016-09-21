@@ -47,6 +47,7 @@ public class WeatherBuilder implements ResettableBuilder<LanternWeather, Weather
     Set<String> aliases;
     Action action;
     OptionValueMap options;
+    double weight = 100;
     @Nullable private String name;
 
     WeatherBuilder() {
@@ -132,6 +133,11 @@ public class WeatherBuilder implements ResettableBuilder<LanternWeather, Weather
         return this;
     }
 
+    public WeatherBuilder weight(double weight) {
+        this.weight = weight;
+        return this;
+    }
+
     @Override
     public Weather create(String pluginId, String id) {
         return this.create(pluginId, id, this.name == null ? id : this.name);
@@ -143,6 +149,6 @@ public class WeatherBuilder implements ResettableBuilder<LanternWeather, Weather
         checkNotNull(name, "name");
         checkNotNull(id, "id");
         return new LanternWeather(pluginId, id, name,
-                this.action, this.aliases, new UnmodifiableOptionValueMap(this.options));
+                this.action, this.aliases, new UnmodifiableOptionValueMap(this.options), this.weight);
     }
 }

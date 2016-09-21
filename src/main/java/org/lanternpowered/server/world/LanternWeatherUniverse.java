@@ -27,18 +27,19 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.collect.Lists;
+import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.component.AttachableTo;
 import org.lanternpowered.server.component.Component;
 import org.lanternpowered.server.component.Locked;
+import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
+import org.spongepowered.api.util.weighted.WeightedTable;
 import org.spongepowered.api.world.weather.Weather;
-import org.spongepowered.api.world.weather.WeatherUniverse;
-import org.spongepowered.api.world.weather.Weathers;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -53,12 +54,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
 
     // The world this weather universe is attached to
     @Inject private LanternWorld world;
-
-    // The current weather
-    private LanternWeather weather = (LanternWeather) Weathers.CLEAR;
-
-    private long duration;
-    private long remaining;
+    private WeatherData weatherData;
 
     private float rainStrengthTarget;
     private float rainStrength;
@@ -66,64 +62,25 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
     private float darknessTarget;
     private float darkness;
 
-    void setRaining(boolean raining) {
-        if (raining && this.world.properties.rainTime > 0) {
-            this.setWeather(Weathers.RAIN, this.world.properties.rainTime);
-        } else {
-            this.world.properties.raining = false;
-        }
-    }
-
-    void setRainTime(int time) {
-        if (!this.world.properties.raining) {
-            return;
-        }
-        if (this.weather.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0) {
-            this.duration += time;
-            this.remaining += time;
-        } else {
-            this.setWeather(Weathers.RAIN, time);
-        }
-    }
-
-    void setThundering(boolean thundering) {
-        if (thundering && this.world.properties.raining && this.world.properties.rainTime > 0
-                && this.world.properties.thunderTime > 0) {
-            this.setWeather(Weathers.THUNDER_STORM, this.world.properties.thunderTime);
-        } else {
-            this.world.properties.thundering = false;
-        }
-    }
-
-    void setThunderTime(int time) {
-        if (!this.world.properties.raining || !this.world.properties.thundering) {
-            return;
-        }
-        //if (this.weather.getThunderRate() > 0f) { TODO
-        if (this.weather.getId().contains("thunder")) {
-            this.duration += time;
-            this.remaining += time;
-        } else {
-            this.setWeather(Weathers.THUNDER_STORM, time);
-        }
+    @OnAttach
+    private void onAttach() {
+        this.weatherData = this.world.getProperties().getWeatherData();
+        this.rainStrengthTarget = this.weatherData.getWeather().getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get().floatValue();
+        this.rainStrength = this.rainStrengthTarget;
+        this.darknessTarget = this.weatherData.getWeather().getOptions().getOrDefault(WeatherOptions.SKY_DARKNESS).get().floatValue();
+        this.darkness = this.darknessTarget;
     }
 
     /**
      * Pulses the weather.
      */
     void pulse() {
-        if (this.world.properties.raining && this.world.properties.rainTime > 0) {
-            this.world.properties.rainTime--;
-        }
-        if (this.world.properties.thundering && this.world.properties.thunderTime > 0) {
-            this.world.properties.thunderTime--;
-        }
-        if (!this.world.properties.thundering && !this.world.properties.raining &&
-                this.world.properties.clearWeatherTime > 0) {
-            this.world.properties.clearWeatherTime--;
-        }
-        if (--this.remaining <= 0) {
+        this.weatherData.setRunningDuration(this.weatherData.getRunningDuration() + 1);
+        final long remaining = this.weatherData.getRemainingDuration() - 1;
+        if (remaining <= 0) {
             this.setWeather(this.nextWeather());
+        } else {
+            this.weatherData.setRemainingDuration(remaining);
         }
         boolean updateSky = false;
         if (this.darkness != this.darknessTarget) {
@@ -155,7 +112,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
      * Creates a new {@link MessagePlayOutWorldSky} for the
      * current state of the sky.
      *
-     * @return the message
+     * @return The message
      */
     public MessagePlayOutWorldSky createSkyUpdateMessage() {
         return new MessagePlayOutWorldSky(this.rainStrength, this.darkness);
@@ -165,32 +122,35 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
      * Gets the next possible {@link LanternWeather}, ignoring
      * the last weather type.
      *
-     * @return the next weather type
+     * @return The next weather type
      */
     private LanternWeather nextWeather() {
-        List<Weather> weathers = Lists.newArrayList(this.world.game.getRegistry().getAllOf(Weather.class));
-        while (weathers.size() > 1) {
-            LanternWeather next = (LanternWeather) weathers.remove(this.random.nextInt(weathers.size()));
-            if (next != this.weather) {
-                return next;
-            }
+        //noinspection unchecked
+        final List<LanternWeather> weathers = new ArrayList(this.world.game.getRegistry().getAllOf(Weather.class));
+        final LanternWeather current = this.weatherData.getWeather();
+        weathers.remove(current);
+        if (weathers.isEmpty()) {
+            return current;
         }
-        return weathers.isEmpty() ? this.weather : (LanternWeather) weathers.get(0);
+
+        final WeightedTable<LanternWeather> table = new WeightedTable<>();
+        weathers.forEach(weather -> table.add(weather, weather.getWeight()));
+        return table.get(this.random).get(0);
     }
 
     @Override
     public LanternWeather getWeather() {
-        return this.weather;
+        return this.weatherData.getWeather();
     }
 
     @Override
     public long getRemainingDuration() {
-        return this.remaining;
+        return this.weatherData.getRemainingDuration();
     }
 
     @Override
     public long getRunningDuration() {
-        return this.duration;
+        return this.weatherData.getRunningDuration();
     }
 
     @Override
@@ -201,26 +161,18 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
     @Override
     public void setWeather(Weather weather, long duration) {
         final LanternWeather weather0 = (LanternWeather) checkNotNull(weather, "weather");
-        boolean rain = weather0.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0f;
-        boolean thunder = this.weather.getId().contains("thunder"); // weather0.getThunderRate() > 0f; TODO
-        this.world.properties.raining = rain;
-        // Lets just assume for now that it won't throw errors
-        this.world.properties.rainTime = rain ? (int) duration : 0;
-        this.world.properties.thundering = thunder;
-        // Lets just assume for now that it won't throw errors
-        this.world.properties.thunderTime = thunder ? (int) duration : 0;
-        if (this.weather == weather) {
-            this.duration += duration;
-            this.remaining += duration;
-        } else {
-            this.duration = duration;
-            this.remaining = duration;
+        final LanternWeather current = this.weatherData.getWeather();
+        this.weatherData.setRemainingDuration(duration);
+        if (current != weather) {
+            this.weatherData.setRunningDuration(0);
+            this.weatherData.setWeather(weather0);
         }
         this.darknessTarget = weather0.getOptions().getOrDefault(WeatherOptions.SKY_DARKNESS).get().floatValue();
         this.rainStrengthTarget = weather0.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get().floatValue();
     }
 
-    public float getDarkness() {
+    @Override
+    public double getDarkness() {
         return this.darkness;
     }
 

@@ -41,19 +41,24 @@ public final class LanternWeather extends PluginCatalogType.Base implements Weat
     private final Action action;
     private final Set<String> aliases;
     private final OptionValueMap options;
+    private final double weight;
 
-    LanternWeather(String pluginId, String name, Action action, Set<String> aliases, OptionValueMap options) {
+    LanternWeather(String pluginId, String name, Action action, Set<String> aliases,
+            OptionValueMap options, double weight) {
         super(pluginId, name);
         this.action = action;
         this.aliases = aliases;
         this.options = options;
+        this.weight = weight;
     }
 
-    LanternWeather(String pluginId, String id, String name, Action action, Set<String> aliases, OptionValueMap options) {
+    LanternWeather(String pluginId, String id, String name, Action action, Set<String> aliases,
+            OptionValueMap options, double weight) {
         super(pluginId, id, name);
         this.action = action;
         this.aliases = aliases;
         this.options = options;
+        this.weight = weight;
     }
 
     public Action getAction() {
@@ -66,5 +71,9 @@ public final class LanternWeather extends PluginCatalogType.Base implements Weat
 
     public OptionValueMap getOptions() {
         return this.options;
+    }
+
+    public double getWeight() {
+        return this.weight;
     }
 }

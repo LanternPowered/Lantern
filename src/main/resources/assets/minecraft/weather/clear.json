@@ -1,7 +1,9 @@
 {
     "name": "Clear",
     "aliases": [
+        "clear",
         "sunny",
         "sun"
-    ]
+    ],
+    "weight": 100
 }

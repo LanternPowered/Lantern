@@ -2,12 +2,14 @@
     "name": "Thunder Storm",
     "aliases": [
         "storm",
+        "thunder_storm",
         "thunderStorm"
     ],
     "options": {
         "rain_strength": 1.0,
         "sky_darkness": 1.0
     },
+    "weight": 100,
     "action": [
         {
             "type": "random_chunk_action",

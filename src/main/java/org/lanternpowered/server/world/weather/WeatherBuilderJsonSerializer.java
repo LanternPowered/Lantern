@@ -75,6 +75,9 @@ public class WeatherBuilderJsonSerializer implements JsonSerializer<WeatherBuild
         if (json.has("name")) {
             builder.name(json.get("name").getAsString());
         }
+        if (json.has("weight")) {
+            builder.weight(json.get("weight").getAsDouble());
+        }
         return builder;
     }
 }

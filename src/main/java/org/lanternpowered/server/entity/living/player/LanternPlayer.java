@@ -34,6 +34,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
+import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
@@ -53,15 +54,18 @@ import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.objects.LocalizedText;
+import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
@@ -75,7 +79,10 @@ import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -672,7 +679,17 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public void sendBookView(BookView bookView) {
+        checkNotNull(bookView, "bookView");
 
+        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        ItemStackStore.writeBookData(dataView, bookView, this.locale);
+
+        // Written book internal id
+        final RawItemStack rawItemStack = new RawItemStack(387, 0, 1, dataView);
+        final int slot = this.inventory.getHotbar().getSelectedSlotIndex();
+        this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, rawItemStack));
+        this.session.send(new MessagePlayOutOpenBook(HandTypes.MAIN_HAND));
+        this.session.send(new MessagePlayOutSetWindowSlot(-2, slot, this.inventory.getHotbar().getSelectedSlot().peek().orElse(null)));
     }
 
     @Override

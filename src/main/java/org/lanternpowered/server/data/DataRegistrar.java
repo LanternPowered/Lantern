@@ -36,6 +36,10 @@ import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
 import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
 import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.text.BookView;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.serializer.BookViewDataBuilder;
+import org.spongepowered.api.text.serializer.TextConfigSerializer;
 import org.spongepowered.api.util.RespawnLocation;
 
 public class DataRegistrar {
@@ -45,13 +49,15 @@ public class DataRegistrar {
         propertyRegistry.register(SkyLuminanceProperty.class, new SkyLuminancePropertyStore());
         propertyRegistry.register(GroundLuminanceProperty.class, new GroundLuminancePropertyStore());
 
-        final LanternDataManager dataManager = LanternDataManager.getInstance();
+        final LanternDataManager dataManager = LanternDataManager.get();
         // Register the data type serializers
         DataTypeSerializers.registerSerializers(dataManager);
         // Register the data serializers
         DataTranslators.registerSerializers(dataManager);
 
         // Register the data builders
+        dataManager.registerBuilder(Text.class, new TextConfigSerializer());
+        dataManager.registerBuilder(BookView.class, new BookViewDataBuilder());
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
     }

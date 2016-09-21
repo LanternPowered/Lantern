@@ -254,9 +254,6 @@ public class LanternGame implements Game {
     // The command manager
     private LanternCommandManager commandManager;
 
-    // The serialization service 
-    private LanternDataManager dataManager;
-
     // The asset repository
     private AssetRepository assetRepository;
     // The asset manager
@@ -424,9 +421,6 @@ public class LanternGame implements Game {
 
         // Create the chunk load service
         this.chunkTicketManager = new LanternChunkTicketManager(this.globalConfig);
-
-        // Create the data manager
-        this.dataManager = new LanternDataManager();
 
         // Register the game profile resolver
         this.gameProfileManager = new LanternGameProfileManager(this.configFolder.resolve(PROFILE_CACHE_FILE));
@@ -755,7 +749,7 @@ public class LanternGame implements Game {
 
     @Override
     public LanternDataManager getDataManager() {
-        return this.dataManager;
+        return LanternDataManager.get();
     }
 
     public Path getConfigDir() {

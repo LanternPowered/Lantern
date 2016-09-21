@@ -73,7 +73,7 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public DataSerializable deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView data) throws InvalidDataException {
-            DataBuilder<DataSerializable> dataBuilder = (DataBuilder<DataSerializable>) LanternDataManager.getInstance()
+            DataBuilder<DataSerializable> dataBuilder = (DataBuilder<DataSerializable>) LanternDataManager.get()
                     .getBuilder((Class<? extends DataSerializable>) type.getRawType())
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a DataBuilder for the DataSerializable: " + type));
             return dataBuilder.build(data).orElseThrow(() -> new InvalidDataException("Unable to deserializer the " + type));

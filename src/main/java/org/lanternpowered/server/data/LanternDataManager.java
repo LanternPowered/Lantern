@@ -65,7 +65,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
 
     private static final LanternDataManager instance = new LanternDataManager();
 
-    public static LanternDataManager getInstance() {
+    public static LanternDataManager get() {
         return instance;
     }
 
@@ -80,7 +80,7 @@ public final class LanternDataManager extends SimpleDataTypeSerializerCollection
 
     private boolean allowRegistrations = true;
 
-    public LanternDataManager() {
+    private LanternDataManager() {
     }
 
     @Override

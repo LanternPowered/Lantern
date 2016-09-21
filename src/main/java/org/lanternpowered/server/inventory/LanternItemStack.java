@@ -31,7 +31,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;

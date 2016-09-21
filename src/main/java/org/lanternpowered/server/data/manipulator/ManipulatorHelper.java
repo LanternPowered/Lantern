@@ -58,9 +58,9 @@ public final class ManipulatorHelper {
             Key<?> key = entry.getKey();
             DataQuery dataQuery = key.getQuery();
             TypeToken<?> typeToken = key.getElementToken();
-            DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.getInstance().getTypeSerializer(typeToken)
+            DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.get().getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
-            DataTypeSerializerContext context = LanternDataManager.getInstance().getTypeSerializerContext();
+            DataTypeSerializerContext context = LanternDataManager.get().getTypeSerializerContext();
             // The value's shouldn't be null inside a data manipulator,
             // since it doesn't support removal of values
             dataContainer.set(dataQuery, typeSerializer.serialize(typeToken, context, checkNotNull(((ElementHolder) entry.getValue()).get(),
@@ -83,9 +83,9 @@ public final class ManipulatorHelper {
             TypeToken<?> typeToken = key.getElementToken();
             Object data = container.get(dataQuery).orElseThrow(
                     () -> new InvalidDataException("Key query (" + dataQuery.toString() + ") is missing."));
-            DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.getInstance().getTypeSerializer(typeToken)
+            DataTypeSerializer typeSerializer = (DataTypeSerializer) LanternDataManager.get().getTypeSerializer(typeToken)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for the element type: " + typeToken.toString()));
-            DataTypeSerializerContext context = LanternDataManager.getInstance().getTypeSerializerContext();
+            DataTypeSerializerContext context = LanternDataManager.get().getTypeSerializerContext();
             ((ElementHolder) map.get(key)).set(typeSerializer.deserialize(typeToken, context, data));
         }
         return Optional.of(manipulator);

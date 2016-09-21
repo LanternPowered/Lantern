@@ -71,8 +71,8 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static final DataQuery SELECTED_ITEM_SLOT = DataQuery.of("SelectedItemSlot");
     private static final DataQuery DIMENSION = DataQuery.of("Dimension");
 
-    private static final DataQuery BUKKIT_FIRST_DATE_PLAYED = DataQuery.of("bukkit.firstPlayed");
-    private static final DataQuery BUKKIT_LAST_DATE_PLAYED = DataQuery.of("bukkit.lastPlayed");
+    private static final DataQuery BUKKIT_FIRST_DATE_PLAYED = DataQuery.of('.', "bukkit.firstPlayed");
+    private static final DataQuery BUKKIT_LAST_DATE_PLAYED = DataQuery.of('.', "bukkit.lastPlayed");
 
     private static final DataQuery FIRST_DATE_PLAYED = DataQuery.of("FirstJoin");
     private static final DataQuery LAST_DATE_PLAYED = DataQuery.of("LastPlayed");

@@ -28,24 +28,24 @@ package org.lanternpowered.server.network.vanilla.message.codec.play;
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
+import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.NullMessage;
 import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.objects.RawItemStack;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeItemName;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInChangeOffer;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditCommandBlock;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSound;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.type.HandTypes;
 
 import java.util.List;
 
@@ -56,17 +56,17 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
     private final static DataQuery AUTHOR = DataQuery.of("author");
     private final static DataQuery TITLE = DataQuery.of("title");
 
-    private final static ByteBuffer EMPTY = ByteBufferAllocator.unpooled().buffer(0);
-
     @Override
     protected MessageResult encode0(CodecContext context, Message message) throws CodecException {
         if (message instanceof MessagePlayInOutBrand) {
             return new MessageResult("MC|Brand", context.byteBufAlloc().buffer().writeString(((MessagePlayInOutBrand) message).getBrand()));
         } else if (message instanceof MessagePlayOutOpenBook) {
-            return new MessageResult("MC|BOpen", EMPTY);
+            final ByteBuffer buf = context.byteBufAlloc().buffer();
+            buf.writeVarInt(((MessagePlayOutOpenBook) message).getHandType() == HandTypes.MAIN_HAND ? 0 : 1);
+            return new MessageResult("MC|BOpen", buf);
         } else if (message instanceof MessagePlayOutStopSound) {
-            MessagePlayOutStopSound message0 = (MessagePlayOutStopSound) message;
-            ByteBuffer buf = context.byteBufAlloc().buffer();
+            final MessagePlayOutStopSound message0 = (MessagePlayOutStopSound) message;
+            final ByteBuffer buf = context.byteBufAlloc().buffer();
             buf.writeString(message0.getSound() == null ? "" : message0.getSound());
             buf.writeString(message0.getCategory() == null ? "" : message0.getCategory().getId());
             return new MessageResult("MC|StopSound", buf);

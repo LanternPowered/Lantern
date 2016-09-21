@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.LanternDataManager;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
@@ -76,7 +75,7 @@ public final class DataUtil {
             final DataView manipulatorView = view.getView(DataQueries.INTERNAL_DATA).get();
             try {
                 final Class<?> clazz = Class.forName(clazzName);
-                final Optional<DataManipulatorBuilder<?, ?>> optional = LanternDataManager.getInstance().getBuilder((Class) clazz);
+                final Optional<DataManipulatorBuilder<?, ?>> optional = LanternDataManager.get().getBuilder((Class) clazz);
                 if (optional.isPresent()) {
                     final Optional<? extends DataManipulator<?, ?>> manipulatorOptional = optional.get().build(manipulatorView);
                     if (manipulatorOptional.isPresent()) {

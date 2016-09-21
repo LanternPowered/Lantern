@@ -23,24 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
-
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.data.type.HandType;
-
-/**
- * This message opens the book gui of the item the player has currently in it's
- * hand.
- */
-public final class MessagePlayOutOpenBook implements Message {
-
-    private final HandType handType;
-
-    public MessagePlayOutOpenBook(HandType handType) {
-        this.handType = handType;
-    }
-
-    public HandType getHandType() {
-        return this.handType;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.data.io.store.item;

@@ -26,7 +26,6 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.item.inventory.ItemStack;
 
 import javax.annotation.Nullable;
 
@@ -35,9 +34,9 @@ public final class MessagePlayOutSetWindowSlot implements Message {
     private final int index;
     private final int window;
 
-    @Nullable private final ItemStack itemStack;
+    @Nullable private final Object itemStack;
 
-    public MessagePlayOutSetWindowSlot(int window, int index, @Nullable ItemStack itemStack) {
+    public MessagePlayOutSetWindowSlot(int window, int index, @Nullable Object itemStack) {
         this.itemStack = itemStack;
         this.window = window;
         this.index = index;
@@ -49,7 +48,7 @@ public final class MessagePlayOutSetWindowSlot implements Message {
      * @return the item stack
      */
     @Nullable
-    public ItemStack getItem() {
+    public Object getItem() {
         return this.itemStack;
     }
 

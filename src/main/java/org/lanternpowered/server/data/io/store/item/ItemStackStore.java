@@ -29,8 +29,9 @@ import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.text.LanternTextSerializer;
+import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.text.LanternTexts;
+import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
@@ -38,10 +39,10 @@ import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.BookView;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 import java.util.Locale;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
 
@@ -91,7 +92,8 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     public static void writeBookData(DataView dataView, BookView bookView, Locale locale) {
         dataView.set(AUTHOR, LanternTexts.toLegacy(bookView.getAuthor()));
         dataView.set(TITLE, LanternTexts.toLegacy(bookView.getTitle()));
-        dataView.set(PAGES, bookView.getPages().stream().map(
-                text -> ((LanternTextSerializer) TextSerializers.JSON).serialize(text, locale)));
+        JsonTextTranslatableSerializer.setCurrentLocale(locale);
+        dataView.set(PAGES, bookView.getPages().stream().map(Types.TEXT_GSON::toJson).collect(Collectors.toList()));
+        JsonTextTranslatableSerializer.removeCurrentLocale();
     }
 }

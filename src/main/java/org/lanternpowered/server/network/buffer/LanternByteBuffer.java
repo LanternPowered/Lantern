@@ -575,7 +575,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setUniqueId(int index, UUID data) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
         this.writeUniqueId(data);
         this.buf.writerIndex(oldIndex);
@@ -584,16 +584,16 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public UUID readUniqueId() {
-        long most = this.buf.readLong();
-        long least = this.buf.readLong();
+        final long most = this.buf.readLong();
+        final long least = this.buf.readLong();
         return new UUID(most, least);
     }
 
     @Override
     public UUID getUniqueId(int index) {
-        int oldIndex = this.buf.readerIndex();
+        final int oldIndex = this.buf.readerIndex();
         this.buf.readerIndex(index);
-        UUID data = this.readUniqueId();
+        final UUID data = this.readUniqueId();
         this.buf.readerIndex(oldIndex);
         return data;
     }
@@ -601,11 +601,11 @@ public class LanternByteBuffer implements ByteBuffer {
     @Override
     public LanternByteBuffer writeDataView(@Nullable DataView data) {
         if (data == null) {
-            buf.writeByte(0);
+            this.buf.writeByte(0);
             return this;
         }
         try {
-            NbtStreamUtils.write(data, new ByteBufOutputStream(buf), true);
+            NbtStreamUtils.write(data, new ByteBufOutputStream(this.buf), false);
         } catch (IOException e) {
             throw new CodecException(e);
         }
@@ -614,7 +614,7 @@ public class LanternByteBuffer implements ByteBuffer {
 
     @Override
     public LanternByteBuffer setDataView(int index, @Nullable DataView data) {
-        int oldIndex = this.buf.writerIndex();
+        final int oldIndex = this.buf.writerIndex();
         this.buf.writerIndex(index);
         this.writeDataView(data);
         this.buf.writerIndex(oldIndex);
@@ -624,7 +624,7 @@ public class LanternByteBuffer implements ByteBuffer {
     @Nullable
     @Override
     public DataView readLimitedDataView(int maximumDepth, int maxBytes) {
-        int index = this.buf.readerIndex();
+        final int index = this.buf.readerIndex();
         if (this.buf.readByte() == 0) {
             return null;
         }

@@ -58,11 +58,11 @@ public final class RuleTypes {
     public static final RuleType<Boolean> SHOW_DEATH_MESSAGES =
             RuleType.create(DefaultGameRules.SHOW_DEATH_MESSAGES, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> SPECTATORS_GENERATE_CHUNKS =
-            RuleType.create("spectatorsGenerateChunks", RuleDataTypes.BOOLEAN, true);
+            RuleType.create(DefaultGameRules.SPECTATORS_GENERATE_CHUNKS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Integer> SPAWN_RADIUS =
-            RuleType.create("spawnRadius", RuleDataTypes.INTEGER, 10);
+            RuleType.create(DefaultGameRules.SPAWN_RADIUS, RuleDataTypes.INTEGER, 10);
     public static final RuleType<Boolean> DISABLE_ELYTRA_MOVEMENT_CHECK =
-            RuleType.create("disableElytraMovementCheck", RuleDataTypes.BOOLEAN, false);
+            RuleType.create(DefaultGameRules.DISABLE_ELYTRA_MOVEMENT_CHECK, RuleDataTypes.BOOLEAN, false);
 
     private RuleTypes() {
     }

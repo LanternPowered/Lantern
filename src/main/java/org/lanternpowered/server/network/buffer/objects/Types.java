@@ -106,7 +106,7 @@ public final class Types {
         }
     });
 
-    private static final Gson TEXT_GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
+    public static final Gson TEXT_GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
             Lantern.getGame().getRegistry().getTranslationManager(), true).create();
 
     /**

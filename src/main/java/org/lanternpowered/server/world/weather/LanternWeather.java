@@ -26,7 +26,11 @@
 package org.lanternpowered.server.world.weather;
 
 import org.lanternpowered.api.script.function.action.Action;
+import org.lanternpowered.api.script.function.value.IntValueProvider;
+import org.lanternpowered.server.LanternServer;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.script.context.EmptyScriptContext;
 import org.lanternpowered.server.util.option.OptionValueMap;
 import org.spongepowered.api.world.weather.Weather;
 
@@ -42,19 +46,22 @@ public final class LanternWeather extends PluginCatalogType.Base implements Weat
     private final Set<String> aliases;
     private final OptionValueMap options;
     private final double weight;
+    private final IntValueProvider duration;
 
     LanternWeather(String pluginId, String name, Action action, Set<String> aliases,
-            OptionValueMap options, double weight) {
+            OptionValueMap options, double weight, IntValueProvider duration) {
         super(pluginId, name);
         this.action = action;
         this.aliases = aliases;
         this.options = options;
         this.weight = weight;
+        this.duration = duration;
     }
 
     LanternWeather(String pluginId, String id, String name, Action action, Set<String> aliases,
-            OptionValueMap options, double weight) {
+            OptionValueMap options, double weight, IntValueProvider duration) {
         super(pluginId, id, name);
+        this.duration = duration;
         this.action = action;
         this.aliases = aliases;
         this.options = options;
@@ -75,5 +82,13 @@ public final class LanternWeather extends PluginCatalogType.Base implements Weat
 
     public double getWeight() {
         return this.weight;
+    }
+
+    public IntValueProvider getDuration() {
+        return this.duration;
+    }
+
+    public long getRandomTicksDuration() {
+        return this.duration.get(EmptyScriptContext.INSTANCE) * LanternGame.TICKS_PER_SECOND;
     }
 }

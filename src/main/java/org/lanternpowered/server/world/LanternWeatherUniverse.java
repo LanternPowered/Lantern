@@ -91,10 +91,12 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         this.weatherData.setRunningDuration(this.weatherData.getRunningDuration() + 1);
         final long remaining = this.weatherData.getRemainingDuration() - 1;
         if (remaining <= 0) {
-            if (this.setWeather(this.nextWeather(), randomDuration(this.random), true)) {
+            final LanternWeather next = this.nextWeather();
+            if (this.setWeather(next, next.getRandomTicksDuration(), true)) {
                 // If the event is cancelled, continue the current weather for
                 // a random amount of time, maybe more luck next time
-                this.weatherData.setRemainingDuration(randomDuration(this.random));
+                final LanternWeather current = this.weatherData.getWeather();
+                this.weatherData.setRemainingDuration(current.getRandomTicksDuration());
             }
         } else {
             this.weatherData.setRemainingDuration(remaining);
@@ -175,7 +177,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
 
     @Override
     public void setWeather(Weather weather) {
-        this.setWeather(weather, randomDuration(this.random));
+        this.setWeather(weather, ((LanternWeather) weather).getRandomTicksDuration());
     }
 
     @Override
@@ -184,7 +186,6 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
     }
 
     private boolean setWeather(Weather weather, long duration, boolean doEvent) {
-        System.out.println(duration);
         checkNotNull(weather, "weather");
         final Cause cause = Cause.source(this.world).build();
         final LanternWeather current = this.weatherData.getWeather();
@@ -212,9 +213,5 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
     @Override
     public double getDarkness() {
         return this.darkness;
-    }
-
-    static int randomDuration(Random random) {
-        return (300 + random.nextInt(600)) * 20;
     }
 }

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.script.function.value.json;
 
+import static org.lanternpowered.server.script.transformer.Transformer.SCRIPT_PREFIX;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
@@ -32,6 +34,7 @@ import org.lanternpowered.api.script.function.value.DoubleValueProvider;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
 import org.lanternpowered.api.script.function.value.FloatValueProvider;
 import org.lanternpowered.server.script.AbstractObjectTypeRegistryModule;
+import org.lanternpowered.server.script.LanternScriptGameRegistry;
 import org.lanternpowered.server.script.ScriptFunction;
 import org.lanternpowered.server.script.json.ObjectTypeAdapterFactory;
 
@@ -70,6 +73,10 @@ public class DoubleValueProviderTypeAdapterFactory extends ObjectTypeAdapterFact
             // The actual condition type isn't provided, we will try
             // to assume the right type based in the json format
             if (element.isJsonPrimitive()) {
+                final String value = element.getAsString();
+                if (value.startsWith(SCRIPT_PREFIX)) {
+                    return LanternScriptGameRegistry.get().compile(value, DoubleValueProvider.class).get();
+                }
                 return gson.getDelegateAdapter(this, TypeToken.get(DoubleValueProvider.Constant.class)).fromJsonTree(element);
             }
         }

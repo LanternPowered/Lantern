@@ -5,5 +5,6 @@
         "sunny",
         "sun"
     ],
-    "weight": 100
+    "weight": 100,
+    "duration": "@ 300 + $random.nextInt(600)"
 }

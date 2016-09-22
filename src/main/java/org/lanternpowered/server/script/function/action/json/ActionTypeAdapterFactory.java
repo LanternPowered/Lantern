@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.script.function.action.json;
 
+import static org.lanternpowered.server.script.transformer.Transformer.SCRIPT_PREFIX;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -84,6 +86,11 @@ public class ActionTypeAdapterFactory extends ObjectTypeAdapterFactory<Action, A
                 if (obj.has(ConditionalActionJsonSerializer.ACTION) &&
                         obj.has(ConditionalActionJsonSerializer.CONDITION)) {
                     return gson.getDelegateAdapter(this, TypeToken.get(ConditionalAction.class)).fromJsonTree(element);
+                }
+            } else {
+                final String value = element.getAsString();
+                if (value.startsWith(SCRIPT_PREFIX)) {
+                    return LanternScriptGameRegistry.get().compile(value, Action.class).get();
                 }
             }
         }

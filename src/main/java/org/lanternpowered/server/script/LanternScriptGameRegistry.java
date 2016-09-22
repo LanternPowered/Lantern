@@ -41,6 +41,7 @@ import org.lanternpowered.api.script.ScriptObjectTypes;
 import org.lanternpowered.server.asset.AssetRepository;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.script.json.JsonSerializers;
+import org.lanternpowered.server.script.transformer.AdditionalImportsScriptTransformer;
 import org.lanternpowered.server.script.transformer.FirstSuccessTransformer;
 import org.lanternpowered.server.script.transformer.ImportsCollectorTransformer;
 import org.lanternpowered.server.script.transformer.ReferencedScriptTransformer;
@@ -87,7 +88,8 @@ public class LanternScriptGameRegistry implements ScriptGameRegistry {
             ),
             new StripPackageNameTransformer(),
             new ImportsCollectorTransformer(),
-            new ReferencedScriptTransformer()
+            new ReferencedScriptTransformer(),
+            new AdditionalImportsScriptTransformer()
     );
     private final Map<String, LanternScript<Object>> assetScripts = new ConcurrentHashMap<>();
     private final Map<String, LanternScript<Object>> functionAssetScripts = new ConcurrentHashMap<>();

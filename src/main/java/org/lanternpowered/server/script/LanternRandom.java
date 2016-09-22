@@ -29,7 +29,7 @@ import java.util.Random;
 
 public class LanternRandom extends Random {
 
-    public static final LanternRandom random = new LanternRandom();
+    public static final LanternRandom $random = new LanternRandom();
 
     public float range(float min, float max) {
         return min + this.nextFloat() * (max - min);

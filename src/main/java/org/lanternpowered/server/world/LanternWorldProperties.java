@@ -27,7 +27,6 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.world.LanternWeatherUniverse.randomDuration;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -427,11 +426,12 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public void setRaining(boolean state) {
-        final Weather weather = this.weatherData.getWeather();
-        final boolean raining = ((LanternWeather) weather).getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0;
+        LanternWeather weather = this.weatherData.getWeather();
+        final boolean raining = weather.getOptions().getOrDefault(WeatherOptions.RAIN_STRENGTH).get() > 0;
         if (raining != state) {
-            this.weatherData.setWeather((LanternWeather) (state ? Weathers.RAIN : Weathers.CLEAR));
-            this.weatherData.setRemainingDuration(randomDuration(RANDOM));
+            weather = (LanternWeather) (state ? Weathers.RAIN : Weathers.CLEAR);
+            this.weatherData.setWeather(weather);
+            this.weatherData.setRemainingDuration(weather.getRandomTicksDuration());
             this.weatherData.setRunningDuration(0);
         }
     }
@@ -458,11 +458,12 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public void setThundering(boolean state) {
-        final Weather weather = this.weatherData.getWeather();
+        LanternWeather weather = this.weatherData.getWeather();
         final boolean thunderStorm = weather == Weathers.THUNDER_STORM;
         if (thunderStorm != state) {
-            this.weatherData.setWeather((LanternWeather) (state ? Weathers.THUNDER_STORM : Weathers.CLEAR));
-            this.weatherData.setRemainingDuration(randomDuration(RANDOM));
+            weather = (LanternWeather) (state ? Weathers.THUNDER_STORM : Weathers.CLEAR);
+            this.weatherData.setWeather(weather);
+            this.weatherData.setRemainingDuration(weather.getRandomTicksDuration());
             this.weatherData.setRunningDuration(0);
         }
     }
@@ -560,11 +561,12 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public Optional<String> getGameRule(String gameRule) {
-        Optional<RuleType<?>> optRuleType = RuleType.get(gameRule);
+        final Optional<RuleType<?>> optRuleType = RuleType.get(gameRule);
         if (!optRuleType.isPresent()) {
             return Optional.empty();
         }
-        Optional<Rule> rule = this.rules.getRule((RuleType) optRuleType.get());
+        //noinspection unchecked
+        final Optional<Rule> rule = this.rules.getRule((RuleType) optRuleType.get());
         if (!rule.isPresent()) {
             return Optional.empty();
         }
@@ -573,7 +575,7 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public Map<String, String> getGameRules() {
-        ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
+        final ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         for (Map.Entry<RuleType<?>, Rule<?>> entry : this.rules.getRules().entrySet()) {
             builder.put(entry.getKey().getName(), entry.getValue().getRawValue());
         }

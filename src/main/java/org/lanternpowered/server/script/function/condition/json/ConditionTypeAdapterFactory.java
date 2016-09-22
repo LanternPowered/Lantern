@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.script.function.condition.json;
 
+import static org.lanternpowered.server.script.transformer.Transformer.SCRIPT_PREFIX;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
@@ -70,7 +72,10 @@ public class ConditionTypeAdapterFactory extends ObjectTypeAdapterFactory<Condit
             if (element.isJsonArray()) {
                 return gson.getAdapter(AndCondition.class).fromJsonTree(element);
             } else if (element.isJsonPrimitive()) {
-                return LanternScriptGameRegistry.get().compile(element.getAsString(), Condition.class).get();
+                final String value = element.getAsString();
+                if (value.startsWith(SCRIPT_PREFIX)) {
+                    return LanternScriptGameRegistry.get().compile(value, Condition.class).get();
+                }
             }
         }
         return super.deserialize(type, element, gson);

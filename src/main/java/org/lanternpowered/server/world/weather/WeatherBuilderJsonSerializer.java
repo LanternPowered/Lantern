@@ -35,6 +35,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import org.lanternpowered.api.script.function.action.Action;
+import org.lanternpowered.api.script.function.value.IntValueProvider;
 import org.lanternpowered.server.util.option.OptionValueMap;
 import org.lanternpowered.server.util.option.SimpleOptionValueMap;
 import org.lanternpowered.server.util.option.UnmodifiableOptionValueMap;
@@ -52,6 +53,10 @@ public class WeatherBuilderJsonSerializer implements JsonSerializer<WeatherBuild
         }
         json.add("options", context.serialize(src.options));
         json.add("action", context.serialize(src.action));
+        json.addProperty("weight", src.weight);
+        if (src.duration != WeatherBuilder.DEFAULT_DURATION) {
+            json.add("duration", context.serialize(src.duration));
+        }
         return json;
     }
 
@@ -77,6 +82,9 @@ public class WeatherBuilderJsonSerializer implements JsonSerializer<WeatherBuild
         }
         if (json.has("weight")) {
             builder.weight(json.get("weight").getAsDouble());
+        }
+        if (json.has("duration")) {
+            builder.duration(context.deserialize(json.get("duration"), IntValueProvider.class));
         }
         return builder;
     }

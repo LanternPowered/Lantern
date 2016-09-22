@@ -68,7 +68,7 @@ public interface DoubleValueProvider {
 
         @Override
         public double get(@Parameter("context") ScriptContext scriptContext) {
-            return LanternRandom.random.range(this.min, this.max);
+            return LanternRandom.$random.range(this.min, this.max);
         }
 
         public double getMin() {

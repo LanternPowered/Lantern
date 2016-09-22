@@ -10,6 +10,7 @@
         "sky_darkness": 1.0
     },
     "weight": 100,
+    "duration": "@ 300 + $random.nextInt(600)",
     "action": [
         {
             "type": "random_chunk_action",
@@ -17,7 +18,7 @@
                 "actions-per-chunk": 2,
                 "action": {
                     "condition": [
-                        "@ random.range(0.0, 1.0) < 0.000001",
+                        "@ $random.range(0.0, 1.0) < 0.000001",
                         "@ $<minecraft:weather/utils.scr>.testDarkness(context, 0.8)"
                     ],
                     "action": {

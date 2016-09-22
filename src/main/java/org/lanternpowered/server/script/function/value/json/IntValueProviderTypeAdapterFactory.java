@@ -25,9 +25,12 @@
  */
 package org.lanternpowered.server.script.function.value.json;
 
+import static org.lanternpowered.server.script.transformer.Transformer.SCRIPT_PREFIX;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import org.lanternpowered.api.script.function.action.Action;
 import org.lanternpowered.api.script.function.condition.AndCondition;
 import org.lanternpowered.api.script.function.condition.Condition;
 import org.lanternpowered.api.script.function.condition.OrCondition;
@@ -73,6 +76,10 @@ public class IntValueProviderTypeAdapterFactory extends ObjectTypeAdapterFactory
             // The actual condition type isn't provided, we will try
             // to assume the right type based in the json format
             if (element.isJsonPrimitive()) {
+                final String value = element.getAsString();
+                if (value.startsWith(SCRIPT_PREFIX)) {
+                    return LanternScriptGameRegistry.get().compile(value, IntValueProvider.class).get();
+                }
                 return gson.getDelegateAdapter(this, TypeToken.get(IntValueProvider.Constant.class)).fromJsonTree(element);
             }
         }

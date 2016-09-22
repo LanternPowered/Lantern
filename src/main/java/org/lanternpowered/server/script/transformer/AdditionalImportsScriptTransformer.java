@@ -23,60 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.script.function.value;
+package org.lanternpowered.server.script.transformer;
 
-import org.lanternpowered.api.script.Parameter;
-import org.lanternpowered.api.script.ScriptContext;
+import org.lanternpowered.api.script.Import;
 import org.lanternpowered.server.script.LanternRandom;
 
-@FunctionalInterface
-public interface IntValueProvider {
+public class AdditionalImportsScriptTransformer implements Transformer {
 
-    static Constant constant(int value) {
-        return new Constant(value);
-    }
-
-    static Range range(int min, int max) {
-        return new Range(min, max);
-    }
-
-    int get(@Parameter("context") ScriptContext scriptContext);
-
-    final class Constant implements IntValueProvider {
-
-        private final int value;
-
-        private Constant(int value) {
-            this.value = value;
-        }
-
-        @Override
-        public int get(@Parameter("context") ScriptContext scriptContext) {
-            return this.value;
-        }
-    }
-
-    final class Range implements IntValueProvider {
-
-        private final int min;
-        private final int max;
-
-        private Range(int min, int max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public int get(@Parameter("context") ScriptContext scriptContext) {
-            return LanternRandom.$random.range(this.min, this.max);
-        }
-
-        public int getMin() {
-            return this.min;
-        }
-
-        public int getMax() {
-            return this.max;
-        }
+    @Override
+    public boolean transform(ScriptTransformerContext context) throws TransformerException {
+        context.addImport(Import.ofField(LanternRandom.class, "$random"));
+        return true;
     }
 }

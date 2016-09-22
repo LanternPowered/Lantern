@@ -28,7 +28,10 @@ package org.lanternpowered.server.world.weather;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.api.script.Parameter;
+import org.lanternpowered.api.script.ScriptContext;
 import org.lanternpowered.api.script.function.action.Action;
+import org.lanternpowered.api.script.function.value.IntValueProvider;
 import org.lanternpowered.server.script.CatalogTypeConstructor;
 import org.lanternpowered.server.util.option.Option;
 import org.lanternpowered.server.util.option.OptionValueMap;
@@ -38,16 +41,21 @@ import org.spongepowered.api.util.ResettableBuilder;
 import org.spongepowered.api.world.weather.Weather;
 
 import java.util.Collections;
+import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.Nullable;
 
 public class WeatherBuilder implements ResettableBuilder<LanternWeather, WeatherBuilder>, CatalogTypeConstructor<Weather> {
 
+    private final static Random RANDOM = new Random();
+    final static IntValueProvider DEFAULT_DURATION = scriptContext -> 300 + RANDOM.nextInt(600);
+
     Set<String> aliases;
     Action action;
     OptionValueMap options;
     double weight = 100;
+    IntValueProvider duration;
     @Nullable private String name;
 
     WeatherBuilder() {
@@ -125,6 +133,8 @@ public class WeatherBuilder implements ResettableBuilder<LanternWeather, Weather
         this.aliases = Collections.emptySet();
         this.action = Action.empty();
         this.options = new SimpleOptionValueMap();
+        this.weight = 100;
+        this.duration = DEFAULT_DURATION;
         return this;
     }
 
@@ -138,6 +148,11 @@ public class WeatherBuilder implements ResettableBuilder<LanternWeather, Weather
         return this;
     }
 
+    public WeatherBuilder duration(IntValueProvider duration) {
+        this.duration = duration;
+        return this;
+    }
+
     @Override
     public Weather create(String pluginId, String id) {
         return this.create(pluginId, id, this.name == null ? id : this.name);
@@ -148,7 +163,7 @@ public class WeatherBuilder implements ResettableBuilder<LanternWeather, Weather
         checkNotNull(pluginId, "pluginId");
         checkNotNull(name, "name");
         checkNotNull(id, "id");
-        return new LanternWeather(pluginId, id, name,
-                this.action, this.aliases, new UnmodifiableOptionValueMap(this.options), this.weight);
+        return new LanternWeather(pluginId, id, name, this.action, this.aliases,
+                new UnmodifiableOptionValueMap(this.options), this.weight, this.duration);
     }
 }

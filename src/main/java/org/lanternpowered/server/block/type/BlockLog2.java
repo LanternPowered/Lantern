@@ -33,8 +33,9 @@ import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.ItemType;
 
-import javax.annotation.Nullable;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class BlockLog2 extends BlockLog {
 
@@ -44,5 +45,6 @@ public class BlockLog2 extends BlockLog {
 
     public BlockLog2(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
+        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternTreeType.ACACIA).get());
     }
 }

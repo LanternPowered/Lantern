@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 public class VariantBlock<E extends CatalogType & Comparable<E>> extends LanternBlockType {
 
     private final Map<E, Translation> translations = new HashMap<>();
-    private final BlockTrait<E> variantTrait;
+    protected final BlockTrait<E> variantTrait;
 
     public VariantBlock(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder,
             BlockTrait<E> enumTrait, BlockTrait<?>... blockTraits) {

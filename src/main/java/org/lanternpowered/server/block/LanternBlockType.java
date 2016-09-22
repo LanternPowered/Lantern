@@ -271,6 +271,6 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
 
     public Optional<BlockState> placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
             ItemStack itemStack, Vector3i position, Direction blockFace, Vector3d cursorOffset) {
-        return Optional.of(this.getDefaultState());
+        return Optional.of(this.getStateFromItemStack(itemStack));
     }
 }

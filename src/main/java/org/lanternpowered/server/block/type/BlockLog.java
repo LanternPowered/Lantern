@@ -37,6 +37,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -74,5 +75,15 @@ public class BlockLog extends VariantBlock<LanternTreeType> {
         final BlockState state = super.placeBlockAt(player, world, interactionType, itemStack,
                 clickedBlock, blockFace, cursorOffset).orElse(this.getDefaultState());
         return Optional.of(state.withTrait(AXIS, LanternLogAxis.fromDirection(blockFace)).get());
+    }
+
+    @Override
+    public BlockState getStateFromItemStack(ItemStack itemStack) {
+        final BlockState blockState = super.getStateFromItemStack(itemStack);
+        final Optional<TreeType> optTreeType = itemStack.get(Keys.TREE_TYPE);
+        if (optTreeType.isPresent()) {
+            return blockState.withTrait(this.variantTrait, optTreeType.get()).get();
+        }
+        return blockState;
     }
 }

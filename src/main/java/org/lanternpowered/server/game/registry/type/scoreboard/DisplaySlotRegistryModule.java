@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.game.registry.type.scoreboard;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.lanternpowered.server.scoreboard.LanternDisplaySlot;
 import org.lanternpowered.server.text.FormattingCodeTextSerializer;
 import org.spongepowered.api.Sponge;
@@ -36,11 +36,13 @@ import org.spongepowered.api.scoreboard.displayslot.DisplaySlots;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
-public final class DisplaySlotRegistryModule extends AdditionalPluginCatalogRegistryModule<DisplaySlot> {
+public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<DisplaySlot> {
 
-    private final Int2ObjectMap<DisplaySlot> byInternalIds = new Int2ObjectOpenHashMap<>();
+    private final Map<TextColor, DisplaySlot> byTeamColors = new HashMap<>();
 
     public DisplaySlotRegistryModule() {
         super(DisplaySlots.class);
@@ -49,7 +51,7 @@ public final class DisplaySlotRegistryModule extends AdditionalPluginCatalogRegi
     @Override
     protected void register(DisplaySlot catalogType, boolean disallowInbuiltPluginIds) {
         super.register(catalogType, disallowInbuiltPluginIds);
-        this.byInternalIds.putIfAbsent(((LanternDisplaySlot) catalogType).getInternalId(), catalogType);
+        catalogType.getTeamColor().ifPresent(color -> this.byTeamColors.putIfAbsent(color, catalogType));
     }
 
     @Override
@@ -69,7 +71,8 @@ public final class DisplaySlotRegistryModule extends AdditionalPluginCatalogRegi
         }
     }
 
-    public Optional<DisplaySlot> getByInternalId(int internalId) {
-        return Optional.ofNullable(this.byInternalIds.get(internalId));
+    public Optional<DisplaySlot> getByTeamColor(TextColor teamColor) {
+        checkNotNull(teamColor, "teamColor");
+        return Optional.ofNullable(this.byTeamColors.get(teamColor));
     }
 }

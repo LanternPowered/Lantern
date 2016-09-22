@@ -368,7 +368,7 @@ public class LanternGameRegistry implements GameRegistry {
     // Whether all the modules are synced
     private boolean modulesSynced = true;
 
-    public LanternGameRegistry(LanternGame game) {
+    LanternGameRegistry(LanternGame game) {
         this.game = game;
     }
 
@@ -421,7 +421,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SkinPart.class, new SkinPartRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
-                .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.getInstance())
+                .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.get())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
                 .registerModule(GameMode.class, GameModeRegistryModule.get())
@@ -942,8 +942,7 @@ public class LanternGameRegistry implements GameRegistry {
 
     @Override
     public Optional<DisplaySlot> getDisplaySlotForColor(TextColor color) {
-        // TODO Auto-generated method stub
-        return null;
+        return this.getRegistryModule(DisplaySlotRegistryModule.class).get().getByTeamColor(color);
     }
 
     @Override

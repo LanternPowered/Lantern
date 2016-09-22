@@ -68,6 +68,9 @@ public final class RuleTypes {
     public static final RuleType<Integer> MAX_ENTITY_CRAMMING =
             RuleType.create("maxEntityCramming", RuleDataTypes.INTEGER, 24);
 
+    public static void init() {
+    }
+
     private RuleTypes() {
     }
 }

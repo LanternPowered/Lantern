@@ -26,7 +26,6 @@
 package org.lanternpowered.server.game.registry.type.world;
 
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.world.rules.RuleType;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.registry.RegistryModule;
 import org.spongepowered.api.world.gamerule.DefaultGameRules;
@@ -42,7 +41,7 @@ public final class DefaultGameRulesRegistryModule implements RegistryModule {
 
     @Override
     public void registerDefaults() {
-        ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+       final ImmutableSet.Builder<String> builder = ImmutableSet.builder();
         for (Field field : DefaultGameRules.class.getFields()) {
             if (Modifier.isStatic(field.getModifiers()) && field.getType() == String.class) {
                 try {
@@ -53,8 +52,7 @@ public final class DefaultGameRulesRegistryModule implements RegistryModule {
             }
         }
         this.rules = builder.build();
-        // Just access the rule types class to initialize the default rule types
-        RuleType<?> type = RuleTypes.COMMAND_BLOCK_OUTPUT;
+        RuleTypes.init();
     }
 
     public Collection<String> get() {

@@ -38,7 +38,7 @@ public final class GameModeRegistryModule extends AdditionalInternalPluginCatalo
         return instance;
     }
 
-    public GameModeRegistryModule() {
+    private GameModeRegistryModule() {
         super(GameModes.class);
     }
 

@@ -631,7 +631,7 @@ public class LanternByteBuffer implements ByteBuffer {
         this.buf.readerIndex(index);
         try {
             try (NbtDataContainerInputStream input = new NbtDataContainerInputStream(
-                    new LimitInputStream(new ByteBufInputStream(this.buf), maxBytes), true, maximumDepth)) {
+                    new LimitInputStream(new ByteBufInputStream(this.buf), maxBytes), false, maximumDepth)) {
                 return input.read();
             }
         } catch (IOException e) {

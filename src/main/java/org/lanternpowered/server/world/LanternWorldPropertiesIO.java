@@ -328,9 +328,12 @@ final class LanternWorldPropertiesIO {
         final TimeData timeData = properties.getTimeData();
         final long age = dataView.getLong(AGE).get();
         timeData.setAge(age);
-        timeData.setDayTime(dataView.getLong(TIME).get());
+        final long time = dataView.getLong(TIME).orElse(age);
+        timeData.setDayTime(time);
         if (lanternDataView != null && lanternDataView.contains(MOON_PHASE)) {
             timeData.setMoonPhase(MoonPhase.valueOf(lanternDataView.getString(MOON_PHASE).get().toUpperCase()));
+        } else {
+            timeData.setMoonPhase(MoonPhase.values()[(int) (time / TimeUniverse.TICKS_IN_A_DAY) % 8]);
         }
 
         // Get the spawn position

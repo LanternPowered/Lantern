@@ -23,37 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.world;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
-import org.lanternpowered.server.world.TimeUniverse;
+import org.lanternpowered.server.data.world.MoonPhase;
 
-public final class CodecPlayOutWorldTime implements Codec<MessagePlayOutWorldTime> {
+public class TimeData {
 
-    private final static int LENGTH = Long.BYTES * 2;
+    private long dayTime;
+    private long age;
+    private MoonPhase moonPhase = MoonPhase.NEW_MOON;
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutWorldTime message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer(LENGTH);
+    public MoonPhase getMoonPhase() {
+        return this.moonPhase;
+    }
 
-        // The time also uses a negative tag
-        long time = message.getTime();
-        while (time < 0) {
-            time += TimeUniverse.TICKS_IN_A_DAY;
-        }
-        time %= TimeUniverse.TICKS_IN_A_DAY;
-        time += message.getMoonPhase().ordinal() * TimeUniverse.TICKS_IN_A_DAY;
-        if (!message.getEnabled()) {
-            time = time == 0 ? -1 : -time;
-        }
+    public void setMoonPhase(MoonPhase moonPhase) {
+        this.moonPhase = moonPhase;
+    }
 
-        buf.writeLong(message.getAge());
-        buf.writeLong(time);
+    public long getDayTime() {
+        return this.dayTime;
+    }
 
-        return buf;
+    public void setDayTime(long dayTime) {
+        this.moonPhase = this.moonPhase.rotate((int) (dayTime / TimeUniverse.TICKS_IN_A_DAY));
+        this.dayTime = dayTime % TimeUniverse.TICKS_IN_A_DAY;
+    }
+
+    public long getAge() {
+        return this.age;
+    }
+
+    public void setAge(long age) {
+        this.age = age;
     }
 }

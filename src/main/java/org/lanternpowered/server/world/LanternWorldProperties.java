@@ -73,15 +73,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
 public final class LanternWorldProperties implements WorldProperties {
-
-    private static final Random RANDOM = new Random();
 
     private static final int BOUNDARY = 29999984;
 
@@ -127,10 +124,8 @@ public final class LanternWorldProperties implements WorldProperties {
     private boolean commandsAllowed;
     boolean mapFeatures;
 
+    private final TimeData timeData = new TimeData();
     private final WeatherData weatherData = new WeatherData();
-
-    long time;
-    long age;
 
     @Nullable private LanternWorld world;
 
@@ -382,17 +377,17 @@ public final class LanternWorldProperties implements WorldProperties {
 
     @Override
     public long getTotalTime() {
-        return this.age;
+        return this.timeData.getAge();
     }
 
     @Override
     public long getWorldTime() {
-        return this.time;
+        return this.timeData.getDayTime();
     }
 
     @Override
     public void setWorldTime(long time) {
-        this.time = time;
+        this.timeData.setDayTime(time);
     }
 
     @Override
@@ -827,7 +822,7 @@ public final class LanternWorldProperties implements WorldProperties {
      * @return Is difficulty locked
      */
     public boolean isDifficultyLocked() {
-        return difficultyLocked;
+        return this.difficultyLocked;
     }
 
     /**
@@ -841,5 +836,9 @@ public final class LanternWorldProperties implements WorldProperties {
 
     public WeatherData getWeatherData() {
         return this.weatherData;
+    }
+
+    public TimeData getTimeData() {
+        return this.timeData;
     }
 }

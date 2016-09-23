@@ -82,25 +82,21 @@ public enum MoonPhase {
         return this.rotate(-1);
     }
 
+    private static final MoonPhase[] MOON_PHASES = values();
+
     /**
      * Rotates the moon phase enum to the next index.
      * 
      * @param add the indexes to add
      * @return the new moon phase
      */
-    private MoonPhase rotate(int add) {
-        int index = this.ordinal();
-        int size = values().length;
-
-        index += add;
-        while (index > size) {
-            index -= size;
+    public MoonPhase rotate(int add) {
+        final int length = MOON_PHASES.length;
+        int index = (this.ordinal() + add) % length;
+        if (index < 0) {
+            index = length + index;
         }
-        while (index < size) {
-            index += size;
-        }
-
-        return values()[index];
+        return MOON_PHASES[index];
     }
 
 }

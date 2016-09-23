@@ -35,12 +35,12 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
-import org.lanternpowered.server.data.world.MoonPhase;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -51,7 +51,6 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
@@ -67,7 +66,6 @@ import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWo
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
 import org.lanternpowered.server.world.rules.RuleType;
-import org.lanternpowered.server.world.rules.RuleTypes;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -143,7 +141,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class LanternWorld extends BaseComponentHolder implements AbstractExtent, World, AbstractViewer, RuleHolder {
+public class LanternWorld extends BaseComponentHolder implements AbstractExtent, org.lanternpowered.api.world.World, AbstractViewer, RuleHolder {
 
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
@@ -167,6 +165,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     // The weather universe
     @Nullable final LanternWeatherUniverse weatherUniverse;
+    private final TimeUniverse timeUniverse;
 
     // All the players in this world
     private final Set<LanternPlayer> players = Sets.newConcurrentHashSet();
@@ -232,6 +231,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         } else {
             this.weatherUniverse = null;
         }
+        this.timeUniverse = this.addComponent(TimeUniverse.class);
         // Create the world border
         this.worldBorder = this.addComponent(LanternWorldBorder.class);
         // Create the dimension
@@ -246,7 +246,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         this.worldContext = new Context(Context.WORLD_KEY, this.getName());
     }
 
-    public Optional<LanternWeatherUniverse> getWeatherUniverse() {
+    @Override
+    public Optional<WeatherUniverse> getWeatherUniverse() {
         return Optional.ofNullable(this.weatherUniverse);
     }
 
@@ -1105,29 +1106,15 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         return new LanternChunkPreGenerate(this, checkNotNull(center, "center"), diameter);
     }
 
-    private static final int timeSyncDelay = 6;
-    private int timeSyncTime;
-
     public void pulse() {
         this.chunkManager.pulse();
-        // Increase the age of the world
-        this.properties.age++;
-        // Increase the time of the world
-        if (++this.properties.time > 24000) {
-            this.properties.time %= 24000;
-        }
-        // Sync the client time with the server time
-        if (this.timeSyncTime-- <= 0) {
-            this.timeSyncTime = this.timeSyncDelay;
-            this.broadcast(() -> new MessagePlayOutWorldTime(MoonPhase.NEW_MOON, (int) this.properties.time,
-                    this.getOrCreateRule(RuleTypes.DO_DAYLIGHT_CYCLE).getValue()));
-        }
+        this.timeUniverse.pulse();
         if (this.weatherUniverse != null) {
             this.weatherUniverse.pulse();
         }
         // TODO: This is temporarily, pulses will be given to all
         // entities in the future and it will be chunk based
-        this.players.forEach(player -> player.pulse());
+        this.players.forEach(LanternPlayer::pulse);
         // TODO: Maybe async?
         this.observedChunkManager.pulse();
     }

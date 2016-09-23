@@ -70,6 +70,7 @@ import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.title.LanternTitles;
+import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
@@ -344,7 +345,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             final Vector3d position = this.getPosition();
             final Vector3d rotation = this.getRotation();
             this.session.send(world.getProperties().createWorldBorderMessage());
-            world.getWeatherUniverse().ifPresent(u -> this.session.send(u.createSkyUpdateMessage()));
+            world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(),
                     (float) rotation.getY(), (float) rotation.getX(), Collections.emptySet(), 0));

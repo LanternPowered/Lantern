@@ -32,6 +32,8 @@ import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutWorldTime implements Message {
 
+    private final long age;
+
     // The current moon phase
     private final MoonPhase moonPhase;
 
@@ -43,15 +45,16 @@ public final class MessagePlayOutWorldTime implements Message {
 
     /**
      * Creates a new world time message.
-     * 
-     * @param moonPhase the moon phase of the world
-     * @param time the time of the world
-     * @param enabled whether the time is enabled
+     * @param moonPhase The moon phase of the world
+     * @param age The age of the world
+     * @param time The day time of the world
+     * @param enabled Whether the time is enabled
      */
-    public MessagePlayOutWorldTime(MoonPhase moonPhase, int time, boolean enabled) {
+    public MessagePlayOutWorldTime(MoonPhase moonPhase, long age, int time, boolean enabled) {
         this.moonPhase = checkNotNull(moonPhase, "moonPhase");
         this.enabled = enabled;
         this.time = time;
+        this.age = age;
     }
 
     /**
@@ -81,4 +84,7 @@ public final class MessagePlayOutWorldTime implements Message {
         return this.enabled;
     }
 
+    public long getAge() {
+        return this.age;
+    }
 }

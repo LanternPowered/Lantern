@@ -85,7 +85,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
     }
 
     private void pulseWeather() {
-        if (!this.world.getOrCreateRule(RuleTypes.DO_WEATHER_CYLCE).getValue()) {
+        if (!this.world.getOrCreateRule(RuleTypes.DO_WEATHER_CYCLE).getValue()) {
             return;
         }
         this.weatherData.setRunningDuration(this.weatherData.getRunningDuration() + 1);

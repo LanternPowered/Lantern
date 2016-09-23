@@ -37,6 +37,7 @@ public final class RuleType<T> {
     private static final Map<String, RuleType> rulesByName = Maps.newHashMap();
 
     public static Optional<RuleType<?>> get(String name) {
+        //noinspection unchecked
         return Optional.ofNullable(rulesByName.get(name));
     }
 

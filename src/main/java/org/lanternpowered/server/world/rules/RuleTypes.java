@@ -31,6 +31,8 @@ public final class RuleTypes {
 
     public static final RuleType<Boolean> COMMAND_BLOCK_OUTPUT =
             RuleType.create(DefaultGameRules.COMMAND_BLOCK_OUTPUT, RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<Boolean> DISABLE_ELYTRA_MOVEMENT_CHECK =
+            RuleType.create(DefaultGameRules.DISABLE_ELYTRA_MOVEMENT_CHECK, RuleDataTypes.BOOLEAN, false);
     public static final RuleType<Boolean> DO_DAYLIGHT_CYCLE =
             RuleType.create(DefaultGameRules.DO_DAYLIGHT_CYCLE, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_ENTITY_DROPS =
@@ -39,12 +41,18 @@ public final class RuleTypes {
             RuleType.create(DefaultGameRules.DO_FIRE_TICK, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_MOB_LOOT =
             RuleType.create(DefaultGameRules.DO_MOB_LOOT, RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<Boolean> DO_MOB_SPAWNING =
+            RuleType.create(DefaultGameRules.DO_MOB_SPAWNING, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_TILE_DROPS =
             RuleType.create(DefaultGameRules.DO_TILE_DROPS, RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<Boolean> DO_WEATHER_CYCLE =
+            RuleType.create("doWeatherCycle", RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> KEEP_INVENTORY =
             RuleType.create(DefaultGameRules.KEEP_INVENTORY, RuleDataTypes.BOOLEAN, false);
     public static final RuleType<Boolean> LOG_ADMIN_COMMANDS =
             RuleType.create(DefaultGameRules.LOG_ADMIN_COMMANDS, RuleDataTypes.BOOLEAN, true);
+    public static final RuleType<Integer> MAX_ENTITY_CRAMMING =
+            RuleType.create("maxEntityCramming", RuleDataTypes.INTEGER, 24);
     public static final RuleType<Boolean> MOB_GRIEFING =
             RuleType.create(DefaultGameRules.MOB_GRIEFING, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> NATURAL_REGENERATION =
@@ -57,16 +65,10 @@ public final class RuleTypes {
             RuleType.create(DefaultGameRules.SEND_COMMAND_FEEDBACK, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> SHOW_DEATH_MESSAGES =
             RuleType.create(DefaultGameRules.SHOW_DEATH_MESSAGES, RuleDataTypes.BOOLEAN, true);
-    public static final RuleType<Boolean> SPECTATORS_GENERATE_CHUNKS =
-            RuleType.create(DefaultGameRules.SPECTATORS_GENERATE_CHUNKS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Integer> SPAWN_RADIUS =
             RuleType.create(DefaultGameRules.SPAWN_RADIUS, RuleDataTypes.INTEGER, 10);
-    public static final RuleType<Boolean> DISABLE_ELYTRA_MOVEMENT_CHECK =
-            RuleType.create(DefaultGameRules.DISABLE_ELYTRA_MOVEMENT_CHECK, RuleDataTypes.BOOLEAN, false);
-    public static final RuleType<Boolean> DO_WEATHER_CYLCE =
-            RuleType.create("doWeatherCycle", RuleDataTypes.BOOLEAN, true);
-    public static final RuleType<Integer> MAX_ENTITY_CRAMMING =
-            RuleType.create("maxEntityCramming", RuleDataTypes.INTEGER, 24);
+    public static final RuleType<Boolean> SPECTATORS_GENERATE_CHUNKS =
+            RuleType.create(DefaultGameRules.SPECTATORS_GENERATE_CHUNKS, RuleDataTypes.BOOLEAN, true);
 
     public static void init() {
     }

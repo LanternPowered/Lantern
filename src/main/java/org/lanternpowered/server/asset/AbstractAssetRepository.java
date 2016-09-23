@@ -58,7 +58,6 @@ public abstract class AbstractAssetRepository implements AssetRepository {
     public Optional<Asset> get(Object plugin, String name) {
         checkNotNull(plugin, "plugin");
         checkNotNull(name, "name");
-        name = name.toLowerCase(Locale.ENGLISH);
         PluginContainer pluginContainer;
         String pluginId;
         if (plugin instanceof String) {
@@ -68,18 +67,22 @@ public abstract class AbstractAssetRepository implements AssetRepository {
             pluginContainer = Sponge.getPluginManager().fromInstance(plugin).get();
             pluginId = pluginContainer.getId();
         }
-        final String id = pluginId + ':' + name;
+        final String id = pluginId + ':' + name.toLowerCase(Locale.ENGLISH);
         pluginId = pluginId.replace('.', File.separatorChar);
         if (!pluginId.endsWith(File.separator)) {
             pluginId += File.separator;
         }
-        final Path path = Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId).resolve(name);
-        return this.loadedAssets.computeIfAbsent(path, path1 -> {
-            final URL url = this.getAssetURL(pluginContainer, path1);
+        final String pluginId0 = pluginId;
+        final Path pathLowerCase = Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId).resolve(name.toLowerCase(Locale.ENGLISH));
+        return this.loadedAssets.computeIfAbsent(pathLowerCase, path1 -> {
+            URL url = this.getAssetURL(pluginContainer, path1);
             if (url == null) {
-                return Optional.empty();
+                url = this.getAssetURL(pluginContainer, Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId0).resolve(name));
+                if (url == null) {
+                    return Optional.empty();
+                }
             }
-            return Optional.of(new LanternAsset(pluginContainer, id, path, url));
+            return Optional.of(new LanternAsset(pluginContainer, id, pathLowerCase, url));
         });
     }
 

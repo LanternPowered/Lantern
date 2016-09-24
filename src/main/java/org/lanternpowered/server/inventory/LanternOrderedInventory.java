@@ -52,7 +52,7 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
     /**
      * All the leaf {@link Slot}s of this inventory.
      */
-    final List<LanternSlot> leafSlots = new ArrayList<>();
+    private final List<LanternSlot> leafSlots = new ArrayList<>();
     /**
      * All the {@link Slot}s of this inventory, may also contain indirect
      * {@link Slot}s.
@@ -133,18 +133,24 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, Object key) {
-        checkNotNull(child, "child");
-        checkNotNull(property, "property");
-        checkNotNull(key, "key");
-        // Not sure what the key would do for any of this properties
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, Object key) {
         if (property == SlotIndex.class && child instanceof Slot) {
-            if (this.indexBySlot.containsKey(child)) {
-                return Optional.of(property.cast(SlotIndex.of(this.indexBySlot.get(child))));
-            }
-            return Optional.empty();
+            final Integer index = this.indexBySlot.get(child);
+            return index == null ? Optional.empty() : Optional.of(property.cast(SlotIndex.of(index)));
         }
-        return super.getProperty(child, property, key);
+        return super.tryGetProperty(child, property, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
+        final List<T> properties = super.tryGetProperties(child, property);
+        if (property == SlotIndex.class && child instanceof Slot) {
+            final Integer index = this.indexBySlot.get(child);
+            if (index != null) {
+                properties.add(property.cast(SlotIndex.of(index)));
+            }
+        }
+        return properties;
     }
 
     @Override

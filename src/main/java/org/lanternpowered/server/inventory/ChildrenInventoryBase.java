@@ -50,10 +50,6 @@ import javax.annotation.Nullable;
 
 public class ChildrenInventoryBase extends InventoryBase {
 
-    /**
-     * All the children {@link Inventory}s of this inventory, there shouldn't be any {@link Slot}s
-     * inside this list.
-     */
     final List<InventoryBase> children;
 
     public ChildrenInventoryBase(@Nullable Inventory parent, @Nullable Translation name) {
@@ -542,5 +538,18 @@ public class ChildrenInventoryBase extends InventoryBase {
             }
         }
         return false;
+    }
+
+    @Override
+    public int slotCount() {
+        int slotCount = 0;
+        for (InventoryBase child : this.children) {
+            if (child instanceof Slot) {
+                slotCount++;
+            } else {
+                slotCount += child.slotCount();
+            }
+        }
+        return slotCount;
     }
 }

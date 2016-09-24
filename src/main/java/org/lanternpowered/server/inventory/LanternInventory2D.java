@@ -40,6 +40,7 @@ import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResu
 import org.spongepowered.api.item.inventory.type.Inventory2D;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -49,7 +50,7 @@ public class LanternInventory2D extends LanternOrderedInventory implements Inven
     /**
      * All the {@link LanternSlot}s mapped by their position.
      */
-    protected final BiMap<Vector2i, LanternSlot> slotsByPos = HashBiMap.create();
+    final BiMap<Vector2i, LanternSlot> slotsByPos = HashBiMap.create();
 
     public LanternInventory2D(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
@@ -91,15 +92,23 @@ public class LanternInventory2D extends LanternOrderedInventory implements Inven
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, Object key) {
-        checkNotNull(child, "child");
-        checkNotNull(property, "property");
-        checkNotNull(key, "key");
-        // Not sure what the key would do for any of this properties
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, Object key) {
         if (property == SlotPos.class && child instanceof Slot) {
             final Vector2i pos = this.slotsByPos.inverse().get(child);
             return pos == null ? Optional.empty() : Optional.of(property.cast(SlotPos.of(pos)));
         }
-        return super.getProperty(child, property, key);
+        return super.tryGetProperty(child, property, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
+        final List<T> properties = super.tryGetProperties(child, property);
+        if (property == SlotPos.class && child instanceof Slot) {
+            final Vector2i pos = this.slotsByPos.inverse().get(child);
+            if (pos != null) {
+                properties.add(property.cast(SlotPos.of(pos)));
+            }
+        }
+        return properties;
     }
 }

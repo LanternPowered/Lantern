@@ -38,11 +38,8 @@ import org.lanternpowered.server.inventory.slot.LanternCraftingOutput;
 import org.lanternpowered.server.inventory.slot.LanternEquipmentSlot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.lang.ref.WeakReference;

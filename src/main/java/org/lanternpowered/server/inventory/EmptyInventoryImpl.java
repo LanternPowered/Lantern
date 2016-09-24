@@ -48,10 +48,18 @@ import javax.annotation.Nullable;
 /**
  * Bottom type / empty results set for inventory queries.
  */
-public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory {
+class EmptyInventoryImpl implements EmptyInventory, IInventory {
 
-    public EmptyInventoryImpl(@Nullable Inventory parent) {
-        super(parent, null);
+    @Nullable
+    private final IInventory parent;
+
+    EmptyInventoryImpl(@Nullable Inventory parent) {
+        this.parent = (IInventory) parent;
+    }
+
+    @Override
+    public IInventory parent() {
+        return this.parent == null ? this : this.parent;
     }
 
     @Override
@@ -101,6 +109,12 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
                 .type(InventoryTransactionResult.Type.FAILURE).reject(stack).build());
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
+        return (T) this;
+    }
+
     @Override
     public boolean isValidItem(ItemStack stack) {
         return false;
@@ -109,6 +123,11 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
     @Override
     public boolean isChild(Inventory child) {
         return false;
+    }
+
+    @Override
+    public int slotCount() {
+        return 0;
     }
 
     @Override
@@ -216,12 +235,6 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        return (T) this;
-    }
-
     @Override
     public Iterator<Inventory> iterator() {
         return EmptyIterator.get();
@@ -231,6 +244,36 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
     @Override
     public <T extends Inventory> T next() {
         return (T) this;
+    }
+
+    @Override
+    public Optional<ItemStack> poll() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ItemStack> poll(int limit) {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ItemStack> peek() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<ItemStack> peek(int limit) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean hasProperty(InventoryProperty<?, ?> property) {
+        return false;
+    }
+
+    @Override
+    public boolean hasProperty(Inventory child, InventoryProperty<?, ?> property) {
+        return false;
     }
 
     @Override
@@ -251,5 +294,10 @@ public class EmptyInventoryImpl extends InventoryBase implements EmptyInventory 
     @Override
     public InventoryTransactionResult set(ItemStack stack) {
         return InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE).reject(stack).build();
+    }
+
+    @Override
+    public Translation getName() {
+        return InventoryBase.EmptyNameHolder.EMPTY_NAME;
     }
 }

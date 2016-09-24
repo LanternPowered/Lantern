@@ -129,6 +129,11 @@ public class LanternSlot extends InventoryBase implements Slot {
     }
 
     @Override
+    public int slotCount() {
+        return 0;
+    }
+
+    @Override
     public int getStackSize() {
         return this.itemStack != null ? this.itemStack.getQuantity() : 0;
     }

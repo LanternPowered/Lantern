@@ -26,23 +26,21 @@
 package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.text.BookView;
 
-import java.util.Locale;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
 
@@ -51,49 +49,77 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     private static final DataQuery DATA = DataQuery.of("Damage");
     private static final DataQuery TAG = DataQuery.of("tag");
 
-    private static final DataQuery AUTHOR = DataQuery.of("author");
-    private static final DataQuery TITLE = DataQuery.of("title");
-    private static final DataQuery PAGES = DataQuery.of("pages");
+    private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
+
+    {
+        final LogBlockItemTypeObjectSerializer logBlockItemTypeObjectSerializer = new LogBlockItemTypeObjectSerializer();
+        this.add(BlockTypes.LOG, logBlockItemTypeObjectSerializer);
+        this.add(BlockTypes.LOG2, logBlockItemTypeObjectSerializer);
+    }
+
+    private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {
+        this.itemTypeSerializers.put(itemType, serializer);
+    }
+
+    private void add(BlockType blockType, ItemTypeObjectSerializer serializer) {
+        this.itemTypeSerializers.put(blockType.getItem().get(), serializer);
+    }
 
     @Override
     public LanternItemStack deserialize(DataView dataView) throws InvalidDataException {
         final String identifier = dataView.getString(IDENTIFIER).get();
         final ItemType itemType = ItemRegistryModule.get().getById(identifier).orElseThrow(
                 () -> new InvalidDataException("There is no item type with the id: " + identifier));
-        return new LanternItemStack(itemType);
+        final LanternItemStack itemStack = new LanternItemStack(itemType);
+        this.deserialize(itemStack, dataView);
+        return itemStack;
     }
 
     @Override
     public DataView serialize(LanternItemStack object) {
         final DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         dataContainer.set(IDENTIFIER, object.getItem().getId());
+        this.serialize(object, dataContainer);
         return dataContainer;
     }
 
     @Override
     public void deserialize(LanternItemStack object, DataView dataView) {
         object.setQuantity(dataView.getInt(QUANTITY).get());
-        // TODO: Handle cases of data?
         // All the extra data we will handle will be stored in the tag
-        final Optional<DataView> optTag = dataView.getView(TAG);
-        if (optTag.isPresent()) {
-            super.deserialize(object, optTag.get());
-        }
+        final DataView tag = dataView.getView(TAG).orElseGet(() -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED));
+        tag.set(ItemTypeObjectSerializer.DATA_VALUE, dataView.getShort(DATA).get());
+        super.deserialize(object, tag);
     }
 
     @Override
     public void serialize(LanternItemStack object, DataView dataView) {
         dataView.set(QUANTITY, (byte) object.getQuantity());
-        // TODO: Handle cases of data?
-        dataView.set(DATA, (short) 0);
-        super.serialize(object, dataView.createView(TAG));
+        final DataView tag = dataView.createView(TAG);
+        super.serialize(object, tag);
+        tag.getShort(ItemTypeObjectSerializer.DATA_VALUE);
+        tag.remove(ItemTypeObjectSerializer.DATA_VALUE);
+        dataView.set(DATA, tag.getShort(ItemTypeObjectSerializer.DATA_VALUE).orElse((short) 0));
+        if (tag.isEmpty()) {
+            dataView.remove(TAG);
+        }
     }
 
-    public static void writeBookData(DataView dataView, BookView bookView, Locale locale) {
-        dataView.set(AUTHOR, LanternTexts.toLegacy(bookView.getAuthor()));
-        dataView.set(TITLE, LanternTexts.toLegacy(bookView.getTitle()));
-        JsonTextTranslatableSerializer.setCurrentLocale(locale);
-        dataView.set(PAGES, bookView.getPages().stream().map(Types.TEXT_GSON::toJson).collect(Collectors.toList()));
-        JsonTextTranslatableSerializer.removeCurrentLocale();
+    @Override
+    public void serializeValues(LanternItemStack object, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(object, valueContainer, dataView);
+        final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getItem());
+        if (serializer != null) {
+            serializer.serializeValues(object, valueContainer, dataView);
+        }
+    }
+
+    @Override
+    public void deserializeValues(LanternItemStack object, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(object, valueContainer, dataView);
+        final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getItem());
+        if (serializer != null) {
+            serializer.deserializeValues(object, valueContainer, dataView);
+        }
     }
 }

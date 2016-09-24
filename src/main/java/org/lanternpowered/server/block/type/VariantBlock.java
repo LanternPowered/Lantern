@@ -68,6 +68,10 @@ public class VariantBlock<E extends CatalogType & Comparable<E>> extends Lantern
         }
     }
 
+    public BlockTrait<E> getVariantTrait() {
+        return this.variantTrait;
+    }
+
     protected String getTranslationKey(E element) {
         final String id = element.getId().toLowerCase();
         return "tile." + id + ".name";

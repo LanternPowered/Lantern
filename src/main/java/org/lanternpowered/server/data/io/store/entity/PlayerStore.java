@@ -28,6 +28,9 @@ package org.lanternpowered.server.data.io.store.entity;
 import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.data.io.store.ObjectSerializer;
+import org.lanternpowered.server.data.io.store.ObjectStore;
+import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.util.DataQueries;
@@ -35,6 +38,11 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.inventory.LanternEquipmentInventory;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.entity.HumanMainInventory;
+import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
 import org.spongepowered.api.data.DataQuery;
@@ -44,6 +52,10 @@ import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
 import org.spongepowered.api.util.RespawnLocation;
 
 import java.time.Instant;
@@ -83,6 +95,9 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
     private static final DataQuery RESPAWN_LOCATIONS_Y = DataQuery.of("SpawnY");
     private static final DataQuery RESPAWN_LOCATIONS_Z = DataQuery.of("SpawnZ");
     private static final DataQuery RESPAWN_LOCATIONS_FORCED = DataQuery.of("SpawnForced");
+
+    private static final DataQuery SLOT = DataQuery.of("Slot");
+    private static final DataQuery INVENTORY = DataQuery.of("Inventory");
 
     @Override
     public void deserialize(LanternPlayer player, DataView dataView) {
@@ -133,6 +148,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         dataView.set(RESPAWN_LOCATIONS, respawnLocationViews);
         dataView.set(GAME_MODE, ((LanternGameMode) valueContainer.remove(Keys.GAME_MODE).orElse(GameModes.NOT_SET)).getInternalId());
         dataView.set(SELECTED_ITEM_SLOT, player.getInventory().getHotbar().getSelectedSlotIndex());
+        dataView.set(INVENTORY, serializePlayerInventory(player.getInventory()));
         super.serializeValues(player, valueContainer, dataView);
     }
 
@@ -186,6 +202,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
                 .flatMap(v -> GameModeRegistryModule.get().getByInternalId(v)).orElse(GameModes.NOT_SET);
         valueContainer.set(Keys.GAME_MODE, gameMode);
         player.getInventory().getHotbar().setRawSelectedSlotIndex(dataView.getInt(SELECTED_ITEM_SLOT).orElse(0));
+        dataView.getViewList(INVENTORY).ifPresent(views -> deserializePlayerInventory(player.getInventory(), views));
         super.deserializeValues(player, valueContainer, dataView);
     }
 
@@ -196,5 +213,71 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
                 .position(new Vector3d(x, y, z))
                 .forceSpawn(forced)
                 .build();
+    }
+
+    private static void deserializePlayerInventory(LanternPlayerInventory inventory, List<DataView> itemViews) {
+        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
+        //noinspection unchecked
+        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
+
+        final HumanMainInventory mainInventory = inventory.getMain();
+        final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
+        final OffHandSlot offHandSlot = inventory.getOffhand();
+
+        for (DataView itemView : itemViews) {
+            final int slot = itemView.getByte(SLOT).get() & 0xff;
+            final LanternItemStack itemStack = itemStackSerializer.deserialize(itemView);
+
+            if (slot >= 0 && slot < mainInventory.slotCount()) {
+                mainInventory.set(new SlotIndex(slot), itemStack);
+            } else if (slot >= 100 && slot - 100 < equipmentInventory.slotCount()) {
+                equipmentInventory.set(new SlotIndex(slot - 100), itemStack);
+            } else if (slot == 150) {
+                offHandSlot.set(itemStack);
+            }
+        }
+    }
+
+    private static List<DataView> serializePlayerInventory(LanternPlayerInventory inventory) {
+        final List<DataView> itemViews = new ArrayList<>();
+
+        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
+        //noinspection unchecked
+        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
+
+        final HumanMainInventory mainInventory = inventory.getMain();
+        final LanternEquipmentInventory equipmentInventory = inventory.getEquipment();
+        final OffHandSlot offHandSlot = inventory.getOffhand();
+
+        Iterable<Slot> slots = mainInventory.slots();
+        for (Slot slot : slots) {
+            serializeSlot(mainInventory, slot, 0, itemStackSerializer, itemViews);
+        }
+        slots = equipmentInventory.slots();
+        for (Slot slot : slots) {
+            serializeSlot(equipmentInventory, slot, 100, itemStackSerializer, itemViews);
+        }
+        serializeSlot(150, offHandSlot, itemStackSerializer, itemViews);
+
+        return itemViews;
+    }
+
+    private static void serializeSlot(Inventory parent, Slot slot, int indexOffset,
+            ObjectSerializer<LanternItemStack> itemStackSerializer, List<DataView> views) {
+        final SlotIndex index = parent.getProperty(slot, SlotIndex.class, "index").get(); // Key doesn't matter
+        //noinspection ConstantConditions
+        serializeSlot(index.getValue() + indexOffset, slot, itemStackSerializer, views);
+    }
+
+    private static void serializeSlot(int index, Slot slot, ObjectSerializer<LanternItemStack> itemStackSerializer, List<DataView> views) {
+        final Optional<ItemStack> optItemStack = slot.peek();
+        if (!optItemStack.isPresent()) {
+            return;
+        }
+        final ItemStack itemStack = optItemStack.get();
+        final DataView itemView = itemStackSerializer.serialize((LanternItemStack) itemStack);
+        //noinspection ConstantConditions
+        itemView.set(SLOT, (byte) index);
+        views.add(itemView);
     }
 }

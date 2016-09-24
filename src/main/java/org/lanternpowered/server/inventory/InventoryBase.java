@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.item.ItemType;
@@ -39,20 +40,20 @@ import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-public abstract class InventoryBase implements Inventory {
+public abstract class InventoryBase implements IInventory {
 
-    private static class EmptyNameHolder {
+    static class EmptyNameHolder {
 
-        private static final Translation EMPTY_NAME = Lantern.getRegistry().getTranslationManager().get("inventory.empty.title");
+        static final Translation EMPTY_NAME = Lantern.getRegistry().getTranslationManager().get("inventory.empty.title");
     }
 
     @Nullable private final Inventory parent;
@@ -84,22 +85,11 @@ public abstract class InventoryBase implements Inventory {
      *
      * @param inventoryProperty The inventory property
      */
-    public void registerProperty(InventoryProperty<?, ?> inventoryProperty) {
+    protected void registerProperty(InventoryProperty<?, ?> inventoryProperty) {
         checkNotNull(inventoryProperty, "inventoryProperty");
         this.inventoryPropertiesByClass.put(inventoryProperty.getClass(), inventoryProperty);
         this.inventoryPropertiesByKey.put(inventoryProperty.getKey(), inventoryProperty);
     }
-
-    /**
-     * Offers the {@link ItemStack} fast to this inventory, avoiding
-     * the creation of {@link InventoryTransactionResult}s.
-     *
-     * @param stack The item stack
-     * @return The fast offer result
-     */
-    public abstract FastOfferResult offerFast(ItemStack stack);
-
-    public abstract PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack);
 
     @Override
     public InventoryTransactionResult offer(ItemStack stack) {
@@ -107,8 +97,8 @@ public abstract class InventoryBase implements Inventory {
     }
 
     @Override
-    public Inventory parent() {
-        return this.parent == null ? this : this.parent;
+    public IInventory parent() {
+        return this.parent == null ? this : (IInventory) this.parent;
     }
 
     @Override
@@ -116,42 +106,102 @@ public abstract class InventoryBase implements Inventory {
         return this.name == null ? EmptyNameHolder.EMPTY_NAME : this.name;
     }
 
-    /**
-     * Gets whether the specified {@link InventoryProperty} is present on this inventory.
-     *
-     * @param property The property
-     * @return Is present
-     */
-    public boolean hasProperty(InventoryProperty<?,?> property) {
-        return this.inventoryPropertiesByKey.containsValue(checkNotNull(property, "property"));
+    @Override
+    public boolean hasProperty(InventoryProperty<?, ?> property) {
+        checkNotNull(property, "property");
+        final InventoryProperty property1 = this.inventoryPropertiesByKey.get(property.getKey());
+        if (property1 != null && property1.equals(property)) {
+            return true;
+        }
+        final IInventory parent = this.parent();
+        if (parent != this && parent instanceof InventoryBase) {
+            //noinspection unchecked
+            final Optional<InventoryProperty<?, ?>> optProperty = ((InventoryBase) parent).tryGetProperty(
+                    this, (Class) property.getClass(), property.getKey());
+            return optProperty.isPresent() && optProperty.get().equals(property);
+        }
+        return false;
+    }
+
+    @Override
+    public boolean hasProperty(Inventory child, InventoryProperty<?,?> property) {
+        checkNotNull(property, "property");
+        if (!(child instanceof InventoryBase)) {
+            return false;
+        }
+        final InventoryProperty property1 = ((InventoryBase) child).inventoryPropertiesByKey.get(property.getKey());
+        if (property1 != null && property1.equals(property)) {
+            return true;
+        }
+        //noinspection unchecked
+        final Optional<InventoryProperty<?, ?>> optProperty = this.tryGetProperty(
+                child, (Class) property.getClass(), property.getKey());
+        return optProperty.isPresent() && optProperty.get().equals(property);
+    }
+
+    @Override
+    public <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Class<T> property) {
+        checkNotNull(property, "property");
+        final IInventory parent = this.parent();
+        final ImmutableList.Builder<T> properties = ImmutableList.builder();
+        //noinspection unchecked
+        properties.addAll((Collection<? extends T>) this.inventoryPropertiesByClass.get(property));
+        if (parent != this && parent instanceof InventoryBase) {
+            properties.addAll(((InventoryBase) parent).tryGetProperties(this, property));
+        }
+        return properties.build();
     }
 
     @Override
     public <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Inventory child, Class<T> property) {
-        // TODO: Get properties based on the parent, like SlotIndex
-        return child.getProperties(property);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Class<T> property) {
         checkNotNull(property, "property");
-        return Collections.unmodifiableCollection((Collection<? extends T>) this.inventoryPropertiesByClass.get(property));
-    }
-
-    @Override
-    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, Object key) {
-        // TODO: Get properties based on the parent, like SlotIndex
-        return child.getProperty(property, key);
+        if (!(child instanceof InventoryBase)) {
+            return ImmutableList.of();
+        }
+        final ImmutableList.Builder<T> properties = ImmutableList.builder();
+        //noinspection unchecked
+        properties.addAll((Collection<? extends T>) ((InventoryBase) child).inventoryPropertiesByClass.get(property));
+        properties.addAll(this.tryGetProperties(child, property));
+        return properties.build();
     }
 
     @Override
     public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, Object key) {
         checkNotNull(property, "property");
         checkNotNull(key, "key");
-        final InventoryProperty<?,?> inventoryProperty = this.inventoryPropertiesByKey.get(key);
-        return inventoryProperty != null && property.isInstance(inventoryProperty) ?
-                Optional.of(property.cast(inventoryProperty)) : Optional.empty();
+        final InventoryProperty<?, ?> property1 = this.inventoryPropertiesByKey.get(key);
+        if (property1 != null && property.isInstance(property1)) {
+            return Optional.of(property.cast(property1));
+        }
+        final IInventory parent = this.parent();
+        if (parent != this && parent instanceof InventoryBase) {
+            return ((InventoryBase) parent).tryGetProperty(this, property, key);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, Object key) {
+        checkNotNull(child, "child");
+        checkNotNull(property, "property");
+        checkNotNull(key, "key");
+        if (!(child instanceof InventoryBase)) {
+            return Optional.empty();
+        }
+        final InventoryBase inventoryBase = (InventoryBase) child;
+        final InventoryProperty<?, ?> property1 = inventoryBase.inventoryPropertiesByKey.get(key);
+        if (property1 != null && property.isInstance(property1)) {
+            return Optional.of(property.cast(property1));
+        }
+        return this.tryGetProperty(child, property, key);
+    }
+
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, Object key) {
+        return Optional.empty();
+    }
+
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
+        return new ArrayList<>();
     }
 
     @SuppressWarnings("unchecked")
@@ -258,79 +308,4 @@ public abstract class InventoryBase implements Inventory {
             return false;
         }, false);
     }
-
-    public abstract <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested);
-
-    @Override
-    public Optional<ItemStack> poll() {
-        return this.poll(stack -> true);
-    }
-
-    public Optional<ItemStack> poll(ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.poll(stack -> stack.getItem().equals(itemType));
-    }
-
-    public abstract Optional<ItemStack> poll(Predicate<ItemStack> matcher);
-
-    @Override
-    public Optional<ItemStack> poll(int limit) {
-        return this.poll(limit, stack -> true);
-    }
-
-    public Optional<ItemStack> poll(int limit, ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.poll(limit, stack -> stack.getItem().equals(itemType));
-    }
-
-    public abstract Optional<ItemStack> poll(int limit, Predicate<ItemStack> matcher);
-
-    @Override
-    public Optional<ItemStack> peek() {
-        return this.peek(stack -> true);
-    }
-
-    public Optional<ItemStack> peek(ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.poll(stack -> stack.getItem().equals(itemType));
-    }
-
-    public abstract Optional<ItemStack> peek(Predicate<ItemStack> matcher);
-
-    public abstract Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher);
-
-    @Override
-    public Optional<ItemStack> peek(int limit) {
-        return this.peek(limit, stack -> true);
-    }
-
-    public Optional<ItemStack> peek(int limit, ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.poll(limit, stack -> stack.getItem().equals(itemType));
-    }
-
-    public abstract Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher);
-
-    public abstract Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher);
-
-    public abstract PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack itemStack);
-
-    /**
-     * Check whether the supplied item can be inserted into this one of the children of the
-     * inventory. Returning false from this method implies that {@link #offer} <b>would
-     * always return false</b> for this item.
-     *
-     * @param stack ItemStack to check
-     * @return true if the stack is valid for one of the children of this inventory
-     */
-    public abstract boolean isValidItem(ItemStack stack);
-
-    /**
-     * Gets whether the specified {@link Inventory} a child is of this inventory,
-     * this includes if it's a child of a child inventory.
-     *
-     * @param child The child inventory
-     * @return Whether the inventory was a child of this inventory
-     */
-    public abstract boolean isChild(Inventory child);
 }

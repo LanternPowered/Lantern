@@ -34,7 +34,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
-import org.lanternpowered.server.data.io.store.item.ItemStackStore;
+import org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
@@ -48,9 +48,9 @@ import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBui
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
+import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.objects.LocalizedText;
@@ -683,7 +683,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         checkNotNull(bookView, "bookView");
 
         final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-        ItemStackStore.writeBookData(dataView, bookView, this.locale);
+        BookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);
 
         // Written book internal id
         final RawItemStack rawItemStack = new RawItemStack(387, 0, 1, dataView);

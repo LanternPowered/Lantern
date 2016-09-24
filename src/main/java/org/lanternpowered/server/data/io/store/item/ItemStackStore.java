@@ -97,9 +97,8 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         dataView.set(QUANTITY, (byte) object.getQuantity());
         final DataView tag = dataView.createView(TAG);
         super.serialize(object, tag);
-        tag.getShort(ItemTypeObjectSerializer.DATA_VALUE);
-        tag.remove(ItemTypeObjectSerializer.DATA_VALUE);
         dataView.set(DATA, tag.getShort(ItemTypeObjectSerializer.DATA_VALUE).orElse((short) 0));
+        tag.remove(ItemTypeObjectSerializer.DATA_VALUE);
         if (tag.isEmpty()) {
             dataView.remove(TAG);
         }

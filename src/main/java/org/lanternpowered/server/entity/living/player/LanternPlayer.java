@@ -857,6 +857,11 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         return null;
     }
 
+    @Override
+    public boolean respawnPlayer() {
+        return false;
+    }
+
     public PlayerInteractionHandler getInteractionHandler() {
         return this.interactionHandler;
     }

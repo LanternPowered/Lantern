@@ -1079,7 +1079,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public void triggerExplosion(Explosion explosion) {
+    public void triggerExplosion(Explosion explosion, Cause cause) {
         // TODO Auto-generated method stub
         
     }

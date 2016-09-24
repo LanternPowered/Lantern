@@ -40,12 +40,6 @@ import javax.annotation.Nullable;
 
 public final class LanternPluginContainer extends AbstractPluginContainer {
 
-    public static final String ID_REGEX = "[a-z][a-z0-9-_.]{0,63}";
-
-    private final String id;
-
-    private final Optional<String> name;
-    private final Optional<String> version;
     private final Optional<String> description;
     private final Optional<String> url;
     private final ImmutableList<String> authors;
@@ -58,11 +52,8 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
     private final Injector injector;
 
     LanternPluginContainer(String id, Class<?> pluginClass, @Nullable String name, @Nullable String version,
-            @Nullable String description, @Nullable String url, List<String> authors,
-            Optional<Path> source) {
-        this.id = id;
-        this.name = Optional.ofNullable(name);
-        this.version = Optional.ofNullable(version);
+            @Nullable String description, @Nullable String url, List<String> authors, Optional<Path> source) {
+        super(id, name, version);
         this.description = Optional.ofNullable(description);
         this.url = Optional.ofNullable(url);
         this.authors = ImmutableList.copyOf(authors);
@@ -71,21 +62,6 @@ public final class LanternPluginContainer extends AbstractPluginContainer {
 
         this.injector = Guice.createInjector(new PluginModule(this, pluginClass, Lantern.getGame()));
         this.instance = Optional.of(this.injector.getInstance(pluginClass));
-    }
-
-    @Override
-    public String getId() {
-        return this.id;
-    }
-
-    @Override
-    public String getName() {
-        return this.name.orElse(this.id);
-    }
-
-    @Override
-    public Optional<String> getVersion() {
-        return this.version;
     }
 
     @Override

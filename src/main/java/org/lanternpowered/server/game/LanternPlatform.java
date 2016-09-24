@@ -65,7 +65,7 @@ public class LanternPlatform implements Platform {
         }
     };
 
-    public LanternPlatform(PluginContainer apiContainer, PluginContainer implContainer) {
+    LanternPlatform(PluginContainer apiContainer, PluginContainer implContainer) {
         this.implContainer = implContainer;
         this.apiContainer = apiContainer;
 
@@ -117,5 +117,4 @@ public class LanternPlatform implements Platform {
                 .add("minecraftVersion", this.getMinecraftVersion())
                 .toString();
     }
-
 }

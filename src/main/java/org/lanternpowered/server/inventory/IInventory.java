@@ -90,7 +90,7 @@ public interface IInventory extends Inventory {
 
     default Optional<ItemStack> peek(ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        return this.poll(stack -> stack.getItem().equals(itemType));
+        return this.peek(stack -> stack.getItem().equals(itemType));
     }
 
     Optional<ItemStack> peek(Predicate<ItemStack> matcher);

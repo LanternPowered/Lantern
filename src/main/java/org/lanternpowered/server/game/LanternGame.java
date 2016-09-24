@@ -86,9 +86,7 @@ import org.lanternpowered.server.game.version.MinecraftVersionCache;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.plugin.LanternPluginManager;
-import org.lanternpowered.server.plugin.LanternServerContainer;
-import org.lanternpowered.server.plugin.MinecraftPluginContainer;
-import org.lanternpowered.server.plugin.SpongeApiContainer;
+import org.lanternpowered.server.plugin.SimplePluginContainer;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
 import org.lanternpowered.server.scheduler.LanternScheduler;
 import org.lanternpowered.server.service.LanternServiceListeners;
@@ -105,6 +103,7 @@ import org.slf4j.LoggerFactory;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.GameState;
+import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.AssetManager;
 import org.spongepowered.api.command.CommandManager;
@@ -153,7 +152,10 @@ public class LanternGame implements Game {
     private final static boolean SCAN_CLASSPATH = PropertiesUtil.getProperties().getBooleanProperty("scanClasspath", false);
 
     public static final String API_NAME = "SpongeAPI";
-    public static final String API_ID = "sponge";
+    public static final String API_ID = Platform.API_ID;
+
+    public static final String SPONGE_PLATFORM_NAME = "Sponge";
+    public static final String SPONGE_PLATFORM_ID = "sponge";
 
     public static final String IMPL_NAME = "Lantern";
     public static final String IMPL_ID = "lantern";
@@ -268,6 +270,7 @@ public class LanternGame implements Game {
     // The inbuilt plugin containers
     private PluginContainer minecraft;
     private PluginContainer apiContainer;
+    private PluginContainer spongePlatformContainer;
     private PluginContainer implContainer;
 
     // The folder where the worlds are saved
@@ -292,6 +295,7 @@ public class LanternGame implements Game {
 
     public LanternGame() {
         this.gameFolder = new File("").toPath();
+        //noinspection ConstantConditions
         if (game != null) {
             throw new IllegalStateException("The game can only be initialized once!");
         }
@@ -344,10 +348,18 @@ public class LanternGame implements Game {
         // Load the asset repository
         this.loadAssetRepository();
 
-        // Create the inbuilt plugin containers and platform
-        this.minecraft = new MinecraftPluginContainer(this);
-        this.apiContainer = new SpongeApiContainer();
-        this.implContainer = new LanternServerContainer();
+        // Create the minecraft plugin container
+        this.minecraft = new SimplePluginContainer(MINECRAFT_ID, MINECRAFT_NAME, MINECRAFT_VERSION, () -> this.server);
+        // Create the api plugin container
+        final String apiVersion = LanternPlatform.API_VERSION.orElse(null);
+        this.apiContainer = new SimplePluginContainer(API_ID, LanternPlatform.API_NAME, apiVersion, () -> this);
+        // Create the sponge platform plugin container
+        this.spongePlatformContainer = new SimplePluginContainer(SPONGE_PLATFORM_ID, SPONGE_PLATFORM_NAME, apiVersion, () -> this);
+        // Create the implementation plugin container
+        final String implVersion = LanternPlatform.IMPL_VERSION.orElse(null);
+        this.implContainer = new SimplePluginContainer(IMPL_ID, LanternPlatform.IMPL_NAME, implVersion, () -> this.server);
+
+        // Create the platform instance
         this.platform = new LanternPlatform(this.apiContainer, this.implContainer);
 
         this.minecraftVersionCache = new MinecraftVersionCache();
@@ -363,6 +375,7 @@ public class LanternGame implements Game {
         this.pluginManager = new LanternPluginManager(this, this.pluginsFolder);
         this.pluginManager.registerPlugin(this.implContainer);
         this.pluginManager.registerPlugin(this.apiContainer);
+        this.pluginManager.registerPlugin(this.spongePlatformContainer);
         this.pluginManager.registerPlugin(this.minecraft);
         this.pluginManager.registerPluginInstances();
 
@@ -562,7 +575,7 @@ public class LanternGame implements Game {
     /**
      * Gets the plugin container that represents the minecraft server.
      * 
-     * @return the plugin container
+     * @return The plugin container
      */
     public PluginContainer getMinecraftPlugin() {
         return this.minecraft;
@@ -571,7 +584,7 @@ public class LanternGame implements Game {
     /**
      * Gets the plugin container that represents the implementation.
      *
-     * @return the plugin container
+     * @return The plugin container
      */
     public PluginContainer getImplementationPlugin() {
         return this.implContainer;
@@ -580,10 +593,19 @@ public class LanternGame implements Game {
     /**
      * Gets the plugin container that represents the api.
      *
-     * @return the plugin container
+     * @return The plugin container
      */
     public PluginContainer getApiPlugin() {
         return this.apiContainer;
+    }
+
+    /**
+     * Gets the plugin container that represents the sponge platform.
+     *
+     * @return The plugin container
+     */
+    public PluginContainer getSpongePlugin() {
+        return this.spongePlatformContainer;
     }
 
     /**

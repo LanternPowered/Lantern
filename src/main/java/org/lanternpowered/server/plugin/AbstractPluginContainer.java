@@ -25,15 +25,76 @@
  */
 package org.lanternpowered.server.plugin;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.MoreObjects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public abstract class AbstractPluginContainer implements PluginContainer {
+import java.nio.file.Path;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
-    protected AbstractPluginContainer() {
+import javax.annotation.Nullable;
+
+abstract class AbstractPluginContainer implements PluginContainer {
+
+    private final String id;
+    private final Optional<String> name;
+    private final Optional<String> version;
+    private final Logger logger;
+
+    AbstractPluginContainer(String id, @Nullable String name, @Nullable String version) {
+        this.id = checkNotNull(id, "id");
+        this.name = Optional.ofNullable(name);
+        this.version = Optional.ofNullable(version);
+        this.logger = LoggerFactory.getLogger(id);
     }
 
-    protected MoreObjects.ToStringHelper toStringHelper() {
+    @Override
+    public String getId() {
+        return this.id;
+    }
+
+    @Override
+    public String getName() {
+        return this.name.orElse(this.id);
+    }
+
+    @Override
+    public Optional<String> getVersion() {
+        return this.version;
+    }
+
+    @Override
+    public Optional<String> getDescription() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> getUrl() {
+        return Optional.empty();
+    }
+
+    @Override
+    public List<String> getAuthors() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Optional<Path> getSource() {
+        return Optional.empty();
+    }
+
+    @Override
+    public Logger getLogger() {
+        return this.logger;
+    }
+
+    @Override
+    public String toString() {
         return MoreObjects.toStringHelper("Plugin")
                 .omitNullValues()
                 .add("id", this.getId())
@@ -42,11 +103,7 @@ public abstract class AbstractPluginContainer implements PluginContainer {
                 .add("description", this.getDescription().orElse(null))
                 .add("url", this.getUrl().orElse(null))
                 .add("authors", this.getAuthors().isEmpty() ? null : this.getAuthors())
-                .add("source", this.getSource().orElse(null));
-    }
-
-    @Override
-    public final String toString() {
-        return this.toStringHelper().toString();
+                .add("source", this.getSource().orElse(null))
+                .toString();
     }
 }

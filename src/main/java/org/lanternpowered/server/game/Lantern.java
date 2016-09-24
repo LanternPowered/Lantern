@@ -43,10 +43,6 @@ public class Lantern {
         return LanternGame.game.getMinecraftPlugin();
     }
 
-    public static PluginContainer getApiPlugin() {
-        return LanternGame.game.getApiPlugin();
-    }
-
     public static PluginContainer getImplementationPlugin() {
         return LanternGame.game.getImplementationPlugin();
     }

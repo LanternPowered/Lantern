@@ -36,6 +36,7 @@ import org.spongepowered.plugin.meta.version.DefaultArtifactVersion;
 import org.spongepowered.plugin.meta.version.InvalidVersionSpecificationException;
 import org.spongepowered.plugin.meta.version.VersionRange;
 
+import java.math.BigInteger;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +59,7 @@ public final class PluginCandidate {
 
     @Nullable private Set<PluginCandidate> dependencies;
     @Nullable private Set<PluginCandidate> requirements;
+    private final Set<String> dependenciesWithUnknownVersion = new HashSet<>();
     @Nullable private Map<String, String> versions;
     @Nullable private Map<String, String> missingRequirements;
 
@@ -218,7 +220,7 @@ public final class PluginCandidate {
 
             final String version = dependency.getVersion();
 
-            PluginContainer loaded = loadedPlugins.get(id);
+            final PluginContainer loaded = loadedPlugins.get(id);
             if (loaded != null) {
                 if (!verifyVersionRange(id, version, loaded.getVersion().orElse(null))) {
                     this.missingRequirements.put(id, version);
@@ -233,7 +235,7 @@ public final class PluginCandidate {
                 continue;
             }
 
-            PluginCandidate candidate = candidates.get(id);
+            final PluginCandidate candidate = candidates.get(id);
             if (candidate != null) {
                 if (verifyVersionRange(id, version, candidate.getMetadata().getVersion())) {
                     this.dependencies.add(candidate);
@@ -249,21 +251,28 @@ public final class PluginCandidate {
             return true;
         }
 
+        // Don't check version again if it already failed
+        if (expectedRange.equals(this.missingRequirements.get(id))) {
+            return false;
+        }
+
+        // Don't check version again if it was already checked
+        if (expectedRange.equals(this.versions.get(id))) {
+            return true;
+        }
+
         if (version != null) {
             try {
-                VersionRange range = VersionRange.createFromVersionSpec(expectedRange);
-                if (range.containsVersion(new DefaultArtifactVersion(version))) {
-                    String currentRange = this.versions.get(id);
+                final VersionRange range = VersionRange.createFromVersionSpec(expectedRange);
+                final DefaultArtifactVersion installedVersion = new DefaultArtifactVersion(version);
+                if (range.containsVersion(installedVersion)) {
+                    final String currentRange = this.versions.get(id);
                     if (currentRange != null) {
-                        if (currentRange.equals(expectedRange)) {
-                            return true;
-                        }
-
                         // This should almost never happen because it means the plugin is
                         // depending on two different versions of another plugin
 
                         // We need to merge the ranges
-                        VersionRange otherRange;
+                        final VersionRange otherRange;
                         try {
                             otherRange = VersionRange.createFromVersionSpec(currentRange);
                         } catch (InvalidVersionSpecificationException e) {
@@ -275,6 +284,21 @@ public final class PluginCandidate {
 
                     this.versions.put(id, expectedRange);
 
+                    if (range.getRecommendedVersion() instanceof DefaultArtifactVersion) {
+                        final BigInteger majorExpected = ((DefaultArtifactVersion) range.getRecommendedVersion()).getVersion().getFirstInteger();
+                        if (majorExpected != null) {
+                            final BigInteger majorInstalled = installedVersion.getVersion().getFirstInteger();
+
+                            // Show a warning if the major version does not match,
+                            // or if the installed version is lower than the recommended version
+                            if (majorInstalled != null && (!majorExpected.equals(majorInstalled) ||
+                                    installedVersion.compareTo(range.getRecommendedVersion()) < 0)) {
+                                Lantern.getLogger().warn("Plugin {} from {} was designed for {} {}. It may not work properly.",
+                                        this.id, this.source, id, range.getRecommendedVersion());
+                            }
+                        }
+
+                    }
                     return true;
                 }
             } catch (InvalidVersionSpecificationException e) {
@@ -282,6 +306,12 @@ public final class PluginCandidate {
                         version, id, this.id, getDisplaySource(), e.getMessage());
                 this.invalid = true;
             }
+        } else {
+            if (this.dependenciesWithUnknownVersion.add(id)) {
+                Lantern.getLogger().warn("Cannot check version of dependency {} for plugin {} from {}: Version of dependency unknown",
+                        id, this.id, this.source);
+            }
+            return true;
         }
 
         return false;
@@ -306,7 +336,7 @@ public final class PluginCandidate {
 
     @Override
     public String toString() {
-        MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this)
+        final MoreObjects.ToStringHelper helper = MoreObjects.toStringHelper(this)
                 .omitNullValues()
                 .add("id", this.id)
                 .add("class", this.pluginClass)

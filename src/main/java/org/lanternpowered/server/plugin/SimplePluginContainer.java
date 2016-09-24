@@ -25,33 +25,23 @@
  */
 package org.lanternpowered.server.plugin;
 
-import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
-import org.lanternpowered.server.game.LanternPlatform;
-
 import java.util.Optional;
+import java.util.function.Supplier;
 
-public final class LanternServerContainer extends AbstractPluginContainer {
+import javax.annotation.Nullable;
 
-    @Override
-    public String getId() {
-        return LanternGame.IMPL_ID;
+public class SimplePluginContainer extends AbstractPluginContainer {
+
+    private final Supplier<Object> instanceSupplier;
+
+    public SimplePluginContainer(String id, @Nullable String name, @Nullable String version,
+            Supplier<Object> instanceSupplier) {
+        super(id, name, version);
+        this.instanceSupplier = instanceSupplier;
     }
 
     @Override
-    public String getName() {
-        return LanternPlatform.IMPL_NAME;
+    public Optional<?> getInstance() {
+        return Optional.ofNullable(this.instanceSupplier.get());
     }
-
-    @Override
-    public Optional<String> getVersion() {
-        return LanternPlatform.IMPL_VERSION;
-    }
-
-    @Override
-    public Optional<LanternServer> getInstance() {
-        return Optional.ofNullable(Lantern.getGame().getServer());
-    }
-
 }

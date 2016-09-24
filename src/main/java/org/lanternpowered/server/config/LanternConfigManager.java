@@ -27,7 +27,6 @@ package org.lanternpowered.server.config;
 
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
-import com.google.inject.Injector;
 import ninja.leaping.configurate.objectmapping.DefaultObjectMapperFactory;
 import ninja.leaping.configurate.objectmapping.GuiceObjectMapperFactory;
 import ninja.leaping.configurate.objectmapping.ObjectMapperFactory;
@@ -62,10 +61,7 @@ public final class LanternConfigManager implements ConfigManager {
 
     private ObjectMapperFactory getMapperFactory(PluginContainer container) {
         if (container instanceof LanternPluginContainer) {
-            Injector injector = ((LanternPluginContainer) container).getInjector();
-            if (injector != null) {
-                return injector.getInstance(GuiceObjectMapperFactory.class);
-            }
+            return ((LanternPluginContainer) container).getInjector().getInstance(GuiceObjectMapperFactory.class);
         }
         return DefaultObjectMapperFactory.getInstance();
     }

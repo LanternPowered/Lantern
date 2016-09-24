@@ -83,6 +83,8 @@ public final class PluginModule extends AbstractModule {
         this.bind(PluginContainer.class).annotatedWith(named(pluginContainer.getId())).toInstance(pluginContainer);
         pluginContainer = this.game.getMinecraftPlugin();
         this.bind(PluginContainer.class).annotatedWith(named(pluginContainer.getId())).toInstance(pluginContainer);
+        pluginContainer = this.game.getSpongePlugin();
+        this.bind(PluginContainer.class).annotatedWith(named(pluginContainer.getId())).toInstance(pluginContainer);
 
         this.bind(this.pluginClass).in(Scopes.SINGLETON);
         this.bind(PluginContainer.class).toInstance(this.container);

@@ -41,6 +41,7 @@ import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.type.OrderedInventory;
 import org.spongepowered.api.text.translation.Translation;
@@ -190,30 +191,25 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     public void streamSlotChanges() {
         final List<Message> messages = new ArrayList<>();
         for (Map.Entry<LanternSlot, Boolean> entry : this.dirtySlots.entrySet()) {
+            final LanternSlot slot = entry.getKey();
             int windowId = this.windowId;
             int index = -1;
-            if (windowId != 0) {
-                index = this.openInventory.getSlotIndex(entry.getKey());
-            } else {
-                // The silent slot index, is different....
-                // Try the raw inventory slots first
-                if (entry.getValue()) {
-                    index = ((LanternOrderedInventory) this.playerInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY))
-                            .getSlotIndex(entry.getKey());
-                    // Silent updates use the window id -2, this is not
-                    // supported for all slot though
-                    if (index != -1) {
-                        windowId = -2;
-                    }
-                }
-                if (index == -1) {
-                    index = this.getSlotIndex(entry.getKey());
-                }
+            if (entry.getValue() || !(slot.parent() instanceof Hotbar)) {
+                index = ((LanternOrderedInventory) this.playerInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY)).getSlotIndex(slot);
             }
-            messages.add(new MessagePlayOutSetWindowSlot(windowId, index, entry.getKey().peek().orElse(null)));
+            if (index == -1) {
+                index = this.openInventory.getSlotIndex(slot);
+            } else {
+                windowId = -2;
+            }
+            System.out.println(windowId + " " + index);
+            if (index != -1) {
+                messages.add(new MessagePlayOutSetWindowSlot(windowId, index, slot.peek().orElse(null)));
+            }
         }
         this.dirtySlots.clear();
         if (!messages.isEmpty()) {
+            System.out.println(this.getRawViewers().size());
             this.getRawViewers().forEach(player -> ((LanternPlayer) player).getConnection().send(messages));
         }
     }

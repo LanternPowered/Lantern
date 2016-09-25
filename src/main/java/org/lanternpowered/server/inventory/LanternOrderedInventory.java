@@ -133,7 +133,7 @@ public class LanternOrderedInventory extends ChildrenInventoryBase implements Or
     }
 
     @Override
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, Object key) {
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (property == SlotIndex.class && child instanceof Slot) {
             final Integer index = this.indexBySlot.get(child);
             return index == null ? Optional.empty() : Optional.of(property.cast(SlotIndex.of(index)));

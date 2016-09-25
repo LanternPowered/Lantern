@@ -48,6 +48,12 @@ public interface IInventory extends Inventory {
 
     boolean hasProperty(Inventory child, InventoryProperty<?,?> property);
 
+    @Override
+    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key);
+
+    @Override
+    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, @Nullable Object key);
+
     /**
      * Offers the {@link ItemStack} fast to this inventory, avoiding
      * the creation of {@link InventoryTransactionResult}s.

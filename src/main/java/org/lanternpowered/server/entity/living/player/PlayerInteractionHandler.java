@@ -219,14 +219,19 @@ public final class PlayerInteractionHandler {
     }
 
     public void handleBlockPlacing(MessagePlayInPlayerBlockPlacement message) {
-        // The hand the action was excepted from
-        // HandType expectedHand = message.getHand();
+        final ItemInteractionType itemInteractionType = message.getInteractionType();
+        // Ignore the off hand interaction type for now, a main hand message
+        // will always be send before this message. So we will only listen for
+        // the main hand message.
+        if (itemInteractionType == ItemInteractionType.OFF) {
+            return;
+        }
         // TODO: Send updates if something failed, events, ...
 
         ItemInteractionResult interactionResult = null;
 
         // Try the action of the hotbar item first
-        LanternHotbar hotbar = this.player.getInventory().query(LanternHotbar.class).first();
+        final LanternHotbar hotbar = this.player.getInventory().getHotbar();
         Optional<ItemStack> optItemStack = hotbar.getSelectedSlot().peek();
         if (optItemStack.isPresent()) {
             final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
@@ -236,7 +241,7 @@ public final class PlayerInteractionHandler {
         }
 
         if (interactionResult == null || interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
-            OffHandSlot offHandSlot = this.player.getInventory().query(OffHandSlot.class).first();
+            final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
             optItemStack = offHandSlot.peek();
             if (optItemStack.isPresent()) {
                 final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();

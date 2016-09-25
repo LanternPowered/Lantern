@@ -45,6 +45,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -67,7 +68,32 @@ public abstract class InventoryBase implements IInventory {
     /**
      * All the {@link InventoryProperty}s of this inventory mapped by their key.
      */
-    private final Map<Object, InventoryProperty<?,?>> inventoryPropertiesByKey = new HashMap<>();
+    private final Map<PropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey = new HashMap<>();
+
+    private static final class PropertyKey {
+
+        private final Class<? extends InventoryProperty> type;
+        @Nullable private final Object key;
+
+        private PropertyKey(Class<? extends InventoryProperty> type, @Nullable Object key) {
+            this.type = type;
+            this.key = key;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (!(other instanceof PropertyKey)) {
+                return false;
+            }
+            final PropertyKey other0 = (PropertyKey) other;
+            return other0.type == this.type && Objects.equals(other0.key, this.key);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.type, this.key);
+        }
+    }
 
     protected final EmptyInventory emptyInventory = this instanceof EmptyInventory ?
             (EmptyInventory) this : new EmptyInventoryImpl(this);
@@ -88,7 +114,8 @@ public abstract class InventoryBase implements IInventory {
     protected void registerProperty(InventoryProperty<?, ?> inventoryProperty) {
         checkNotNull(inventoryProperty, "inventoryProperty");
         this.inventoryPropertiesByClass.put(inventoryProperty.getClass(), inventoryProperty);
-        this.inventoryPropertiesByKey.put(inventoryProperty.getKey(), inventoryProperty);
+        final PropertyKey propertyKey = new PropertyKey(inventoryProperty.getClass(), inventoryProperty.getKey());
+        this.inventoryPropertiesByKey.put(propertyKey, inventoryProperty);
     }
 
     @Override
@@ -109,7 +136,8 @@ public abstract class InventoryBase implements IInventory {
     @Override
     public boolean hasProperty(InventoryProperty<?, ?> property) {
         checkNotNull(property, "property");
-        final InventoryProperty property1 = this.inventoryPropertiesByKey.get(property.getKey());
+        final PropertyKey propertyKey = new PropertyKey(property.getClass(), property.getKey());
+        final InventoryProperty property1 = this.inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property1.equals(property)) {
             return true;
         }
@@ -129,7 +157,8 @@ public abstract class InventoryBase implements IInventory {
         if (!(child instanceof InventoryBase)) {
             return false;
         }
-        final InventoryProperty property1 = ((InventoryBase) child).inventoryPropertiesByKey.get(property.getKey());
+        final PropertyKey propertyKey = new PropertyKey(property.getClass(), property.getKey());
+        final InventoryProperty property1 = ((InventoryBase) child).inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property1.equals(property)) {
             return true;
         }
@@ -166,10 +195,10 @@ public abstract class InventoryBase implements IInventory {
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, Object key) {
+    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key) {
         checkNotNull(property, "property");
-        checkNotNull(key, "key");
-        final InventoryProperty<?, ?> property1 = this.inventoryPropertiesByKey.get(key);
+        final PropertyKey propertyKey = new PropertyKey(property, key);
+        final InventoryProperty<?, ?> property1 = this.inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property.isInstance(property1)) {
             return Optional.of(property.cast(property1));
         }
@@ -181,22 +210,22 @@ public abstract class InventoryBase implements IInventory {
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, Object key) {
+    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, @Nullable Object key) {
         checkNotNull(child, "child");
         checkNotNull(property, "property");
-        checkNotNull(key, "key");
         if (!(child instanceof InventoryBase)) {
             return Optional.empty();
         }
         final InventoryBase inventoryBase = (InventoryBase) child;
-        final InventoryProperty<?, ?> property1 = inventoryBase.inventoryPropertiesByKey.get(key);
+        final PropertyKey propertyKey = new PropertyKey(property, key);
+        final InventoryProperty<?, ?> property1 = inventoryBase.inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property.isInstance(property1)) {
             return Optional.of(property.cast(property1));
         }
         return this.tryGetProperty(child, property, key);
     }
 
-    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, Object key) {
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         return Optional.empty();
     }
 

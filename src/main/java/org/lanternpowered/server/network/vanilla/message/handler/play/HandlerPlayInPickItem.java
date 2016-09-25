@@ -35,22 +35,31 @@ import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.spongepowered.api.item.inventory.ItemStack;
 
+import java.util.Optional;
+
 public final class HandlerPlayInPickItem implements Handler<MessagePlayInPickItem> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPickItem message) {
+        System.out.println("DEBUG");
         final LanternPlayerInventory humanInventory = context.getSession().getPlayer().getInventory();
         final LanternSlot slot = humanInventory.getSlotAt(message.getSlot()).orElse(null);
         if (slot != null) {
             final LanternHotbar hotbar = humanInventory.getHotbar();
 
             // The slot we will swap items with
-            LanternSlot hotbarSlot = hotbar.getSlots().stream()
-                    .filter(slot1 -> !slot1.peek().isPresent())
-                    .findFirst().orElse(hotbar.getSelectedSlot());
+            LanternSlot hotbarSlot = hotbar.getSelectedSlot();
+            if (!hotbarSlot.peek().isPresent()) {
+                final Optional<LanternSlot> optSlot = hotbar.getSlots().stream()
+                        .filter(slot1 -> !slot1.peek().isPresent())
+                        .findFirst();
+                if (optSlot.isPresent()) {
+                    hotbarSlot = optSlot.get();
+                }
+            }
 
-            ItemStack slotItem = slot.peek().orElse(null);
-            ItemStack hotbarItem = hotbarSlot.peek().orElse(null);
+            final ItemStack slotItem = slot.peek().orElse(null);
+            final ItemStack hotbarItem = hotbarSlot.peek().orElse(null);
 
             hotbarSlot.set(slotItem);
             slot.set(hotbarItem);

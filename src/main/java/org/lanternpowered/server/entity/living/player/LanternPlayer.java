@@ -480,10 +480,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.interactionHandler.pulse();
 
         // Stream the inventory updates
-        this.inventoryContainer.streamSlotChanges();
-        if (this.containerSession.getOpenContainer() != null) {
-            this.containerSession.getOpenContainer().streamSlotChanges();
-        }
+        final LanternContainer container = this.containerSession.getOpenContainer();
+        (container == null ? this.inventoryContainer : container).streamSlotChanges();
     }
 
     /**

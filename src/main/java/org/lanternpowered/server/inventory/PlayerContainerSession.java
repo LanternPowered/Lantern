@@ -163,7 +163,7 @@ public class PlayerContainerSession {
         this.updateCursorItem();
     }
 
-    void updateCursorItem() {
+    private void updateCursorItem() {
         this.player.getConnection().send(
                 new MessagePlayOutSetWindowSlot(-1, -1, this.cursorItem));
     }

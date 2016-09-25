@@ -65,6 +65,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutConfirmWindowTransaction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityCollectItem;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityLookAndRelativeMove;
@@ -184,6 +185,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutConfirmWindowTransaction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLookAndRelativeMove;
@@ -414,7 +416,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x39, CodecPlayOutEntityMetadata.class, MessagePlayOutEntityMetadata.class);
         // 0x3a
         outbound.bind(0x3b, CodecPlayOutEntityVelocity.class, MessagePlayOutEntityVelocity.class);
-        // 0x3c
+        outbound.bind(0x3c, CodecPlayOutEntityEquipment.class, MessagePlayOutEntityEquipment.class);
         outbound.bind(0x3d, CodecPlayOutSetExperience.class, MessagePlayOutSetExperience.class);
         outbound.bind(0x3e, CodecPlayOutPlayerHealthUpdate.class, MessagePlayOutPlayerHealthUpdate.class);
         final CodecRegistration<MessagePlayOutScoreboardObjective, CodecPlayOutScoreboardObjective> codecPlayOutScoreboardObjective = outbound.bind(

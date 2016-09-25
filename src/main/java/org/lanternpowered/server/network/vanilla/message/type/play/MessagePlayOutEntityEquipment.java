@@ -23,42 +23,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.text.translation.Translation;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.lanternpowered.server.network.message.Message;
 
 import javax.annotation.Nullable;
 
-public class PlayerInventoryContainer extends LanternContainer {
+public class MessagePlayOutEntityEquipment implements Message {
 
-    public PlayerInventoryContainer(@Nullable Translation name, LanternPlayerInventory playerInventory) {
-        super(name, playerInventory, null);
+    private final int entityId;
+    private final int slotIndex;
+    @Nullable private final Object itemStack;
+
+    public MessagePlayOutEntityEquipment(int entityId, int slotIndex, Object itemStack) {
+        this.entityId = entityId;
+        this.slotIndex = slotIndex;
+        this.itemStack = itemStack;
     }
 
-    @Override
-    protected void openInventoryFor(LanternPlayer viewer) {
+    public int getEntityId() {
+        return this.entityId;
     }
 
-    @Override
-    void queueSlotChange(Slot slot, boolean silent) {
-        this.queueHumanSlotChange(slot, silent);
+    @Nullable
+    public Object getItem() {
+        return this.itemStack;
     }
 
-    @Override
-    Set<Player> getRawViewers() {
-        final Player player = this.playerInventory.getCarrier().orElse(null);
-        if (player != null) {
-            final Set<Player> viewers = new HashSet<>(this.viewers);
-            viewers.add(player);
-            return viewers;
-        }
-        return this.viewers;
+    public int getSlotIndex() {
+        return this.slotIndex;
     }
 }

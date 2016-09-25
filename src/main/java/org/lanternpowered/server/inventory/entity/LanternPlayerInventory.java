@@ -115,19 +115,19 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
 
         // Generate inventory views
         this.inventoryViews.put(HumanInventoryView.MAIN,
-                this.generateMainView(this, mainInventory));
+                this.generateMainView(this, this.mainInventory));
         this.inventoryViews.put(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR,
-                this.generateReverseMainAndHotbarView(this, mainInventory));
-        final InventoryBase priorityMainAndHotbarView = this.generatePriorityMainAndHotbarView(this, mainInventory);
+                this.generateReverseMainAndHotbarView(this, this.mainInventory));
+        final InventoryBase priorityMainAndHotbarView = this.generatePriorityMainAndHotbarView(this, this.mainInventory);
         this.inventoryViews.put(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR,
                 priorityMainAndHotbarView);
         this.inventoryViews.put(HumanInventoryView.ALL_PRIORITY_MAIN,
-                this.generateAllPriorityMainView(mainInventory));
+                this.generateAllPriorityMainView(this.mainInventory));
         this.inventoryViews.put(HumanInventoryView.RAW_INVENTORY,
-                this.generateRawInventoryView(mainInventory, equipmentInventory, offHandSlot));
+                this.generateRawInventoryView(this.mainInventory, this.equipmentInventory, this.offHandSlot));
 
         // This is the default views/inventories
-        this.inventoryViews.put(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR, mainInventory);
+        this.inventoryViews.put(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR, this.mainInventory);
         this.inventoryViews.put(HumanInventoryView.HOTBAR, this.hotbar);
     }
 

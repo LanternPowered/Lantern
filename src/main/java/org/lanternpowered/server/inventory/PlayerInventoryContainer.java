@@ -48,7 +48,7 @@ public class PlayerInventoryContainer extends LanternContainer {
 
     @Override
     void queueSlotChange(Slot slot, boolean silent) {
-        this.queueHumanSlotChange(slot, silent);
+        this.queueSlotChange0(slot, silent);
     }
 
     @Override

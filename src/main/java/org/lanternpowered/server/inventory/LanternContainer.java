@@ -86,7 +86,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             this.registerChild(openInventory);
             this.registerChild(mainInventory);
             this.windowId = windowIdCounter++;
-            if (windowIdCounter >= 127) {
+            if (windowIdCounter >= 100) {
                 windowIdCounter = 1;
             }
             this.openInventory = (LanternOrderedInventory) openInventory;
@@ -168,17 +168,12 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
 
     void queueSlotChange(Slot slot, boolean silent) {
         if (!this.viewers.isEmpty()) {
-            int index = this.openInventory.getSlotIndex(slot);
-            if (index != -1) {
-                this.dirtySlots.put((LanternSlot) slot, silent);
-            } else {
-                this.queueHumanSlotChange(slot, silent);
-            }
+            this.queueSlotChange0(slot, silent);
         }
     }
 
-    void queueHumanSlotChange(Slot slot, boolean silent) {
-        int index = this.playerInventory.getSlotIndex(slot);
+    void queueSlotChange0(Slot slot, boolean silent) {
+        int index = this.getSlotIndex(slot);
         if (index != -1) {
             this.dirtySlots.put((LanternSlot) slot, silent);
         }
@@ -194,7 +189,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             final LanternSlot slot = entry.getKey();
             int windowId = this.windowId;
             int index = -1;
-            if (entry.getValue() || !(slot.parent() instanceof Hotbar)) {
+            if (entry.getValue() && slot.parent() instanceof Hotbar) {
                 index = ((LanternOrderedInventory) this.playerInventory.getInventoryView(HumanInventoryView.RAW_INVENTORY)).getSlotIndex(slot);
             }
             if (index == -1) {
@@ -202,14 +197,12 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             } else {
                 windowId = -2;
             }
-            System.out.println(windowId + " " + index);
             if (index != -1) {
                 messages.add(new MessagePlayOutSetWindowSlot(windowId, index, slot.peek().orElse(null)));
             }
         }
         this.dirtySlots.clear();
         if (!messages.isEmpty()) {
-            System.out.println(this.getRawViewers().size());
             this.getRawViewers().forEach(player -> ((LanternPlayer) player).getConnection().send(messages));
         }
     }

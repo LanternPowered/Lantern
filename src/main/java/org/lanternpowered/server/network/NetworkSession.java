@@ -680,17 +680,13 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // Don't bother checking if we are in the event loop,
         // there is only one message.
         final ChannelPromise voidPromise = this.channel.voidPromise();
-        if (it.hasNext()) {
+        if (!it.hasNext()) {
             this.channel.writeAndFlush(message, voidPromise);
         } else {
             final EventLoop eventLoop = this.channel.eventLoop();
             if (eventLoop.inEventLoop()) {
-                while (true) {
-                    this.channel.writeAndFlush(message, voidPromise);
-                    if (!it.hasNext()) {
-                        break;
-                    }
-                    message = it.next();
+                for (Message message0 : messages) {
+                    this.channel.writeAndFlush(message0, voidPromise);
                 }
             } else {
                 // If there are more then one message, combine them inside the

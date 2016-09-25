@@ -39,7 +39,7 @@ public final class CodecPlayOutSetWindowSlot implements Codec<MessagePlayOutSetW
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSetWindowSlot message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeByte((byte) message.getWindow());
         buf.writeShort((short) message.getIndex());
         final Object item = message.getItem();

@@ -41,7 +41,6 @@ public final class HandlerPlayInPickItem implements Handler<MessagePlayInPickIte
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPickItem message) {
-        System.out.println("DEBUG");
         final LanternPlayerInventory humanInventory = context.getSession().getPlayer().getInventory();
         final LanternSlot slot = humanInventory.getSlotAt(message.getSlot()).orElse(null);
         if (slot != null) {
@@ -49,7 +48,7 @@ public final class HandlerPlayInPickItem implements Handler<MessagePlayInPickIte
 
             // The slot we will swap items with
             LanternSlot hotbarSlot = hotbar.getSelectedSlot();
-            if (!hotbarSlot.peek().isPresent()) {
+            if (hotbarSlot.peek().isPresent()) {
                 final Optional<LanternSlot> optSlot = hotbar.getSlots().stream()
                         .filter(slot1 -> !slot1.peek().isPresent())
                         .findFirst();

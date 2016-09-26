@@ -33,6 +33,8 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
@@ -91,8 +93,7 @@ public final class LanternWorldProperties implements WorldProperties {
     // The rules of the world
     private final Rules rules = new Rules(this);
 
-    // This is a map added by sponge, not sure what it is supposed to do yet
-    final List<UUID> pendingUniqueIds = Lists.newArrayList();
+    private final TrackerIdAllocator trackerIdAllocator = new TrackerIdAllocator();
 
     // The serialization behavior
     SerializationBehavior serializationBehavior = SerializationBehaviors.AUTOMATIC;
@@ -840,5 +841,9 @@ public final class LanternWorldProperties implements WorldProperties {
 
     public TimeData getTimeData() {
         return this.timeData;
+    }
+
+    public TrackerIdAllocator getTrackerIdAllocator() {
+        return this.trackerIdAllocator;
     }
 }

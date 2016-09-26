@@ -38,7 +38,6 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.UUID;
 
-@NonnullByDefault
 public class LanternEntityLiving extends LanternEntity implements Living {
 
     private Vector3d headRotation = Vector3d.ZERO;

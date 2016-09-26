@@ -52,10 +52,11 @@ import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_MAS
 import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_SIZE;
 
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Lists;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
+import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.NibbleArray;
 import org.lanternpowered.server.world.chunk.LanternChunk;
@@ -103,6 +104,10 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final DataQuery BIOMES_EXTRA = DataQuery.of("BiomesE"); // byte array
     private static final DataQuery HEIGHT_MAP = DataQuery.of("HeightMap");  // int array
     private static final DataQuery LAST_UPDATE = DataQuery.of("LastUpdate"); // long
+    private static final DataQuery TRACKER_DATA_TABLE = DataQuery.of("BlockPosTable");
+    private static final DataQuery TRACKER_BLOCK_POS = DataQuery.of("pos");
+    private static final DataQuery TRACKER_ENTRY_CREATOR = DataQuery.of("owner");
+    private static final DataQuery TRACKER_ENTRY_NOTIFIER = DataQuery.of("notifier");
 
     private final WorldProperties properties;
     private final RegionFileCache cache;
@@ -130,37 +135,37 @@ public class AnvilChunkIOService implements ChunkIOService {
         int x = chunk.getX();
         int z = chunk.getZ();
 
-        RegionFile region = this.cache.getRegionFileByChunk(x, z);
-        int regionX = x & REGION_MASK;
-        int regionZ = z & REGION_MASK;
+        final RegionFile region = this.cache.getRegionFileByChunk(x, z);
+        final int regionX = x & REGION_MASK;
+        final int regionZ = z & REGION_MASK;
 
-        DataInputStream is = region.getChunkDataInputStream(regionX, regionZ);
+        final DataInputStream is = region.getChunkDataInputStream(regionX, regionZ);
         if (is == null) {
             return false;
         }
 
-        DataView levelTag;
+        final DataView levelDataView;
         try (NbtDataContainerInputStream nbt = new NbtDataContainerInputStream(is)) {
-            levelTag = nbt.read().getView(LEVEL).get();
+            levelDataView = nbt.read().getView(LEVEL).get();
         }
 
         // read the vertical sections
-        List<DataView> sectionList = levelTag.getViewList(SECTIONS).get();
-        ChunkSection[] sections = new ChunkSection[16];
+        final List<DataView> sectionList = levelDataView.getViewList(SECTIONS).get();
+        final ChunkSection[] sections = new ChunkSection[16];
 
         for (DataView sectionTag : sectionList) {
-            int y = sectionTag.getInt(Y).get();
-            byte[] rawTypes = (byte[]) sectionTag.get(BLOCKS).get();
+            final int y = sectionTag.getInt(Y).get();
+            final byte[] rawTypes = (byte[]) sectionTag.get(BLOCKS).get();
 
-            byte[] extTypes = sectionTag.contains(BLOCKS_EXTRA) ? (byte[]) sectionTag.get(BLOCKS_EXTRA).get() : null;
-            byte[] data = (byte[]) sectionTag.get(DATA).get();
-            byte[] blockLight = (byte[]) sectionTag.get(BLOCK_LIGHT).get();
-            byte[] skyLight = (byte[]) sectionTag.get(SKY_LIGHT).get();
+            final byte[] extTypes = sectionTag.contains(BLOCKS_EXTRA) ? (byte[]) sectionTag.get(BLOCKS_EXTRA).get() : null;
+            final byte[] data = (byte[]) sectionTag.get(DATA).get();
+            final byte[] blockLight = (byte[]) sectionTag.get(BLOCK_LIGHT).get();
+            final byte[] skyLight = (byte[]) sectionTag.get(SKY_LIGHT).get();
 
-            NibbleArray dataArray = new NibbleArray(rawTypes.length, data, true);
-            NibbleArray extTypesArray = extTypes == null ? null : new NibbleArray(rawTypes.length, extTypes, true);
+            final NibbleArray dataArray = new NibbleArray(rawTypes.length, data, true);
+            final NibbleArray extTypesArray = extTypes == null ? null : new NibbleArray(rawTypes.length, extTypes, true);
 
-            short[] types = new short[rawTypes.length];
+            final short[] types = new short[rawTypes.length];
             for (int i = 0; i < rawTypes.length; i++) {
                 types[i] = (short) ((extTypesArray == null ? 0 : extTypesArray.get(i)) << 12 | ((rawTypes[i] & 0xff) << 4) | dataArray.get(i));
             }
@@ -169,13 +174,38 @@ public class AnvilChunkIOService implements ChunkIOService {
                     new NibbleArray(rawTypes.length, blockLight, true));
         }
 
+
+        final DataView spongeDataView = levelDataView.getView(DataQueries.SPONGE_DATA).orElse(null);
+        final List<DataView> trackerDataViews = spongeDataView == null ? null : levelDataView.getViewList(TRACKER_DATA_TABLE).orElse(null);
+
+        //noinspection unchecked
+        final Short2ObjectMap<LanternChunk.TrackerData>[] trackerData = chunk.getTrackerData().getRawObjects();
+
+        if (trackerDataViews != null) {
+            for (DataView dataView : trackerDataViews) {
+                final Optional<Short> optIndex = dataView.getShort(TRACKER_BLOCK_POS);
+                if (!optIndex.isPresent()) {
+                    continue;
+                }
+                final int creatorId = dataView.getInt(TRACKER_ENTRY_CREATOR).orElse(-1);
+                final int notifierId = dataView.getInt(TRACKER_ENTRY_NOTIFIER).orElse(-1);
+                // index = z << 12 | y << 4 | x
+                short index = optIndex.get();
+                final short section = (short) ((index >> 8) & 0xf);
+                // Convert the index to the section based system
+                // index = y << 8 | z << 4 | x
+                index = ChunkSection.index(index & 0xf, (index >> 4) & 0xf, index >> 12);
+                trackerData[section].put(index, new LanternChunk.TrackerData(creatorId, notifierId));
+            }
+        }
+
         // initialize the chunk
         chunk.initializeSections(sections);
-        chunk.setPopulated(levelTag.getInt(TERRAIN_POPULATED).orElse(0) > 0);
+        chunk.setPopulated(levelDataView.getInt(TERRAIN_POPULATED).orElse(0) > 0);
 
-        if (levelTag.contains(BIOMES)) {
-            byte[] biomes = (byte[]) levelTag.get(BIOMES).get();
-            byte[] biomesExtra = (byte[]) (levelTag.contains(BIOMES_EXTRA) ? levelTag.get(BIOMES_EXTRA).get() : null);
+        if (levelDataView.contains(BIOMES)) {
+            byte[] biomes = (byte[]) levelDataView.get(BIOMES).get();
+            byte[] biomesExtra = (byte[]) (levelDataView.contains(BIOMES_EXTRA) ? levelDataView.get(BIOMES_EXTRA).get() : null);
             short[] newBiomes = new short[biomes.length];
             for (int i = 0; i < biomes.length; i++) {
                 newBiomes[i] = (short) ((biomesExtra == null ? 0 : biomesExtra[i]) << 8 | biomes[i]);
@@ -184,13 +214,13 @@ public class AnvilChunkIOService implements ChunkIOService {
         }
 
         Object heightMap;
-        if (levelTag.contains(HEIGHT_MAP) && (heightMap = levelTag.get(HEIGHT_MAP).get()) instanceof int[]) {
+        if (levelDataView.contains(HEIGHT_MAP) && (heightMap = levelDataView.get(HEIGHT_MAP).get()) instanceof int[]) {
             chunk.initializeHeightMap((int[]) heightMap);
         } else {
             chunk.initializeHeightMap(null);
         }
 
-        chunk.setLightPopulated(levelTag.getInt(LIGHT_POPULATED).orElse(0) > 0);
+        chunk.setLightPopulated(levelDataView.getInt(LIGHT_POPULATED).orElse(0) > 0);
         chunk.initializeLight();
 
         /*
@@ -239,43 +269,43 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public void write(LanternChunk chunk) throws IOException {
-        int x = chunk.getX();
-        int z = chunk.getZ();
+        final int x = chunk.getX();
+        final int z = chunk.getZ();
 
-        RegionFile region = this.cache.getRegionFileByChunk(x, z);
+        final RegionFile region = this.cache.getRegionFileByChunk(x, z);
 
-        int regionX = x & REGION_MASK;
-        int regionZ = z & REGION_MASK;
+        final int regionX = x & REGION_MASK;
+        final int regionZ = z & REGION_MASK;
 
-        DataContainer root = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-        DataView levelTags = root.createView(LEVEL);
+        final DataContainer rootView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataView levelDataView = rootView.createView(LEVEL);
 
         // Core properties
-        levelTags.set(VERSION, (byte) 1);
-        levelTags.set(X, chunk.getX());
-        levelTags.set(Z, chunk.getZ());
-        levelTags.set(TERRAIN_POPULATED, (byte) (chunk.isPopulated() ? 1 : 0));
-        levelTags.set(LIGHT_POPULATED, (byte) (chunk.isLightPopulated() ? 1 : 0));
-        levelTags.set(LAST_UPDATE, 0L);
+        levelDataView.set(VERSION, (byte) 1);
+        levelDataView.set(X, chunk.getX());
+        levelDataView.set(Z, chunk.getZ());
+        levelDataView.set(TERRAIN_POPULATED, (byte) (chunk.isPopulated() ? 1 : 0));
+        levelDataView.set(LIGHT_POPULATED, (byte) (chunk.isLightPopulated() ? 1 : 0));
+        levelDataView.set(LAST_UPDATE, 0L);
 
         // Chunk sections
-        ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(true);
-        List<DataView> sectionTags = new ArrayList<>();
+        final ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(true);
+        final List<DataView> sectionDataViews = new ArrayList<>();
 
         for (byte i = 0; i < sections.length; ++i) {
-            ChunkSectionSnapshot section = sections[i];
+            final ChunkSectionSnapshot section = sections[i];
             if (section == null) {
                 continue;
             }
 
-            DataContainer sectionTag = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-            sectionTag.set(Y, i);
+            final DataContainer sectionDataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            sectionDataView.set(Y, i);
 
-            byte[] rawTypes = new byte[section.types.length];
-            short[] types = section.types;
+            final byte[] rawTypes = new byte[section.types.length];
+            final short[] types = section.types;
 
             NibbleArray extTypes = null;
-            NibbleArray data = new NibbleArray(rawTypes.length);
+            final NibbleArray data = new NibbleArray(rawTypes.length);
 
             for (int j = 0; j < rawTypes.length; j++) {
                 rawTypes[j] = (byte) ((types[j] >> 4) & 0xff);
@@ -288,23 +318,50 @@ public class AnvilChunkIOService implements ChunkIOService {
                 }
                 data.set(j, (byte) (types[j] & 0xf));
             }
-            sectionTag.set(BLOCKS, rawTypes);
+            sectionDataView.set(BLOCKS, rawTypes);
             if (extTypes != null) {
-                sectionTag.set(BLOCKS_EXTRA, extTypes.getPackedArray());
+                sectionDataView.set(BLOCKS_EXTRA, extTypes.getPackedArray());
             }
-            sectionTag.set(DATA, data.getPackedArray());
-            sectionTag.set(BLOCK_LIGHT, section.lightFromBlock);
-            sectionTag.set(SKY_LIGHT, section.lightFromSky);
+            sectionDataView.set(DATA, data.getPackedArray());
+            sectionDataView.set(BLOCK_LIGHT, section.lightFromBlock);
 
-            sectionTags.add(sectionTag);
+            final byte[] lightFromSky = section.lightFromSky;
+            if (lightFromSky != null) {
+                sectionDataView.set(SKY_LIGHT, lightFromSky);
+            }
+
+            sectionDataViews.add(sectionDataView);
         }
 
-        levelTags.set(SECTIONS, sectionTags);
-        levelTags.set(HEIGHT_MAP, chunk.getHeightMap());
+        levelDataView.set(SECTIONS, sectionDataViews);
+        levelDataView.set(HEIGHT_MAP, chunk.getHeightMap());
 
-        short[] biomes = chunk.getBiomes();
+        //noinspection unchecked
+        final Short2ObjectMap<LanternChunk.TrackerData>[] trackerData = chunk.getTrackerData().getRawObjects();
+        final List<DataView> trackerDataViews = new ArrayList<>();
 
-        byte[] biomes0 = new byte[biomes.length];
+        for (int i = 0; i < trackerData.length; i++) {
+            final Short2ObjectMap<LanternChunk.TrackerData> trackerDataSection = trackerData[i];
+            for (Short2ObjectMap.Entry<LanternChunk.TrackerData> entry : trackerDataSection.short2ObjectEntrySet()) {
+                // index = y << 8 | z << 4 | x
+                short index = entry.getShortKey();
+                // Convert the index to the column based system
+                // index = z << 12 | y << 4 | x
+                index = (short) (((index >> 4) & 0xf) << 12 | i << 8 | index >> 4 | index & 0xf);
+                final DataView trackerDataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                trackerDataView.set(TRACKER_BLOCK_POS, index);
+                trackerDataView.set(TRACKER_ENTRY_NOTIFIER, entry.getValue().getNotifierId());
+                trackerDataView.set(TRACKER_ENTRY_CREATOR, entry.getValue().getCreatorId());
+                trackerDataViews.add(trackerDataView);
+            }
+        }
+
+        if (!trackerDataViews.isEmpty()) {
+            levelDataView.createView(DataQueries.SPONGE_DATA).set(TRACKER_DATA_TABLE, trackerDataViews);
+        }
+
+        final short[] biomes = chunk.getBiomes();
+        final byte[] biomes0 = new byte[biomes.length];
         byte[] biomes1 = null;
 
         for (int i = 0; i < biomes.length; i++) {
@@ -318,13 +375,13 @@ public class AnvilChunkIOService implements ChunkIOService {
             }
         }
 
-        levelTags.set(BIOMES, biomes0);
+        levelDataView.set(BIOMES, biomes0);
         if (biomes1 != null) {
-            levelTags.set(BIOMES_EXTRA, biomes1);
+            levelDataView.set(BIOMES_EXTRA, biomes1);
         }
 
         try (NbtDataContainerOutputStream nbt = new NbtDataContainerOutputStream(region.getChunkDataOutputStream(regionX, regionZ))) {
-            nbt.write(root);
+            nbt.write(rootView);
         }
     }
 
@@ -370,8 +427,8 @@ public class AnvilChunkIOService implements ChunkIOService {
                 }
 
                 try {
-                    DataInputStream is = this.region.getChunkDataInputStream(this.chunkX, this.chunkZ);
-                    DataContainer data;
+                    final DataInputStream is = this.region.getChunkDataInputStream(this.chunkX, this.chunkZ);
+                    final DataContainer data;
 
                     try (NbtDataContainerInputStream nbt = new NbtDataContainerInputStream(is)) {
                         data = nbt.read();

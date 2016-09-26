@@ -27,66 +27,50 @@ package org.lanternpowered.server.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
-public final class LanternEntityType extends SimpleCatalogType.Base implements EntityType {
+import java.util.UUID;
+import java.util.function.Function;
+
+public final class LanternEntityType<E extends LanternEntity> extends PluginCatalogType.Base.Translatable implements EntityType {
 
     private final Class<? extends Entity> entityClass;
-    private final String minecraftId;
-    private final Translation name;
+    private final Function<UUID, E> entityConstructor;
 
-    /**
-     * Creates a new entity type.
-     *
-     * @param identifier the identifier
-     * @param entityClass the entity class
-     * @param name the name
-     */
-    public LanternEntityType(String identifier, Class<? extends Entity> entityClass, Translation name) {
-        this(identifier, identifier, entityClass, name);
+    public LanternEntityType(String pluginId, String name, String translation,
+            Function<UUID, E> entityConstructor) {
+        super(pluginId, name, translation);
+        this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
+        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
     }
 
-    /**
-     * Creates a new entity type.
-     *
-     * @param identifier the identifier
-     * @param minecraftId the minecraft identifier (for internal use)
-     * @param entityClass the entity class
-     */
-    public LanternEntityType(String identifier, String minecraftId, Class<? extends Entity> entityClass) {
-        this(identifier, minecraftId, entityClass, Lantern.getGame().getRegistry().getTranslationManager().get(
-                "entity." + minecraftId + ".name"));
+    public LanternEntityType(String pluginId, String name, Translation translation,
+            Function<UUID, E> entityConstructor) {
+        super(pluginId, name, translation);
+        this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
+        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
     }
 
-    /**
-     * Creates a new entity type.
-     *
-     * @param identifier the identifier
-     * @param minecraftId the minecraft identifier (for internal use)
-     * @param entityClass the entity class
-     * @param name the name
-     */
-    private LanternEntityType(String identifier, String minecraftId, Class<? extends Entity> entityClass, Translation name) {
-        super(identifier);
-
-        this.entityClass = checkNotNull(entityClass, "entityClass");
-        this.minecraftId = checkNotNull(minecraftId, "minecraftId");
-        this.name = checkNotNull(name, "name");
+    public LanternEntityType(String pluginId, String id, String name, String translation,
+            Function<UUID, E> entityConstructor) {
+        super(pluginId, id, name, translation);
+        this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
+        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
     }
 
-    public String getMinecraftId() {
-        return this.minecraftId;
+    public LanternEntityType(String pluginId, String id, String name, Translation translation,
+            Function<UUID, E> entityConstructor) {
+        super(pluginId, id, name, translation);
+        this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
+        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
     }
 
-    @Override
-    public Translation getTranslation() {
-        return this.name;
+    public Function<UUID, E> getEntityConstructor() {
+        return this.entityConstructor;
     }
 
     @Override
@@ -94,4 +78,8 @@ public final class LanternEntityType extends SimpleCatalogType.Base implements E
         return this.entityClass;
     }
 
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("entityClass", this.entityClass);
+    }
 }

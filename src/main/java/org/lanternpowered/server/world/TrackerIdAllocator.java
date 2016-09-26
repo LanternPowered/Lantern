@@ -23,33 +23,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.world;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
+public final class TrackerIdAllocator {
 
-    public LanternEntityHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    private final List<UUID> uniqueIdsByIndex = new ArrayList<>();
+    private final Object2IntMap<UUID> uniqueIds = new Object2IntOpenHashMap<>();
+
+    /**
+     * Gets the index for the specified {@link UUID}.
+     *
+     * @param uniqueId The unique id
+     * @return The tracking id
+     */
+    public synchronized int get(UUID uniqueId) {
+        return this.uniqueIds.computeIfAbsent(uniqueId, uniqueId0 -> {
+            final int index = this.uniqueIdsByIndex.size();
+            this.uniqueIdsByIndex.add(uniqueId0);
+            return index;
+        });
     }
 
-    public LanternEntityHumanoid() {
-        super();
+    public synchronized Optional<UUID> get(int trackingId) {
+        return trackingId < 0 || trackingId > this.uniqueIdsByIndex.size() ? Optional.empty() :
+                Optional.ofNullable(this.uniqueIdsByIndex.get(trackingId));
     }
 
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
+    Object2IntMap<UUID> getUniqueIds() {
+        return this.uniqueIds;
     }
 
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
+    List<UUID> getUniqueIdsByIndex() {
+        return this.uniqueIdsByIndex;
     }
 }

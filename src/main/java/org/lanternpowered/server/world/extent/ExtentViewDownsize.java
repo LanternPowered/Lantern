@@ -572,9 +572,9 @@ public class ExtentViewDownsize implements AbstractExtent {
 
     @Override
     public Optional<Entity> getEntity(UUID uuid) {
-        Optional<Entity> optEntity = this.extent.getEntity(uuid);
+        final Optional<Entity> optEntity = this.extent.getEntity(uuid);
         if (optEntity.isPresent()) {
-            Vector3d pos = ((LanternEntity) optEntity.get()).getPosition();
+            final Vector3d pos = ((LanternEntity) optEntity.get()).getPosition();
             if (VecHelper.inBounds(pos.getFloorX(), pos.getFloorY(), pos.getFloorZ(), this.blockMin, this.blockMax)) {
                 return optEntity;
             }
@@ -689,23 +689,6 @@ public class ExtentViewDownsize implements AbstractExtent {
         this.checkRange(min.getX(), min.getY(), min.getZ());
         this.checkRange(max.getX(), max.getY(), max.getZ());
         return this.extent.createArchetypeVolume(min, max, origin);
-    }
-
-    private static class EntityInBounds implements Predicate<Entity> {
-
-        private final Vector3i min;
-        private final Vector3i max;
-
-        private EntityInBounds(Vector3i min, Vector3i max) {
-            this.min = min;
-            this.max = max;
-        }
-
-        @Override
-        public boolean test(Entity input) {
-            final Location<World> block = input.getLocation();
-            return VecHelper.inBounds(block.getX(), block.getY(), block.getZ(), this.min, this.max);
-        }
     }
 
     private static class TileEntityInBounds implements Predicate<TileEntity> {

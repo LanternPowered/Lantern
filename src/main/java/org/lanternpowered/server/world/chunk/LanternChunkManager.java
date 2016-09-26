@@ -45,6 +45,7 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.Lantern;
@@ -1008,8 +1009,9 @@ public final class LanternChunkManager {
         // Create the chunk sections
         final ChunkSection[] sections = new ChunkSection[CHUNK_SECTIONS];
         for (int sy = 0; sy < CHUNK_SECTIONS; sy++) {
-            if (blockBuffer.nonAirCount[sy] > 0) {
-                sections[sy] = new ChunkSection(blockBuffer.types[sy]);
+            final int nonAirCount = blockBuffer.nonAirCount[sy];
+            if (nonAirCount > 0) {
+                sections[sy] = new ChunkSection(blockBuffer.types[sy], nonAirCount);
             }
         }
 

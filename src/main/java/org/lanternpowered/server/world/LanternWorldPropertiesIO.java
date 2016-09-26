@@ -28,6 +28,7 @@ package org.lanternpowered.server.world;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.IOHelper;
 import org.lanternpowered.server.data.persistence.nbt.NbtStreamUtils;
@@ -66,6 +67,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -131,13 +133,15 @@ final class LanternWorldPropertiesIO {
     private final static DataQuery DIMENSION_ARRAY = DataQuery.of("DimensionArray");
 
     // Sponge properties
-    private final static DataQuery UUID_MOST = DataQuery.of("uuid_most");
-    private final static DataQuery UUID_LEAST = DataQuery.of("uuid_least");
+    private final static DataQuery UUID_MOST = DataQuery.of("UUIDMost");
+    private final static DataQuery UUID_LEAST = DataQuery.of("UUIDLeast");
+    private final static DataQuery OLD_UUID_MOST = DataQuery.of("uuid_most");
+    private final static DataQuery OLD_UUID_LEAST = DataQuery.of("uuid_least");
     private final static DataQuery PORTAL_AGENT_TYPE = DataQuery.of("portalAgentType");
     private final static DataQuery DIMENSION_TYPE = DataQuery.of("dimensionType");
     private final static DataQuery DIMENSION_INDEX = DataQuery.of("dimensionId");
     private final static DataQuery GENERATOR_MODIFIERS = DataQuery.of("generatorModifiers");
-    private final static DataQuery PLAYER_UUID_TABLE = DataQuery.of("PlayerIdTable");
+    private final static DataQuery TRACKER_UUID_TABLE = DataQuery.of("PlayerIdTable");
     private final static DataQuery ENABLED = DataQuery.of("enabled");
     private final static DataQuery KEEP_SPAWN_LOADED = DataQuery.of("keepSpawnLoaded");
     private final static DataQuery LOAD_ON_STARTUP = DataQuery.of("loadOnStartup");
@@ -177,8 +181,8 @@ final class LanternWorldPropertiesIO {
         if (uniqueId == null) {
             // Try for the sponge (lantern) storage format
             if (spongeContainer != null) {
-                final Long most = spongeContainer.getLong(UUID_MOST).orElse(null);
-                final Long least = spongeContainer.getLong(UUID_LEAST).orElse(null);
+                final Long most = spongeContainer.getLong(UUID_MOST).orElseGet(() -> spongeContainer.getLong(OLD_UUID_MOST).orElse(null));
+                final Long least = spongeContainer.getLong(UUID_LEAST).orElseGet(() -> spongeContainer.getLong(OLD_UUID_LEAST).orElse(null));
                 if (most != null && least != null) {
                     uniqueId = new UUID(most, least);
                 }
@@ -278,18 +282,28 @@ final class LanternWorldPropertiesIO {
             }
             properties.setPortalAgentType(portalAgentType == null ? PortalAgentTypes.DEFAULT : portalAgentType);
 
-            if (spongeDataView.contains(PLAYER_UUID_TABLE)) {
-                List<DataView> views = spongeDataView.getViewList(PLAYER_UUID_TABLE).get();
-                for (DataView view : views) {
-                    long most = view.getLong(UUID_MOST).get();
-                    long least = view.getLong(UUID_LEAST).get();
-                    properties.pendingUniqueIds.add(new UUID(most, least));
-                }
-            }
-
             spongeDataView.getInt(GENERATE_BONUS_CHEST).ifPresent(v -> properties.setGenerateBonusChest(v > 0));
             spongeDataView.getInt(SERIALIZATION_BEHAVIOR).ifPresent(v -> properties.setSerializationBehavior(
                     v == 0 ? SerializationBehaviors.MANUAL : v == 1 ? SerializationBehaviors.AUTOMATIC : SerializationBehaviors.NONE));
+
+            // Tracker
+            final Optional<List<DataView>> optTrackerUniqueIdViews = spongeDataView.getViewList(TRACKER_UUID_TABLE);
+            if (optTrackerUniqueIdViews.isPresent()) {
+                final List<DataView> trackerUniqueIdViews = optTrackerUniqueIdViews.get();
+                final Object2IntMap<UUID> trackerUniqueIds = properties.getTrackerIdAllocator().getUniqueIds();
+                final List<UUID> uniqueIdsByIndex = properties.getTrackerIdAllocator().getUniqueIdsByIndex();
+
+                for (DataView view : trackerUniqueIdViews) {
+                    UUID uniqueId = null;
+                    if (!view.isEmpty()) {
+                        final long most = view.getLong(UUID_MOST).get();
+                        final long least = view.getLong(UUID_LEAST).get();
+                        uniqueId = new UUID(most, least);
+                        trackerUniqueIds.put(uniqueId, uniqueIdsByIndex.size());
+                    }
+                    uniqueIdsByIndex.add(uniqueId);
+                }
+            }
         }
 
         // Weather
@@ -506,11 +520,8 @@ final class LanternWorldPropertiesIO {
         spongeContainer.set(PORTAL_AGENT_TYPE, properties.getPortalAgentType().getId());
         spongeContainer.set(GENERATOR_MODIFIERS, properties.generatorModifiers.stream().map(
                 CatalogType::getId).collect(Collectors.toList()));
-        spongeContainer.set(PLAYER_UUID_TABLE, properties.pendingUniqueIds.stream().map(
-                uuid -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
-                        .set(UUID_MOST, uuid.getMostSignificantBits())
-                        .set(UUID_LEAST, uuid.getLeastSignificantBits()))
-                .collect(Collectors.toList()));
+
+        // Serialization behavior
         short serializationBehaviorId = 1;
         if (properties.getSerializationBehavior() == SerializationBehaviors.MANUAL) {
             serializationBehaviorId = 0;
@@ -518,6 +529,21 @@ final class LanternWorldPropertiesIO {
             serializationBehaviorId = -1;
         }
         spongeContainer.set(SERIALIZATION_BEHAVIOR, serializationBehaviorId);
+
+        // Tracker
+        final List<DataView> trackerUniqueIdViews = new ArrayList<>();
+        final List<UUID> uniqueIdsByIndex = properties.getTrackerIdAllocator().getUniqueIdsByIndex();
+
+        for (UUID uniqueId : uniqueIdsByIndex) {
+            final DataView uniqueIdView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            if (uniqueId != null) {
+                uniqueIdView.set(UUID_MOST, uniqueId.getMostSignificantBits());
+                uniqueIdView.set(UUID_LEAST, uniqueId.getLeastSignificantBits());
+            }
+            trackerUniqueIdViews.add(uniqueIdView);
+        }
+        spongeContainer.set(TRACKER_UUID_TABLE, trackerUniqueIdViews);
+
         return new LevelData(properties.getWorldName(), properties.getUniqueId(), rootContainer,
                 spongeRootContainer, dimensionId, dimensionMap);
     }

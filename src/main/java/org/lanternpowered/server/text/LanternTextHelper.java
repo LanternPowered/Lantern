@@ -171,7 +171,8 @@ public final class LanternTextHelper {
             DataContainer dataContainer = new MemoryDataContainer();
             dataContainer.set(SHOW_ENTITY_ID, ref.getUniqueId().toString());
             dataContainer.set(SHOW_ENTITY_NAME, ref.getName());
-            ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, ((LanternEntityType) type).getMinecraftId()));
+            // TODO
+            // ref.getType().ifPresent(type -> dataContainer.set(SHOW_ENTITY_TYPE, ((LanternEntityType) type).getMinecraftId()));
 
             return new RawAction("show_entity", GSON.toJson(JsonTranslator.instance().translate(dataContainer)));
         } else if (hoverAction instanceof HoverAction.ShowItem) {

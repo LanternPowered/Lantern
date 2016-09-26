@@ -26,6 +26,7 @@
 package org.lanternpowered.server.world.extent.worker;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.block.BlockState;
@@ -47,8 +48,8 @@ public class LanternBlockVolumeWorker<V extends BlockVolume> implements BlockVol
     protected final Cause cause;
 
     public LanternBlockVolumeWorker(V volume, Cause cause) {
-        this.volume = volume;
-        this.cause = cause;
+        this.volume = checkNotNull(volume, "volume");
+        this.cause = checkNotNull(cause, "cause");
     }
 
     @Override

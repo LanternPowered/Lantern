@@ -23,54 +23,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.entity;
+package org.lanternpowered.server.game.registry.type.block;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.entity.LanternEntityType;
-import org.lanternpowered.server.entity.LanternItem;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.block.tile.LanternEnderChest;
+import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.tileentity.TileEntityType;
+import org.spongepowered.api.block.tileentity.TileEntityTypes;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<EntityType> {
+public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<TileEntityType> {
 
-    private static final EntityTypeRegistryModule INSTANCE = new EntityTypeRegistryModule();
+    private static final TileEntityTypeRegistryModule INSTANCE = new TileEntityTypeRegistryModule();
 
-    public static EntityTypeRegistryModule get() {
+    public static TileEntityTypeRegistryModule get() {
         return INSTANCE;
     }
 
-    private final Map<Class<?>, EntityType> entityTypeByClass = new HashMap<>();
+    private final Map<Class<?>, TileEntityType> tileEntityTypesByClass = new HashMap<>();
 
-    private EntityTypeRegistryModule() {
-        super(EntityTypes.class);
+    private TileEntityTypeRegistryModule() {
+        super(TileEntityTypes.class);
     }
 
     @Override
-    protected void register(EntityType catalogType, boolean disallowInbuiltPluginIds) {
+    protected void register(TileEntityType catalogType, boolean disallowInbuiltPluginIds) {
         checkNotNull(catalogType, "catalogType");
-        checkArgument(!this.entityTypeByClass.containsKey(catalogType.getClass()), "There is already a EntityType registered for the class: %s",
-                catalogType.getEntityClass().getName());
+        checkArgument(!this.tileEntityTypesByClass.containsKey(catalogType.getClass()),
+                "There is already a TileEntityType registered for the class: %s", catalogType.getTileEntityType().getName());
         super.register(catalogType, disallowInbuiltPluginIds);
-        this.entityTypeByClass.put(catalogType.getEntityClass(), catalogType);
+        this.tileEntityTypesByClass.put(catalogType.getTileEntityType(), catalogType);
     }
 
-    public Optional<EntityType> getByClass(Class<? extends Entity> entityClass) {
+    public Optional<TileEntityType> getByClass(Class<? extends TileEntity> entityClass) {
         checkNotNull(entityClass, "entityClass");
-        return Optional.ofNullable(this.entityTypeByClass.get(entityClass));
+        return Optional.ofNullable(this.tileEntityTypesByClass.get(entityClass));
     }
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternEntityType("minecraft", "player", "entity.player.name", LanternPlayer.class));
-        this.register(new LanternEntityType("minecraft", "item", "entity.Item.name", LanternItem::new));
+        this.register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
     }
 }

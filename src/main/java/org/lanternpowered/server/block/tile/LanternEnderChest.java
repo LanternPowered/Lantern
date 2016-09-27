@@ -28,15 +28,8 @@ package org.lanternpowered.server.block.tile;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.EnderChest;
-import org.spongepowered.api.block.tileentity.TileEntityType;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 public class LanternEnderChest extends LanternTileEntity implements EnderChest {
-
-    protected LanternEnderChest(TileEntityType tileEntityType) {
-        super(tileEntityType);
-    }
 
     @Override
     public BlockState getBlock() {

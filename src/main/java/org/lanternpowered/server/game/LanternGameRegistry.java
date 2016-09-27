@@ -97,6 +97,7 @@ import org.lanternpowered.server.game.registry.type.attribute.AttributeRegistryM
 import org.lanternpowered.server.game.registry.type.attribute.AttributeTargetRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockStateRegistryModule;
+import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.bossbar.BossBarOverlayRegistryModule;
 import org.lanternpowered.server.game.registry.type.cause.DamageTypeRegistryModule;
@@ -179,6 +180,7 @@ import org.spongepowered.api.GameRegistry;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.ServerBossBar;
@@ -456,6 +458,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())
                 .registerModule(EntityType.class, EntityTypeRegistryModule.get())
+                .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
                 // Script registry modules
                 .registerModule(ContextParameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

@@ -220,7 +220,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         this.properties = properties;
         this.game = game;
         // Create the chunk io service
-        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, properties);
+        final ChunkIOService chunkIOService = new AnvilChunkIOService(directory, this);
         // Get the chunk load service
         final LanternChunkTicketManager chunkLoadService = game.getChunkTicketManager();
         // Get the dimension type

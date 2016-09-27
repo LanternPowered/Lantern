@@ -32,18 +32,73 @@ import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 
+import java.lang.reflect.Field;
+import java.util.function.Supplier;
+
 public final class LanternTileEntityType extends PluginCatalogType.Base implements TileEntityType {
 
-    private final Class<? extends TileEntity> tileEntityClass;
+    private static final Field BYPASS_FIELD;
 
-    public LanternTileEntityType(String pluginId, String name, Class<? extends TileEntity> tileEntityClass) {
-        super(pluginId, name);
-        this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
+    static {
+        try {
+            BYPASS_FIELD = LanternTileEntity.class.getDeclaredField("bypassEntityTypeLookup");
+            BYPASS_FIELD.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public LanternTileEntityType(String pluginId, String id, String name, Class<? extends TileEntity> tileEntityClass) {
+    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String name,
+            Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
+        //noinspection unchecked
+        return new LanternTileEntityType(pluginId, name, tileEntityClass, (Supplier) tileEntitySupplier);
+    }
+
+    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String id, String name,
+            Class<T> tileEntityClass, Supplier<T> tileEntitySupplier) {
+        //noinspection unchecked
+        return new LanternTileEntityType(pluginId, id, name, tileEntityClass, (Supplier) tileEntitySupplier);
+    }
+
+    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String name,
+            Supplier<T> tileEntitySupplier) {
+        //noinspection unchecked
+        return new LanternTileEntityType(pluginId, name, getClass(tileEntitySupplier), (Supplier) tileEntitySupplier);
+    }
+
+    public static <T extends TileEntity> LanternTileEntityType of(String pluginId, String id, String name,
+            Supplier<T> tileEntitySupplier) {
+        //noinspection unchecked
+        return new LanternTileEntityType(pluginId, id, name, getClass(tileEntitySupplier), (Supplier) tileEntitySupplier);
+    }
+
+    private static Class<? extends TileEntity> getClass(Supplier<? extends TileEntity> tileEntitySupplier) {
+        try {
+            BYPASS_FIELD.set(null, true);
+            final Class<? extends TileEntity> tileEntityClass = tileEntitySupplier.get().getClass();
+            BYPASS_FIELD.set(null, false);
+            //noinspection unchecked
+            return tileEntityClass;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final Class<? extends TileEntity> tileEntityClass;
+    private final Supplier<TileEntity> tileEntityConstructor;
+
+    private LanternTileEntityType(String pluginId, String name, Class<? extends TileEntity> tileEntityClass,
+            Supplier<TileEntity> tileEntityConstructor) {
+        super(pluginId, name);
+        this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
+        this.tileEntityConstructor = tileEntityConstructor;
+    }
+
+    private LanternTileEntityType(String pluginId, String id, String name, Class<? extends TileEntity> tileEntityClass,
+            Supplier<TileEntity> tileEntityConstructor) {
         super(pluginId, id, name);
         this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
+        this.tileEntityConstructor = tileEntityConstructor;
     }
 
     @Override
@@ -54,5 +109,9 @@ public final class LanternTileEntityType extends PluginCatalogType.Base implemen
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
         return super.toStringHelper().add("tileEntityClass", this.tileEntityClass);
+    }
+
+    public Supplier<TileEntity> getTileEntityConstructor() {
+        return this.tileEntityConstructor;
     }
 }

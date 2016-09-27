@@ -26,9 +26,12 @@
 package org.lanternpowered.server.data.io.store.tile;
 
 import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
@@ -46,8 +49,15 @@ public class TileEntitySerializer implements ObjectSerializer<LanternTileEntity>
         final String id = fixTileId(dataView, dataView.getString(ID).get());
         dataView.remove(ID);
 
-        // TODO
-        return null;
+        final LanternTileEntityType tileEntityType = (LanternTileEntityType) Sponge.getRegistry().getType(TileEntityType.class, id).orElseThrow(
+                () -> new InvalidDataException("Unknown tile entity id: " + id));
+        //noinspection unchecked
+        final ObjectStore<LanternTileEntity> store = (ObjectStore)
+                ObjectStoreRegistry.get().get(tileEntityType.getTileEntityType()).get();
+        //noinspection unchecked
+        final LanternTileEntity entity = (LanternTileEntity) tileEntityType.getTileEntityConstructor().get();
+        store.deserialize(entity, dataView);
+        return entity;
     }
 
     @Override
@@ -55,7 +65,7 @@ public class TileEntitySerializer implements ObjectSerializer<LanternTileEntity>
         final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         dataView.set(ID, object.getType().getId());
         //noinspection unchecked
-        final ObjectStore<LanternTileEntity> store = (ObjectStore<LanternTileEntity>) ObjectStoreRegistry.get().get(object.getClass()).get();
+        final ObjectStore<LanternTileEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();
         store.serialize(object, dataView);
         return dataView;
     }

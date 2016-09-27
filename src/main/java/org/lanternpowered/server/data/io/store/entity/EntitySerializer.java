@@ -54,7 +54,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
         final LanternEntityType entityType = (LanternEntityType) Sponge.getRegistry().getType(EntityType.class, id).orElseThrow(
                 () -> new InvalidDataException("Unknown entity id: " + id));
         //noinspection unchecked
-        final ObjectStore<LanternEntity> store = (ObjectStore<LanternEntity>) ObjectStoreRegistry.get().get(entityType.getEntityClass()).get();
+        final ObjectStore<LanternEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(entityType.getEntityClass()).get();
         final UUID uniqueId;
         if (store instanceof IdentifiableObjectStore) {
             uniqueId = ((IdentifiableObjectStore) store).deserializeUniqueId(dataView);
@@ -72,7 +72,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
         final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         dataView.set(ID, object.getType().getId());
         //noinspection unchecked
-        final ObjectStore<LanternEntity> store = (ObjectStore<LanternEntity>) ObjectStoreRegistry.get().get(object.getClass()).get();
+        final ObjectStore<LanternEntity> store = (ObjectStore) ObjectStoreRegistry.get().get(object.getClass()).get();
         store.serialize(object, dataView);
         if (store instanceof IdentifiableObjectStore) {
             ((IdentifiableObjectStore) store).serializeUniqueId(dataView, object.getUniqueId());

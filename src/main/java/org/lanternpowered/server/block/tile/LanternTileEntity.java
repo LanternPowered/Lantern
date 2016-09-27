@@ -29,6 +29,7 @@ import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.game.registry.type.block.TileEntityTypeRegistryModule;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
@@ -45,13 +46,21 @@ import java.util.Map;
 
 public abstract class LanternTileEntity extends BaseComponentHolder implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
 
+    private static boolean bypassEntityTypeLookup;
+
     private final TileEntityType tileEntityType;
     private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
     private volatile Location<World> location;
     private volatile boolean valid;
 
-    protected LanternTileEntity(TileEntityType tileEntityType) {
-        this.tileEntityType = tileEntityType;
+    protected LanternTileEntity() {
+        if (!bypassEntityTypeLookup) {
+            this.tileEntityType = TileEntityTypeRegistryModule.get().getByClass(this.getClass()).orElseThrow(
+                    () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
+        } else {
+            //noinspection ConstantConditions
+            this.tileEntityType = null;
+        }
     }
 
     /**

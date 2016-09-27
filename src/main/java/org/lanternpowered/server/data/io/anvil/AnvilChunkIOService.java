@@ -56,13 +56,14 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.io.ChunkIOService;
-import org.lanternpowered.server.data.io.store.ObjectStore;
-import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
+import org.lanternpowered.server.data.io.store.ObjectSerializer;
+import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
 import org.lanternpowered.server.data.util.DataQueries;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.NibbleArray;
+import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSectionSnapshot;
@@ -70,6 +71,8 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -116,16 +119,16 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final DataQuery TILE_ENTITIES = DataQuery.of("TileEntities");
     private static final DataQuery INHABITED_TIME = DataQuery.of("InhabitedTime");
 
-    private final WorldProperties properties;
+    private final LanternWorld world;
     private final RegionFileCache cache;
     private final Path baseDir;
 
     // TODO: Consider the session.lock file
 
-    public AnvilChunkIOService(Path baseDir, WorldProperties properties) {
+    public AnvilChunkIOService(Path baseDir, LanternWorld world) {
         this.cache = new RegionFileCache(baseDir);
-        this.properties = properties;
         this.baseDir = baseDir;
+        this.world = world;
     }
 
     public boolean exists(int x, int z) throws IOException {
@@ -185,6 +188,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         }
 
         levelDataView.getViewList(TILE_ENTITIES).ifPresent(tileEntityViews -> {
+            final ObjectSerializer<LanternTileEntity> tileEntitySerializer = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
             for (DataView tileEntityView : tileEntityViews) {
                 final int tileY = tileEntityView.getInt(TILE_ENTITY_Y).get();
                 final int section = tileY >> 4;
@@ -193,9 +197,15 @@ public class AnvilChunkIOService implements ChunkIOService {
                 }
                 final int tileZ = tileEntityView.getInt(TILE_ENTITY_Z).get();
                 final int tileX = tileEntityView.getInt(TILE_ENTITY_X).get();
-                final short index = ChunkSection.index(tileX, tileY & 0xf, tileZ);
 
-                // TODO: Deserialize the tile entity
+                try {
+                    final LanternTileEntity tileEntity = tileEntitySerializer.deserialize(tileEntityView);
+                    tileEntity.setLocation(new Location<>(this.world, x * 16 + tileX, tileY, z * 16 + tileZ));
+                    tileEntitySections[section].put(ChunkSection.index(tileX, tileY & 0xf, tileZ), tileEntity);
+                } catch (InvalidDataException e) {
+                    Lantern.getLogger().warn("Error loading tile entity at ({};{};{}) in the chunk ({},{}) in the world {}",
+                            tileX, tileY, tileZ, x, z, this.getWorldProperties().getWorldName(), e);
+                }
             }
         });
 
@@ -237,7 +247,7 @@ public class AnvilChunkIOService implements ChunkIOService {
             chunk.initializeBiomes(newBiomes);
         }
 
-        Object heightMap;
+        final Object heightMap;
         if (levelDataView.contains(HEIGHT_MAP) && (heightMap = levelDataView.get(HEIGHT_MAP).get()) instanceof int[]) {
             chunk.initializeHeightMap((int[]) heightMap);
         } else {
@@ -342,10 +352,8 @@ public class AnvilChunkIOService implements ChunkIOService {
                     continue;
                 }
                 //noinspection unchecked
-                final ObjectStore<LanternTileEntity> store =
-                        (ObjectStore<LanternTileEntity>) ObjectStoreRegistry.get().get(tileEntityEntry.getValue().getClass()).get();
-                final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-                store.serialize(tileEntityEntry.getValue(), dataView);
+                final ObjectSerializer<LanternTileEntity> tileEntitySerializer = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
+                final DataView dataView = tileEntitySerializer.serialize(tileEntityEntry.getValue());
                 final short pos = tileEntityEntry.getShortKey();
                 dataView.set(TILE_ENTITY_X, (int) pos & 0xf);
                 dataView.set(TILE_ENTITY_Y, (i << 4) | (pos >> 8));
@@ -564,7 +572,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
     @Override
     public WorldProperties getWorldProperties() {
-        return this.properties;
+        return this.world.getProperties();
     }
 
 }

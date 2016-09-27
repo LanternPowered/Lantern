@@ -67,9 +67,14 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
 
     @Override
     public LanternItemStack deserialize(DataView dataView) throws InvalidDataException {
-        final String identifier = dataView.getString(IDENTIFIER).get();
+        String identifier = dataView.getString(IDENTIFIER).get();
+        // Fix a identifier type in the mc server
+        if (identifier.equals("minecraft:cooked_fished")) {
+            identifier = "minecraft:cooked_fish";
+        }
+        final String identifier1 = identifier;
         final ItemType itemType = ItemRegistryModule.get().getById(identifier).orElseThrow(
-                () -> new InvalidDataException("There is no item type with the id: " + identifier));
+                () -> new InvalidDataException("There is no item type with the id: " + identifier1));
         final LanternItemStack itemStack = new LanternItemStack(itemType);
         this.deserialize(itemStack, dataView);
         return itemStack;

@@ -28,13 +28,10 @@ package org.lanternpowered.server.network.vanilla.message.type.play;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3i;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.util.VariableValueArray;
-import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
-
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
@@ -45,10 +42,8 @@ public final class MessagePlayOutChunkData implements Message {
 
     private final Section[] sections;
     @Nullable private final byte[] biomes;
-    private final Map<Vector3i, DataView> tileEntities;
 
-    public MessagePlayOutChunkData(int x, int z, boolean skylight, Section[] sections, @Nullable byte[] biomes,
-            Map<Vector3i, DataView> tileEntities) {
+    public MessagePlayOutChunkData(int x, int z, boolean skylight, Section[] sections, @Nullable byte[] biomes) {
         checkNotNull(sections, "sections");
         for (Section section : sections) {
             if (section != null) {
@@ -56,7 +51,6 @@ public final class MessagePlayOutChunkData implements Message {
                         "Skylight must be present in every section if skylight is to true, and absent if false.");
             }
         }
-        this.tileEntities = tileEntities;
         this.sections = sections;
         this.biomes = biomes;
         this.x = x;
@@ -80,10 +74,6 @@ public final class MessagePlayOutChunkData implements Message {
         return this.biomes;
     }
 
-    public Map<Vector3i, DataView> getTileEntities() {
-        return this.tileEntities;
-    }
-
     /**
      * Represents the data of chunk section.
      *
@@ -97,8 +87,11 @@ public final class MessagePlayOutChunkData implements Message {
         @Nullable private final int[] palette;
         private final byte[] blockLight;
         @Nullable private final byte[] skyLight;
+        private final Short2ObjectMap<DataView> tileEntities;
 
-        public Section(VariableValueArray types, @Nullable int[] palette, byte[] blockLight, @Nullable byte[] skyLight) {
+        public Section(VariableValueArray types, @Nullable int[] palette, byte[] blockLight, @Nullable byte[] skyLight,
+                Short2ObjectMap<DataView> tileEntities) {
+            this.tileEntities = tileEntities;
             this.blockLight = blockLight;
             this.skyLight = skyLight;
             this.palette = palette;
@@ -121,6 +114,10 @@ public final class MessagePlayOutChunkData implements Message {
         @Nullable
         public int[] getPalette() {
             return this.palette;
+        }
+
+        public Short2ObjectMap<DataView> getTileEntities() {
+            return this.tileEntities;
         }
     }
 

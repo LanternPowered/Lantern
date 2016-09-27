@@ -33,8 +33,13 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.data.io.store.ObjectStore;
+import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
@@ -45,6 +50,8 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -55,7 +62,7 @@ import org.spongepowered.api.event.world.chunk.PopulateChunkEvent;
 import org.spongepowered.api.world.World;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -150,10 +157,10 @@ public final class ObservedChunkManager {
     }
 
     private static final MessagePlayOutChunkData.Section EMPTY_SECTION_SKYLIGHT = new MessagePlayOutChunkData.Section(
-            EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, EMPTY_SECTION_SKY_LIGHT);
+            EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, EMPTY_SECTION_SKY_LIGHT, new Short2ObjectOpenHashMap<>());
 
     private static final MessagePlayOutChunkData.Section EMPTY_SECTION = new MessagePlayOutChunkData.Section(
-            EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, null);
+            EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, null, new Short2ObjectOpenHashMap<>());
 
     public class ObservedChunk {
 
@@ -198,13 +205,13 @@ public final class ObservedChunkManager {
         }
 
         void streamChanges() {
-            LanternChunk chunk = world.getChunkManager().getChunkIfLoaded(this.coords);
+            final LanternChunk chunk = world.getChunkManager().getChunkIfLoaded(this.coords);
             if (chunk == null || this.clientObservers.isEmpty()) {
                 return;
             }
 
             if (this.dirtyChunk) {
-                MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true);
+                final MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true);
                 this.clientObservers.forEach(player -> player.getConnection().send(message));
                 this.dirtyChunk = false;
                 this.dirtyBlocks.clear();
@@ -213,7 +220,7 @@ public final class ObservedChunkManager {
 
             if (!this.dirtyBlocks.isEmpty()) {
                 // All the changes per coordinate
-                Set<Vector3i> changes = Sets.newHashSet();
+                final Set<Vector3i> changes = new HashSet<>();
 
                 // All the section which contain a block change
                 int dirtySections = 0;
@@ -228,16 +235,16 @@ public final class ObservedChunkManager {
                 int clumpingThreshold = world.getProperties().getConfig().getChunkClumpingThreshold();
 
                 if (changes.size() >= clumpingThreshold) {
-                    MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, dirtySections, false);
+                    final MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, dirtySections, false);
                     this.clientObservers.forEach(player -> player.getConnection().send(message));
                 } else if (changes.size() > 1) {
-                    MessagePlayOutMultiBlockChange message = new MessagePlayOutMultiBlockChange(
+                    final MessagePlayOutMultiBlockChange message = new MessagePlayOutMultiBlockChange(
                             this.coords.getX(), this.coords.getY(), changes.stream().map(
                             c -> new MessagePlayOutBlockChange(c, chunk.getType(c))).collect(Collectors.toList()));
                     this.clientObservers.forEach(player -> player.getConnection().send(message));
                 } else {
                     dirtyBlock = changes.iterator().next();
-                    MessagePlayOutBlockChange message = new MessagePlayOutBlockChange(dirtyBlock, chunk.getType(dirtyBlock));
+                    final MessagePlayOutBlockChange message = new MessagePlayOutBlockChange(dirtyBlock, chunk.getType(dirtyBlock));
                     this.clientObservers.forEach(player -> player.getConnection().send(message));
                 }
                 // TODO: Also update tile entities
@@ -265,10 +272,10 @@ public final class ObservedChunkManager {
 
         private MessagePlayOutChunkData createLoadChunkMessage(LanternChunk chunk, int sectionsBitMask, boolean biomes) {
             // Whether we should send sky light
-            boolean skyLight = world.getDimension().hasSky();
+            final boolean skyLight = world.getDimension().hasSky();
 
-            LanternChunk.ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(skyLight, sectionsBitMask);
-            MessagePlayOutChunkData.Section[] msgSections = new MessagePlayOutChunkData.Section[sections.length];
+            final LanternChunk.ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(skyLight, sectionsBitMask);
+            final MessagePlayOutChunkData.Section[] msgSections = new MessagePlayOutChunkData.Section[sections.length];
 
             for (int i = 0; i < sections.length; i++) {
                 if (sections[i] != null) {
@@ -281,7 +288,6 @@ public final class ObservedChunkManager {
                     int[] palette;
                     // The lookup for global to local palette id
                     Short2ShortMap globalToLocalPalette;
-                    // TODO: How to fix this?
                     // There seems to be a weird issue, some blocks are not rendered
                     // on the client (bedrock with the flat generator) and it cannot
                     // be placed in creative
@@ -308,8 +314,8 @@ public final class ObservedChunkManager {
                         globalToLocalPalette = null;
                         palette = null;
                     }
-                    short[] types = section.types;
-                    VariableValueArray array = new VariableValueArray(bitsPerValue, types.length);
+                    final short[] types = section.types;
+                    final VariableValueArray array = new VariableValueArray(bitsPerValue, types.length);
                     if (globalToLocalPalette != null) {
                         for (int j = 0; j < types.length; j++) {
                             array.set(j, globalToLocalPalette.get(types[j]));
@@ -319,7 +325,21 @@ public final class ObservedChunkManager {
                             array.set(j, types[j]);
                         }
                     }
-                    msgSections[i] = new MessagePlayOutChunkData.Section(array, palette, section.lightFromBlock, section.lightFromSky);
+                    final Short2ObjectMap<DataView> tileEntityDataViews = new Short2ObjectOpenHashMap<>();
+                    // Serialize the tile entities
+                    for (Short2ObjectMap.Entry<LanternTileEntity> tileEntityEntry : section.tileEntities.short2ObjectEntrySet()) {
+                        if (!tileEntityEntry.getValue().isValid()) {
+                            continue;
+                        }
+                        //noinspection unchecked
+                        final ObjectStore<LanternTileEntity> store =
+                                (ObjectStore<LanternTileEntity>) ObjectStoreRegistry.get().get(tileEntityEntry.getValue().getClass()).get();
+                        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                        store.serialize(tileEntityEntry.getValue(), dataView);
+                        tileEntityDataViews.put(tileEntityEntry.getShortKey(), dataView);
+                    }
+                    msgSections[i] = new MessagePlayOutChunkData.Section(array, palette,
+                            section.lightFromBlock, section.lightFromSky, tileEntityDataViews);
                 // The insert entry setting is used to send a "null" chunk
                 // after the chunk is already send to the client
                 // TODO: Better way to do this?
@@ -338,7 +358,7 @@ public final class ObservedChunkManager {
                 }
             }
 
-            return new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), skyLight, msgSections, biomesArray, Collections.emptyMap());
+            return new MessagePlayOutChunkData(this.coords.getX(), this.coords.getY(), skyLight, msgSections, biomesArray);
         }
 
         /**

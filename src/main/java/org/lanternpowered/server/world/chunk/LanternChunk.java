@@ -37,12 +37,14 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import it.unimi.dsi.fastutil.objects.ObjectIterator;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
@@ -173,6 +175,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final NibbleArray lightFromSky;
         final NibbleArray lightFromBlock;
 
+        final Short2ObjectMap<LanternTileEntity> tileEntities;
+
         /**
          * The amount of non air blocks in this chunk section.
          */
@@ -204,11 +208,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
             } else {
                 this.types = new short[CHUNK_SECTION_VOLUME];
             }
+            this.tileEntities = new Short2ObjectOpenHashMap<>();
             this.lightFromBlock = new NibbleArray(CHUNK_SECTION_VOLUME);
             this.lightFromSky = new NibbleArray(CHUNK_SECTION_VOLUME);
         }
 
-        public ChunkSection(short[] types, NibbleArray lightFromSky, NibbleArray lightFromBlock) {
+        public ChunkSection(short[] types, NibbleArray lightFromSky, NibbleArray lightFromBlock,
+                Short2ObjectMap<LanternTileEntity> tileEntities) {
             checkArgument(types.length == CHUNK_SECTION_VOLUME, "Type array length mismatch: Got "
                     + types.length + ", but expected " + CHUNK_SECTION_VOLUME);
             checkArgument(lightFromSky.length() == CHUNK_SECTION_VOLUME, "Sky light nibble array length mismatch: Got "
@@ -217,6 +223,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                     + lightFromBlock.length() + ", but expected " + CHUNK_SECTION_VOLUME);
             this.lightFromBlock = lightFromBlock;
             this.lightFromSky = lightFromSky;
+            this.tileEntities = tileEntities;
             this.types = types;
 
             // Count the non air blocks.
@@ -255,7 +262,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (count > 0) {
                 typeCounts.put((short) 0, (short) count);
             }
-            return new ChunkSectionSnapshot(this.types.clone(), typeCounts,
+            return new ChunkSectionSnapshot(this.types.clone(), typeCounts, new Short2ObjectOpenHashMap<>(this.tileEntities),
                     this.lightFromBlock.getPackedArray(), skylight ? this.lightFromSky.getPackedArray() : null);
         }
     }
@@ -266,12 +273,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
         public final short[] types;
         // The types count map.
         public final Short2ShortMap typesCountMap;
+        // The tile entities
+        public final Short2ObjectMap<LanternTileEntity> tileEntities;
 
         // The light level arrays.
         @Nullable public final byte[] lightFromSky;
         public final byte[] lightFromBlock;
 
-        private ChunkSectionSnapshot(short[] types, Short2ShortMap typesCountMap, byte[] lightFromBlock, @Nullable byte[] lightFromSky) {
+        private ChunkSectionSnapshot(short[] types, Short2ShortMap typesCountMap, Short2ObjectMap<LanternTileEntity> tileEntities,
+                byte[] lightFromBlock, @Nullable byte[] lightFromSky) {
+            this.tileEntities = tileEntities;
             this.lightFromBlock = lightFromBlock;
             this.typesCountMap = typesCountMap;
             this.lightFromSky = lightFromSky;
@@ -287,6 +298,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     // The chunk sections column
     private ConcurrentObjectArray<ChunkSection> chunkSections;
+
+    private volatile long inhabitedTime;
 
     // The height map of the chunk
     // This is lazily updated, meaning that it won't
@@ -1183,20 +1196,47 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Collection<TileEntity> getTileEntities() {
-        // TODO Auto-generated method stub
-        return Collections.emptyList();
+        final ImmutableSet.Builder<TileEntity> tileEntities = ImmutableSet.builder();
+        for (int i = 0; i < CHUNK_SECTIONS; i++) {
+            this.chunkSections.work(i, chunkSection -> {
+                if (chunkSection == null) {
+                    return;
+                }
+                final ObjectIterator<LanternTileEntity> it = chunkSection.tileEntities.values().iterator();
+                while (it.hasNext()) {
+                    final LanternTileEntity tileEntity = it.next();
+                    if (tileEntity.isValid()) {
+                        tileEntities.add(tileEntity);
+                    } else {
+                        it.remove();
+                    }
+                }
+            }, true);
+        }
+        return tileEntities.build();
     }
 
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
-        // TODO Auto-generated method stub
-        return Collections.emptyList();
+        return this.getTileEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableSet());
     }
 
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
-        // TODO Auto-generated method stub
-        return Optional.empty();
+        this.checkVolumeBounds(x, y, z);
+        final short index = ChunkSection.index(x, y & 0xf, z);
+        return this.chunkSections.work(y >> 4, chunkSection -> {
+            if (chunkSection == null) {
+                return Optional.empty();
+            }
+            final LanternTileEntity tileEntity = chunkSection.tileEntities.get(index);
+            // Remove invalid tile entities
+            if (tileEntity != null && !tileEntity.isValid()) {
+                chunkSection.tileEntities.remove(index);
+                return Optional.empty();
+            }
+            return Optional.ofNullable(tileEntity);
+        }, true);
     }
 
     private void checkAreaBounds(int x, int z) {
@@ -1584,10 +1624,18 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return false;
     }
 
+    // Typo
     @Override
     public int getInhabittedTime() {
-        // TODO Auto-generated method stub
-        return 0;
+        return (int) Math.min(Integer.MAX_VALUE, this.inhabitedTime);
+    }
+
+    public long getInhabitedTime() {
+        return this.inhabitedTime;
+    }
+
+    public void setInhabitedTime(long inhabitedTime) {
+        this.inhabitedTime = inhabitedTime;
     }
 
     @Override

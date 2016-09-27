@@ -72,8 +72,8 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     private static final DataQuery OLD_UNIQUE_ID_LEAST = DataQuery.of("PersistentIDLSB");
     // A field that will be converted if present
     private static final DataQuery BUKKIT_MAX_HEALTH = DataQuery.of("Bukkit.MaxHealth");
+    private static final DataQuery OLD_HEALTH = DataQuery.of("HealF");
     private static final DataQuery HEALTH = DataQuery.of("Health");
-    private static final DataQuery HEALTH_OLD = DataQuery.of("HealF");
     private static final DataQuery REMAINING_AIR = DataQuery.of("Air");
     private static final DataQuery MAX_AIR = DataQuery.of("maxAir");
     private static final DataQuery DISPLAY_NAME = DataQuery.of("CustomName");
@@ -108,26 +108,24 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
 
     @Override
     public UUID deserializeUniqueId(DataView dataView) {
-        Optional<Long> uuidMost = dataView.getLong(OLD_UNIQUE_ID_MOST);
-        Optional<Long> uuidLeast = dataView.getLong(OLD_UNIQUE_ID_LEAST);
-        UUID uuid;
+        Optional<Long> uuidMost = dataView.getLong(UNIQUE_ID_MOST);
+        Optional<Long> uuidLeast = dataView.getLong(UNIQUE_ID_LEAST);
         if (uuidMost.isPresent() && uuidLeast.isPresent()) {
-            uuid = new UUID(uuidMost.get(), uuidLeast.get());
+            return new UUID(uuidMost.get(), uuidLeast.get());
         } else {
-            uuidMost = dataView.getLong(UNIQUE_ID_MOST);
-            uuidLeast = dataView.getLong(UNIQUE_ID_LEAST);
+            // Try to convert from an older format
+            uuidMost = dataView.getLong(OLD_UNIQUE_ID_MOST);
+            uuidLeast = dataView.getLong(OLD_UNIQUE_ID_LEAST);
             if (uuidMost.isPresent() && uuidLeast.isPresent()) {
-                uuid = new UUID(uuidMost.get(), uuidLeast.get());
+                return new UUID(uuidMost.get(), uuidLeast.get());
             } else {
-                Optional<String> uuidString = dataView.getString(UNIQUE_ID);
+                final Optional<String> uuidString = dataView.getString(UNIQUE_ID);
                 if (uuidString.isPresent()) {
-                    uuid = UUID.fromString(uuidString.get());
-                } else {
-                    uuid = UUID.randomUUID();
+                    return UUID.fromString(uuidString.get());
                 }
             }
         }
-        return uuid;
+        return UUID.randomUUID();
     }
 
     @Override
@@ -178,7 +176,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.HEALTH).ifPresent(v -> dataView.set(HEALTH, v.floatValue()));
         valueContainer.remove(Keys.REMAINING_AIR).ifPresent(v -> dataView.set(REMAINING_AIR, v));
         valueContainer.remove(LanternKeys.ABSORPTION_AMOUNT).ifPresent(v -> dataView.set(ABSORPTION_AMOUNT, v.floatValue()));
-        DataView spongeView = getOrCreateView(dataView, SPONGE_DATA);
+        final DataView spongeView = getOrCreateView(dataView, SPONGE_DATA);
         valueContainer.remove(Keys.MAX_AIR).ifPresent(v -> spongeView.set(MAX_AIR, v));
         valueContainer.remove(Keys.CAN_GRIEF).ifPresent(v -> spongeView.set(CAN_GRIEF, (byte) (v ? 1 : 0)));
         valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(v -> dataView.set(DISPLAY_NAME, LanternTexts.toLegacy(v)));
@@ -205,7 +203,6 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.FOOD_LEVEL).ifPresent(v -> dataView.set(FOOD_LEVEL, v));
         valueContainer.remove(Keys.EXHAUSTION).ifPresent(v -> dataView.set(EXHAUSTION, v.floatValue()));
         valueContainer.remove(Keys.SATURATION).ifPresent(v -> dataView.set(SATURATION, v.floatValue()));
-
         super.serializeValues(object, valueContainer, dataView);
     }
 
@@ -214,10 +211,11 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         dataView.getInt(FIRE_TICKS).ifPresent(v -> valueContainer.set(Keys.FIRE_TICKS, v));
         dataView.getDouble(FALL_DISTANCE).ifPresent(v -> valueContainer.set(Keys.FALL_DISTANCE, v.floatValue()));
         dataView.getInt(REMAINING_AIR).ifPresent(v -> valueContainer.set(Keys.REMAINING_AIR, v));
+        // The health
         Optional<Double> health = dataView.getDouble(HEALTH);
-        // Try for the old health data
         if (!health.isPresent()) {
-            health = dataView.getDouble(HEALTH_OLD);
+            // Try to convert old data
+            health = dataView.getDouble(OLD_HEALTH);
         }
         health.ifPresent(v -> valueContainer.set(Keys.HEALTH, v));
         dataView.getString(DISPLAY_NAME).ifPresent(v -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(v)));

@@ -53,7 +53,11 @@ import static org.lanternpowered.server.data.io.anvil.RegionFileCache.REGION_SIZ
 
 import com.flowpowered.math.vector.Vector3i;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.io.ChunkIOService;
+import org.lanternpowered.server.data.io.store.ObjectStore;
+import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerInputStream;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataContainerOutputStream;
 import org.lanternpowered.server.data.util.DataQueries;
@@ -66,7 +70,6 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.storage.ChunkDataStream;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -83,7 +86,6 @@ import java.util.regex.Matcher;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class AnvilChunkIOService implements ChunkIOService {
 
     private static final DataQuery VERSION = DataQuery.of("V"); // byte
@@ -108,6 +110,11 @@ public class AnvilChunkIOService implements ChunkIOService {
     private static final DataQuery TRACKER_BLOCK_POS = DataQuery.of("pos");
     private static final DataQuery TRACKER_ENTRY_CREATOR = DataQuery.of("owner");
     private static final DataQuery TRACKER_ENTRY_NOTIFIER = DataQuery.of("notifier");
+    private static final DataQuery TILE_ENTITY_X = DataQuery.of("x");
+    private static final DataQuery TILE_ENTITY_Y = DataQuery.of("y");
+    private static final DataQuery TILE_ENTITY_Z = DataQuery.of("z");
+    private static final DataQuery TILE_ENTITIES = DataQuery.of("TileEntities");
+    private static final DataQuery INHABITED_TIME = DataQuery.of("InhabitedTime");
 
     private final WorldProperties properties;
     private final RegionFileCache cache;
@@ -122,18 +129,18 @@ public class AnvilChunkIOService implements ChunkIOService {
     }
 
     public boolean exists(int x, int z) throws IOException {
-        RegionFile region = this.cache.getRegionFileByChunk(x, z);
+        final RegionFile region = this.cache.getRegionFileByChunk(x, z);
 
-        int regionX = x & REGION_MASK;
-        int regionZ = z & REGION_MASK;
+        final int regionX = x & REGION_MASK;
+        final int regionZ = z & REGION_MASK;
 
         return region.hasChunk(regionX, regionZ);
     }
 
     @Override
     public boolean read(LanternChunk chunk) throws IOException {
-        int x = chunk.getX();
-        int z = chunk.getZ();
+        final int x = chunk.getX();
+        final int z = chunk.getZ();
 
         final RegionFile region = this.cache.getRegionFileByChunk(x, z);
         final int regionX = x & REGION_MASK;
@@ -152,6 +159,8 @@ public class AnvilChunkIOService implements ChunkIOService {
         // read the vertical sections
         final List<DataView> sectionList = levelDataView.getViewList(SECTIONS).get();
         final ChunkSection[] sections = new ChunkSection[16];
+        //noinspection unchecked
+        final Short2ObjectOpenHashMap<LanternTileEntity>[] tileEntitySections = new Short2ObjectOpenHashMap[sections.length];
 
         for (DataView sectionTag : sectionList) {
             final int y = sectionTag.getInt(Y).get();
@@ -170,10 +179,25 @@ public class AnvilChunkIOService implements ChunkIOService {
                 types[i] = (short) ((extTypesArray == null ? 0 : extTypesArray.get(i)) << 12 | ((rawTypes[i] & 0xff) << 4) | dataArray.get(i));
             }
 
+            tileEntitySections[y] = new Short2ObjectOpenHashMap<>();
             sections[y] = new ChunkSection(types, new NibbleArray(rawTypes.length, skyLight, true),
-                    new NibbleArray(rawTypes.length, blockLight, true));
+                    new NibbleArray(rawTypes.length, blockLight, true), tileEntitySections[y]);
         }
 
+        levelDataView.getViewList(TILE_ENTITIES).ifPresent(tileEntityViews -> {
+            for (DataView tileEntityView : tileEntityViews) {
+                final int tileY = tileEntityView.getInt(TILE_ENTITY_Y).get();
+                final int section = tileY >> 4;
+                if (tileEntitySections[section] == null) {
+                    continue;
+                }
+                final int tileZ = tileEntityView.getInt(TILE_ENTITY_Z).get();
+                final int tileX = tileEntityView.getInt(TILE_ENTITY_X).get();
+                final short index = ChunkSection.index(tileX, tileY & 0xf, tileZ);
+
+                // TODO: Deserialize the tile entity
+            }
+        });
 
         final DataView spongeDataView = levelDataView.getView(DataQueries.SPONGE_DATA).orElse(null);
         final List<DataView> trackerDataViews = spongeDataView == null ? null : levelDataView.getViewList(TRACKER_DATA_TABLE).orElse(null);
@@ -204,9 +228,9 @@ public class AnvilChunkIOService implements ChunkIOService {
         chunk.setPopulated(levelDataView.getInt(TERRAIN_POPULATED).orElse(0) > 0);
 
         if (levelDataView.contains(BIOMES)) {
-            byte[] biomes = (byte[]) levelDataView.get(BIOMES).get();
-            byte[] biomesExtra = (byte[]) (levelDataView.contains(BIOMES_EXTRA) ? levelDataView.get(BIOMES_EXTRA).get() : null);
-            short[] newBiomes = new short[biomes.length];
+            final byte[] biomes = (byte[]) levelDataView.get(BIOMES).get();
+            final byte[] biomesExtra = (byte[]) (levelDataView.contains(BIOMES_EXTRA) ? levelDataView.get(BIOMES_EXTRA).get() : null);
+            final short[] newBiomes = new short[biomes.length];
             for (int i = 0; i < biomes.length; i++) {
                 newBiomes[i] = (short) ((biomesExtra == null ? 0 : biomesExtra[i]) << 8 | biomes[i]);
             }
@@ -220,6 +244,7 @@ public class AnvilChunkIOService implements ChunkIOService {
             chunk.initializeHeightMap(null);
         }
 
+        levelDataView.getLong(INHABITED_TIME).ifPresent(time -> chunk.setInhabitedTime(time.intValue()));
         chunk.setLightPopulated(levelDataView.getInt(LIGHT_POPULATED).orElse(0) > 0);
         chunk.initializeLight();
 
@@ -241,29 +266,6 @@ public class AnvilChunkIOService implements ChunkIOService {
             }
         }
         */
-
-        /*
-        // read tile entities
-        List<CompoundTag> storedTileEntities = levelTag.getCompoundList("TileEntities");
-        for (CompoundTag tileEntityTag : storedTileEntities) {
-            int tx = tileEntityTag.getInt("x");
-            int ty = tileEntityTag.getInt("y");
-            int tz = tileEntityTag.getInt("z");
-            TileEntity tileEntity = chunk.getEntity(tx & 0xf, ty, tz & 0xf);
-            if (tileEntity != null) {
-                try {
-                    tileEntity.loadNbt(tileEntityTag);
-                } catch (Exception ex) {
-                    String id = tileEntityTag.isString("id") ? tileEntityTag.getString("id") : "<missing>";
-                    GlowServer.logger.log(Level.SEVERE, "Error loading tile entity at " + tileEntity.getBlock() + ": " + id, ex);
-                }
-            } else {
-                String id = tileEntityTag.isString("id") ? tileEntityTag.getString("id") : "<missing>";
-                GlowServer.logger.warning("Unknown tile entity at " + chunk.getWorld().getName() + "," + tx + "," + ty + "," + tz + ": " + id);
-            }
-        }
-        */
-
         return true;
     }
 
@@ -287,10 +289,12 @@ public class AnvilChunkIOService implements ChunkIOService {
         levelDataView.set(TERRAIN_POPULATED, (byte) (chunk.isPopulated() ? 1 : 0));
         levelDataView.set(LIGHT_POPULATED, (byte) (chunk.isLightPopulated() ? 1 : 0));
         levelDataView.set(LAST_UPDATE, 0L);
+        levelDataView.set(INHABITED_TIME, chunk.getInhabitedTime());
 
         // Chunk sections
         final ChunkSectionSnapshot[] sections = chunk.getSectionSnapshots(true);
         final List<DataView> sectionDataViews = new ArrayList<>();
+        final List<DataView> tileEntityDataViews = new ArrayList<>();
 
         for (byte i = 0; i < sections.length; ++i) {
             final ChunkSectionSnapshot section = sections[i];
@@ -331,8 +335,26 @@ public class AnvilChunkIOService implements ChunkIOService {
             }
 
             sectionDataViews.add(sectionDataView);
+
+            // Serialize the tile entities
+            for (Short2ObjectMap.Entry<LanternTileEntity> tileEntityEntry : section.tileEntities.short2ObjectEntrySet()) {
+                if (!tileEntityEntry.getValue().isValid()) {
+                    continue;
+                }
+                //noinspection unchecked
+                final ObjectStore<LanternTileEntity> store =
+                        (ObjectStore<LanternTileEntity>) ObjectStoreRegistry.get().get(tileEntityEntry.getValue().getClass()).get();
+                final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                store.serialize(tileEntityEntry.getValue(), dataView);
+                final short pos = tileEntityEntry.getShortKey();
+                dataView.set(TILE_ENTITY_X, (int) pos & 0xf);
+                dataView.set(TILE_ENTITY_Y, (i << 4) | (pos >> 8));
+                dataView.set(TILE_ENTITY_Z, (pos >> 4) & 0xf);
+                tileEntityDataViews.add(dataView);
+            }
         }
 
+        levelDataView.set(TILE_ENTITIES, tileEntityDataViews);
         levelDataView.set(SECTIONS, sectionDataViews);
         levelDataView.set(HEIGHT_MAP, chunk.getHeightMap());
 

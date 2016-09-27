@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
@@ -34,8 +34,6 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.util.VariableValueArray;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
-
-import java.util.Map;
 
 public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkData> {
 
@@ -56,15 +54,19 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
         int sectionBitmask = 0;
 
         final ByteBuffer dataBuf = context.byteBufAlloc().buffer();
+
+        ByteBuffer tileEntitiesBuf = null;
+        int tileEntitiesCount = 0;
+
         for (int i = 0; i < sections.length; i++) {
             if (sections[i] == null) {
                 continue;
             }
             sectionBitmask |= 1 << i;
-            MessagePlayOutChunkData.Section section = sections[i];
-            VariableValueArray types = section.getTypes();
+            final MessagePlayOutChunkData.Section section = sections[i];
+            final VariableValueArray types = section.getTypes();
             dataBuf.writeByte((byte) types.getBitsPerValue());
-            int[] palette = section.getPalette();
+            final int[] palette = section.getPalette();
             if (palette != null) {
                 dataBuf.writeVarInt(palette.length);
                 for (int value : palette) {
@@ -74,10 +76,10 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
                 // Using global palette
                 dataBuf.writeVarInt(0);
             }
-            long[] backing = types.getBacking();
+            final long[] backing = types.getBacking();
             dataBuf.writeVarInt(backing.length);
-            byte[] blockLight = section.getBlockLight();
-            byte[] skyLight = section.getSkyLight();
+            final byte[] blockLight = section.getBlockLight();
+            final byte[] skyLight = section.getSkyLight();
             dataBuf.ensureWritable(backing.length * 8 + blockLight.length +
                     (skyLight != null ? skyLight.length : 0));
             for (long value : backing) {
@@ -86,6 +88,20 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             dataBuf.writeBytes(blockLight);
             if (skyLight != null) {
                 dataBuf.writeBytes(skyLight);
+            }
+            final Short2ObjectMap<DataView> tileEntities = section.getTileEntities();
+            if (!tileEntities.isEmpty() && tileEntitiesBuf == null) {
+                tileEntitiesBuf  = context.byteBufAlloc().buffer();
+            }
+            for (Short2ObjectMap.Entry<DataView> tileEntityEntry : tileEntities.short2ObjectEntrySet()) {
+                tileEntitiesCount++;
+                final short index = tileEntityEntry.getShortKey();
+                final DataView dataView = tileEntityEntry.getValue();
+                dataView.set(X, index & 0xf);
+                dataView.set(Y, index >> 8);
+                dataView.set(Z, (index >> 4) & 0xf);
+                //noinspection ConstantConditions
+                tileEntitiesBuf.writeDataView(dataView);
             }
         }
 
@@ -101,16 +117,13 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             dataBuf.release();
         }
 
-        Map<Vector3i, DataView> tileEntities = message.getTileEntities();
-        buf.writeVarInt(tileEntities.size());
-
-        for (Map.Entry<Vector3i, DataView> tileEntity : tileEntities.entrySet()) {
-            DataView dataView = tileEntity.getValue();
-            Vector3i pos = tileEntity.getKey();
-            dataView.set(X, pos.getX());
-            dataView.set(Y, pos.getY());
-            dataView.set(Z, pos.getZ());
-            buf.writeDataView(dataView);
+        buf.writeVarInt(tileEntitiesCount);
+        if (tileEntitiesBuf != null) {
+            try {
+                buf.writeBytes(tileEntitiesBuf);
+            } finally {
+                tileEntitiesBuf.release();
+            }
         }
 
         return buf;

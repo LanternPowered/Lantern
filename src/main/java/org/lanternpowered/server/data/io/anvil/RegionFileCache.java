@@ -52,7 +52,6 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,7 +64,6 @@ import java.util.regex.Pattern;
  * A simple cache and wrapper for efficiently accessing multiple RegionFiles
  * simultaneously.
  */
-@NonnullByDefault
 public class RegionFileCache {
 
     public static final String DEFAULT_REGION_FILE_EXTENSION = "mca";

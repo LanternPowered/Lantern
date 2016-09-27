@@ -68,7 +68,6 @@
 package org.lanternpowered.server.data.io.anvil;
 
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -88,7 +87,6 @@ import java.util.zip.InflaterInputStream;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class RegionFile {
 
     private static final int VERSION_GZIP = 1;

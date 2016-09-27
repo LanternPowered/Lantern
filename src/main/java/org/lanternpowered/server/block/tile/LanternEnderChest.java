@@ -23,5 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
 package org.lanternpowered.server.block.tile;
+
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.EnderChest;
+import org.spongepowered.api.block.tileentity.TileEntityType;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+public class LanternEnderChest extends LanternTileEntity implements EnderChest {
+
+    protected LanternEnderChest(Location<World> location, TileEntityType tileEntityType) {
+        super(location, tileEntityType);
+    }
+
+    @Override
+    public BlockState getBlock() {
+        return BlockTypes.ENDER_CHEST.getDefaultState();
+    }
+}

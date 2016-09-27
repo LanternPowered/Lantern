@@ -27,22 +27,32 @@ package org.lanternpowered.server.block.tile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 
-public final class LanternTileEntityType extends SimpleCatalogType.Base implements TileEntityType {
+public final class LanternTileEntityType extends PluginCatalogType.Base implements TileEntityType {
 
-    private final Class<? extends TileEntity> tileClass;
+    private final Class<? extends TileEntity> tileEntityClass;
 
-    public LanternTileEntityType(String identifier, Class<? extends TileEntity> tileClass) {
-        super(identifier);
-        this.tileClass = checkNotNull(tileClass, "tileClass");
+    public LanternTileEntityType(String pluginId, String name, Class<? extends TileEntity> tileEntityClass) {
+        super(pluginId, name);
+        this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
+    }
+
+    public LanternTileEntityType(String pluginId, String id, String name, Class<? extends TileEntity> tileEntityClass) {
+        super(pluginId, id, name);
+        this.tileEntityClass = checkNotNull(tileEntityClass, "tileEntityClass");
     }
 
     @Override
     public Class<? extends TileEntity> getTileEntityType() {
-        return this.tileClass;
+        return this.tileEntityClass;
     }
 
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().add("tileEntityClass", this.tileEntityClass);
+    }
 }

@@ -41,6 +41,7 @@ import org.lanternpowered.server.block.type.BlockAir;
 import org.lanternpowered.server.block.type.BlockBarrier;
 import org.lanternpowered.server.block.type.BlockBedrock;
 import org.lanternpowered.server.block.type.BlockDirt;
+import org.lanternpowered.server.block.type.BlockEnderChest;
 import org.lanternpowered.server.block.type.BlockGlass;
 import org.lanternpowered.server.block.type.BlockGrass;
 import org.lanternpowered.server.block.type.BlockLog;
@@ -242,6 +243,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
             return (byte) (portion << 3 | slabType);
         });
+        this.register(130, new BlockEnderChest("minecraft", "ender_chest", DEFAULT_ITEM_TYPE_BUILDER));
         this.register(162, new BlockLog2("minecraft", "log2", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final byte treeType = (byte) (blockState.getTraitValue(BlockLog2.TYPE).get().getInternalId() - 4);
             final byte axis = (byte) blockState.getTraitValue(BlockLog.AXIS).get().getInternalId();

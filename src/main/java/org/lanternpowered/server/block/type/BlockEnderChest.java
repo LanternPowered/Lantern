@@ -23,56 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item;
-
-import static com.google.common.base.Preconditions.checkNotNull;
+package org.lanternpowered.server.block.type;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.spongepowered.api.block.BlockState;
+import org.lanternpowered.server.block.PropertyProviders;
+import org.lanternpowered.server.item.ItemInteractionResult;
+import org.lanternpowered.server.item.ItemInteractionType;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.World;
 
-import java.util.Optional;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class BlockItemType extends LanternItemType {
+public class BlockEnderChest extends LanternBlockType {
 
-    protected final LanternBlockType blockType;
-
-    public BlockItemType(String pluginId, String identifier, BlockType blockType) {
-        super(pluginId, identifier, checkNotNull(blockType, "blockType").getTranslation());
-        this.blockType = (LanternBlockType) blockType;
-    }
-
-    @Override
-    public Optional<BlockType> getBlock() {
-        return Optional.of(this.blockType);
+    public BlockEnderChest(String pluginId, String identifier,
+            @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
+        super(pluginId, identifier, itemTypeBuilder);
+        this.modifyPropertyProviders(builder -> {
+            builder.add(PropertyProviders.hardness(22.5));
+            builder.add(PropertyProviders.blastResistance(1000.0));
+        });
     }
 
     @Override
     public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
-        if (world.getProperty(clickedBlock, ReplaceableProperty.class).get().getValue() != Boolean.TRUE) {
-            clickedBlock = clickedBlock.add(blockFace.getOpposite().asBlockOffset());
-        }
-        final Optional<BlockState> blockState = this.blockType.placeBlockAt(player, world, interactionType,
-                itemStack, clickedBlock, blockFace, cursorOffset);
-        if (blockState.isPresent()) {
-            itemStack = itemStack.copy();
-            itemStack.setQuantity(itemStack.getQuantity() - 1);
-            world.setBlock(clickedBlock, blockState.get(), Cause.source(player == null ? itemStack : player).build());
-            return ItemInteractionResult.builder()
-                    .type(ItemInteractionResult.Type.SUCCESS)
-                    .resultItem(itemStack.createSnapshot())
-                    .build();
+            ItemStack itemStack, Vector3i position, Direction blockFace, Vector3d cursorOffset) {
+        if (player != null) {
+            player.openInventory(player.getEnderChestInventory(), Cause.source(player).build());
         }
         return ItemInteractionResult.pass();
     }

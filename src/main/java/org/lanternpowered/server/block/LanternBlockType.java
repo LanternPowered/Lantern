@@ -36,6 +36,7 @@ import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.BlockItemType;
+import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -272,5 +273,10 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
     public Optional<BlockState> placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
             ItemStack itemStack, Vector3i position, Direction blockFace, Vector3d cursorOffset) {
         return Optional.of(this.getStateFromItemStack(itemStack));
+    }
+
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
+            ItemStack itemStack, Vector3i position, Direction blockFace, Vector3d cursorOffset) {
+        return ItemInteractionResult.pass();
     }
 }

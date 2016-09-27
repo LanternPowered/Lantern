@@ -23,5 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.block.tile;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
+
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
+import org.spongepowered.api.data.key.Keys;
+
+public final class HandlerPlayInPlayerSneak implements Handler<MessagePlayInPlayerSneak> {
+
+    @Override
+    public void handle(NetworkContext context, MessagePlayInPlayerSneak message) {
+        context.getSession().getPlayer().offer(Keys.IS_SNEAKING, message.isSneaking());
+    }
+}

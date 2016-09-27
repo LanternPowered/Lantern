@@ -110,6 +110,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInAllPlayerMovement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
@@ -333,7 +334,8 @@ final class ProtocolPlay extends ProtocolBase {
         // Provided by CodecPlayInPlayerAction
         inbound.bind(MessagePlayInLeaveBed.class);// TODO: Handler
         // Provided by CodecPlayInPlayerVehicleControls or CodecPlayInPlayerAction
-        inbound.bind(MessagePlayInPlayerSneak.class); // TODO: Handler
+        inbound.bind(MessagePlayInPlayerSneak.class)
+                .bindHandler(new HandlerPlayInPlayerSneak());
         inbound.bind(MessagePlayInPlayerSprint.class); // TODO: Handler
         inbound.bind(MessagePlayInPlayerVehicleJump.class); // TODO: Handler
         // Provided by CodecPlayInPlayerVehicleControls

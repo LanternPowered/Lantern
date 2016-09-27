@@ -29,7 +29,6 @@ import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
 import org.spongepowered.api.block.tileentity.TileEntityType;
@@ -44,9 +43,23 @@ import org.spongepowered.api.world.World;
 import java.util.HashMap;
 import java.util.Map;
 
-public class LanternTileEntity extends BaseComponentHolder implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
+public abstract class LanternTileEntity extends BaseComponentHolder implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
 
+    private final Location<World> location;
+    private final TileEntityType tileEntityType;
     private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
+    private volatile boolean valid;
+
+    protected LanternTileEntity(Location<World> location, TileEntityType tileEntityType) {
+        this.tileEntityType = tileEntityType;
+        this.location = location;
+    }
+
+    /**
+     * Pulses this {@link LanternTileEntity}.
+     */
+    public void pulse() {
+    }
 
     @Override
     public boolean validateRawData(DataView dataView) {
@@ -64,22 +77,17 @@ public class LanternTileEntity extends BaseComponentHolder implements TileEntity
 
     @Override
     public boolean isValid() {
-        return false;
+        return this.valid;
     }
 
     @Override
     public void setValid(boolean valid) {
-        
+        this.valid = valid;
     }
 
     @Override
     public TileEntityType getType() {
-        return null;
-    }
-
-    @Override
-    public BlockState getBlock() {
-        return null;
+        return this.tileEntityType;
     }
 
     @Override
@@ -89,7 +97,7 @@ public class LanternTileEntity extends BaseComponentHolder implements TileEntity
 
     @Override
     public Location<World> getLocation() {
-        return null;
+        return this.location;
     }
 
     @Override

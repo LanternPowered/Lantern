@@ -97,6 +97,7 @@ import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -135,7 +136,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         private int notifierId;
         private int creatorId;
 
-        public TrackerData() {
+        TrackerData() {
             this(-1, -1);
         }
 
@@ -150,14 +151,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
         public int getCreatorId() {
             return this.creatorId;
-        }
-
-        public void setCreatorId(int creatorId) {
-            this.creatorId = creatorId;
-        }
-
-        public void setNotifierId(int notifierId) {
-            this.notifierId = notifierId;
         }
     }
 
@@ -258,7 +251,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
         private ChunkSectionSnapshot asSnapshot(boolean skylight) {
             final Short2ShortMap typeCounts = new Short2ShortOpenHashMap(this.typesCountMap);
-            int count = this.types.length - this.nonAirCount;
+            final int count = this.types.length - this.nonAirCount;
             if (count > 0) {
                 typeCounts.put((short) 0, (short) count);
             }
@@ -495,7 +488,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     public ChunkSectionSnapshot[] getSectionSnapshots(boolean skylight, int sectionBitMask) {
-        ChunkSectionSnapshot[] array = new ChunkSectionSnapshot[CHUNK_SECTIONS];
+        final ChunkSectionSnapshot[] array = new ChunkSectionSnapshot[CHUNK_SECTIONS];
         for (int i = 0; i < array.length; i++) {
             if ((sectionBitMask & (1 << i)) == 0) {
                 continue;
@@ -531,7 +524,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return 0;
         }
-        int index = (z & 0xf) << 4 | x & 0xf;
+        final int index = (z & 0xf) << 4 | x & 0xf;
         long stamp = this.heightMapLock.tryOptimisticRead();
         try {
             boolean lower = this.heightMapUpdateFlags.get(index);
@@ -552,11 +545,11 @@ public class LanternChunk implements AbstractExtent, Chunk {
                         return height;
                     }
                 }
-                int sections = height >> 4;
+                final int sections = height >> 4;
                 // 0: The height we are looping through
-                int[] values0 = { 0 };
+                final int[] values0 = { 0 };
                 // 0: Finished
-                boolean[] values1 = { false };
+                final boolean[] values1 = { false };
                 // Loop trough all the chunk sections
                 for (int i = sections; i >= 0; i--) {
                     final int j = i;
@@ -616,14 +609,14 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final byte[] heightMap = oldHeightMap.clone();
 
         // Which coordinates are finished
-        boolean[] finished = new boolean[CHUNK_AREA];
+        final boolean[] finished = new boolean[CHUNK_AREA];
 
         // 0: The amount of finished searches
-        int[] values0 = { 0 };
+        final int[] values0 = { 0 };
 
         // 0: Whether we found the first non-null chunk
         // 1: Finished
-        boolean[] values1 = { false, false };
+        final boolean[] values1 = { false, false };
 
         // Loop trough all the chunk sections
         for (int i = CHUNK_SECTIONS - 1; i >= 0; i--) {
@@ -731,7 +724,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         checkArgument(biomes.length == CHUNK_AREA, "Biomes array length mismatch: Got "
                 + biomes.length + ", but expected " + CHUNK_AREA);
         biomes = biomes.clone();
-        long stamp = this.biomesLock.writeLock();
+        final long stamp = this.biomesLock.writeLock();
         try {
             this.biomes = biomes;
         } finally {
@@ -751,7 +744,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return 0;
         }
-        int index = (z & 0xf) << 4 | x & 0xf;
+        final int index = (z & 0xf) << 4 | x & 0xf;
         long stamp = this.biomesLock.tryOptimisticRead();
         short biome = this.biomes[index];
         if (!this.biomesLock.validate(stamp)) {
@@ -1304,12 +1297,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     private <T extends Property<?, ?>> Optional<T> getProperty0(int x, int y, int z, @Nullable Direction direction, Class<T> propertyClass) {
+        this.checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return Optional.empty();
         }
-        Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
+        final Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
         Optional<T> property = Optional.empty();
-        Optional<PropertyStore<T>> store = LanternPropertyRegistry.getInstance().getStore(propertyClass);
+        final Optional<PropertyStore<T>> store = LanternPropertyRegistry.getInstance().getStore(propertyClass);
         if (store.isPresent()) {
             if (direction != null) {
                 property = AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, propertyClass);
@@ -1317,8 +1311,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 property = AbstractPropertyHolder.getPropertyFor(location, propertyClass);
             }
         }
-        if (!property.isPresent()) {
-            Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+        if (direction == null && !property.isPresent()) {
+            final Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
             if (tileEntity.isPresent()) {
                 property = tileEntity.get().getProperty(propertyClass);
             }
@@ -1331,17 +1325,29 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Collections.emptyList();
         }
-        Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
-        ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
+        final Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
+        final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
         builder.addAll(LanternPropertyRegistry.getInstance().getPropertiesFor(location));
         this.getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
         return builder.build();
     }
 
+    private static final Direction[] CARDINAL_FACES = Arrays.stream(Direction.values()).filter(Direction::isCardinal).toArray(Direction[]::new);
+
     @Override
     public Collection<Direction> getFacesWithProperty(int x, int y, int z, Class<? extends Property<?, ?>> propertyClass) {
-        // TODO Auto-generated method stub
-        return null;
+        if (!this.loaded) {
+            return Collections.emptyList();
+        }
+        final Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
+        //noinspection unchecked
+        final Optional<PropertyStore<?>> store = (Optional) LanternPropertyRegistry.getInstance().getStore(propertyClass);
+        if (!store.isPresent()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(CARDINAL_FACES)
+                .filter(direction -> AbstractDirectionRelativePropertyHolder.getPropertyFor(location, direction, store.get()).isPresent())
+                .collect(GuavaCollectors.toImmutableList());
     }
 
     @Override
@@ -1349,10 +1355,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Optional.empty();
         }
-        BlockState blockState = this.getBlock(x, y, z);
+        final BlockState blockState = this.getBlock(x, y, z);
         Optional<E> value = blockState.get(key);
         if (!value.isPresent()) {
-            Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            final Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
             if (tileEntity.isPresent()) {
                 value = tileEntity.get().get(key);
             }
@@ -1365,10 +1371,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Optional.empty();
         }
-        BlockState blockState = this.getBlock(x, y, z);
+        final BlockState blockState = this.getBlock(x, y, z);
         Optional<V> value = blockState.getValue(key);
         if (!value.isPresent()) {
-            Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            final Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
             if (tileEntity.isPresent()) {
                 value = tileEntity.get().getValue(key);
             }

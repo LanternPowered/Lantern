@@ -35,7 +35,7 @@ public final class MessagePlayInPlayerSneak implements Message {
         this.sneaking = sneaking;
     }
 
-    public boolean isSprinting() {
+    public boolean isSneaking() {
         return this.sneaking;
     }
 

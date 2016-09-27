@@ -40,15 +40,18 @@ public interface AbstractDirectionRelativePropertyHolder extends AbstractPropert
         return getPropertyFor(this, direction, clazz);
     }
 
+    static <T extends Property<?, ?>> Optional<T> getPropertyFor(PropertyHolder propertyHolder, Direction direction, PropertyStore<T> propertyStore) {
+        if (propertyStore instanceof DirectionRelativePropertyStore) {
+            return ((DirectionRelativePropertyStore<T>) propertyStore).getFor(propertyHolder, direction);
+        } else {
+            return Optional.empty();
+        }
+    }
+
     static <T extends Property<?, ?>> Optional<T> getPropertyFor(PropertyHolder propertyHolder, Direction direction, Class<T> clazz) {
         final Optional<PropertyStore<T>> optional = LanternPropertyRegistry.getInstance().getStore(clazz);
         if (optional.isPresent()) {
-            PropertyStore<T> propertyStore = optional.get();
-            if (propertyStore instanceof DirectionRelativePropertyStore) {
-                return ((DirectionRelativePropertyStore<T>) propertyStore).getFor(propertyHolder, direction);
-            } else {
-                return propertyStore.getFor(propertyHolder);
-            }
+            return getPropertyFor(propertyHolder, direction, optional.get());
         }
         return Optional.empty();
     }

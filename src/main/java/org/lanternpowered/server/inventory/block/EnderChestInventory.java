@@ -23,5 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.block.tile;
+package org.lanternpowered.server.inventory.block;
+
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.text.translation.Translation;
+
+import javax.annotation.Nullable;
+
+public class EnderChestInventory extends ChestInventory {
+
+    public EnderChestInventory(@Nullable Inventory parent) {
+        this(parent, null);
+    }
+
+    public EnderChestInventory(@Nullable Inventory parent, @Nullable Translation name) {
+        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.enderchest") : name, 3);
+    }
+}

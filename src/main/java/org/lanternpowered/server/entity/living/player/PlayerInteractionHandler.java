@@ -26,9 +26,11 @@
 package org.lanternpowered.server.entity.living.player;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.entity.LanternHotbar;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.item.LanternItemType;
@@ -37,8 +39,10 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.world.LanternWorld;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.HardnessProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
 import org.spongepowered.api.event.cause.Cause;
@@ -228,27 +232,52 @@ public final class PlayerInteractionHandler {
         }
         // TODO: Send updates if something failed, events, ...
 
-        ItemInteractionResult interactionResult = null;
-
         // Try the action of the hotbar item first
-        final LanternHotbar hotbar = this.player.getInventory().getHotbar();
-        Optional<ItemStack> optItemStack = hotbar.getSelectedSlot().peek();
+        final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
+        final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
+
+        ItemInteractionResult interactionResult;
+        Optional<ItemStack> optItemStack;
+
+        if (!this.player.get(Keys.IS_SNEAKING).orElse(false)) {
+            final BlockState blockState = this.player.getWorld().getBlock(message.getPosition());
+            optItemStack = hotbarSlot.peek();
+
+            interactionResult = ((LanternBlockType) blockState.getType()).onInteractWithItemAt(
+                    this.player, this.player.getWorld(), ItemInteractionType.MAIN, optItemStack.orElse(null),
+                    message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult.getResultItem().ifPresent(item -> hotbarSlot.set(item.createStack()));
+            if (!interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
+                return;
+            }
+
+            optItemStack = offHandSlot.peek();
+            interactionResult = ((LanternBlockType) blockState.getType()).onInteractWithItemAt(
+                    this.player, this.player.getWorld(), ItemInteractionType.OFF, optItemStack.orElse(null),
+                    message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult.getResultItem().ifPresent(item -> offHandSlot.set(item.createStack()));
+            if (!interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
+                return;
+            }
+        }
+
+        optItemStack = hotbarSlot.peek();
         if (optItemStack.isPresent()) {
             final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
             interactionResult = itemType.onInteractWithItemAt(this.player, this.player.getWorld(), ItemInteractionType.MAIN,
                     optItemStack.get(), message.getPosition(), message.getFace(), message.getClickOffset());
-            interactionResult.getResultItem().ifPresent(item -> hotbar.getSelectedSlot().set(item.createStack()));
+            interactionResult.getResultItem().ifPresent(item -> hotbarSlot.set(item.createStack()));
+            if (!interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
+                return;
+            }
         }
 
-        if (interactionResult == null || interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
-            final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
-            optItemStack = offHandSlot.peek();
-            if (optItemStack.isPresent()) {
-                final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
-                interactionResult = itemType.onInteractWithItemAt(this.player, this.player.getWorld(), ItemInteractionType.OFF,
-                        optItemStack.get(), message.getPosition(), message.getFace(), message.getClickOffset());
-                interactionResult.getResultItem().ifPresent(item -> offHandSlot.set(item.createStack()));
-            }
+        optItemStack = offHandSlot.peek();
+        if (optItemStack.isPresent()) {
+            final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
+            interactionResult = itemType.onInteractWithItemAt(this.player, this.player.getWorld(), ItemInteractionType.OFF,
+                    optItemStack.get(), message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult.getResultItem().ifPresent(item -> offHandSlot.set(item.createStack()));
         }
     }
 }

@@ -51,6 +51,9 @@ import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
+import org.lanternpowered.server.inventory.block.ChestInventory;
+import org.lanternpowered.server.inventory.block.EnderChestInventory;
+import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.objects.LocalizedText;
@@ -94,6 +97,8 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
+import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -109,7 +114,6 @@ import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.Location;
@@ -127,7 +131,6 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer {
 
     private final LanternUser user;
@@ -178,9 +181,14 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     private final ResourcePackSendQueue resourcePackSendQueue = new ResourcePackSendQueue(this);
 
     /**
-     * The inventory of the {@link Player}.
+     * The inventory of this {@link Player}.
      */
     private final LanternPlayerInventory inventory;
+
+    /**
+     * The ender chest inventory of this {@link Player}.
+     */
+    private final EnderChestInventory enderChestInventory;
 
     /**
      * The {@link LanternContainer} of the players inventory.
@@ -214,6 +222,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.interactionHandler = new PlayerInteractionHandler(this);
         this.inventory = new LanternPlayerInventory(null, null, this);
         this.inventoryContainer = new PlayerInventoryContainer(null, this.inventory);
+        this.enderChestInventory = new EnderChestInventory(null);
         this.containerSession = new PlayerContainerSession(this);
         this.session = session;
         this.gameProfile = gameProfile;
@@ -241,6 +250,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         this.registerKey(Keys.LAST_DATE_PLAYED, null);
         this.registerKey(Keys.FIRST_DATE_PLAYED, null);
         this.registerKey(Keys.IS_FLYING, false).nonRemovableAttachedValueProcessor();
+        this.registerKey(Keys.IS_SNEAKING, false).nonRemovableAttachedValueProcessor();
         this.registerKey(Keys.FLYING_SPEED, 0.1).nonRemovableAttachedValueProcessor();
         this.registerKey(Keys.CAN_FLY, false).nonRemovableAttachedValueProcessor();
         this.registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();
@@ -734,17 +744,29 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public Optional<Inventory> getOpenInventory() {
-        return null;
+        final LanternContainer container = this.containerSession.getOpenContainer();
+        return container == null ? Optional.empty() : Optional.of(container.getOpenInventory());
     }
 
     @Override
     public void openInventory(Inventory inventory, Cause cause) {
-
+        checkNotNull(inventory, "inventory");
+        checkNotNull(cause, "cause");
+        // TODO: Make this better
+        LanternContainer container;
+        if (inventory instanceof ChestInventory) {
+            container = new ChestInventoryContainer(this.inventory, (ChestInventory) inventory);
+        } else if (inventory instanceof PlayerInventory) {
+            return;
+        } else {
+            throw new UnsupportedOperationException("Unsupported inventory type: " + inventory);
+        }
+        this.containerSession.setOpenContainer(container);
     }
 
     @Override
     public void closeInventory(Cause cause) {
-
+        this.containerSession.setOpenContainer(null);
     }
 
     @Override
@@ -828,6 +850,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     @Override
     public void setScoreboard(Scoreboard scoreboard) {
         checkNotNull(scoreboard, "scoreboard");
+        //noinspection ConstantConditions
         if (this.scoreboard != null && scoreboard != this.scoreboard) {
             this.scoreboard.removePlayer(this);
         }
@@ -851,8 +874,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     @Override
-    public Inventory getEnderChestInventory() {
-        return null;
+    public EnderChestInventory getEnderChestInventory() {
+        return this.enderChestInventory;
     }
 
     @Override

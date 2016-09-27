@@ -56,6 +56,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
+import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.util.RespawnLocation;
 
 import java.time.Instant;
@@ -98,6 +99,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
 
     private static final DataQuery SLOT = DataQuery.of("Slot");
     private static final DataQuery INVENTORY = DataQuery.of("Inventory");
+    private static final DataQuery ENDER_CHEST_INVENTORY = DataQuery.of("EnderItems");
 
     @Override
     public void deserialize(LanternPlayer player, DataView dataView) {
@@ -148,7 +150,12 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         dataView.set(RESPAWN_LOCATIONS, respawnLocationViews);
         dataView.set(GAME_MODE, ((LanternGameMode) valueContainer.remove(Keys.GAME_MODE).orElse(GameModes.NOT_SET)).getInternalId());
         dataView.set(SELECTED_ITEM_SLOT, player.getInventory().getHotbar().getSelectedSlotIndex());
+
+        // Serialize the player inventory
         dataView.set(INVENTORY, serializePlayerInventory(player.getInventory()));
+        // Serialize the ender chest inventory
+        dataView.set(ENDER_CHEST_INVENTORY, serializeEnderChest(player.getEnderChestInventory()));
+
         super.serializeValues(player, valueContainer, dataView);
     }
 
@@ -202,7 +209,12 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
                 .flatMap(v -> GameModeRegistryModule.get().getByInternalId(v)).orElse(GameModes.NOT_SET);
         valueContainer.set(Keys.GAME_MODE, gameMode);
         player.getInventory().getHotbar().setRawSelectedSlotIndex(dataView.getInt(SELECTED_ITEM_SLOT).orElse(0));
+
+        // Deserialize the player inventory
         dataView.getViewList(INVENTORY).ifPresent(views -> deserializePlayerInventory(player.getInventory(), views));
+        // Deserialize the ender chest inventory
+        dataView.getViewList(ENDER_CHEST_INVENTORY).ifPresent(views -> deserializeEnderChest(player.getEnderChestInventory(), views));
+
         super.deserializeValues(player, valueContainer, dataView);
     }
 
@@ -213,6 +225,39 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
                 .position(new Vector3d(x, y, z))
                 .forceSpawn(forced)
                 .build();
+    }
+
+    private static List<DataView> serializeEnderChest(GridInventory enderChestInventory) {
+        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
+        //noinspection unchecked
+        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
+
+        final List<DataView> itemViews = new ArrayList<>();
+        final Iterable<Slot> slots = enderChestInventory.slots();
+        for (Slot slot : slots) {
+            final Optional<ItemStack> optItemStack = slot.peek();
+            if (!optItemStack.isPresent()) {
+                continue;
+            }
+            final DataView itemView = itemStackSerializer.serialize((LanternItemStack) optItemStack.get());
+            //noinspection ConstantConditions
+            itemView.set(SLOT, (byte) enderChestInventory.getProperty(slot, SlotIndex.class, null).get().getValue().intValue());
+            itemViews.add(itemView);
+        }
+
+        return itemViews;
+    }
+
+    private static void deserializeEnderChest(GridInventory enderChestInventory, List<DataView> itemViews) {
+        final ObjectStore<LanternItemStack> itemStackStore = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
+        //noinspection unchecked
+        final ObjectSerializer<LanternItemStack> itemStackSerializer = (ObjectSerializer<LanternItemStack>) itemStackStore;
+
+        for (DataView itemView : itemViews) {
+            final int slot = itemView.getByte(SLOT).get() & 0xff;
+            final LanternItemStack itemStack = itemStackSerializer.deserialize(itemView);
+            enderChestInventory.set(new SlotIndex(slot), itemStack);
+        }
     }
 
     private static void deserializePlayerInventory(LanternPlayerInventory inventory, List<DataView> itemViews) {

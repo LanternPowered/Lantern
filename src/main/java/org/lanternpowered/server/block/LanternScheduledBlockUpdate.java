@@ -31,8 +31,6 @@ import org.spongepowered.api.block.ScheduledBlockUpdate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Arrays;
-
 public class LanternScheduledBlockUpdate implements ScheduledBlockUpdate, Comparable<LanternScheduledBlockUpdate> {
 
     private final Location<World> location;

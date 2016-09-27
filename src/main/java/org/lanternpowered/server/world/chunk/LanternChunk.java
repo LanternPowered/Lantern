@@ -44,7 +44,9 @@ import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
+import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.type.IBlockContainer;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
@@ -817,20 +819,22 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }, false);
     }
 
-    /**
-     * Sets the type of the block at the coordinates.
-     * 
-     * @param x the x coordinate
-     * @param y the y coordinate
-     * @param z the z coordinate
-     * @param type the block type
-     */
-    public void setType(int x, int y, int z, short type) {
+    @Override
+    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
+        return this.setBlock(x, y, z, block, BlockChangeFlag.ALL, cause);
+    }
+
+    @Override
+    public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag, Cause cause) {
+        checkNotNull(block, "block");
+        checkNotNull(flag, "flag");
+        checkNotNull(cause, "cause");
         this.checkVolumeBounds(x, y, z);
         if (!this.loaded) {
-            return;
+            return false;
         }
 
+        final short type = BlockRegistryModule.get().getStateInternalIdAndData(block);
         final short type1;
         // Air doesn't have metadata values
         if (type >> 4 == 0 && type != 0) {
@@ -842,8 +846,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
         x &= 0xf;
         z &= 0xf;
 
-        int x1 = x;
-        int z1 = z;
+        final int x1 = x;
+        final int z1 = z;
         this.chunkSections.work(y >> 4, section -> {
             if (section == null) {
                 // The section is already filled with air,
@@ -854,8 +858,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 // Create a new section
                 section = new ChunkSection();
             }
-            int index = ChunkSection.index(x1, y & 0xf, z1);
-            short oldType = section.types[index];
+            final short index = ChunkSection.index(x1, y & 0xf, z1);
+            final short oldType = section.types[index];
             if (oldType != type1) {
                 if (oldType != 0) {
                     short count = section.typesCountMap.get(oldType);
@@ -880,11 +884,46 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (section.nonAirCount <= 0) {
                 return null;
             }
+            final LanternTileEntity tileEntity = section.tileEntities.get(index);
+            boolean remove = false;
+            boolean refresh = false;
+            if (tileEntity != null) {
+                if (oldType == 0 || type1 == 0) {
+                    remove = true;
+                } else if (tileEntity instanceof ITileEntityRefreshBehavior) {
+                    // Try the custom refresh behavior first
+                    final BlockState oldState = BlockRegistryModule.get().getStateByInternalIdAndData(oldType).get();
+                    if (((ITileEntityRefreshBehavior) tileEntity).shouldRefresh(oldState, block)) {
+                        remove = true;
+                        refresh = true;
+                    }
+                } else if (oldType >> 4 != type1 >> 4) {
+                    // The default behavior will only refresh if the
+                    // block type is changed and not the block state
+                    remove = true;
+                    refresh = true;
+                }
+                if (refresh && !(block.getType() instanceof IBlockContainer)) {
+                    refresh = false;
+                }
+            } else if (block.getType() instanceof IBlockContainer) {
+                refresh = true;
+            }
+            if (remove) {
+                tileEntity.setValid(false);
+            }
+            if (refresh) {
+                final LanternTileEntity newTileEntity = (LanternTileEntity) ((IBlockContainer) block.getType()).createTile(block);
+                section.tileEntities.put(index, newTileEntity);
+                newTileEntity.setValid(true);
+            } else if (remove) {
+                section.tileEntities.remove(index);
+            }
             section.types[index] = type1;
             return section;
         });
 
-        int index = z << 4 | x;
+        final int index = z << 4 | x;
         long stamp = this.heightMapLock.writeLock();
         try {
             // TODO: Check first and then use the write lock?
@@ -897,6 +936,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
         } finally {
             this.heightMapLock.unlock(stamp);
         }
+
+        return true;
     }
 
     /**
@@ -987,6 +1028,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return null;
     }
 
+    public PriorityBlockingQueue<LanternScheduledBlockUpdate> getScheduledBlockUpdateQueue() {
+        return this.scheduledBlockUpdateQueue;
+    }
+
     @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         this.checkVolumeBounds(x, y, z);
@@ -1002,9 +1047,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public ScheduledBlockUpdate addScheduledUpdate(int x, int y, int z, int priority, int ticks) {
         this.checkVolumeBounds(x, y, z);
-        int entryId = this.scheduledBlockUpdateCounter.getAndIncrement();
-        Location<World> location = new Location<>(this.world, new Vector3i(x, y, z));
-        LanternScheduledBlockUpdate update = new LanternScheduledBlockUpdate(entryId, location, ticks, priority);
+        final int entryId = this.scheduledBlockUpdateCounter.getAndIncrement();
+        final Location<World> location = new Location<>(this.world, new Vector3i(x, y, z));
+        final LanternScheduledBlockUpdate update = new LanternScheduledBlockUpdate(entryId, location, ticks, priority);
         this.scheduledBlockUpdateQueue.add(update);
         return update;
     }
@@ -1224,7 +1269,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
         this.checkVolumeBounds(x, y, z);
-        final short index = ChunkSection.index(x, y & 0xf, z);
+        final short index = ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
         return this.chunkSections.work(y >> 4, chunkSection -> {
             if (chunkSection == null) {
                 return Optional.empty();
@@ -1264,20 +1309,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Vector3i getBlockSize() {
         return CHUNK_SIZE;
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
-        this.setType(x, y, z, BlockRegistryModule.get().getStateInternalIdAndData(block));
-        // TODO: Events
-        return true;
-    }
-
-    @Override
-    public boolean setBlock(int x, int y, int z, BlockState blockState, BlockChangeFlag flag, Cause cause) {
-        this.setBlock(x, y, z, blockState, cause);
-        // TODO: Events
-        return true;
     }
 
     @Override

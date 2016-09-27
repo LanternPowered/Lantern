@@ -61,6 +61,7 @@ import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.util.Direction;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -243,7 +244,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
             return (byte) (portion << 3 | slabType);
         });
-        this.register(130, new BlockEnderChest("minecraft", "ender_chest", DEFAULT_ITEM_TYPE_BUILDER));
+        this.register(130, new BlockEnderChest("minecraft", "ender_chest", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+            final Direction facing = blockState.getTraitValue(BlockEnderChest.FACING).get();
+            return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
+                    facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
+        });
         this.register(162, new BlockLog2("minecraft", "log2", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final byte treeType = (byte) (blockState.getTraitValue(BlockLog2.TYPE).get().getInternalId() - 4);
             final byte axis = (byte) blockState.getTraitValue(BlockLog.AXIS).get().getInternalId();

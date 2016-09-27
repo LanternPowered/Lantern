@@ -38,7 +38,8 @@ public class LogBlockItemTypeObjectSerializer implements ItemTypeObjectSerialize
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         final BlockType blockType = itemStack.getItem().getBlock().get();
-        final BlockState blockState = blockType.getDefaultState().with(Keys.TREE_TYPE, itemStack.get(Keys.TREE_TYPE).get()).get();
+        // TODO
+        final BlockState blockState = blockType.getDefaultState();//.with(Keys.TREE_TYPE, itemStack.get(Keys.TREE_TYPE).get()).get();
         dataView.set(DATA_VALUE, BlockRegistryModule.get().getStateData(blockState));
     }
 

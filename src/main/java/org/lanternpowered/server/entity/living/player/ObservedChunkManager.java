@@ -38,8 +38,8 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.data.io.store.ObjectStore;
-import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
+import org.lanternpowered.server.data.io.store.ObjectSerializer;
+import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
@@ -51,7 +51,6 @@ import org.lanternpowered.server.world.chunk.LanternChunk;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
@@ -332,10 +331,8 @@ public final class ObservedChunkManager {
                             continue;
                         }
                         //noinspection unchecked
-                        final ObjectStore<LanternTileEntity> store =
-                                (ObjectStore<LanternTileEntity>) ObjectStoreRegistry.get().get(tileEntityEntry.getValue().getClass()).get();
-                        final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-                        store.serialize(tileEntityEntry.getValue(), dataView);
+                        final ObjectSerializer<LanternTileEntity> store = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
+                        final DataView dataView = store.serialize(tileEntityEntry.getValue());
                         tileEntityDataViews.put(tileEntityEntry.getShortKey(), dataView);
                     }
                     msgSections[i] = new MessagePlayOutChunkData.Section(array, palette,

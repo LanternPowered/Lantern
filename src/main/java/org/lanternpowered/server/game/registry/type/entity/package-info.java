@@ -23,29 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
-
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import java.util.Optional;
-import java.util.UUID;
-
-public abstract class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
-
-    public LanternEntityHumanoid(UUID uniqueId) {
-        super(uniqueId);
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.game.registry.type.entity;

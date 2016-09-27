@@ -45,14 +45,13 @@ import java.util.Map;
 
 public abstract class LanternTileEntity extends BaseComponentHolder implements TileEntity, AbstractDataHolder, AbstractPropertyHolder {
 
-    private final Location<World> location;
     private final TileEntityType tileEntityType;
     private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
+    private volatile Location<World> location;
     private volatile boolean valid;
 
-    protected LanternTileEntity(Location<World> location, TileEntityType tileEntityType) {
+    protected LanternTileEntity(TileEntityType tileEntityType) {
         this.tileEntityType = tileEntityType;
-        this.location = location;
     }
 
     /**
@@ -115,5 +114,14 @@ public abstract class LanternTileEntity extends BaseComponentHolder implements T
     @Override
     public DataHolder copy() {
         return null;
+    }
+
+    /**
+     * Sets the {@link Location} of this tile entity.
+     *
+     * @param location The location
+     */
+    public void setLocation(Location<World> location) {
+        this.location = location;
     }
 }

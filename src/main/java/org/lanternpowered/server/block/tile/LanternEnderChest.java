@@ -34,8 +34,8 @@ import org.spongepowered.api.world.World;
 
 public class LanternEnderChest extends LanternTileEntity implements EnderChest {
 
-    protected LanternEnderChest(Location<World> location, TileEntityType tileEntityType) {
-        super(location, tileEntityType);
+    protected LanternEnderChest(TileEntityType tileEntityType) {
+        super(tileEntityType);
     }
 
     @Override

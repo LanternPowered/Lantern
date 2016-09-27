@@ -122,6 +122,7 @@ import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryM
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
@@ -454,6 +455,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SerializationBehavior.class, new SerializationBehaviorRegistryModule())
                 .registerModule(Weather.class, new WeatherTypeRegistryModule())
                 .registerModule(WorldArchetype.class, new WorldArchetypeRegistryModule())
+                .registerModule(EntityType.class, EntityTypeRegistryModule.get())
                 // Script registry modules
                 .registerModule(ContextParameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

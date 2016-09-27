@@ -34,8 +34,9 @@ import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
-import org.lanternpowered.server.util.IdAllocator;
 import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
+import org.lanternpowered.server.util.IdAllocator;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -43,10 +44,7 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -61,7 +59,6 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -77,6 +74,7 @@ import javax.annotation.Nullable;
 public class LanternEntity extends BaseComponentHolder implements Entity, AbstractDataHolder, AbstractPropertyHolder {
 
     private static final IdAllocator idAllocator = new IdAllocator();
+    private static boolean bypassEntityTypeLookup;
 
     public static IdAllocator getIdAllocator() {
         return idAllocator;
@@ -87,6 +85,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     // The unique id of this entity
     private final UUID uniqueId;
+
+    // The entity type of this entity
+    private final LanternEntityType entityType;
 
     // The random object of this entity
     private final Random random = new Random();
@@ -111,10 +112,12 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     public LanternEntity(UUID uniqueId) {
         this.uniqueId = uniqueId;
         this.registerKeys();
-    }
-
-    public LanternEntity() {
-        this(UUID.randomUUID());
+        if (!bypassEntityTypeLookup) {
+            this.entityType = (LanternEntityType) EntityTypeRegistryModule.get().getByClass(this.getClass()).orElseThrow(
+                    () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
+        } else {
+            this.entityType = null;
+        }
     }
 
     @Override

@@ -46,10 +46,6 @@ public class LanternEntityLiving extends LanternEntity implements Living {
         super(uniqueId);
     }
 
-    public LanternEntityLiving() {
-        super();
-    }
-
     @Override
     public void registerKeys() {
         super.registerKeys();

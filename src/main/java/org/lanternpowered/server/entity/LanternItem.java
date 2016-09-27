@@ -25,27 +25,13 @@
  */
 package org.lanternpowered.server.entity;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import org.spongepowered.api.entity.Item;
 
-import java.util.Optional;
 import java.util.UUID;
 
-public abstract class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
+public class LanternItem extends LanternEntity implements Item {
 
-    public LanternEntityHumanoid(UUID uniqueId) {
+    public LanternItem(UUID uniqueId) {
         super(uniqueId);
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
     }
 }

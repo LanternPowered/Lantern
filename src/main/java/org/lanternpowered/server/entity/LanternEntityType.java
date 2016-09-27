@@ -33,10 +33,22 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.lang.reflect.Field;
 import java.util.UUID;
 import java.util.function.Function;
 
 public final class LanternEntityType<E extends LanternEntity> extends PluginCatalogType.Base.Translatable implements EntityType {
+
+    private static final Field BYPASS_FIELD;
+
+    static {
+        try {
+            BYPASS_FIELD = LanternEntity.class.getDeclaredField("bypassEntityTypeLookup");
+            BYPASS_FIELD.setAccessible(true);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private final Class<? extends Entity> entityClass;
     private final Function<UUID, E> entityConstructor;
@@ -45,28 +57,68 @@ public final class LanternEntityType<E extends LanternEntity> extends PluginCata
             Function<UUID, E> entityConstructor) {
         super(pluginId, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
+        this.entityClass = getEntityClass(entityConstructor);
     }
 
     public LanternEntityType(String pluginId, String name, Translation translation,
             Function<UUID, E> entityConstructor) {
         super(pluginId, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
+        this.entityClass = getEntityClass(entityConstructor);
     }
 
     public LanternEntityType(String pluginId, String id, String name, String translation,
             Function<UUID, E> entityConstructor) {
         super(pluginId, id, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
+        this.entityClass = getEntityClass(entityConstructor);
     }
 
     public LanternEntityType(String pluginId, String id, String name, Translation translation,
             Function<UUID, E> entityConstructor) {
         super(pluginId, id, name, translation);
         this.entityConstructor = checkNotNull(entityConstructor, "entityConstructor");
-        this.entityClass = this.entityConstructor.apply(UUID.randomUUID()).getClass();
+        this.entityClass = getEntityClass(entityConstructor);
+    }
+
+    public LanternEntityType(String pluginId, String id, String translation,
+            Class<E> entityClass) {
+        super(pluginId, id, translation);
+        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
+        this.entityClass = entityClass;
+    }
+
+    public LanternEntityType(String pluginId, String id, Translation translation,
+            Class<E> entityClass) {
+        super(pluginId, id, translation);
+        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
+        this.entityClass = entityClass;
+    }
+
+    public LanternEntityType(String pluginId, String id, String name, String translation,
+            Class<E> entityClass) {
+        super(pluginId, id, name, translation);
+        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
+        this.entityClass = entityClass;
+    }
+
+    public LanternEntityType(String pluginId, String id, String name, Translation translation,
+            Class<E> entityClass) {
+        super(pluginId, id, name, translation);
+        this.entityConstructor = uuid -> { throw new UnsupportedOperationException("You cannot construct a " + id); };
+        this.entityClass = entityClass;
+    }
+
+    private static Class<? extends Entity> getEntityClass(Function<UUID, ? extends Entity> entityConstructor) {
+        try {
+            BYPASS_FIELD.set(null, true);
+            //noinspection unchecked
+            final Class<? extends Entity> clazz = entityConstructor.apply(UUID.randomUUID()).getClass();
+            BYPASS_FIELD.set(null, false);
+            return clazz;
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Function<UUID, E> getEntityConstructor() {

@@ -29,40 +29,38 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import org.lanternpowered.server.data.io.store.entity.EntityStore;
-import org.lanternpowered.server.data.io.store.entity.LivingStore;
-import org.lanternpowered.server.data.io.store.entity.PlayerStore;
+import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.data.io.store.entity.EntitySerializer;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
+import org.lanternpowered.server.data.io.store.tile.TileEntitySerializer;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.LanternEntityLiving;
-import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternItemStack;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-public final class ObjectStoreRegistry {
+public final class ObjectSerializerRegistry {
 
-    private static final ObjectStoreRegistry registry = new ObjectStoreRegistry();
+    private static final ObjectSerializerRegistry registry = new ObjectSerializerRegistry();
 
-    public static ObjectStoreRegistry get() {
+    public static ObjectSerializerRegistry get() {
         return registry;
     }
 
-    private final Map<Class<?>, ObjectStore> objectsStores = new HashMap<>();
-    private final LoadingCache<Class<?>, Optional<ObjectStore>> objectStoreCache =
-            Caffeine.newBuilder().build(this::findStore);
+    private final Map<Class<?>, ObjectSerializer> objectSerializers = new HashMap<>();
+    private final LoadingCache<Class<?>, Optional<ObjectSerializer>> objectSerializerCache =
+            Caffeine.newBuilder().build(this::findSerializer);
 
-    private Optional<ObjectStore> findStore(Class<?> key) {
-        ObjectStore store;
+    private Optional<ObjectSerializer> findSerializer(Class<?> key) {
+        ObjectSerializer store;
         while (key != Object.class) {
-            store = this.objectsStores.get(key);
+            store = this.objectSerializers.get(key);
             if (store != null) {
                 return Optional.of(store);
             }
             for (Class<?> interf : key.getInterfaces()) {
-                store = this.objectsStores.get(interf);
+                store = this.objectSerializers.get(interf);
                 if (store != null) {
                     return Optional.of(store);
                 }
@@ -72,35 +70,34 @@ public final class ObjectStoreRegistry {
         return Optional.empty();
     }
 
-    public ObjectStoreRegistry() {
-        this.register(LanternEntity.class, new EntityStore<>());
-        this.register(LanternEntityLiving.class, new LivingStore<>());
-        this.register(LanternPlayer.class, new PlayerStore());
+    public ObjectSerializerRegistry() {
         this.register(LanternItemStack.class, new ItemStackStore());
+        this.register(LanternEntity.class, new EntitySerializer());
+        this.register(LanternTileEntity.class, new TileEntitySerializer());
     }
 
     /**
-     * Register a {@link ObjectStore} for the specified object type.
+     * Register a {@link ObjectSerializer} for the specified object type.
      *
      * @param objectType The object type
-     * @param objectStore The object store
+     * @param objectSerializer The object serializer
      * @param <T> The type of the object
      */
-    public <T> void register(Class<? extends T> objectType, ObjectStore<T> objectStore) {
-        this.objectsStores.put(checkNotNull(objectType, "objectType"), checkNotNull(objectStore, "objectStore"));
-        this.objectStoreCache.invalidateAll();
+    public <T> void register(Class<? extends T> objectType, ObjectSerializer<T> objectSerializer) {
+        this.objectSerializers.put(checkNotNull(objectType, "objectType"), checkNotNull(objectSerializer, "objectSerializer"));
+        this.objectSerializerCache.invalidateAll();
     }
 
     /**
-     * Gets the most suitable {@link ObjectStore} for the specified object type,
+     * Gets the most suitable {@link ObjectSerializer} for the specified object type,
      * may return {@link Optional#empty()} if no suitable store could be found.
      *
      * @param objectType The object type
      * @param <T> The type of the object
-     * @return The object store
+     * @return The object serializer
      */
     @SuppressWarnings("unchecked")
-    public <T> Optional<ObjectStore<T>> get(Class<? extends T> objectType) {
-        return (Optional) this.objectStoreCache.get(objectType);
+    public <T> Optional<ObjectSerializer<T>> get(Class<? extends T> objectType) {
+        return (Optional) this.objectSerializerCache.get(objectType);
     }
 }

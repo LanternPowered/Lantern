@@ -102,7 +102,6 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
                 dataView.set(X, x * 16 + (index & 0xf));
                 dataView.set(Y, i << 4 | index >> 8);
                 dataView.set(Z, z * 16 + ((index >> 4) & 0xf));
-                System.out.println(dataView);
                 //noinspection ConstantConditions
                 tileEntitiesBuf.writeDataView(dataView);
             }

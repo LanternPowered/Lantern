@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.entity.living.player;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.entity.LanternHotbar;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.item.ItemInteractionResult;
@@ -47,11 +47,14 @@ import org.spongepowered.api.data.property.block.HardnessProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 public final class PlayerInteractionHandler {
 
@@ -114,10 +117,10 @@ public final class PlayerInteractionHandler {
         if (world == null) {
             return;
         }
-        Set<LanternPlayer> players = this.player.getWorld().getRawPlayers();
+        final Set<LanternPlayer> players = this.player.getWorld().getRawPlayers();
         // Update for all the players except the breaker
         if (players.size() - 1 <= 0) {
-            MessagePlayOutBlockBreakAnimation message = new MessagePlayOutBlockBreakAnimation(
+            final MessagePlayOutBlockBreakAnimation message = new MessagePlayOutBlockBreakAnimation(
                     this.diggingBlock, this.player.getEntityId(), breakState);
             players.forEach(player -> {
                 if (player != this.player) {
@@ -133,8 +136,8 @@ public final class PlayerInteractionHandler {
      * @param message The message
      */
     public void handleDigging(MessagePlayInPlayerDigging message) {
-        MessagePlayInPlayerDigging.Action action = message.getAction();
-        Vector3i blockPos = message.getPosition();
+        final MessagePlayInPlayerDigging.Action action = message.getAction();
+        final Vector3i blockPos = message.getPosition();
 
         if (action == MessagePlayInPlayerDigging.Action.START) {
             // Check if the block is within the players reach
@@ -236,6 +239,17 @@ public final class PlayerInteractionHandler {
         final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
         final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
 
+        // The offset can round up to 1, causing
+        // an incorrect clicked block location
+        final Vector3d pos2 = message.getClickOffset();
+        final double dx = pos2.getX() < 1 ? pos2.getX() : 0.99;
+        final double dy = pos2.getY() < 1 ? pos2.getY() : 0.99;
+        final double dz = pos2.getZ() < 1 ? pos2.getZ() : 0.99;
+
+        final Location<World> clickedLocation = new Location<>(this.player.getWorld(),
+                message.getPosition().toDouble().add(dx, dy, dz));
+        final Direction face = message.getFace();
+
         ItemInteractionResult interactionResult;
         Optional<ItemStack> optItemStack;
 
@@ -243,18 +257,16 @@ public final class PlayerInteractionHandler {
             final BlockState blockState = this.player.getWorld().getBlock(message.getPosition());
             optItemStack = hotbarSlot.peek();
 
-            interactionResult = ((LanternBlockType) blockState.getType()).onInteractWithItemAt(
-                    this.player, this.player.getWorld(), ItemInteractionType.MAIN, optItemStack.orElse(null),
-                    message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult = ((LanternBlockType) blockState.getType()).onInteractWithItemAt(this.player, optItemStack.orElse(null),
+                    ItemInteractionType.MAIN, clickedLocation, face);
             interactionResult.getResultItem().ifPresent(item -> hotbarSlot.set(item.createStack()));
             if (!interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
                 return;
             }
 
             optItemStack = offHandSlot.peek();
-            interactionResult = ((LanternBlockType) blockState.getType()).onInteractWithItemAt(
-                    this.player, this.player.getWorld(), ItemInteractionType.OFF, optItemStack.orElse(null),
-                    message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult = ((LanternBlockType) blockState.getType()).onInteractWithItemAt(this.player, optItemStack.orElse(null),
+                    ItemInteractionType.OFF, clickedLocation, face);
             interactionResult.getResultItem().ifPresent(item -> offHandSlot.set(item.createStack()));
             if (!interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
                 return;
@@ -264,8 +276,8 @@ public final class PlayerInteractionHandler {
         optItemStack = hotbarSlot.peek();
         if (optItemStack.isPresent()) {
             final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
-            interactionResult = itemType.onInteractWithItemAt(this.player, this.player.getWorld(), ItemInteractionType.MAIN,
-                    optItemStack.get(), message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult = itemType.onInteractWithItemAt(this.player, optItemStack.get(),
+                    ItemInteractionType.MAIN, clickedLocation, face);
             interactionResult.getResultItem().ifPresent(item -> hotbarSlot.set(item.createStack()));
             if (!interactionResult.getType().equals(ItemInteractionResult.Type.PASS)) {
                 return;
@@ -275,8 +287,8 @@ public final class PlayerInteractionHandler {
         optItemStack = offHandSlot.peek();
         if (optItemStack.isPresent()) {
             final LanternItemType itemType = (LanternItemType) optItemStack.get().getItem();
-            interactionResult = itemType.onInteractWithItemAt(this.player, this.player.getWorld(), ItemInteractionType.OFF,
-                    optItemStack.get(), message.getPosition(), message.getFace(), message.getClickOffset());
+            interactionResult = itemType.onInteractWithItemAt(this.player, optItemStack.get(),
+                    ItemInteractionType.OFF, clickedLocation, face);
             interactionResult.getResultItem().ifPresent(item -> offHandSlot.set(item.createStack()));
         }
     }

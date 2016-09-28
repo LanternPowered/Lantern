@@ -37,6 +37,7 @@ import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.util.IdAllocator;
+import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -50,10 +51,12 @@ import org.spongepowered.api.entity.EntityArchetype;
 import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Location;
@@ -129,6 +132,12 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         this.registerKey(Keys.FALL_DISTANCE, 0f).nonRemovableAttachedValueProcessor();
         this.registerKey(LanternKeys.INVULNERABLE, false).nonRemovableAttachedValueProcessor();
         this.registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).nonRemovableAttachedValueProcessor();
+    }
+
+    public Direction getHorizontalDirection(Direction.Division division) {
+        final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
+        final Vector3d direction = Quaternions.fromAxesAnglesDeg(rotation.mul(0, 1, 0)).getDirection().mul(-1, 0, 1);
+        return Direction.getClosest(direction, division);
     }
 
     /**

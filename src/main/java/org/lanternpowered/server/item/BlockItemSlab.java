@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.item;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.type.BlockSlabBase;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.EnumTrait;
@@ -37,6 +35,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import javax.annotation.Nullable;
@@ -48,11 +47,11 @@ public class BlockItemSlab extends BlockItemType {
     }
 
     @Override
-    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> clickedLocation, Direction blockFace) {
         final BlockSlabBase slabBase = (BlockSlabBase) this.blockType;
         if (slabBase.isHalf()) {
-            BlockState state = world.getBlock(clickedBlock);
+            BlockState state = clickedLocation.getBlock();
             BlockState blockState = null;
             boolean success = false;
             if (state.getType() == this.blockType) {
@@ -67,12 +66,12 @@ public class BlockItemSlab extends BlockItemType {
                         success = true;
                     }
                 }
-            } else if (world.getProperty(clickedBlock, ReplaceableProperty.class).get().getValue() == Boolean.TRUE) {
+            } else if (clickedLocation.getProperty(ReplaceableProperty.class).get().getValue() == Boolean.TRUE) {
                 success = true;
             }
             if (!success) {
-                clickedBlock = clickedBlock.add(blockFace.getOpposite().asBlockOffset());
-                state = world.getBlock(clickedBlock);
+                clickedLocation = clickedLocation.add(blockFace.getOpposite().asBlockOffset());
+                state = clickedLocation.getBlock();
                 if (state.getType() == this.blockType) {
                     final EnumTrait variantTrait = (EnumTrait) slabBase.getVariantTrait();
                     if (state.getTraitValue(variantTrait).get()
@@ -85,7 +84,7 @@ public class BlockItemSlab extends BlockItemType {
                             success = true;
                         }
                     }
-                } else if (world.getProperty(clickedBlock, ReplaceableProperty.class).get().getValue() == Boolean.TRUE) {
+                } else if (clickedLocation.getProperty(ReplaceableProperty.class).get().getValue() == Boolean.TRUE) {
                     success = true;
                 }
             }
@@ -97,7 +96,8 @@ public class BlockItemSlab extends BlockItemType {
                     } else if (blockFace == Direction.DOWN) {
                         portionType = PortionTypes.BOTTOM;
                     } else {
-                        if (cursorOffset.getY() >= 0.5) {
+                        final double y = clickedLocation.getY() - clickedLocation.getBlockY();
+                        if (y >= 0.5) {
                             portionType = PortionTypes.TOP;
                         } else {
                             portionType = PortionTypes.BOTTOM;
@@ -110,13 +110,13 @@ public class BlockItemSlab extends BlockItemType {
             }
             itemStack = itemStack.copy();
             itemStack.setQuantity(itemStack.getQuantity() - 1);
-            world.setBlock(clickedBlock, blockState, Cause.source(player == null ? itemStack : player).build());
+            clickedLocation.setBlock(blockState, Cause.source(player == null ? itemStack : player).build());
             return ItemInteractionResult.builder()
                     .type(ItemInteractionResult.Type.SUCCESS)
                     .resultItem(itemStack.createSnapshot())
                     .build();
         } else {
-            return super.onInteractWithItemAt(player, world, interactionType, itemStack, clickedBlock, blockFace, cursorOffset);
+            return super.onInteractWithItemAt(player, itemStack, interactionType, clickedLocation, blockFace);
         }
     }
 }

@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.block.type;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.data.type.LanternLogAxis;
@@ -42,12 +40,13 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import javax.annotation.Nullable;
 
 import java.util.Optional;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class BlockLog extends VariantBlock<LanternTreeType> {
 
@@ -70,10 +69,9 @@ public class BlockLog extends VariantBlock<LanternTreeType> {
     }
 
     @Override
-    public Optional<BlockState> placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
-        final BlockState state = super.placeBlockAt(player, world, interactionType, itemStack,
-                clickedBlock, blockFace, cursorOffset).orElse(this.getDefaultState());
+    public Optional<BlockState> placeBlockAt(@Nullable Player player, ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> location, Direction blockFace) {
+        final BlockState state = super.placeBlockAt(player, itemStack, interactionType, location, blockFace).get();
         return Optional.of(state.withTrait(AXIS, LanternLogAxis.fromDirection(blockFace)).get());
     }
 

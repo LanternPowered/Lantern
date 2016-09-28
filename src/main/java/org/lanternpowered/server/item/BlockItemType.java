@@ -27,8 +27,6 @@ package org.lanternpowered.server.item;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -37,6 +35,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
@@ -58,17 +57,16 @@ public class BlockItemType extends LanternItemType {
     }
 
     @Override
-    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
-        if (world.getProperty(clickedBlock, ReplaceableProperty.class).get().getValue() != Boolean.TRUE) {
-            clickedBlock = clickedBlock.add(blockFace.getOpposite().asBlockOffset());
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> clickedLocation, Direction blockFace) {
+        if (clickedLocation.getProperty(ReplaceableProperty.class).get().getValue() != Boolean.TRUE) {
+            clickedLocation = clickedLocation.add(blockFace.getOpposite().asBlockOffset());
         }
-        final Optional<BlockState> blockState = this.blockType.placeBlockAt(player, world, interactionType,
-                itemStack, clickedBlock, blockFace, cursorOffset);
+        final Optional<BlockState> blockState = this.blockType.placeBlockAt(player, itemStack, interactionType, clickedLocation, blockFace);
         if (blockState.isPresent()) {
             itemStack = itemStack.copy();
             itemStack.setQuantity(itemStack.getQuantity() - 1);
-            world.setBlock(clickedBlock, blockState.get(), Cause.source(player == null ? itemStack : player).build());
+            clickedLocation.setBlock(blockState.get(), Cause.source(player == null ? itemStack : player).build());
             return ItemInteractionResult.builder()
                     .type(ItemInteractionResult.Type.SUCCESS)
                     .resultItem(itemStack.createSnapshot())

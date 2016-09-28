@@ -197,10 +197,10 @@ public class AnvilChunkIOService implements ChunkIOService {
                 }
                 final int tileZ = tileEntityView.getInt(TILE_ENTITY_Z).get();
                 final int tileX = tileEntityView.getInt(TILE_ENTITY_X).get();
-
                 try {
                     final LanternTileEntity tileEntity = tileEntitySerializer.deserialize(tileEntityView);
                     tileEntity.setLocation(new Location<>(this.world, tileX, tileY, tileZ));
+                    tileEntity.setValid(true);
                     tileEntitySections[section].put((short) ChunkSection.index(tileX & 0xf, tileY & 0xf, tileZ & 0xf), tileEntity);
                 } catch (InvalidDataException e) {
                     Lantern.getLogger().warn("Error loading tile entity at ({};{};{}) in the chunk ({},{}) in the world {}",

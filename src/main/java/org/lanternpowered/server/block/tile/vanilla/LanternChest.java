@@ -26,6 +26,7 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.type.BlockChest;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -54,16 +55,20 @@ public class LanternChest extends LanternTileEntity implements Chest {
             return Optional.empty();
         }
         final Location<World> location = this.getLocation();
-        final Direction[] directionsToCheck = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
-        for (Direction directionToCheck : directionsToCheck) {
+        for (Direction directionToCheck : BlockChest.HORIZONTAL_DIRECTIONS) {
             final Location<World> loc = location.getRelative(directionToCheck);
             if (loc.getBlock().getType() != this.getBlock().getType()) {
                 continue;
             }
             final Optional<TileEntity> optTileEntity = location.getRelative(directionToCheck).getTileEntity();
             if (optTileEntity.isPresent() && optTileEntity.get() instanceof LanternChest) {
-                return Optional.of(new TileDoubleChestInventory(null, this.chestInventory.getName(), this.chestInventory,
-                        ((LanternChest) optTileEntity.get()).chestInventory));
+                if (directionToCheck != Direction.WEST && directionToCheck != Direction.NORTH) {
+                    return Optional.of(new TileDoubleChestInventory(null, null,
+                            this.chestInventory, ((LanternChest) optTileEntity.get()).chestInventory));
+                } else {
+                    return Optional.of(new TileDoubleChestInventory(null, null,
+                            ((LanternChest) optTileEntity.get()).chestInventory ,this.chestInventory));
+                }
             }
         }
         return Optional.empty();
@@ -77,7 +82,6 @@ public class LanternChest extends LanternTileEntity implements Chest {
     @Override
     public BlockState getBlock() {
         final BlockState block = this.getLocation().getBlock();
-        return block.getType() == BlockTypes.CHEST ||
-                block.getType() == BlockTypes.TRAPPED_CHEST ? block :BlockTypes.CHEST.getDefaultState();
+        return block.getType() == BlockTypes.CHEST || block.getType() == BlockTypes.TRAPPED_CHEST ? block : BlockTypes.CHEST.getDefaultState();
     }
 }

@@ -1370,7 +1370,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Optional.empty();
         }
-        final Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
+        final Location<World> location = new Location<>(this.world, x, y, z);
         Optional<T> property = Optional.empty();
         final Optional<PropertyStore<T>> store = LanternPropertyRegistry.getInstance().getStore(propertyClass);
         if (store.isPresent()) {
@@ -1394,7 +1394,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Collections.emptyList();
         }
-        final Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
+        final Location<World> location = new Location<>(this.world, x, y, z);
         final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
         builder.addAll(LanternPropertyRegistry.getInstance().getPropertiesFor(location));
         this.getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
@@ -1408,7 +1408,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Collections.emptyList();
         }
-        final Location<World> location = new Location<>(this.world, this.x << 4 | x, y, this.z << 4 | z);
+        final Location<World> location = new Location<>(this.world, x, y, z);
         //noinspection unchecked
         final Optional<PropertyStore<?>> store = (Optional) LanternPropertyRegistry.getInstance().getStore(propertyClass);
         if (!store.isPresent()) {

@@ -25,14 +25,12 @@
  */
 package org.lanternpowered.server.block.type;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
-import org.lanternpowered.server.util.Quaternions;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -42,6 +40,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
@@ -62,23 +61,22 @@ public class BlockEnderChest extends LanternBlockType implements IBlockContainer
     }
 
     @Override
-    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i position, Direction blockFace, Vector3d cursorOffset) {
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, @Nullable ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> location, Direction blockFace) {
         if (player != null) {
             player.openInventory(player.getEnderChestInventory(), Cause.source(player).build());
+            return ItemInteractionResult.success();
         }
         return ItemInteractionResult.pass();
     }
 
     @Override
-    public Optional<BlockState> placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
-        final BlockState state = super.placeBlockAt(player, world, interactionType, itemStack,
-                clickedBlock, blockFace, cursorOffset).orElse(this.getDefaultState());
+    public Optional<BlockState> placeBlockAt(@Nullable Player player, ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> location, Direction blockFace) {
+        final BlockState state = super.placeBlockAt(player, itemStack, interactionType, location, blockFace).get();
         final Direction facing;
         if (player != null) {
-            final Vector3d direction = Quaternions.fromAxesAnglesDeg(player.getRotation().mul(0, 1, 0)).getDirection().mul(-1, 0, 1);
-            facing = Direction.getClosest(direction, Direction.Division.CARDINAL).getOpposite();
+            facing = ((LanternEntity) player).getHorizontalDirection(Direction.Division.CARDINAL).getOpposite();
         } else {
             facing = Direction.NORTH;
         }

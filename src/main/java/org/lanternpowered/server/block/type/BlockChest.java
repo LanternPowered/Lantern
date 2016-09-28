@@ -25,15 +25,13 @@
  */
 package org.lanternpowered.server.block.type;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
-import org.lanternpowered.server.util.Quaternions;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -46,6 +44,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
@@ -69,31 +68,63 @@ public class BlockChest extends LanternBlockType implements IBlockContainer {
     }
 
     @Override
-    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i position, Direction blockFace, Vector3d cursorOffset) {
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, @Nullable ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> clickedLocation, Direction blockFace) {
         if (player != null) {
-            final TileEntity tileEntity = world.getTileEntity(position).orElse(null);
+            final TileEntity tileEntity = clickedLocation.getTileEntity().orElse(null);
             if (tileEntity instanceof Chest) {
                 player.openInventory(((Chest) tileEntity).getDoubleChestInventory().orElse(
                         ((Chest) tileEntity).getInventory()), Cause.source(player).build());
+                return ItemInteractionResult.success();
             }
         }
         return ItemInteractionResult.pass();
     }
 
+    public static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
+
     @Override
-    public Optional<BlockState> placeBlockAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
-        final BlockState state = super.placeBlockAt(player, world, interactionType, itemStack,
-                clickedBlock, blockFace, cursorOffset).orElse(this.getDefaultState());
+    public Optional<BlockState> placeBlockAt(@Nullable Player player, ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> location, Direction blockFace) {
+        final Optional<BlockState> state = super.placeBlockAt(player, itemStack, interactionType, location, blockFace);
+        if (!state.isPresent()) {
+            return state;
+        }
+
+        Location<World> otherChestLoc = null;
+        // Check whether the chest already a double chest is,
+        // and fail if this is the case
+        for (Direction directionToCheck : HORIZONTAL_DIRECTIONS) {
+            otherChestLoc = location.getRelative(directionToCheck);
+            // We found a chest
+            if (otherChestLoc.getBlock().getType() == this) {
+                // Check if it isn't already double
+                for (Direction directionToCheck1 : HORIZONTAL_DIRECTIONS) {
+                    final Location<World> loc1 = otherChestLoc.getRelative(directionToCheck1);
+                    if (loc1.getBlock().getType() == this) {
+                        return Optional.empty();
+                    }
+                }
+            } else {
+                otherChestLoc = null;
+            }
+        }
+
+        // Get the direction the chest should face
         final Direction facing;
         if (player != null) {
-            final Vector3d direction = Quaternions.fromAxesAnglesDeg(player.getRotation().mul(0, 1, 0)).getDirection().mul(-1, 0, 1);
-            facing = Direction.getClosest(direction, Direction.Division.CARDINAL).getOpposite();
+            facing = ((LanternEntity) player).getHorizontalDirection(Direction.Division.CARDINAL).getOpposite();
         } else {
             facing = Direction.NORTH;
         }
-        return Optional.of(state.withTrait(FACING, facing).get());
+
+        // Rotate the other chest in the same one as we placed
+        if (otherChestLoc != null) {
+            otherChestLoc.setBlock(otherChestLoc.getBlock().withTrait(FACING, facing).get(),
+                    Cause.source(player == null ? itemStack : player).build());
+        }
+
+        return Optional.of(state.get().withTrait(FACING, facing).get());
     }
 
     @Override

@@ -40,6 +40,7 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.lang.reflect.Modifier;
@@ -138,8 +139,8 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
         return Optional.ofNullable((T) this.properties.get(checkNotNull(propertyClass, "propertyClass")));
     }
 
-    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
-            ItemStack itemStack, Vector3i clickedBlock, Direction blockFace, Vector3d cursorOffset) {
+    public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> clickedLocation, Direction blockFace) {
         return ItemInteractionResult.pass();
     }
 

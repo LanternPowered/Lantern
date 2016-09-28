@@ -37,6 +37,7 @@ import javax.annotation.Nullable;
 public final class ItemInteractionResult {
 
     private static final ItemInteractionResult PASS = builder().type(Type.PASS).build();
+    private static final ItemInteractionResult SUCCESS = builder().type(Type.SUCCESS).build();
 
     /**
      * Gets a {@link ItemInteractionResult} of the type {@link Type#PASS}, with no
@@ -46,6 +47,16 @@ public final class ItemInteractionResult {
      */
     public static ItemInteractionResult pass() {
         return PASS;
+    }
+
+    /**
+     * Gets a {@link ItemInteractionResult} of the type {@link Type#SUCCESS}, with no
+     * modifications done to the result item.
+     *
+     * @return The item interaction result
+     */
+    public static ItemInteractionResult success() {
+        return SUCCESS;
     }
 
     /**

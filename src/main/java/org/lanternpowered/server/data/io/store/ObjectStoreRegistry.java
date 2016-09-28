@@ -30,10 +30,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.data.io.store.entity.EntityStore;
 import org.lanternpowered.server.data.io.store.entity.LivingStore;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
 import org.lanternpowered.server.data.io.store.item.ItemStackStore;
+import org.lanternpowered.server.data.io.store.tile.ChestTileEntityStore;
 import org.lanternpowered.server.data.io.store.tile.TileEntityObjectStore;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityLiving;
@@ -80,6 +82,7 @@ public final class ObjectStoreRegistry {
         this.register(LanternPlayer.class, new PlayerStore());
         this.register(LanternItemStack.class, new ItemStackStore());
         this.register(LanternTileEntity.class, new TileEntityObjectStore<>());
+        this.register(LanternChest.class, new ChestTileEntityStore<>());
     }
 
     /**

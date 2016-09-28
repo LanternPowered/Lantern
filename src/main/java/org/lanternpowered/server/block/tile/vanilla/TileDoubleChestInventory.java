@@ -23,29 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.block;
+package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.inventory.LanternGridInventory;
+import org.lanternpowered.server.inventory.LanternOrderedInventory;
+import org.lanternpowered.server.inventory.block.IChestInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.translation.Translation;
 
 import javax.annotation.Nullable;
 
-public class ChestInventory extends LanternGridInventory implements IChestInventory {
+public class TileDoubleChestInventory extends LanternOrderedInventory implements IChestInventory {
 
-    public ChestInventory(@Nullable Inventory parent, int rows) {
-        this(parent, null, rows);
-    }
-
-    public ChestInventory(@Nullable Inventory parent, @Nullable Translation name, int rows) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chest") : name);
-
-        for (int y = 0; y < rows; y++) {
-            for (int x = 0; x < 9; x++) {
-                this.registerSlotAt(x, y);
-            }
-        }
+    public TileDoubleChestInventory(@Nullable Inventory parent, @Nullable Translation name,
+            IChestInventory upperInventory, IChestInventory lowerInventory) {
+        super(parent, name);
+        this.registerChild(upperInventory);
+        this.registerChild(lowerInventory);
         this.finalizeContent();
     }
 }

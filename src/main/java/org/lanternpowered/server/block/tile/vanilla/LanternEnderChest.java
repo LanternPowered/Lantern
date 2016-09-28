@@ -23,31 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.block.tile.vanilla;
 
-public final class IdGenerator {
+import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.EnderChest;
 
-    public static String generate(String name) {
-        final StringBuilder builder = new StringBuilder();
+public class LanternEnderChest extends LanternTileEntity implements EnderChest {
 
-        final char[] chars = name.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            char c = chars[i];
-            if (Character.isUpperCase(c)) {
-                if (i != 0) {
-                    builder.append('_');
-                }
-                builder.append(Character.toLowerCase(c));
-            } else if (c == '.') {
-                builder.append('_');
-            } else {
-                builder.append(c);
-            }
-        }
-
-        return builder.toString();
-    }
-
-    private IdGenerator() {
+    @Override
+    public BlockState getBlock() {
+        final BlockState block = this.getLocation().getBlock();
+        return block.getType() == BlockTypes.ENDER_CHEST ? block : BlockTypes.ENDER_CHEST.getDefaultState();
     }
 }

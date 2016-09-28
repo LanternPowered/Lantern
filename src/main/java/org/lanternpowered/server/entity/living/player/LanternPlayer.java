@@ -53,6 +53,7 @@ import org.lanternpowered.server.inventory.PlayerContainerSession;
 import org.lanternpowered.server.inventory.PlayerInventoryContainer;
 import org.lanternpowered.server.inventory.block.ChestInventory;
 import org.lanternpowered.server.inventory.block.EnderChestInventory;
+import org.lanternpowered.server.inventory.block.IChestInventory;
 import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkSession;
@@ -754,8 +755,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         checkNotNull(cause, "cause");
         // TODO: Make this better
         LanternContainer container;
-        if (inventory instanceof ChestInventory) {
-            container = new ChestInventoryContainer(this.inventory, (ChestInventory) inventory);
+        if (inventory instanceof IChestInventory) {
+            container = new ChestInventoryContainer(this.inventory, (IChestInventory) inventory);
         } else if (inventory instanceof PlayerInventory) {
             return;
         } else {

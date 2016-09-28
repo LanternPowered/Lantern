@@ -30,6 +30,7 @@ import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
 import org.lanternpowered.server.util.Quaternions;
@@ -37,6 +38,9 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
+import org.spongepowered.api.block.tileentity.carrier.Chest;
+import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemType;
@@ -49,15 +53,18 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class BlockEnderChest extends LanternBlockType implements IBlockContainer {
+public class BlockChest extends LanternBlockType implements IBlockContainer {
 
-    public BlockEnderChest(String pluginId, String identifier,
+    public static final EnumTrait<Direction> FACING = LanternEnumTrait.of("facing", Keys.DIRECTION,
+            Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
+
+    public BlockChest(String pluginId, String identifier,
             @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, BlockChest.FACING);
-        this.modifyDefaultState(state -> state.withTrait(BlockChest.FACING, Direction.NORTH).get());
+        super(pluginId, identifier, itemTypeBuilder, FACING);
+        this.modifyDefaultState(state -> state.withTrait(FACING, Direction.NORTH).get());
         this.modifyPropertyProviders(builder -> {
-            builder.add(PropertyProviders.hardness(22.5));
-            builder.add(PropertyProviders.blastResistance(1000.0));
+            builder.add(PropertyProviders.hardness(2.5));
+            builder.add(PropertyProviders.blastResistance(12.5));
         });
     }
 
@@ -65,7 +72,11 @@ public class BlockEnderChest extends LanternBlockType implements IBlockContainer
     public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, World world, ItemInteractionType interactionType,
             ItemStack itemStack, Vector3i position, Direction blockFace, Vector3d cursorOffset) {
         if (player != null) {
-            player.openInventory(player.getEnderChestInventory(), Cause.source(player).build());
+            final TileEntity tileEntity = world.getTileEntity(position).orElse(null);
+            if (tileEntity instanceof Chest) {
+                player.openInventory(((Chest) tileEntity).getDoubleChestInventory().orElse(
+                        ((Chest) tileEntity).getInventory()), Cause.source(player).build());
+            }
         }
         return ItemInteractionResult.pass();
     }
@@ -82,11 +93,11 @@ public class BlockEnderChest extends LanternBlockType implements IBlockContainer
         } else {
             facing = Direction.NORTH;
         }
-        return Optional.of(state.withTrait(BlockChest.FACING, facing).get());
+        return Optional.of(state.withTrait(FACING, facing).get());
     }
 
     @Override
     public TileEntity createTile(BlockState blockState) {
-        return ((LanternTileEntityType) TileEntityTypes.ENDER_CHEST).getTileEntityConstructor().get();
+        return ((LanternTileEntityType) TileEntityTypes.CHEST).getTileEntityConstructor().get();
     }
 }

@@ -28,7 +28,8 @@ package org.lanternpowered.server.game.registry.type.block;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.block.tile.LanternEnderChest;
+import org.lanternpowered.server.block.tile.vanilla.LanternChest;
+import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -69,6 +70,7 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
 
     @Override
     public void registerDefaults() {
+        this.register(LanternTileEntityType.of("minecraft", "chest", LanternChest::new));
         this.register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
     }
 }

@@ -240,8 +240,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
          * @param z The z coordinate
          * @return The index in the array
          */
-        public static short index(int x, int y, int z) {
-            return (short) ((y << 8) | (z << 4) | x);
+        public static int index(int x, int y, int z) {
+            return (y << 8) | (z << 4) | x;
         }
 
         /**
@@ -843,11 +843,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
             type1 = type;
         }
 
-        x &= 0xf;
-        z &= 0xf;
-
-        final int x1 = x;
-        final int z1 = z;
+        final int rx = x & 0xf;
+        final int rz = z & 0xf;
         this.chunkSections.work(y >> 4, section -> {
             if (section == null) {
                 // The section is already filled with air,
@@ -858,7 +855,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
                 // Create a new section
                 section = new ChunkSection();
             }
-            final short index = ChunkSection.index(x1, y & 0xf, z1);
+            final int index = ChunkSection.index(rx, y & 0xf, rz);
             final short oldType = section.types[index];
             if (oldType != type1) {
                 if (oldType != 0) {
@@ -884,7 +881,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (section.nonAirCount <= 0) {
                 return null;
             }
-            final LanternTileEntity tileEntity = section.tileEntities.get(index);
+            final LanternTileEntity tileEntity = section.tileEntities.get((short) index);
             boolean remove = false;
             boolean refresh = false;
             if (tileEntity != null) {
@@ -914,16 +911,17 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
             if (refresh) {
                 final LanternTileEntity newTileEntity = (LanternTileEntity) ((IBlockContainer) block.getType()).createTile(block);
-                section.tileEntities.put(index, newTileEntity);
+                section.tileEntities.put((short) index, newTileEntity);
+                newTileEntity.setLocation(tileEntity != null ? tileEntity.getLocation() : new Location<>(this.world, x, y, z));
                 newTileEntity.setValid(true);
             } else if (remove) {
-                section.tileEntities.remove(index);
+                section.tileEntities.remove((short) index);
             }
             section.types[index] = type1;
             return section;
         });
 
-        final int index = z << 4 | x;
+        final int index = rz << 4 | rx;
         long stamp = this.heightMapLock.writeLock();
         try {
             // TODO: Check first and then use the write lock?
@@ -1106,7 +1104,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public Optional<UUID> getCreator(int x, int y, int z) {
         this.checkVolumeBounds(x, y, z);
         final int creatorId = this.trackerData.work(y >> 4, trackerDataMap ->
-                trackerDataMap.get(ChunkSection.index(x, y & 0xf, z)).creatorId, false);
+                trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf)).creatorId, false);
         return this.world.getProperties().getTrackerIdAllocator().get(creatorId);
     }
 
@@ -1114,7 +1112,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public Optional<UUID> getNotifier(int x, int y, int z) {
         this.checkVolumeBounds(x, y, z);
         final int notifierId = this.trackerData.work(y >> 4, trackerDataMap ->
-                trackerDataMap.get(ChunkSection.index(x, y & 0xf, z)).notifierId, false);
+                trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf)).notifierId, false);
         return this.world.getProperties().getTrackerIdAllocator().get(notifierId);
     }
 
@@ -1123,7 +1121,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         this.checkVolumeBounds(x, y, z);
         final int creatorId = uuid == null ? -1 : this.world.getProperties().getTrackerIdAllocator().get(uuid);
         this.trackerData.work(y >> 4, trackerDataMap -> {
-            final short index = ChunkSection.index(x, y & 0xf, z);
+            final short index = (short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
             TrackerData trackerData = trackerDataMap.get(index);
             if (creatorId == -1) {
                 if (trackerData != null && trackerData.notifierId == -1) {
@@ -1146,7 +1144,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         this.checkVolumeBounds(x, y, z);
         final int notifierId = uuid == null ? -1 : this.world.getProperties().getTrackerIdAllocator().get(uuid);
         this.trackerData.work(y >> 4, trackerDataMap -> {
-            final short index = ChunkSection.index(x, y & 0xf, z);
+            final short index = (short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
             TrackerData trackerData = trackerDataMap.get(index);
             if (notifierId == -1) {
                 if (trackerData != null && trackerData.creatorId == -1) {
@@ -1269,7 +1267,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
         this.checkVolumeBounds(x, y, z);
-        final short index = ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
+        final short index = (short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
         return this.chunkSections.work(y >> 4, chunkSection -> {
             if (chunkSection == null) {
                 return Optional.empty();

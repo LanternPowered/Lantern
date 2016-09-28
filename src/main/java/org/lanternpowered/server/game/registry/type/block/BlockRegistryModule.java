@@ -40,6 +40,7 @@ import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.type.BlockAir;
 import org.lanternpowered.server.block.type.BlockBarrier;
 import org.lanternpowered.server.block.type.BlockBedrock;
+import org.lanternpowered.server.block.type.BlockChest;
 import org.lanternpowered.server.block.type.BlockDirt;
 import org.lanternpowered.server.block.type.BlockEnderChest;
 import org.lanternpowered.server.block.type.BlockGlass;
@@ -244,8 +245,13 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
             return (byte) (portion << 3 | slabType);
         });
+        this.register(54, new BlockChest("minecraft", "chest", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+            final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
+            return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
+                    facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
+        });
         this.register(130, new BlockEnderChest("minecraft", "ender_chest", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
-            final Direction facing = blockState.getTraitValue(BlockEnderChest.FACING).get();
+            final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
             return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
                     facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
         });

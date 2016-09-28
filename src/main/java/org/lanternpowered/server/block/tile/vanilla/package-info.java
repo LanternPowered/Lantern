@@ -23,16 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile;
-
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.tileentity.EnderChest;
-
-public class LanternEnderChest extends LanternTileEntity implements EnderChest {
-
-    @Override
-    public BlockState getBlock() {
-        return BlockTypes.ENDER_CHEST.getDefaultState();
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.block.tile.vanilla;

@@ -45,6 +45,8 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
     public ByteBuffer encode(CodecContext context, MessagePlayOutChunkData message) throws CodecException {
         final MessagePlayOutChunkData.Section[] sections = message.getSections();
         final byte[] biomes = message.getBiomes();
+        final int x = message.getX();
+        final int z = message.getZ();
 
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeInteger(message.getX());
@@ -95,11 +97,12 @@ public final class CodecPlayOutChunkData implements Codec<MessagePlayOutChunkDat
             }
             for (Short2ObjectMap.Entry<DataView> tileEntityEntry : tileEntities.short2ObjectEntrySet()) {
                 tileEntitiesCount++;
-                final short index = tileEntityEntry.getShortKey();
+                final int index = tileEntityEntry.getShortKey() & 0xffff;
                 final DataView dataView = tileEntityEntry.getValue();
-                dataView.set(X, index & 0xf);
+                dataView.set(X, x * 16 + (index & 0xf));
                 dataView.set(Y, i << 4 | index >> 8);
-                dataView.set(Z, (index >> 4) & 0xf);
+                dataView.set(Z, z * 16 + ((index >> 4) & 0xf));
+                System.out.println(dataView);
                 //noinspection ConstantConditions
                 tileEntitiesBuf.writeDataView(dataView);
             }

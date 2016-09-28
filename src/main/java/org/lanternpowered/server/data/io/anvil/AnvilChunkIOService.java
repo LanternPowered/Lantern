@@ -200,11 +200,11 @@ public class AnvilChunkIOService implements ChunkIOService {
 
                 try {
                     final LanternTileEntity tileEntity = tileEntitySerializer.deserialize(tileEntityView);
-                    tileEntity.setLocation(new Location<>(this.world, x * 16 + tileX, tileY, z * 16 + tileZ));
-                    tileEntitySections[section].put(ChunkSection.index(tileX, tileY & 0xf, tileZ), tileEntity);
+                    tileEntity.setLocation(new Location<>(this.world, tileX, tileY, tileZ));
+                    tileEntitySections[section].put((short) ChunkSection.index(tileX & 0xf, tileY & 0xf, tileZ & 0xf), tileEntity);
                 } catch (InvalidDataException e) {
                     Lantern.getLogger().warn("Error loading tile entity at ({};{};{}) in the chunk ({},{}) in the world {}",
-                            tileX, tileY, tileZ, x, z, this.getWorldProperties().getWorldName(), e);
+                            tileX & 0xf, tileY & 0xf, tileZ & 0xf, x, z, this.getWorldProperties().getWorldName(), e);
                 }
             }
         });
@@ -224,12 +224,12 @@ public class AnvilChunkIOService implements ChunkIOService {
                 final int creatorId = dataView.getInt(TRACKER_ENTRY_CREATOR).orElse(-1);
                 final int notifierId = dataView.getInt(TRACKER_ENTRY_NOTIFIER).orElse(-1);
                 // index = z << 12 | y << 4 | x
-                short index = optIndex.get();
-                final short section = (short) ((index >> 8) & 0xf);
+                int index = optIndex.get() & 0xffff;
+                final int section = (index >> 8) & 0xf;
                 // Convert the index to the section based system
                 // index = y << 8 | z << 4 | x
                 index = ChunkSection.index(index & 0xf, (index >> 4) & 0xf, index >> 12);
-                trackerData[section].put(index, new LanternChunk.TrackerData(creatorId, notifierId));
+                trackerData[section].put((short) index, new LanternChunk.TrackerData(creatorId, notifierId));
             }
         }
 
@@ -355,9 +355,9 @@ public class AnvilChunkIOService implements ChunkIOService {
                 final ObjectSerializer<LanternTileEntity> tileEntitySerializer = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
                 final DataView dataView = tileEntitySerializer.serialize(tileEntityEntry.getValue());
                 final short pos = tileEntityEntry.getShortKey();
-                dataView.set(TILE_ENTITY_X, (int) pos & 0xf);
+                dataView.set(TILE_ENTITY_X, x * 16 + (pos & 0xf));
                 dataView.set(TILE_ENTITY_Y, (i << 4) | (pos >> 8));
-                dataView.set(TILE_ENTITY_Z, (pos >> 4) & 0xf);
+                dataView.set(TILE_ENTITY_Z, z * 16 + ((pos >> 4) & 0xf));
                 tileEntityDataViews.add(dataView);
             }
         }
@@ -374,12 +374,12 @@ public class AnvilChunkIOService implements ChunkIOService {
             final Short2ObjectMap<LanternChunk.TrackerData> trackerDataSection = trackerData[i];
             for (Short2ObjectMap.Entry<LanternChunk.TrackerData> entry : trackerDataSection.short2ObjectEntrySet()) {
                 // index = y << 8 | z << 4 | x
-                short index = entry.getShortKey();
+                int index = entry.getShortKey() & 0xffff;
                 // Convert the index to the column based system
                 // index = z << 12 | y << 4 | x
-                index = (short) (((index >> 4) & 0xf) << 12 | i << 8 | index >> 4 | index & 0xf);
+                index = ((index >> 4) & 0xf) << 12 | i << 8 | (index >> 4) & 0xf0 | index & 0xf;
                 final DataView trackerDataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-                trackerDataView.set(TRACKER_BLOCK_POS, index);
+                trackerDataView.set(TRACKER_BLOCK_POS, (short) index);
                 trackerDataView.set(TRACKER_ENTRY_NOTIFIER, entry.getValue().getNotifierId());
                 trackerDataView.set(TRACKER_ENTRY_CREATOR, entry.getValue().getCreatorId());
                 trackerDataViews.add(trackerDataView);

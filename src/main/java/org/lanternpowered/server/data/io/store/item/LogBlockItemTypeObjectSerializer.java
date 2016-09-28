@@ -48,6 +48,7 @@ public class LogBlockItemTypeObjectSerializer implements ItemTypeObjectSerialize
         final BlockType blockType = itemStack.getItem().getBlock().get();
         final BlockState blockState = BlockRegistryModule.get().getStateByTypeAndData(blockType,
                 dataView.getShort(DATA_VALUE).orElse((short) 0).byteValue()).get();
-        valueContainer.set(Keys.TREE_TYPE, blockState.get(Keys.TREE_TYPE).get());
+        // TODO
+        // valueContainer.set(Keys.TREE_TYPE, blockState.get(Keys.TREE_TYPE).get());
     }
 }

@@ -142,7 +142,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
                 if (dimensionId == 0) {
                     serializeRespawnLocationTo(dataView, respawnLocation);
                 } else {
-                    respawnLocationViews.add(serializeRespawnLocationTo(new MemoryDataContainer(), respawnLocation)
+                    respawnLocationViews.add(serializeRespawnLocationTo(new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED), respawnLocation)
                             .set(RESPAWN_LOCATIONS_DIMENSION, dimensionId));
                 }
             });

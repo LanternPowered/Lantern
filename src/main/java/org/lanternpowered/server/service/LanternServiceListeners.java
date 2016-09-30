@@ -32,6 +32,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.service.ChangeServiceProviderEvent;
 
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -46,10 +47,13 @@ public final class LanternServiceListeners {
     private final Multimap<Class<?>, Predicate<Object>> serviceCallbacks = HashMultimap.create();
 
     @SuppressWarnings("unchecked")
-    public <T> void registerExpirableServiceCallback(Class<T> service, Predicate<T> callback) {
-        Sponge.getServiceManager().provide(service).ifPresent(callback::test);
+    public <T> void registerExpirableServiceCallback(Class<T> serviceType, Predicate<T> callback) {
+        final Optional<T> service = Sponge.getServiceManager().provide(serviceType);
+        if (service.isPresent() && !callback.test(service.get())) {
+            return;
+        }
         synchronized (this.serviceCallbacks) {
-            this.serviceCallbacks.put(service, (Predicate<Object>) callback);
+            this.serviceCallbacks.put(serviceType, (Predicate<Object>) callback);
         }
     }
 
@@ -63,7 +67,7 @@ public final class LanternServiceListeners {
     @Listener
     public void onServiceChange(ChangeServiceProviderEvent event) {
         synchronized (this.serviceCallbacks) {
-            Iterator<Predicate<Object>> it = this.serviceCallbacks.get(event.getService()).iterator();
+            final Iterator<Predicate<Object>> it = this.serviceCallbacks.get(event.getService()).iterator();
             while (it.hasNext()) {
                 if (!it.next().test(event.getNewProvider())) {
                     it.remove();

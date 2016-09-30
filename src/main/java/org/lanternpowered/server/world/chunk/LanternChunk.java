@@ -105,6 +105,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -113,6 +114,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.StampedLock;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
@@ -1182,6 +1184,44 @@ public class LanternChunk implements AbstractExtent, Chunk {
         return null;
     }
 
+    private void forEachEntity(Consumer<LanternEntity> consumer) {
+        final Iterator<LanternEntity> iterator = this.entities.iterator();
+        while (iterator.hasNext()) {
+            final LanternEntity entity = iterator.next();
+            // Only remove the entities that are "destroyed",
+            // the other ones can be resurrected after chunk loading
+            if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+                iterator.remove();
+            } else {
+                consumer.accept(entity);
+            }
+        }
+    }
+
+    /**
+     * Resurrects all the {@link Entity}s that
+     * were temporarily "disabled" (chunk being unloaded).
+     */
+    void resurrectEntities() {
+        this.forEachEntity(LanternEntity::resurrect);
+    }
+
+    /**
+     * Bury all the {@link Entity}s that will be
+     * temporarily "disabled" (chunk being unloaded).
+     */
+    void buryEntities() {
+        this.forEachEntity(entity -> entity.remove(LanternEntity.RemoveState.CHUNK_UNLOAD));
+    }
+
+    public void addEntity(LanternEntity entity) {
+        this.entities.add(entity);
+    }
+
+    public void removeEntity(LanternEntity entity) {
+        this.entities.remove(entity);
+    }
+
     @Override
     public Optional<Entity> getEntity(UUID uniqueId) {
         final Optional<Entity> optEntity = this.world.getEntity(uniqueId);
@@ -1196,12 +1236,14 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Collection<Entity> getEntities() {
-        return ImmutableList.copyOf(this.entities);
+        final ImmutableList.Builder<Entity> entities = ImmutableList.builder();
+        this.forEachEntity(entities::add);
+        return entities.build();
     }
 
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
-        return this.entities.stream().filter(filter).collect(GuavaCollectors.toImmutableList());
+        return this.getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
     }
 
     @Override

@@ -45,7 +45,6 @@ import com.google.common.collect.MapMaker;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
-import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.Lantern;
@@ -696,6 +695,9 @@ public final class LanternChunkManager {
                 this.pendingForUnload.add(new UnloadingChunkEntry(coords));
             }
             this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause.get(), chunk));
+            // Resurrect all the entities in the chunk
+            chunk.resurrectEntities();
+            this.world.addEntities(chunk.getEntities());
             return chunk;
         }
         boolean[] newChunk = new boolean[1];
@@ -723,6 +725,7 @@ public final class LanternChunkManager {
         }
         // Try to load the chunk
         this.load(chunk, cause, generate);
+        this.world.addEntities(chunk.getEntities());
         if (!this.ticketsByPos.containsKey(coords)) {
             this.pendingForUnload.add(new UnloadingChunkEntry(coords));
         }
@@ -1245,6 +1248,8 @@ public final class LanternChunkManager {
             this.loadedChunks.remove(coords);
             // Move the chunk to the graveyard
             this.reusableChunks.put(coords, chunk);
+            // Bury the entities
+            chunk.buryEntities();
             this.save0(chunk);
             return true;
         } finally {

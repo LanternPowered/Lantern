@@ -108,23 +108,23 @@ public class ScoreboardIO {
                 throw new IOException("Unable to access " + file.getFileName() + "!", e);
             }
         }).orElse(null);
-        Scoreboard.Builder scoreboardBuilder = Scoreboard.builder();
+        final Scoreboard.Builder scoreboardBuilder = Scoreboard.builder();
         if (dataView == null) {
             return scoreboardBuilder.build();
         }
-        Map<String, Objective> objectives = new HashMap<>();
+        final Map<String, Objective> objectives = new HashMap<>();
         dataView = dataView.getView(DATA).orElseThrow(() -> new IllegalStateException("Unable to find the data compound."));
         dataView.getViewList(OBJECTIVES).ifPresent(list -> list.forEach(entry -> {
-            String name = entry.getString(NAME).get();
-            Text displayName = LanternTexts.fromLegacy(entry.getString(DISPLAY_NAME).get());
-            Criterion criterion = Sponge.getRegistry().getType(Criterion.class, entry.getString(CRITERION_NAME).get())
+            final String name = entry.getString(NAME).get();
+            final Text displayName = LanternTexts.fromLegacy(entry.getString(DISPLAY_NAME).get());
+            final Criterion criterion = Sponge.getRegistry().getType(Criterion.class, entry.getString(CRITERION_NAME).get())
                     .orElseGet(() -> {
                         Lantern.getLogger().warn("Unable to find a criterion with id: {}, default to dummy.",
                                 entry.getString(CRITERION_NAME).get());
                         return Criteria.DUMMY;
                     });
-            ObjectiveDisplayMode objectiveDisplayMode = Sponge.getRegistry().getType(ObjectiveDisplayMode.class, entry.getString(DISPLAY_MODE).get())
-                    .orElseGet(() -> {
+            final ObjectiveDisplayMode objectiveDisplayMode = Sponge.getRegistry().getType(ObjectiveDisplayMode.class,
+                    entry.getString(DISPLAY_MODE).get()).orElseGet(() -> {
                         Lantern.getLogger().warn("Unable to find a display mode with id: {}, default to integer.",
                                 entry.getString(CRITERION_NAME).get());
                         return ObjectiveDisplayModes.INTEGER;
@@ -144,11 +144,11 @@ public class ScoreboardIO {
                 return;
             }
 
-            Text name = LanternTexts.fromLegacy(entry.getString(NAME).get());
-            int value = entry.getInt(SCORE).get();
-            boolean locked = entry.getInt(LOCKED).orElse(0) > 0; // TODO
+            final Text name = LanternTexts.fromLegacy(entry.getString(NAME).get());
+            final int value = entry.getInt(SCORE).get();
+            final boolean locked = entry.getInt(LOCKED).orElse(0) > 0; // TODO
 
-            String objectiveName = entry.getString(OBJECTIVE).get();
+            final String objectiveName = entry.getString(OBJECTIVE).get();
             Score score = null;
 
             Objective objective = objectives.get(objectiveName);
@@ -156,7 +156,7 @@ public class ScoreboardIO {
                 score = addToObjective(objective, null, name, value);
             }
 
-            List<String> extraObjectives = entry.getStringList(EXTRA_OBJECTIVES).orElse(null);
+            final List<String> extraObjectives = entry.getStringList(EXTRA_OBJECTIVES).orElse(null);
             if (extraObjectives != null) {
                 for (String extraObjective : extraObjectives) {
                     objective = objectives.get(extraObjective);
@@ -167,9 +167,9 @@ public class ScoreboardIO {
             }
         }));
 
-        List<Team> teams = new ArrayList<>();
+        final List<Team> teams = new ArrayList<>();
         dataView.getViewList(TEAMS).ifPresent(list -> list.forEach(entry -> {
-            Team.Builder builder = Team.builder()
+            final Team.Builder builder = Team.builder()
                     .allowFriendlyFire(entry.getInt(ALLOW_FRIENDLY_FIRE).orElse(0) > 0)
                     .canSeeFriendlyInvisibles(entry.getInt(CAN_SEE_FRIENDLY_INVISIBLES).orElse(0) > 0)
                     .name(entry.getString(NAME).get())
@@ -204,15 +204,15 @@ public class ScoreboardIO {
             teams.add(builder.build());
         }));
 
-        Scoreboard scoreboard = scoreboardBuilder.objectives(new ArrayList<>(objectives.values())).teams(teams).build();
+        final Scoreboard scoreboard = scoreboardBuilder.objectives(new ArrayList<>(objectives.values())).teams(teams).build();
 
         dataView.getView(DISPLAY_SLOTS).ifPresent(displaySlots -> {
             for (DataQuery key : displaySlots.getKeys(false)) {
-                Matcher matcher = DISPLAY_SLOT_PATTERN.matcher(key.getParts().get(0));
+                final Matcher matcher = DISPLAY_SLOT_PATTERN.matcher(key.getParts().get(0));
                 if (matcher.matches()) {
-                    int internalId = Integer.parseInt(matcher.group(1));
+                    final int internalId = Integer.parseInt(matcher.group(1));
                     Lantern.getRegistry().getRegistryModule(DisplaySlotRegistryModule.class).get().getByInternalId(internalId).ifPresent(slot -> {
-                        Objective objective = objectives.get(displaySlots.getString(key).get());
+                        final Objective objective = objectives.get(displaySlots.getString(key).get());
                         if (objective != null) {
                             scoreboard.updateDisplaySlot(objective, slot);
                         }
@@ -235,27 +235,26 @@ public class ScoreboardIO {
     }
 
     public static void write(Path folder, Scoreboard scoreboard) throws IOException {
-        List<DataView> objectives = scoreboard.getObjectives().stream().map(objective -> new MemoryDataContainer()
+        final List<DataView> objectives = scoreboard.getObjectives().stream().map(objective -> new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
                 .set(NAME, objective.getName())
                 .set(DISPLAY_NAME, ((LanternObjective) objective).getLegacyDisplayName())
                 .set(CRITERION_NAME, objective.getCriterion().getId())
                 .set(DISPLAY_MODE, objective.getDisplayMode().getId())).collect(Collectors.toList());
 
-        List<DataView> scores = new ArrayList<>();
+        final List<DataView> scores = new ArrayList<>();
         for (Score score : scoreboard.getScores()) {
-            Iterator<Objective> it = score.getObjectives().iterator();
-
-            DataView baseView = new MemoryDataContainer()
+            final Iterator<Objective> it = score.getObjectives().iterator();
+            final DataView baseView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(NAME, ((LanternScore) score).getLegacyName())
                     .set(SCORE, score.getScore());
             // TODO: Locked state
 
-            DataView mainView = baseView.copy()
+            final DataView mainView = baseView.copy()
                     .set(OBJECTIVE, it.next().getName());
 
-            List<String> extraObjectives = new ArrayList<>();
+            final List<String> extraObjectives = new ArrayList<>();
             while (it.hasNext()) {
-                String extraObjectiveName = it.next().getName();
+                final String extraObjectiveName = it.next().getName();
                 scores.add(baseView.copy()
                         .set(OBJECTIVE, extraObjectiveName)
                         .set(INVALID, (byte) 1));
@@ -267,9 +266,9 @@ public class ScoreboardIO {
             }
         }
 
-        List<DataView> teams = new ArrayList<>();
+        final List<DataView> teams = new ArrayList<>();
         for (Team team : scoreboard.getTeams()) {
-            DataView container = new MemoryDataContainer()
+           final DataView container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED)
                     .set(ALLOW_FRIENDLY_FIRE, (byte) (team.allowFriendlyFire() ? 1 : 0))
                     .set(CAN_SEE_FRIENDLY_INVISIBLES, (byte) (team.canSeeFriendlyInvisibles() ? 1 : 0))
                     .set(NAME_TAG_VISIBILITY, team.getNameTagVisibility().getName())
@@ -279,27 +278,27 @@ public class ScoreboardIO {
                     .set(COLLISION_RULE, team.getCollisionRule().getName())
                     .set(PREFIX, ((LanternTeam) team).getLegacyPrefix())
                     .set(SUFFIX, ((LanternTeam) team).getLegacySuffix());
-            TextColor teamColor = team.getColor();
+            final TextColor teamColor = team.getColor();
             if (teamColor != TextColors.NONE) {
                 container.set(TEAM_COLOR, teamColor.getId());
             }
-            Set<Text> members = team.getMembers();
+            final Set<Text> members = team.getMembers();
             container.set(MEMBERS, members.stream().map(LanternTexts::toLegacy).collect(Collectors.toList()));
             teams.add(container);
         }
 
-        DataContainer dataContainer = new MemoryDataContainer();
-        DataView dataView = dataContainer.createView(DATA)
+        final DataContainer rootDataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+        final DataView dataView = rootDataContainer.createView(DATA)
                 .set(OBJECTIVES, objectives)
                 .set(SCORES, scores)
                 .set(TEAMS, teams);
 
-        DataView displaySlots = dataView.createView(DISPLAY_SLOTS);
+        final DataView displaySlots = dataView.createView(DISPLAY_SLOTS);
         ((LanternScoreboard) scoreboard).getObjectivesInSlot().entrySet().forEach(entry ->
                 displaySlots.set(DataQuery.of("slot_" + ((LanternDisplaySlot) entry.getKey()).getInternalId()), entry.getValue().getName()));
 
         IOHelper.write(folder.resolve(SCOREBOARD_DATA), file -> {
-            NbtStreamUtils.write(dataContainer, Files.newOutputStream(file), true);
+            NbtStreamUtils.write(rootDataContainer, Files.newOutputStream(file), true);
             return true;
         });
     }

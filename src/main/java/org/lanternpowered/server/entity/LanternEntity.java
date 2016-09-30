@@ -25,10 +25,13 @@
  */
 package org.lanternpowered.server.entity;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.AbstractDataHolder;
@@ -110,7 +113,28 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     // The scale of the entity
     private Vector3d scale = Vector3d.ONE;
 
+    /**
+     * The state of the removal of this entity.
+     */
+    @Nullable
+    private RemoveState removeState;
+
     private boolean onGround;
+
+    @Nullable private Vector2i lastChunkCoords;
+
+    public enum RemoveState {
+        /**
+         * The entity was destroyed through the {@link #remove()}
+         * method. Will not be respawned in any case.
+         */
+        DESTROYED,
+        /**
+         * The entity was removed due chunk unloading. It will appear
+         * as "removed", but it is basicly just unloaded.
+         */
+        CHUNK_UNLOAD,
+    }
 
     public LanternEntity(UUID uniqueId) {
         this.uniqueId = uniqueId;
@@ -138,6 +162,42 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
         final Vector3d direction = Quaternions.fromAxesAnglesDeg(rotation.mul(0, 1, 0)).getDirection().mul(-1, 0, 1);
         return Direction.getClosest(direction, division);
+    }
+
+    @Override
+    public boolean isRemoved() {
+        return this.removeState != null;
+    }
+
+    @Override
+    public void remove() {
+        if (!this.isRemoved()) {
+            this.remove(RemoveState.DESTROYED);
+        }
+    }
+
+    @Nullable
+    public RemoveState getRemoveState() {
+        return this.removeState;
+    }
+
+    public void remove(RemoveState removeState) {
+        checkNotNull(removeState, "removeState");
+        this.removeState = removeState;
+    }
+
+    public void resurrect() {
+        checkArgument(this.removeState != RemoveState.DESTROYED, "A destroyed entity cannot be resurrected/respawned.");
+        this.removeState = null;
+    }
+
+    @Nullable
+    public Vector2i getLastChunkCoords() {
+        return this.lastChunkCoords;
+    }
+
+    public void setLastChunkCoords(@Nullable Vector2i coords) {
+        this.lastChunkCoords = coords;
     }
 
     /**
@@ -389,27 +449,15 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public boolean isRemoved() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public boolean isLoaded() {
         // TODO Auto-generated method stub
         return false;
     }
 
-    @Override
-    public void remove() {
-        // TODO Auto-generated method stub
-        
-    }
-
     /**
      * Pulses the entity.
      */
-    protected void pulse() {
+    public void pulse() {
 
     }
 

@@ -41,6 +41,7 @@ import org.lanternpowered.server.game.LanternPlatform;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.network.NetworkManager;
 import org.lanternpowered.server.network.ProxyType;
+import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.EmptyRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
@@ -98,34 +99,6 @@ public class LanternServer implements Server {
 
     public static void main(String[] args) {
         try {
-            // The server wasn't run from a terminal, we will just display
-            // a message and the server won't be run.
-            /*
-             * TODO: Currently disabled until the IDE bug is fixed...
-             * https://bugs.eclipse.org/bugs/show_bug.cgi?id=122429
-             */
-            /*
-            if (System.console() == null) {
-                JFrame jFrame = new JFrame();
-                jFrame.setTitle("Lantern Server");
-                jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                // Create the label that should be displayed
-                JLabel label = new JLabel("You have to run LanternServer through a terminal (bash).");
-                // Make the size of the font a bit bigger
-                Font font = label.getFont();
-                label.setFont(font.deriveFont(font.getSize() * 1.4f));
-                // Add the label
-                jFrame.getContentPane().add(label);
-                // Make the frame fit around the added content
-                jFrame.pack();
-                // Make it visible
-                jFrame.setVisible(true);
-                // Disable resizing
-                jFrame.setResizable(false);
-                return;
-            }
-            */
-
             // Create the game instance
             final LanternGame game = new LanternGame();
             game.preInitialize();
@@ -277,8 +250,9 @@ public class LanternServer implements Server {
         final InetSocketAddress address = this.getBindAddress(this.game.getGlobalConfig().getServerPort());
         final boolean useEpollWhenAvailable = this.game.getGlobalConfig().useServerEpollWhenAvailable();
 
-        ChannelFuture future = this.networkManager.init(address, useEpollWhenAvailable);
-        Channel channel = future.awaitUninterruptibly().channel();
+        ProtocolState.init();
+        final ChannelFuture future = this.networkManager.init(address, useEpollWhenAvailable);
+        final Channel channel = future.awaitUninterruptibly().channel();
         if (!channel.isActive()) {
             final Throwable cause = future.cause();
             if (cause instanceof BindException) {

@@ -334,7 +334,6 @@ public final class ObservedChunkManager {
                         final ObjectSerializer<LanternTileEntity> store = ObjectSerializerRegistry.get().get(LanternTileEntity.class).get();
                         final DataView dataView = store.serialize(tileEntityEntry.getValue());
                         tileEntityDataViews.put(tileEntityEntry.getShortKey(), dataView);
-                       // System.out.println(dataView);
                     }
                     msgSections[i] = new MessagePlayOutChunkData.Section(array, palette,
                             section.lightFromBlock, section.lightFromSky, tileEntityDataViews);

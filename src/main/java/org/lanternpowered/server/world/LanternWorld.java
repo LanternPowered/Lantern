@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.world;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MAX;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN;
@@ -43,6 +44,7 @@ import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
 import org.lanternpowered.server.game.Lantern;
@@ -134,6 +136,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -175,6 +178,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     // The chunk manager of this world
     private final LanternChunkManager chunkManager;
+
+    /**
+     * The entities mapped by their unique id.
+     */
+    private final Map<UUID, LanternEntity> entitiesByUniqueId = new ConcurrentHashMap<>();
 
     /**
      * The chunk manager that will allows observers to track
@@ -929,7 +937,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public void sendTitle(Title title) {
         checkNotNull(title, "title");
         if (!this.players.isEmpty()) {
-            List<Message> networkMessages = LanternTitles.getMessages(title);
+            final List<Message> networkMessages = LanternTitles.getMessages(title);
             this.players.forEach(player -> player.getConnection().send(networkMessages));
         }
     }
@@ -1009,8 +1017,66 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Optional<Entity> getEntity(UUID uuid) {
-        // TODO Auto-generated method stub
-        return null;
+        return Optional.ofNullable(this.entitiesByUniqueId.get(checkNotNull(uuid, "uuid")));
+    }
+
+    @Override
+    public boolean spawnEntity(Entity entity, Cause cause) {
+        checkNotNull(entity, "entity");
+        checkArgument(!entity.isRemoved(), "The entity may not be removed.");
+        checkArgument(entity.getWorld() == this, "The entity is not be located in this world.");
+        checkNotNull(cause, "cause");
+        final LanternEntity entity1 = this.entitiesByUniqueId.putIfAbsent(entity.getUniqueId(), (LanternEntity) entity);
+        if (entity1 != null) {
+            if (entity == entity1) {
+                throw new IllegalArgumentException("The entity is already spawned.");
+            } else {
+                throw new IllegalArgumentException("There is already a entity spawned with the unique id.");
+            }
+        }
+        final LanternEntity entity2 = (LanternEntity) entity;
+        final Vector3i position = entity2.getPosition().toInt();
+        final LanternChunk chunk = (LanternChunk) this.loadChunk(position.getX() >> 4, 0, position.getZ() >> 4, true).get();
+        chunk.addEntity(entity2);
+        return true;
+    }
+
+    public void addEntities(Iterable<Entity> entities) {
+        for (Entity entity : entities) {
+            this.entitiesByUniqueId.put(entity.getUniqueId(), (LanternEntity) entity);
+        }
+    }
+
+    private void pulseEntities() {
+        // Pulse the entities
+        final Iterator<LanternEntity> iterator = this.entitiesByUniqueId.values().iterator();
+        while (iterator.hasNext()) {
+            final LanternEntity entity = iterator.next();
+            if (entity.isRemoved()) {
+                final Vector2i lastChunk = entity.getLastChunkCoords();
+                if (lastChunk != null && entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+                    final LanternChunk chunk = this.chunkManager.getChunkIfLoaded(lastChunk);
+                    if (chunk != null) {
+                        chunk.removeEntity(entity);
+                    }
+                }
+                iterator.remove();
+            } else {
+                final Vector2i lastChunk = entity.getLastChunkCoords();
+                entity.pulse();
+                final Vector3i pos = entity.getPosition().toInt();
+                final Vector2i newChunk = new Vector2i(pos.getX() >> 4, pos.getZ() >> 4);
+                if (lastChunk == null || !lastChunk.equals(newChunk)) {
+                    LanternChunk chunk;
+                    if (lastChunk != null && (chunk = this.chunkManager.getChunkIfLoaded(lastChunk)) != null) {
+                        chunk.removeEntity(entity);
+                    }
+                    chunk = this.chunkManager.getOrLoadChunk(newChunk.getX(), newChunk.getY());
+                    chunk.addEntity(entity);
+                    entity.setLastChunkCoords(newChunk);
+                }
+            }
+        }
     }
 
     @Override
@@ -1091,12 +1157,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public boolean spawnEntity(Entity entity, Cause cause) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
     public PortalAgent getPortalAgent() {
         return this.portalAgent;
     }
@@ -1117,6 +1177,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         this.players.forEach(LanternPlayer::pulse);
         // TODO: Maybe async?
         this.observedChunkManager.pulse();
+
+        // Pulse the entities
+        this.pulseEntities();
     }
 
     public void broadcast(Supplier<Message> message) {

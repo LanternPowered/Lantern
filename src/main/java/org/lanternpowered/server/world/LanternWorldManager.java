@@ -107,8 +107,7 @@ public final class LanternWorldManager {
         // The reference to the world instance
         @Nullable public volatile LanternWorld world;
 
-        public WorldLookupEntry(LanternWorldProperties properties, Path folder,
-                int dimensionId) {
+        WorldLookupEntry(LanternWorldProperties properties, Path folder, int dimensionId) {
             this.dimensionId = dimensionId;
             this.properties = properties;
             this.folder = folder;
@@ -677,7 +676,7 @@ public final class LanternWorldManager {
      * @return The world config
      * @throws IOException 
      */
-    WorldConfigResult getOrCreateWorldConfig(String worldName) throws IOException {
+    private WorldConfigResult getOrCreateWorldConfig(String worldName) throws IOException {
         checkNotNull(worldName, "worldName");
         final Path path = this.globalConfig.getPath().getParent().resolve("worlds")
                 .resolve(worldName).resolve(WORLD_CONFIG);
@@ -690,7 +689,7 @@ public final class LanternWorldManager {
     /**
      * Adds the task for the world to tick it.
      */
-    void addWorldTask(LanternWorld world) {
+    private void addWorldTask(LanternWorld world) {
         if (this.worldThreads.containsKey(world)) {
             return;
         }
@@ -720,7 +719,7 @@ public final class LanternWorldManager {
     /**
      * Removes the task for the world to tick it.
      */
-    void removeWorldTask(LanternWorld world) {
+    private void removeWorldTask(LanternWorld world) {
         if (!this.worldThreads.containsKey(world)) {
             return;
         }
@@ -777,7 +776,7 @@ public final class LanternWorldManager {
      * @param dimensionId the dimension id
      * @return the world folder
      */
-    Path getWorldFolder(String folderName, int dimensionId) {
+    private Path getWorldFolder(String folderName, int dimensionId) {
         return dimensionId == 0 ? this.rootWorldDirectory : this.rootWorldDirectory.resolve(folderName);
     }
 
@@ -788,7 +787,7 @@ public final class LanternWorldManager {
      * 
      * @return the next dimension id
      */
-    int getNextFreeDimensionId() {
+    private int getNextFreeDimensionId() {
         // Keep the ids -1; 0; 1 safe
         int next = MIN_CUSTOM_DIMENSION_ID;
         while (true) {
@@ -801,7 +800,7 @@ public final class LanternWorldManager {
         }
     }
 
-    void addUpdatedWorldProperties(LanternWorldProperties properties, Path worldFolder, @Nullable Integer dimensionId) {
+    private void addUpdatedWorldProperties(LanternWorldProperties properties, Path worldFolder, @Nullable Integer dimensionId) {
         // The world is already added
         if (this.worldByUUID.containsKey(properties.getUniqueId())) {
             return;
@@ -824,7 +823,7 @@ public final class LanternWorldManager {
      * @param dimensionId The id of the world (dimension)
      * @return The world lookup entry
      */
-    WorldLookupEntry addWorldProperties(LanternWorldProperties properties, Path worldDirectory, int dimensionId) {
+    private WorldLookupEntry addWorldProperties(LanternWorldProperties properties, Path worldDirectory, int dimensionId) {
         final WorldLookupEntry entry = new WorldLookupEntry(properties, worldDirectory, dimensionId);
         this.worldByUUID.put(properties.getUniqueId(), entry);
         this.worldByName.put(properties.getWorldName(), entry);

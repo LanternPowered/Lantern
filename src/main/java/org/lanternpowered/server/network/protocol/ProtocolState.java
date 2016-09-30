@@ -28,6 +28,8 @@ package org.lanternpowered.server.network.protocol;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 
+import java.util.Optional;
+
 public enum ProtocolState {
     /**
      * The handshake state (initial).
@@ -86,13 +88,16 @@ public enum ProtocolState {
      * @param id the id
      * @return the protocol state
      */
-    public static ProtocolState fromId(int id) {
-        return lookup.get(id);
+    public static Optional<ProtocolState> getFromId(int id) {
+        return Optional.ofNullable(lookup.get(id));
     }
 
     static {
         for (ProtocolState state : values()) {
             lookup.put(state.id, state);
         }
+    }
+
+    public static void init() {
     }
 }

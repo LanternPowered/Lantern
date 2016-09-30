@@ -78,6 +78,7 @@ public final class MessagePlayOutOpenWindow implements Message {
         HOPPER,
         DROPPER,
         HORSE,
+        SHULKER_BOX,
         ;
     }
 }

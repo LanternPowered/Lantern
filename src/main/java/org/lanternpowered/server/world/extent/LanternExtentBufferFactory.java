@@ -33,6 +33,7 @@ import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuff
 import org.lanternpowered.server.util.gen.block.ShortArrayMutableBlockBuffer;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
+import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.extent.MutableBiomeArea;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -88,5 +89,10 @@ public final class LanternExtentBufferFactory implements ExtentBufferFactory {
     @Override
     public MutableBlockVolume createThreadSafeBlockBuffer(int xSize, int ySize, int zSize) {
         return this.createThreadSafeBlockBuffer(new Vector3i(xSize, ySize, zSize));
+    }
+
+    @Override
+    public ArchetypeVolume createArchetypeVolume(Vector3i size, Vector3i origin) {
+        return null;
     }
 }

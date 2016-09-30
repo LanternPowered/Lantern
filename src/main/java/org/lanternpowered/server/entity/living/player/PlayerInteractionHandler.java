@@ -242,9 +242,9 @@ public final class PlayerInteractionHandler {
         // The offset can round up to 1, causing
         // an incorrect clicked block location
         final Vector3d pos2 = message.getClickOffset();
-        final double dx = pos2.getX() < 1 ? pos2.getX() : 0.99;
-        final double dy = pos2.getY() < 1 ? pos2.getY() : 0.99;
-        final double dz = pos2.getZ() < 1 ? pos2.getZ() : 0.99;
+        final double dx = Math.min(pos2.getX(), 0.999);
+        final double dy = Math.min(pos2.getY(), 0.999);
+        final double dz = Math.min(pos2.getZ(), 0.999);
 
         final Location<World> clickedLocation = new Location<>(this.player.getWorld(),
                 message.getPosition().toDouble().add(dx, dy, dz));

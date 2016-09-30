@@ -42,13 +42,13 @@ public final class CodecPlayInPlayerBlockPlacement implements Codec<MessagePlayI
 
     @Override
     public MessagePlayInPlayerBlockPlacement decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        Vector3i position = buf.read(Types.VECTOR_3_I);
-        Direction face = fromFace(buf.readVarInt());
-        ItemInteractionType hand = ItemInteractionType.values()[buf.readVarInt()];
-        double ox = (double) buf.readByte() / 15.0;
-        double oy = (double) buf.readByte() / 15.0;
-        double oz = (double) buf.readByte() / 15.0;
-        Vector3d offset = new Vector3d(ox , oy, oz);
+        final Vector3i position = buf.read(Types.VECTOR_3_I);
+        final Direction face = fromFace(buf.readVarInt());
+        final ItemInteractionType hand = ItemInteractionType.values()[buf.readVarInt()];
+        final double ox = buf.readFloat();
+        final double oy = buf.readFloat();
+        final double oz = buf.readFloat();
+        final Vector3d offset = new Vector3d(ox, oy, oz);
         return new MessagePlayInPlayerBlockPlacement(position, offset, face, hand);
     }
 }

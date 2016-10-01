@@ -23,24 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Item;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInDropHeldItem;
 
-import java.util.UUID;
-
-public class LanternItem extends LanternEntity implements Item {
-
-    public LanternItem(UUID uniqueId) {
-        super(uniqueId);
-        this.setEntityProtocolType(EntityProtocolTypes.ITEM);
-    }
+public class HandlerPlayInDropHeldItem implements Handler<MessagePlayInDropHeldItem> {
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        this.registerKey(Keys.REPRESENTED_ITEM, null);
+    public void handle(NetworkContext context, MessagePlayInDropHeldItem message) {
+        context.getSession().getPlayer().getContainerSession().handleItemDrop(message);
     }
 }

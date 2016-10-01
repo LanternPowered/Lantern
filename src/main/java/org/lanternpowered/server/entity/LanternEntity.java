@@ -87,7 +87,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     // The entity id that will be used for the client
-    private int entityId;
+    private int entityId = -1;
 
     // The unique id of this entity
     private final UUID uniqueId;

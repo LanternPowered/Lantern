@@ -36,6 +36,8 @@ public final class EntityProtocolTypes {
 
     public static final EntityProtocolType<LanternEntityLiving> HUSK = dummy("HUSK");
 
+    public static final EntityProtocolType<LanternEntity> ITEM = dummy("ITEM");
+
     public static final EntityProtocolType<LanternEntity> LIGHTNING = dummy("LIGHTNING");
 
     public static final EntityProtocolType<LanternEntityLiving> MAGMA_CUBE = dummy("MAGMA_CUBE");

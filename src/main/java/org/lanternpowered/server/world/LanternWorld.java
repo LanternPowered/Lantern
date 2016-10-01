@@ -33,6 +33,7 @@ import static org.lanternpowered.server.world.chunk.LanternChunkLayout.SPACE_MIN
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -45,6 +46,7 @@ import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.ObservedChunkManager;
 import org.lanternpowered.server.game.Lantern;
@@ -107,6 +109,7 @@ import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.DiscreteTransform3;
+import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
 import org.spongepowered.api.world.Chunk;
@@ -139,6 +142,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -509,28 +513,40 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         return null;
     }
 
+    private void forEachEntity(Consumer<LanternEntity> consumer) {
+        final Iterator<LanternEntity> iterator = this.entitiesByUniqueId.values().iterator();
+        while (iterator.hasNext()) {
+            final LanternEntity entity = iterator.next();
+            // Only remove the entities that are "destroyed",
+            // the other ones can be resurrected after chunk loading
+            if (entity.isRemoved()) {
+                iterator.remove();
+            } else {
+                consumer.accept(entity);
+            }
+        }
+    }
+
     @Override
     public Collection<Entity> getEntities() {
-        // TODO Auto-generated method stub
-        return Collections.emptyList();
+        final ImmutableList.Builder<Entity> entities = ImmutableList.builder();
+        this.forEachEntity(entities::add);
+        return entities.build();
     }
 
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
-        // TODO Auto-generated method stub
-        return Collections.emptyList();
+        return this.getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
     }
 
     @Override
     public Entity createEntity(EntityType type, Vector3d position) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Entity createEntity(EntityType type, Vector3i position) {
-        // TODO Auto-generated method stub
-        return null;
+        checkNotNull(position, "position");
+        final LanternEntityType entityType = (LanternEntityType) checkNotNull(type, "type");
+        //noinspection unchecked
+        final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(UUID.randomUUID());
+        entity.setPositionAndWorld(this, position);
+        return entity;
     }
 
     @Override
@@ -547,7 +563,11 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
-        return false;
+        boolean spawned = true;
+        for (Entity entity : entities) {
+            spawned &= this.spawnEntity(entity, cause);
+        }
+        return spawned;
     }
 
     @Override

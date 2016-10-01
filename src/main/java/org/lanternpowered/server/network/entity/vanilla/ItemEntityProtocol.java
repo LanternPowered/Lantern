@@ -23,24 +23,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.network.entity.EntityProtocolTypes;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Item;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.UUID;
+import java.util.Objects;
 
-public class LanternItem extends LanternEntity implements Item {
+public class ItemEntityProtocol<E extends LanternEntity> extends ObjectEntityProtocol<E> {
 
-    public LanternItem(UUID uniqueId) {
-        super(uniqueId);
-        this.setEntityProtocolType(EntityProtocolTypes.ITEM);
+    private ItemStackSnapshot lastItemStackSnapshot;
+
+    public ItemEntityProtocol(E entity) {
+        super(entity);
     }
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        this.registerKey(Keys.REPRESENTED_ITEM, null);
+    protected void spawn(ParameterList parameterList) {
+        super.spawn(parameterList);
+        parameterList.add(EntityParameters.Item.ITEM, this.entity.get(Keys.REPRESENTED_ITEM).map(ItemStackSnapshot::createStack).orElse(null));
+    }
+
+    @Override
+    protected void update(ParameterList parameterList) {
+        super.update(parameterList);
+        final ItemStackSnapshot itemStackSnapshot = this.entity.get(Keys.REPRESENTED_ITEM).orElse(null);
+        if (!Objects.equals(this.lastItemStackSnapshot, itemStackSnapshot)) {
+            // Ignore the NoAI tag, isn't used on the client
+            parameterList.add(EntityParameters.Item.ITEM, itemStackSnapshot.createStack());
+            this.lastItemStackSnapshot = itemStackSnapshot;
+        }
+    }
+
+    @Override
+    protected int getObjectType() {
+        return 2;
+    }
+
+    @Override
+    protected int getObjectData() {
+        return 1;
     }
 }

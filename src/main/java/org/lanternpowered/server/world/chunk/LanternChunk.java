@@ -1260,11 +1260,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public Entity createEntity(EntityType type, Vector3i position) {
-        return this.createEntity(type, checkNotNull(position, "position").toDouble());
-    }
-
-    @Override
     public Optional<Entity> createEntity(DataContainer entityContainer) {
         // TODO Auto-generated method stub
         return Optional.empty();

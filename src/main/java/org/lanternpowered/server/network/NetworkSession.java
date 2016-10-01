@@ -765,8 +765,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                 Lantern.getLogger().warn("An error occurred while saving the player data of {} ({})", this.gameProfile.getName().get(),
                         this.gameProfile.getUniqueId(), e);
             }
+
             this.player.remove(LanternEntity.RemoveState.DESTROYED);
             this.player.setWorld(null);
+            LanternEntity.getIdAllocator().push(this.player.getEntityId());
+            this.player.setEntityId(-1);
         }
     }
 

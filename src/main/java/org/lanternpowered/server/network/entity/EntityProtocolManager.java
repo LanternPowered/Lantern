@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -74,6 +75,8 @@ public final class EntityProtocolManager {
         final AbstractEntityProtocol<?> removed = this.entityProtocols.put(entity, entityProtocol);
         if (removed != null) {
             this.queuedForRemoval.add(removed);
+        } else if (entity.getEntityId() == -1) {
+            entity.setEntityId(LanternEntity.getIdAllocator().poll());
         }
     }
 
@@ -87,6 +90,11 @@ public final class EntityProtocolManager {
         final AbstractEntityProtocol<?> removed = this.entityProtocols.remove(entity);
         if (removed != null) {
             this.queuedForRemoval.add(removed);
+            // Don't release entity ids allocated for players
+            if (!(entity instanceof Player)) {
+                LanternEntity.getIdAllocator().push(entity.getEntityId());
+                entity.setEntityId(-1);
+            }
         }
     }
 

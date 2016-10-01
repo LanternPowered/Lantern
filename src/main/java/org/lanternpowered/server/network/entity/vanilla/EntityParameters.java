@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 import org.lanternpowered.server.network.entity.parameter.ParameterType;
 import org.lanternpowered.server.network.entity.parameter.ParameterTypeCollection;
 import org.lanternpowered.server.network.entity.parameter.ParameterValueTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -520,6 +521,16 @@ public final class EntityParameters {
         public static final ParameterType<Byte> FLAGS = PARAMETERS.newParameterType(ParameterValueTypes.BYTE);
 
         private Snowman() {
+        }
+    }
+
+    public static final class Item {
+
+        public static final ParameterTypeCollection PARAMETERS = Base.PARAMETERS.copy();
+
+        public static final ParameterType<ItemStack> ITEM = PARAMETERS.newParameterType(ParameterValueTypes.ITEM_STACK);
+
+        private Item() {
         }
     }
 

@@ -11,27 +11,16 @@
     },
     "weight": 100,
     "duration": "@ 300 + $random.nextInt(600)",
-    "action": [
-        {
-            "type": "random_chunk_action",
+    "action": {
+        "condition": [
+            "@ $context.get(Parameters.WORLD).get().weatherUniverse.get().darkness > 0.8"
+        ],
+        "action": {
+            "type": "lantern:lightning_weather_spawner",
             "data": {
-                "actions-per-chunk": 2,
-                "action": {
-                    "condition": [
-                        "@ $random.range(0.0, 1.0) < 0.000001",
-                        "@ $<minecraft:weather/utils.scr>.testDarkness($context, 0.8)"
-                    ],
-                    "action": {
-                        "type": "play_sound",
-                        "data": {
-                            "type": "minecraft:entity_lightning_thunder",
-                            "category": "minecraft:weather",
-                            "pitch": 1.0,
-                            "volume": 2.0
-                        }
-                    }
-                }
+                "attempts-per-chunk": 2,
+                "chance": 0.000004
             }
         }
-    ]
+    }
 }

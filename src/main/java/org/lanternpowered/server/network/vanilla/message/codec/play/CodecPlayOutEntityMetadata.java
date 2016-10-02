@@ -36,7 +36,7 @@ public final class CodecPlayOutEntityMetadata implements Codec<MessagePlayOutEnt
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityMetadata message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         ((AbstractParameterList) message.getParameterList()).write(buf);
         return buf;

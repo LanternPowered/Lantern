@@ -27,11 +27,11 @@ package org.lanternpowered.api.script.context;
 
 import org.spongepowered.api.CatalogType;
 
-public interface ContextParameter<V> extends CatalogType {
+public interface Parameter<V> extends CatalogType {
 
     /**
      * Gets the type of the value that will be stored
-     * by this {@link ContextParameter}.
+     * by this {@link Parameter}.
      *
      * @return The value type
      */

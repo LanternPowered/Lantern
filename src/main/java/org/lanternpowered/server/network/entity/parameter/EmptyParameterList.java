@@ -23,5 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.script.function.action.misc;
+package org.lanternpowered.server.network.entity.parameter;
+
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+
+public final class EmptyParameterList extends AbstractParameterList {
+
+    public static EmptyParameterList INSTANCE = new EmptyParameterList();
+
+    private EmptyParameterList() {
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return true;
+    }
+
+    @Override
+    public <T> void add(ParameterType<T> type, T value) {
+    }
+
+    @Override
+    public void write(ByteBuffer byteBuffer) {
+        byteBuffer.writeByte((byte) 0xff);
+    }
+}

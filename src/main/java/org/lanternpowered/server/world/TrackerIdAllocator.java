@@ -99,6 +99,12 @@ public final class TrackerIdAllocator {
                 if (stamp1 == 0L) {
                     this.lock.unlockRead(stamp);
                     stamp1 = this.lock.writeLock();
+                    index = this.uniqueIds.get(uniqueId);
+                    if (index != INVALID_INDEX) {
+                        // Release the write lock
+                        this.lock.unlockWrite(stamp1);
+                        return index;
+                    }
                 }
                 try {
                     // Get the next free index

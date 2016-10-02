@@ -33,7 +33,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.lanternpowered.api.script.context.ContextParameter;
+import org.lanternpowered.api.script.context.Parameter;
 import org.lanternpowered.api.script.function.action.ActionType;
 import org.lanternpowered.api.script.function.condition.ConditionType;
 import org.lanternpowered.api.script.function.value.DoubleValueProviderType;
@@ -463,7 +463,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 // Script registry modules
-                .registerModule(ContextParameter.class, new ContextParameterRegistryModule())
+                .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())
                 .registerModule(ConditionType.class, ConditionTypeRegistryModule.get())
                 .registerModule(DoubleValueProviderType.class, DoubleValueProviderTypeRegistryModule.get())

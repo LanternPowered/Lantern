@@ -25,13 +25,49 @@
  */
 package org.lanternpowered.server.entity.weather;
 
+import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.network.entity.EntityProtocolTypes;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundTypes;
 
 import java.util.UUID;
 
 public class LanternLightning extends LanternEntity implements AbstractLightning {
 
+    /**
+     * The amount of ticks that the lightning will be alive.
+     */
+    private int ticksToLive = 10;
+
     public LanternLightning(UUID uniqueId) {
         super(uniqueId);
+        this.setEntityProtocolType(EntityProtocolTypes.LIGHTNING);
+    }
+
+    @Override
+    public void registerKeys() {
+        super.registerKeys();
+        this.registerKey(LanternKeys.IS_EFFECT, false).nonRemovableAttachedValueProcessor();
+    }
+
+    @Override
+    public void pulse() {
+        super.pulse();
+
+        this.ticksToLive--;
+        if (this.ticksToLive <= 0) {
+            this.remove();
+        } else if (this.ticksToLive == 1) {
+            final Vector3d position = this.getPosition();
+            this.getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_THUNDER, SoundCategories.WEATHER, position,
+                    10000.0, 0.8 + this.getRandom().nextDouble() * 0.2);
+            this.getWorld().playSound(SoundTypes.ENTITY_LIGHTNING_IMPACT, SoundCategories.WEATHER, position,
+                    2.0, 0.5 + this.getRandom().nextDouble() * 0.2);
+
+            // TODO: Damage entities?
+            // TODO: Create fire
+        }
     }
 }

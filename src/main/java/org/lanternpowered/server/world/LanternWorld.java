@@ -388,6 +388,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         return this.getLocation(position.getX(), position.getY(), position.getZ());
     }
 
+    public int getHighestBlockAt(int x, int z) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getHighestBlockAt(x, z);
+    }
+
     @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
         LanternChunk chunk = this.chunkManager.getChunk(x >> 4, z >> 4);
@@ -1280,5 +1284,4 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // TODO Auto-generated method stub
         return 0;
     }
-
 }

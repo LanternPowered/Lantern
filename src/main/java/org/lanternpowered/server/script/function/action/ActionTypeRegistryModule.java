@@ -30,8 +30,7 @@ import org.lanternpowered.api.script.function.action.ActionType;
 import org.lanternpowered.api.script.function.action.ConditionalAction;
 import org.lanternpowered.api.script.function.action.MultiAction;
 import org.lanternpowered.server.script.AbstractObjectTypeRegistryModule;
-import org.lanternpowered.server.script.function.action.misc.PlaySoundAction;
-import org.lanternpowered.server.script.function.action.misc.RandomChunkAction;
+import org.lanternpowered.server.world.weather.action.LightningSpawnerAction;
 
 public class ActionTypeRegistryModule extends AbstractObjectTypeRegistryModule<Action, ActionType> {
 
@@ -49,7 +48,6 @@ public class ActionTypeRegistryModule extends AbstractObjectTypeRegistryModule<A
     public void registerDefaults() {
         this.register(new ActionTypeImpl("lantern", "multi", MultiAction.class));
         this.register(new ActionTypeImpl("lantern", "conditional", ConditionalAction.class));
-        this.register(new ActionTypeImpl("lantern", "play_sound", PlaySoundAction.class));
-        this.register(new ActionTypeImpl("lantern", "random_chunk_action", RandomChunkAction.class));
+        this.register(new ActionTypeImpl("lantern", "lightning_weather_spawner", LightningSpawnerAction.class));
     }
 }

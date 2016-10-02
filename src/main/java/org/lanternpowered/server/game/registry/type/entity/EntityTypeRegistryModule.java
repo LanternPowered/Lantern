@@ -31,15 +31,19 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.weather.LanternLightning;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+@RegistrationDependency({ EntityProtocolTypeRegistryModule.class })
 public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<EntityType> {
 
     private static final EntityTypeRegistryModule INSTANCE = new EntityTypeRegistryModule();
@@ -73,5 +77,6 @@ public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegis
         this.register(LanternEntityType.of("minecraft", "player", "entity.player.name", LanternPlayer.class,
                 uuid -> { throw new UnsupportedOperationException("You cannot construct a Player."); }));
         this.register(LanternEntityType.of("minecraft", "item", "entity.Item.name", LanternItem::new));
+        this.register(LanternEntityType.of("minecraft", "lightning", "entity.lightning.name", LanternLightning::new));
     }
 }

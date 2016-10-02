@@ -23,21 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.entity.parameter;
+package org.lanternpowered.api.script.context;
 
-public final class NullParameterList implements ParameterList {
+import org.lanternpowered.api.world.World;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.spongepowered.api.world.Location;
 
-    public static NullParameterList INSTANCE = new NullParameterList();
+@SuppressWarnings("unchecked")
+public final class Parameters {
 
-    private NullParameterList() {
-    }
+    public static final Parameter<Location<World>> TARGET_LOCATION = DummyObjectProvider.createFor(Parameter.class, "TARGET_LOCATION");
 
-    @Override
-    public boolean isEmpty() {
-        return true;
-    }
+    public static final Parameter<World> WORLD = DummyObjectProvider.createFor(Parameter.class, "WORLD");
 
-    @Override
-    public <T> void add(ParameterType<T> type, T value) {
+    private Parameters() {
     }
 }

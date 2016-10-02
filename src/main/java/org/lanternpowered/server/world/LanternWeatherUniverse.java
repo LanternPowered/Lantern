@@ -27,6 +27,9 @@ package org.lanternpowered.server.world;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.api.script.ScriptContext;
+import org.lanternpowered.api.script.context.Parameters;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.component.AttachableTo;
 import org.lanternpowered.server.component.Component;
@@ -34,6 +37,7 @@ import org.lanternpowered.server.component.Locked;
 import org.lanternpowered.server.component.OnAttach;
 import org.lanternpowered.server.inject.Inject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
+import org.lanternpowered.server.script.context.ContextImpl;
 import org.lanternpowered.server.world.rules.RuleTypes;
 import org.lanternpowered.server.world.weather.LanternWeather;
 import org.lanternpowered.server.world.weather.WeatherOptions;
@@ -67,6 +71,8 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
     private float darknessTarget;
     private float darkness;
 
+    private ScriptContext context;
+
     @OnAttach
     private void onAttach() {
         this.weatherData = this.world.getProperties().getWeatherData();
@@ -74,6 +80,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         this.rainStrength = this.rainStrengthTarget;
         this.darknessTarget = this.weatherData.getWeather().getOptions().getOrDefault(WeatherOptions.SKY_DARKNESS).get().floatValue();
         this.darkness = this.darknessTarget;
+        this.context = new ContextImpl(ImmutableMap.of(Parameters.WORLD, this.world));
     }
 
     /**
@@ -101,6 +108,7 @@ public final class LanternWeatherUniverse implements Component, WeatherUniverse 
         } else {
             this.weatherData.setRemainingDuration(remaining);
         }
+        this.weatherData.getWeather().getAction().run(this.context);
     }
 
     private void pulseSky() {

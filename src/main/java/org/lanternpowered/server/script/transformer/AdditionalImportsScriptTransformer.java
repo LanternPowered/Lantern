@@ -26,6 +26,9 @@
 package org.lanternpowered.server.script.transformer;
 
 import org.lanternpowered.api.script.Import;
+import org.lanternpowered.api.script.Parameter;
+import org.lanternpowered.api.script.context.Parameters;
+import org.lanternpowered.api.world.World;
 import org.lanternpowered.server.script.LanternRandom;
 
 public class AdditionalImportsScriptTransformer implements Transformer {
@@ -33,6 +36,8 @@ public class AdditionalImportsScriptTransformer implements Transformer {
     @Override
     public boolean transform(ScriptTransformerContext context) throws TransformerException {
         context.addImport(Import.ofField(LanternRandom.class, "$random"));
+        context.addImport(Import.ofClass(World.class));
+        context.addImport(Import.ofClass(Parameters.class));
         return true;
     }
 }

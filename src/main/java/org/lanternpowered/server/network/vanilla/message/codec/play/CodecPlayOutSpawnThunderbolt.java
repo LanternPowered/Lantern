@@ -37,13 +37,13 @@ public final class CodecPlayOutSpawnThunderbolt implements Codec<MessagePlayOutS
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnThunderbolt message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         buf.writeByte((byte) 1);
-        Vector3d position = message.getPosition();
-        buf.writeInteger((int) (position.getX() * 32.0));
-        buf.writeInteger((int) (position.getY() * 32.0));
-        buf.writeInteger((int) (position.getZ() * 32.0));
+        final Vector3d position = message.getPosition();
+        buf.writeDouble(position.getX());
+        buf.writeDouble(position.getY());
+        buf.writeDouble(position.getZ());
         return buf;
     }
 }

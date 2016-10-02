@@ -1,8 +1,0 @@
-package assets.minecraft.weather
-
-import org.lanternpowered.api.script.ScriptContext
-import org.lanternpowered.api.world.World
-
-static boolean testDarkness(ScriptContext context, float minDarkness) {
-    return context.firstValue(World.class).get().weatherUniverse.get().darkness > minDarkness
-}

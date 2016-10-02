@@ -544,65 +544,65 @@ public class LanternChunk implements AbstractExtent, Chunk {
         }
         final int index = (z & 0xf) << 4 | x & 0xf;
         long stamp = this.heightMapLock.tryOptimisticRead();
-        try {
-            boolean lower = this.heightMapUpdateFlags.get(index);
-            int height = this.heightMap[index] & 0xff;
-            if (!this.heightMapLock.validate(stamp)) {
-                stamp = this.heightMapLock.readLock();
-                lower = this.heightMapUpdateFlags.get(index);
-            }
-            // We have to update the height map for the coordinates
-            if (lower) {
-                if (this.heightMapLock.tryConvertToWriteLock(stamp) == 0L) {
-                    // We couldn't convert the lock, so create one anyway
-                    this.heightMapLock.unlock(stamp);
-                    stamp = this.heightMapLock.writeLock();
-                    height = this.heightMap[index] & 0xff;
-                    // We were to late to acquire the lock, something else modified the index first
-                    if (!this.heightMapUpdateFlags.get(index)) {
-                        return height;
-                    }
+        boolean lower = stamp != 0L && this.heightMapUpdateFlags.get(index);
+        int height = stamp == 0L ? 0 : this.heightMap[index] & 0xff;
+        if (stamp == 0L || !this.heightMapLock.validate(stamp)) {
+            stamp = this.heightMapLock.readLock();
+            lower = this.heightMapUpdateFlags.get(index);
+            height = this.heightMap[index] & 0xff;
+        } else {
+            stamp = 0L;
+        }
+        // We have to update the height map for the coordinates
+        if (lower) {
+            long stamp1 = this.heightMapLock.tryConvertToWriteLock(stamp);
+            if (stamp1 == 0L) {
+                // We couldn't convert the lock, so create one anyway
+                this.heightMapLock.unlockRead(stamp);
+                stamp1 = this.heightMapLock.writeLock();
+                // We were to late to acquire the lock, something else modified the index first
+                if (!this.heightMapUpdateFlags.get(index)) {
+                    return height;
                 }
-                final int sections = height >> 4;
-                // 0: The height we are looping through
-                final int[] values0 = { 0 };
-                // 0: Finished
-                final boolean[] values1 = { false };
-                // Loop trough all the chunk sections
-                for (int i = sections; i >= 0; i--) {
-                    final int j = i;
-                    // We do this section by section to avoid
-                    // having to lock the section too many times
-                    this.chunkSections.work(i, section -> {
-                        if (section == null) {
-                            values0[0] -= CHUNK_SECTION_SIZE;
-                        } else {
-                            int y = CHUNK_SECTION_SIZE;
-                            // Loop down in the section until we may find a
-                            // non empty block
-                            while (--y >= 0) {
-                                if (section.types[(y << 8) | index] != 0) {
-                                    values0[0] = j << 4 | y;
-                                    values1[0] = true;
-                                    break;
-                                }
+            }
+            final int sections = height >> 4;
+            // 0: The height we are looping through
+            final int[] values0 = { 0 };
+            // 0: Finished
+            final boolean[] values1 = { false };
+            // Loop trough all the chunk sections
+            for (int i = sections; i >= 0; i--) {
+                final int j = i;
+                // We do this section by section to avoid
+                // having to lock the section too many times
+                this.chunkSections.work(i, section -> {
+                    if (section == null) {
+                        values0[0] -= CHUNK_SECTION_SIZE;
+                    } else {
+                        int y = CHUNK_SECTION_SIZE;
+                        // Loop down in the section until we may find a
+                        // non empty block
+                        while (--y >= 0) {
+                            if (section.types[(y << 8) | index] != 0) {
+                                values0[0] = j << 4 | y;
+                                values1[0] = true;
+                                break;
                             }
                         }
-                    }, false);
-                    if (values1[0]) {
-                        break;
                     }
+                }, false);
+                if (values1[0]) {
+                    break;
                 }
-                this.heightMap[index] = (byte) height;
-                this.heightMapUpdateFlags.clear(index);
-                height = values0[0];
-            } else {
-                height = this.heightMap[index] & 0xff;
             }
-            return height;
-        } finally {
-            this.heightMapLock.unlock(stamp);
+            this.heightMap[index] = (byte) height;
+            this.heightMapUpdateFlags.clear(index);
+            height = values0[0];
+            this.heightMapLock.unlockWrite(stamp1);
+        } else if (stamp != 0L) {
+            this.heightMapLock.unlockRead(stamp);
         }
+        return height;
     }
 
     /**

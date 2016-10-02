@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.script.context;
 
-import org.lanternpowered.api.script.context.ContextParameter;
+import org.lanternpowered.api.script.context.Parameter;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 
-public class ContextParameterImpl<V> extends SimpleCatalogType.Base implements ContextParameter<V> {
+public class ContextParameterImpl<V> extends SimpleCatalogType.Base implements Parameter<V> {
 
     private final Class<V> valueType;
 

@@ -23,21 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.api.script.context;
-
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
-public final class ContextParameters {
-
-    public static final ContextParameter<Location<World>> TARGET_LOCATION = dummy("TARGET_LOCATION");
-
-    @SuppressWarnings("unchecked")
-    private static <T> ContextParameter<T> dummy(String name) {
-        return DummyObjectProvider.createFor(ContextParameter.class, name);
-    }
-
-    private ContextParameters() {
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.world.weather.action;

@@ -26,11 +26,8 @@
 package org.lanternpowered.server.script.context;
 
 import org.lanternpowered.api.script.ScriptContext;
-import org.lanternpowered.api.script.context.ContextParameter;
-import org.spongepowered.api.util.Tuple;
+import org.lanternpowered.api.script.context.Parameter;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Optional;
 
 public class EmptyScriptContext implements ScriptContext {
@@ -38,47 +35,12 @@ public class EmptyScriptContext implements ScriptContext {
     public static final EmptyScriptContext INSTANCE = new EmptyScriptContext();
 
     @Override
-    public boolean contains(ContextParameter<?> parameter) {
+    public <T> boolean has(Parameter<T> parameter) {
         return false;
     }
 
     @Override
-    public boolean containsValueType(Class<?> valueType) {
-        return false;
-    }
-
-    @Override
-    public boolean containsValue(Object object) {
-        return false;
-    }
-
-    @Override
-    public <T> Optional<T> get(ContextParameter<T> parameter) {
+    public <T> Optional<T> get(Parameter<T> parameter) {
         return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> put(ContextParameter<T> parameter, T value) {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<T> remove(ContextParameter<T> parameter) {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<Tuple<ContextParameter<T>, T>> first(Class<T> valueType) {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> Optional<Tuple<ContextParameter<T>, T>> last(Class<T> valueType) {
-        return Optional.empty();
-    }
-
-    @Override
-    public <T> List<T> allOf(Class<T> valueType) {
-        return Collections.emptyList();
     }
 }

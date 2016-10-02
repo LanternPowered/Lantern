@@ -25,39 +25,15 @@
  */
 package org.lanternpowered.api.script;
 
-import org.lanternpowered.api.script.context.ContextParameter;
-import org.spongepowered.api.util.Tuple;
+import org.lanternpowered.api.script.context.Parameter;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ScriptContext {
 
     String CONTEXT_PARAMETER = "$context";
 
-    boolean contains(ContextParameter<?> parameter);
+    <T> boolean has(Parameter<T> parameter);
 
-    boolean containsValueType(Class<?> valueType);
-
-    boolean containsValue(Object object);
-
-    <T> Optional<T> get(ContextParameter<T> parameter);
-
-    <T> Optional<T> put(ContextParameter<T> parameter, T value);
-
-    <T> Optional<T> remove(ContextParameter<T> parameter);
-
-    <T> Optional<Tuple<ContextParameter<T>, T>> first(Class<T> valueType);
-
-    default <T> Optional<T> firstValue(Class<T> valueType) {
-        return first(valueType).map(Tuple::getSecond);
-    }
-
-    <T> Optional<Tuple<ContextParameter<T>, T>> last(Class<T> valueType);
-
-    default <T> Optional<T> lastValue(Class<T> valueType) {
-        return last(valueType).map(Tuple::getSecond);
-    }
-
-    <T> List<T> allOf(Class<T> valueType);
+    <T> Optional<T> get(Parameter<T> parameter);
 }

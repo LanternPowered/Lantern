@@ -96,7 +96,9 @@ public class ByteBufParameterList extends AbstractParameterList {
     @Override
     public void write(ByteBuffer byteBuffer) {
         if (this.buf != null) {
-            byteBuffer.writeBytes(this.buf);
+            // Slice the ByteBuffer to avoid issues when this ParameterList is
+            // used in multiple messages or in messages send to multiple players.
+            byteBuffer.writeBytes(this.buf.slice());
         }
         byteBuffer.writeByte((byte) 0xff);
     }

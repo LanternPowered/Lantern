@@ -27,47 +27,67 @@ package org.lanternpowered.server.network.message;
 
 import io.netty.util.ReferenceCounted;
 
+import javax.annotation.Nullable;
+
 /**
  * A simple implementation of a {@link Message} that is reference counted.
- *
- * @param <C> The type of the content
  */
-public interface ReferenceCountedMessage<C extends ReferenceCounted> extends Message, ReferenceCounted {
-
-    C getContent();
+public abstract class ReferenceCountedMessage implements Message, ReferenceCounted {
 
     @Override
-    default int refCnt() {
-        return getContent().refCnt();
+    public int refCnt() {
+        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        return referenceCounted == null ? 1 : referenceCounted.refCnt();
     }
 
     @Override
-    default ReferenceCounted retain() {
-        return getContent().retain();
+    public ReferenceCounted retain() {
+        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        if (referenceCounted != null) {
+            referenceCounted.retain();
+        }
+        return this;
     }
 
     @Override
-    default ReferenceCounted retain(int increment) {
-        return getContent().retain(increment);
+    public ReferenceCounted retain(int increment) {
+        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        if (referenceCounted != null) {
+            referenceCounted.retain(increment);
+        }
+        return this;
     }
 
     @Override
-    default ReferenceCounted touch() {
-        return getContent().touch();
+    public ReferenceCounted touch() {
+        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        if (referenceCounted != null) {
+            referenceCounted.touch();
+        }
+        return this;
     }
 
     @Override
-    default ReferenceCounted touch(Object hint) {
-        return getContent().touch(hint);
+    public ReferenceCounted touch(Object hint) {
+        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        if (referenceCounted != null) {
+            referenceCounted.touch(hint);
+        }
+        return this;
     }
 
     @Override
-    default boolean release() {
-        return getContent().release();
+    public boolean release() {
+        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        return referenceCounted == null || referenceCounted.release();
     }
 
     @Override
-    default boolean release(int decrement) {
-        return getContent().release(decrement);
+    public boolean release(int decrement) {
+        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        return referenceCounted == null || referenceCounted.release(decrement);
     }
+
+    @Nullable
+    protected abstract ReferenceCounted getReferenceCounted();
 }

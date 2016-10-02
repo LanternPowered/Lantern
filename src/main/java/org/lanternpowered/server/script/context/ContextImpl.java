@@ -23,30 +23,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.entity.vanilla;
+package org.lanternpowered.server.script.context;
 
-import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.network.entity.EntityUpdateContext;
-import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnThunderbolt;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public class LightningEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
+import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.api.script.ScriptContext;
+import org.lanternpowered.api.script.context.Parameter;
 
-    public LightningEntityProtocol(E entity) {
-        super(entity);
-        this.setTrackingRange(512);
+import java.util.Map;
+import java.util.Optional;
+
+public class ContextImpl implements ScriptContext {
+
+    private final Map<Parameter<?>, Object> parameters;
+
+    public ContextImpl(Map<Parameter<?>, Object> parameters) {
+        this.parameters = ImmutableMap.copyOf(parameters);
     }
 
     @Override
-    public void spawn(EntityUpdateContext context) {
-        context.sendToAllExceptSelf(new MessagePlayOutSpawnThunderbolt(this.entity.getEntityId(), this.entity.getPosition()));
+    public <T> boolean has(Parameter<T> parameter) {
+        checkNotNull(parameter, "parameter");
+        return this.parameters.containsKey(parameter);
     }
 
     @Override
-    public void spawn(ParameterList parameterList) {
-    }
-
-    @Override
-    public void update(ParameterList parameterList) {
+    public <T> Optional<T> get(Parameter<T> parameter) {
+        checkNotNull(parameter, "parameter");
+        //noinspection unchecked
+        return Optional.ofNullable((T) this.parameters.get(parameter));
     }
 }

@@ -284,8 +284,8 @@ public class ChildrenInventoryBase extends InventoryBase {
     }
 
     @Override
-    public boolean isEmpty() {
-        return this.children.isEmpty();
+    public boolean hasChildren() {
+        return !this.children.isEmpty();
     }
 
     @Override

@@ -42,7 +42,8 @@ public class VillagerEntityProtocol<E extends LanternEntityLiving> extends Ageab
 
     private int getProfessionId() {
         return ((LanternProfession) this.entity.get(Keys.CAREER).map(Career::getProfession).orElseGet(
-                () -> this.entity.get(Keys.VILLAGER_ZOMBIE_PROFESSION).orElse(Professions.FARMER))).getInternalId();
+                () -> this.entity.get(Keys.VILLAGER_ZOMBIE_PROFESSION).map(opt -> opt.orElse(Professions.FARMER))
+                        .orElse(Professions.FARMER))).getInternalId();
     }
 
     @Override

@@ -150,8 +150,8 @@ class EmptyInventoryImpl implements EmptyInventory, IInventory {
     }
 
     @Override
-    public boolean isEmpty() {
-        return true;
+    public boolean hasChildren() {
+        return false;
     }
 
     @Override

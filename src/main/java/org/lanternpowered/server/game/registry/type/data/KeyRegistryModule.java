@@ -33,7 +33,6 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeNextEntit
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makePatternListKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
-import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSingleKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeWeightedCollectionKey;
 import static org.spongepowered.api.data.DataQuery.of;
@@ -88,10 +87,7 @@ import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.data.type.WireAttachmentType;
-import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
-import org.spongepowered.api.data.value.mutable.OptionalValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.type.ZombieType;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.entity.EntitySnapshot;
@@ -136,7 +132,6 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         this.register(makeMutableBoundedValueKey(Integer.class, of("Anger"), "sponge:anger"));
         this.register(makeValueKey(Boolean.class, of("ArmorStandHasArms"), "sponge:armor_stand_has_arms"));
         this.register(makeValueKey(Boolean.class, of("ArmorStandHasBasePlate"), "sponge:armor_stand_has_base_plate"));
-        this.register(makeValueKey(Boolean.class, of("ArmorStandHasGravity"), "sponge:armor_stand_has_gravity"));
         this.register(makeValueKey(Boolean.class, of("ArmorStandIsSmall"), "sponge:armor_stand_is_small"));
         this.register(makeValueKey(Boolean.class, of("ArmorStandMarker"), "sponge:armor_stand_marker"));
         this.register(makeValueKey(Boolean.class, of("Angry"), "sponge:angry"));
@@ -219,6 +214,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         this.register(makeMutableBoundedValueKey(Integer.class, of("Generation"), "sponge:generation"));
         this.register(makeValueKey(GoldenApple.class, of("GoldenAppleType"), "sponge:golden_apple_type"));
         this.register(makeMutableBoundedValueKey(Integer.class, of("GrowthStage"), "sponge:growth_stage"));
+        this.register(makeValueKey(Boolean.class, of("HasGravity"), "sponge:has_gravity"));
         this.register(makeValueKey(Vector3d.class, of("HeadRotation"), "sponge:head_rotation"));
         this.register(makeMutableBoundedValueKey(Double.class, of("Health"), "sponge:health"));
         this.register(makeMutableBoundedValueKey(Double.class, of("HealthScale"), "sponge:health_scale"));
@@ -347,7 +343,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         this.register(makeValueKey(Boolean.class, of("VanishPreventsTargeting"), "sponge:vanish_prevents_targeting"));
         this.register(makeValueKey(EntitySnapshot.class, of("Vehicle"), "sponge:vehicle"));
         this.register(makeValueKey(Vector3d.class, of("Velocity"), "sponge:velocity"));
-        this.register(makeValueKey(Profession.class, of("VillagerZombieProfession"), "sponge:villager_zombie_profession"));
+        this.register(makeOptionalKey(Profession.class, of("VillagerZombieProfession"), "sponge:villager_zombie_profession"));
         this.register(makeValueKey(Double.class, of("WalkingSpeed"), "sponge:walking_speed"));
         this.register(makeValueKey(WallType.class, of("WallType"), "sponge:wall_type"));
         this.register(makeValueKey(Boolean.class, of("WillShatter"), "sponge:will_shatter"));
@@ -356,6 +352,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         this.register(makeValueKey(WireAttachmentType.class, of("WireAttachmentNorth"), "sponge:wire_attachment_north"));
         this.register(makeValueKey(WireAttachmentType.class, of("WireAttachmentSouth"), "sponge:wire_attachment_south"));
         this.register(makeValueKey(WireAttachmentType.class, of("WireAttachmentWest"), "sponge:wire_attachment_west"));
+        this.register(makeValueKey(ZombieType.class, of("ZombieType"), "sponge:zombie_type"));
 
         // Register the lantern keys
         for (Field field : LanternKeys.class.getFields()) {

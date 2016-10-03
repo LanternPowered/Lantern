@@ -28,16 +28,9 @@ package org.lanternpowered.server.boss;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.boss.BossBarColor;
 
-public final class LanternBossBarColor extends PluginCatalogType.Base implements BossBarColor {
-
-    private final int internalId;
+public final class LanternBossBarColor extends PluginCatalogType.Base.Internal implements BossBarColor {
 
     public LanternBossBarColor(String pluginId, String name, int internalId) {
-        super(pluginId, name);
-        this.internalId = internalId;
-    }
-
-    public int getInternalId() {
-        return this.internalId;
+        super(pluginId, name, internalId);
     }
 }

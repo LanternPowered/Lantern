@@ -28,16 +28,9 @@ package org.lanternpowered.server.boss;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.boss.BossBarOverlay;
 
-public final class LanternBossBarOverlay extends PluginCatalogType.Base implements BossBarOverlay {
-
-    private final int internalId;
+public final class LanternBossBarOverlay extends PluginCatalogType.Base.Internal implements BossBarOverlay {
 
     public LanternBossBarOverlay(String pluginId, String name, int internalId) {
-        super(pluginId, name);
-        this.internalId = internalId;
-    }
-
-    public int getInternalId() {
-        return this.internalId;
+        super(pluginId, name, internalId);
     }
 }

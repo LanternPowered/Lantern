@@ -176,6 +176,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         this.register(makeMapKeyWithKeyAndValue(EntityType.class, Double.class, of("EntityDamageMap"), "sponge:damage_entity_map"));
         this.register(makeValueKey(Boolean.class, of("Decayable"), "sponge:decayable"));
         this.register(makeMutableBoundedValueKey(Integer.class, of("Delay"), "sponge:delay"));
+        this.register(makeMutableBoundedValueKey(Integer.class, of("DespawnDelay"), "sponge:despawn_delay"));
         this.register(makeValueKey(Direction.class, of("Direction"), "sponge:direction"));
         this.register(makeValueKey(DirtType.class, of("DirtType"), "sponge:dirt_type"));
         this.register(makeValueKey(Boolean.class, of("Disarmed"), "sponge:disarmed"));
@@ -230,6 +231,8 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         this.register(makeValueKey(HorseColor.class, of("HorseColor"), "sponge:horse_color"));
         this.register(makeValueKey(HorseStyle.class, of("HorseStyle"), "sponge:horse_style"));
         this.register(makeValueKey(HorseVariant.class, of("HorseVariant"), "sponge:horse_variant"));
+        this.register(makeValueKey(Boolean.class, of("InfiniteDespawnDelay"), "sponge:infinite_despawn_delay"));
+        this.register(makeValueKey(Boolean.class, of("InfinitePickupDelay"), "sponge:infinite_pickup_delay"));
         this.register(makeValueKey(Boolean.class, of("InvisibilityIgnoresCollision"), "sponge:invisibility_ignores_collision"));
         this.register(makeValueKey(Boolean.class, of("InvisibilityPreventsTargeting"), "sponge:invisibility_prevents_targeting"));
         this.register(makeValueKey(Boolean.class, of("Invisible"), "sponge:invisible"));
@@ -277,6 +280,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         this.register(makeListKey(EntitySnapshot.class, of("Passengers"), "sponge:passengers"));
         this.register(makeValueKey(Boolean.class, of("Persists"), "sponge:persists"));
         this.register(makeValueKey(PickupRule.class, of("PickupRule"), "sponge:pickup_rule"));
+        this.register(makeMutableBoundedValueKey(Integer.class, of("PickupDelay"), "sponge:pickup_delay"));
         this.register(makeValueKey(Boolean.class, of("PigSaddle"), "sponge:pig_saddle"));
         this.register(makeValueKey(PistonType.class, of("PistonType"), "sponge:piston_type"));
         this.register(makeSetKey(BlockType.class, of("PlaceableBlocks"), "sponge:placeable_blocks"));

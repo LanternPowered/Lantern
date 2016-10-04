@@ -23,30 +23,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.persistence.nbt;
+package org.lanternpowered.server.data.persistence;
 
-import org.lanternpowered.server.data.persistence.AbstractDataFormat;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.gson.GsonConfigurationLoader;
+import ninja.leaping.configurate.loader.HeaderMode;
+import org.lanternpowered.server.data.translator.ConfigurateTranslator;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataFormatException;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
-public final class NbtDataFormat extends AbstractDataFormat {
+public final class JsonDataFormat extends AbstractDataFormat {
 
-    public NbtDataFormat(String identifier) {
+    public JsonDataFormat(String identifier) {
         super(identifier);
     }
 
     @Override
     public DataContainer readFrom(InputStream input) throws InvalidDataFormatException, IOException {
-        return NbtStreamUtils.read(input, false);
+        final GsonConfigurationLoader loader = GsonConfigurationLoader.builder()
+                .setSource(() -> new BufferedReader(new InputStreamReader(input)))
+                .build();
+        final ConfigurationNode node = loader.load();
+        return ConfigurateTranslator.instance().translate(node);
     }
 
     @Override
     public void writeTo(OutputStream output, DataView data) throws IOException {
-        NbtStreamUtils.write(data, output, false);
+        final ConfigurationNode node = ConfigurateTranslator.instance().translate(data);
+        final GsonConfigurationLoader loader = GsonConfigurationLoader.builder()
+                .setIndent(0)
+                .setSink(() -> new BufferedWriter(new OutputStreamWriter(output)))
+                .setHeaderMode(HeaderMode.NONE)
+                .build();
+        loader.save(node);
     }
+
 }

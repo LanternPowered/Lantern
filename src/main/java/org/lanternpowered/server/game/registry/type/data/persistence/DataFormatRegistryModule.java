@@ -26,6 +26,7 @@
 package org.lanternpowered.server.game.registry.type.data.persistence;
 
 import org.lanternpowered.server.data.persistence.HoconDataFormat;
+import org.lanternpowered.server.data.persistence.JsonDataFormat;
 import org.lanternpowered.server.data.persistence.nbt.NbtDataFormat;
 import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.spongepowered.api.data.persistence.DataFormat;
@@ -40,6 +41,7 @@ public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<
     @Override
     public void registerDefaults() {
         this.register(new HoconDataFormat("hocon"));
+        this.register(new JsonDataFormat("json"));
         this.register(new NbtDataFormat("nbt"));
     }
 }

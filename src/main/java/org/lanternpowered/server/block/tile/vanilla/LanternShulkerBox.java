@@ -25,16 +25,19 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.spongepowered.api.Sponge;
+import org.lanternpowered.server.block.LanternBlockTypes;
+import org.lanternpowered.server.effect.sound.LanternSoundTypes;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public class LanternShulkerBox extends LanternTileEntity implements TileEntityCarrier {
+import java.util.Random;
 
-    private final TileChestInventory chestInventory = new TileChestInventory(null, this);
+public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory> {
+
+    private final Random random = new Random();
 
     @Override
     public void registerKeys() {
@@ -43,14 +46,26 @@ public class LanternShulkerBox extends LanternTileEntity implements TileEntityCa
     }
 
     @Override
-    public TileChestInventory getInventory() {
-        return this.chestInventory;
+    protected TileShulkerBoxInventory createInventory() {
+        return new TileShulkerBoxInventory(null, this);
+    }
+
+    @Override
+    protected void playOpenSound(Location<World> location) {
+        location.getExtent().playSound(LanternSoundTypes.BLOCK_SHULKER_BOX_OPEN, SoundCategories.BLOCK,
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+    }
+
+    @Override
+    protected void playCloseSound(Location<World> location) {
+        location.getExtent().playSound(LanternSoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
     }
 
     @Override
     public BlockState getBlock() {
         final BlockState block = this.getLocation().getBlock();
-        return block.getType().getId().equals("minecraft:shulker_box") ? block :
-                Sponge.getRegistry().getType(BlockType.class, "minecraft:shulker_box").get().getDefaultState();
+        // TODO: Check the colors??
+        return block.getType().getId().contains("shulker_box") ? block : LanternBlockTypes.WHITE_SHULKER_BOX.getDefaultState();
     }
 }

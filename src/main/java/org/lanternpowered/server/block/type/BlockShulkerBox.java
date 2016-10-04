@@ -28,18 +28,20 @@ package org.lanternpowered.server.block.type;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.tile.LanternTileEntityTypes;
+import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
+import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.IViewerListener;
-import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.tileentity.EnderChest;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
-import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.block.tileentity.carrier.Chest;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemType;
@@ -53,27 +55,25 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class BlockEnderChest extends LanternBlockType implements IBlockContainer {
+public class BlockShulkerBox extends LanternBlockType implements IBlockContainer {
 
-    public BlockEnderChest(String pluginId, String identifier,
+    public BlockShulkerBox(String pluginId, String identifier,
             @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, BlockChest.FACING);
         this.modifyDefaultState(state -> state.withTrait(BlockChest.FACING, Direction.NORTH).get());
         this.modifyPropertyProviders(builder -> {
-            builder.add(PropertyProviders.hardness(22.5));
-            builder.add(PropertyProviders.blastResistance(1000.0));
+            builder.add(PropertyProviders.hardness(2.0));
+            builder.add(PropertyProviders.blastResistance(10.0));
         });
     }
 
     @Override
     public ItemInteractionResult onInteractWithItemAt(@Nullable Player player, @Nullable ItemStack itemStack,
-            ItemInteractionType interactionType, Location<World> location, Direction blockFace) {
+            ItemInteractionType interactionType, Location<World> clickedLocation, Direction blockFace) {
         if (player != null) {
-            final TileEntity tileEntity = location.getTileEntity().orElse(null);
-            if (tileEntity instanceof EnderChest) {
-                final IInventory inventory = (IInventory) player.getEnderChestInventory();
-                inventory.add((IViewerListener) tileEntity);
-                player.openInventory(player.getEnderChestInventory(), Cause.source(player).build());
+            final TileEntity tileEntity = clickedLocation.getTileEntity().orElse(null);
+            if (tileEntity instanceof LanternShulkerBox) {
+                player.openInventory(((LanternShulkerBox) tileEntity).getInventory(), Cause.source(player).build());
                 return ItemInteractionResult.success();
             }
         }
@@ -81,20 +81,7 @@ public class BlockEnderChest extends LanternBlockType implements IBlockContainer
     }
 
     @Override
-    public Optional<BlockState> placeBlockAt(@Nullable Player player, ItemStack itemStack,
-            ItemInteractionType interactionType, Location<World> location, Direction blockFace) {
-        final BlockState state = super.placeBlockAt(player, itemStack, interactionType, location, blockFace).get();
-        final Direction facing;
-        if (player != null) {
-            facing = ((LanternEntity) player).getHorizontalDirection(Direction.Division.CARDINAL).getOpposite();
-        } else {
-            facing = Direction.NORTH;
-        }
-        return Optional.of(state.withTrait(BlockChest.FACING, facing).get());
-    }
-
-    @Override
     public TileEntity createTile(BlockState blockState) {
-        return ((LanternTileEntityType) TileEntityTypes.ENDER_CHEST).getTileEntityConstructor().get();
+        return ((LanternTileEntityType) LanternTileEntityTypes.SHULKER_BOX).getTileEntityConstructor().get();
     }
 }

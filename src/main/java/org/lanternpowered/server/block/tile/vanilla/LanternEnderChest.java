@@ -25,16 +25,49 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.tile.LanternTileEntity;
+import org.lanternpowered.server.inventory.LanternContainer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.block.tileentity.EnderChest;
+import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public class LanternEnderChest extends LanternTileEntity implements EnderChest {
+import java.util.Random;
+
+public class LanternEnderChest extends LanternContainerBase implements EnderChest {
+
+    private final Random random = new Random();
 
     @Override
     public BlockState getBlock() {
         final BlockState block = this.getLocation().getBlock();
         return block.getType() == BlockTypes.ENDER_CHEST ? block : BlockTypes.ENDER_CHEST.getDefaultState();
+    }
+
+    @Override
+    public Result onViewerAdded(Viewer viewer, LanternContainer container) {
+        super.onViewerAdded(viewer, container);
+        return Result.IGNORE;
+    }
+
+    @Override
+    public Result onViewerRemoved(Viewer viewer, LanternContainer container) {
+        super.onViewerRemoved(viewer, container);
+        return Result.REMOVE_LISTENER;
+    }
+
+    @Override
+    protected void playOpenSound(Location<World> location) {
+        location.getExtent().playSound(SoundTypes.BLOCK_ENDERCHEST_OPEN, SoundCategories.BLOCK,
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
+    }
+
+    @Override
+    protected void playCloseSound(Location<World> location) {
+        location.getExtent().playSound(SoundTypes.BLOCK_ENDERCHEST_CLOSE, SoundCategories.BLOCK,
+                location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
     }
 }

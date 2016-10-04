@@ -23,25 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.effect.sound;
 
-import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-public interface IViewerListener {
+public final class LanternSoundTypes {
 
-    Result onViewerAdded(Viewer viewer, LanternContainer container);
+    public static final SoundType BLOCK_SHULKER_BOX_CLOSE = DummyObjectProvider.createFor(SoundType.class, "BLOCK_SHULKER_BOX_CLOSE");
 
-    Result onViewerRemoved(Viewer viewer, LanternContainer container);
+    public static final SoundType BLOCK_SHULKER_BOX_OPEN = DummyObjectProvider.createFor(SoundType.class, "BLOCK_SHULKER_BOX_OPEN");
 
-    enum Result {
-        /**
-         * Don't do anything.
-         */
-        IGNORE,
-        /**
-         * The listener should be removed from
-         * the target container.
-         */
-        REMOVE_LISTENER,
+    private LanternSoundTypes() {
     }
 }

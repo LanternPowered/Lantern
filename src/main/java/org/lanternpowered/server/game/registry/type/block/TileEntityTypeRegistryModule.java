@@ -28,15 +28,20 @@ package org.lanternpowered.server.game.registry.type.block;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.tile.LanternTileEntityTypes;
 import org.lanternpowered.server.block.tile.vanilla.LanternChest;
 import org.lanternpowered.server.block.tile.vanilla.LanternEnderChest;
-import org.lanternpowered.server.block.tile.LanternTileEntityType;
+import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -72,5 +77,14 @@ public final class TileEntityTypeRegistryModule extends AdditionalPluginCatalogR
     public void registerDefaults() {
         this.register(LanternTileEntityType.of("minecraft", "chest", LanternChest::new));
         this.register(LanternTileEntityType.of("minecraft", "ender_chest", LanternEnderChest::new));
+        this.register(LanternTileEntityType.of("minecraft", "shulker_box", LanternShulkerBox::new));
+    }
+
+    @Override
+    public List<CatalogMappingData> getCatalogMappings() {
+        return ImmutableList.<CatalogMappingData>builder()
+                .addAll(super.getCatalogMappings())
+                .add(new CatalogMappingData(LanternTileEntityTypes.class, this.provideCatalogMap()))
+                .build();
     }
 }

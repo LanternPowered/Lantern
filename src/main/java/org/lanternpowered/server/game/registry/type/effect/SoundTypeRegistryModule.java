@@ -25,15 +25,20 @@
  */
 package org.lanternpowered.server.game.registry.type.effect;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.effect.sound.LanternSoundTypes;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.List;
 
 public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
 
@@ -51,5 +56,13 @@ public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegist
             final String id = name.replaceAll("\\.", "_");
             this.register(new LanternSoundType("minecraft", id, name, i));
         }
+    }
+
+    @Override
+    public List<CatalogMappingData> getCatalogMappings() {
+        return ImmutableList.<CatalogMappingData>builder()
+                .addAll(super.getCatalogMappings())
+                .add(new CatalogMappingData(LanternSoundTypes.class, this.provideCatalogMap()))
+                .build();
     }
 }

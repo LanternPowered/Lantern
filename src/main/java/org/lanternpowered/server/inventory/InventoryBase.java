@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -349,10 +350,22 @@ public abstract class InventoryBase implements IInventory {
     }
 
     protected void addViewer(Viewer viewer, LanternContainer container) {
-        this.viewerListeners.forEach(listener -> listener.onViewerAdded(viewer, container));
+        final Iterator<IViewerListener> it = this.viewerListeners.iterator();
+        while (it.hasNext()) {
+            final IViewerListener listener = it.next();
+            if (listener.onViewerAdded(viewer, container) == IViewerListener.Result.REMOVE_LISTENER) {
+                it.remove();
+            }
+        }
     }
 
     protected void removeViewer(Viewer viewer, LanternContainer container) {
-        this.viewerListeners.forEach(listener -> listener.onViewerRemoved(viewer, container));
+        final Iterator<IViewerListener> it = this.viewerListeners.iterator();
+        while (it.hasNext()) {
+            final IViewerListener listener = it.next();
+            if (listener.onViewerRemoved(viewer, container) == IViewerListener.Result.REMOVE_LISTENER) {
+                it.remove();
+            }
+        }
     }
 }

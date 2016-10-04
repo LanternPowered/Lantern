@@ -23,25 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.block;
 
-import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-public interface IViewerListener {
+public final class LanternBlockTypes {
 
-    Result onViewerAdded(Viewer viewer, LanternContainer container);
+    public static final BlockType ORANGE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "ORANGE_SHULKER_BOX");
 
-    Result onViewerRemoved(Viewer viewer, LanternContainer container);
+    public static final BlockType WHITE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "WHITE_SHULKER_BOX");
 
-    enum Result {
-        /**
-         * Don't do anything.
-         */
-        IGNORE,
-        /**
-         * The listener should be removed from
-         * the target container.
-         */
-        REMOVE_LISTENER,
+    private LanternBlockTypes() {
     }
 }

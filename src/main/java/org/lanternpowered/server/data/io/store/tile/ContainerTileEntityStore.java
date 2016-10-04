@@ -25,7 +25,7 @@
  */
 package org.lanternpowered.server.data.io.store.tile;
 
-import org.lanternpowered.server.block.tile.vanilla.LanternChest;
+import org.lanternpowered.server.block.tile.vanilla.LanternContainer;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
@@ -44,7 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ChestTileEntityStore<T extends LanternChest> extends TileEntityObjectStore<T> {
+public class ContainerTileEntityStore<T extends LanternContainer> extends TileEntityObjectStore<T> {
 
     private static final DataQuery DISPLAY_NAME = DataQuery.of("CustomName");
     private static final DataQuery ITEMS = DataQuery.of("Items");
@@ -55,7 +55,7 @@ public class ChestTileEntityStore<T extends LanternChest> extends TileEntityObje
         final List<DataView> itemViews = dataView.getViewList(ITEMS).orElse(null);
         if (itemViews != null) {
             dataView.remove(ITEMS);
-            final IChestInventory inventory = object.getInventory();
+            final IChestInventory inventory = (IChestInventory) object.getInventory();
             final ObjectSerializer<LanternItemStack> itemStackSerializer = ObjectSerializerRegistry.get().get(LanternItemStack.class).get();
             for (DataView itemView : itemViews) {
                 final int slot = itemView.getByte(SLOT).get() & 0xff;

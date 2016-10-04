@@ -23,25 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.block.tile.vanilla;
 
-import org.spongepowered.api.effect.Viewer;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.text.translation.Translation;
 
-public interface IViewerListener {
+import javax.annotation.Nullable;
 
-    Result onViewerAdded(Viewer viewer, LanternContainer container);
+public final class TileShulkerBoxInventory extends TileChestInventory {
 
-    Result onViewerRemoved(Viewer viewer, LanternContainer container);
+    public TileShulkerBoxInventory(@Nullable Inventory parent,
+            @Nullable TileEntityCarrier carrier) {
+        super(parent, carrier);
+    }
 
-    enum Result {
-        /**
-         * Don't do anything.
-         */
-        IGNORE,
-        /**
-         * The listener should be removed from
-         * the target container.
-         */
-        REMOVE_LISTENER,
+    public TileShulkerBoxInventory(@Nullable Inventory parent, @Nullable Translation name,
+            @Nullable TileEntityCarrier carrier) {
+        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.shulkerBox") : name, carrier);
     }
 }

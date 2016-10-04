@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.block.LanternBlockType.DEFAULT_ITEM_TYPE_BUILDER;
 
+import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
@@ -36,6 +37,7 @@ import it.unimi.dsi.fastutil.objects.Object2ShortOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.type.BlockAir;
 import org.lanternpowered.server.block.type.BlockBarrier;
@@ -51,6 +53,7 @@ import org.lanternpowered.server.block.type.BlockLog2;
 import org.lanternpowered.server.block.type.BlockPlanks;
 import org.lanternpowered.server.block.type.BlockSand;
 import org.lanternpowered.server.block.type.BlockSapling;
+import org.lanternpowered.server.block.type.BlockShulkerBox;
 import org.lanternpowered.server.block.type.BlockSlabBase;
 import org.lanternpowered.server.block.type.BlockStone;
 import org.lanternpowered.server.block.type.BlockStoneSlab1;
@@ -58,12 +61,14 @@ import org.lanternpowered.server.block.type.BlockStoneSlab2;
 import org.lanternpowered.server.block.type.BlockStoneSlabBase;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.util.Direction;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -271,6 +276,23 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
             return (byte) (portion << 3 | slabType);
         });
+        this.register(219, new BlockShulkerBox("minecraft", "white_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+            final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
+            return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
+                    facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
+        });
+        this.register(220, new BlockShulkerBox("minecraft", "orange_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+            final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
+            return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
+                    facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
+        });
     }
 
+    @Override
+    public List<CatalogMappingData> getCatalogMappings() {
+        return ImmutableList.<CatalogMappingData>builder()
+                .addAll(super.getCatalogMappings())
+                .add(new CatalogMappingData(LanternBlockTypes.class, this.provideCatalogMap()))
+                .build();
+    }
 }

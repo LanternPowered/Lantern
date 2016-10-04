@@ -23,25 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory;
+package org.lanternpowered.server.block.tile.vanilla;
 
-import org.spongepowered.api.effect.Viewer;
+import org.lanternpowered.server.inventory.IInventory;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 
-public interface IViewerListener {
+public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
 
-    Result onViewerAdded(Viewer viewer, LanternContainer container);
+    protected final I inventory;
 
-    Result onViewerRemoved(Viewer viewer, LanternContainer container);
+    protected LanternContainer() {
+        this.inventory = this.createInventory();
+        ((IInventory) this.inventory).add(this);
+    }
 
-    enum Result {
-        /**
-         * Don't do anything.
-         */
-        IGNORE,
-        /**
-         * The listener should be removed from
-         * the target container.
-         */
-        REMOVE_LISTENER,
+    protected abstract I createInventory();
+
+    @Override
+    public TileEntityInventory<TileEntityCarrier> getInventory() {
+        return this.inventory;
     }
 }

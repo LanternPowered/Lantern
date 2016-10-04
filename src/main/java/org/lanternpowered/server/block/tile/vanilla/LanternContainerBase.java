@@ -99,7 +99,7 @@ public abstract class LanternContainerBase extends LanternTileEntity implements 
     public void pulse() {
         super.pulse();
 
-        if (this.tickCounter++ % 15 == 0) {
+        if (this.tickCounter++ % 8 == 0) {
             final Location<World> location = this.getLocation();
             final LanternWorld world = (LanternWorld) location.getExtent();
             world.broadcast(() -> new MessagePlayOutBlockAction(location.getBlockPosition(),

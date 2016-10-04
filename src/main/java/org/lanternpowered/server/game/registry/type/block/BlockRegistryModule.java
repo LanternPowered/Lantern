@@ -277,14 +277,14 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
             return (byte) (portion << 3 | slabType);
         });
         this.register(219, new BlockShulkerBox("minecraft", "white_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
-            final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
-            return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
-                    facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
+            final Direction facing = blockState.getTraitValue(BlockShulkerBox.FACING).get();
+            return (byte) (facing == Direction.DOWN ? 0 : facing == Direction.UP ? 1 : facing == Direction.NORTH ? 2 :
+                    facing == Direction.SOUTH ? 3 : facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 0);
         });
         this.register(220, new BlockShulkerBox("minecraft", "orange_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
-            final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
-            return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
-                    facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
+            final Direction facing = blockState.getTraitValue(BlockShulkerBox.FACING).get();
+            return (byte) (facing == Direction.DOWN ? 0 : facing == Direction.UP ? 1 : facing == Direction.NORTH ? 2 :
+                    facing == Direction.SOUTH ? 3 : facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 0);
         });
     }
 

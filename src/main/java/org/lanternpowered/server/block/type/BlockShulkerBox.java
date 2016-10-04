@@ -31,15 +31,11 @@ import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.block.tile.LanternTileEntityTypes;
 import org.lanternpowered.server.block.tile.vanilla.LanternShulkerBox;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
-import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.TileEntity;
-import org.spongepowered.api.block.tileentity.TileEntityTypes;
-import org.spongepowered.api.block.tileentity.carrier.Chest;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -57,10 +53,13 @@ import javax.annotation.Nullable;
 
 public class BlockShulkerBox extends LanternBlockType implements IBlockContainer {
 
+    public static final EnumTrait<Direction> FACING = LanternEnumTrait.of("facing", Keys.DIRECTION,
+            Direction.UP, Direction.DOWN, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
+
     public BlockShulkerBox(String pluginId, String identifier,
             @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, BlockChest.FACING);
-        this.modifyDefaultState(state -> state.withTrait(BlockChest.FACING, Direction.NORTH).get());
+        super(pluginId, identifier, itemTypeBuilder, FACING);
+        this.modifyDefaultState(state -> state.withTrait(FACING, Direction.NORTH).get());
         this.modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(2.0));
             builder.add(PropertyProviders.blastResistance(10.0));
@@ -78,6 +77,18 @@ public class BlockShulkerBox extends LanternBlockType implements IBlockContainer
             }
         }
         return ItemInteractionResult.pass();
+    }
+
+    @Override
+    public Optional<BlockState> placeBlockAt(@Nullable Player player, ItemStack itemStack,
+            ItemInteractionType interactionType, Location<World> location, Direction blockFace) {
+        final Optional<BlockState> state = super.placeBlockAt(player, itemStack, interactionType, location, blockFace);
+        if (!state.isPresent()) {
+            return state;
+        }
+
+        // Rotate the other chest in the same one as we placed
+        return Optional.of(state.get().withTrait(FACING, blockFace.getOpposite()).get());
     }
 
     @Override

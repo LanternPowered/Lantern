@@ -31,6 +31,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -43,10 +44,12 @@ import org.spongepowered.api.text.translation.Translation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.annotation.Nullable;
 
@@ -69,6 +72,8 @@ public abstract class InventoryBase implements IInventory {
      * All the {@link InventoryProperty}s of this inventory mapped by their key.
      */
     private final Map<PropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey = new HashMap<>();
+
+    private final Set<IViewerListener> viewerListeners = new HashSet<>();
 
     private static final class PropertyKey {
 
@@ -336,5 +341,18 @@ public abstract class InventoryBase implements IInventory {
             }
             return false;
         }, false);
+    }
+
+    @Override
+    public void add(IViewerListener listener) {
+        this.viewerListeners.add(checkNotNull(listener, "listener"));
+    }
+
+    protected void addViewer(Viewer viewer, LanternContainer container) {
+        this.viewerListeners.forEach(listener -> listener.onViewerAdded(viewer, container));
+    }
+
+    protected void removeViewer(Viewer viewer, LanternContainer container) {
+        this.viewerListeners.forEach(listener -> listener.onViewerRemoved(viewer, container));
     }
 }

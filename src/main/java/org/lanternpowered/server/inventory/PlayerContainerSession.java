@@ -138,6 +138,11 @@ public class PlayerContainerSession {
     public void setRawOpenContainer(@Nullable LanternContainer container) {
         if (this.openContainer != container) {
             if (container != null) {
+                // The container is being used for the first time
+                if (container.getRawViewers().isEmpty()) {
+                    container.addSlotTrackers();
+                }
+                container.addViewer(this.player, container);
                 container.viewers.add(this.player);
                 container.openInventoryForAndInitialize(this.player);
                 this.updateCursorItem();
@@ -150,6 +155,10 @@ public class PlayerContainerSession {
                     this.cursorItem = null;
                 }
                 this.openContainer.viewers.remove(this.player);
+                this.openContainer.removeViewer(this.player, this.openContainer);
+                if (this.openContainer.getRawViewers().isEmpty()) {
+                    this.openContainer.removeSlotTrackers();
+                }
             }
         }
         this.openContainer = container;

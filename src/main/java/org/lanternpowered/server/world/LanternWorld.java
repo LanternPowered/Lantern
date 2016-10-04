@@ -1223,6 +1223,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         // Pulse the entities
         this.pulseEntities();
 
+        // Pulse the tile entities
+        this.getLoadedChunks().forEach(chunk -> ((LanternChunk) chunk).pulse());
+
         // TODO: Maybe async?
         this.observedChunkManager.pulse();
         this.entityProtocolManager.updateTrackers(this.players);

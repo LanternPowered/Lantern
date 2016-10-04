@@ -153,4 +153,6 @@ public interface IInventory extends Inventory {
      * @return The slot count
      */
     int slotCount();
+
+    void add(IViewerListener listener);
 }

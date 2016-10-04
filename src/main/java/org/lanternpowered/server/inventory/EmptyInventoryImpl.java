@@ -131,6 +131,10 @@ class EmptyInventoryImpl implements EmptyInventory, IInventory {
     }
 
     @Override
+    public void add(IViewerListener listener) {
+    }
+
+    @Override
     public void clear() {
     }
 

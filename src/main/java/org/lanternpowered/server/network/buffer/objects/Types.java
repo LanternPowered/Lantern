@@ -55,9 +55,9 @@ public final class Types {
     public static final Type<Vector3i> VECTOR_3_I = Type.create(Vector3i.class, new ValueSerializer<Vector3i>() {
         @Override
         public void write(ByteBuffer buf, Vector3i object) throws CodecException {
-            int x = object.getX();
-            int y = object.getY();
-            int z = object.getZ();
+            long x = object.getX();
+            long y = object.getY();
+            long z = object.getZ();
             buf.writeLong((x & 0x3ffffff) << 38 | (y & 0xfff) << 26 | (z & 0x3ffffff));
         }
 

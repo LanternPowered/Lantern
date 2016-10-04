@@ -1061,7 +1061,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         this.scheduledBlockUpdateQueue.remove(update);
     }
 
-    public void processScheduledUpdates() {
+    public void pulse() {
         // The update entry
         LanternScheduledBlockUpdate update;
         while ((update = this.scheduledBlockUpdateQueue.peek()) != null && update.getTicks() <= 0) {
@@ -1069,6 +1069,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
             this.scheduledBlockUpdateQueue.poll();
             // TODO: Update
         }
+
+        this.getTileEntities().forEach(tileEntity -> ((LanternTileEntity) tileEntity).pulse());
     }
 
     @Override

@@ -198,7 +198,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     @Override
     public short getStateInternalId(BlockState blockState) {
-        return (short) (this.packedTypeByBlockState.get(checkNotNull(blockState, "blockState")) >> 4);
+        return this.internalIdByBlockType.getShort(checkNotNull(blockState, "blockState").getType());
     }
 
     @Override

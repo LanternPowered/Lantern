@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.FastOfferResult;
+import org.lanternpowered.server.inventory.IViewerListener;
 import org.lanternpowered.server.inventory.InventoryBase;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -38,6 +39,7 @@ import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
+import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -89,7 +91,11 @@ public class LanternSlot extends InventoryBase implements Slot {
     }
 
     public void addContainer(LanternContainer container) {
-        this.containers.add(checkNotNull(container, "container"));
+        this.containers.add(container);
+    }
+
+    public void removeContainer(LanternContainer container) {
+        this.containers.remove(container);
     }
 
     private void queueUpdate() {

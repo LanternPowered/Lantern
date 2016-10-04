@@ -56,6 +56,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInS
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInUseEntity;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBossBar;
@@ -180,6 +181,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBossBar;
@@ -355,7 +357,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x07, CodecPlayOutStatistics.class, MessagePlayOutStatistics.class);
         outbound.bind(0x08, CodecPlayOutBlockBreakAnimation.class, MessagePlayOutBlockBreakAnimation.class);
         outbound.bind(0x09, CodecPlayOutUpdateTileEntity.class, MessagePlayOutUpdateTileEntity.class);
-        // ...
+        outbound.bind(0x0a, CodecPlayOutBlockAction.class, MessagePlayOutBlockAction.class);
         outbound.bind(0x0b, CodecPlayOutBlockChange.class, MessagePlayOutBlockChange.class);
         final CodecRegistration<MessagePlayOutBossBar, CodecPlayOutBossBar> codecPlayOutBossBar = outbound.bind(0x0c, CodecPlayOutBossBar.class);
         codecPlayOutBossBar.bind(MessagePlayOutBossBar.Add.class);

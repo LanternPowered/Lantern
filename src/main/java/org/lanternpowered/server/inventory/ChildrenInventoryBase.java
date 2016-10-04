@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Iterables;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -551,5 +552,17 @@ public class ChildrenInventoryBase extends InventoryBase {
             }
         }
         return slotCount;
+    }
+
+    @Override
+    protected void addViewer(Viewer viewer, LanternContainer container) {
+        super.addViewer(viewer, container);
+        this.children.forEach(child -> child.addViewer(viewer, container));
+    }
+
+    @Override
+    protected void removeViewer(Viewer viewer, LanternContainer container) {
+        super.removeViewer(viewer, container);
+        this.children.forEach(child -> child.removeViewer(viewer, container));
     }
 }

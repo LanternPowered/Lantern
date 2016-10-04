@@ -81,7 +81,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             LanternPlayerInventory playerInventory, @Nullable OrderedInventory openInventory) {
         super(null, name);
         this.playerInventory = playerInventory;
-        HumanMainInventory mainInventory = playerInventory.query(HumanMainInventory.class).first();
+        final HumanMainInventory mainInventory = playerInventory.getMain();
         if (openInventory != null) {
             this.registerChild(openInventory);
             this.registerChild(mainInventory);
@@ -95,8 +95,17 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
             this.openInventory = playerInventory;
             this.windowId = 0;
         }
+    }
+
+    void addSlotTrackers() {
         for (LanternSlot slot : this.slots) {
             slot.addContainer(this);
+        }
+    }
+
+    void removeSlotTrackers() {
+        for (LanternSlot slot : this.slots) {
+            slot.removeContainer(this);
         }
     }
 
@@ -128,7 +137,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     @Override
     public void close(Player viewer) {
         checkNotNull(viewer, "viewer");
-        PlayerContainerSession session = ((LanternPlayer) viewer).getContainerSession();
+        final PlayerContainerSession session = ((LanternPlayer) viewer).getContainerSession();
         if (session.getOpenContainer() == this) {
             session.setOpenContainer(null);
         }

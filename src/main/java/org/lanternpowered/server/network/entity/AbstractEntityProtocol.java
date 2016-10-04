@@ -242,7 +242,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      * @return Whether the tracker can see the entity
      */
     protected boolean isVisible(LanternPlayer tracker) {
-        return true;
+        return tracker.canSee(this.entity);
     }
 
     /**

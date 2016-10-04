@@ -39,6 +39,7 @@ import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
+import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.IdAllocator;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
@@ -57,6 +58,8 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.translation.FixedTranslation;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
@@ -126,6 +129,15 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     private boolean onGround;
 
     @Nullable private Vector2i lastChunkCoords;
+
+    /**
+     * The base of the {@link AABB} of this entity.
+     */
+    @Nullable private AABB boundingBoxBase;
+    @Nullable private AABB boundingBox;
+
+    @Nullable private UUID creator;
+    @Nullable private UUID notifier;
 
     public enum RemoveState {
         /**
@@ -261,6 +273,21 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         return this.uniqueId;
     }
 
+    public void setBoundingBoxBase(@Nullable AABB boundingBox) {
+        this.boundingBoxBase = boundingBox;
+        this.boundingBox = null;
+    }
+
+    @Override
+    public Optional<AABB> getBoundingBox() {
+        AABB boundingBox = this.boundingBox;
+        if (boundingBox == null && this.boundingBoxBase != null) {
+            boundingBox = this.boundingBoxBase.offset(this.position);
+            this.boundingBox = boundingBox;
+        }
+        return Optional.ofNullable(boundingBox);
+    }
+
     @Override
     public Map<Key<?>, KeyRegistration> getRawValueMap() {
         return this.rawValueMap;
@@ -305,6 +332,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     protected void setRawPosition(Vector3d position) {
         this.position = checkNotNull(position, "position");
+        this.boundingBox = null;
     }
 
     protected void setRawRotation(Vector3d rotation) {
@@ -361,11 +389,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public boolean transferToWorld(World world, Vector3d position) {
         return this.setPositionAndWorld(checkNotNull(world, "world"), position);
-    }
-
-    @Override
-    public Optional<AABB> getBoundingBox() {
-        return Optional.empty();
     }
 
     @Override
@@ -472,8 +495,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public boolean isLoaded() {
-        // TODO Auto-generated method stub
-        return false;
+        return this.removeState != RemoveState.CHUNK_UNLOAD;
     }
 
     /**
@@ -505,27 +527,31 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public Optional<UUID> getCreator() {
-        return Optional.empty();
+        return Optional.ofNullable(this.creator);
     }
 
     @Override
     public Optional<UUID> getNotifier() {
-        return Optional.empty();
+        return Optional.ofNullable(this.notifier);
     }
 
     @Override
     public void setCreator(@Nullable UUID uuid) {
-
+        this.creator = uuid;
     }
 
     @Override
     public void setNotifier(@Nullable UUID uuid) {
-
+        this.notifier = uuid;
     }
 
     @Override
     public Translation getTranslation() {
-        return null;
+        final Optional<Text> displayName = this.get(Keys.DISPLAY_NAME);
+        if (displayName.isPresent()) {
+            return new FixedTranslation(LanternTexts.toLegacy(displayName.get()));
+        }
+        return this.entityType.getTranslation();
     }
 
     @Override

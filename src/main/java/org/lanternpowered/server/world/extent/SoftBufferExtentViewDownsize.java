@@ -53,7 +53,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -533,11 +532,6 @@ public class SoftBufferExtentViewDownsize implements AbstractExtent {
         this.checkSoftRange(newMax.getX(), newMax.getY(), newMax.getZ());
         return new SoftBufferExtentViewDownsize(this.extent, newMin, newMax, newMin.add(this.hardBlockMin.sub(this.blockMin)),
                 newMax.add(this.hardBlockMax.sub(this.blockMax)));
-    }
-
-    @Override
-    public Extent getExtentView(DiscreteTransform3 transform) {
-        return new ExtentViewTransform(this, transform);
     }
 
     @Override

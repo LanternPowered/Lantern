@@ -66,7 +66,6 @@ import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
-import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.lanternpowered.server.world.rules.Rule;
@@ -108,7 +107,6 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -430,16 +428,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         this.checkVolumeBounds(newMin.getX(), newMin.getY(), newMin.getZ());
         this.checkVolumeBounds(newMax.getX(), newMax.getY(), newMax.getZ());
         return new ExtentViewDownsize(this, newMin, newMax);
-    }
-
-    @Override
-    public Extent getExtentView(DiscreteTransform3 transform) {
-        return new ExtentViewTransform(this, transform);
-    }
-
-    @Override
-    public Extent getRelativeExtentView() {
-        return this.getExtentView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
     }
 
     @Override

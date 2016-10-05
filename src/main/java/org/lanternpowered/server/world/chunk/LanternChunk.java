@@ -59,7 +59,6 @@ import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
-import org.lanternpowered.server.world.extent.ExtentViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -87,7 +86,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
 import org.spongepowered.api.world.BlockChangeFlag;
@@ -117,7 +115,6 @@ import java.util.concurrent.locks.StampedLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -1083,16 +1080,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
         this.checkVolumeBounds(newMin.getX(), newMin.getY(), newMin.getZ());
         this.checkVolumeBounds(newMax.getX(), newMax.getY(), newMax.getZ());
         return new ExtentViewDownsize(this, newMin, newMax);
-    }
-
-    @Override
-    public Extent getExtentView(DiscreteTransform3 transform) {
-        return new ExtentViewTransform(this, transform);
-    }
-
-    @Override
-    public Extent getRelativeExtentView() {
-        return this.getExtentView(DiscreteTransform3.fromTranslation(this.getBlockMin().negate()));
     }
 
     @Override

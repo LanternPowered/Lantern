@@ -44,6 +44,7 @@ import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
+import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.block.type.IBlockContainer;
@@ -119,6 +120,10 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 public class LanternChunk implements AbstractExtent, Chunk {
+
+    public static long key(int cx, int cz) {
+        return ((long) cx & 0x3ffffff) << 38 | ((long) cz & 0x3ffffff);
+    }
 
     // The size of a chunk section in the x, y and z directions
     public static final int CHUNK_SECTION_SIZE = 16;
@@ -339,6 +344,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
     private final int x;
     private final int z;
 
+    private final long key;
+
     // The lock that will be locking the chunk while it's getting loaded/saved
     final ReentrantLock lock = new ReentrantLock();
     // This condition is present while loading the chunk, a thread attempting to
@@ -362,6 +369,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     // The state of the lock
     volatile LockState lockState = LockState.NONE;
+
+    private boolean dirtyBlockActions;
 
     // Whether the light in this chunk is populated
     private boolean lightPopulated;
@@ -393,6 +402,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     public LanternChunk(LanternWorld world, int x, int z) {
         this.world = world;
+        this.key = key(x, z);
         this.x = x;
         this.z = z;
 
@@ -413,6 +423,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
             trackerDataSections[i] = new Short2ObjectOpenHashMap<>();
         }
         this.trackerData = new ConcurrentObjectArray<>(trackerDataSections);
+    }
+
+    public long getKey() {
+        return this.key;
     }
 
     public ConcurrentObjectArray<Short2ObjectMap<TrackerData>> getTrackerData() {
@@ -530,9 +544,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * Gets the highest non air block (y coordinate) at the
      * x and z coordinates.
      *
-     * @param x the x coordinate
-     * @param z the z coordinate
-     * @return the y coordinate
+     * @param x The x coordinate
+     * @param z The z coordinate
+     * @return The y coordinate
      */
     public int getHighestBlockAt(int x, int z) {
         this.checkAreaBounds(x, z);
@@ -687,7 +701,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     /**
      * Gets the x coordinate of the chunk.
      * 
-     * @return the x coordinate
+     * @return The x coordinate
      */
     public int getX() {
         return this.x;
@@ -696,7 +710,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     /**
      * Gets the z coordinate of the chunk.
      * 
-     * @return the z coordinate
+     * @return The z coordinate
      */
     public int getZ() {
         return this.z;
@@ -705,7 +719,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     /**
      * Gets the coordinates of the chunk.
      *
-     * @return the coordinates
+     * @return The coordinates
      */
     public Vector2i getCoords() {
         return this.chunkPos;
@@ -714,7 +728,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     /**
      * Gets a copy of the biomes array.
      *
-     * @return the biomes
+     * @return The biomes
      */
     public short[] getBiomes() {
         long stamp = this.biomesLock.tryOptimisticRead();
@@ -843,6 +857,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
             type1 = type;
         }
 
+        final BlockState[] changeData = new BlockState[1];
+
         final int rx = x & 0xf;
         final int rz = z & 0xf;
         this.chunkSections.work(y >> 4, section -> {
@@ -857,26 +873,29 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
             final int index = ChunkSection.index(rx, y & 0xf, rz);
             final short oldType = section.types[index];
-            if (oldType != type1) {
-                if (oldType != 0) {
-                    short count = section.typesCountMap.get(oldType);
-                    if (count > 0) {
-                        if (--count <= 0) {
-                            section.typesCountMap.remove(oldType);
-                        } else {
-                            section.typesCountMap.put(oldType, count);
-                        }
+            if (oldType == type1) {
+                return section;
+            }
+            if (oldType != 0) {
+                short count = section.typesCountMap.get(oldType);
+                if (count > 0) {
+                    if (--count <= 0) {
+                        section.typesCountMap.remove(oldType);
+                    } else {
+                        section.typesCountMap.put(oldType, count);
                     }
-                }
-                if (type1 != 0) {
-                    section.typesCountMap.put(type1, (short) (section.typesCountMap.get(type1) + 1));
-                    if (oldType == 0) {
-                        section.nonAirCount++;
-                    }
-                } else {
-                    section.nonAirCount--;
                 }
             }
+            if (type1 != 0) {
+                section.typesCountMap.put(type1, (short) (section.typesCountMap.get(type1) + 1));
+                if (oldType == 0) {
+                    section.nonAirCount++;
+                }
+            } else {
+                section.nonAirCount--;
+            }
+            final BlockState oldState = BlockRegistryModule.get().getStateByInternalIdAndData(oldType).get();
+            changeData[0] = oldState;
             // The section is empty, destroy it
             if (section.nonAirCount <= 0) {
                 return null;
@@ -887,14 +906,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
             if (tileEntity != null) {
                 if (oldType == 0 || type1 == 0) {
                     remove = true;
-                } else if (tileEntity instanceof ITileEntityRefreshBehavior) {
-                    // Try the custom refresh behavior first
-                    final BlockState oldState = BlockRegistryModule.get().getStateByInternalIdAndData(oldType).get();
-                    if (((ITileEntityRefreshBehavior) tileEntity).shouldRefresh(oldState, block)) {
-                        remove = true;
-                        refresh = true;
-                    }
-                } else if (oldType >> 4 != type1 >> 4) {
+                } else if ((tileEntity instanceof ITileEntityRefreshBehavior &&
+                        ((ITileEntityRefreshBehavior) tileEntity).shouldRefresh(oldState, block)) || oldType >> 4 != type1 >> 4) {
                     // The default behavior will only refresh if the
                     // block type is changed and not the block state
                     remove = true;
@@ -935,7 +948,21 @@ public class LanternChunk implements AbstractExtent, Chunk {
             this.heightMapLock.unlock(stamp);
         }
 
+        if (changeData[0] != null) {
+            this.world.getEventListener().onBlockChange(x, y, z, changeData[0], block);
+        }
+
         return true;
+    }
+
+    public void addBlockAction(int x, int y, int z, BlockType blockType, BlockAction blockAction) {
+        this.checkVolumeBounds(x, y, z);
+        if (!this.loaded) {
+            return;
+        }
+        if (this.getBlock(x, y, z).getType() == blockType) {
+            this.world.getEventListener().onBlockAction(x, y, z, blockType, blockAction);
+        }
     }
 
     /**
@@ -1156,12 +1183,35 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
-        return null;
+        checkNotNull(box, "box");
+        final ImmutableSet.Builder<AABB> builder = ImmutableSet.builder();
+        final Vector3d min = box.getMin();
+        final Vector3d max = box.getMax();
+        final int minX = min.getFloorX();
+        final int minY = min.getFloorY();
+        final int minZ = min.getFloorZ();
+        final int maxX = max.getFloorX();
+        final int maxY = max.getFloorY();
+        final int maxZ = max.getFloorZ();
+        for (int x = minX; x <= maxX; x++) {
+            for (int z = minZ; z <= maxZ; z++) {
+                for (int y = minY; y <= maxY; y++) {
+                    final Optional<AABB> optAABB = this.getBlockSelectionBox(x, y, z);
+                    if (optAABB.isPresent()) {
+                        final AABB aabb = optAABB.get();
+                        if (aabb.intersects(box)) {
+                            builder.add(box);
+                        }
+                    }
+                }
+            }
+        }
+        return builder.build();
     }
 
     @Override

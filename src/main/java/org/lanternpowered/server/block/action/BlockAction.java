@@ -23,55 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.block.action;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Chunk;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-
-@NonnullByDefault
-public final class IdAllocator {
-
-    private final Queue<Integer> reusableIds = new LinkedBlockingQueue<>();
-    private final AtomicInteger idCounter = new AtomicInteger();
+public interface BlockAction {
 
     /**
-     * Polls a new id from the allocator.
+     * Fills the {@link BlockActionData} with values that are
+     * needed to trigger this action.
      *
-     * @return the id
+     * @param actionData The action data
      */
-    public int poll() {
-        Integer id = this.reusableIds.poll();
-        if (id != null) {
-            return id;
-        }
-        return this.idCounter.getAndIncrement();
-    }
-
-    public int[] poll(int count) {
-        return this.poll(new int[count]);
-    }
-
-    public int[] poll(int[] array) {
-        checkNotNull(array, "array");
-        for (int i = 0; i < array.length; i++) {
-            array[i] = this.poll();
-        }
-        return array;
-    }
+    void fill(BlockActionData actionData);
 
     /**
-     * Pushes a id back to be reused.
+     * Gets the {@link Type}.
      *
-     * <p>WARNING: Do not push ids back twice or
-     * when they are still in use, it may cause
-     * some unforeseen issues.</p>
+     * @return The type
      */
-    public void push(int id) {
-        this.reusableIds.offer(id);
+    Type type();
+
+    enum Type {
+        /**
+         * The event will be present until a new {@link BlockAction}
+         * is triggered for the block.
+         * <p>The event will only be resend when a {@link Player} starts
+         * tracking a {@link Chunk}.</p>
+         */
+        CONTINUOUS,
+        /**
+         * The event will be triggered once.
+         */
+        SINGLE,
     }
 }

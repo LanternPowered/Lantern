@@ -26,20 +26,18 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.block.action.BlockActionData;
 import org.lanternpowered.server.network.message.Message;
 
-public final class MessagePlayOutBlockAction implements Message {
+public final class MessagePlayOutBlockAction implements Message, BlockActionData {
 
     private final Vector3i position;
     private final int blockType;
-    private final int parameterA;
-    private final int parameterB;
+    private final int[] parameters = new int[2];
 
-    public MessagePlayOutBlockAction(Vector3i position, int blockType, int parameterA, int parameterB) {
+    public MessagePlayOutBlockAction(Vector3i position, int blockType) {
         this.blockType = blockType;
         this.position = position;
-        this.parameterA = parameterA;
-        this.parameterB = parameterB;
     }
 
     public Vector3i getPosition() {
@@ -50,11 +48,14 @@ public final class MessagePlayOutBlockAction implements Message {
         return this.blockType;
     }
 
-    public int getParameterA() {
-        return this.parameterA;
+    public int[] getParameters() {
+        return this.parameters;
     }
 
-    public int getParameterB() {
-        return this.parameterB;
+    @Override
+    public void set(int index, int data) {
+        if (index >= 0 && index < this.parameters.length) {
+            this.parameters[index] = data;
+        }
     }
 }

@@ -38,6 +38,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
+import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
@@ -213,6 +214,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     // The context of this world
     private final Context worldContext;
 
+    private final MultiWorldEventListener worldEventListener = new MultiWorldEventListener();
+
     /**
      * The directory where all the data of the
      * world is stored.
@@ -261,6 +264,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         this.chunkManager = new LanternChunkManager(this.game, this, this.worldConfig, chunkLoadService,
                 chunkIOService, worldGenerator, directory);
         this.worldContext = new Context(Context.WORLD_KEY, this.getName());
+        this.worldEventListener.add(this.observedChunkManager);
     }
 
     @Override
@@ -1274,5 +1278,20 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public int getBlockDigTimeWith(int x, int y, int z, ItemStack itemStack, Cause cause) {
         // TODO Auto-generated method stub
         return 0;
+    }
+
+    public MultiWorldEventListener getEventListener() {
+        return this.worldEventListener;
+    }
+
+    public void addBlockAction(Vector3i position, BlockType blockType, BlockAction blockAction) {
+        this.addBlockAction(position.getX(), position.getY(), position.getZ(), blockType, blockAction);
+    }
+
+    public void addBlockAction(int x, int y, int z, BlockType blockType, BlockAction blockAction) {
+        final LanternChunk chunk = this.chunkManager.getChunkIfLoaded(x >> 4, z >> 4);
+        if (chunk != null) {
+            chunk.addBlockAction(x, y, z, blockType, blockAction);
+        }
     }
 }

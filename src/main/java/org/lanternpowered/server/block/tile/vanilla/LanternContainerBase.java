@@ -26,9 +26,8 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.block.tile.LanternTileEntity;
-import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.block.vanilla.container.action.ContainerAnimationAction;
 import org.lanternpowered.server.inventory.IViewerListener;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.world.Location;
@@ -37,7 +36,6 @@ import org.spongepowered.api.world.World;
 public abstract class LanternContainerBase extends LanternTileEntity implements IViewerListener {
 
     private int playersCount = 0;
-    private int tickCounter = 0;
 
     /**
      * The delay that will be used to play
@@ -49,6 +47,10 @@ public abstract class LanternContainerBase extends LanternTileEntity implements 
     public Result onViewerAdded(Viewer viewer, org.lanternpowered.server.inventory.LanternContainer container) {
         if (this.playersCount++ == 0) {
             this.soundDelay = this.getOpenSoundDelay();
+
+            final Location<World> location = this.getLocation();
+            final LanternWorld world = (LanternWorld) location.getExtent();
+            world.addBlockAction(location.getBlockPosition(), this.getBlock().getType(), ContainerAnimationAction.OPEN);
         }
         return Result.IGNORE;
     }
@@ -57,6 +59,10 @@ public abstract class LanternContainerBase extends LanternTileEntity implements 
     public Result onViewerRemoved(Viewer viewer, org.lanternpowered.server.inventory.LanternContainer container) {
         if (--this.playersCount == 0) {
             this.soundDelay = this.getCloseSoundDelay();
+
+            final Location<World> location = this.getLocation();
+            final LanternWorld world = (LanternWorld) location.getExtent();
+            world.addBlockAction(location.getBlockPosition(), this.getBlock().getType(), ContainerAnimationAction.CLOSE);
         }
         return Result.IGNORE;
     }
@@ -98,13 +104,6 @@ public abstract class LanternContainerBase extends LanternTileEntity implements 
     @Override
     public void pulse() {
         super.pulse();
-
-        if (this.tickCounter++ % 8 == 0) {
-            final Location<World> location = this.getLocation();
-            final LanternWorld world = (LanternWorld) location.getExtent();
-            world.broadcast(() -> new MessagePlayOutBlockAction(location.getBlockPosition(),
-                    BlockRegistryModule.get().getStateInternalId(location.getBlock()), 1, this.playersCount));
-        }
 
         if (this.soundDelay > 0 && --this.soundDelay == 0) {
             final Location<World> location = this.getLocation();

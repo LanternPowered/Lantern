@@ -23,55 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.block.action;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
-
-@NonnullByDefault
-public final class IdAllocator {
-
-    private final Queue<Integer> reusableIds = new LinkedBlockingQueue<>();
-    private final AtomicInteger idCounter = new AtomicInteger();
+public interface BlockActionData {
 
     /**
-     * Polls a new id from the allocator.
+     * Sets the data value that should be used
+     * for the specific index.
      *
-     * @return the id
+     * @param index The index
+     * @param data The data value
      */
-    public int poll() {
-        Integer id = this.reusableIds.poll();
-        if (id != null) {
-            return id;
-        }
-        return this.idCounter.getAndIncrement();
-    }
-
-    public int[] poll(int count) {
-        return this.poll(new int[count]);
-    }
-
-    public int[] poll(int[] array) {
-        checkNotNull(array, "array");
-        for (int i = 0; i < array.length; i++) {
-            array[i] = this.poll();
-        }
-        return array;
-    }
-
-    /**
-     * Pushes a id back to be reused.
-     *
-     * <p>WARNING: Do not push ids back twice or
-     * when they are still in use, it may cause
-     * some unforeseen issues.</p>
-     */
-    public void push(int id) {
-        this.reusableIds.offer(id);
-    }
+    void set(int index, int data);
 }

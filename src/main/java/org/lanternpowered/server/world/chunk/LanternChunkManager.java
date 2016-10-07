@@ -593,6 +593,11 @@ public final class LanternChunkManager {
     }
 
     @Nullable
+    public LanternChunk getChunkIfLoaded(int x, int z) {
+        return this.getChunkIfLoaded(new Vector2i(x, z));
+    }
+
+    @Nullable
     private LanternChunk getChunk(Vector2i coords, boolean wait) {
         final LanternChunk chunk = this.loadedChunks.get(checkNotNull(coords, "coords"));
         if (wait && chunk != null && !chunk.loaded &&
@@ -695,6 +700,7 @@ public final class LanternChunkManager {
                 this.pendingForUnload.add(new UnloadingChunkEntry(coords));
             }
             this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause.get(), chunk));
+            this.world.getEventListener().onLoadChunk(chunk);
             // Resurrect all the entities in the chunk
             chunk.resurrectEntities();
             this.world.addEntities(chunk.getEntities());
@@ -868,6 +874,7 @@ public final class LanternChunkManager {
 
         // Called when a chunk finishes populating. (javadoc)
         eventManager.post(SpongeEventFactory.createPopulateChunkEventPost(cause, ImmutableList.copyOf(populators), chunk));
+        this.world.getEventListener().onPopulateChunk(chunk);
 
         // We are done
         chunk.populated = true;
@@ -957,6 +964,7 @@ public final class LanternChunkManager {
             // Try to populate the chunk
             this.tryPopulateSurroundingChunks(chunk, cause0);
             this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause0, chunk));
+            this.world.getEventListener().onLoadChunk(chunk);
             return true;
         } finally {
             chunk.lockState = LanternChunk.LockState.NONE;
@@ -972,11 +980,12 @@ public final class LanternChunkManager {
      * 
      * @param chunk the chunk
      */
-    void generate(LanternChunk chunk, Cause cause) {
+    private void generate(LanternChunk chunk, Cause cause) {
         final EventManager eventManager = Sponge.getEventManager();
         eventManager.post(SpongeEventFactory.createGenerateChunkEventPre(cause, chunk));
 
         final GenerationBuffers buffers = this.genBuffers.get();
+        //noinspection ConstantConditions
         final ChunkBiomeBuffer biomeBuffer = buffers.chunkBiomeBuffer;
         biomeBuffer.reuse(new Vector2i(chunk.getX() << 4, chunk.getZ() << 4));
 
@@ -1037,7 +1046,7 @@ public final class LanternChunkManager {
 
         private final BiomeType[] biomeTypes;
 
-        public ChunkBiomeBuffer() {
+        ChunkBiomeBuffer() {
             super(Vector2i.ZERO, CHUNK_AREA_SIZE);
             this.biomeTypes = new BiomeType[CHUNK_AREA];
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
@@ -1244,6 +1253,7 @@ public final class LanternChunkManager {
             }
             // Post the chunk unload event
             this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(cause.get(), chunk));
+            this.world.getEventListener().onUnloadChunk(chunk);
             // Remove from the loaded chunks
             this.loadedChunks.remove(coords);
             // Move the chunk to the graveyard

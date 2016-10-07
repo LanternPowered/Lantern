@@ -23,55 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.block.vanilla.container.action;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import org.lanternpowered.server.block.action.BlockAction;
+import org.lanternpowered.server.block.action.BlockActionData;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+public final class ContainerAnimationAction implements BlockAction {
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+    public static final ContainerAnimationAction OPEN = new ContainerAnimationAction(true);
+    public static final ContainerAnimationAction CLOSE = new ContainerAnimationAction(false);
 
-@NonnullByDefault
-public final class IdAllocator {
+    private final boolean open;
 
-    private final Queue<Integer> reusableIds = new LinkedBlockingQueue<>();
-    private final AtomicInteger idCounter = new AtomicInteger();
-
-    /**
-     * Polls a new id from the allocator.
-     *
-     * @return the id
-     */
-    public int poll() {
-        Integer id = this.reusableIds.poll();
-        if (id != null) {
-            return id;
-        }
-        return this.idCounter.getAndIncrement();
+    private ContainerAnimationAction(boolean open) {
+        this.open = open;
     }
 
-    public int[] poll(int count) {
-        return this.poll(new int[count]);
+    @Override
+    public void fill(BlockActionData actionData) {
+        actionData.set(0, 1);
+        actionData.set(1, this.open ? 1 : 0);
     }
 
-    public int[] poll(int[] array) {
-        checkNotNull(array, "array");
-        for (int i = 0; i < array.length; i++) {
-            array[i] = this.poll();
-        }
-        return array;
-    }
-
-    /**
-     * Pushes a id back to be reused.
-     *
-     * <p>WARNING: Do not push ids back twice or
-     * when they are still in use, it may cause
-     * some unforeseen issues.</p>
-     */
-    public void push(int id) {
-        this.reusableIds.offer(id);
+    @Override
+    public BlockAction.Type type() {
+        // The open action should be send to all the players
+        // who start tracking the block
+        return this.open ? BlockAction.Type.CONTINUOUS : BlockAction.Type.SINGLE;
     }
 }

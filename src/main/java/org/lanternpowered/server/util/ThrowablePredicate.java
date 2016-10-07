@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.util;
 
+@FunctionalInterface
 public interface ThrowablePredicate<T, E extends Throwable> {
 
     boolean test(T object) throws E;

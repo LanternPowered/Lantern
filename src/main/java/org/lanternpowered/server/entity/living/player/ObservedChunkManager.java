@@ -37,39 +37,39 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
+import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.tile.LanternTileEntity;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
-import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.network.message.Message;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutUnloadChunk;
 import org.lanternpowered.server.util.VariableValueArray;
 import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.WorldEventListener;
 import org.lanternpowered.server.world.chunk.LanternChunk;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.Transaction;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.world.UnloadWorldEvent;
-import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
-import org.spongepowered.api.event.world.chunk.PopulateChunkEvent;
 import org.spongepowered.api.world.World;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public final class ObservedChunkManager {
+public final class ObservedChunkManager implements WorldEventListener {
 
     /**
      * The {@link World} attached to the observed chunk manager.
@@ -79,10 +79,9 @@ public final class ObservedChunkManager {
     /**
      * All the chunks that are being observed.
      */
-    private final Map<Vector2i, ObservedChunk> observedChunks = Maps.newConcurrentMap();
+    private final Map<Long, ObservedChunk> observedChunks = Maps.newConcurrentMap();
 
     public ObservedChunkManager(LanternWorld world) {
-        Sponge.getEventManager().registerListeners(Lantern.getMinecraftPlugin(), new Listeners());
         this.world = world;
     }
 
@@ -90,59 +89,64 @@ public final class ObservedChunkManager {
         this.observedChunks.values().forEach(ObservedChunkManager.ObservedChunk::streamChanges);
     }
 
-    public class Listeners {
-
-        @Listener(order = Order.POST)
-        public void onWorldUnload(UnloadWorldEvent event) {
-            if (event.getTargetWorld() == world) {
-                Sponge.getEventManager().unregisterListeners(this);
-            }
+    @Override
+    public void onLoadChunk(LanternChunk chunk) {
+        final ObservedChunk observedChunk = this.observedChunks.get(chunk.getKey());
+        if (observedChunk != null) {
+            observedChunk.streamChunk(chunk);
         }
+    }
 
-        @Listener(order = Order.POST)
-        public void onChunkLoad(LoadChunkEvent event) {
-            final LanternChunk chunk = (LanternChunk) event.getTargetChunk();
-            final ObservedChunk observedChunk = observedChunks.get(chunk.getCoords());
-            if (observedChunk != null) {
-                observedChunk.streamChunk(chunk);
-            }
+    @Override
+    public void onUnloadChunk(LanternChunk chunk) {
+        final ObservedChunk observedChunk = this.observedChunks.get(chunk.getKey());
+        if (observedChunk != null) {
+            observedChunk.streamChunk(chunk);
         }
+    }
 
-        @Listener(order = Order.POST)
-        public void onBlockChange(ChangeBlockEvent event) {
-            for (Transaction<BlockSnapshot> change : event.getTransactions()) {
-                final Vector3i blockPos = change.getFinal().getPosition();
-                final ObservedChunk observedChunk = observedChunks.get(new Vector2i(blockPos.getX() >> 4, blockPos.getZ() >> 4));
-                if (observedChunk != null) {
-                    observedChunk.addBlockChange(() -> new Vector3i(blockPos.getX() & 0xf, blockPos.getY(), blockPos.getZ()));
-                }
-            }
+    @Override
+    public void onPopulateChunk(LanternChunk chunk) {
+        final ObservedChunk observedChunk = this.observedChunks.get(chunk.getKey());
+        if (observedChunk != null) {
+            observedChunk.dirtyChunk = true;
         }
+    }
 
-        @Listener(order = Order.POST)
-        public void onChunkPopulate(PopulateChunkEvent.Post event) {
-            if (event.getAppliedPopulators().isEmpty()) {
-                return;
-            }
-            final LanternChunk chunk = (LanternChunk) event.getTargetChunk();
-            final ObservedChunk observedChunk = observedChunks.get(chunk.getCoords());
-            if (observedChunk != null) {
-                observedChunk.dirtyChunk = true;
+    @Override
+    public void onBlockChange(int x, int y, int z, BlockState oldBlockState, BlockState newBlockState) {
+        final long key = LanternChunk.key(x >> 4,  z >> 4);
+        final ObservedChunk observedChunk = this.observedChunks.get(key);
+        if (observedChunk != null) {
+            observedChunk.addBlockChange(() -> new Vector3i(x, y, z));
+            if (oldBlockState.getType() != newBlockState.getType()) {
+                observedChunk.removeBlockAction(new Vector3i(x, y, z));
             }
         }
     }
 
-    public void addObserver(Vector2i coords, LanternPlayer observer) {
-        final ObservedChunk observedChunk = this.observedChunks.computeIfAbsent(coords, ObservedChunk::new);
+    @Override
+    public void onBlockAction(int x, int y, int z, BlockType blockType, BlockAction blockAction) {
+        final long key = LanternChunk.key(x >> 4,  z >> 4);
+        final ObservedChunk observedChunk = this.observedChunks.get(key);
+        if (observedChunk != null) {
+            observedChunk.addBlockAction(new Vector3i(x, y, z), blockType, blockAction);
+        }
+    }
+
+    void addObserver(Vector2i coords, LanternPlayer observer) {
+        final long key = LanternChunk.key(coords.getX(), coords.getY());
+        final ObservedChunk observedChunk = this.observedChunks.computeIfAbsent(key, key1 -> new ObservedChunk(coords));
         observedChunk.addObserver(observer);
     }
 
-    public void removeObserver(Vector2i coords, LanternPlayer observer, boolean updateClient) {
-        final ObservedChunk observedChunk = this.observedChunks.get(coords);
+    void removeObserver(Vector2i coords, LanternPlayer observer, boolean updateClient) {
+        final long key = LanternChunk.key(coords.getX(), coords.getY());
+        final ObservedChunk observedChunk = this.observedChunks.get(key);
         if (observedChunk != null) {
             observedChunk.removeObserver(observer, updateClient);
             if (observedChunk.observers.isEmpty()) {
-                this.observedChunks.remove(coords);
+                this.observedChunks.remove(key);
             }
         }
     }
@@ -161,7 +165,18 @@ public final class ObservedChunkManager {
     private static final MessagePlayOutChunkData.Section EMPTY_SECTION = new MessagePlayOutChunkData.Section(
             EMPTY_SECTION_TYPES, new int[1], EMPTY_SECTION_LIGHT, null, new Short2ObjectOpenHashMap<>());
 
-    public class ObservedChunk {
+    private class ObservedChunk {
+
+        private final class QueuedBlockAction {
+
+            private final BlockAction blockAction;
+            private final MessagePlayOutBlockAction blockActionData;
+
+            private QueuedBlockAction(BlockAction blockAction, MessagePlayOutBlockAction blockActionData) {
+                this.blockAction = blockAction;
+                this.blockActionData = blockActionData;
+            }
+        }
 
         /**
          * The coordinates of this chunk.
@@ -184,6 +199,12 @@ public final class ObservedChunkManager {
         private final Queue<Vector3i> dirtyBlocks = new ConcurrentLinkedQueue<>();
 
         /**
+         * All the block events that should be send to the observers.
+         */
+        private final Map<Vector3i, QueuedBlockAction> addedBlockActions = new ConcurrentHashMap<>();
+        private final Map<Vector3i, QueuedBlockAction> activeBlockActions = new ConcurrentHashMap<>();
+
+        /**
          * Whether all the chunk sections are modified or whether the biomes are modified
          * and the client should be updated.
          *
@@ -191,8 +212,27 @@ public final class ObservedChunkManager {
          */
         private volatile boolean dirtyChunk;
 
-        public ObservedChunk(Vector2i coords) {
+        ObservedChunk(Vector2i coords) {
             this.coords = coords;
+        }
+
+        void removeBlockAction(Vector3i coords) {
+            this.addedBlockActions.remove(coords);
+            this.activeBlockActions.remove(coords);
+        }
+
+        void addBlockAction(Vector3i coords, BlockType blockType, BlockAction blockAction) {
+            final BlockAction.Type type = blockAction.type();
+            // Don't store single events if there are no observers
+            if (type == BlockAction.Type.SINGLE &&
+                    this.observers.isEmpty() && this.clientObservers.isEmpty()) {
+                return;
+            }
+            // Create the message
+            final MessagePlayOutBlockAction blockActionData = new MessagePlayOutBlockAction(coords,
+                    BlockRegistryModule.get().getStateInternalId(blockType.getDefaultState()));
+            blockAction.fill(blockActionData);
+            this.addedBlockActions.put(coords, new QueuedBlockAction(blockAction, blockActionData));
         }
 
         void addBlockChange(Supplier<Vector3i> coords) {
@@ -231,22 +271,40 @@ public final class ObservedChunkManager {
                     changes.add(dirtyBlock);
                 }
 
-                int clumpingThreshold = world.getProperties().getConfig().getChunkClumpingThreshold();
-
+                final int clumpingThreshold = world.getProperties().getConfig().getChunkClumpingThreshold();
                 if (changes.size() >= clumpingThreshold) {
                     final MessagePlayOutChunkData message = this.createLoadChunkMessage(chunk, dirtySections, false);
                     this.clientObservers.forEach(player -> player.getConnection().send(message));
                 } else if (changes.size() > 1) {
                     final MessagePlayOutMultiBlockChange message = new MessagePlayOutMultiBlockChange(
-                            this.coords.getX(), this.coords.getY(), changes.stream().map(
-                            c -> new MessagePlayOutBlockChange(c, chunk.getType(c))).collect(Collectors.toList()));
+                            this.coords.getX(), this.coords.getY(), changes.stream().map(coords -> {
+                                final int x = coords.getX() & 0xf;
+                                final int z = coords.getZ() & 0xf;
+                                return new MessagePlayOutBlockChange(new Vector3i(x, coords.getY(), z), chunk.getType(coords));
+                            }).collect(Collectors.toList()));
                     this.clientObservers.forEach(player -> player.getConnection().send(message));
                 } else {
                     dirtyBlock = changes.iterator().next();
                     final MessagePlayOutBlockChange message = new MessagePlayOutBlockChange(dirtyBlock, chunk.getType(dirtyBlock));
                     this.clientObservers.forEach(player -> player.getConnection().send(message));
                 }
+
                 // TODO: Also update tile entities
+            }
+
+            if (!this.addedBlockActions.isEmpty()) {
+                final Set<Message> messages = new HashSet<>();
+
+                for (Map.Entry<Vector3i, QueuedBlockAction> entry : this.addedBlockActions.entrySet()) {
+                    final QueuedBlockAction blockAction = entry.getValue();
+                    messages.add(blockAction.blockActionData);
+                    if (blockAction.blockAction.type() == BlockAction.Type.CONTINUOUS) {
+                        this.activeBlockActions.put(entry.getKey(), blockAction);
+                    }
+                }
+
+                this.addedBlockActions.clear();
+                this.clientObservers.forEach(player -> player.getConnection().send(messages));
             }
         }
 
@@ -254,16 +312,21 @@ public final class ObservedChunkManager {
          * Sends a chunk load message to all the observers
          * of this chunk.
          *
-         * @param chunk the chunk
+         * @param chunk The chunk
          */
         void streamChunk(LanternChunk chunk) {
-            MessagePlayOutChunkData message = null;
+            List<Message> messages = null;
             for (LanternPlayer observer : this.observers) {
                 if (this.clientObservers.add(observer)) {
-                    if (message == null) {
-                        message = this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true);
+                    if (messages == null) {
+                        messages = new ArrayList<>();
+                        messages.add(this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true));
+                        final List<Message> messages0 = messages;
+                        if (!this.activeBlockActions.isEmpty()) {
+                            this.activeBlockActions.values().forEach(queuedBlockAction -> messages0.add(queuedBlockAction.blockActionData));
+                        }
                     }
-                    observer.getConnection().send(message);
+                    observer.getConnection().send(messages);
                 }
             }
             // TODO: Also send tile entities

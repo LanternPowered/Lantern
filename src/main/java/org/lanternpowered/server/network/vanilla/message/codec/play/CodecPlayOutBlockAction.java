@@ -31,7 +31,6 @@ import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
 
 public final class CodecPlayOutBlockAction implements Codec<MessagePlayOutBlockAction> {
 
@@ -39,8 +38,9 @@ public final class CodecPlayOutBlockAction implements Codec<MessagePlayOutBlockA
     public ByteBuffer encode(CodecContext context, MessagePlayOutBlockAction message) throws CodecException {
         final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.write(Types.VECTOR_3_I, message.getPosition());
-        buf.writeByte((byte) message.getParameterA());
-        buf.writeByte((byte) message.getParameterB());
+        final int[] parameters = message.getParameters();
+        buf.writeByte((byte) parameters[0]);
+        buf.writeByte((byte) parameters[1]);
         buf.writeVarInt(message.getBlockType());
         return buf;
     }

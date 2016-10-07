@@ -292,6 +292,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         if (world == oldWorld) {
             return;
         }
+        //noinspection ConstantConditions
         if (oldWorld != null) {
             if (this.loadingTicket != null) {
                 this.loadingTicket.release();
@@ -314,6 +315,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
             boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
             // The player has joined the server
+            //noinspection ConstantConditions
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
                 this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.getEntityId(),
@@ -332,6 +334,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
                 }
                 this.tabList.init(tabListEntries);
             } else {
+                //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {
                     LanternDimensionType oldDimensionType = (LanternDimensionType) oldWorld.getDimension().getType();
                     // The client only creates a new world instance on the client if a
@@ -398,6 +401,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void setPosition(Vector3d position) {
         super.setPosition(position);
         final LanternWorld world = this.getWorld();
+        //noinspection ConstantConditions
         if (world != null) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
         }
@@ -407,6 +411,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     public void setRotation(Vector3d rotation) {
         super.setRotation(rotation);
         final LanternWorld world = this.getWorld();
+        //noinspection ConstantConditions
         if (world != null) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(0, 0, 0,
                     (float) rotation.getX(), (float) rotation.getY(), RELATIVE_POSITION, 0));

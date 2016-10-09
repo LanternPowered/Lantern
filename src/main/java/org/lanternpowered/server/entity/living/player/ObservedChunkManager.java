@@ -238,7 +238,7 @@ public final class ObservedChunkManager implements WorldEventListener {
         void addBlockChange(Supplier<Vector3i> coords) {
             // There is not need to track the changes if no one wants to see them
             // dirtyBiomes will force the chunk to be completely resend
-            if (!this.dirtyChunk && !this.observers.isEmpty() && this.clientObservers.isEmpty()) {
+            if (!this.dirtyChunk && !this.clientObservers.isEmpty()) {
                 this.dirtyBlocks.add(coords.get());
             }
         }
@@ -308,6 +308,15 @@ public final class ObservedChunkManager implements WorldEventListener {
             }
         }
 
+        private List<Message> createChunkLoadMessages(LanternChunk chunk) {
+            final List<Message> messages = new ArrayList<>();
+            messages.add(this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true));
+            if (!this.activeBlockActions.isEmpty()) {
+                this.activeBlockActions.values().forEach(queuedBlockAction -> messages.add(queuedBlockAction.blockActionData));
+            }
+            return messages;
+        }
+
         /**
          * Sends a chunk load message to all the observers
          * of this chunk.
@@ -319,12 +328,7 @@ public final class ObservedChunkManager implements WorldEventListener {
             for (LanternPlayer observer : this.observers) {
                 if (this.clientObservers.add(observer)) {
                     if (messages == null) {
-                        messages = new ArrayList<>();
-                        messages.add(this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true));
-                        final List<Message> messages0 = messages;
-                        if (!this.activeBlockActions.isEmpty()) {
-                            this.activeBlockActions.values().forEach(queuedBlockAction -> messages0.add(queuedBlockAction.blockActionData));
-                        }
+                        messages = this.createChunkLoadMessages(chunk);
                     }
                     observer.getConnection().send(messages);
                 }
@@ -455,7 +459,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                 // to the player
                 if (chunk != null) {
                     this.clientObservers.add(observer);
-                    observer.getConnection().send(this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true));
+                    observer.getConnection().send(this.createChunkLoadMessages(chunk));
                 }
                 // Otherwise we will wait for the LoadChunkEvent to be called and
                 // send the messages at that point

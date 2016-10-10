@@ -47,7 +47,7 @@ public class HumanoidEntityProtocol<E extends LanternEntityLiving> extends Livin
 
     @Override
     public void spawn(EntityProtocolUpdateContext context) {
-        final int entityId = this.entity.getEntityId();
+        final int entityId = this.getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
         final Vector3d headRot = this.entity.getHeadRotation();
@@ -58,7 +58,7 @@ public class HumanoidEntityProtocol<E extends LanternEntityLiving> extends Livin
         double headPitch = headRot.getX();
         double headYaw = headRot.getY();
 
-        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnPlayer(this.entity.getEntityId(), this.entity.getUniqueId(),
+        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnPlayer(entityId, this.entity.getUniqueId(),
                 pos, wrapAngle(yaw), wrapAngle(headPitch), this.fillParameters(true)));
         context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headYaw)));
         if (!vel.equals(Vector3d.ZERO)) {

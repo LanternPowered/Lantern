@@ -47,7 +47,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         super.init(() -> new IdAllocator() {
             @Override
             public int acquire() {
-                return entity.getEntityId();
+                return entity.getNetworkEntityId();
             }
         });
     }
@@ -60,7 +60,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     @Override
     public void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
-        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(this.entity.getEntityId(), this.fillParameters(true)));
+        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(this.getRootEntityId(), this.fillParameters(true)));
     }
 
     @Override

@@ -121,6 +121,10 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         }
     }
 
+    protected int getRootEntityId() {
+        return this.entityId;
+    }
+
     /**
      * Sets the tick rate of this entity protocol.
      *
@@ -178,7 +182,6 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         // Release the entity id of the entity
         context.getIdAllocator().release(this.entityId);
         this.entityId = INVALID_ID;
-        this.entity.setEntityId(this.entityId);
     }
 
     /**
@@ -190,7 +193,6 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     protected void init(EntityProtocolInitContext context) {
         // Allocate the next free id
         this.entityId = context.getIdAllocator().acquire();
-        this.entity.setEntityId(this.entityId);
     }
 
     final class TrackerUpdateContextData {

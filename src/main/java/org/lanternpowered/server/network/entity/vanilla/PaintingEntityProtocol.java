@@ -71,7 +71,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
     }
 
     private void spawn(EntityProtocolUpdateContext context, Art art, Direction direction, Vector3i position) {
-        context.sendToAll(() -> new MessagePlayOutSpawnPainting(this.entity.getEntityId(),
+        context.sendToAll(() -> new MessagePlayOutSpawnPainting(this.getRootEntityId(),
                 this.entity.getUniqueId(), art, position.getX(), position.getY(), position.getZ(), direction));
     }
 
@@ -92,7 +92,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
             this.lastY = y;
             this.lastZ = z;
         } else if (x != this.lastX || y != this.lastY || z != this.lastZ) {
-            context.sendToAll(() -> new MessagePlayOutEntityTeleport(this.entity.getEntityId(), x, y, z, 0, 0, true));
+            context.sendToAll(() -> new MessagePlayOutEntityTeleport(this.getRootEntityId(), x, y, z, 0, 0, true));
             this.lastX = x;
             this.lastY = y;
             this.lastZ = z;

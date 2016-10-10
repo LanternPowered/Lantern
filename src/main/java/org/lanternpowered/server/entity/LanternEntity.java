@@ -84,9 +84,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;
 
-    // The entity id that will be used for the client
-    private int entityId = -1;
-
     // The unique id of this entity
     private final UUID uniqueId;
 
@@ -228,25 +225,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     public void setLastChunkCoords(@Nullable Vector2i coords) {
         this.lastChunkCoords = coords;
-    }
-
-    /**
-     * Gets the internal entity id.
-     *
-     * @return The entity id
-     */
-    public int getEntityId() {
-        return this.entityId;
-    }
-
-    /**
-     * Sets the internal entity id, this will be
-     * used for the client.
-     *
-     * @param entityId The entity id
-     */
-    public void setEntityId(int entityId) {
-        this.entityId = entityId;
     }
 
     @Override

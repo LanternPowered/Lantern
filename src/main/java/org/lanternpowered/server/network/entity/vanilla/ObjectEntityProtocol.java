@@ -48,7 +48,7 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
 
     @Override
     public void spawn(EntityProtocolUpdateContext context) {
-        final int entityId = this.entity.getEntityId();
+        final int entityId = this.getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
         final Vector3d pos = this.entity.getPosition();

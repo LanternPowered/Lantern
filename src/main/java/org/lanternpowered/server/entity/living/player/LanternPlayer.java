@@ -138,6 +138,9 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     private final LanternTabList tabList = new LanternTabList(this);
 
+    // The entity id that will be used for the client
+    private int networkEntityId = -1;
+
     private MessageChannel messageChannel = MessageChannel.TO_ALL;
 
     // The (client) locale of the player
@@ -237,6 +240,24 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
     }
 
     /**
+     * Gets the network entity id.
+     *
+     * @return The network entity id
+     */
+    public int getNetworkEntityId() {
+        return this.networkEntityId;
+    }
+
+    /**
+     * Sets the network entity id.
+     *
+     * @param entityId The network entity id
+     */
+    public void setNetworkEntityId(int entityId) {
+        this.networkEntityId = entityId;
+    }
+
+    /**
      * Resets the timeout counter.
      */
     public void resetIdleTimeoutCounter() {
@@ -318,7 +339,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
             //noinspection ConstantConditions
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
-                this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.getEntityId(),
+                this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.networkEntityId,
                         this.session.getServer().getMaxPlayers(), reducedDebug, false));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(LanternGame.IMPL_NAME));

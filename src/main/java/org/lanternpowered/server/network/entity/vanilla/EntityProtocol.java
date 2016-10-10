@@ -72,7 +72,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Override
     protected void destroy(EntityProtocolUpdateContext context) {
-        context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(new int[] { this.entity.getEntityId() }));
+        context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(this.getRootEntityId()));
     }
 
     @Override
@@ -95,7 +95,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
         // TODO: On ground state
 
-        final int entityId = this.entity.getEntityId();
+        final int entityId = this.getRootEntityId();
 
         if (dirtyPos) {
             double dx = x - this.lastX;

@@ -772,7 +772,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             this.player.getContainerSession().setOpenContainer(null);
             this.player.remove(LanternEntity.RemoveState.DESTROYED);
             this.player.setWorld(null);
-            EntityProtocolManager.getEntityIdAllocator().release(this.player.getEntityId());
+            EntityProtocolManager.getEntityIdAllocator().release(this.player.getNetworkEntityId());
         }
     }
 
@@ -786,7 +786,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             throw new IllegalStateException("The game profile must first be available!");
         }
         this.player = new LanternPlayer(this.gameProfile, this);
-        this.player.setEntityId(EntityProtocolManager.getEntityIdAllocator().acquire());
+        this.player.setNetworkEntityId(EntityProtocolManager.getEntityIdAllocator().acquire());
         this.player.setEntityProtocolType(EntityProtocolTypes.PLAYER);
 
         try {

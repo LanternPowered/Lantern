@@ -31,7 +31,7 @@ public final class MessagePlayOutDestroyEntities implements Message {
 
     private final int[] entityIds;
 
-    public MessagePlayOutDestroyEntities(int[] entityIds) {
+    public MessagePlayOutDestroyEntities(int... entityIds) {
         this.entityIds = entityIds;
     }
 

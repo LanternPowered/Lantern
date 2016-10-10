@@ -27,9 +27,11 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.entity.EntityUpdateContext;
+import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
+import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
+import org.lanternpowered.server.util.IdAllocator;
 import org.spongepowered.api.data.key.Keys;
 
 public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> {
@@ -41,7 +43,22 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     @Override
-    public void spawn(EntityUpdateContext context) {
+    protected void init(EntityProtocolInitContext context) {
+        super.init(() -> new IdAllocator() {
+            @Override
+            public int acquire() {
+                return entity.getEntityId();
+            }
+        });
+    }
+
+    @Override
+    protected void remove(EntityProtocolInitContext context) {
+        // Don't release the entity id
+    }
+
+    @Override
+    public void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
         context.sendToSelf(() -> new MessagePlayOutEntityMetadata(this.entity.getEntityId(), this.fillParameters(true)));
     }

@@ -29,7 +29,7 @@ import org.lanternpowered.server.network.message.Message;
 
 import java.util.function.Supplier;
 
-final class EmptyEntityUpdateContext implements EntityUpdateContext {
+final class EmptyEntityUpdateContext implements EntityProtocolUpdateContext {
 
     static final EmptyEntityUpdateContext INSTANCE = new EmptyEntityUpdateContext();
 

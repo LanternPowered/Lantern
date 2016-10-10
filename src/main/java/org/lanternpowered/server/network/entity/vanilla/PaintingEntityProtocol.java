@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.network.entity.EntityUpdateContext;
+import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPainting;
@@ -66,17 +66,17 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
     }
 
     @Override
-    protected void spawn(EntityUpdateContext context) {
+    protected void spawn(EntityProtocolUpdateContext context) {
         this.spawn(context, this.getArt(), this.getDirection(), this.entity.getPosition().toInt());
     }
 
-    private void spawn(EntityUpdateContext context, Art art, Direction direction, Vector3i position) {
+    private void spawn(EntityProtocolUpdateContext context, Art art, Direction direction, Vector3i position) {
         context.sendToAll(() -> new MessagePlayOutSpawnPainting(this.entity.getEntityId(),
                 this.entity.getUniqueId(), art, position.getX(), position.getY(), position.getZ(), direction));
     }
 
     @Override
-    public void update(EntityUpdateContext context) {
+    public void update(EntityProtocolUpdateContext context) {
         final Art art = this.getArt();
         final Direction direction = this.getDirection();
         final Vector3i position = this.entity.getPosition().toInt();

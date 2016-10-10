@@ -23,30 +23,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.entity.vanilla;
+package org.lanternpowered.server.network.entity;
 
-import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnThunderbolt;
+import org.lanternpowered.server.util.IdAllocator;
 
-public class LightningEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
+public interface EntityProtocolInitContext {
 
-    public LightningEntityProtocol(E entity) {
-        super(entity);
-        this.setTrackingRange(512);
-    }
-
-    @Override
-    public void spawn(EntityProtocolUpdateContext context) {
-        context.sendToAllExceptSelf(new MessagePlayOutSpawnThunderbolt(this.entity.getEntityId(), this.entity.getPosition()));
-    }
-
-    @Override
-    public void spawn(ParameterList parameterList) {
-    }
-
-    @Override
-    public void update(ParameterList parameterList) {
-    }
+    /**
+     * Gets the {@link IdAllocator}.
+     *
+     * @return The id allocator
+     */
+    IdAllocator getIdAllocator();
 }

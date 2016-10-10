@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.entity;
 
+import static org.lanternpowered.server.util.IdAllocator.INVALID_ID;
+
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
@@ -35,6 +37,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.function.Supplier;
+
+import javax.annotation.Nullable;
 
 public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
@@ -49,6 +53,11 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     protected final E entity;
 
     /**
+     * The entity id of the entity.
+     */
+    private int entityId;
+
+    /**
      * The amount of ticks between every update.
      */
     private int tickRate = 4;
@@ -58,14 +67,15 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      */
     private double trackingRange = 64;
 
-    int tickCounter = 0;
+    private int tickCounter = 0;
 
     public AbstractEntityProtocol(E entity) {
         this.entity = entity;
     }
 
-    private final class SimpleEntityProtocolContext implements EntityUpdateContext {
+    private final class SimpleEntityProtocolContext implements EntityProtocolUpdateContext {
 
+        @SuppressWarnings("NullableProblems")
         private Set<LanternPlayer> trackers;
 
         @Override
@@ -150,31 +160,55 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     /**
      * Destroys the entity. This removes all the trackers and sends a destroy
      * message to the client.
+     *
+     * @param context The entity protocol context
      */
-    public void destroy() {
+    void destroy(EntityProtocolInitContext context) {
         if (!this.trackers.isEmpty()) {
+            // Destroy the entity on all the clients
             final SimpleEntityProtocolContext ctx = new SimpleEntityProtocolContext();
             ctx.trackers = this.trackers;
             this.destroy(ctx);
             this.trackers.clear();
         }
+        this.remove(context);
+    }
+
+    protected void remove(EntityProtocolInitContext context) {
+        // Release the entity id of the entity
+        context.getIdAllocator().release(this.entityId);
+        this.entityId = INVALID_ID;
+        this.entity.setEntityId(this.entityId);
     }
 
     /**
-     * Post updates the trackers of the entity.
+     * Initializes this entity protocol. This acquires the ids
+     * that are required to spawn the entity.
+     *
+     * @param context The entity protocol context
      */
-    void postUpdateTrackers() {
+    protected void init(EntityProtocolInitContext context) {
+        // Allocate the next free id
+        this.entityId = context.getIdAllocator().acquire();
+        this.entity.setEntityId(this.entityId);
     }
 
-    /**
-     * Updates the trackers of the entity. The players list contains all the players that
-     * are in the same world of the entities.
-     *
-     * TODO: Or provide players based on the loaded chunks?
-     *
-     * @param players The players
-     */
-    void updateTrackers(Set<LanternPlayer> players) {
+    final class TrackerUpdateContextData {
+
+        final AbstractEntityProtocol<?> entityProtocol;
+        final SimpleEntityProtocolContext ctx = new SimpleEntityProtocolContext();
+
+        @Nullable Set<LanternPlayer> added;
+        @Nullable Set<LanternPlayer> removed;
+        @Nullable Set<LanternPlayer> update;
+
+        TrackerUpdateContextData(AbstractEntityProtocol<?> entityProtocol) {
+            this.entityProtocol = entityProtocol;
+        }
+    }
+
+    @Nullable
+    TrackerUpdateContextData buildUpdateContextData(Set<LanternPlayer> players) {
         players = new HashSet<>(players);
 
         final Set<LanternPlayer> removed = new HashSet<>();
@@ -199,35 +233,53 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
             }
         }
 
-        boolean flag0 = !this.trackers.isEmpty();
+        boolean flag0 = this.tickCounter++ % this.tickRate == 0 && !this.trackers.isEmpty();
         boolean flag1 = !added.isEmpty();
         boolean flag2 = !removed.isEmpty();
 
-        if (flag0 || flag1 || flag2) {
-            final SimpleEntityProtocolContext ctx = new SimpleEntityProtocolContext();
+        if (!flag0 && !flag1 && !flag2) {
+            return null;
+        }
 
-            // Stream updates to players that are already tracking
-            // The entity tracker should also be updated when the
-            // a entity is being spawned, because all the fields to
-            // check the changes should be updated, even if there is
-            // not a player to track them yet
-            if (flag0 || flag1) {
-                ctx.trackers = this.trackers;
-                this.update(ctx);
-            }
+        final TrackerUpdateContextData contextData = new TrackerUpdateContextData(this);
+        if (flag0 || flag1) {
+            contextData.update = new HashSet<>(this.trackers);
+        }
+        if (flag1) {
+            contextData.added = added;
+            this.trackers.addAll(added);
+        }
+        if (flag2) {
+            contextData.removed = removed;
+        }
+        return contextData;
+    }
 
-            // Stream spawn messages to the added trackers
-            if (flag1) {
-                ctx.trackers = added;
-                this.spawn(ctx);
-                this.trackers.addAll(added);
-            }
+    void updateTrackers(TrackerUpdateContextData contextData) {
+        final SimpleEntityProtocolContext ctx = contextData.ctx;
+        if (contextData.removed != null) {
+            ctx.trackers = contextData.removed;
+            this.destroy(ctx);
+        }
+        if (contextData.update != null) {
+            ctx.trackers = contextData.update;
+            this.update(ctx);
+        }
+        if (contextData.added != null) {
+            ctx.trackers = contextData.added;
+            this.spawn(ctx);
+        }
+    }
 
-            // Stream destroy messages to the removed trackers
-            if (flag2) {
-                ctx.trackers = removed;
-                this.destroy(ctx);
-            }
+    void postUpdateTrackers(TrackerUpdateContextData contextData) {
+        final SimpleEntityProtocolContext ctx = contextData.ctx;
+        if (contextData.update != null) {
+            ctx.trackers = contextData.update;
+            this.postUpdate(ctx);
+        }
+        if (contextData.added != null) {
+            ctx.trackers = contextData.added;
+            this.postSpawn(ctx);
         }
     }
 
@@ -250,21 +302,30 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      *
      * @param context The entity update context
      */
-    protected abstract void spawn(EntityUpdateContext context);
+    protected abstract void spawn(EntityProtocolUpdateContext context);
 
     /**
      * Destroys the tracked entity.
      *
      * @param context The entity update context
      */
-    protected abstract void destroy(EntityUpdateContext context);
+    protected abstract void destroy(EntityProtocolUpdateContext context);
 
     /**
      * Updates the tracked entity.
      *
      * @param context The entity update context
      */
-    protected abstract void update(EntityUpdateContext context);
+    protected abstract void update(EntityProtocolUpdateContext context);
+
+    /**
+     * Post spawns the tracked entity. This method will be called after
+     * all the entities that were pending for updates/spawns are processed.
+     *
+     * @param context The entity update context
+     */
+    protected void postSpawn(EntityProtocolUpdateContext context) {
+    }
 
     /**
      * Post updates the tracked entity. This method will be called after
@@ -272,6 +333,6 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      *
      * @param context The entity update context
      */
-    protected void postUpdate(EntityUpdateContext context) {
+    protected void postUpdate(EntityProtocolUpdateContext context) {
     }
 }

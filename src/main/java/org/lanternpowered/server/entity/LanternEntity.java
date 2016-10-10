@@ -40,7 +40,6 @@ import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.text.LanternTexts;
-import org.lanternpowered.server.util.IdAllocator;
 import org.lanternpowered.server.util.Quaternions;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.data.DataContainer;
@@ -82,12 +81,8 @@ import javax.annotation.Nullable;
 @NonnullByDefault
 public class LanternEntity extends BaseComponentHolder implements Entity, AbstractDataHolder, AbstractPropertyHolder {
 
-    private static final IdAllocator idAllocator = new IdAllocator();
+    @SuppressWarnings("unused")
     private static boolean bypassEntityTypeLookup;
-
-    public static IdAllocator getIdAllocator() {
-        return idAllocator;
-    }
 
     // The entity id that will be used for the client
     private int entityId = -1;

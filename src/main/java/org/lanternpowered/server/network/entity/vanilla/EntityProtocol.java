@@ -32,7 +32,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
-import org.lanternpowered.server.network.entity.EntityUpdateContext;
+import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
 import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
@@ -71,12 +71,12 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     @Override
-    protected void destroy(EntityUpdateContext context) {
+    protected void destroy(EntityProtocolUpdateContext context) {
         context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(new int[] { this.entity.getEntityId() }));
     }
 
     @Override
-    public void update(EntityUpdateContext context) {
+    public void update(EntityProtocolUpdateContext context) {
         final Vector3d rot = this.entity.getRotation();
         final Vector3d headRot = this.entity instanceof Living ? ((Living) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();
@@ -150,7 +150,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             this.lastVelY = vy;
             this.lastVelZ = vz;
         }
-        final ParameterList parameterList = context == EntityUpdateContext.empty() ?
+        final ParameterList parameterList = context == EntityProtocolUpdateContext.empty() ?
                 this.fillParameters(false, EmptyParameterList.INSTANCE) : this.fillParameters(false);
         // There were parameters applied
         if (!parameterList.isEmpty()) {

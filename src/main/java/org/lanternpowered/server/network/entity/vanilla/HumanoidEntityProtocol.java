@@ -31,7 +31,7 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntityLiving;
 import org.lanternpowered.server.entity.living.player.HandSide;
-import org.lanternpowered.server.network.entity.EntityUpdateContext;
+import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
@@ -46,7 +46,7 @@ public class HumanoidEntityProtocol<E extends LanternEntityLiving> extends Livin
     }
 
     @Override
-    public void spawn(EntityUpdateContext context) {
+    public void spawn(EntityProtocolUpdateContext context) {
         final int entityId = this.entity.getEntityId();
 
         final Vector3d rot = this.entity.getRotation();

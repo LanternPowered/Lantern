@@ -29,10 +29,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.util.IdAllocator;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
@@ -41,12 +43,36 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public final class EntityProtocolManager {
 
+    private static final int UPDATE_RATE = 3;
+
+    /**
+     * The {@link IdAllocator} of this entity protocol manager.
+     */
+    private static final IdAllocator idAllocator = new IdAllocator();
+
+    /**
+     * Gets the {@link IdAllocator} that is used to allocate
+     * entity ids.
+     *
+     * @return The id allocator
+     */
+    public static IdAllocator getEntityIdAllocator() {
+        return idAllocator;
+    }
+
     private final Map<Entity, AbstractEntityProtocol<?>> entityProtocols = new ConcurrentHashMap<>();
 
     /**
      * All the {@link AbstractEntityProtocol}s that will be destroyed.
      */
     private final Queue<AbstractEntityProtocol<?>> queuedForRemoval = new ConcurrentLinkedDeque<>();
+
+    /**
+     * The {@link EntityProtocolInitContext}.
+     */
+    private final EntityProtocolInitContext initContext = () -> idAllocator;
+
+    private int pulseCounter;
 
     /**
      * Adds the {@link Entity} to be tracked.
@@ -67,17 +93,15 @@ public final class EntityProtocolManager {
      * @param entity The entity
      * @param protocolType The protocol type
      */
-    public <E extends LanternEntity> void add(E entity,
-            EntityProtocolType<E> protocolType) {
+    public <E extends LanternEntity> void add(E entity, EntityProtocolType<E> protocolType) {
         checkNotNull(entity, "entity");
         checkNotNull(protocolType, "protocolType");
         final AbstractEntityProtocol<E> entityProtocol = protocolType.getSupplier().apply(entity);
         final AbstractEntityProtocol<?> removed = this.entityProtocols.put(entity, entityProtocol);
         if (removed != null) {
             this.queuedForRemoval.add(removed);
-        } else if (entity.getEntityId() == -1) {
-            entity.setEntityId(LanternEntity.getIdAllocator().poll());
         }
+        entityProtocol.init(this.initContext);
     }
 
     /**
@@ -90,11 +114,6 @@ public final class EntityProtocolManager {
         final AbstractEntityProtocol<?> removed = this.entityProtocols.remove(entity);
         if (removed != null) {
             this.queuedForRemoval.add(removed);
-            // Don't release entity ids allocated for players
-            if (!(entity instanceof Player)) {
-                LanternEntity.getIdAllocator().push(entity.getEntityId());
-                entity.setEntityId(-1);
-            }
         }
     }
 
@@ -105,22 +124,30 @@ public final class EntityProtocolManager {
      * @param players The players
      */
     public void updateTrackers(Set<LanternPlayer> players) {
+        // TODO: Sync the updates in a different thread?
+        if (this.pulseCounter++ % UPDATE_RATE != 0) {
+            return;
+        }
+
         AbstractEntityProtocol<?> removed;
         while ((removed = this.queuedForRemoval.poll()) != null) {
-            removed.destroy();
+            removed.destroy(this.initContext);
         }
+
+        final List<AbstractEntityProtocol.TrackerUpdateContextData> updateContextDataList = new ArrayList<>();
 
         final Set<AbstractEntityProtocol<?>> protocols = new HashSet<>(this.entityProtocols.values());
         for (AbstractEntityProtocol<?> protocol : protocols) {
-            if (protocol.tickCounter % protocol.getTickRate() == 0) {
-                protocol.updateTrackers(players);
+            final AbstractEntityProtocol.TrackerUpdateContextData contextData = protocol.buildUpdateContextData(players);
+            if (contextData != null) {
+                //noinspection unchecked
+                protocol.updateTrackers(contextData);
+                updateContextDataList.add(contextData);
             }
         }
 
-        for (AbstractEntityProtocol<?> protocol : protocols) {
-            if (protocol.tickCounter++ % protocol.getTickRate() == 0) {
-                protocol.postUpdateTrackers();
-            }
+        for (AbstractEntityProtocol.TrackerUpdateContextData contextData : updateContextDataList) {
+            contextData.entityProtocol.postUpdateTrackers(contextData);
         }
     }
 }

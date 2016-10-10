@@ -27,51 +27,102 @@ package org.lanternpowered.server.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.StampedLock;
 
-@NonnullByDefault
-public final class IdAllocator {
+public class IdAllocator {
 
-    private final Queue<Integer> reusableIds = new LinkedBlockingQueue<>();
-    private final AtomicInteger idCounter = new AtomicInteger();
+    public static final int INVALID_ID = -1;
+
+    private int idCounter = 0;
+
+    private final IntSet reusableIds = new IntOpenHashSet();
+    private final IntIterator reusableIdsIterator = this.reusableIds.iterator();
+
+    private final StampedLock lock = new StampedLock();
 
     /**
-     * Polls a new id from the allocator.
+     * Gets whether the specified id is allocated.
      *
-     * @return the id
+     * @param id The id to check
+     * @return Whether the id is allocated
      */
-    public int poll() {
-        Integer id = this.reusableIds.poll();
-        if (id != null) {
-            return id;
+    public boolean isAllocated(int id) {
+        long stamp = this.lock.tryOptimisticRead();
+        boolean allocated = stamp != 0L && this.isAllocated0(id);
+        if (stamp == 0L || !this.lock.validate(stamp)) {
+            stamp = this.lock.readLock();
+            try {
+                allocated = this.isAllocated0(id);
+            } finally {
+                this.lock.unlockRead(stamp);
+            }
         }
-        return this.idCounter.getAndIncrement();
+        return allocated;
     }
 
-    public int[] poll(int count) {
-        return this.poll(new int[count]);
+    private boolean isAllocated0(int id) {
+        return id < this.idCounter && !this.reusableIds.contains(id);
     }
 
-    public int[] poll(int[] array) {
+    /**
+     * Acquires the next free id.
+     *
+     * @return The id
+     */
+    public int acquire() {
+        final long stamp = this.lock.writeLock();
+        try {
+            return this.acquire0();
+        } finally {
+            this.lock.unlockWrite(stamp);
+        }
+    }
+
+    public int[] acquire(int count) {
+        return this.acquire(new int[count]);
+    }
+
+    public int[] acquire(int[] array) {
         checkNotNull(array, "array");
-        for (int i = 0; i < array.length; i++) {
-            array[i] = this.poll();
+        final long stamp = this.lock.writeLock();
+        try {
+            for (int i = 0; i < array.length; i++) {
+                array[i] = this.acquire0();
+            }
+        } finally {
+            this.lock.unlockWrite(stamp);
         }
         return array;
     }
 
+    private int acquire0() {
+        if (this.reusableIdsIterator.hasNext()) {
+            try {
+                return this.reusableIdsIterator.nextInt();
+            } finally {
+                this.reusableIdsIterator.remove();
+            }
+        }
+        return this.idCounter++;
+    }
+
     /**
-     * Pushes a id back to be reused.
+     * Releases the id so that it can be reused.
      *
-     * <p>WARNING: Do not push ids back twice or
-     * when they are still in use, it may cause
-     * some unforeseen issues.</p>
+     * @param id The id
      */
-    public void push(int id) {
-        this.reusableIds.offer(id);
+    public void release(int id) {
+        if (id != INVALID_ID) {
+            final long stamp = this.lock.writeLock();
+            try {
+                this.reusableIds.add(id);
+            } finally {
+                this.lock.unlockWrite(stamp);
+            }
+        }
     }
 }

@@ -300,6 +300,8 @@ public final class ObservedChunkManager implements WorldEventListener {
                     messages.add(blockAction.blockActionData);
                     if (blockAction.blockAction.type() == BlockAction.Type.CONTINUOUS) {
                         this.activeBlockActions.put(entry.getKey(), blockAction);
+                    } else {
+                        this.activeBlockActions.remove(entry.getKey());
                     }
                 }
 

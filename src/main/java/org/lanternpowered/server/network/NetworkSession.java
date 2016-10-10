@@ -53,6 +53,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.lanternpowered.server.network.message.AsyncHelper;
 import org.lanternpowered.server.network.message.BulkMessage;
@@ -745,6 +746,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             throw new IllegalStateException("The player must first be available!");
         }
         final LanternWorld world = this.player.getWorld();
+        //noinspection ConstantConditions
         if (world != null) {
             final MessageChannel messageChannel = this.player.getMessageChannel();
             final Text quitMessage = t("multiplayer.player.left", this.player.getName());
@@ -762,14 +764,15 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             try {
                 PlayerIO.save(Lantern.getGame().getSavesDirectory(), this.player);
             } catch (IOException e) {
+                //noinspection ConstantConditions
                 Lantern.getLogger().warn("An error occurred while saving the player data of {} ({})", this.gameProfile.getName().get(),
                         this.gameProfile.getUniqueId(), e);
             }
 
+            this.player.getContainerSession().setOpenContainer(null);
             this.player.remove(LanternEntity.RemoveState.DESTROYED);
             this.player.setWorld(null);
-            LanternEntity.getIdAllocator().push(this.player.getEntityId());
-            this.player.setEntityId(-1);
+            EntityProtocolManager.getEntityIdAllocator().release(this.player.getEntityId());
         }
     }
 
@@ -783,7 +786,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             throw new IllegalStateException("The game profile must first be available!");
         }
         this.player = new LanternPlayer(this.gameProfile, this);
-        this.player.setEntityId(LanternEntity.getIdAllocator().poll());
+        this.player.setEntityId(EntityProtocolManager.getEntityIdAllocator().acquire());
         this.player.setEntityProtocolType(EntityProtocolTypes.PLAYER);
 
         try {
@@ -793,6 +796,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         LanternWorld world = this.player.getWorld();
+        //noinspection ConstantConditions
         if (world == null) {
             LanternWorldProperties worldProperties = this.player.getTempWorld();
             boolean fixSpawnLocation = false;

@@ -29,7 +29,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.network.entity.EntityUpdateContext;
+import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
@@ -47,7 +47,7 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
     protected abstract int getObjectData();
 
     @Override
-    public void spawn(EntityUpdateContext context) {
+    public void spawn(EntityProtocolUpdateContext context) {
         final int entityId = this.entity.getEntityId();
 
         final Vector3d rot = this.entity.getRotation();
@@ -66,11 +66,11 @@ public abstract class ObjectEntityProtocol<E extends LanternEntity> extends Enti
     }
 
     @Override
-    public void update(EntityUpdateContext context) {
+    public void update(EntityProtocolUpdateContext context) {
         final int objectData = this.getObjectData();
         if (this.lastObjectData != objectData) {
             this.spawn(context);
-            super.update(EntityUpdateContext.empty());
+            super.update(EntityProtocolUpdateContext.empty());
             this.lastObjectData = objectData;
         } else {
             super.update(context);

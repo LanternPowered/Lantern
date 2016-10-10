@@ -30,9 +30,9 @@ import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.function.Supplier;
 
-public interface EntityUpdateContext {
+public interface EntityProtocolUpdateContext {
 
-    static EntityUpdateContext empty() {
+    static EntityProtocolUpdateContext empty() {
         return EmptyEntityUpdateContext.INSTANCE;
     }
 

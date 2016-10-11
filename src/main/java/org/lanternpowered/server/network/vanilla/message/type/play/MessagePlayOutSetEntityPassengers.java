@@ -23,24 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
+import org.lanternpowered.server.network.message.Message;
 
-public final class CodecPlayOutDestroyEntities implements Codec<MessagePlayOutDestroyEntities> {
+public final class MessagePlayOutSetEntityPassengers implements Message {
 
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutDestroyEntities message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        final int[] entityIds = message.getEntityIds();
-        buf.writeVarInt(entityIds.length);
-        for (int entityId : entityIds) {
-            buf.writeVarInt(entityId);
-        }
-        return buf;
+    private final int entityId;
+    private final int[] passengerIds;
+
+    public MessagePlayOutSetEntityPassengers(int entityId, int... passengerIds) {
+        this.entityId = entityId;
+        this.passengerIds = passengerIds;
+    }
+
+    public int getEntityId() {
+        return this.entityId;
+    }
+
+    public int[] getPassengersIds() {
+        return this.passengerIds;
     }
 }

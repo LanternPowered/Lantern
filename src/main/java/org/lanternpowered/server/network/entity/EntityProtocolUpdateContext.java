@@ -25,9 +25,13 @@
  */
 package org.lanternpowered.server.network.entity;
 
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 
 public interface EntityProtocolUpdateContext {
@@ -35,6 +39,23 @@ public interface EntityProtocolUpdateContext {
     static EntityProtocolUpdateContext empty() {
         return EmptyEntityUpdateContext.INSTANCE;
     }
+
+    /**
+     * Gets the {@link LanternEntity} that is assigned to
+     * the entity id if present.
+     *
+     * @param entityId The entity id
+     * @return The entity id present
+     */
+    Optional<LanternEntity> getById(int entityId);
+
+    /**
+     * Gets the entity id that is assigned to the {@link Entity}.
+     *
+     * @param entity The entity
+     * @return The entity id
+     */
+    OptionalInt getId(Entity entity);
 
     /**
      * Sends the {@link Message} to the owner, will only do something

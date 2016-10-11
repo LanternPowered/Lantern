@@ -28,6 +28,8 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import com.flowpowered.math.vector.Vector3d;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+import it.unimi.dsi.fastutil.ints.IntList;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
@@ -44,10 +46,14 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityRelativeMove;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityTeleport;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
 import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
+
+import java.util.Collections;
+import java.util.List;
 
 public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEntityProtocol<E> {
 
@@ -65,6 +71,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private double lastVelZ;
 
     private byte lastFlags;
+
+    private List<Entity> lastPassengers = Collections.emptyList();
 
     public EntityProtocol(E entity) {
         super(entity);
@@ -97,38 +105,43 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
         final int entityId = this.getRootEntityId();
 
+        if (dirtyRot) {
+            this.lastYaw = yaw;
+            this.lastPitch = pitch;
+        }
         if (dirtyPos) {
             double dx = x - this.lastX;
             double dy = y - this.lastY;
             double dz = z - this.lastZ;
-
-            if (dirtyRot) {
-                this.lastYaw = yaw;
-                this.lastPitch = pitch;
-            }
-            if (Math.abs(dx) < 8 && Math.abs(dy) < 8 && Math.abs(dz) < 8) {
-                int dxu = (int) (dx * 4096);
-                int dyu = (int) (dy * 4096);
-                int dzu = (int) (dz * 4096);
-
-                if (dirtyRot) {
-                    context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
-                            dxu, dyu, dzu, wrapAngle(yaw), wrapAngle(pitch), false));
-                    // The rotation is already send
-                    dirtyRot = false;
-                } else {
-                    context.sendToAllExceptSelf(new MessagePlayOutEntityRelativeMove(entityId,
-                            dxu, dyu, dzu, false));
-                }
-            } else {
-                context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
-                        x, y, z, wrapAngle(yaw), wrapAngle(pitch), false));
-                // The rotation is already send
-                dirtyRot = false;
-            }
             this.lastX = x;
             this.lastY = y;
             this.lastZ = z;
+
+            // Don't send movement messages if the entity
+            // is a passengers, otherwise glitches will
+            // rule the world.
+            if (!this.entity.getVehicle().isPresent()) {
+                if (Math.abs(dx) < 8 && Math.abs(dy) < 8 && Math.abs(dz) < 8) {
+                    int dxu = (int) (dx * 4096);
+                    int dyu = (int) (dy * 4096);
+                    int dzu = (int) (dz * 4096);
+
+                    if (dirtyRot) {
+                        context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
+                                dxu, dyu, dzu, wrapAngle(yaw), wrapAngle(pitch), false));
+                        // The rotation is already send
+                        dirtyRot = false;
+                    } else {
+                        context.sendToAllExceptSelf(new MessagePlayOutEntityRelativeMove(entityId,
+                                dxu, dyu, dzu, false));
+                    }
+                } else {
+                    context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
+                            x, y, z, wrapAngle(yaw), wrapAngle(pitch), false));
+                    // The rotation is already send
+                    dirtyRot = false;
+                }
+            }
         }
         if (dirtyRot) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, wrapAngle(yaw), wrapAngle(pitch), false));
@@ -159,6 +172,30 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         // TODO: Update attributes
     }
 
+    @Override
+    public void postUpdate(EntityProtocolUpdateContext context) {
+        final List<Entity> passengers = this.entity.getPassengers();
+        if (!passengers.equals(this.lastPassengers)) {
+            this.lastPassengers = passengers;
+            this.sendPassengers(context, passengers);
+        }
+    }
+
+    @Override
+    public void postSpawn(EntityProtocolUpdateContext context) {
+        this.sendPassengers(context, this.entity.getPassengers());
+    }
+
+    private void sendPassengers(EntityProtocolUpdateContext context, List<Entity> passengers) {
+        context.sendToAll(() -> {
+            final IntList passengerIds = new IntArrayList();
+            for (Entity passenger : passengers) {
+                context.getId(passenger).ifPresent(passengerIds::add);
+            }
+            return new MessagePlayOutSetEntityPassengers(getRootEntityId(), passengerIds.toIntArray());
+        });
+    }
+
     /**
      * Fills a {@link ByteBuffer} with parameters to spawn or update the {@link Entity}.
      *
@@ -169,7 +206,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         return this.fillParameters(initial, new ByteBufParameterList(ByteBufferAllocator.unpooled()));
     }
 
-    ParameterList fillParameters(boolean initial, ParameterList parameterList) {
+    private ParameterList fillParameters(boolean initial, ParameterList parameterList) {
         if (initial) {
             this.spawn(parameterList);
         } else {

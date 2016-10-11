@@ -56,6 +56,7 @@ import org.lanternpowered.server.inventory.block.IChestInventory;
 import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
@@ -130,7 +131,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer {
+public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, NetworkIdHolder {
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
@@ -239,12 +240,8 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
         return this.bossBars;
     }
 
-    /**
-     * Gets the network entity id.
-     *
-     * @return The network entity id
-     */
-    public int getNetworkEntityId() {
+    @Override
+    public int getNetworkId() {
         return this.networkEntityId;
     }
 
@@ -253,7 +250,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
      *
      * @param entityId The network entity id
      */
-    public void setNetworkEntityId(int entityId) {
+    public void setNetworkId(int entityId) {
         this.networkEntityId = entityId;
     }
 

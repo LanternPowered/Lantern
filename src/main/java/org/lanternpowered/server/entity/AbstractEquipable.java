@@ -35,13 +35,11 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public interface AbstractEquipable extends Equipable {
 
     @Override

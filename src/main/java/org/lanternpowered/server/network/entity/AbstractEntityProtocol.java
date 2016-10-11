@@ -25,22 +25,28 @@
  */
 package org.lanternpowered.server.network.entity;
 
-import static org.lanternpowered.server.util.IdAllocator.INVALID_ID;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
 public abstract class AbstractEntityProtocol<E extends LanternEntity> {
+
+    @SuppressWarnings("NullableProblems") EntityProtocolManager entityProtocolManager;
 
     /**
      * All the players tracking this entity.
@@ -55,7 +61,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     /**
      * The entity id of the entity.
      */
-    private int entityId;
+    private int entityId = INVALID_ENTITY_ID;
 
     /**
      * The amount of ticks between every update.
@@ -77,6 +83,18 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
         @SuppressWarnings("NullableProblems")
         private Set<LanternPlayer> trackers;
+
+        @Override
+        public Optional<LanternEntity> getById(int entityId) {
+            return entityProtocolManager.getEntityProtocolById(entityId).map(AbstractEntityProtocol::getEntity);
+        }
+
+        @Override
+        public OptionalInt getId(Entity entity) {
+            checkNotNull(entity, "entity");
+            final Optional<AbstractEntityProtocol<?>> entityProtocol = entityProtocolManager.getEntityProtocolByEntity(entity);
+            return entityProtocol.isPresent() ? OptionalInt.of(entityProtocol.get().entityId) : OptionalInt.empty();
+        }
 
         @Override
         public void sendToSelf(Message message) {
@@ -119,6 +137,10 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
                 this.sendToAllExceptSelf(messageSupplier.get());
             }
         }
+    }
+
+    public E getEntity() {
+        return this.entity;
     }
 
     protected int getRootEntityId() {
@@ -180,8 +202,10 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
     protected void remove(EntityProtocolInitContext context) {
         // Release the entity id of the entity
-        context.getIdAllocator().release(this.entityId);
-        this.entityId = INVALID_ID;
+        if (!(this.entity instanceof NetworkIdHolder)) {
+            context.release(this.entityId);
+        }
+        this.entityId = INVALID_ENTITY_ID;
     }
 
     /**
@@ -191,8 +215,12 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      * @param context The entity protocol context
      */
     protected void init(EntityProtocolInitContext context) {
-        // Allocate the next free id
-        this.entityId = context.getIdAllocator().acquire();
+        if (this.entity instanceof NetworkIdHolder) {
+            this.entityId = ((NetworkIdHolder) this.entity).getNetworkId();
+        } else {
+            // Allocate the next free id
+            this.entityId = context.acquire();
+        }
     }
 
     final class TrackerUpdateContextData {

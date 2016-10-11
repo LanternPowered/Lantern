@@ -31,12 +31,14 @@ import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.text.LanternTexts;
@@ -63,11 +65,10 @@ import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RelativePositions;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
@@ -78,7 +79,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternEntity extends BaseComponentHolder implements Entity, AbstractDataHolder, AbstractPropertyHolder {
 
     @SuppressWarnings("unused")
@@ -128,8 +128,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Nullable private AABB boundingBoxBase;
     @Nullable private AABB boundingBox;
 
-    @Nullable private UUID creator;
-    @Nullable private UUID notifier;
+    @Nullable private volatile UUID creator;
+    @Nullable private volatile UUID notifier;
+
+    @Nullable private LanternEntity vehicle;
+    private final List<LanternEntity> passengers = new ArrayList<>();
 
     public enum RemoveState {
         /**
@@ -151,6 +154,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
             this.entityType = (LanternEntityType) EntityTypeRegistryModule.get().getByClass(this.getClass()).orElseThrow(
                     () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
         } else {
+            //noinspection ConstantConditions
             this.entityType = null;
         }
     }
@@ -211,6 +215,10 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     public void remove(RemoveState removeState) {
         checkNotNull(removeState, "removeState");
         this.removeState = removeState;
+        if (removeState == RemoveState.DESTROYED) {
+            this.setVehicle(null);
+            this.clearPassengers();
+        }
     }
 
     public void resurrect() {
@@ -365,26 +373,6 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public List<Entity> getPassengers() {
-        return Collections.emptyList();
-    }
-
-    @Override
-    public DataTransactionResult addPassenger(Entity entity) {
-        return DataTransactionResult.failNoData();
-    }
-
-    @Override
-    public DataTransactionResult removePassenger(Entity entity) {
-        return DataTransactionResult.failNoData();
-    }
-
-    @Override
-    public DataTransactionResult clearPassengers() {
-        return DataTransactionResult.failNoData();
-    }
-
-    @Override
     public Transform<World> getTransform() {
         return new Transform<>(this.world, this.position, this.rotation);
     }
@@ -416,8 +404,8 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         checkNotNull(rotation, "rotation");
         checkNotNull(relativePositions, "relativePositions");
 
-        World world = location.getExtent();
-        Vector3d pos = location.getPosition();
+        final World world = location.getExtent();
+        final Vector3d pos = location.getPosition();
 
         double x = pos.getX();
         double y = pos.getY();
@@ -452,18 +440,107 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Override
-    public Optional<Entity> getVehicle() {
-        return Optional.empty();
+    public List<Entity> getPassengers() {
+        synchronized (this.passengers) {
+            return ImmutableList.copyOf(this.passengers);
+        }
     }
 
     @Override
-    public DataTransactionResult setVehicle(@Nullable Entity entity) {
+    public DataTransactionResult addPassenger(Entity entity) {
+        checkNotNull(entity, "entity");
+        final LanternEntity entity1 = (LanternEntity) entity;
+        if (entity1.getVehicle0() != null) {
+            return DataTransactionResult.failNoData();
+        }
+        return entity1.setVehicle(this);
+    }
+
+    @Override
+    public DataTransactionResult removePassenger(Entity entity) {
+        checkNotNull(entity, "entity");
+        final LanternEntity entity1 = (LanternEntity) entity;
+        if (entity1.getVehicle0() != this) {
+            return DataTransactionResult.failNoData();
+        }
+        return entity1.setVehicle(null);
+    }
+
+    @Override
+    public DataTransactionResult clearPassengers() {
+        synchronized (this.passengers) {
+            for (LanternEntity passenger : this.passengers) {
+                passenger.setVehicle(null);
+            }
+        }
         return DataTransactionResult.failNoData();
     }
 
     @Override
-    public Entity getBaseVehicle() {
-        return this;
+    public Optional<Entity> getVehicle() {
+        synchronized (this.passengers) {
+            return Optional.ofNullable(this.vehicle);
+        }
+    }
+
+    @Override
+    public DataTransactionResult setVehicle(@Nullable Entity entity) {
+        synchronized (this.passengers) {
+            if (this.vehicle == entity) {
+                return DataTransactionResult.failNoData();
+            }
+            if (this.vehicle != null) {
+                this.vehicle.removePassenger0(this);
+            }
+            this.vehicle = (LanternEntity) entity;
+            if (this.vehicle != null) {
+                this.vehicle.addPassenger0(this);
+            }
+            return DataTransactionResult.successNoData();
+        }
+    }
+
+    private void removePassenger0(LanternEntity passenger) {
+        synchronized (this.passengers) {
+            this.passengers.remove(passenger);
+        }
+    }
+
+    private void addPassenger0(LanternEntity passenger) {
+        synchronized (this.passengers) {
+            int index = -1;
+            if (passenger instanceof LanternPlayer) {
+                do {
+                    index++;
+                } while (index < this.passengers.size() && this.passengers.get(index) instanceof LanternPlayer);
+            }
+            if (index == -1) {
+                this.passengers.add(passenger);
+            } else {
+                this.passengers.add(index, passenger);
+            }
+        }
+    }
+
+    @Override
+    public LanternEntity getBaseVehicle() {
+        synchronized (this.passengers) {
+            LanternEntity lastEntity = this;
+            while (true) {
+                final LanternEntity entity = lastEntity.getVehicle0();
+                if (entity == null) {
+                    return lastEntity;
+                }
+                lastEntity = entity;
+            }
+        }
+    }
+
+    @Nullable
+    private LanternEntity getVehicle0() {
+        synchronized (this.passengers) {
+            return this.vehicle;
+        }
     }
 
     @Override
@@ -475,7 +552,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
      * Pulses the entity.
      */
     public void pulse() {
-
+        synchronized (this.passengers) {
+            if (this.vehicle != null) {
+                this.position = this.vehicle.getPosition();
+            }
+        }
     }
 
     @Override

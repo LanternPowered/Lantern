@@ -25,8 +25,12 @@
  */
 package org.lanternpowered.server.network.entity;
 
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.entity.Entity;
 
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.function.Supplier;
 
 final class EmptyEntityUpdateContext implements EntityProtocolUpdateContext {
@@ -34,6 +38,16 @@ final class EmptyEntityUpdateContext implements EntityProtocolUpdateContext {
     static final EmptyEntityUpdateContext INSTANCE = new EmptyEntityUpdateContext();
 
     private EmptyEntityUpdateContext() {
+    }
+
+    @Override
+    public Optional<LanternEntity> getById(int entityId) {
+        return Optional.empty();
+    }
+
+    @Override
+    public OptionalInt getId(Entity entity) {
+        return OptionalInt.empty();
     }
 
     @Override

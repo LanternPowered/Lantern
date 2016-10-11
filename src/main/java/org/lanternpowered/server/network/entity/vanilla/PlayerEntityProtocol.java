@@ -27,11 +27,9 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
-import org.lanternpowered.server.util.IdAllocator;
 import org.spongepowered.api.data.key.Keys;
 
 public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> {
@@ -40,21 +38,6 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
-    }
-
-    @Override
-    protected void init(EntityProtocolInitContext context) {
-        super.init(() -> new IdAllocator() {
-            @Override
-            public int acquire() {
-                return entity.getNetworkEntityId();
-            }
-        });
-    }
-
-    @Override
-    protected void remove(EntityProtocolInitContext context) {
-        // Don't release the entity id
     }
 
     @Override

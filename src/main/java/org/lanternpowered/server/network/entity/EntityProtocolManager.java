@@ -27,37 +27,40 @@ package org.lanternpowered.server.network.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.ints.IntIterator;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
+import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
-import org.lanternpowered.server.util.IdAllocator;
 import org.spongepowered.api.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.locks.StampedLock;
+
+import javax.annotation.Nullable;
 
 public final class EntityProtocolManager {
 
+    public static final int INVALID_ENTITY_ID = -1;
+
     private static final int UPDATE_RATE = 3;
 
-    /**
-     * The {@link IdAllocator} of this entity protocol manager.
-     */
-    private static final IdAllocator idAllocator = new IdAllocator();
+    public static int acquireEntityId() {
+        return new EntityProtocolInitContextImpl(null).acquire();
+    }
 
-    /**
-     * Gets the {@link IdAllocator} that is used to allocate
-     * entity ids.
-     *
-     * @return The id allocator
-     */
-    public static IdAllocator getEntityIdAllocator() {
-        return idAllocator;
+    public static void releaseEntityId(int id) {
+        new EntityProtocolInitContextImpl(null).release(id);
     }
 
     private final Map<Entity, AbstractEntityProtocol<?>> entityProtocols = new ConcurrentHashMap<>();
@@ -67,12 +70,112 @@ public final class EntityProtocolManager {
      */
     private final Queue<AbstractEntityProtocol<?>> queuedForRemoval = new ConcurrentLinkedDeque<>();
 
+    private final Int2ObjectMap<AbstractEntityProtocol<?>> idToEntityProtocolMap = new Int2ObjectOpenHashMap<>();
+
+    private static int allocatorIdCounter = 0;
+
+    private final static IntSet allocatorReusableIds = new IntOpenHashSet();
+    private final static IntIterator allocatorReusableIdsIterator = allocatorReusableIds.iterator();
+
+    private final static StampedLock allocatorLock = new StampedLock();
+
     /**
      * The {@link EntityProtocolInitContext}.
      */
-    private final EntityProtocolInitContext initContext = () -> idAllocator;
+    private static class EntityProtocolInitContextImpl implements EntityProtocolInitContext {
+
+        @Nullable private final AbstractEntityProtocol<?> entityProtocol;
+
+        private EntityProtocolInitContextImpl(@Nullable AbstractEntityProtocol<?> entityProtocol) {
+            this.entityProtocol = entityProtocol;
+        }
+
+        /**
+         * Acquires the next free id.
+         *
+         * @return The id
+         */
+        @Override
+        public int acquire() {
+            final long stamp = allocatorLock.writeLock();
+            try {
+                return this.acquire0();
+            } finally {
+                allocatorLock.unlockWrite(stamp);
+            }
+        }
+
+        @Override
+        public int[] acquire(int count) {
+            return this.acquire(new int[count]);
+        }
+
+        @Override
+        public int[] acquire(int[] array) {
+            checkNotNull(array, "array");
+            final long stamp = allocatorLock.writeLock();
+            try {
+                for (int i = 0; i < array.length; i++) {
+                    array[i] = this.acquire0();
+                }
+            } finally {
+                allocatorLock.unlockWrite(stamp);
+            }
+            return array;
+        }
+
+        private int acquire0() {
+            final int id;
+            if (allocatorReusableIdsIterator.hasNext()) {
+                try {
+                    id = allocatorReusableIdsIterator.nextInt();
+                } finally {
+                    allocatorReusableIdsIterator.remove();
+                }
+            } else {
+                id = allocatorIdCounter++;
+            }
+            if (this.entityProtocol != null) {
+                this.entityProtocol.entityProtocolManager.idToEntityProtocolMap.put(id, this.entityProtocol);
+            }
+            return id;
+        }
+
+        @Override
+        public void release(int id) {
+            if (id != INVALID_ENTITY_ID) {
+                final long stamp = allocatorLock.writeLock();
+                try {
+                    allocatorReusableIds.add(id);
+                    if (this.entityProtocol != null) {
+                        this.entityProtocol.entityProtocolManager.idToEntityProtocolMap.remove(id);
+                    }
+                } finally {
+                    allocatorLock.unlockWrite(stamp);
+                }
+            }
+        }
+    }
 
     private int pulseCounter;
+
+    Optional<AbstractEntityProtocol<?>> getEntityProtocolById(int id) {
+        long stamp = allocatorLock.tryOptimisticRead();
+        AbstractEntityProtocol<?> entityProtocol = stamp != 0L ? this.idToEntityProtocolMap.get(id) : null;
+        if (stamp == 0L || !allocatorLock.validate(stamp)) {
+            stamp = allocatorLock.readLock();
+            try {
+                entityProtocol = this.idToEntityProtocolMap.get(id);
+            } finally {
+                allocatorLock.unlockRead(stamp);
+            }
+        }
+        return Optional.ofNullable(entityProtocol);
+    }
+
+    Optional<AbstractEntityProtocol<?>> getEntityProtocolByEntity(Entity entity) {
+        return Optional.ofNullable(this.entityProtocols.get(entity));
+    }
 
     /**
      * Adds the {@link Entity} to be tracked.
@@ -97,11 +200,20 @@ public final class EntityProtocolManager {
         checkNotNull(entity, "entity");
         checkNotNull(protocolType, "protocolType");
         final AbstractEntityProtocol<E> entityProtocol = protocolType.getSupplier().apply(entity);
+        entityProtocol.entityProtocolManager = this;
         final AbstractEntityProtocol<?> removed = this.entityProtocols.put(entity, entityProtocol);
         if (removed != null) {
             this.queuedForRemoval.add(removed);
         }
-        entityProtocol.init(this.initContext);
+        entityProtocol.init(new EntityProtocolInitContextImpl(entityProtocol));
+        if (entity instanceof NetworkIdHolder) {
+            final long stamp = allocatorLock.writeLock();
+            try {
+                this.idToEntityProtocolMap.put(((NetworkIdHolder) entity).getNetworkId(), entityProtocol);
+            } finally {
+                allocatorLock.unlockWrite(stamp);
+            }
+        }
     }
 
     /**
@@ -131,7 +243,7 @@ public final class EntityProtocolManager {
 
         AbstractEntityProtocol<?> removed;
         while ((removed = this.queuedForRemoval.poll()) != null) {
-            removed.destroy(this.initContext);
+            removed.destroy(new EntityProtocolInitContextImpl(removed));
         }
 
         final List<AbstractEntityProtocol.TrackerUpdateContextData> updateContextDataList = new ArrayList<>();

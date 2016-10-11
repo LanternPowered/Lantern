@@ -89,6 +89,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetCamera;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetCooldown;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetDifficulty;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetEntityPassengers;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetExperience;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSpawnExperienceOrb;
@@ -202,6 +203,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPainting;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStopSound;
@@ -432,7 +434,7 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Create.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Update.class);
         codecPlayOutScoreboardObjective.bind(MessagePlayOutScoreboardObjective.Remove.class);
-        // ...
+        outbound.bind(0x40, CodecPlayOutSetEntityPassengers.class, MessagePlayOutSetEntityPassengers.class);
         final CodecRegistration<MessagePlayOutTeams, CodecPlayOutTeams> codecPlayOutTeams = outbound.bind(
                 0x41, CodecPlayOutTeams.class);
         codecPlayOutTeams.bind(MessagePlayOutTeams.AddPlayers.class);

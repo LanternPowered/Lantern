@@ -27,17 +27,13 @@ package org.lanternpowered.server.entity;
 
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.ArmorEquipable;
-import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public interface AbstractArmorEquipable extends AbstractEquipable, ArmorEquipable {
 
     @Override

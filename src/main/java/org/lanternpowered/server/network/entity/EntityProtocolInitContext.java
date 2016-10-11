@@ -25,14 +25,23 @@
  */
 package org.lanternpowered.server.network.entity;
 
-import org.lanternpowered.server.util.IdAllocator;
-
 public interface EntityProtocolInitContext {
 
     /**
-     * Gets the {@link IdAllocator}.
+     * Acquires the next free id.
      *
-     * @return The id allocator
+     * @return The id
      */
-    IdAllocator getIdAllocator();
+    int acquire();
+
+    int[] acquire(int count);
+
+    int[] acquire(int[] array);
+
+    /**
+     * Releases the id so that it can be reused.
+     *
+     * @param id The id
+     */
+    void release(int id);
 }

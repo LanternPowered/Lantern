@@ -121,7 +121,7 @@ public final class PlayerInteractionHandler {
         // Update for all the players except the breaker
         if (players.size() - 1 <= 0) {
             final MessagePlayOutBlockBreakAnimation message = new MessagePlayOutBlockBreakAnimation(
-                    this.diggingBlock, this.player.getNetworkEntityId(), breakState);
+                    this.diggingBlock, this.player.getNetworkId(), breakState);
             players.forEach(player -> {
                 if (player != this.player) {
                     player.getConnection().send(message);

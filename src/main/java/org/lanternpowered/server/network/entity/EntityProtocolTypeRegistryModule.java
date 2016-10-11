@@ -29,6 +29,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.lanternpowered.server.network.entity.vanilla.EnderDragonEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.HumanEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.HumanoidEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.HuskEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ItemEntityProtocol;
@@ -51,7 +52,7 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
     @Override
     public void registerDefaults() {
         this.register(new LanternEntityProtocolType<>("minecraft", "ender_dragon", LanternEntity.class, EnderDragonEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "human", LanternEntity.class, HumanoidEntityProtocol::new));
+        this.register(new LanternEntityProtocolType<>("minecraft", "human", LanternEntity.class, HumanEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "husk", LanternEntity.class, HuskEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "item", LanternEntity.class, ItemEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "lightning", LanternEntity.class, LightningEntityProtocol::new));

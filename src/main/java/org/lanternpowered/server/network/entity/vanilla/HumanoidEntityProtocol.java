@@ -38,7 +38,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
 
-public class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
+public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 
     private HandSide lastDominantHand = HandSide.RIGHT;
 
@@ -75,8 +75,6 @@ public class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntit
         parameterList.add(EntityParameters.Humanoid.MAIN_HAND,
                 (byte) (this.entity.get(LanternKeys.DOMINANT_HAND).orElse(HandSide.RIGHT) == HandSide.RIGHT ? 1 : 0));
         parameterList.add(EntityParameters.Humanoid.SKIN_PARTS, (byte) 0);
-        parameterList.add(EntityParameters.Humanoid.SCORE, this.entity.get(LanternKeys.SCORE).orElse(0));
-        parameterList.add(EntityParameters.Humanoid.ADDITIONAL_HEARTS, 0f);
     }
 
     @Override

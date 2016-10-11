@@ -27,13 +27,13 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternProfession;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.Professions;
 
-public class ZombieVillagerEntityProtocol<E extends LanternEntityLiving> extends AbstractZombieEntityProtocol<E> {
+public class ZombieVillagerEntityProtocol<E extends LanternEntity> extends AbstractZombieEntityProtocol<E> {
 
     private int lastProfession;
     private boolean lastIsConverting;

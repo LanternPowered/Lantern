@@ -28,11 +28,12 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityLiving;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
 
-public abstract class CreatureEntityProtocol<E extends LanternEntityLiving> extends LivingEntityProtocol<E> {
+public abstract class CreatureEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 
     public CreatureEntityProtocol(E entity) {
         super(entity);
@@ -48,15 +49,15 @@ public abstract class CreatureEntityProtocol<E extends LanternEntityLiving> exte
     @Override
     public void spawn(EntityProtocolUpdateContext context) {
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity.getHeadRotation();
+        final Vector3d headRot = this.entity instanceof LanternEntityLiving ? ((LanternEntityLiving) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();
         final Vector3d vel = this.entity.getVelocity();
 
-        double yaw = rot.getY();
-        double headPitch = headRot.getX();
-        double headYaw = headRot.getY();
+        final double yaw = rot.getY();
+        final double pitch = headRot != null ? headRot.getX() : rot.getX();
+        final double headYaw = headRot != null ? headRot.getY() : 0;
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnMob(this.getRootEntityId(), this.entity.getUniqueId(), this.getMobType(),
-                pos, wrapAngle(yaw), wrapAngle(headPitch), wrapAngle(headYaw), vel, this.fillParameters(true)));
+                pos, wrapAngle(yaw), wrapAngle(pitch), wrapAngle(headYaw), vel, this.fillParameters(true)));
     }
 }

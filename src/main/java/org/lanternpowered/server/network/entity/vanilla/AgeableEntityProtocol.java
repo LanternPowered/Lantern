@@ -26,11 +26,11 @@
 package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
 
-public abstract class AgeableEntityProtocol<E extends LanternEntityLiving> extends InsentientEntityProtocol<E> {
+public abstract class AgeableEntityProtocol<E extends LanternEntity> extends InsentientEntityProtocol<E> {
 
     private boolean lastIsBaby;
 

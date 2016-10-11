@@ -26,11 +26,11 @@
 package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
 
-public abstract class LivingEntityProtocol<E extends LanternEntityLiving> extends EntityProtocol<E> {
+public abstract class LivingEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
 
     private float lastHealth;
     private int lastArrowsInEntity;
@@ -43,7 +43,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntityLiving> extend
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
         parameterList.add(EntityParameters.Living.HAND_DATA, (byte) 0);
-        parameterList.add(EntityParameters.Living.HEALTH, this.entity.get(Keys.HEALTH).orElse(1.0).floatValue());
+        parameterList.add(EntityParameters.Living.HEALTH, this.entity.get(Keys.HEALTH).map(Double::floatValue).orElse(1f));
         parameterList.add(EntityParameters.Living.ARROWS_IN_ENTITY, this.entity.get(LanternKeys.ARROWS_IN_ENTITY).orElse(0));
         parameterList.add(EntityParameters.Living.POTION_EFFECT_COLOR, 0);
         parameterList.add(EntityParameters.Living.POTION_EFFECT_AMBIENT, false);
@@ -52,7 +52,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntityLiving> extend
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final float health = this.entity.get(Keys.HEALTH).get().floatValue();
+        final float health = this.entity.get(Keys.HEALTH).map(Double::floatValue).orElse(1f);
         if (health != this.lastHealth) {
             parameterList.add(EntityParameters.Living.HEALTH, health);
             this.lastHealth = health;

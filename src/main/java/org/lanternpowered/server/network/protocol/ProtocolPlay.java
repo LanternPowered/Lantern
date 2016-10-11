@@ -115,6 +115,8 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInDropHeldItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityAttack;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityInteract;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInAllPlayerMovement;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInChangeSign;
@@ -324,8 +326,10 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInOutUnregisterChannels.class)
                 .bindHandler(new HandlerPlayInUnregisterChannels());
         // Provided by CodecPlayInUseEntity
-        inbound.bind(MessagePlayInUseEntity.Attack.class); // TODO: Handler
-        inbound.bind(MessagePlayInUseEntity.Interact.class); // TODO: Handler
+        inbound.bind(MessagePlayInUseEntity.Attack.class)
+                .bindHandler(new HandlerPlayInUseEntityAttack());
+        inbound.bind(MessagePlayInUseEntity.Interact.class)
+                .bindHandler(new HandlerPlayInUseEntityInteract());
         // Provided by CodecPlayInPlayerDigging
         inbound.bind(MessagePlayInPlayerDigging.class)
                 .bindHandler(new HandlerPlayInPlayerDigging());

@@ -26,10 +26,10 @@
 package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 
-public abstract class AbstractZombieEntityProtocol<E extends LanternEntityLiving> extends AgeableEntityProtocol<E> {
+public abstract class AbstractZombieEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
 
     private boolean lastAreHandsUp;
 

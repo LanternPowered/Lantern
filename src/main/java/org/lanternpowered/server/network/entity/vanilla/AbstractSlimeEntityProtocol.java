@@ -25,11 +25,11 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
 
-public abstract class AbstractSlimeEntityProtocol<E extends LanternEntityLiving> extends InsentientEntityProtocol<E> {
+public abstract class AbstractSlimeEntityProtocol<E extends LanternEntity> extends InsentientEntityProtocol<E> {
 
     private int lastSize;
 

@@ -25,10 +25,14 @@
  */
 package org.lanternpowered.server.network.entity;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID;
 
 import com.flowpowered.math.vector.Vector3d;
+import it.unimi.dsi.fastutil.objects.Object2LongMap;
+import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
@@ -74,6 +78,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
     private double trackingRange = 64;
 
     private int tickCounter = 0;
+
+    final Object2LongMap<Player> playerInteractTimes = new Object2LongOpenHashMap<>();
 
     public AbstractEntityProtocol(E entity) {
         this.entity = entity;
@@ -196,6 +202,9 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
             ctx.trackers = this.trackers;
             this.destroy(ctx);
             this.trackers.clear();
+            synchronized (this.playerInteractTimes) {
+                this.playerInteractTimes.clear();
+            }
         }
         this.remove(context);
     }
@@ -216,11 +225,22 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      */
     protected void init(EntityProtocolInitContext context) {
         if (this.entity instanceof NetworkIdHolder) {
-            this.entityId = ((NetworkIdHolder) this.entity).getNetworkId();
+            this.initRootId(((NetworkIdHolder) this.entity).getNetworkId());
         } else {
             // Allocate the next free id
-            this.entityId = context.acquire();
+            this.initRootId(context.acquire());
         }
+    }
+
+    /**
+     * Initializes the root entity id of this protocol.
+     *
+     * @param rootEntityId The root entity id
+     */
+    protected final void initRootId(int rootEntityId) {
+        checkArgument(rootEntityId != INVALID_ENTITY_ID, "The root entity id cannot be invalid.");
+        checkState(this.entityId == INVALID_ENTITY_ID, "This entity protocol is already initialized.");
+        this.entityId = rootEntityId;
     }
 
     final class TrackerUpdateContextData {
@@ -290,6 +310,9 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         if (contextData.removed != null) {
             ctx.trackers = contextData.removed;
             this.destroy(ctx);
+            synchronized (this.playerInteractTimes) {
+                contextData.removed.forEach(this.playerInteractTimes::remove);
+            }
         }
         if (contextData.update != null) {
             ctx.trackers = contextData.update;
@@ -364,5 +387,26 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      * @param context The entity update context
      */
     protected void postUpdate(EntityProtocolUpdateContext context) {
+    }
+
+    /**
+     * Is called when the specified {@link LanternPlayer} tries to interact
+     * with this entity, or at least one of the ids assigned to it.
+     *
+     * @param player The player that interacted with the entity
+     * @param entityId The entity the player interacted with
+     * @param position The position where the player interacted with the entity, if present
+     */
+    protected void playerInteract(LanternPlayer player, int entityId, @Nullable Vector3d position) {
+    }
+
+    /**
+     * Is called when the specified {@link LanternPlayer} tries to attach
+     * this entity, or at least one of the ids assigned to it.
+     *
+     * @param player The player that attack the entity
+     * @param entityId The entity id the player attacked
+     */
+    protected void playerAttack(LanternPlayer player, int entityId) {
     }
 }

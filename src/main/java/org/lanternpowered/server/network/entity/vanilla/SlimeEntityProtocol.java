@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 
-public class SlimeEntityProtocol<E extends LanternEntityLiving> extends AbstractSlimeEntityProtocol<E> {
+public class SlimeEntityProtocol<E extends LanternEntity> extends AbstractSlimeEntityProtocol<E> {
 
     public SlimeEntityProtocol(E entity) {
         super(entity);

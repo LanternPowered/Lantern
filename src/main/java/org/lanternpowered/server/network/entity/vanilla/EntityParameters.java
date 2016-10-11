@@ -534,6 +534,19 @@ public final class EntityParameters {
         }
     }
 
+    public static final class EnderDragon {
+
+        public static final ParameterTypeCollection PARAMETERS = Insentient.PARAMETERS.copy();
+
+        /**
+         * Whether the entity is a baby.
+         */
+        public static final ParameterType<Integer> PHASE = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+
+        private EnderDragon() {
+        }
+    }
+
     private EntityParameters() {
     }
 }

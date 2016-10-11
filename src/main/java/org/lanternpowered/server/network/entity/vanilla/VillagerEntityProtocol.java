@@ -26,13 +26,13 @@
 package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.type.LanternProfession;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.Professions;
 
-public class VillagerEntityProtocol<E extends LanternEntityLiving> extends AgeableEntityProtocol<E> {
+public class VillagerEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
 
     private int lastProfession;
 

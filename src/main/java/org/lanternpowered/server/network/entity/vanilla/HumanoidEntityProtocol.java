@@ -29,6 +29,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternEntityLiving;
 import org.lanternpowered.server.entity.living.player.HandSide;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
@@ -37,7 +38,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
 
-public class HumanoidEntityProtocol<E extends LanternEntityLiving> extends LivingEntityProtocol<E> {
+public class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 
     private HandSide lastDominantHand = HandSide.RIGHT;
 
@@ -50,17 +51,18 @@ public class HumanoidEntityProtocol<E extends LanternEntityLiving> extends Livin
         final int entityId = this.getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity.getHeadRotation();
+        final Vector3d headRot = this.entity instanceof LanternEntityLiving ? ((LanternEntityLiving) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();
         final Vector3d vel = this.entity.getVelocity();
 
-        double yaw = rot.getY();
-        double headPitch = headRot.getX();
-        double headYaw = headRot.getY();
+        final double yaw = rot.getY();
+        final double pitch = headRot != null ? headRot.getX() : rot.getX();
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnPlayer(entityId, this.entity.getUniqueId(),
-                pos, wrapAngle(yaw), wrapAngle(headPitch), this.fillParameters(true)));
-        context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headYaw)));
+                pos, wrapAngle(yaw), wrapAngle(pitch), this.fillParameters(true)));
+        if (headRot != null) {
+            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));
+        }
         if (!vel.equals(Vector3d.ZERO)) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityVelocity(entityId, vel.getX(), vel.getY(), vel.getZ()));
         }
@@ -73,6 +75,8 @@ public class HumanoidEntityProtocol<E extends LanternEntityLiving> extends Livin
         parameterList.add(EntityParameters.Humanoid.MAIN_HAND,
                 (byte) (this.entity.get(LanternKeys.DOMINANT_HAND).orElse(HandSide.RIGHT) == HandSide.RIGHT ? 1 : 0));
         parameterList.add(EntityParameters.Humanoid.SKIN_PARTS, (byte) 0);
+        parameterList.add(EntityParameters.Humanoid.SCORE, this.entity.get(LanternKeys.SCORE).orElse(0));
+        parameterList.add(EntityParameters.Humanoid.ADDITIONAL_HEARTS, 0f);
     }
 
     @Override

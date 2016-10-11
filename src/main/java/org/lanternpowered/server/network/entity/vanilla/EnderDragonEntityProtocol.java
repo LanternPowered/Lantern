@@ -25,42 +25,54 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.data.type.LanternRabbitType;
+import static com.google.common.base.Preconditions.checkState;
+
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
+import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.RabbitTypes;
 
-public class RabbitEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
+public class EnderDragonEntityProtocol<E extends LanternEntity> extends CreatureEntityProtocol<E> {
 
-    private int lastType;
+    private static final int PART_HEAD = 0;
+    private static final int PART_NECK = 1;
+    private static final int PART_BODY = 2;
+    private static final int PART_TAIL1 = 3;
+    private static final int PART_TAIL2 = 4;
+    private static final int PART_TAIL3 = 5;
+    private static final int PART_WING1 = 6;
+    private static final int PART_WING2 = 7;
 
-    public RabbitEntityProtocol(E entity) {
+    private final int[] partEntityIds = new int[8];
+
+    public EnderDragonEntityProtocol(E entity) {
         super(entity);
-    }
-
-    private int getTypeId() {
-        return ((LanternRabbitType) this.entity.get(Keys.RABBIT_TYPE).orElse(RabbitTypes.WHITE)).getInternalId();
     }
 
     @Override
     protected int getMobType() {
-        return 101;
+        return 63;
+    }
+
+    @Override
+    protected void init(EntityProtocolInitContext context) {
+        checkState(!(this.entity instanceof NetworkIdHolder), "EnderDragons cannot have a predefined network id.");
+        // A ender dragon uses 9 entity ids
+        final int[] ids = new int[this.partEntityIds.length + 1];
+        context.acquireRow(ids);
+        this.initRootId(ids[0]);
+        System.arraycopy(ids, 1, this.partEntityIds, 0, this.partEntityIds.length);
     }
 
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
-        parameterList.add(EntityParameters.Rabbit.VARIANT, this.getTypeId());
+        // TODO: Send phase
     }
 
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final int type = this.getTypeId();
-        if (type != this.lastType) {
-            parameterList.add(EntityParameters.Rabbit.VARIANT, type);
-            this.lastType = type;
-        }
+        // TODO: Update phase
     }
 }

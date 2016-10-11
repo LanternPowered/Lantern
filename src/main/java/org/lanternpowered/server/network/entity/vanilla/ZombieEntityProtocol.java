@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 
-public class ZombieEntityProtocol<E extends LanternEntityLiving> extends AbstractZombieEntityProtocol<E> {
+public class ZombieEntityProtocol<E extends LanternEntity> extends AbstractZombieEntityProtocol<E> {
 
     public ZombieEntityProtocol(E entity) {
         super(entity);

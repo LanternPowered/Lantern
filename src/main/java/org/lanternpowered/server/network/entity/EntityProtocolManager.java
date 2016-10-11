@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntIterator;
@@ -46,6 +47,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.locks.StampedLock;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -117,6 +119,50 @@ public final class EntityProtocolManager {
             try {
                 for (int i = 0; i < array.length; i++) {
                     array[i] = this.acquire0();
+                }
+            } finally {
+                allocatorLock.unlockWrite(stamp);
+            }
+            return array;
+        }
+
+        @Override
+        public int[] acquireRow(int count) {
+            return this.acquireRow(new int[count]);
+        }
+
+        @Override
+        public int[] acquireRow(int[] array) {
+            final long stamp = allocatorLock.writeLock();
+            try {
+                final IntIterator iterator = allocatorReusableIds.iterator();
+                boolean fail = false;
+                for (int i = 0; i < array.length; i++) {
+                    if (!iterator.hasNext()) {
+                        fail = true;
+                        break;
+                    }
+                    array[i] = iterator.next();
+                    if (i != 0 && array[i - 1] != array[i] - 1) {
+                        fail = true;
+                        break;
+                    }
+                }
+                if (fail) {
+                    for (int i = 0; i < array.length; i++) {
+                        array[i] = allocatorIdCounter++;
+                        if (this.entityProtocol != null) {
+                            this.entityProtocol.entityProtocolManager.idToEntityProtocolMap.put(array[i], this.entityProtocol);
+                        }
+                    }
+                } else {
+                    for (int id : array) {
+                        allocatorReusableIdsIterator.nextInt();
+                        allocatorReusableIdsIterator.remove();
+                        if (this.entityProtocol != null) {
+                            this.entityProtocol.entityProtocolManager.idToEntityProtocolMap.put(id, this.entityProtocol);
+                        }
+                    }
                 }
             } finally {
                 allocatorLock.unlockWrite(stamp);
@@ -261,5 +307,29 @@ public final class EntityProtocolManager {
         for (AbstractEntityProtocol.TrackerUpdateContextData contextData : updateContextDataList) {
             contextData.entityProtocol.postUpdateTrackers(contextData);
         }
+    }
+
+    private static final int INTERACT_DELAY = 50;
+
+    public void playerInteract(LanternPlayer player, int entityId, @Nullable Vector3d position) {
+        this.playerUseEntity(player, entityId, entityProtocol -> entityProtocol.playerInteract(player, entityId, position));
+    }
+
+    public void playerAttack(LanternPlayer player, int entityId) {
+        this.playerUseEntity(player, entityId, entityProtocol -> entityProtocol.playerAttack(player, entityId));
+    }
+
+    private void playerUseEntity(LanternPlayer player, int entityId,
+            Consumer<AbstractEntityProtocol<?>> entityProtocolConsumer) {
+        this.getEntityProtocolById(entityId).ifPresent(entityProtocol -> {
+            synchronized (entityProtocol.playerInteractTimes) {
+                final long time = entityProtocol.playerInteractTimes.getLong(player);
+                final long current = System.currentTimeMillis();
+                if (time == 0L || current - time > INTERACT_DELAY) {
+                    entityProtocolConsumer.accept(entityProtocol);
+                    entityProtocol.playerInteractTimes.put(player, current);
+                }
+            }
+        });
     }
 }

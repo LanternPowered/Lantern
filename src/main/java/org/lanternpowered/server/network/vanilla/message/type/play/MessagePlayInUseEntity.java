@@ -37,7 +37,7 @@ public abstract class MessagePlayInUseEntity implements Message {
 
     private final int entityId;
 
-    MessagePlayInUseEntity(int entityId) {
+    private MessagePlayInUseEntity(int entityId) {
         this.entityId = entityId;
     }
 
@@ -55,11 +55,11 @@ public abstract class MessagePlayInUseEntity implements Message {
     public static final class Interact extends MessagePlayInUseEntity {
 
         private final ItemInteractionType interactionType;
-        private final Optional<Vector3d> position;
+        @Nullable private final Vector3d position;
 
         public Interact(int entityId, ItemInteractionType interactionType, @Nullable Vector3d position) {
             super(entityId);
-            this.position = Optional.ofNullable(position);
+            this.position = position;
             this.interactionType = interactionType;
         }
 
@@ -68,7 +68,7 @@ public abstract class MessagePlayInUseEntity implements Message {
         }
 
         public Optional<Vector3d> getPosition() {
-            return this.position;
+            return Optional.ofNullable(this.position);
         }
     }
 }

@@ -1280,6 +1280,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         return 0;
     }
 
+    public EntityProtocolManager getEntityProtocolManager() {
+        return this.entityProtocolManager;
+    }
+
     public MultiWorldEventListener getEventListener() {
         return this.worldEventListener;
     }

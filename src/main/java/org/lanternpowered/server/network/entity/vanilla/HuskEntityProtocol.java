@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 
-public class HuskEntityProtocol<E extends LanternEntityLiving> extends AbstractZombieEntityProtocol<E> {
+public class HuskEntityProtocol<E extends LanternEntity> extends AbstractZombieEntityProtocol<E> {
 
     public HuskEntityProtocol(E entity) {
         super(entity);

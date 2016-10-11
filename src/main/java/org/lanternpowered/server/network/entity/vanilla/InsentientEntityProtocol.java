@@ -26,11 +26,11 @@
 package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.HandSide;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 
-public abstract class InsentientEntityProtocol<E extends LanternEntityLiving> extends CreatureEntityProtocol<E> {
+public abstract class InsentientEntityProtocol<E extends LanternEntity> extends CreatureEntityProtocol<E> {
 
     private HandSide lastDominantHand = HandSide.RIGHT;
 

@@ -46,8 +46,8 @@ public final class CodecPlayInPlayerAction implements Codec<Message> {
         // Normally should this be the entity id, but only the
         // client player will send this, so it won't be used
         buf.readVarInt();
-        int action = buf.readVarInt();
-        int value = buf.readVarInt();
+        final int action = buf.readVarInt();
+        final int value = buf.readVarInt();
         // Sneaking states
         if (action == 0 || action == 1) {
             return new MessagePlayInPlayerSneak(action == 0);

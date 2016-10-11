@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.Lists;
 import io.netty.handler.codec.CodecException;
 import io.netty.util.AttributeKey;
@@ -48,24 +49,30 @@ public final class CodecPlayInPlayerVehicleControls implements Codec<Message> {
     public Message decode(CodecContext context, ByteBuffer buf) throws CodecException {
         float sideways = buf.readFloat();
         float forwards = buf.readFloat();
-        byte flags = buf.readByte();
-        boolean jump = (flags & 0x1) != 0;
-        boolean sneak = (flags & 0x2) != 0;
+
+        final byte flags = buf.readByte();
+
+        final boolean jump = (flags & 0x1) != 0;
+        final boolean sneak = (flags & 0x2) != 0;
 
         final List<Message> messages = Lists.newArrayList();
-        boolean lastSneak = context.getChannel().attr(SNEAKING).getAndSet(sneak);
+        final boolean lastSneak = MoreObjects.firstNonNull(context.getChannel().attr(SNEAKING).getAndSet(sneak), false);
         if (lastSneak != sneak) {
             messages.add(new MessagePlayInPlayerSneak(sneak));
         }
-        boolean lastJump = context.getChannel().attr(JUMPING).getAndSet(jump);
-        if (lastJump != jump && !context.getChannel().attr(CodecPlayInPlayerAction.CANCEL_NEXT_JUMP_MESSAGE).getAndSet(false)) {
+
+        final boolean lastJump = MoreObjects.firstNonNull(context.getChannel().attr(JUMPING).getAndSet(jump), false);
+        if (lastJump != jump && !MoreObjects.firstNonNull(
+                context.getChannel().attr(CodecPlayInPlayerAction.CANCEL_NEXT_JUMP_MESSAGE).getAndSet(false), false)) {
             messages.add(new MessagePlayInPlayerVehicleJump(jump, 0f));
         }
+
         // The mc client already applies the sneak speed, but we want to choose it
         if (sneak) {
             sideways /= 0.3f;
             forwards /= 0.3f;
         }
+
         messages.add(new MessagePlayInPlayerVehicleMovement(forwards, sideways));
         return messages.size() == 1 ? messages.get(0) : new BulkMessage(messages);
     }

@@ -40,6 +40,15 @@ public class PlayerInventoryContainer extends LanternContainer {
 
     public PlayerInventoryContainer(@Nullable Translation name, LanternPlayerInventory playerInventory) {
         super(name, playerInventory, null);
+        super.addSlotTrackers();
+    }
+
+    @Override
+    void addSlotTrackers() {
+    }
+
+    @Override
+    void removeSlotTrackers() {
     }
 
     @Override

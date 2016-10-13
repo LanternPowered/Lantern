@@ -31,19 +31,18 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.buffer.objects.Types;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTitle.SetTimes;
 
 public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
 
     private static final int SET_TITLE = 0;
     private static final int SET_SUBTITLE = 1;
-    private static final int SET_TIMES = 2;
-    private static final int CLEAR = 3;
-    private static final int RESET = 4;
+    private static final int SET_TIMES = 3;
+    private static final int CLEAR = 4;
+    private static final int RESET = 5;
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutTitle message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         if (message instanceof MessagePlayOutTitle.Clear) {
             buf.writeVarInt(CLEAR);
         } else if (message instanceof MessagePlayOutTitle.Reset) {
@@ -55,7 +54,7 @@ public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
             buf.writeVarInt(SET_SUBTITLE);
             buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
         } else {
-            MessagePlayOutTitle.SetTimes message0 = (SetTimes) message;
+            final MessagePlayOutTitle.SetTimes message0 = (MessagePlayOutTitle.SetTimes) message;
             buf.writeVarInt(SET_TIMES);
             buf.writeInteger(message0.getFadeIn());
             buf.writeInteger(message0.getStay());

@@ -48,9 +48,11 @@ public final class CommandTitle extends CommandProvider {
     @Override
     public void completeSpec(PluginContainer pluginContainer, CommandSpec.Builder specBuilder) {
         specBuilder
+                .arguments(GenericArguments.playerOrSource(Text.of("player")))
                 .child(CommandSpec.builder()
                         .executor((src, args) -> {
                             args.<Player>getOne("player").get().clearTitle();
+                            src.sendMessage(t("commands.title.success"));
                             return CommandResult.success();
                         })
                         .build(), "clear")
@@ -64,6 +66,7 @@ public final class CommandTitle extends CommandProvider {
                                 throw new CommandException(t("commands.tellraw.jsonException", e.getMessage()));
                             }
                             args.<Player>getOne("player").get().sendTitle(Title.builder().title(title).build());
+                            src.sendMessage(t("commands.title.success"));
                             return CommandResult.success();
                         })
                         .build(), "title")
@@ -77,12 +80,14 @@ public final class CommandTitle extends CommandProvider {
                                 throw new CommandException(t("commands.tellraw.jsonException", e.getMessage()));
                             }
                             args.<Player>getOne("player").get().sendTitle(Title.builder().subtitle(title).build());
+                            src.sendMessage(t("commands.title.success"));
                             return CommandResult.success();
                         })
                         .build(), "subtitle")
                 .child(CommandSpec.builder()
                         .executor((src, args) -> {
                             args.<Player>getOne("player").get().resetTitle();
+                            src.sendMessage(t("commands.title.success"));
                             return CommandResult.success();
                         })
                         .build(), "reset")
@@ -98,6 +103,7 @@ public final class CommandTitle extends CommandProvider {
                                     .stay(args.<Integer>getOne("stay").get())
                                     .fadeOut(args.<Integer>getOne("fadeOut").get())
                                     .build());
+                            src.sendMessage(t("commands.title.success"));
                             return CommandResult.success();
                         })
                         .build(), "times");

@@ -86,6 +86,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
 
         if (art != this.lastArt || direction != this.lastDirection) {
             this.spawn(context, art, direction, position);
+            this.update0(EntityProtocolUpdateContext.empty());
             this.lastDirection = direction;
             this.lastArt = art;
             this.lastX = x;

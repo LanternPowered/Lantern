@@ -57,6 +57,7 @@ public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends Entity
         final int quantity = this.entity.get(Keys.HELD_EXPERIENCE).orElse(1);
         if (this.lastQuantity != quantity) {
             this.spawn(context, quantity);
+            this.update0(EntityProtocolUpdateContext.empty());
             this.lastQuantity = quantity;
         } else {
             this.update0(context);

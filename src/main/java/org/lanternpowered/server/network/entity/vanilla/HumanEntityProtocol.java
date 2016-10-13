@@ -62,6 +62,7 @@ public class HumanEntityProtocol extends HumanoidEntityProtocol<LanternEntity> {
         final String name = this.entity.getTranslation().get();
         if (!Objects.equals(this.lastName, name)) {
             this.spawn(context, name);
+            this.update0(EntityProtocolUpdateContext.empty());
             this.lastName = name;
         } else {
             this.update0(context);

@@ -65,6 +65,12 @@ public class EnderDragonEntityProtocol<E extends LanternEntity> extends Creature
     }
 
     @Override
+    protected void remove(EntityProtocolInitContext context) {
+        super.remove(context);
+        context.release(this.partEntityIds);
+    }
+
+    @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
         // TODO: Send phase

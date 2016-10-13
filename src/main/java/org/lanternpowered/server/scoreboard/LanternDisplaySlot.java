@@ -36,7 +36,7 @@ import javax.annotation.Nullable;
 
 public class LanternDisplaySlot extends PluginCatalogType.Base.Internal implements DisplaySlot {
 
-    private final Optional<TextColor> teamColor;
+    @Nullable private final TextColor teamColor;
 
     public LanternDisplaySlot(String pluginId, String name, @Nullable TextColor teamColor, int internalId) {
         this(pluginId, name, name, teamColor, internalId);
@@ -45,16 +45,16 @@ public class LanternDisplaySlot extends PluginCatalogType.Base.Internal implemen
     public LanternDisplaySlot(String pluginId, String id, String name,
             @Nullable TextColor teamColor, int internalId) {
         super(pluginId, id, name, internalId);
-        this.teamColor = Optional.ofNullable(teamColor);
+        this.teamColor = teamColor;
     }
 
     @Override
     public Optional<TextColor> getTeamColor() {
-        return this.teamColor;
+        return Optional.ofNullable(this.teamColor);
     }
 
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().omitNullValues().add("teamColor", this.teamColor.orElse(null));
+        return super.toStringHelper().omitNullValues().add("teamColor", this.teamColor);
     }
 }

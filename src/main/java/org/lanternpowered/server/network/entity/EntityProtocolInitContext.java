@@ -62,4 +62,6 @@ public interface EntityProtocolInitContext {
      * @param id The id
      */
     void release(int id);
+
+    void release(int[] array);
 }

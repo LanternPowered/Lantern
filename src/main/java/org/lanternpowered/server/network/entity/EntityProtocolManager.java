@@ -133,6 +133,7 @@ public final class EntityProtocolManager {
 
         @Override
         public int[] acquireRow(int[] array) {
+            checkNotNull(array, "array");
             final long stamp = allocatorLock.writeLock();
             try {
                 final IntIterator iterator = allocatorReusableIds.iterator();
@@ -199,6 +200,22 @@ public final class EntityProtocolManager {
                 } finally {
                     allocatorLock.unlockWrite(stamp);
                 }
+            }
+        }
+
+        @Override
+        public void release(int[] array) {
+            checkNotNull(array, "array");
+            final long stamp = allocatorLock.writeLock();
+            try {
+                for (int id : array) {
+                    allocatorReusableIds.add(id);
+                    if (this.entityProtocol != null) {
+                        this.entityProtocol.entityProtocolManager.idToEntityProtocolMap.remove(id);
+                    }
+                }
+            } finally {
+                allocatorLock.unlockWrite(stamp);
             }
         }
     }

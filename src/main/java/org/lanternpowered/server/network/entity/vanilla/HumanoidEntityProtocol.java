@@ -29,29 +29,37 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.living.player.HandSide;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
+import org.spongepowered.api.data.type.SkinPart;
+
+import java.util.Objects;
+import java.util.Set;
+
+import javax.annotation.Nullable;
 
 public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 
     private HandSide lastDominantHand = HandSide.RIGHT;
+    @Nullable private Set<SkinPart> lastSkinParts;
 
     public HumanoidEntityProtocol(E entity) {
         super(entity);
     }
 
     @Override
-    public void spawn(EntityProtocolUpdateContext context) {
+    protected void spawn(EntityProtocolUpdateContext context) {
         final int entityId = this.getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity instanceof LanternEntityLiving ? ((LanternEntityLiving) this.entity).getHeadRotation() : null;
+        final Vector3d headRot = this.entity instanceof LanternLiving ? ((LanternLiving) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();
         final Vector3d vel = this.entity.getVelocity();
 
@@ -74,7 +82,9 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         // Ignore the NoAI tag, isn't used on the client
         parameterList.add(EntityParameters.Humanoid.MAIN_HAND,
                 (byte) (this.entity.get(LanternKeys.DOMINANT_HAND).orElse(HandSide.RIGHT) == HandSide.RIGHT ? 1 : 0));
-        parameterList.add(EntityParameters.Humanoid.SKIN_PARTS, (byte) 0);
+        final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
+        parameterList.add(EntityParameters.Humanoid.SKIN_PARTS,
+                (byte) (skinParts == null ? 0xff : LanternSkinPart.toBitPattern(skinParts)));
     }
 
     @Override
@@ -84,6 +94,12 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         if (dominantHand != this.lastDominantHand) {
             parameterList.add(EntityParameters.Humanoid.MAIN_HAND, (byte) (dominantHand == HandSide.RIGHT ? 1 : 0));
             this.lastDominantHand = dominantHand;
+        }
+        final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
+        if (!Objects.equals(this.lastSkinParts, skinParts)) {
+            parameterList.add(EntityParameters.Humanoid.SKIN_PARTS,
+                    (byte) (skinParts == null ? 0xff : LanternSkinPart.toBitPattern(skinParts)));
+            this.lastSkinParts = skinParts;
         }
     }
 }

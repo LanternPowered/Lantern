@@ -38,7 +38,7 @@ import org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.entity.LanternEntityHumanoid;
+import org.lanternpowered.server.entity.LanternHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabListEntry;
@@ -131,7 +131,7 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubject, Player, AbstractViewer, NetworkIdHolder {
+public class LanternPlayer extends LanternHumanoid implements AbstractSubject, Player, AbstractViewer, NetworkIdHolder {
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
@@ -821,11 +821,7 @@ public class LanternPlayer extends LanternEntityHumanoid implements AbstractSubj
 
     @Override
     public Set<SkinPart> getDisplayedSkinParts() {
-        return this.skinParts;
-    }
-
-    public void setSkinParts(Set<SkinPart> skinParts) {
-        this.skinParts = checkNotNull(skinParts, "skinParts");
+        return this.get(LanternKeys.DISPLAYED_SKIN_PARTS).get();
     }
 
     @Override

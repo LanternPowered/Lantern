@@ -28,9 +28,12 @@ package org.lanternpowered.server.network.entity;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.network.entity.vanilla.ChickenEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.EnderDragonEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.EndermiteEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.ExperienceOrbEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.GiantEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.HumanEntityProtocol;
-import org.lanternpowered.server.network.entity.vanilla.HumanoidEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.HuskEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ItemEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.LightningEntityProtocol;
@@ -38,6 +41,7 @@ import org.lanternpowered.server.network.entity.vanilla.MagmaCubeEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.PaintingEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.PlayerEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.RabbitEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.SilverfishEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.SlimeEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.VillagerEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ZombieEntityProtocol;
@@ -51,7 +55,11 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
 
     @Override
     public void registerDefaults() {
+        this.register(new LanternEntityProtocolType<>("minecraft", "chicken", LanternEntity.class, ChickenEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "ender_dragon", LanternEntity.class, EnderDragonEntityProtocol::new));
+        this.register(new LanternEntityProtocolType<>("minecraft", "endermite", LanternEntity.class, EndermiteEntityProtocol::new));
+        this.register(new LanternEntityProtocolType<>("minecraft", "experience_orb", LanternEntity.class, ExperienceOrbEntityProtocol::new));
+        this.register(new LanternEntityProtocolType<>("minecraft", "giant", LanternEntity.class, GiantEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "human", LanternEntity.class, HumanEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "husk", LanternEntity.class, HuskEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "item", LanternEntity.class, ItemEntityProtocol::new));
@@ -60,6 +68,7 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
         this.register(new LanternEntityProtocolType<>("minecraft", "painting", LanternEntity.class, PaintingEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "player", LanternPlayer.class, PlayerEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "rabbit", LanternEntity.class, RabbitEntityProtocol::new));
+        this.register(new LanternEntityProtocolType<>("minecraft", "silverfish", LanternEntity.class, SilverfishEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "slime", LanternEntity.class, SlimeEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "villager", LanternEntity.class, VillagerEntityProtocol::new));
         this.register(new LanternEntityProtocolType<>("minecraft", "zombie", LanternEntity.class, ZombieEntityProtocol::new));

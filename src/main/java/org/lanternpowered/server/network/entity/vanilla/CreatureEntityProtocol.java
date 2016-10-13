@@ -29,7 +29,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnMob;
 
@@ -49,7 +49,7 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
     @Override
     public void spawn(EntityProtocolUpdateContext context) {
         final Vector3d rot = this.entity.getRotation();
-        final Vector3d headRot = this.entity instanceof LanternEntityLiving ? ((LanternEntityLiving) this.entity).getHeadRotation() : null;
+        final Vector3d headRot = this.entity instanceof LanternLiving ? ((LanternLiving) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();
         final Vector3d vel = this.entity.getVelocity();
 

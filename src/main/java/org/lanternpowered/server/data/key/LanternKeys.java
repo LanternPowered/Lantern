@@ -26,12 +26,15 @@
 package org.lanternpowered.server.data.key;
 
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBoundedValueKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import org.lanternpowered.server.entity.living.player.HandSide;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
+import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
 public final class LanternKeys {
@@ -59,6 +62,8 @@ public final class LanternKeys {
             makeValueKey(HandSide.class, DataQuery.of("DominantHand"), "lantern:dominant_hand");
     public static final Key<Value<Boolean>> IS_CONVERTING =
             makeValueKey(Boolean.class, DataQuery.of("IsConverting"), "lantern:is_converting");
+    public static final Key<SetValue<SkinPart>> DISPLAYED_SKIN_PARTS =
+            makeSetKey(SkinPart.class, DataQuery.of("DisplayedSkinParts"), "lantern:displayed_skin_parts");
 
     private LanternKeys() {
     }

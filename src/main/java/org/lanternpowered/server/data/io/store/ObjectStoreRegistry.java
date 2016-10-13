@@ -38,7 +38,7 @@ import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.data.io.store.tile.ContainerTileEntityStore;
 import org.lanternpowered.server.data.io.store.tile.TileEntityObjectStore;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.LanternEntityLiving;
+import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternItemStack;
 
@@ -78,7 +78,7 @@ public final class ObjectStoreRegistry {
 
     public ObjectStoreRegistry() {
         this.register(LanternEntity.class, new EntityStore<>());
-        this.register(LanternEntityLiving.class, new LivingStore<>());
+        this.register(LanternLiving.class, new LivingStore<>());
         this.register(LanternPlayer.class, new PlayerStore());
         this.register(LanternItemStack.class, new ItemStackStore());
         this.register(LanternTileEntity.class, new TileEntityObjectStore<>());

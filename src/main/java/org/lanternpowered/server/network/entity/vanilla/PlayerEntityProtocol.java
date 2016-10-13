@@ -41,7 +41,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     @Override
-    public void spawn(EntityProtocolUpdateContext context) {
+    protected void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
         context.sendToSelf(() -> new MessagePlayOutEntityMetadata(this.getRootEntityId(), this.fillParameters(true)));
     }

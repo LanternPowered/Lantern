@@ -92,11 +92,15 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
             this.lastY = y;
             this.lastZ = z;
         } else if (x != this.lastX || y != this.lastY || z != this.lastZ) {
+            this.update0(context);
             context.sendToAll(() -> new MessagePlayOutEntityTeleport(this.getRootEntityId(), x, y, z, 0, 0, true));
             this.lastX = x;
             this.lastY = y;
             this.lastZ = z;
         }
+    }
+
+    protected void update0(EntityProtocolUpdateContext context) {
     }
 
     @Override

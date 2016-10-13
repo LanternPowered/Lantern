@@ -31,21 +31,21 @@ import org.lanternpowered.server.network.message.Message;
 public final class MessagePlayOutSpawnExperienceOrb implements Message {
 
     private final int entityId;
-    private final int orbsCount;
+    private final int quantity;
     private final Vector3d position;
 
-    public MessagePlayOutSpawnExperienceOrb(int entityId, int orbsCount, Vector3d position) {
+    public MessagePlayOutSpawnExperienceOrb(int entityId, int quantity, Vector3d position) {
         this.entityId = entityId;
         this.position = position;
-        this.orbsCount = orbsCount;
+        this.quantity = quantity;
     }
 
     public int getEntityId() {
         return this.entityId;
     }
 
-    public int getOrbsCount() {
-        return this.orbsCount;
+    public int getQuantity() {
+        return this.quantity;
     }
 
     public Vector3d getPosition() {

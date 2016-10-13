@@ -25,55 +25,45 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
-import org.lanternpowered.server.network.entity.parameter.ParameterList;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnExperienceOrb;
+import org.spongepowered.api.data.key.Keys;
 
-public abstract class ObjectEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
+public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
 
-    private int lastObjectData;
+    private int lastQuantity;
 
-    public ObjectEntityProtocol(E entity) {
+    public ExperienceOrbEntityProtocol(E entity) {
         super(entity);
     }
 
-    protected abstract int getObjectType();
-
-    protected abstract int getObjectData();
-
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        final int entityId = this.getRootEntityId();
+        this.spawn(context, this.entity.get(Keys.HELD_EXPERIENCE).orElse(1));
+    }
 
-        final Vector3d rot = this.entity.getRotation();
-        final Vector3d pos = this.entity.getPosition();
-        final Vector3d vel = this.entity.getVelocity();
-
-        double yaw = rot.getY();
-        double pitch = rot.getX();
-
-        context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnObject(entityId, this.entity.getUniqueId(),
-                this.getObjectType(), this.getObjectData(), pos, wrapAngle(yaw), wrapAngle(pitch), vel));
-        final ParameterList parameterList = this.fillParameters(true);
-        if (!parameterList.isEmpty()) {
-            context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
+    private void spawn(EntityProtocolUpdateContext context, int quantity) {
+        if (quantity == 0) {
+            context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.getRootEntityId()));
+        } else {
+            context.sendToAll(() -> new MessagePlayOutSpawnExperienceOrb(this.getRootEntityId(), quantity, this.entity.getPosition()));
         }
     }
 
     @Override
     protected void update(EntityProtocolUpdateContext context) {
-        final int objectData = this.getObjectData();
-        if (this.lastObjectData != objectData) {
-            this.spawn(context);
-            super.update(EntityProtocolUpdateContext.empty());
-            this.lastObjectData = objectData;
+        final int quantity = this.entity.get(Keys.HELD_EXPERIENCE).orElse(1);
+        if (this.lastQuantity != quantity) {
+            this.spawn(context, quantity);
+            this.lastQuantity = quantity;
         } else {
-            super.update(context);
+            this.update0(context);
         }
+    }
+
+    protected void update0(EntityProtocolUpdateContext context) {
+        super.update(context);
     }
 }

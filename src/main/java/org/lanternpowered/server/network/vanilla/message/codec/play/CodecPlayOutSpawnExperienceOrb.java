@@ -36,13 +36,13 @@ public final class CodecPlayOutSpawnExperienceOrb implements Codec<MessagePlayOu
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutSpawnExperienceOrb message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        Vector3d position = message.getPosition();
+        final Vector3d position = message.getPosition();
         buf.writeDouble(position.getX());
         buf.writeDouble(position.getY());
         buf.writeDouble(position.getZ());
-        buf.writeShort((short) Math.min(message.getOrbsCount(), Short.MAX_VALUE));
+        buf.writeShort((short) Math.min(message.getQuantity(), Short.MAX_VALUE));
         return buf;
     }
 }

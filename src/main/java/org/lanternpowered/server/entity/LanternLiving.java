@@ -38,11 +38,11 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.UUID;
 
-public class LanternEntityLiving extends LanternEntity implements Living {
+public class LanternLiving extends LanternEntity implements Living {
 
     private Vector3d headRotation = Vector3d.ZERO;
 
-    public LanternEntityLiving(UUID uniqueId) {
+    public LanternLiving(UUID uniqueId) {
         super(uniqueId);
     }
 

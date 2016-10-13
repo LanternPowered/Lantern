@@ -29,7 +29,6 @@ import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
@@ -73,10 +72,10 @@ public final class LanternSkinPart extends PluginCatalogType.Base implements Ski
      * @return the skin parts
      */
     public static Set<SkinPart> fromBitPattern(int bitPattern) {
-        ImmutableSet.Builder<SkinPart> parts = ImmutableSet.builder();
-        int count = Integer.bitCount(bitPattern);
+        final ImmutableSet.Builder<SkinPart> parts = ImmutableSet.builder();
+        final int count = Integer.bitCount(bitPattern);
         for (int i = 0; i < count; i++) {
-            LanternSkinPart part = lookup.get(i);
+            final LanternSkinPart part = lookup.get(i);
             if (part != null && (bitPattern & part.mask) != 0) {
                 parts.add(part);
             }

@@ -26,17 +26,24 @@
 package org.lanternpowered.server.entity;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class LanternEntityHumanoid extends LanternEntityLiving implements Humanoid, AbstractArmorEquipable {
+public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
 
-    public LanternEntityHumanoid(UUID uniqueId) {
+    public LanternHumanoid(UUID uniqueId) {
         super(uniqueId);
+    }
+
+    @Override
+    public void registerKeys() {
+        super.registerKeys();
+        this.registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).nonRemovableAttachedValueProcessor();
     }
 
     @Override

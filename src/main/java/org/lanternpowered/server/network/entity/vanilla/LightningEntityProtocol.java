@@ -38,15 +38,15 @@ public class LightningEntityProtocol<E extends LanternEntity> extends EntityProt
     }
 
     @Override
-    public void spawn(EntityProtocolUpdateContext context) {
+    protected void spawn(EntityProtocolUpdateContext context) {
         context.sendToAllExceptSelf(new MessagePlayOutSpawnThunderbolt(this.getRootEntityId(), this.entity.getPosition()));
     }
 
     @Override
-    public void spawn(ParameterList parameterList) {
+    protected void spawn(ParameterList parameterList) {
     }
 
     @Override
-    public void update(ParameterList parameterList) {
+    protected void update(ParameterList parameterList) {
     }
 }

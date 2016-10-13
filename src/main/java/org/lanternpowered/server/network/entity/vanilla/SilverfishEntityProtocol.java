@@ -23,33 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.entity;
+package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.entity.LanternLiving;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
+import org.lanternpowered.server.entity.LanternEntity;
 
-import java.util.List;
-import java.util.Optional;
+public class SilverfishEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
 
-public class LivingStore<T extends LanternLiving> extends EntityStore<T> {
-
-    protected static final DataQuery HEAD_ROTATION = DataQuery.of("HeadRotation"); // Lantern
-
-    @Override
-    public void deserialize(T entity, DataView dataView) {
-        final Optional<List<Double>> optValues = dataView.getDoubleList(HEAD_ROTATION);
-        if (optValues.isPresent()) {
-            entity.setHeadRotation(fromDoubleList(optValues.get()));
-        } else {
-            entity.setHeadRotation(entity.getRotation());
-        }
-        super.deserialize(entity, dataView);
+    public SilverfishEntityProtocol(E entity) {
+        super(entity);
     }
 
     @Override
-    public void serialize(T entity, DataView dataView) {
-        dataView.set(HEAD_ROTATION, toDoubleList(entity.getHeadRotation()));
-        super.serialize(entity, dataView);
+    protected int getMobType() {
+        return 60;
     }
 }

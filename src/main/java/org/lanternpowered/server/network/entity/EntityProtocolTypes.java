@@ -26,13 +26,20 @@
 package org.lanternpowered.server.network.entity;
 
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.LanternEntityLiving;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 public final class EntityProtocolTypes {
 
+    public static final EntityProtocolType<LanternEntity> CHICKEN = dummy("CHICKEN");
+
     public static final EntityProtocolType<LanternEntity> ENDER_DRAGON = dummy("ENDER_DRAGON");
+
+    public static final EntityProtocolType<LanternEntity> ENDERMITE = dummy("ENDERMITE");
+
+    public static final EntityProtocolType<LanternEntity> EXPERIENCE_ORB = dummy("EXPERIENCE_ORB");
+
+    public static final EntityProtocolType<LanternEntity> GIANT = dummy("EXPERIENCE_ORB");
 
     public static final EntityProtocolType<LanternEntity> HUMAN = dummy("HUMAN");
 
@@ -49,6 +56,8 @@ public final class EntityProtocolTypes {
     public static final EntityProtocolType<LanternPlayer> PLAYER = dummy("PLAYER");
 
     public static final EntityProtocolType<LanternEntity> RABBIT = dummy("RABBIT");
+
+    public static final EntityProtocolType<LanternEntity> SILVERFISH = dummy("SILVERFISH");
 
     public static final EntityProtocolType<LanternEntity> SLIME = dummy("SLIME");
 

@@ -40,16 +40,16 @@ public final class HandlerPlayInClientSettings implements Handler<MessagePlayInC
 
     @Override
     public void handle(NetworkContext context, MessagePlayInClientSettings message) {
-        LanternPlayer player = context.getSession().getPlayer();
-        PlayerChangeClientSettingsEvent event = SpongeEventFactory.createPlayerChangeClientSettingsEvent(
+        final LanternPlayer player = context.getSession().getPlayer();
+        final PlayerChangeClientSettingsEvent event = SpongeEventFactory.createPlayerChangeClientSettingsEvent(
                 Cause.source(player).build(), message.getChatVisibility(), LanternSkinPart.fromBitPattern(message.getSkinPartsBitPattern()),
                 message.getLocale(), player, message.getEnableColors(), message.getViewDistance());
         Sponge.getEventManager().post(event);
         player.setLocale(event.getLocale());
         player.setViewDistance(event.getViewDistance());
-        player.setSkinParts(event.getDisplayedSkinParts());
         player.setChatVisibility(event.getChatVisibility());
         player.setChatColorsEnabled(message.getEnableColors());
+        player.offer(LanternKeys.DISPLAYED_SKIN_PARTS, event.getDisplayedSkinParts());
         player.offer(LanternKeys.DOMINANT_HAND, message.getMainHand());
     }
 }

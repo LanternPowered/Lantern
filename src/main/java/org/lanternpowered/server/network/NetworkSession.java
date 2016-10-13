@@ -164,7 +164,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     /**
      * The reason that caused the channel to disconnect.
      */
-    @Nullable private Text disconnectReason;
+    @Nullable private volatile Text disconnectReason;
 
     /**
      * A queue of incoming messages that must be handled on
@@ -728,6 +728,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
      */
     public void disconnect(Text reason) {
         checkNotNull(reason, "reason");
+        if (this.disconnectReason != null) {
+            return;
+        }
         this.disconnectReason = reason;
         if (this.channel.isActive() && (this.protocolState == ProtocolState.PLAY ||
                 this.protocolState == ProtocolState.LOGIN || this.protocolState == ProtocolState.FORGE_HANDSHAKE)) {

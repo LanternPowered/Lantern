@@ -84,7 +84,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     @Override
-    public void update(EntityProtocolUpdateContext context) {
+    protected void update(EntityProtocolUpdateContext context) {
         final Vector3d rot = this.entity.getRotation();
         final Vector3d headRot = this.entity instanceof Living ? ((Living) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();
@@ -173,7 +173,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     @Override
-    public void postUpdate(EntityProtocolUpdateContext context) {
+    protected void postUpdate(EntityProtocolUpdateContext context) {
         final List<Entity> passengers = this.entity.getPassengers();
         if (!passengers.equals(this.lastPassengers)) {
             this.lastPassengers = passengers;

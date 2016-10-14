@@ -47,31 +47,28 @@
  */
 package org.lanternpowered.server.data.io.anvil;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.RemovalListener;
-import com.google.common.cache.RemovalNotification;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import com.google.common.base.Throwables;
 import org.lanternpowered.server.game.Lantern;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ExecutionException;
 import java.util.regex.Pattern;
 
 /**
  * A simple cache and wrapper for efficiently accessing multiple RegionFiles
  * simultaneously.
  */
-public class RegionFileCache {
+final class RegionFileCache {
 
-    public static final String DEFAULT_REGION_FILE_EXTENSION = "mca";
+    private static final String DEFAULT_REGION_FILE_EXTENSION = "mca";
 
-    public static final int REGION_COORDINATE_BITS = 5;
-    public static final int REGION_SIZE = 1 << REGION_COORDINATE_BITS;
-    public static final int REGION_AREA = REGION_SIZE * REGION_SIZE;
-    public static final int REGION_MASK = REGION_SIZE - 1;
+    private static final int REGION_COORDINATE_BITS = 5;
+    static final int REGION_SIZE = 1 << REGION_COORDINATE_BITS;
+    static final int REGION_AREA = REGION_SIZE * REGION_SIZE;
+    static final int REGION_MASK = REGION_SIZE - 1;
 
     private static final int MAX_CACHE_SIZE = 256;
 
@@ -80,11 +77,11 @@ public class RegionFileCache {
     private final Pattern filePattern;
     private final Path regionDir;
 
-    public RegionFileCache(Path basePath) {
+    RegionFileCache(Path basePath) {
         this(basePath, DEFAULT_REGION_FILE_EXTENSION);
     }
 
-    public RegionFileCache(Path basePath, String extension) {
+    RegionFileCache(Path basePath, String extension) {
         this.extension = extension;
         this.regionDir = basePath.resolve("region");
         this.filePattern = Pattern.compile("^r\\.([-]?[0-9]+)\\.([-]?[0-9]+)\\." + extension + "$");
@@ -95,44 +92,45 @@ public class RegionFileCache {
             Lantern.getLogger().warn("Failed to create directory: " + this.regionDir);
         }
 
-        this.cache = CacheBuilder.<Long, RegionFile>newBuilder()
-                .concurrencyLevel(4)
+        this.cache = Caffeine.newBuilder()
                 .maximumSize(MAX_CACHE_SIZE)
                 .softValues()
-                .removalListener(new RemovalListener<Long, RegionFile>() {
-                    @Override
-                    public void onRemoval(RemovalNotification<Long, RegionFile> not) {
-                        if (not.getValue() != null) {
-                            try {
-                                not.getValue().close();
-                            } catch (IOException ignored) {
-                            }
+                .removalListener((key, value, cause) -> {
+                    if (value != null) {
+                        try {
+                            ((RegionFile) value).close();
+                        } catch (IOException e) {
+                            throw Throwables.propagate(e);
                         }
                     }
                 })
                 .build();
     }
 
-    public File[] getRegionFiles() {
-        return this.regionDir.toFile().listFiles(file -> this.filePattern.matcher(file.getName()).matches());
+    public Path[] getRegionFiles() {
+        try {
+            return Files.list(this.regionDir).filter(file -> this.filePattern.matcher(file.getFileName().toString()).matches()).toArray(Path[]::new);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public RegionFile getRegionFileByChunk(int chunkX, int chunkZ) throws IOException {
         final int regionX = chunkX >> REGION_COORDINATE_BITS;
         final int regionZ = chunkZ >> REGION_COORDINATE_BITS;
-
         return this.getRegionFile(regionX, regionZ);
     }
 
     public RegionFile getRegionFile(int regionX, int regionZ) throws IOException {
         final long coords = (regionZ & 0xffffffffL) << 32 | regionX & 0xffffffffL;
-
-        try {
-            return cache.get(coords, () -> new RegionFile(this.regionDir.resolve("r." + regionX + "." + regionZ + "." + this.extension),
-                    regionX, regionZ));
-        } catch (ExecutionException e) {
-            throw new IOException("Unable to load region file (" + regionX + ";" + regionZ + ")");
-        }
+        return this.cache.get(coords, coords0 -> {
+            try {
+                return new RegionFile(this.regionDir.resolve("r." + regionX + "." + regionZ + "." + this.extension), regionX, regionZ);
+            } catch (IOException e) {
+                Lantern.getLogger().error("Failed to load the region file (%s;%s)", regionX, regionZ);
+                throw Throwables.propagate(e);
+            }
+        });
     }
 
     public void clear() {

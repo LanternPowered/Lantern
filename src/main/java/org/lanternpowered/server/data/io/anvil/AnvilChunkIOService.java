@@ -81,6 +81,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -438,7 +439,7 @@ public class AnvilChunkIOService implements ChunkIOService {
         return new ChunkDataStream() {
 
             // All the region files
-            private File[] files;
+            private Path[] paths;
 
             // The current region file that we opened
             @Nullable private RegionFile region;
@@ -512,14 +513,14 @@ public class AnvilChunkIOService implements ChunkIOService {
                     this.regionChunkIndex = -1;
                     // There was no chunk present in the current region,
                     // try the next region
-                    if (++this.regionFileIndex >= this.files.length) {
+                    if (++this.regionFileIndex >= this.paths.length) {
                         this.region = null;
                         this.done = true;
                         return false;
                     }
-                    File nextRegionFile = this.files[this.regionFileIndex];
-                    if (nextRegionFile.exists()) {
-                        Matcher matcher = cache.getFilePattern().matcher(nextRegionFile.getName());
+                    final Path nextRegionFile = this.paths[this.regionFileIndex];
+                    if (Files.exists(nextRegionFile)) {
+                        Matcher matcher = cache.getFilePattern().matcher(nextRegionFile.getFileName().toString());
                         int regionX = Integer.parseInt(matcher.group(0));
                         int regionZ = Integer.parseInt(matcher.group(1));
                         try {
@@ -544,7 +545,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
             @Override
             public void reset() {
-                this.files = cache.getRegionFiles();
+                this.paths = cache.getRegionFiles();
                 this.regionFileIndex = -1;
                 this.regionChunkIndex = -1;
                 this.region = null;

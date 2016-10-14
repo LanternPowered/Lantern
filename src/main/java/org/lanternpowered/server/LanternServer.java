@@ -79,7 +79,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.KeyPair;
 import java.util.Collection;
 import java.util.Collections;
@@ -307,10 +309,10 @@ public class LanternServer implements Server {
         this.maxPlayers = config.getMaxPlayers();
         this.onlineMode = config.isOnlineMode();
 
-        final File faviconFile = new File(config.getFavicon());
-        if (faviconFile.exists()) {
+        final Path faviconPath = Paths.get(config.getFavicon());
+        if (Files.exists(faviconPath)) {
             try {
-                this.favicon = LanternFavicon.load(faviconFile.toPath());
+                this.favicon = LanternFavicon.load(faviconPath);
             } catch (IOException e) {
                 Lantern.getLogger().error("Failed to load the favicon", e);
             }

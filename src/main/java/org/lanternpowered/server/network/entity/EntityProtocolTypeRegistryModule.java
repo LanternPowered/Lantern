@@ -53,25 +53,48 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
         super(EntityProtocolTypes.class);
     }
 
+    @SuppressWarnings("Convert2MethodRef")
     @Override
     public void registerDefaults() {
-        this.register(new LanternEntityProtocolType<>("minecraft", "chicken", LanternEntity.class, ChickenEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "ender_dragon", LanternEntity.class, EnderDragonEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "endermite", LanternEntity.class, EndermiteEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "experience_orb", LanternEntity.class, ExperienceOrbEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "giant", LanternEntity.class, GiantEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "human", LanternEntity.class, HumanEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "husk", LanternEntity.class, HuskEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "item", LanternEntity.class, ItemEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "lightning", LanternEntity.class, LightningEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "magma_cube", LanternEntity.class, MagmaCubeEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "painting", LanternEntity.class, PaintingEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "player", LanternPlayer.class, PlayerEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "rabbit", LanternEntity.class, RabbitEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "silverfish", LanternEntity.class, SilverfishEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "slime", LanternEntity.class, SlimeEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "villager", LanternEntity.class, VillagerEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "zombie", LanternEntity.class, ZombieEntityProtocol::new));
-        this.register(new LanternEntityProtocolType<>("minecraft", "zombie_villager", LanternEntity.class, ZombieVillagerEntityProtocol::new));
+        // Now you are probably thinking, use the method reference: ChickenEntityProtocol::new ??
+        // well it's not working, at least not outside the development environment, java is throwing
+        // "no such constructor" exceptions...
+        // Tested with: oracle jre1.8.0_101
+        this.register(LanternEntityProtocolType.of("minecraft", "chicken", LanternEntity.class,
+                entity -> new ChickenEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "ender_dragon", LanternEntity.class,
+                entity -> new EnderDragonEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "endermite", LanternEntity.class,
+                entity -> new EndermiteEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "experience_orb", LanternEntity.class,
+                entity -> new ExperienceOrbEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "giant", LanternEntity.class,
+                entity -> new GiantEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "human", LanternEntity.class,
+                entity -> new HumanEntityProtocol(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "husk", LanternEntity.class,
+                entity -> new HuskEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "item", LanternEntity.class,
+                entity -> new ItemEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "lightning", LanternEntity.class,
+                entity -> new LightningEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "magma_cube", LanternEntity.class,
+                entity -> new MagmaCubeEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "painting", LanternEntity.class,
+                entity -> new PaintingEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "player", LanternPlayer.class,
+                entity -> new PlayerEntityProtocol(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "rabbit", LanternEntity.class,
+                entity -> new RabbitEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "silverfish", LanternEntity.class,
+                entity -> new SilverfishEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "slime", LanternEntity.class,
+                entity -> new SlimeEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "villager", LanternEntity.class,
+                entity -> new VillagerEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "zombie", LanternEntity.class,
+                entity -> new ZombieEntityProtocol<>(entity)));
+        this.register(LanternEntityProtocolType.of("minecraft", "zombie_villager", LanternEntity.class,
+                entity -> new ZombieVillagerEntityProtocol<>(entity)));
     }
 }

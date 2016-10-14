@@ -25,22 +25,32 @@
  */
 package org.lanternpowered.server.network.entity;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.entity.LanternEntity;
 
 import java.util.function.Function;
 
-public class LanternEntityProtocolType<E extends LanternEntity> extends PluginCatalogType.Base implements EntityProtocolType<E> {
+public final class LanternEntityProtocolType<E extends LanternEntity> extends PluginCatalogType.Base implements EntityProtocolType<E> {
+
+    public static <E extends LanternEntity> EntityProtocolType<E> of(String pluginId, String name,
+            Class<E> entityType, Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
+        checkNotNull(pluginId, "entityType");
+        checkNotNull(entityProtocolSupplier, "entityProtocolSupplier");
+        return new LanternEntityProtocolType<>(pluginId, name, entityType, entityProtocolSupplier);
+    }
 
     private final Class<E> entityType;
     private final Function<E, AbstractEntityProtocol<E>> entityProtocolSupplier;
 
-    public LanternEntityProtocolType(String pluginId, String name, Class<E> entityType,
-            Function<E, AbstractEntityProtocol<E>> entityProtocolSupplier) {
+    private LanternEntityProtocolType(String pluginId, String name, Class<E> entityType,
+            Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
         super(pluginId, name);
+        //noinspection unchecked
+        this.entityProtocolSupplier = (Function<E, AbstractEntityProtocol<E>>) entityProtocolSupplier;
         this.entityType = entityType;
-        this.entityProtocolSupplier = entityProtocolSupplier;
     }
 
     public Class<E> getEntityType() {

@@ -1,9 +1,9 @@
 /*
  * This file is part of LanternServer, licensed under the MIT License (MIT).
  *
- * Copyright (c) LanternPowered <https://github.com/LanternPowered>
+ * Copyright (c) LanternPowered <https://www.lanternpowered.org>
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
- * Copyright (c) Contributors
+ * Copyright (c) contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the Software), to deal

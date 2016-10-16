@@ -32,12 +32,14 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternSkinPart;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
-import org.lanternpowered.server.entity.living.player.HandSide;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandPreference;
+import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.SkinPart;
 
 import java.util.Objects;
@@ -47,7 +49,7 @@ import javax.annotation.Nullable;
 
 public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends LivingEntityProtocol<E> {
 
-    private HandSide lastDominantHand = HandSide.RIGHT;
+    private HandPreference lastDominantHand = HandPreferences.RIGHT;
     @Nullable private Set<SkinPart> lastSkinParts;
 
     public HumanoidEntityProtocol(E entity) {
@@ -81,7 +83,7 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         super.spawn(parameterList);
         // Ignore the NoAI tag, isn't used on the client
         parameterList.add(EntityParameters.Humanoid.MAIN_HAND,
-                (byte) (this.entity.get(LanternKeys.DOMINANT_HAND).orElse(HandSide.RIGHT) == HandSide.RIGHT ? 1 : 0));
+                (byte) (this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT) == HandPreferences.RIGHT ? 1 : 0));
         final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);
         parameterList.add(EntityParameters.Humanoid.SKIN_PARTS,
                 (byte) (skinParts == null ? 0xff : LanternSkinPart.toBitPattern(skinParts)));
@@ -90,9 +92,9 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final HandSide dominantHand = this.entity.get(LanternKeys.DOMINANT_HAND).orElse(HandSide.RIGHT);
+        final HandPreference dominantHand = this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT);
         if (dominantHand != this.lastDominantHand) {
-            parameterList.add(EntityParameters.Humanoid.MAIN_HAND, (byte) (dominantHand == HandSide.RIGHT ? 1 : 0));
+            parameterList.add(EntityParameters.Humanoid.MAIN_HAND, (byte) (dominantHand == HandPreferences.RIGHT ? 1 : 0));
             this.lastDominantHand = dominantHand;
         }
         final Set<SkinPart> skinParts = this.entity.get(LanternKeys.DISPLAYED_SKIN_PARTS).orElse(null);

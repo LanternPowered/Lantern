@@ -25,14 +25,15 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.entity.living.player.HandSide;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandPreference;
+import org.spongepowered.api.data.type.HandPreferences;
 
 public abstract class InsentientEntityProtocol<E extends LanternEntity> extends CreatureEntityProtocol<E> {
 
-    private HandSide lastDominantHand = HandSide.RIGHT;
+    private HandPreference lastDominantHand = HandPreferences.RIGHT;
 
     protected InsentientEntityProtocol(E entity) {
         super(entity);
@@ -43,16 +44,16 @@ public abstract class InsentientEntityProtocol<E extends LanternEntity> extends 
         super.spawn(parameterList);
         // Ignore the NoAI tag, isn't used on the client
         parameterList.add(EntityParameters.Insentient.FLAGS,
-                (byte) (this.entity.get(LanternKeys.DOMINANT_HAND).orElse(HandSide.RIGHT) == HandSide.LEFT ? 0x2 : 0));
+                (byte) (this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT) == HandPreferences.LEFT ? 0x2 : 0));
     }
 
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final HandSide dominantHand = this.entity.get(LanternKeys.DOMINANT_HAND).orElse(HandSide.RIGHT);
+        final HandPreference dominantHand = this.entity.get(Keys.DOMINANT_HAND).orElse(HandPreferences.RIGHT);
         if (dominantHand != this.lastDominantHand) {
             // Ignore the NoAI tag, isn't used on the client
-            parameterList.add(EntityParameters.Insentient.FLAGS, (byte) (dominantHand == HandSide.LEFT ? 0x2 : 0));
+            parameterList.add(EntityParameters.Insentient.FLAGS, (byte) (dominantHand == HandPreferences.LEFT ? 0x2 : 0));
             this.lastDominantHand = dominantHand;
         }
     }

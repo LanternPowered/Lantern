@@ -34,7 +34,7 @@ public class LanternHandType extends SimpleCatalogType.Base.Translatable impleme
 
     public LanternHandType(String identifier, String translationKey) {
         // The used translations are not available in vanilla minecraft
-        this(identifier, Lantern.getRegistry().getTranslationManager().get("hand." + translationKey));
+        this(identifier, Lantern.getRegistry().getTranslationManager().get(translationKey));
     }
 
     public LanternHandType(String identifier, Translation translation) {

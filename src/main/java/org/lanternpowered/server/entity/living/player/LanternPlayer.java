@@ -87,6 +87,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkinParts;
@@ -266,7 +267,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         this.registerKey(Keys.CAN_FLY, false).nonRemovableAttachedValueProcessor();
         this.registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();
         this.registerKey(Keys.GAME_MODE, GameModes.NOT_SET).nonRemovableAttachedValueProcessor();
-        this.registerKey(LanternKeys.DOMINANT_HAND, HandSide.RIGHT).nonRemovableAttachedValueProcessor();
+        this.registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).nonRemovableAttachedValueProcessor();
         this.registerKey(LanternKeys.SCORE, 0).nonRemovableAttachedValueProcessor();
     }
 

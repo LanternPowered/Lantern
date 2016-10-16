@@ -23,30 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.game.registry.type.data;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
+import org.lanternpowered.server.data.type.LanternHandPreference;
+import org.lanternpowered.server.game.registry.SimpleCatalogRegistryModule;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
-import org.spongepowered.api.text.chat.ChatVisibility;
 
-import java.util.Locale;
+public final class HandPreferenceRegistryModule extends SimpleCatalogRegistryModule<HandPreference> {
 
-public final class CodecPlayInClientSettings implements Codec<MessagePlayInClientSettings> {
+    public HandPreferenceRegistryModule() {
+        super(HandPreferences.class);
+    }
 
     @Override
-    public MessagePlayInClientSettings decode(CodecContext context, ByteBuffer buf) throws CodecException {
-        final Locale locale = Locale.forLanguageTag(buf.readString());
-        final int viewDistance = buf.readByte();
-        final ChatVisibility visibility = ChatVisibilityRegistryModule.get().getByInternalId(buf.readByte()).get();
-        final boolean enableColors = buf.readBoolean();
-        final int skinPartsBitPattern = buf.readByte() & 0xff;
-        final HandPreference dominantHand = buf.readVarInt() == 1 ? HandPreferences.RIGHT : HandPreferences.LEFT;
-        return new MessagePlayInClientSettings(locale, viewDistance, visibility, dominantHand, enableColors, skinPartsBitPattern);
+    public void registerDefaults() {
+        this.register(new LanternHandPreference("left", "options.mainHand.left"));
+        this.register(new LanternHandPreference("right", "options.mainHand.right"));
     }
 }

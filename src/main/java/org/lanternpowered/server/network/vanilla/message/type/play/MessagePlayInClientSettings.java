@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import org.lanternpowered.server.entity.living.player.HandSide;
 import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.text.chat.ChatVisibility;
 
 import java.util.Locale;
@@ -35,14 +35,14 @@ public final class MessagePlayInClientSettings implements Message {
 
     private final Locale locale;
     private final ChatVisibility chatVisibility;
-    private final HandSide mainHand;
+    private final HandPreference dominantHand;
     private final int viewDistance;
     private final int skinPartsBitPattern;
     private final boolean enableColors;
 
     public MessagePlayInClientSettings(Locale locale, int viewDistance, ChatVisibility chatVisibility,
-            HandSide mainHand, boolean enableColors, int skinPartsBitPattern) {
-        this.mainHand = mainHand;
+            HandPreference dominantHand, boolean enableColors, int skinPartsBitPattern) {
+        this.dominantHand = dominantHand;
         this.skinPartsBitPattern = skinPartsBitPattern;
         this.chatVisibility = chatVisibility;
         this.viewDistance = viewDistance;
@@ -70,7 +70,7 @@ public final class MessagePlayInClientSettings implements Message {
         return this.enableColors;
     }
 
-    public HandSide getMainHand() {
-        return this.mainHand;
+    public HandPreference getDominantHand() {
+        return this.dominantHand;
     }
 }

@@ -32,6 +32,7 @@ import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInClientSettings;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.living.humanoid.player.PlayerChangeClientSettingsEvent;
@@ -50,6 +51,6 @@ public final class HandlerPlayInClientSettings implements Handler<MessagePlayInC
         player.setChatVisibility(event.getChatVisibility());
         player.setChatColorsEnabled(message.getEnableColors());
         player.offer(LanternKeys.DISPLAYED_SKIN_PARTS, event.getDisplayedSkinParts());
-        player.offer(LanternKeys.DOMINANT_HAND, message.getMainHand());
+        player.offer(Keys.DOMINANT_HAND, message.getDominantHand());
     }
 }

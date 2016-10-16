@@ -23,9 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.living.player;
+package org.lanternpowered.server.data.type;
 
-public enum HandSide {
-    LEFT,
-    RIGHT,
+import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.game.Lantern;
+import org.spongepowered.api.data.type.HandPreference;
+import org.spongepowered.api.text.translation.Translation;
+
+public class LanternHandPreference extends SimpleCatalogType.Base.Translatable implements HandPreference {
+
+    public LanternHandPreference(String identifier, String translationKey) {
+        // The used translations are not available in vanilla minecraft
+        this(identifier, Lantern.getRegistry().getTranslationManager().get(translationKey));
+    }
+
+    public LanternHandPreference(String identifier, Translation translation) {
+        super(identifier, translation);
+    }
 }

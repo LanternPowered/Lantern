@@ -29,7 +29,6 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBo
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
-import org.lanternpowered.server.entity.living.player.HandSide;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.SkinPart;
@@ -57,9 +56,6 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("AreHandsUp"), "lantern:are_hands_up");
     public static final Key<Value<Integer>> ARROWS_IN_ENTITY =
             makeValueKey(Integer.class, DataQuery.of("ArrowsInEntity"), "lantern:arrows_in_entity");
-    // TODO: Replace this key with Keys#DOMINANT_HAND when the api is fixed.
-    public static final Key<Value<HandSide>> DOMINANT_HAND =
-            makeValueKey(HandSide.class, DataQuery.of("DominantHand"), "lantern:dominant_hand");
     public static final Key<Value<Boolean>> IS_CONVERTING =
             makeValueKey(Boolean.class, DataQuery.of("IsConverting"), "lantern:is_converting");
     public static final Key<SetValue<SkinPart>> DISPLAYED_SKIN_PARTS =

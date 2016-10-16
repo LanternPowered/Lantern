@@ -48,8 +48,8 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
 
     @Override
     public MutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        return new MutableBlockViewDownsize(this.volume, this.inverseTransform.transform(newMin), this.inverseTransform.transform(newMax))
-            .getBlockView(this.transform);
+        return new MutableBlockViewDownsize(this.volume, this.inverseTransform.transform(newMin),
+                this.inverseTransform.transform(newMax)).getBlockView(this.transform);
     }
 
     @Override
@@ -66,5 +66,4 @@ public class MutableBlockViewTransform extends AbstractBlockViewTransform<Mutabl
     public UnmodifiableBlockVolume getUnmodifiableBlockView() {
         return new UnmodifiableBlockVolumeWrapper(this);
     }
-
 }

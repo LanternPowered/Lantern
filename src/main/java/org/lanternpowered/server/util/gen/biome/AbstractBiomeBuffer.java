@@ -25,85 +25,74 @@
  */
 package org.lanternpowered.server.util.gen.biome;
 
-import com.flowpowered.math.vector.Vector2i;
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.extent.BiomeArea;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
-import org.spongepowered.api.world.extent.StorageType;
+import org.spongepowered.api.world.extent.BiomeVolume;
 
 /**
  * Base class for biome areas. This class provides methods for retrieving the
  * size and for range checking.
  */
-@NonnullByDefault
-public abstract class AbstractBiomeBuffer implements BiomeArea {
+public abstract class AbstractBiomeBuffer implements BiomeVolume {
 
-    protected Vector2i start;
-    protected Vector2i size;
-    protected Vector2i end;
-    private final int xLine;
+    protected Vector3i start;
+    protected Vector3i size;
+    protected Vector3i end;
+    private final int yLine;
+    private final int yzSlice;
 
-    protected AbstractBiomeBuffer(Vector2i start, Vector2i size) {
+    protected AbstractBiomeBuffer(Vector3i start, Vector3i size) {
         this.start = start;
         this.size = size;
-        this.end = start.add(size).sub(Vector2i.ONE);
-        this.xLine = size.getX();
+        this.end = this.start.add(this.size).sub(Vector3i.ONE);
+        this.yLine = size.getY();
+        this.yzSlice = this.yLine * size.getZ();
     }
 
-    protected final void checkRange(int x, int z) {
-        if (!VecHelper.inBounds(x, z, this.start, this.end)) {
-            throw new PositionOutOfBoundsException(new Vector2i(x, z), this.start, this.end);
+    protected final void checkRange(Vector3i position) {
+        checkNotNull(position);
+        checkRange(position.getX(), position.getY(), position.getZ());
+    }
+
+    protected final void checkRange(int x, int y, int z) {
+        if (!VecHelper.inBounds(x, y, z, this.start, this.end)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.start, this.end);
         }
     }
 
-    protected int index(int x, int y) {
-        return (y - this.start.getY()) * this.xLine + (x - this.start.getX());
+    protected int index(int x, int y, int z) {
+        return (x - this.start.getX()) * this.yzSlice + (z - this.start.getZ()) * this.yLine + (y - this.start.getY());
     }
 
     @Override
-    public BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
-    }
-
-    @Override
-    public Vector2i getBiomeMin() {
+    public Vector3i getBiomeMin() {
         return this.start;
     }
 
     @Override
-    public Vector2i getBiomeMax() {
+    public Vector3i getBiomeMax() {
         return this.end;
     }
 
     @Override
-    public Vector2i getBiomeSize() {
+    public Vector3i getBiomeSize() {
         return this.size;
     }
 
     @Override
-    public boolean containsBiome(Vector2i position) {
-        return this.containsBiome(position.getX(), position.getY());
-    }
-
-    @Override
-    public boolean containsBiome(int x, int z) {
-        return VecHelper.inBounds(x, z, this.start, this.end);
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeCopy() {
-        return this.getBiomeCopy(StorageType.STANDARD);
+    public boolean containsBiome(int x, int y, int z) {
+        return VecHelper.inBounds(x, y, z, this.start, this.end);
     }
 
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-            .add("min", this.getBiomeMin())
-            .add("max", this.getBiomeMax())
-            .toString();
+                .add("min", this.getBiomeMin())
+                .add("max", this.getBiomeMax())
+                .toString();
     }
 }

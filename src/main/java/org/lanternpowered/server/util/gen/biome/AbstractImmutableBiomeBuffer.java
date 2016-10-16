@@ -23,35 +23,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.extent;
+package org.lanternpowered.server.util.gen.biome;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.world.extent.ImmutableBiomeViewDownsize;
+import org.lanternpowered.server.world.extent.ImmutableBiomeViewTransform;
+import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
+import org.lanternpowered.server.world.extent.UnmodifiableBiomeVolumeWrapper;
 import org.lanternpowered.server.world.extent.worker.LanternBiomeVolumeWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.spongepowered.api.util.DiscreteTransform3;
-import org.spongepowered.api.world.extent.BiomeVolume;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBiomeVolume;
 import org.spongepowered.api.world.extent.worker.BiomeVolumeWorker;
+import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 
-public class UnmodifiableBiomeViewDownsize extends AbstractBiomeViewDownsize<BiomeVolume> implements UnmodifiableBiomeVolume {
+public abstract class AbstractImmutableBiomeBuffer extends AbstractBiomeBuffer implements ImmutableBiomeVolume {
 
-    public UnmodifiableBiomeViewDownsize(BiomeVolume volume, Vector3i min, Vector3i max) {
-        super(volume, min, max);
+    protected AbstractImmutableBiomeBuffer(Vector3i start, Vector3i size) {
+        super(start, size);
     }
 
     @Override
-    public UnmodifiableBiomeVolume getBiomeView(Vector3i newMin, Vector3i newMax) {
+    public ImmutableBiomeVolume getBiomeView(Vector3i newMin, Vector3i newMax) {
         checkRange(newMin);
         checkRange(newMax);
-        return new UnmodifiableBiomeViewDownsize(this.volume, newMin, newMax);
+        return new ImmutableBiomeViewDownsize(this, newMin, newMax);
     }
 
     @Override
-    public UnmodifiableBiomeVolume getBiomeView(DiscreteTransform3 transform) {
-        return new UnmodifiableBiomeViewTransform(this, transform);
+    public ImmutableBiomeVolume getBiomeView(DiscreteTransform3 transform) {
+        return new ImmutableBiomeViewTransform(this, transform);
     }
 
     @Override
-    public BiomeVolumeWorker<? extends UnmodifiableBiomeVolume> getBiomeWorker() {
+    public BiomeVolumeWorker<? extends ImmutableBiomeVolume> getBiomeWorker() {
         return new LanternBiomeVolumeWorker<>(this);
+    }
+
+    @Override
+    public UnmodifiableBiomeVolume getUnmodifiableBiomeView() {
+        return this;
     }
 }

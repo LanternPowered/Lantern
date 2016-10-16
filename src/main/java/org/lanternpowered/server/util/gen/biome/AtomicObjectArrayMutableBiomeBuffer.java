@@ -27,14 +27,11 @@ package org.lanternpowered.server.util.gen.biome;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 
 import java.util.concurrent.atomic.AtomicReferenceArray;
 
@@ -46,8 +43,7 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
  * example for a contract specified by Minecraft) this implementation becomes
  * more efficient.</p>
  */
-@NonnullByDefault
-public final class AtomicObjectArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer implements MutableBiomeArea {
+public final class AtomicObjectArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer {
 
     private final AtomicReferenceArray<BiomeType> biomes;
 
@@ -58,7 +54,7 @@ public final class AtomicObjectArrayMutableBiomeBuffer extends AbstractMutableBi
      * @param start The start position
      * @param size The size
      */
-    public AtomicObjectArrayMutableBiomeBuffer(BiomeType[] biomes, Vector2i start, Vector2i size) {
+    public AtomicObjectArrayMutableBiomeBuffer(BiomeType[] biomes, Vector3i start, Vector3i size) {
         super(start, size);
         this.biomes = new AtomicReferenceArray<>(biomes);
     }
@@ -71,19 +67,19 @@ public final class AtomicObjectArrayMutableBiomeBuffer extends AbstractMutableBi
      * @param start The start position
      * @param size The size
      */
-    private AtomicObjectArrayMutableBiomeBuffer(AtomicReferenceArray<BiomeType> biomes, Vector2i start, Vector2i size) {
+    private AtomicObjectArrayMutableBiomeBuffer(AtomicReferenceArray<BiomeType> biomes, Vector3i start, Vector3i size) {
         super(start, size);
         this.biomes = biomes;
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
-        this.checkRange(x, z);
-        return this.biomes.get(this.index(x, z));
+    public BiomeType getBiome(int x, int y, int z) {
+        checkRange(x, y, z);
+        return this.biomes.get(index(x, y, z));
     }
 
     @Override
-    public MutableBiomeArea getBiomeCopy(StorageType type) {
+    public MutableBiomeVolume getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
                 final BiomeType[] array = new BiomeType[this.biomes.length()];
@@ -103,7 +99,7 @@ public final class AtomicObjectArrayMutableBiomeBuffer extends AbstractMutableBi
     }
 
     @Override
-    public ImmutableBiomeArea getImmutableBiomeCopy() {
+    public ImmutableBiomeVolume getImmutableBiomeCopy() {
         final BiomeType[] array = new BiomeType[this.biomes.length()];
         for (int i = 0; i < array.length; i++) {
             array[i] = this.biomes.get(i);
@@ -112,14 +108,9 @@ public final class AtomicObjectArrayMutableBiomeBuffer extends AbstractMutableBi
     }
 
     @Override
-    public void setBiome(int x, int z, BiomeType biome) {
+    public void setBiome(int x, int y, int z, BiomeType biome) {
         checkNotNull(biome, "biome");
-        this.checkRange(x, z);
-        this.biomes.set(this.index(x, z), biome);
-    }
-
-    @Override
-    public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
-        return new LanternMutableBiomeAreaWorker<>(this);
+        checkRange(x, y, z);
+        this.biomes.set(index(x, y, z), biome);
     }
 }

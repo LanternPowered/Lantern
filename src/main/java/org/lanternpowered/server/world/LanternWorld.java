@@ -67,7 +67,7 @@ import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.lanternpowered.server.world.rules.Rule;
 import org.lanternpowered.server.world.rules.RuleHolder;
@@ -122,7 +122,7 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.explosion.Explosion;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.gen.WorldGenerator;
 import org.spongepowered.api.world.storage.WorldStorage;
@@ -154,9 +154,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public static final Vector3i BLOCK_MIN = new Vector3i(-30000000, 0, -30000000);
     public static final Vector3i BLOCK_MAX = new Vector3i(30000000, 256, 30000000).sub(1, 1, 1);
     public static final Vector3i BLOCK_SIZE = BLOCK_MAX.sub(BLOCK_MIN).add(1, 1, 1);
-    public static final Vector2i BIOME_MIN = BLOCK_MIN.toVector2(true);
-    public static final Vector2i BIOME_MAX = BLOCK_MAX.toVector2(true);
-    public static final Vector2i BIOME_SIZE = BIOME_MAX.sub(BIOME_MIN).add(1, 1);
+    public static final Vector3i BIOME_MIN = BLOCK_MIN.mul(1, 0, 1);
+    public static final Vector3i BIOME_MAX = BLOCK_MAX.mul(1, 0, 1);
+    public static final Vector3i BIOME_SIZE = BIOME_MAX.sub(BLOCK_MIN).add(1, 1, 1);
 
     // The spawn size starting from the spawn point and expanded
     // by this size in the directions +x, +z, -x, -z
@@ -309,7 +309,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     /**
-     * Enables whether the spawn area should be generated and keeping it loaded.
+     * Enables whether the spawn volume should be generated and keeping it loaded.
      * 
      * @param keepSpawnLoaded keep spawn loaded
      */
@@ -327,7 +327,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
             final int chunkX = spawnPoint.getX() >> 4;
             final int chunkZ = spawnPoint.getZ() >> 4;
 
-            this.game.getLogger().info("Generating spawn area...");
+            this.game.getLogger().info("Generating spawn volume...");
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
@@ -337,7 +337,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
                 }
             }
 
-            this.game.getLogger().info("Finished generating spawn area.");
+            this.game.getLogger().info("Finished generating spawn volume.");
         } else if (this.spawnLoadingTicket != null) {
             this.spawnLoadingTicket.unforceChunks();
         }
@@ -435,8 +435,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public MutableBiomeAreaWorker<World> getBiomeWorker() {
-        return new LanternMutableBiomeAreaWorker<>(this);
+    public MutableBiomeVolumeWorker<World> getBiomeWorker() {
+        return new LanternMutableBiomeVolumeWorker<>(this);
     }
 
     @Override
@@ -599,22 +599,22 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public void setBiome(int x, int z, BiomeType biome) {
-        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBiome(x, z, biome);
+    public void setBiome(int x, int y, int z, BiomeType biome) {
+        this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).setBiome(x, y, z, biome);
     }
 
     @Override
-    public Vector2i getBiomeMin() {
+    public Vector3i getBiomeMin() {
         return BIOME_MIN;
     }
 
     @Override
-    public Vector2i getBiomeMax() {
+    public Vector3i getBiomeMax() {
         return BIOME_MAX;
     }
 
     @Override
-    public Vector2i getBiomeSize() {
+    public Vector3i getBiomeSize() {
         return BIOME_SIZE;
     }
 
@@ -634,13 +634,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public boolean containsBiome(int x, int z) {
-        return VecHelper.inBounds(x, z, BIOME_MIN, BIOME_MAX);
+    public boolean containsBiome(int x, int y, int z) {
+        return VecHelper.inBounds(x, y, z, BIOME_MIN, BIOME_MAX);
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
-        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBiome(x, z);
+    public BiomeType getBiome(int x, int y, int z) {
+        return this.chunkManager.getOrLoadChunk(x >> 4, z >> 4).getBiome(x, y, z);
     }
 
     @Override

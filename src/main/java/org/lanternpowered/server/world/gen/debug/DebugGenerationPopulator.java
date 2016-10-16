@@ -37,7 +37,7 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 
@@ -80,7 +80,7 @@ public final class DebugGenerationPopulator implements GenerationPopulator {
     }
 
     @Override
-    public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeArea biomes) {
+    public void populate(World world, MutableBlockVolume buffer, ImmutableBiomeVolume biomes) {
         final Vector3i min = buffer.getBlockMin();
         final Vector3i max = buffer.getBlockMax();
 

@@ -25,46 +25,47 @@
  */
 package org.lanternpowered.server.util.gen.biome;
 
-import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
-import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
-import org.spongepowered.api.util.DiscreteTransform2;
+import org.lanternpowered.server.world.extent.UnmodifiableBiomeVolumeWrapper;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
+import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
-import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
+import org.spongepowered.api.world.extent.UnmodifiableBiomeVolume;
+import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 
-public abstract class AbstractMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeArea {
+public abstract class AbstractMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeVolume {
 
-    protected AbstractMutableBiomeBuffer(Vector2i start, Vector2i size) {
+    protected AbstractMutableBiomeBuffer(Vector3i start, Vector3i size) {
         super(start, size);
     }
 
     @Override
-    public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
-        return new UnmodifiableBiomeAreaWrapper(this);
+    public UnmodifiableBiomeVolume getUnmodifiableBiomeView() {
+        return new UnmodifiableBiomeVolumeWrapper(this);
     }
 
     @Override
-    public void setBiome(Vector2i position, BiomeType biome) {
-        this.setBiome(position.getX(), position.getY(), biome);
+    public void setBiome(Vector3i position, BiomeType biome) {
+        setBiome(position.getX(), position.getY(), position.getZ(), biome);
     }
 
     @Override
-    public MutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY());
-        this.checkRange(newMax.getX(), newMax.getY());
+    public MutableBiomeVolume getBiomeView(Vector3i newMin, Vector3i newMax) {
+        checkRange(newMin);
+        checkRange(newMax);
         return new MutableBiomeViewDownsize(this, newMin, newMax);
     }
 
     @Override
-    public MutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
+    public MutableBiomeVolume getBiomeView(DiscreteTransform3 transform) {
         return new MutableBiomeViewTransform(this, transform);
     }
 
     @Override
-    public MutableBiomeArea getRelativeBiomeView() {
-        return this.getBiomeView(DiscreteTransform2.fromTranslation(this.start.negate()));
+    public MutableBiomeVolumeWorker<? extends MutableBiomeVolume> getBiomeWorker() {
+        return new LanternMutableBiomeVolumeWorker<>(this);
     }
-
 }

@@ -25,51 +25,54 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.extent.BiomeArea;
+import org.spongepowered.api.world.extent.BiomeVolume;
 import org.spongepowered.api.world.extent.BlockVolume;
 
 public final class ExtentBufferHelper {
 
-    public static short[] copyToArray(BiomeArea area, Vector2i min, Vector2i max, Vector2i size) {
-        // Check if the area has more biomes than can be stored in an array
-        final long memory = (long) size.getX() * (long) size.getY();
+    public static short[] copyToBiomeArray(BiomeVolume area, Vector3i min, Vector3i max, Vector3i size) {
+        // Check if the volume has more biomes than can be stored in an array
+        final long memory = (long) size.getX() * (long) size.getY() * (long) size.getZ();
         // Leave 8 bytes for a header used in some JVMs
         if (memory > Integer.MAX_VALUE - 8) {
             throw new OutOfMemoryError("Cannot copy the biomes to an array because the size limit was reached!");
         }
         final short[] copy = new short[(int) memory];
         int i = 0;
-        for (int y = min.getY(); y <= max.getY(); y++) {
-            for (int x = min.getX(); x <= max.getX(); x++) {
-                copy[i++] = BiomeRegistryModule.get().getInternalId(area.getBiome(x, y));
+        for (int x = min.getX(); x <= max.getX(); x++) {
+            for (int z = min.getZ(); z <= max.getZ(); z++) {
+                for (int y = min.getY(); y <= max.getY(); y++) {
+                    copy[i++] = BiomeRegistryModule.get().getInternalId(area.getBiome(x, 0, z));
+                }
             }
         }
         return copy;
     }
 
-    public static BiomeType[] copyToObjectArray(BiomeArea area, Vector2i min, Vector2i max, Vector2i size) {
-        // Check if the area has more biomes than can be stored in an array
-        final long memory = (long) size.getX() * (long) size.getY();
+    public static BiomeType[] copyToBiomeObjectArray(BiomeVolume area, Vector3i min, Vector3i max, Vector3i size) {
+        // Check if the volume has more biomes than can be stored in an array
+        final long memory = (long) size.getX() * (long) size.getY() * (long) size.getZ();
         // Leave 8 bytes for a header used in some JVMs
         if (memory > Integer.MAX_VALUE - 8) {
             throw new OutOfMemoryError("Cannot copy the biomes to an array because the size limit was reached!");
         }
         final BiomeType[] copy = new BiomeType[(int) memory];
         int i = 0;
-        for (int y = min.getY(); y <= max.getY(); y++) {
-            for (int x = min.getX(); x <= max.getX(); x++) {
-                copy[i++] = area.getBiome(x, y);
+        for (int x = min.getX(); x <= max.getX(); x++) {
+            for (int z = min.getZ(); z <= max.getZ(); z++) {
+                for (int y = min.getY(); y <= max.getY(); y++) {
+                    copy[i++] = area.getBiome(x, y, z);
+                }
             }
         }
         return copy;
     }
 
-    public static short[] copyToArray(BlockVolume volume, Vector3i min, Vector3i max, Vector3i size) {
+    public static short[] copyToBlockArray(BlockVolume volume, Vector3i min, Vector3i max, Vector3i size) {
         // Check if the volume has more blocks than can be stored in an array
         final long memory = (long) size.getX() * (long) size.getY() * (long) size.getZ();
         // Leave 8 bytes for a header used in some JVMs

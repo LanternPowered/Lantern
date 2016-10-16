@@ -40,8 +40,8 @@ public class ImmutableBlockViewDownsize extends AbstractBlockViewDownsize<Immuta
 
     @Override
     public ImmutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkRange(newMax.getX(), newMax.getY(), newMax.getZ());
+        checkRange(newMin);
+        checkRange(newMax);
         return new ImmutableBlockViewDownsize(this.volume, newMin, newMax);
     }
 
@@ -54,5 +54,4 @@ public class ImmutableBlockViewDownsize extends AbstractBlockViewDownsize<Immuta
     public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker(Cause cause) {
         return new LanternBlockVolumeWorker<>(this, cause);
     }
-
 }

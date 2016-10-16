@@ -28,17 +28,13 @@ package org.lanternpowered.server.util.gen.block;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
-@NonnullByDefault
 public class AtomicShortArrayMutableBlockBuffer extends AbstractMutableBlockBuffer implements MutableBlockVolume {
 
     private final BlockState air = BlockTypes.AIR.getDefaultState();
@@ -56,20 +52,15 @@ public class AtomicShortArrayMutableBlockBuffer extends AbstractMutableBlockBuff
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
-        this.checkRange(x, y, z);
-        this.blocks.set(this.index(x, y, z), BlockRegistryModule.get().getStateInternalIdAndData(block));
+        checkRange(x, y, z);
+        this.blocks.set(index(x, y, z), BlockRegistryModule.get().getStateInternalIdAndData(block));
         return true;
     }
 
     @Override
-    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
-        return new LanternMutableBlockVolumeWorker<>(this, cause);
-    }
-
-    @Override
     public BlockState getBlock(int x, int y, int z) {
-        this.checkRange(x, y, z);
-        final short blockState = this.blocks.get(this.index(x, y, z));
+        checkRange(x, y, z);
+        final short blockState = this.blocks.get(index(x, y, z));
         final BlockState block = BlockRegistryModule.get().getStateByInternalIdAndData(blockState).orElse(BlockTypes.AIR.getDefaultState());
         return block == null ? this.air : block;
     }

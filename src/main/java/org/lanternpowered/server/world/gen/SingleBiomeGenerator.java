@@ -27,9 +27,9 @@ package org.lanternpowered.server.world.gen;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 
 public class SingleBiomeGenerator implements BiomeGenerator {
@@ -41,12 +41,14 @@ public class SingleBiomeGenerator implements BiomeGenerator {
     }
 
     @Override
-    public void generateBiomes(MutableBiomeArea buffer) {
-        final Vector2i min = buffer.getBiomeMin();
-        final Vector2i max = buffer.getBiomeMax();
+    public void generateBiomes(MutableBiomeVolume buffer) {
+        final Vector3i min = buffer.getBiomeMin();
+        final Vector3i max = buffer.getBiomeMax();
         for (int x = min.getX(); x <= max.getX(); x++) {
-            for (int z = min.getY(); z <= max.getY(); z++) {
-                buffer.setBiome(x, z, this.biomeType);
+            for (int y = min.getY(); y <= max.getY(); y++) {
+                for (int z = min.getZ(); z <= max.getZ(); z++) {
+                    buffer.setBiome(x, y, z, this.biomeType);
+                }
             }
         }
     }

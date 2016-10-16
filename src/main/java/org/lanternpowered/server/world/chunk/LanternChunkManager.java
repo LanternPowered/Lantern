@@ -32,7 +32,7 @@ import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_HEIGHT;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTIONS;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_SIZE;
 import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_VOLUME;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_BIOME_VOLUME;
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
@@ -61,7 +61,7 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.extent.ExtentBufferHelper;
 import org.lanternpowered.server.world.extent.SoftBufferExtentViewDownsize;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -80,12 +80,12 @@ import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.Extent;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GenerationPopulator;
@@ -218,7 +218,7 @@ public final class LanternChunkManager {
                 while (this.future == null) {
                     try {
                         this.wait();
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignored) {
                     }
                 }
             }
@@ -226,14 +226,14 @@ public final class LanternChunkManager {
             return null;
         }
 
-        public boolean cancel() {
+        boolean cancel() {
             // We have to wait for the future to be set before we
             // can cancel it, shouldn't be long
             synchronized (this) {
                 while (this.future == null) {
                     try {
                         this.wait();
-                    } catch (InterruptedException e) {
+                    } catch (InterruptedException ignored) {
                     }
                 }
             }
@@ -767,7 +767,7 @@ public final class LanternChunkManager {
      * +----------+----------+ . . The chunk provided as a parameter
      * |          |          | . . to this method.
      * |          |          |
-     * |     #####|#####     | ### The area you (the populator) should populate.
+     * |     #####|#####     | ### The volume you (the populator) should populate.
      * |     #####|#####     | ###
      * +----------+----------+
      * | . . #####|#####     |
@@ -847,7 +847,7 @@ public final class LanternChunkManager {
 
         // Using the biome at an arbitrary point within the chunk
         // ({16, 0, 16} in the vanilla game)
-        final BiomeType biomeType = chunk.getWorld().getBiome(chunkX + 16, chunkZ + 16);
+        final BiomeType biomeType = chunk.getWorld().getBiome(chunkX + 16, 0, chunkZ + 16);
 
         // Get the generation settings
         final BiomeGenerationSettings biomeGenSettings = this.worldGenerator.getBiomeSettings(biomeType);
@@ -987,35 +987,35 @@ public final class LanternChunkManager {
         final GenerationBuffers buffers = this.genBuffers.get();
         //noinspection ConstantConditions
         final ChunkBiomeBuffer biomeBuffer = buffers.chunkBiomeBuffer;
-        biomeBuffer.reuse(new Vector2i(chunk.getX() << 4, chunk.getZ() << 4));
+        biomeBuffer.reuse(new Vector3i(chunk.getX() << 4, 0, chunk.getZ() << 4));
 
         // Generate the biomes
         final BiomeGenerator biomeGenerator = this.worldGenerator.getBiomeGenerator();
         biomeGenerator.generateBiomes(biomeBuffer);
 
         // Initialize the biomes into the chunk
-        final ImmutableBiomeArea immutableBiomeArea = biomeBuffer.getImmutableBiomeCopy();
-        chunk.initializeBiomes(biomeBuffer.detach());
+        final ImmutableBiomeVolume immutableBiomeVolume = biomeBuffer.getImmutableBiomeCopy();
+        chunk.initializeBiomes(biomeBuffer.detach().clone());
 
         final ChunkBlockBuffer blockBuffer = buffers.chunkBlockBuffer;
         blockBuffer.reuse(new Vector3i(chunk.getX() << 4, 0, chunk.getZ() << 4));
 
         // Apply the main world generator
         final GenerationPopulator baseGenerator = this.worldGenerator.getBaseGenerationPopulator();
-        baseGenerator.populate(this.world, blockBuffer, immutableBiomeArea);
+        baseGenerator.populate(this.world, blockBuffer, immutableBiomeVolume);
 
         // Get all the used biome types
         final Set<BiomeType> biomeTypes = ImmutableSet.copyOf(biomeBuffer.biomeTypes);
         for (BiomeType biomeType : biomeTypes) {
             final BiomeGenerationSettings settings = this.worldGenerator.getBiomeSettings(biomeType);
             for (GenerationPopulator generator : settings.getGenerationPopulators()) {
-                generator.populate(this.world, blockBuffer, immutableBiomeArea);
+                generator.populate(this.world, blockBuffer, immutableBiomeVolume);
             }
         }
 
         // Apply the generator populators to complete the block buffer
         for (GenerationPopulator generator : this.worldGenerator.getGenerationPopulators()) {
-            generator.populate(this.world, blockBuffer, immutableBiomeArea);
+            generator.populate(this.world, blockBuffer, immutableBiomeVolume);
         }
 
         // Create the chunk sections
@@ -1047,25 +1047,30 @@ public final class LanternChunkManager {
         private final BiomeType[] biomeTypes;
 
         ChunkBiomeBuffer() {
-            super(Vector2i.ZERO, CHUNK_AREA_SIZE);
+            super(Vector3i.ZERO, CHUNK_BIOME_VOLUME);
             this.biomeTypes = new BiomeType[CHUNK_AREA];
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
             this.detach();
         }
 
         @Override
-        public void setBiome(int x, int z, BiomeType biome) {
-            super.setBiome(x, z, biome);
-            this.biomeTypes[this.index(x, z)] = biome;
+        public void setBiome(int x, int y, int z, BiomeType biome) {
+            super.setBiome(x, y, z, biome);
+            this.biomeTypes[this.index(x, y, z)] = biome;
         }
 
         @Override
-        public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
-            return new LanternMutableBiomeAreaWorker<>(this);
+        protected int index(int x, int y, int z) {
+            return (z & 0xf) << 4 | x & 0xf;
         }
 
         @Override
-        public void reuse(Vector2i start) {
+        public MutableBiomeVolumeWorker<? extends MutableBiomeVolume> getBiomeWorker() {
+            return new LanternMutableBiomeVolumeWorker<>(this);
+        }
+
+        @Override
+        public void reuse(Vector3i start) {
             super.reuse(start);
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
         }
@@ -1096,7 +1101,7 @@ public final class LanternChunkManager {
         @Override
         public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
             checkNotNull(block, "blockState");
-            this.checkRange(x, y, z);
+            checkRange(x, y, z);
             final int sy = y >> 4;
             final int index = ((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf;
             final short[] types = this.types[sy];
@@ -1111,13 +1116,8 @@ public final class LanternChunkManager {
         }
 
         @Override
-        public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
-            return new LanternMutableBlockVolumeWorker<>(this, cause);
-        }
-
-        @Override
         public BlockState getBlock(int x, int y, int z) {
-            this.checkRange(x, y, z);
+            checkRange(x, y, z);
             return BlockRegistryModule.get().getStateByInternalIdAndData(this.types[y >> 4][((y & 0xf) << 8) | ((z & 0xf) << 4) | x & 0xf])
                     .orElse(BlockTypes.AIR.getDefaultState());
         }
@@ -1127,10 +1127,10 @@ public final class LanternChunkManager {
             checkNotNull(type, "storageType");
             switch (type) {
                 case STANDARD:
-                    return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                    return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                             this, this.start, this.end, this.size), this.start, this.size);
                 case THREAD_SAFE:
-                    return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                    return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                             this, this.start, this.end, this.size), this.start, this.size);
                 default:
                     throw new UnsupportedOperationException(type.name());
@@ -1139,7 +1139,7 @@ public final class LanternChunkManager {
 
         @Override
         public ImmutableBlockVolume getImmutableBlockCopy() {
-            return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToArray(
+            return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(
                     this, this.start, this.end, this.size), this.start, this.size);
         }
     }

@@ -25,32 +25,31 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector2i;
-import org.lanternpowered.server.world.extent.worker.LanternBiomeAreaWorker;
-import org.spongepowered.api.util.DiscreteTransform2;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.worker.BiomeAreaWorker;
+import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.world.extent.worker.LanternBiomeVolumeWorker;
+import org.spongepowered.api.util.DiscreteTransform3;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.worker.BiomeVolumeWorker;
 
-public class ImmutableBiomeViewTransform extends AbstractBiomeViewTransform<ImmutableBiomeArea> implements ImmutableBiomeArea {
+public class ImmutableBiomeViewTransform extends AbstractBiomeViewTransform<ImmutableBiomeVolume> implements ImmutableBiomeVolume {
 
-    public ImmutableBiomeViewTransform(ImmutableBiomeArea area, DiscreteTransform2 transform) {
+    public ImmutableBiomeViewTransform(ImmutableBiomeVolume area, DiscreteTransform3 transform) {
         super(area, transform);
     }
 
     @Override
-    public ImmutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
-        return new ImmutableBiomeViewDownsize(this.area, this.inverseTransform.transform(newMin),
+    public ImmutableBiomeVolume getBiomeView(Vector3i newMin, Vector3i newMax) {
+        return new ImmutableBiomeViewDownsize(this.volume, this.inverseTransform.transform(newMin),
                 this.inverseTransform.transform(newMax)).getBiomeView(this.transform);
     }
 
     @Override
-    public ImmutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
-        return new ImmutableBiomeViewTransform(this.area, this.transform.withTransformation(transform));
+    public ImmutableBiomeVolume getBiomeView(DiscreteTransform3 transform) {
+        return new ImmutableBiomeViewTransform(this.volume, this.transform.withTransformation(transform));
     }
 
     @Override
-    public BiomeAreaWorker<? extends ImmutableBiomeArea> getBiomeWorker() {
-        return new LanternBiomeAreaWorker<>(this);
+    public BiomeVolumeWorker<? extends ImmutableBiomeVolume> getBiomeWorker() {
+        return new LanternBiomeVolumeWorker<>(this);
     }
-
 }

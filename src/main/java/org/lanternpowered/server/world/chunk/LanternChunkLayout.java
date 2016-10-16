@@ -46,6 +46,7 @@ public class LanternChunkLayout implements ChunkLayout {
     public static final Vector3i CHUNK_MASK = CHUNK_SIZE.sub(Vector3i.ONE);
 
     public static final Vector2i CHUNK_AREA_SIZE = CHUNK_SECTION_SIZE_VECTOR.toVector2(true);
+    public static final Vector3i CHUNK_BIOME_VOLUME = new Vector3i(CHUNK_SECTION_SIZE_VECTOR.getX(), 1, CHUNK_SECTION_SIZE_VECTOR.getZ());
 
     public static final Vector3i SPACE_MAX = LanternWorld.BLOCK_MAX.div(CHUNK_SIZE);
     public static final Vector3i SPACE_MIN = LanternWorld.BLOCK_MIN.div(CHUNK_SIZE);

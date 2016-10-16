@@ -41,8 +41,8 @@ public class UnmodifiableBlockViewDownsize extends AbstractBlockViewDownsize<Blo
 
     @Override
     public UnmodifiableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkRange(newMax.getX(), newMax.getY(), newMax.getZ());
+        checkRange(newMin);
+        checkRange(newMax);
         return new UnmodifiableBlockViewDownsize(this.volume, newMin, newMax);
     }
 
@@ -55,5 +55,4 @@ public class UnmodifiableBlockViewDownsize extends AbstractBlockViewDownsize<Blo
     public BlockVolumeWorker<? extends UnmodifiableBlockVolume> getBlockWorker(Cause cause) {
         return new LanternBlockVolumeWorker<>(this, cause);
     }
-
 }

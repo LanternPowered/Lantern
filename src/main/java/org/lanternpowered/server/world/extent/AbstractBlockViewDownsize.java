@@ -52,6 +52,16 @@ public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implement
         this.size = max.sub(min).add(Vector3i.ONE);
     }
 
+    protected final void checkRange(Vector3i position) {
+        checkRange(position.getX(), position.getY(), position.getZ());
+    }
+
+    protected final void checkRange(int x, int y, int z) {
+        if (!VecHelper.inBounds(x, y, z, this.min, this.max)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.min, this.max);
+        }
+    }
+
     @Override
     public Vector3i getBlockMin() {
         return this.min;
@@ -72,20 +82,14 @@ public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implement
         return VecHelper.inBounds(x, y, z, this.min, this.max);
     }
 
-    protected final void checkRange(int x, int y, int z) {
-        if (!VecHelper.inBounds(x, y, z, this.min, this.max)) {
-            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.min, this.max);
-        }
-    }
-
     @Override
     public BlockType getBlockType(int x, int y, int z) {
-        return this.getBlock(x, y, z).getType();
+        return getBlock(x, y, z).getType();
     }
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        this.checkRange(x, y, z);
+        checkRange(x, y, z);
         return this.volume.getBlock(x, y, z);
     }
 
@@ -93,10 +97,10 @@ public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implement
     public MutableBlockVolume getBlockCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                         this, this.min, this.max, this.size), this.min, this.size);
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                         this, this.min, this.max, this.size), this.min, this.size);
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -105,8 +109,7 @@ public abstract class AbstractBlockViewDownsize<V extends BlockVolume> implement
 
     @Override
     public ImmutableBlockVolume getImmutableBlockCopy() {
-        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToArray(
+        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(
                 this, this.min, this.max, this.size), this.min, this.size);
     }
-
 }

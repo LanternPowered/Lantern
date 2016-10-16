@@ -34,14 +34,14 @@ import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
 
 public class UnmodifiableBlockViewTransform extends AbstractBlockViewTransform<UnmodifiableBlockVolume> implements UnmodifiableBlockVolume {
 
-    public UnmodifiableBlockViewTransform(UnmodifiableBlockVolume area, DiscreteTransform3 transform) {
-        super(area, transform);
+    public UnmodifiableBlockViewTransform(UnmodifiableBlockVolume volume, DiscreteTransform3 transform) {
+        super(volume, transform);
     }
 
     @Override
     public UnmodifiableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        return new UnmodifiableBlockViewDownsize(this.volume, this.inverseTransform.transform(newMin), this.inverseTransform.transform(newMax))
-            .getBlockView(this.transform);
+        return new UnmodifiableBlockViewDownsize(this.volume, this.inverseTransform.transform(newMin),
+                this.inverseTransform.transform(newMax)).getBlockView(this.transform);
     }
 
     @Override
@@ -53,5 +53,4 @@ public class UnmodifiableBlockViewTransform extends AbstractBlockViewTransform<U
     public BlockVolumeWorker<? extends UnmodifiableBlockVolume> getBlockWorker(Cause cause) {
         return new LanternBlockVolumeWorker<>(this, cause);
     }
-
 }

@@ -28,32 +28,23 @@ package org.lanternpowered.server.util.gen.biome;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
-import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
-import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
-import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
-import org.spongepowered.api.util.DiscreteTransform2;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 
 import java.util.Arrays;
 
 /**
- * Mutable biome area backed by a short array. Reusable.
+ * Mutable biome volume backed by a short array. Reusable.
 
  * <p>Using {@link #detach()} the underlying short array can be accessed.
- * The short array can then be reused by calling {@link #reuse(Vector2i)}.</p>
+ * The short array can then be reused by calling {@link #reuse(Vector3i)}.</p>
  */
-@NonnullByDefault
-public class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeArea {
+public class ShortArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer {
 
     private boolean detached;
     private final short[] biomes;
@@ -62,42 +53,32 @@ public class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements
         checkState(!this.detached, "Trying to use buffer after it's closed!");
     }
 
-    public ShortArrayMutableBiomeBuffer(Vector2i start, Vector2i size) {
-        this(new short[size.getX() * size.getY()], start, size);
+    public ShortArrayMutableBiomeBuffer(Vector3i start, Vector3i size) {
+        this(new short[size.getX() * size.getY() * size.getZ()], start, size);
     }
 
-    public ShortArrayMutableBiomeBuffer(short[] biomes, Vector2i start, Vector2i size) {
+    public ShortArrayMutableBiomeBuffer(short[] biomes, Vector3i start, Vector3i size) {
         super(start, size);
         this.biomes = biomes;
     }
 
     @Override
-    public void setBiome(Vector2i position, BiomeType biome) {
-        this.setBiome(position.getX(), position.getY(), biome);
+    public void setBiome(int x, int y, int z, BiomeType biome) {
+        checkOpen();
+        checkRange(x, y, z);
+        this.biomes[index(x, y, z)] = BiomeRegistryModule.get().getInternalId(biome);
     }
 
     @Override
-    public void setBiome(int x, int z, BiomeType biome) {
-        this.checkOpen();
-        this.checkRange(x, z);
-        this.biomes[this.index(x, z)] = BiomeRegistryModule.get().getInternalId(biome);
-    }
-
-    @Override
-    public BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
-    }
-
-    @Override
-    public BiomeType getBiome(int x, int z) {
-        this.checkOpen();
-        this.checkRange(x, z);
-        return BiomeRegistryModule.get().getByInternalId(this.biomes[this.index(x, z)]).orElse(BiomeTypes.OCEAN);
+    public BiomeType getBiome(int x, int y, int z) {
+        checkOpen();
+        checkRange(x, y, z);
+        return BiomeRegistryModule.get().getByInternalId(this.biomes[this.index(x, y, z)]).orElse(BiomeTypes.OCEAN);
     }
 
     /**
      * Gets the internal short array, and prevents further of it through this
-     * object uses until {@link #reuse(Vector2i)} is called.
+     * object uses until {@link #reuse(Vector3i)} is called.
      *
      * @return The internal byte array.
      */
@@ -108,61 +89,34 @@ public class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements
     }
 
     /**
-     * Gets whether this biome area is currently detached. When detached, this
-     * object is available for reuse using {@link #reuse(Vector2i)}.
+     * Gets whether this biome volume is currently detached. When detached, this
+     * object is available for reuse using {@link #reuse(Vector3i)}.
      *
-     * @return Whether this biome area is detached.
+     * @return Whether this biome volume is detached.
      */
     public boolean isDetached() {
         return this.detached;
     }
 
     /**
-     * Changes the bounds of this biome area, so that it can be reused for
+     * Changes the bounds of this biome volume, so that it can be reused for
      * another chunk.
      *
      * @param start New start position.
      */
-    public void reuse(Vector2i start) {
+    public void reuse(Vector3i start) {
         checkState(this.detached, "Cannot reuse while still in use");
 
         this.start = checkNotNull(start, "start");
-        this.end = this.start.add(this.size).sub(Vector2i.ONE);
+        this.end = this.start.add(this.size).sub(Vector3i.ONE);
         Arrays.fill(this.biomes, (short) 0);
 
         this.detached = false;
     }
 
     @Override
-    public MutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY());
-        this.checkRange(newMax.getX(), newMax.getY());
-        return new MutableBiomeViewDownsize(this, newMin, newMax);
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
-        return new MutableBiomeViewTransform(this, transform);
-    }
-
-    @Override
-    public MutableBiomeArea getRelativeBiomeView() {
-        return this.getBiomeView(DiscreteTransform2.fromTranslation(this.start.negate()));
-    }
-
-    @Override
-    public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
-        return new LanternMutableBiomeAreaWorker<>(this);
-    }
-
-    @Override
-    public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
-        return new UnmodifiableBiomeAreaWrapper(this);
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeCopy(StorageType type) {
-        this.checkOpen();
+    public MutableBiomeVolume getBiomeCopy(StorageType type) {
+        checkOpen();
         switch (type) {
             case STANDARD:
                 return new ShortArrayMutableBiomeBuffer(this.biomes.clone(), this.start, this.size);
@@ -174,8 +128,8 @@ public class ShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements
     }
 
     @Override
-    public ImmutableBiomeArea getImmutableBiomeCopy() {
-        this.checkOpen();
+    public ImmutableBiomeVolume getImmutableBiomeCopy() {
+        checkOpen();
         return new ShortArrayImmutableBiomeBuffer(this.biomes, this.start, this.size);
     }
 }

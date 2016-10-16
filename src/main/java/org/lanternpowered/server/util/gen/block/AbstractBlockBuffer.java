@@ -31,16 +31,13 @@ import org.lanternpowered.server.util.VecHelper;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.util.PositionOutOfBoundsException;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.BlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
 
 /**
  * Base class for block buffers.
- *
  */
-@NonnullByDefault
 public abstract class AbstractBlockBuffer implements BlockVolume {
 
     protected Vector3i start;
@@ -54,9 +51,12 @@ public abstract class AbstractBlockBuffer implements BlockVolume {
         this.end = start.add(size).sub(Vector3i.ONE);
         this.start = start;
         this.size = size;
-
         this.yLine = size.getY();
         this.yzSlice = this.yLine * size.getZ();
+    }
+
+    protected void checkRange(Vector3i position) {
+        checkRange(position.getX(), position.getY(), position.getZ());
     }
 
     protected void checkRange(int x, int y, int z) {
@@ -86,7 +86,7 @@ public abstract class AbstractBlockBuffer implements BlockVolume {
 
     @Override
     public boolean containsBlock(Vector3i position) {
-        return this.containsBlock(position.getX(), position.getY(), position.getZ());
+        return containsBlock(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
@@ -96,22 +96,22 @@ public abstract class AbstractBlockBuffer implements BlockVolume {
 
     @Override
     public BlockState getBlock(Vector3i position) {
-        return this.getBlock(position.getX(), position.getY(), position.getZ());
+        return getBlock(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
     public BlockType getBlockType(Vector3i position) {
-        return this.getBlockType(position.getX(), position.getY(), position.getZ());
+        return getBlockType(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
     public BlockType getBlockType(int x, int y, int z) {
-        return this.getBlock(x, y, z).getType();
+        return getBlock(x, y, z).getType();
     }
 
     @Override
     public MutableBlockVolume getBlockCopy() {
-        return this.getBlockCopy(StorageType.STANDARD);
+        return getBlockCopy(StorageType.STANDARD);
     }
 
     @Override

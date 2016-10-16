@@ -27,22 +27,13 @@ package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.world.extent.ImmutableBlockViewDownsize;
-import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;
-import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.util.DiscreteTransform3;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
-import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
 
-@NonnullByDefault
-public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implements ImmutableBlockVolume {
+public class ShortArrayImmutableBlockBuffer extends AbstractImmutableBlockBuffer {
 
     private final BlockState air = BlockTypes.AIR.getDefaultState();
     private final short[] blocks;
@@ -59,32 +50,10 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        this.checkRange(x, y, z);
-        short blockState = this.blocks[this.index(x, y, z)];
+        checkRange(x, y, z);
+        short blockState = this.blocks[index(x, y, z)];
         BlockState block = BlockRegistryModule.get().getStateByInternalId(blockState).orElse(BlockTypes.AIR.getDefaultState());
         return block == null ? this.air : block;
-    }
-
-    @Override
-    public ImmutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkRange(newMax.getX(), newMax.getY(), newMax.getZ());
-        return new ImmutableBlockViewDownsize(this, newMin, newMax);
-    }
-
-    @Override
-    public ImmutableBlockVolume getBlockView(DiscreteTransform3 transform) {
-        return new ImmutableBlockViewTransform(this, transform);
-    }
-
-    @Override
-    public ImmutableBlockVolume getRelativeBlockView() {
-        return this.getBlockView(DiscreteTransform3.fromTranslation(this.start.negate()));
-    }
-
-    @Override
-    public UnmodifiableBlockVolume getUnmodifiableBlockView() {
-        return this;
     }
 
     @Override
@@ -99,16 +68,6 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
         }
     }
 
-    @Override
-    public ImmutableBlockVolume getImmutableBlockCopy() {
-        return this;
-    }
-
-    @Override
-    public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker(Cause cause) {
-        return new LanternBlockVolumeWorker<>(this, cause);
-    }
-
     /**
      * This method doesn't clone the array passed into it. INTERNAL USE ONLY.
      * Make sure your code doesn't leak the reference if you're using it.
@@ -121,5 +80,4 @@ public class ShortArrayImmutableBlockBuffer extends AbstractBlockBuffer implemen
     public static ImmutableBlockVolume newWithoutArrayClone(short[] blocks, Vector3i start, Vector3i size) {
         return new ShortArrayImmutableBlockBuffer(start, size, blocks);
     }
-
 }

@@ -38,6 +38,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.BlockItemType;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
+import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
@@ -258,6 +259,11 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
     @Override
     public Optional<BlockTrait<?>> getTrait(String blockTrait) {
         return this.getDefaultState().getTrait(blockTrait);
+    }
+
+    @Override
+    public BlockSoundGroup getSoundGroup() {
+        return null; // TODO
     }
 
     /**

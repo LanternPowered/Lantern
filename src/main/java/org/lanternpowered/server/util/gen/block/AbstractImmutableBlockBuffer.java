@@ -23,34 +23,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.extent;
+package org.lanternpowered.server.util.gen.block;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.world.extent.ImmutableBlockViewDownsize;
+import org.lanternpowered.server.world.extent.ImmutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.worker.LanternBlockVolumeWorker;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
 import org.spongepowered.api.world.extent.worker.BlockVolumeWorker;
 
-public class ImmutableBlockViewTransform extends AbstractBlockViewTransform<ImmutableBlockVolume> implements ImmutableBlockVolume {
+public abstract class AbstractImmutableBlockBuffer extends AbstractBlockBuffer implements ImmutableBlockVolume {
 
-    public ImmutableBlockViewTransform(ImmutableBlockVolume area, DiscreteTransform3 transform) {
-        super(area, transform);
-    }
-
-    @Override
-    public ImmutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        return new ImmutableBlockViewDownsize(this.volume, this.inverseTransform.transform(newMin),
-                this.inverseTransform.transform(newMax)).getBlockView(this.transform);
-    }
-
-    @Override
-    public ImmutableBlockVolume getBlockView(DiscreteTransform3 transform) {
-        return new ImmutableBlockViewTransform(this.volume, this.transform.withTransformation(transform));
+    protected AbstractImmutableBlockBuffer(Vector3i start, Vector3i size) {
+        super(start, size);
     }
 
     @Override
     public BlockVolumeWorker<? extends ImmutableBlockVolume> getBlockWorker(Cause cause) {
         return new LanternBlockVolumeWorker<>(this, cause);
+    }
+
+    @Override
+    public ImmutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
+        checkRange(newMin);
+        checkRange(newMax);
+        return new ImmutableBlockViewDownsize(this, newMin, newMax);
+    }
+
+    @Override
+    public ImmutableBlockVolume getBlockView(DiscreteTransform3 transform) {
+        return new ImmutableBlockViewTransform(this, transform);
     }
 }

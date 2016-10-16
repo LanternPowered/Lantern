@@ -27,14 +27,11 @@ package org.lanternpowered.server.util.gen.biome;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.flowpowered.math.vector.Vector2i;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+import com.flowpowered.math.vector.Vector3i;
 import org.spongepowered.api.world.biome.BiomeType;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 
 /**
  * Mutable view of a {@link BiomeType} array.
@@ -44,8 +41,7 @@ import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
  * example for a contract specified by Minecraft) this implementation becomes
  * more efficient.</p>
  */
-@NonnullByDefault
-public final class ObjectArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer implements MutableBiomeArea {
+public final class ObjectArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer {
 
     private final BiomeType[] biomes;
 
@@ -57,19 +53,26 @@ public final class ObjectArrayMutableBiomeBuffer extends AbstractMutableBiomeBuf
      * @param start The start position
      * @param size The size
      */
-    public ObjectArrayMutableBiomeBuffer(BiomeType[] biomes, Vector2i start, Vector2i size) {
+    public ObjectArrayMutableBiomeBuffer(BiomeType[] biomes, Vector3i start, Vector3i size) {
         super(start, size);
         this.biomes = biomes;
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
-        this.checkRange(x, z);
-        return this.biomes[this.index(x, z)];
+    public void setBiome(int x, int y, int z, BiomeType biome) {
+        checkNotNull(biome, "biome");
+        checkRange(x, y, z);
+        this.biomes[index(x, y, z)] = biome;
     }
 
     @Override
-    public MutableBiomeArea getBiomeCopy(StorageType type) {
+    public BiomeType getBiome(int x, int y, int z) {
+        checkRange(x, y, z);
+        return this.biomes[index(x, y, z)];
+    }
+
+    @Override
+    public MutableBiomeVolume getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
                 return new ObjectArrayMutableBiomeBuffer(this.biomes.clone(), this.start, this.size);
@@ -81,19 +84,7 @@ public final class ObjectArrayMutableBiomeBuffer extends AbstractMutableBiomeBuf
     }
 
     @Override
-    public ImmutableBiomeArea getImmutableBiomeCopy() {
+    public ImmutableBiomeVolume getImmutableBiomeCopy() {
         return new ObjectArrayImmutableBiomeBuffer(this.biomes, this.start, this.size);
-    }
-
-    @Override
-    public void setBiome(int x, int z, BiomeType biome) {
-        checkNotNull(biome, "biome");
-        this.checkRange(x, z);
-        this.biomes[this.index(x, z)] = biome;
-    }
-
-    @Override
-    public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
-        return new LanternMutableBiomeAreaWorker<>(this);
     }
 }

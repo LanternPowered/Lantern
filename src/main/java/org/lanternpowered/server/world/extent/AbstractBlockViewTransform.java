@@ -95,10 +95,10 @@ public abstract class AbstractBlockViewTransform<V extends BlockVolume> implemen
     public MutableBlockVolume getBlockCopy(StorageType type) {
         switch (type) {
             case STANDARD:
-                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                return new ShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                         this, this.min, this.max, this.size), this.min, this.size);
             case THREAD_SAFE:
-                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToArray(
+                return new AtomicShortArrayMutableBlockBuffer(ExtentBufferHelper.copyToBlockArray(
                         this, this.min, this.max, this.size), this.min, this.size);
             default:
                 throw new UnsupportedOperationException(type.name());
@@ -107,7 +107,7 @@ public abstract class AbstractBlockViewTransform<V extends BlockVolume> implemen
 
     @Override
     public ImmutableBlockVolume getImmutableBlockCopy() {
-        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToArray(
+        return ShortArrayImmutableBlockBuffer.newWithoutArrayClone(ExtentBufferHelper.copyToBlockArray(
                 this, this.min, this.max, this.size), this.min, this.size);
     }
 

@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
@@ -35,7 +34,7 @@ import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 
 import java.util.Arrays;
@@ -48,27 +47,27 @@ public final class LanternExtentBufferFactory implements ExtentBufferFactory {
     }
 
     @Override
-    public MutableBiomeArea createBiomeBuffer(Vector2i size) {
-        final BiomeType[] array = new BiomeType[size.getX() * size.getY()];
+    public MutableBiomeVolume createBiomeBuffer(Vector3i size) {
+        final BiomeType[] array = new BiomeType[size.getX() * size.getY() * size.getZ()];
         Arrays.fill(array, BiomeTypes.OCEAN);
-        return new ObjectArrayMutableBiomeBuffer(array, Vector2i.ZERO, size);
+        return new ObjectArrayMutableBiomeBuffer(array, Vector3i.ZERO, size);
     }
 
     @Override
-    public MutableBiomeArea createBiomeBuffer(int xSize, int zSize) {
-        return this.createBiomeBuffer(new Vector2i(xSize, zSize));
+    public MutableBiomeVolume createBiomeBuffer(int xSize, int ySize, int zSize) {
+        return this.createBiomeBuffer(new Vector3i(xSize, ySize, zSize));
     }
 
     @Override
-    public MutableBiomeArea createThreadSafeBiomeBuffer(Vector2i size) {
-        final BiomeType[] array = new BiomeType[size.getX() * size.getY()];
+    public MutableBiomeVolume createThreadSafeBiomeBuffer(Vector3i size) {
+        final BiomeType[] array = new BiomeType[size.getX() * size.getY() * size.getZ()];
         Arrays.fill(array, BiomeTypes.OCEAN);
-        return new AtomicObjectArrayMutableBiomeBuffer(array, Vector2i.ZERO, size);
+        return new AtomicObjectArrayMutableBiomeBuffer(array, Vector3i.ZERO, size);
     }
 
     @Override
-    public MutableBiomeArea createThreadSafeBiomeBuffer(int xSize, int zSize) {
-        return this.createThreadSafeBiomeBuffer(new Vector2i(xSize, zSize));
+    public MutableBiomeVolume createThreadSafeBiomeBuffer(int xSize, int ySize, int zSize) {
+        return this.createThreadSafeBiomeBuffer(new Vector3i(xSize, ySize, zSize));
     }
 
     @Override

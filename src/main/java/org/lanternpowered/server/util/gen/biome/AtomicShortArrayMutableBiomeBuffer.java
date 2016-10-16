@@ -25,92 +25,46 @@
  */
 package org.lanternpowered.server.util.gen.biome;
 
-import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.concurrent.AtomicShortArray;
-import org.lanternpowered.server.world.extent.MutableBiomeViewDownsize;
-import org.lanternpowered.server.world.extent.MutableBiomeViewTransform;
-import org.lanternpowered.server.world.extent.UnmodifiableBiomeAreaWrapper;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
-import org.spongepowered.api.util.DiscreteTransform2;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
 
 /**
- * Mutable biome area backed by a atomic short array.
+ * Mutable biome volume backed by a atomic short array.
  */
-@NonnullByDefault
-public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffer implements MutableBiomeArea {
+public final class AtomicShortArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer {
 
     private final AtomicShortArray biomes;
 
-    public AtomicShortArrayMutableBiomeBuffer(Vector2i start, Vector2i size) {
+    public AtomicShortArrayMutableBiomeBuffer(Vector3i start, Vector3i size) {
         super(start, size);
-        this.biomes = new AtomicShortArray(size.getX() * size.getY());
+        this.biomes = new AtomicShortArray(size.getX() * size.getY() * size.getZ());
     }
 
-    public AtomicShortArrayMutableBiomeBuffer(short[] biomes, Vector2i start, Vector2i size) {
+    public AtomicShortArrayMutableBiomeBuffer(short[] biomes, Vector3i start, Vector3i size) {
         super(start, size);
         this.biomes = new AtomicShortArray(biomes);
     }
 
     @Override
-    public void setBiome(Vector2i position, BiomeType biome) {
-        this.setBiome(position.getX(), position.getY(), biome);
+    public void setBiome(int x, int y, int z, BiomeType biome) {
+        checkRange(x, y, z);
+        this.biomes.set(index(x, y, z), BiomeRegistryModule.get().getInternalId(biome));
     }
 
     @Override
-    public void setBiome(int x, int z, BiomeType biome) {
-        this.checkRange(x, z);
-        this.biomes.set(this.index(x, z), BiomeRegistryModule.get().getInternalId(biome));
+    public BiomeType getBiome(int x, int y, int z) {
+        checkRange(x, y, z);
+        return BiomeRegistryModule.get().getByInternalId(this.biomes.get(index(x, y, z))).orElse(BiomeTypes.OCEAN);
     }
 
     @Override
-    public BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
-    }
-
-    @Override
-    public BiomeType getBiome(int x, int z) {
-        this.checkRange(x, z);
-        return BiomeRegistryModule.get().getByInternalId(this.biomes.get(this.index(x, z))).orElse(BiomeTypes.OCEAN);
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY());
-        this.checkRange(newMax.getX(), newMax.getY());
-        return new MutableBiomeViewDownsize(this, newMin, newMax);
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
-        return new MutableBiomeViewTransform(this, transform);
-    }
-
-    @Override
-    public MutableBiomeArea getRelativeBiomeView() {
-        return this.getBiomeView(DiscreteTransform2.fromTranslation(this.start.negate()));
-    }
-
-    @Override
-    public MutableBiomeAreaWorker<? extends MutableBiomeArea> getBiomeWorker() {
-        return new LanternMutableBiomeAreaWorker<>(this);
-    }
-
-    @Override
-    public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
-        return new UnmodifiableBiomeAreaWrapper(this);
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeCopy(StorageType type) {
+    public MutableBiomeVolume getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
                 return new ShortArrayMutableBiomeBuffer(this.biomes.getArray(), this.start, this.size);
@@ -122,7 +76,7 @@ public final class AtomicShortArrayMutableBiomeBuffer extends AbstractBiomeBuffe
     }
 
     @Override
-    public ImmutableBiomeArea getImmutableBiomeCopy() {
+    public ImmutableBiomeVolume getImmutableBiomeCopy() {
         return new ShortArrayImmutableBiomeBuffer(this.biomes.getArray(), this.start, this.size);
     }
 }

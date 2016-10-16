@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.world.extent;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -78,18 +77,18 @@ public class ExtentViewDownsize implements AbstractExtent {
     private final Vector3i blockMin;
     private final Vector3i blockMax;
     private final Vector3i blockSize;
-    private final Vector2i biomeMin;
-    private final Vector2i biomeMax;
-    private final Vector2i biomeSize;
+    private final Vector3i biomeMin;
+    private final Vector3i biomeMax;
+    private final Vector3i biomeSize;
 
     public ExtentViewDownsize(Extent extent, Vector3i blockMin, Vector3i blockMax) {
         this.extent = extent;
         this.blockMin = blockMin;
         this.blockMax = blockMax;
         this.blockSize = this.blockMax.sub(this.blockMin).add(Vector3i.ONE);
-        this.biomeMin = blockMin.toVector2(true);
-        this.biomeMax = blockMax.toVector2(true);
-        this.biomeSize = this.biomeMax.sub(this.biomeMin).add(Vector2i.ONE);
+        this.biomeMin = new Vector3i(blockMin.getX(), 0, blockMin.getZ());
+        this.biomeMax = new Vector3i(blockMax.getX(), 1, blockMax.getZ());
+        this.biomeSize = this.biomeMax.sub(this.biomeMin).add(Vector3i.ONE.mul(1, 0, 1));
     }
 
     @Override
@@ -115,28 +114,28 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public Vector2i getBiomeMin() {
+    public Vector3i getBiomeMin() {
         return this.biomeMin;
     }
 
     @Override
-    public Vector2i getBiomeMax() {
+    public Vector3i getBiomeMax() {
         return this.biomeMax;
     }
 
     @Override
-    public Vector2i getBiomeSize() {
+    public Vector3i getBiomeSize() {
         return this.biomeSize;
     }
 
     @Override
-    public boolean containsBiome(int x, int z) {
-        return VecHelper.inBounds(x, z, this.biomeMin, this.biomeMax);
+    public boolean containsBiome(int x,  int y, int z) {
+        return VecHelper.inBounds(x, y, z, this.biomeMin, this.biomeMax);
     }
 
-    private void checkRange(int x, int z) {
-        if (!VecHelper.inBounds(x, z, this.biomeMin, this.biomeMax)) {
-            throw new PositionOutOfBoundsException(new Vector2i(x, z), this.biomeMin, this.biomeMax);
+    private void checkBiomeRange(int x, int y, int z) {
+        if (!VecHelper.inBounds(x, y, z, this.biomeMin, this.biomeMax)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.biomeMin, this.biomeMax);
         }
     }
 
@@ -183,15 +182,15 @@ public class ExtentViewDownsize implements AbstractExtent {
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
-        this.checkRange(x, z);
-        return this.extent.getBiome(x, z);
+    public BiomeType getBiome(int x, int y, int z) {
+        this.checkBiomeRange(x, y, z);
+        return this.extent.getBiome(x, y, z);
     }
 
     @Override
-    public void setBiome(int x, int z, BiomeType biome) {
-        this.checkRange(x, z);
-        this.extent.setBiome(x, z, biome);
+    public void setBiome(int x, int y, int z, BiomeType biome) {
+        this.checkBiomeRange(x, y, z);
+        this.extent.setBiome(x, y, z, biome);
     }
 
     @Override

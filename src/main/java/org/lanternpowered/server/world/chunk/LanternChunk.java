@@ -27,7 +27,7 @@ package org.lanternpowered.server.world.chunk;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_AREA_SIZE;
+import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_BIOME_VOLUME;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_MASK;
 import static org.lanternpowered.server.world.chunk.LanternChunkLayout.CHUNK_SIZE;
 
@@ -60,7 +60,7 @@ import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.extent.AbstractExtent;
 import org.lanternpowered.server.world.extent.ExtentViewDownsize;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeAreaWorker;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
 import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -97,7 +97,7 @@ import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.ArchetypeVolume;
 import org.spongepowered.api.world.extent.Extent;
-import org.spongepowered.api.world.extent.worker.MutableBiomeAreaWorker;
+import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 import java.util.Arrays;
@@ -127,7 +127,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     // The size of a chunk section in the x, y and z directions
     public static final int CHUNK_SECTION_SIZE = 16;
-    // The area of a chunk and a chunk section (xz plane)
+    // The volume of a chunk and a chunk section (xz plane)
     public static final int CHUNK_AREA = CHUNK_SECTION_SIZE * CHUNK_SECTION_SIZE;
     // The volume of a chunk section
     public static final int CHUNK_SECTION_VOLUME = CHUNK_AREA * CHUNK_SECTION_SIZE;
@@ -330,6 +330,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
     private final Vector3i min;
     private final Vector3i max;
 
+    private final Vector3i biomeMin;
+    private final Vector3i biomeMax;
+
     private final Vector2i areaMin;
     private final Vector2i areaMax;
 
@@ -416,6 +419,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
         this.max = this.min.add(CHUNK_MASK);
         this.areaMin = this.min.toVector2(true);
         this.areaMax = this.max.toVector2(true);
+        this.biomeMin = new Vector3i(this.min.getX(), 1, this.min.getZ());
+        this.biomeMax = new Vector3i(this.max.getX(), 1, this.max.getZ());
 
         //noinspection unchecked
         final Short2ObjectMap<TrackerData>[] trackerDataSections = new Short2ObjectMap[CHUNK_SECTIONS];
@@ -768,8 +773,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @param z the z coordinate
      * @return the biome value
      */
-    public short getBiomeId(int x, int z) {
-        this.checkAreaBounds(x, z);
+    public short getBiomeId(int x, int y, int z) {
+        this.checkBiomeBounds(x, y, z);
         if (!this.loaded) {
             return 0;
         }
@@ -794,8 +799,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @param z the z coordinate
      * @param biome the biome value
      */
-    public void setBiomeId(int x, int z, short biome) {
-        this.checkAreaBounds(x, z);
+    public void setBiomeId(int x, int y, int z, short biome) {
+        this.checkBiomeBounds(x, y, z);
         if (!this.loaded) {
             return;
         }
@@ -1110,8 +1115,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public MutableBiomeAreaWorker<Chunk> getBiomeWorker() {
-        return new LanternMutableBiomeAreaWorker<>(this);
+    public MutableBiomeVolumeWorker<Chunk> getBiomeWorker() {
+        return new LanternMutableBiomeVolumeWorker<>(this);
     }
 
     @Override
@@ -1361,8 +1366,14 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     private void checkAreaBounds(int x, int z) {
-        if (!this.containsBiome(x, z)) {
+        if (VecHelper.inBounds(x, z, this.areaMin, this.areaMax)) {
             throw new PositionOutOfBoundsException(new Vector2i(x, z), this.areaMin, this.areaMax);
+        }
+    }
+
+    private void checkBiomeBounds(int x, int y, int z) {
+        if (!this.containsBiome(x, y, z)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.biomeMin, this.biomeMax);
         }
     }
 
@@ -1403,33 +1414,33 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public void setBiome(int x, int z, BiomeType biome) {
-        this.setBiomeId(x, z, BiomeRegistryModule.get().getInternalId(biome));
+    public void setBiome(int x, int y, int z, BiomeType biome) {
+        this.setBiomeId(x, y, z, BiomeRegistryModule.get().getInternalId(biome));
     }
 
     @Override
-    public Vector2i getBiomeMin() {
-        return this.areaMin;
+    public Vector3i getBiomeMin() {
+        return this.biomeMax;
     }
 
     @Override
-    public Vector2i getBiomeMax() {
-        return this.areaMax;
+    public Vector3i getBiomeMax() {
+        return this.biomeMin;
     }
 
     @Override
-    public Vector2i getBiomeSize() {
-        return CHUNK_AREA_SIZE;
+    public Vector3i getBiomeSize() {
+        return CHUNK_BIOME_VOLUME;
     }
 
     @Override
-    public boolean containsBiome(int x, int z) {
+    public boolean containsBiome(int x, int y, int z) {
         return VecHelper.inBounds(x, z, this.areaMin, this.areaMax);
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
-        return BiomeRegistryModule.get().getByInternalId(this.getBiomeId(x, z)).orElse(BiomeTypes.OCEAN);
+    public BiomeType getBiome(int x, int y, int z) {
+        return BiomeRegistryModule.get().getByInternalId(this.getBiomeId(x, y, z)).orElse(BiomeTypes.OCEAN);
     }
 
     @Override

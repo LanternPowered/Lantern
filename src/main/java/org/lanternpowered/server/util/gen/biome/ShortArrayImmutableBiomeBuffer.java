@@ -25,75 +25,40 @@
  */
 package org.lanternpowered.server.util.gen.biome;
 
-import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
-import org.lanternpowered.server.world.extent.ImmutableBiomeViewDownsize;
-import org.lanternpowered.server.world.extent.ImmutableBiomeViewTransform;
-import org.lanternpowered.server.world.extent.worker.LanternBiomeAreaWorker;
-import org.spongepowered.api.util.DiscreteTransform2;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
-import org.spongepowered.api.world.extent.ImmutableBiomeArea;
-import org.spongepowered.api.world.extent.MutableBiomeArea;
+import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
+import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.UnmodifiableBiomeArea;
-import org.spongepowered.api.world.extent.worker.BiomeAreaWorker;
 
 /**
- * Immutable biome area, backed by a short array. The array passed to the
+ * Immutable biome volume, backed by a short array. The array passed to the
  * constructor is copied to ensure that the instance is immutable.
  */
-@NonnullByDefault
-public final class ShortArrayImmutableBiomeBuffer extends AbstractBiomeBuffer implements ImmutableBiomeArea {
+public final class ShortArrayImmutableBiomeBuffer extends AbstractImmutableBiomeBuffer {
 
     private final short[] biomes;
 
-    public ShortArrayImmutableBiomeBuffer(short[] biomes, Vector2i start, Vector2i size) {
+    public ShortArrayImmutableBiomeBuffer(short[] biomes, Vector3i start, Vector3i size) {
         super(start, size);
         this.biomes = biomes.clone();
     }
 
-    private ShortArrayImmutableBiomeBuffer(Vector2i start, Vector2i size, short[] biomes) {
+    private ShortArrayImmutableBiomeBuffer(Vector3i start, Vector3i size, short[] biomes) {
         super(start, size);
         this.biomes = biomes;
     }
 
     @Override
-    public BiomeType getBiome(int x, int z) {
-        this.checkRange(x, z);
-        return BiomeRegistryModule.get().getByInternalId(this.biomes[this.index(x, z)]).orElse(BiomeTypes.OCEAN);
+    public BiomeType getBiome(int x, int y, int z) {
+        checkRange(x, y, z);
+        return BiomeRegistryModule.get().getByInternalId(this.biomes[index(x, y, z)]).orElse(BiomeTypes.OCEAN);
     }
 
     @Override
-    public BiomeType getBiome(Vector2i position) {
-        return this.getBiome(position.getX(), position.getY());
-    }
-
-    @Override
-    public ImmutableBiomeArea getBiomeView(Vector2i newMin, Vector2i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY());
-        this.checkRange(newMax.getX(), newMax.getY());
-        return new ImmutableBiomeViewDownsize(this, newMin, newMax);
-    }
-
-    @Override
-    public ImmutableBiomeArea getBiomeView(DiscreteTransform2 transform) {
-        return new ImmutableBiomeViewTransform(this, transform);
-    }
-
-    @Override
-    public ImmutableBiomeArea getRelativeBiomeView() {
-        return this.getBiomeView(DiscreteTransform2.fromTranslation(this.start.negate()));
-    }
-
-    @Override
-    public UnmodifiableBiomeArea getUnmodifiableBiomeView() {
-        return this;
-    }
-
-    @Override
-    public MutableBiomeArea getBiomeCopy(StorageType type) {
+    public MutableBiomeVolume getBiomeCopy(StorageType type) {
         switch (type) {
             case STANDARD:
                 return new ShortArrayMutableBiomeBuffer(this.biomes.clone(), this.start, this.size);
@@ -104,26 +69,16 @@ public final class ShortArrayImmutableBiomeBuffer extends AbstractBiomeBuffer im
         }
     }
 
-    @Override
-    public ImmutableBiomeArea getImmutableBiomeCopy() {
-        return this;
-    }
-
-    @Override
-    public BiomeAreaWorker<? extends ImmutableBiomeArea> getBiomeWorker() {
-        return new LanternBiomeAreaWorker<>(this);
-    }
-
     /**
      * This method doesn't clone the array passed into it. INTERNAL USE ONLY.
      * Make sure your code doesn't leak the reference if you're using it.
      *
      * @param biomes The biomes to store
-     * @param start The start of the area
-     * @param size The size of the area
+     * @param start The start of the volume
+     * @param size The size of the volume
      * @return A new buffer using the same array reference
      */
-    public static ImmutableBiomeArea newWithoutArrayClone(short[] biomes, Vector2i start, Vector2i size) {
+    public static ImmutableBiomeVolume newWithoutArrayClone(short[] biomes, Vector3i start, Vector3i size) {
         return new ShortArrayImmutableBiomeBuffer(start, size, biomes);
     }
 }

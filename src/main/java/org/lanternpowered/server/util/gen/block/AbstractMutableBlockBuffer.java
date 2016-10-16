@@ -29,12 +29,13 @@ import com.flowpowered.math.vector.Vector3i;
 import org.lanternpowered.server.world.extent.MutableBlockViewDownsize;
 import org.lanternpowered.server.world.extent.MutableBlockViewTransform;
 import org.lanternpowered.server.world.extent.UnmodifiableBlockVolumeWrapper;
-import org.spongepowered.api.block.BlockState;
+import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.util.DiscreteTransform3;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.UnmodifiableBlockVolume;
+import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 public abstract class AbstractMutableBlockBuffer extends AbstractBlockBuffer implements MutableBlockVolume {
 
@@ -43,39 +44,29 @@ public abstract class AbstractMutableBlockBuffer extends AbstractBlockBuffer imp
     }
 
     @Override
+    public MutableBlockVolumeWorker<? extends MutableBlockVolume> getBlockWorker(Cause cause) {
+        return new LanternMutableBlockVolumeWorker<>(this, cause);
+    }
+
+    @Override
     public UnmodifiableBlockVolume getUnmodifiableBlockView() {
         return new UnmodifiableBlockVolumeWrapper(this);
     }
 
     @Override
-    public boolean setBlock(Vector3i position, BlockState block, Cause cause) {
-        return this.setBlock(position.getX(), position.getY(), position.getZ(), block, cause);
-    }
-
-    @Override
-    public boolean setBlockType(Vector3i position, BlockType type, Cause cause) {
-        return this.setBlockType(position.getX(), position.getY(), position.getZ(), type, cause);
-    }
-
-    @Override
     public boolean setBlockType(int x, int y, int z, BlockType type, Cause cause) {
-        return this.setBlock(x, y, z, type.getDefaultState(), cause);
+        return setBlock(x, y, z, type.getDefaultState(), cause);
     }
 
     @Override
     public MutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        this.checkRange(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkRange(newMax.getX(), newMax.getY(), newMax.getZ());
+        checkRange(newMin);
+        checkRange(newMax);
         return new MutableBlockViewDownsize(this, newMin, newMax);
     }
 
     @Override
     public MutableBlockVolume getBlockView(DiscreteTransform3 transform) {
         return new MutableBlockViewTransform(this, transform);
-    }
-
-    @Override
-    public MutableBlockVolume getRelativeBlockView() {
-        return this.getBlockView(DiscreteTransform3.fromTranslation(this.start.negate()));
     }
 }

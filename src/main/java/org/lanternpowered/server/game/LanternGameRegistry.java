@@ -86,6 +86,7 @@ import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
+import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.CatalogMappingDataHolder;
@@ -507,6 +508,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
                 .registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
                 .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
+                .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
                 ;
         this.registerFactories();
     }

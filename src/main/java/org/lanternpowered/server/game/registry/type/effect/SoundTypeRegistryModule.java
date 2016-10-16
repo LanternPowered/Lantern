@@ -28,7 +28,6 @@ package org.lanternpowered.server.game.registry.type.effect;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
-import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypes;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;

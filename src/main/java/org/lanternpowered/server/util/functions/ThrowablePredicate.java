@@ -23,5 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.command;
+package org.lanternpowered.server.util.functions;
+
+@FunctionalInterface
+public interface ThrowablePredicate<T, E extends Throwable> {
+
+    boolean test(T object) throws E;
+}

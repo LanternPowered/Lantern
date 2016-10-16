@@ -25,8 +25,6 @@
  */
 package org.lanternpowered.server.util;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.security.Key;
 import java.security.KeyFactory;
 import java.security.KeyPair;
@@ -35,13 +33,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.X509EncodedKeySpec;
 
-@NonnullByDefault
 public final class SecurityHelper {
 
     private static SecureRandom random = new SecureRandom();
-
-    private SecurityHelper() {
-    }
 
     public static KeyPair generateKeyPair() {
         try {
@@ -69,4 +63,6 @@ public final class SecurityHelper {
         }
     }
 
+    private SecurityHelper() {
+    }
 }

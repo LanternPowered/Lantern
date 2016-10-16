@@ -30,7 +30,6 @@ import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.concurrent.AbstractExecutorService;
@@ -44,7 +43,6 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 class TaskExecutorService extends AbstractExecutorService implements SpongeExecutorService {
 
     private final Supplier<Task.Builder> taskBuilderProvider;

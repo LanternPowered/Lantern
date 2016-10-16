@@ -28,9 +28,7 @@ package org.lanternpowered.server.util;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
 public final class VecHelper {
 
     public static boolean inBounds(int x, int y, Vector2i min, Vector2i max) {
@@ -51,5 +49,4 @@ public final class VecHelper {
 
     private VecHelper() {
     }
-
 }

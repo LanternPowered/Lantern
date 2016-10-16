@@ -31,7 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import org.lanternpowered.server.data.value.ElementHolder;
 import org.lanternpowered.server.data.value.IValueContainer;
 import org.lanternpowered.server.data.value.ValueHelper;
-import org.lanternpowered.server.util.TriFunction;
+import org.lanternpowered.server.util.functions.TriFunction;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;

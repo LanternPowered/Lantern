@@ -34,14 +34,12 @@ import static org.lanternpowered.server.util.Conditions.checkPlugin;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternTaskBuilder implements Task.Builder {
 
     private final LanternScheduler scheduler;

@@ -70,12 +70,12 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
      * Using a cache to bring the amount of operations down for spawning particles.
      */
     private final LoadingCache<ParticleEffect, ICachedMessage> cache =
-            Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(this::preProcess);
+            Caffeine.newBuilder().weakKeys().expireAfterAccess(3, TimeUnit.MINUTES).build(this::preProcess);
 
     private final Object2IntMap<PotionEffectType> potionEffectTypeToId = new Object2IntOpenHashMap<>();
 
     {
-        this.potionEffectTypeToId.defaultReturnValue(-1);
+        this.potionEffectTypeToId.defaultReturnValue(0); // Default to water?
         this.potionEffectTypeToId.put(PotionEffectTypes.NIGHT_VISION, 5);
         this.potionEffectTypeToId.put(PotionEffectTypes.INVISIBILITY, 7);
         this.potionEffectTypeToId.put(PotionEffectTypes.JUMP_BOOST, 9);
@@ -153,7 +153,7 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
                 return new CachedEffectMessage(2005, quantity, false);
             } else if (type == ParticleTypes.SPLASH_POTION) {
                 final int potionId = this.potionEffectTypeToId.getInt(effect.getOptionOrDefault(ParticleOptions.POTION_EFFECT_TYPE).get());
-                return potionId == -1 ? EmptyCachedMessage.INSTANCE : new CachedEffectMessage(2002, potionId, false);
+                return new CachedEffectMessage(2002, potionId, false);
             } else if (type == ParticleTypes.BREAK_BLOCK) {
                 final int state = getBlockState(effect, type.getDefaultOption(ParticleOptions.BLOCK_STATE));
                 if (state == 0) {

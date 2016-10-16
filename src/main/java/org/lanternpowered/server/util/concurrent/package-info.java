@@ -23,10 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
-
-@FunctionalInterface
-public interface TriFunction<A, B, C, R> {
-
-    R apply(A a, B b, C c);
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.util.concurrent;

@@ -35,10 +35,7 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
-public class ThreadHelper {
-
-    private ThreadHelper() {
-    }
+public final class ThreadHelper {
 
     public static ThreadFactory newFastThreadLocalThreadFactory() {
         return newFastThreadLocalThreadFactory0(null, null);
@@ -111,5 +108,8 @@ public class ThreadHelper {
             };
         }
         return thread;
+    }
+
+    private ThreadHelper() {
     }
 }

@@ -32,11 +32,13 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
+import javax.annotation.Nullable;
+
 /**
  * This is a {@link ThreadLocal} that uses {@link SoftReference}s to store
  * the values to prevent possible memory leaks for some use purposes.
  *
- * @param <T> the type of the value
+ * @param <T> The type of the value
  */
 public class FastSoftThreadLocal<T> {
 
@@ -46,8 +48,8 @@ public class FastSoftThreadLocal<T> {
      * Creates a thread local variable. The initial value of the variable is
      * determined by invoking the {@link Supplier#get()} method.
      *
-     * @param supplier the supplier to be used to determine the initial value
-     * @return a new thread local variable
+     * @param supplier The supplier to be used to determine the initial value
+     * @return A new thread local variable
      */
     public static <S> FastSoftThreadLocal<S> withInitial(Supplier<? extends S> supplier) {
         return new SuppliedSoftThreadLocal<>(supplier);
@@ -70,8 +72,9 @@ public class FastSoftThreadLocal<T> {
      * Gets the current thread's value for this thread-local
      * variable.
      *
-     * @return the value
+     * @return The value
      */
+    @Nullable
     public T get() {
         final SoftReference<T> ref = this.threadLocal.get();
         if (ref != null) {
@@ -96,12 +99,13 @@ public class FastSoftThreadLocal<T> {
      * Sets the current thread's value for this thread-local
      * variable.
      *
-     * @param value the value
+     * @param value The value
      */
-    public void set(T value) {
+    public void set(@Nullable T value) {
         this.threadLocal.set(value == null ? null : new SoftReference<>(value));
     }
 
+    @Nullable
     T initialValue() {
         return null;
     }

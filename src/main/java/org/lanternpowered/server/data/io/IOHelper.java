@@ -25,8 +25,8 @@
  */
 package org.lanternpowered.server.data.io;
 
-import org.lanternpowered.server.util.ThrowableFunction;
-import org.lanternpowered.server.util.ThrowablePredicate;
+import org.lanternpowered.server.util.functions.ThrowableFunction;
+import org.lanternpowered.server.util.functions.ThrowablePredicate;
 
 import java.io.IOException;
 import java.nio.file.Files;

@@ -30,11 +30,13 @@ import static java.util.Objects.requireNonNull;
 import java.lang.ref.SoftReference;
 import java.util.function.Supplier;
 
+import javax.annotation.Nullable;
+
 /**
  * This is a {@link ThreadLocal} that uses {@link SoftReference}s to store
  * the values to prevent possible memory leaks for some use purposes.
  *
- * @param <T> the type of the value
+ * @param <T> The type of the value
  */
 public class SoftThreadLocal<T> {
 
@@ -44,8 +46,8 @@ public class SoftThreadLocal<T> {
      * Creates a thread local variable. The initial value of the variable is
      * determined by invoking the {@link Supplier#get()} method.
      *
-     * @param supplier the supplier to be used to determine the initial value
-     * @return a new thread local variable
+     * @param supplier The supplier to be used to determine the initial value
+     * @return A new thread local variable
      */
     public static <S> SoftThreadLocal<S> withInitial(Supplier<? extends S> supplier) {
         return new SuppliedSoftThreadLocal<>(supplier);
@@ -60,7 +62,7 @@ public class SoftThreadLocal<T> {
         this(new ThreadLocal<>());
     }
 
-    SoftThreadLocal(ThreadLocal<SoftReference<T>> threadLocal) {
+    private SoftThreadLocal(ThreadLocal<SoftReference<T>> threadLocal) {
         this.threadLocal = threadLocal;
     }
 
@@ -68,8 +70,9 @@ public class SoftThreadLocal<T> {
      * Gets the current thread's value for this thread-local
      * variable.
      *
-     * @return the value
+     * @return The value
      */
+    @Nullable
     public T get() {
         final SoftReference<T> ref = this.threadLocal.get();
         if (ref != null) {
@@ -94,17 +97,18 @@ public class SoftThreadLocal<T> {
      * Sets the current thread's value for this thread-local
      * variable.
      *
-     * @param value the value
+     * @param value The value
      */
-    public void set(T value) {
+    public void set(@Nullable T value) {
         this.threadLocal.set(value == null ? null : new SoftReference<>(value));
     }
 
+    @Nullable
     T initialValue() {
         return null;
     }
 
-    static final class SuppliedSoftThreadLocal<T> extends SoftThreadLocal<T> {
+    private static final class SuppliedSoftThreadLocal<T> extends SoftThreadLocal<T> {
 
         private final Supplier<? extends T> supplier;
 

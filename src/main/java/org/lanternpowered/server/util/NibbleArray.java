@@ -33,7 +33,6 @@ import java.util.Arrays;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class NibbleArray {
 
     private final int length;

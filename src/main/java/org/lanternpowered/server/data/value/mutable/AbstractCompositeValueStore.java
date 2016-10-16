@@ -33,7 +33,7 @@ import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.ValueHelper;
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
-import org.lanternpowered.server.util.TriFunction;
+import org.lanternpowered.server.util.functions.TriFunction;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;

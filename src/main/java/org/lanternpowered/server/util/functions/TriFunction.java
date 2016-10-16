@@ -23,21 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.util;
+package org.lanternpowered.server.util.functions;
 
-import java.util.function.Function;
-
-/**
- * Similar like the {@link Function} class but allows the
- * {@link #apply(Object)} method to throw a {@link Throwable}
- * of a specific type {@link E}.
- *
- * @param <T> The type of the parameter
- * @param <R> The type of the returned value
- * @param <E> The type of the exception that may be thrown
- */
 @FunctionalInterface
-public interface ThrowableFunction<T, R, E extends Throwable> {
+public interface TriFunction<A, B, C, R> {
 
-    R apply(T t) throws E;
+    R apply(A a, B b, C c);
 }

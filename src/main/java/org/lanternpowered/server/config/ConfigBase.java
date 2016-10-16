@@ -54,7 +54,6 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -63,10 +62,9 @@ import java.nio.file.Path;
 import java.time.Instant;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-@NonnullByDefault
 public abstract class ConfigBase {
 
-    public static final ConfigurationOptions DEFAULT_OPTIONS;
+    protected static final ConfigurationOptions DEFAULT_OPTIONS;
 
     static {
         final TypeSerializerCollection typeSerializers = ConfigurationOptions.defaults().getSerializers().newChild();
@@ -99,8 +97,7 @@ public abstract class ConfigBase {
     /**
      * Creates a new config object.
      * 
-     * @param path the config path
-     * @throws IOException 
+     * @param path The config path
      */
     public ConfigBase(Path path, boolean hocon) throws IOException {
         this(path, DEFAULT_OPTIONS, hocon);
@@ -109,9 +106,8 @@ public abstract class ConfigBase {
     /**
      * Creates a new config object.
      * 
-     * @param path the config file path
-     * @param options the config options
-     * @throws IOException 
+     * @param path The config file path
+     * @param options The config options
      */
     public ConfigBase(Path path, ConfigurationOptions options, boolean hocon) throws IOException {
         this.hocon = hocon;

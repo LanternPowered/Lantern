@@ -35,7 +35,6 @@ import org.lanternpowered.server.network.message.MessageRegistration;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
 import org.lanternpowered.server.network.protocol.Protocol;
-import org.lanternpowered.server.util.FastThreadLocals;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +46,7 @@ import java.util.List;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
 
-    private final FastThreadLocal<List<Object>> messages = FastThreadLocals.withInitial(null);
+    private final FastThreadLocal<List<Object>> messages = new FastThreadLocal<>();
     private final CodecContext codecContext;
 
     public MessageProcessorHandler(CodecContext codecContext) {
@@ -57,6 +56,7 @@ public class MessageProcessorHandler extends MessageToMessageEncoder<Message> {
     @Override
     protected void encode(ChannelHandlerContext ctx, Message message, List<Object> output) throws Exception {
         final List<Object> messages = this.messages.get();
+        this.messages.remove();
         if (messages != null) {
             output.addAll(messages);
         } else {

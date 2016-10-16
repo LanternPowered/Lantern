@@ -28,7 +28,6 @@ package org.lanternpowered.server.scheduler;
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -37,7 +36,6 @@ import java.util.function.Consumer;
 /**
  * An internal representation of a {@link Task} created by a plugin.
  */
-@NonnullByDefault
 public class ScheduledTask implements Task {
 
     final long offset;

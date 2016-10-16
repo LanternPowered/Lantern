@@ -30,14 +30,12 @@ import com.google.common.collect.Sets;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-@NonnullByDefault
 abstract class SchedulerBase {
 
     // The simple queue of all pending (and running) ScheduledTasks

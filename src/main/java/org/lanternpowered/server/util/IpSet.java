@@ -32,7 +32,6 @@ import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.net.Inet4Address;
 import java.net.Inet6Address;
@@ -41,7 +40,6 @@ import java.net.UnknownHostException;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class IpSet implements Predicate<InetAddress> {
 
     private final InetAddress addr;

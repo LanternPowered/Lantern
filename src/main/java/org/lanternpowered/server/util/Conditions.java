@@ -38,7 +38,6 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public final class Conditions {
 
     private static final String NOT_AVAILABLE = "This function is not available yet.";
@@ -47,12 +46,12 @@ public final class Conditions {
      * Ensures that an object reference passed as a parameter to the calling
      * method is a valid plugin container or plugin reference.
      * 
-     * @param object an object reference
-     * @param message the exception message to use if the check fails; will be
+     * @param object An object reference
+     * @param message The exception message to use if the check fails; will be
      *        converted to a string using {@link String#valueOf(Object)}.
-     * @return the resulted plugin container
-     * @throws NullPointerException - if reference is null
-     * @throws IllegalArgumentException - if reference is invalid
+     * @return The resulted plugin container
+     * @throws NullPointerException - If reference is null
+     * @throws IllegalArgumentException - If reference is invalid
      */
     public static PluginContainer checkPlugin(Object object, @Nullable Object message) {
         checkState(Lantern.getGame() != null, NOT_AVAILABLE);
@@ -71,12 +70,12 @@ public final class Conditions {
      * Ensures that an string reference passed as a parameter to the calling
      * method is not null or empty.
      * 
-     * @param object an object reference
-     * @param message the exception message to use if the check fails; will be
+     * @param object An object reference
+     * @param message The exception message to use if the check fails; will be
      *        converted to a string using {@link String#valueOf(Object)}.
      * @return the reference that was validated
-     * @throws NullPointerException - if reference is null
-     * @throws IllegalArgumentException - if reference is empty
+     * @throws NullPointerException - If reference is null
+     * @throws IllegalArgumentException - If reference is empty
      */
     public static String checkNotNullOrEmpty(String object, @Nullable Object message) {
         checkNotNull(object, message);
@@ -88,10 +87,10 @@ public final class Conditions {
      * Ensures that an string reference passed as a parameter to the calling
      * method is not null or empty.
      * 
-     * @param object an object reference
-     * @return the reference that was validated
-     * @throws NullPointerException - if reference is null
-     * @throws IllegalArgumentException - if reference is empty
+     * @param object An object reference
+     * @return The reference that was validated
+     * @throws NullPointerException - If reference is null
+     * @throws IllegalArgumentException - If reference is empty
      */
     public static String checkNotNullOrEmpty(String object) {
         checkNotNull(object);
@@ -104,8 +103,8 @@ public final class Conditions {
      * a array with the specified length, this will throw a {@link 
      * ArrayIndexOutOfBoundsException} if false.
      * 
-     * @param index the index to check
-     * @param length the length
+     * @param index The index to check
+     * @param length The length
      */
     public static void checkArrayRange(int index, int length) {
         if (index < 0 || index >= length) {

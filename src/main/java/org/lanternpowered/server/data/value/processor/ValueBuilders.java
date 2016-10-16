@@ -27,7 +27,7 @@ package org.lanternpowered.server.data.value.processor;
 
 import org.lanternpowered.server.data.value.IValueContainer;
 import org.lanternpowered.server.data.value.LanternValueFactory;
-import org.lanternpowered.server.util.TriFunction;
+import org.lanternpowered.server.util.functions.TriFunction;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.Value;

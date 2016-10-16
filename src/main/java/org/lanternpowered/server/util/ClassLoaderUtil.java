@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.util;
 
+import com.google.common.base.Throwables;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -43,7 +45,7 @@ public final class ClassLoaderUtil {
             ADD_URL_METHOD = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
             ADD_URL_METHOD.setAccessible(true);
         } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+            throw Throwables.propagate(e);
         }
     }
 

@@ -30,7 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
-import org.lanternpowered.server.util.TriFunction;
+import org.lanternpowered.server.util.functions.TriFunction;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.BaseValue;

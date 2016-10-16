@@ -38,7 +38,6 @@ import org.spongepowered.api.scheduler.SpongeExecutorService;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.api.util.GuavaCollectors;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 import java.util.Set;
@@ -48,7 +47,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.regex.Pattern;
 
-@NonnullByDefault
 public class LanternScheduler implements Scheduler {
 
     private final AsyncScheduler asyncScheduler = new AsyncScheduler();
@@ -61,7 +59,7 @@ public class LanternScheduler implements Scheduler {
 
     @Override
     public Optional<Task> getTaskById(UUID id) {
-        Optional<Task> task = this.syncScheduler.getTask(id);
+        final Optional<Task> task = this.syncScheduler.getTask(id);
         if (task.isPresent()) {
             return task;
         }
@@ -70,7 +68,7 @@ public class LanternScheduler implements Scheduler {
 
     @Override
     public Set<Task> getTasksByName(String pattern) {
-        Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
+        final Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
         return this.getScheduledTasks().stream()
                 .filter(task -> searchPattern.matcher(task.getName()).matches())
                 .collect(GuavaCollectors.toImmutableSet());
@@ -78,7 +76,7 @@ public class LanternScheduler implements Scheduler {
 
     @Override
     public Set<Task> getScheduledTasks() {
-        ImmutableSet.Builder<Task> builder = ImmutableSet.builder();
+        final ImmutableSet.Builder<Task> builder = ImmutableSet.builder();
         builder.addAll(this.asyncScheduler.getScheduledTasks());
         builder.addAll(this.syncScheduler.getScheduledTasks());
         return builder.build();
@@ -95,7 +93,7 @@ public class LanternScheduler implements Scheduler {
 
     @Override
     public Set<Task> getScheduledTasks(Object plugin) {
-        PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
+        final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
         return this.getScheduledTasks().stream()
                 .filter(task -> task.getOwner().equals(pluginContainer))
                 .collect(GuavaCollectors.toImmutableSet());
@@ -113,7 +111,7 @@ public class LanternScheduler implements Scheduler {
      * @return the future result
      */
     public <V> Future<V> callSync(Callable<V> callable) {
-        ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
+        final ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
         this.createTaskBuilder().execute(future).submit(Lantern.getMinecraftPlugin());
         return future;
     }

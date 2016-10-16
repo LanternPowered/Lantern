@@ -27,7 +27,6 @@ package org.lanternpowered.server.scheduler;
 
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -38,8 +37,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-@NonnullByDefault
-public class AsyncScheduler extends SchedulerBase {
+final class AsyncScheduler extends SchedulerBase {
 
     // Adjustable timeout for pending Tasks
     private long minimumTimeout = Long.MAX_VALUE;

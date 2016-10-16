@@ -28,11 +28,9 @@ package org.lanternpowered.server.util;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import org.apache.commons.lang3.LocaleUtils;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Locale;
 
-@NonnullByDefault
 public final class LanguageUtil {
 
     private LanguageUtil() {

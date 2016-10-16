@@ -31,6 +31,8 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 
+import javax.annotation.Nullable;
+
 public class AtomicShortArray implements Serializable {
 
     private static final long serialVersionUID = 3434275139515033068L;
@@ -59,7 +61,7 @@ public class AtomicShortArray implements Serializable {
      * Creates a new {@link AtomicShortArray} of the given length, with all
      * elements initially zero.
      *
-     * @param length the length of the array
+     * @param length The length of the array
      */
     public AtomicShortArray(int length) {
         this.length = length;
@@ -71,12 +73,12 @@ public class AtomicShortArray implements Serializable {
      * Creates a new {@link AtomicShortArray} of the given length, with all
      * elements initially zero.
      *
-     * @param length the length of the array
+     * @param array The content and length that should be used
      */
     public AtomicShortArray(short[] array) {
         this.length = array.length;
         this.backingArraySize = (this.length & 1) + (this.length >> 1);
-        int[] array0 = new int[this.backingArraySize];
+        final int[] array0 = new int[this.backingArraySize];
         for (int i = 0; i < this.backingArraySize; i++) {
             int j = i << 1;
             int value = array[j];
@@ -95,7 +97,7 @@ public class AtomicShortArray implements Serializable {
     /**
      * Gets the length of the array.
      *
-     * @return the length
+     * @return The length
      */
     public final int length() {
         return this.length;
@@ -104,8 +106,8 @@ public class AtomicShortArray implements Serializable {
     /**
      * Gets an element from the array at a given index.
      *
-     * @param index the index
-     * @return the element
+     * @param index The index
+     * @return The element
      */
     public final short get(int index) {
         checkArrayRange(index, this.length);
@@ -116,9 +118,9 @@ public class AtomicShortArray implements Serializable {
     /**
      * Sets an element in the array at a given index and returns the old value.
      *
-     * @param index the index
-     * @param value the new value
-     * @return the old value
+     * @param index The index
+     * @param value The new value
+     * @return The old value
      */
     public final int getAndSet(int index, short value) {
         checkArrayRange(index, this.length);
@@ -148,9 +150,9 @@ public class AtomicShortArray implements Serializable {
     /**
      * Sets two elements in the array at once. The index must be even.
      *
-     * @param index the index
-     * @param even the new value for the element at (index)
-     * @param odd the new value for the element at (index + 1)
+     * @param index The index
+     * @param even The new value for the element at (index)
+     * @param odd The new value for the element at (index + 1)
      */
     public final void set(int index, short even, short odd) {
         checkArrayRange(index, this.length);
@@ -163,10 +165,10 @@ public class AtomicShortArray implements Serializable {
     /**
      * Sets the element at the given index, but only if the previous value was the expected value.
      *
-     * @param index the index
-     * @param expected the expected value
-     * @param newValue the new value
-     * @return true on success
+     * @param index The index
+     * @param expected The expected value
+     * @param newValue The new value
+     * @return True on success
      */
     public final boolean compareAndSet(int index, short expected, short newValue) {
         checkArrayRange(index, this.length);
@@ -216,10 +218,10 @@ public class AtomicShortArray implements Serializable {
      * If an array is provided and it is the correct length, then
      * that array will be used as the destination array.
      *
-     * @param array the provided array
-     * @return an array containing the values in the array
+     * @param array The provided array
+     * @return An array containing the values in the array
      */
-    public final short[] getArray(short[] array) {
+    public final short[] getArray(@Nullable short[] array) {
         if (array == null || array.length != this.length) {
             array = new short[this.length];
         }
@@ -236,8 +238,8 @@ public class AtomicShortArray implements Serializable {
     /**
      * Sets an element to the given value.
      *
-     * @param index the index
-     * @param value the new value
+     * @param index The index
+     * @param value The new value
      */
     public final void set(int index, short value) {
         this.getAndSet(index, value);
@@ -246,8 +248,8 @@ public class AtomicShortArray implements Serializable {
     /**
      * Sets an element to the given value, but the update may not happen immediately.
      *
-     * @param index the index
-     * @param value the new value
+     * @param index The index
+     * @param value The new value
      */
     public final void lazySet(int index, short value) {
         this.set(index, value);
@@ -256,10 +258,10 @@ public class AtomicShortArray implements Serializable {
     /**
      * Sets the element at the given index, but only if the previous value was the expected value. This may fail spuriously.
      *
-     * @param index the index
-     * @param expected the expected value
-     * @param newValue the new value
-     * @return true on success
+     * @param index The index
+     * @param expected The expected value
+     * @param newValue The new value
+     * @return True on success
      */
     public final boolean weakCompareAndSet(int index, short expected, short newValue) {
         return this.compareAndSet(index, expected, newValue);
@@ -268,9 +270,9 @@ public class AtomicShortArray implements Serializable {
     /**
      * Atomically adds a delta to an element, and gets the new value.
      *
-     * @param index the index
-     * @param delta the delta to add to the element
-     * @return the new value
+     * @param index The index
+     * @param delta The delta to add to the element
+     * @return The new value
      */
     public final short addAndGet(int index, short delta) {
         return this.addAndGet(index, delta, false);
@@ -279,9 +281,9 @@ public class AtomicShortArray implements Serializable {
     /**
      * Atomically adds a delta to an element, and gets the old value.
      *
-     * @param index the index
-     * @param delta the delta to add to the element
-     * @return the old value
+     * @param index The index
+     * @param delta The delta to add to the element
+     * @return The old value
      */
     public final short getAndAdd(int index, short delta) {
         return this.addAndGet(index, delta, true);
@@ -290,8 +292,8 @@ public class AtomicShortArray implements Serializable {
     /**
      * Atomically increments an element and returns the old value.
      *
-     * @param index the index
-     * @return the old value
+     * @param index The index
+     * @return The old value
      */
     public final short getAndIncrement(int index) {
         return this.getAndAdd(index, (short) 1);
@@ -300,8 +302,8 @@ public class AtomicShortArray implements Serializable {
     /**
      * Atomically decrements an element and returns the old value.
      *
-     * @param index the index
-     * @return the old value
+     * @param index The index
+     * @return The old value
      */
     public final short getAndDecrement(int index) {
         return this.getAndAdd(index, (short) -1);
@@ -310,8 +312,8 @@ public class AtomicShortArray implements Serializable {
     /**
      * Atomically increments an element and returns the new value.
      *
-     * @param index the index
-     * @return the new value
+     * @param index The index
+     * @return The new value
      */
     public final short incrementAndGet(int index) {
         return this.addAndGet(index, (short) 1);
@@ -320,8 +322,8 @@ public class AtomicShortArray implements Serializable {
     /**
      * Atomically decrements an element and returns the new value.
      *
-     * @param index the index
-     * @return the new value
+     * @param index The index
+     * @return The new value
      */
     public final short decrementAndGet(int index) {
         return this.addAndGet(index, (short) -1);
@@ -332,7 +334,7 @@ public class AtomicShortArray implements Serializable {
      *
      * The returned values are not guaranteed to be from the same time instant.
      *
-     * @return the array
+     * @return The array
      */
     public final short[] getArray() {
         return this.getArray(null);
@@ -343,7 +345,7 @@ public class AtomicShortArray implements Serializable {
      *
      * The returned values are not guaranteed to be from the same time instant.
      *
-     * @return the string representation
+     * @return The string representation
      */
     @Override
     public String toString() {

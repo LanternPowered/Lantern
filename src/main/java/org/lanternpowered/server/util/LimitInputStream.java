@@ -28,8 +28,6 @@ package org.lanternpowered.server.util;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.util.annotation.NonnullByDefault;
-
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,7 +36,6 @@ import java.io.InputStream;
  * A {@link InputStream} that allows only a limits the amount of bytes that may be
  * read and throws a {@link IOException} if the limit is exceeded.
  */
-@NonnullByDefault
 public final class LimitInputStream extends FilterInputStream {
 
     private long left;

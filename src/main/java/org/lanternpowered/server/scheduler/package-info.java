@@ -24,4 +24,4 @@
  * THE SOFTWARE.
  */
 @org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.command;
+package org.lanternpowered.server.scheduler;

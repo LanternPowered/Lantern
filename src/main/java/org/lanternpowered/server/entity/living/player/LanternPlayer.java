@@ -97,6 +97,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.profile.GameProfile;
@@ -154,15 +155,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     // The chat visibility
     private ChatVisibility chatVisibility = ChatVisibilities.FULL;
 
-    // The main hand of the player
-    private HandSide mainHand = HandSide.RIGHT;
-
     // Whether the chat colors are enabled
     private boolean chatColorsEnabled;
-
-    // The visible skin parts
-    private Set<SkinPart> skinParts = Sets.newHashSet(SkinParts.CAPE, SkinParts.HAT, SkinParts.JACKET, SkinParts.LEFT_SLEEVE,
-            SkinParts.LEFT_PANTS_LEG, SkinParts.RIGHT_SLEEVE, SkinParts.RIGHT_PANTS_LEG);
 
     private LanternScoreboard scoreboard;
 
@@ -766,13 +760,12 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     }
 
     @Override
-    public Optional<Inventory> getOpenInventory() {
-        final LanternContainer container = this.containerSession.getOpenContainer();
-        return container == null ? Optional.empty() : Optional.of(container.getOpenInventory());
+    public Optional<Container> getOpenInventory() {
+        return Optional.ofNullable(this.containerSession.getOpenContainer());
     }
 
     @Override
-    public void openInventory(Inventory inventory, Cause cause) {
+    public Optional<Container> openInventory(Inventory inventory, Cause cause) {
         checkNotNull(inventory, "inventory");
         checkNotNull(cause, "cause");
         // TODO: Make this better
@@ -780,16 +773,20 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         if (inventory instanceof IChestInventory) {
             container = new ChestInventoryContainer(this.inventory, (IChestInventory) inventory);
         } else if (inventory instanceof PlayerInventory) {
-            return;
+            return Optional.empty();
         } else {
             throw new UnsupportedOperationException("Unsupported inventory type: " + inventory);
         }
-        this.containerSession.setOpenContainer(container);
+        if (this.containerSession.setOpenContainer(container, cause)) {
+            return Optional.of(container);
+        }
+        return Optional.empty();
     }
 
     @Override
-    public void closeInventory(Cause cause) {
-        this.containerSession.setOpenContainer(null);
+    public boolean closeInventory(Cause cause) {
+        checkNotNull(cause, "cause");
+        return this.containerSession.setOpenContainer(null, cause);
     }
 
     @Override

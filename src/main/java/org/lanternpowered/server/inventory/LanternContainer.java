@@ -37,6 +37,7 @@ import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWindowItems;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -129,17 +130,19 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     }
 
     @Override
-    public void open(Player viewer) {
+    public void open(Player viewer, Cause cause) {
         checkNotNull(viewer, "viewer");
-        ((LanternPlayer) viewer).getContainerSession().setOpenContainer(this);
+        checkNotNull(cause, "cause");
+        ((LanternPlayer) viewer).getContainerSession().setOpenContainer(this, cause);
     }
 
     @Override
-    public void close(Player viewer) {
+    public void close(Player viewer, Cause cause) {
         checkNotNull(viewer, "viewer");
+        checkNotNull(cause, "cause");
         final PlayerContainerSession session = ((LanternPlayer) viewer).getContainerSession();
         if (session.getOpenContainer() == this) {
-            session.setOpenContainer(null);
+            session.setOpenContainer(null, cause);
         }
     }
 

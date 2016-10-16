@@ -35,10 +35,12 @@ import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
@@ -122,6 +124,16 @@ public abstract class InventoryBase implements IInventory {
         this.inventoryPropertiesByClass.put(inventoryProperty.getClass(), inventoryProperty);
         final PropertyKey propertyKey = new PropertyKey(inventoryProperty.getClass(), inventoryProperty.getKey());
         this.inventoryPropertiesByKey.put(propertyKey, inventoryProperty);
+    }
+
+    @Override
+    public PluginContainer getPlugin() {
+        return null; // TODO
+    }
+
+    @Override
+    public InventoryArchetype getArchetype() {
+        return null; // TODO
     }
 
     @Override

@@ -772,7 +772,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
                         this.gameProfile.getUniqueId(), e);
             }
 
-            this.player.getContainerSession().setOpenContainer(null);
+            this.player.getContainerSession().setRawOpenContainer(null, null);
             this.player.remove(LanternEntity.RemoveState.DESTROYED);
             this.player.setWorld(null);
             EntityProtocolManager.releaseEntityId(this.player.getNetworkId());

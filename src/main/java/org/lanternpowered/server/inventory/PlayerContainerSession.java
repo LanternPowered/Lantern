@@ -50,6 +50,7 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
@@ -122,12 +123,12 @@ public class PlayerContainerSession {
      *
      * @param container The container
      */
-    public void setOpenContainer(@Nullable LanternContainer container) {
-        if (this.openContainer != null && container == null) {
-            this.player.getConnection().send(
-                    new MessagePlayInOutCloseWindow(this.openContainer.windowId));
-        }
-        this.setRawOpenContainer(container);
+    public boolean setOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause) {
+        return this.setRawOpenContainer(container, cause, true);
+    }
+
+    public boolean setRawOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause) {
+        return this.setRawOpenContainer(container, cause, false);
     }
 
     /**
@@ -135,25 +136,68 @@ public class PlayerContainerSession {
      *
      * @param container The container
      */
-    public void setRawOpenContainer(@Nullable LanternContainer container) {
+    private boolean setRawOpenContainer(@Nullable LanternContainer container, @Nullable Cause cause, boolean sendClose) {
         if (this.openContainer != container) {
+            final ItemStackSnapshot oldCursorItemSnapshot = LanternItemStack.toSnapshot(this.cursorItem);
+            ItemStackSnapshot cursorItemSnapshot = oldCursorItemSnapshot;
+            if (this.openContainer != null) {
+                if (cause != null) {
+                    final InteractInventoryEvent.Close event = SpongeEventFactory.createInteractInventoryEventClose(
+                            cause, new Transaction<>(cursorItemSnapshot, ItemStackSnapshot.NONE), this.openContainer);
+                    Sponge.getEventManager().post(event);
+                    if (event.isCancelled()) {
+                        return false;
+                    }
+                    final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
+                    if (transaction.isValid()) {
+                        cursorItemSnapshot = transaction.getFinal();
+                    }
+                } else {
+                    this.cursorItem = null;
+                }
+                final List<Entity> entities = new ArrayList<>();
+                entities.add(this.createDroppedItem(oldCursorItemSnapshot));
+
+                final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities, this.player.getWorld());
+                Sponge.getEventManager().post(event1);
+                if (!event1.isCancelled()) {
+                    this.finishSpawnEntityEvent(event1);
+                }
+            } else {
+                sendClose = false;
+            }
             if (container != null) {
+                if (cause != null) {
+                    final InteractInventoryEvent.Open event = SpongeEventFactory.createInteractInventoryEventOpen(
+                            cause, new Transaction<>(cursorItemSnapshot, cursorItemSnapshot), container);
+                    Sponge.getEventManager().post(event);
+                    if (event.isCancelled()) {
+                        this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
+                        return false;
+                    }
+                    final Transaction<ItemStackSnapshot> transaction = event.getCursorTransaction();
+                    if (transaction.isValid()) {
+                        cursorItemSnapshot = transaction.getFinal();
+                        this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
+                    }
+                }
                 // The container is being used for the first time
                 if (container.getRawViewers().isEmpty()) {
                     container.addSlotTrackers();
                 }
+                sendClose = false;
                 container.addViewer(this.player, container);
                 container.viewers.add(this.player);
                 container.openInventoryForAndInitialize(this.player);
                 this.updateCursorItem();
+            } else {
+                this.cursorItem = LanternItemStack.toNullable(cursorItemSnapshot);
+            }
+            if (sendClose && this.openContainer.windowId != -1) {
+                this.player.getConnection().send(
+                        new MessagePlayInOutCloseWindow(this.openContainer.windowId));
             }
             if (this.openContainer != null) {
-                if (container == null && this.cursorItem != null) {
-                    // TODO: Drop the cursor item
-                    this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR)
-                            .offer(this.cursorItem);
-                    this.cursorItem = null;
-                }
                 this.openContainer.viewers.remove(this.player);
                 this.openContainer.removeViewer(this.player, this.openContainer);
                 if (this.openContainer.getRawViewers().isEmpty()) {
@@ -162,6 +206,7 @@ public class PlayerContainerSession {
             }
         }
         this.openContainer = container;
+        return true;
     }
 
     /**

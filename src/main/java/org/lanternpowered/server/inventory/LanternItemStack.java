@@ -166,12 +166,21 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     }
 
     @Nullable
-    public static ItemStack toNullable(@Nullable ItemStack itemStack) {
+    public static LanternItemStack toNullable(@Nullable ItemStackSnapshot itemStackSnapshot) {
+        if (itemStackSnapshot == null || itemStackSnapshot.getType() == ItemTypes.NONE ||
+                itemStackSnapshot.getCount() <= 0) {
+            return null;
+        }
+        return (LanternItemStack) itemStackSnapshot.createStack();
+    }
+
+    @Nullable
+    public static LanternItemStack toNullable(@Nullable ItemStack itemStack) {
         if (itemStack == null || itemStack.getItem() == ItemTypes.NONE ||
                 itemStack.getQuantity() <= 0) {
             return null;
         }
-        return itemStack;
+        return (LanternItemStack) itemStack;
     }
 
     public static ItemStackSnapshot toSnapshot(@Nullable ItemStack itemStack) {

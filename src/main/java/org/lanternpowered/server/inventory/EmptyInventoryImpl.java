@@ -27,13 +27,16 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
@@ -237,6 +240,16 @@ class EmptyInventoryImpl implements EmptyInventory, IInventory {
     @Override
     public <T extends Inventory> T query(Object... args) {
         return (T) this;
+    }
+
+    @Override
+    public PluginContainer getPlugin() {
+        return Lantern.getMinecraftPlugin();
+    }
+
+    @Override
+    public InventoryArchetype getArchetype() {
+        return null; // TODO
     }
 
     @Override

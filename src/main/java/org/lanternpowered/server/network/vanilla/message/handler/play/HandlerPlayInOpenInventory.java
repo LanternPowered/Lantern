@@ -29,12 +29,13 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOpenInventory;
+import org.spongepowered.api.event.cause.Cause;
 
 public final class HandlerPlayInOpenInventory implements Handler<MessagePlayInOpenInventory> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInOpenInventory message) {
         final LanternPlayer player = context.getSession().getPlayer();
-        player.getContainerSession().setOpenContainer(player.getInventoryContainer());
+        player.getContainerSession().setOpenContainer(player.getInventoryContainer(), Cause.source(player).build());
     }
 }

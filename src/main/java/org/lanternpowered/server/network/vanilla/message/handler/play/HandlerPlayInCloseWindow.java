@@ -25,14 +25,17 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutCloseWindow;
+import org.spongepowered.api.event.cause.Cause;
 
 public final class HandlerPlayInCloseWindow implements Handler<MessagePlayInOutCloseWindow> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInOutCloseWindow message) {
-        context.getSession().getPlayer().getContainerSession().setRawOpenContainer(null);
+        final LanternPlayer player = context.getSession().getPlayer();
+        player.getContainerSession().setRawOpenContainer(null, Cause.source(player).build());
     }
 }

@@ -65,6 +65,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutChunkData;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutConfirmWindowTransaction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityCollectItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityHeadLook;
@@ -192,6 +193,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChunkData;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutConfirmWindowTransaction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
@@ -399,7 +401,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x1e, CodecPlayOutChangeGameState.class, MessagePlayOutChangeGameState.class);
         outbound.bind(0x1f, CodecInOutPing.class, MessageInOutKeepAlive.class);
         outbound.bind(0x20, CodecPlayOutChunkData.class, MessagePlayOutChunkData.class);
-        // 0x21
+        outbound.bind(0x21, CodecPlayOutEffect.class, MessagePlayOutEffect.class);
         outbound.bind(0x22, CodecPlayOutSpawnParticle.class, MessagePlayOutSpawnParticle.class);
         outbound.bind(0x23, CodecPlayOutPlayerJoinGame.class, MessagePlayOutPlayerJoinGame.class);
         // 0x24

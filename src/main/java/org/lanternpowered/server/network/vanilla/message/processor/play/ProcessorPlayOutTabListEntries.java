@@ -46,7 +46,7 @@ public final class ProcessorPlayOutTabListEntries implements Processor<MessagePl
 
     @Override
     public void process(CodecContext context, MessagePlayOutTabListEntries message, List<Message> output) throws CodecException {
-        Multimap<Class<?>, Entry> entriesByType = HashMultimap.create();
+        final Multimap<Class<?>, Entry> entriesByType = HashMultimap.create();
         for (Entry entry : message.getEntries()) {
             entriesByType.put(entry.getClass(), entry);
         }

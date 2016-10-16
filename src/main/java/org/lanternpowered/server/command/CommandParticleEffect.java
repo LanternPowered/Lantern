@@ -28,25 +28,26 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.command.element.GenericArguments2;
-import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.data.type.NotePitch;
-import org.spongepowered.api.effect.particle.BlockParticle;
-import org.spongepowered.api.effect.particle.ColoredParticle;
-import org.spongepowered.api.effect.particle.ItemParticle;
-import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleType;
-import org.spongepowered.api.effect.particle.ResizableParticle;
+import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 public final class CommandParticleEffect extends CommandProvider {
 
@@ -59,73 +60,47 @@ public final class CommandParticleEffect extends CommandProvider {
         specBuilder
                 .arguments(
                         GenericArguments.catalogedElement(Text.of("type"), ParticleType.class),
-                        GenericArguments2.targetedVector3d(Text.of("position")),
-                        GenericArguments2.integer(Text.of("count"), 1),
+                        GenericArguments.vector3d(Text.of("position")),
+                        GenericArguments.optional(GenericArguments.world(Text.of("world"))),
                         // TODO: Can we place the world arg after the position without that the parsing system complains
                         // TODO: Tab complaining is currently throwing errors, but it's a small bug in SpongeAPI
-                        GenericArguments.optional(GenericArguments.world(CommandHelper.WORLD_KEY)),
                         GenericArguments.flags()
-                                .valueFlag(GenericArguments2.vector3d(Text.of("offset"), Vector3d.ZERO), "-offset", "o")
-                                .valueFlag(GenericArguments2.vector3d(Text.of("motion"), Vector3d.ZERO), "-motion", "m")
-                                .valueFlag(GenericArguments2.color(Text.of("color"), Color.CYAN), "-color", "c")
-                                .valueFlag(GenericArguments2.doubleNum(Text.of("size"), 1.0), "-size", "s")
+                                .valueFlag(GenericArguments.integer(Text.of("quantity")), "-quantity", "q")
+                                .valueFlag(GenericArguments.vector3d(Text.of("offset")), "-offset", "o")
+                                .valueFlag(GenericArguments.vector3d(Text.of("velocity")), "-velocity", "v")
+                                .valueFlag(GenericArguments.vector3d(Text.of("color")), "-color", "c")
+                                .valueFlag(GenericArguments.doubleNum(Text.of("scale")), "-scale", "s")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("note"), NotePitch.class), "-note", "n")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("block"), BlockState.class), "-block", "b")
                                 .valueFlag(GenericArguments.catalogedElement(Text.of("item"), ItemType.class), "-item", "i")
-                                .buildWith(GenericArguments.none())
-                )
+                                .valueFlag(GenericArguments.catalogedElement(Text.of("potion"), PotionEffectType.class), "-potion", "p")
+                                .buildWith(GenericArguments.none()))
                 .executor((src, args) -> {
-                    ParticleType particleType = args.<ParticleType>getOne("type").get();
-                    Vector3d position = args.<Vector3d>getOne("position").get();
-                    World world = CommandHelper.getWorld(src, args);
+                    final ParticleType particleType = args.<ParticleType>getOne("type").get();
+                    final Vector3d position = args.<Vector3d>getOne("position").get();
+                    final World world = args.<WorldProperties>getOne("world")
+                            .map(props -> Sponge.getServer().getWorld(props.getUniqueId()).get())
+                            .orElseGet(((Locatable) src)::getWorld);
 
-                    ParticleEffect.ParticleBuilder builder;
-                    if (particleType instanceof ParticleType.Colorable) {
-                        builder = new LanternParticleEffectBuilder.Colorable();
-                    } else if (particleType instanceof ParticleType.Resizable) {
-                        builder = new LanternParticleEffectBuilder.Resizable();
-                    } else if (particleType instanceof ParticleType.Item) {
-                        builder = new LanternParticleEffectBuilder.Item();
-                    } else if (particleType instanceof ParticleType.Block) {
-                        builder = new LanternParticleEffectBuilder.Block();
-                    } else {
-                        builder = new LanternParticleEffectBuilder();
-                    }
-
-                    int count = args.<Integer>getOne("count").get();
-
-                    builder.type(particleType);
-                    builder.count(count);
+                    final ParticleEffect.Builder builder = ParticleEffect.builder().type(particleType);
+                    args.<Integer>getOne("quantity").ifPresent(builder::quantity);
                     args.<Vector3d>getOne("offset").ifPresent(builder::offset);
-                    args.<Vector3d>getOne("motion").ifPresent(builder::motion);
-                    args.<Color>getOne("color").ifPresent(color -> {
-                        if (builder instanceof ColoredParticle.Builder) {
-                            ((ColoredParticle.Builder) builder).color(color);
-                        }
-                    });
-                    args.<NotePitch>getOne("note").ifPresent(note -> {
-                        if (builder instanceof NoteParticle.Builder) {
-                            ((NoteParticle.Builder) builder).note(note);
-                        }
-                    });
-                    args.<Double>getOne("size").ifPresent(size -> {
-                        if (builder instanceof ResizableParticle.Builder) {
-                            ((ResizableParticle.Builder) builder).size(size.floatValue());
-                        }
-                    });
-                    args.<BlockState>getOne("block").ifPresent(block -> {
-                        if (builder instanceof BlockParticle.Builder) {
-                            ((BlockParticle.Builder) builder).block(block);
-                        }
-                    });
-                    args.<ItemType>getOne("item").ifPresent(item -> {
-                        if (builder instanceof ItemParticle.Builder) {
-                            // TODO
-                        }
-                    });
+                    args.<Vector3d>getOne("velocity").ifPresent(builder::velocity);
+                    args.<Vector3d>getOne("color").ifPresent(color ->
+                            builder.option(ParticleOptions.COLOR, Color.of(color.toInt())));
+                    args.<NotePitch>getOne("note").ifPresent(note ->
+                            builder.option(ParticleOptions.NOTE, note));
+                    args.<Double>getOne("scale").ifPresent(scale ->
+                            builder.option(ParticleOptions.SCALE, scale));
+                    args.<BlockState>getOne("block").ifPresent(blockState ->
+                            builder.option(ParticleOptions.BLOCK_STATE, blockState));
+                    args.<ItemType>getOne("item").ifPresent(item ->
+                            builder.option(ParticleOptions.ITEM_STACK_SNAPSHOT, new LanternItemStack(item).createSnapshot()));
+                    args.<PotionEffectType>getOne("potion").ifPresent(type ->
+                            builder.option(ParticleOptions.POTION_EFFECT_TYPE, type));
 
                     world.spawnParticles(builder.build(), position);
-                    src.sendMessage(t("commands.particle.success", particleType.getName(), count));
+                    src.sendMessage(t("Successfully spawned the particle %s", particleType.getName()));
                     return CommandResult.success();
                 });
     }

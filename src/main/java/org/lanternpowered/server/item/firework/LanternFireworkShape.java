@@ -23,5 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.item;
+package org.lanternpowered.server.item.firework;
+
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.item.FireworkShape;
+
+public final class LanternFireworkShape extends PluginCatalogType.Base.Internal implements FireworkShape {
+
+    public LanternFireworkShape(String pluginId, String name, int internalId) {
+        super(pluginId, name, internalId);
+    }
+
+    public LanternFireworkShape(String pluginId, String id, String name, int internalId) {
+        super(pluginId, id, name, internalId);
+    }
+}

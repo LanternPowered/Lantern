@@ -121,12 +121,14 @@ import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.ParticleOptionRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CollisionRuleRegistryModule;
@@ -157,8 +159,10 @@ import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryMod
 import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
+import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
+import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.resourcepack.LanternResourcePackFactory;
 import org.lanternpowered.server.scheduler.LanternTaskBuilder;
 import org.lanternpowered.server.scoreboard.LanternObjectiveBuilder;
@@ -170,7 +174,6 @@ import org.lanternpowered.server.script.function.condition.ConditionTypeRegistry
 import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
-import org.lanternpowered.server.network.status.LanternFavicon;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
@@ -244,13 +247,9 @@ import org.spongepowered.api.data.type.TreeTypes;
 import org.spongepowered.api.data.type.WallType;
 import org.spongepowered.api.data.type.WallTypes;
 import org.spongepowered.api.data.value.ValueFactory;
-import org.spongepowered.api.effect.particle.BlockParticle;
-import org.spongepowered.api.effect.particle.ColoredParticle;
-import org.spongepowered.api.effect.particle.ItemParticle;
-import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleOption;
 import org.spongepowered.api.effect.particle.ParticleType;
-import org.spongepowered.api.effect.particle.ResizableParticle;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.sound.SoundCategory;
@@ -279,6 +278,8 @@ import org.spongepowered.api.event.cause.entity.teleport.EntityTeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.PortalTeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
+import org.spongepowered.api.item.FireworkEffect;
+import org.spongepowered.api.item.FireworkShape;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
@@ -430,6 +431,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SkinPart.class, new SkinPartRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
+                .registerModule(ParticleOption.class, new ParticleOptionRegistryModule())
+                .registerModule(FireworkShape.class, new FireworkShapeRegistryModule())
                 .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.get())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
@@ -479,11 +482,6 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
-                .registerBuilderSupplier(NoteParticle.Builder.class, LanternParticleEffectBuilder.Note::new)
-                .registerBuilderSupplier(ResizableParticle.Builder.class, LanternParticleEffectBuilder.Resizable::new)
-                .registerBuilderSupplier(ColoredParticle.Builder.class, LanternParticleEffectBuilder.Colorable::new)
-                .registerBuilderSupplier(ItemParticle.Builder.class, LanternParticleEffectBuilder.Item::new)
-                .registerBuilderSupplier(BlockParticle.Builder.class, LanternParticleEffectBuilder.Block::new)
                 .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)
                 .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(Lantern.getGame().getScheduler()))
                 .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
@@ -509,6 +507,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
                 .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
                 .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
+                .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
                 ;
         this.registerFactories();
     }
@@ -786,7 +785,8 @@ public class LanternGameRegistry implements GameRegistry {
         this.syncModules();
         for (Class<? extends RegistryModule> moduleClass : this.orderedModules) {
             if (!this.classMap.containsKey(moduleClass)) {
-                throw new IllegalStateException("Something funky happened!");
+                throw new IllegalStateException("Something funky happened! The module "
+                        + moduleClass + " is required but seems to be missing.");
             }
             this.tryModulePhaseRegistration(this.classMap.get(moduleClass));
         }

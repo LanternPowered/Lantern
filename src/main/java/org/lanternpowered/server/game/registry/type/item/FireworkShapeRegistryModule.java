@@ -23,5 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.item;
+package org.lanternpowered.server.game.registry.type.item;
+
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.lanternpowered.server.item.firework.LanternFireworkShape;
+import org.spongepowered.api.item.FireworkShape;
+import org.spongepowered.api.item.FireworkShapes;
+
+public class FireworkShapeRegistryModule extends InternalPluginCatalogRegistryModule<FireworkShape> {
+
+    public FireworkShapeRegistryModule() {
+        super(FireworkShapes.class);
+    }
+
+    @Override
+    public void registerDefaults() {
+        this.register(new LanternFireworkShape("minecraft", "ball", 0));
+        this.register(new LanternFireworkShape("minecraft", "large_ball", 1));
+        this.register(new LanternFireworkShape("minecraft", "star", 2));
+        this.register(new LanternFireworkShape("minecraft", "creeper", 3));
+        this.register(new LanternFireworkShape("minecraft", "burst", 4));
+    }
+}

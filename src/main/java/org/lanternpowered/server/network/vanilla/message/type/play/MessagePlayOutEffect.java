@@ -23,5 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault
-package org.lanternpowered.server.item;
+package org.lanternpowered.server.network.vanilla.message.type.play;
+
+import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.network.message.Message;
+
+public final class MessagePlayOutEffect implements Message {
+
+    private final Vector3i position;
+    private final int type;
+    private final int data;
+    private final boolean broadcast;
+
+    public MessagePlayOutEffect(Vector3i position, int type, int data, boolean broadcast) {
+        this.position = position;
+        this.type = type;
+        this.data = data;
+        this.broadcast = broadcast;
+    }
+
+    public Vector3i getPosition() {
+        return this.position;
+    }
+
+    public int getData() {
+        return this.data;
+    }
+
+    public int getType() {
+        return this.type;
+    }
+
+    public boolean isBroadcast() {
+        return this.broadcast;
+    }
+}

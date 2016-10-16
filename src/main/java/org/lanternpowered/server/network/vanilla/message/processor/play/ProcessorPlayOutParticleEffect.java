@@ -25,42 +25,43 @@
  */
 package org.lanternpowered.server.network.vanilla.message.processor.play;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3f;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
 import io.netty.handler.codec.CodecException;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.data.type.LanternNotePitch;
+import org.lanternpowered.server.effect.particle.LanternParticleEffect;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.type.NotePitch;
-import org.spongepowered.api.effect.particle.BlockParticle;
-import org.spongepowered.api.effect.particle.ColoredParticle;
-import org.spongepowered.api.effect.particle.ItemParticle;
-import org.spongepowered.api.effect.particle.NoteParticle;
 import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleType;
+import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
-import org.spongepowered.api.effect.particle.ResizableParticle;
+import org.spongepowered.api.effect.potion.PotionEffectType;
+import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nullable;
 
 @NonnullByDefault
 public final class ProcessorPlayOutParticleEffect implements Processor<MessagePlayOutParticleEffect> {
@@ -68,198 +69,352 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
     /**
      * Using a cache to bring the amount of operations down for spawning particles.
      */
-    private final LoadingCache<ParticleEffect, CachedParticleEffect> cache =
+    private final LoadingCache<ParticleEffect, ICachedMessage> cache =
             Caffeine.newBuilder().expireAfterAccess(5, TimeUnit.MINUTES).build(this::preProcess);
 
-    private CachedParticleEffect preProcess(ParticleEffect effect) {
-        LanternParticleType type = (LanternParticleType) effect.getType();
-        Vector3f offset = effect.getOffset().toFloat();
+    private final Object2IntMap<PotionEffectType> potionEffectTypeToId = new Object2IntOpenHashMap<>();
 
-        int count = effect.getCount();
-        // Don't even try...
-        if (count <= 0) {
-            return CachedParticleEffect.EMPTY;
+    {
+        this.potionEffectTypeToId.defaultReturnValue(-1);
+        this.potionEffectTypeToId.put(PotionEffectTypes.NIGHT_VISION, 5);
+        this.potionEffectTypeToId.put(PotionEffectTypes.INVISIBILITY, 7);
+        this.potionEffectTypeToId.put(PotionEffectTypes.JUMP_BOOST, 9);
+        this.potionEffectTypeToId.put(PotionEffectTypes.FIRE_RESISTANCE, 12);
+        this.potionEffectTypeToId.put(PotionEffectTypes.SPEED, 14);
+        this.potionEffectTypeToId.put(PotionEffectTypes.SLOWNESS, 17);
+        this.potionEffectTypeToId.put(PotionEffectTypes.WATER_BREATHING, 19);
+        this.potionEffectTypeToId.put(PotionEffectTypes.INSTANT_HEALTH, 21);
+        this.potionEffectTypeToId.put(PotionEffectTypes.INSTANT_DAMAGE, 23);
+        this.potionEffectTypeToId.put(PotionEffectTypes.POISON, 25);
+        this.potionEffectTypeToId.put(PotionEffectTypes.REGENERATION, 28);
+        this.potionEffectTypeToId.put(PotionEffectTypes.STRENGTH, 31);
+        this.potionEffectTypeToId.put(PotionEffectTypes.WEAKNESS, 34);
+        this.potionEffectTypeToId.put(PotionEffectTypes.LUCK, 36);
+    }
+
+    private static int getBlockState(LanternParticleEffect effect, Optional<BlockState> defaultBlockState) {
+        final Optional<BlockState> blockState = effect.getOption(ParticleOptions.BLOCK_STATE);
+        if (blockState.isPresent()) {
+            return BlockRegistryModule.get().getStateInternalIdAndData(blockState.get());
+        } else {
+            final Optional<ItemStackSnapshot> optSnapshot = effect.getOption(ParticleOptions.ITEM_STACK_SNAPSHOT);
+            if (optSnapshot.isPresent()) {
+                final ItemStackSnapshot snapshot = optSnapshot.get();
+                final Optional<BlockType> blockType = snapshot.getType().getBlock();
+                if (blockType.isPresent()) {
+                    // TODO: Item stack data value
+                    return BlockRegistryModule.get().getStateInternalIdAndData(blockType.get().getDefaultState());
+                } else {
+                    return 0;
+                }
+            } else {
+                return BlockRegistryModule.get().getStateInternalIdAndData(defaultBlockState.get());
+            }
+        }
+    }
+
+    private static int getDirectionData(Direction direction) {
+        if (direction.isSecondaryOrdinal()) {
+            direction = Direction.getClosest(direction.asOffset(), Direction.Division.ORDINAL);
+        }
+        switch (direction) {
+            case SOUTHEAST:
+                return 0;
+            case SOUTH:
+                return 1;
+            case SOUTHWEST:
+                return 2;
+            case EAST:
+                return 3;
+            case WEST:
+                return 5;
+            case NORTHEAST:
+                return 6;
+            case NORTH:
+                return 7;
+            case NORTHWEST:
+                return 8;
+            default:
+                return 4;
+        }
+    }
+
+    private ICachedMessage preProcess(ParticleEffect effect0) {
+        final LanternParticleEffect effect = (LanternParticleEffect) effect0;
+        final LanternParticleType type = effect.getType();
+        final OptionalInt internalType = type.getInternalType();
+
+        // Special cases
+        if (!internalType.isPresent()) {
+            if (type == ParticleTypes.FIREWORKS) {
+                return EmptyCachedMessage.INSTANCE; // TODO
+            } else if (type == ParticleTypes.FERTILIZER) {
+                final int quantity = effect.getOptionOrDefault(ParticleOptions.QUANTITY).get();
+                return new CachedEffectMessage(2005, quantity, false);
+            } else if (type == ParticleTypes.SPLASH_POTION) {
+                final int potionId = this.potionEffectTypeToId.getInt(effect.getOptionOrDefault(ParticleOptions.POTION_EFFECT_TYPE).get());
+                return potionId == -1 ? EmptyCachedMessage.INSTANCE : new CachedEffectMessage(2002, potionId, false);
+            } else if (type == ParticleTypes.BREAK_BLOCK) {
+                final int state = getBlockState(effect, type.getDefaultOption(ParticleOptions.BLOCK_STATE));
+                if (state == 0) {
+                    return EmptyCachedMessage.INSTANCE;
+                }
+                return new CachedEffectMessage(2001, state, false);
+            } else if (type == ParticleTypes.MOBSPAWNER_FLAMES) {
+                return new CachedEffectMessage(2004, 0, false);
+            } else if (type == ParticleTypes.ENDER_TELEPORT) {
+                return new CachedEffectMessage(2003, 0, false);
+            } else if (type == ParticleTypes.DRAGON_BREATH_ATTACK) {
+                return new CachedEffectMessage(2006, 0, false);
+            } else if (type == ParticleTypes.FIRE_SMOKE) {
+                final Direction direction = effect.getOptionOrDefault(ParticleOptions.DIRECTION).get();
+                return new CachedEffectMessage(2000, getDirectionData(direction), false);
+            }
+            return EmptyCachedMessage.INSTANCE;
         }
 
-        int[] extra = new int[0];
+        final int internalId = internalType.getAsInt();
+        final Vector3f offset = effect.getOption(ParticleOptions.OFFSET).map(Vector3d::toFloat).orElse(Vector3f.ZERO);
+        final int quantity = effect.getOption(ParticleOptions.QUANTITY).orElse(1);
+
+        int[] extra = null;
 
         // The extra values, normal behavior offsetX, offsetY, offsetZ
-        float f0 = 0f;
-        float f1 = 0f;
-        float f2 = 0f;
+        double f0 = 0f;
+        double f1 = 0f;
+        double f2 = 0f;
 
         // Depends on behavior
         // Note: If the count > 0 -> speed = 0f else if count = 0 -> speed = 1f
 
-        if (effect instanceof ItemParticle) {
-            ItemStackSnapshot item = ((ItemParticle) effect).getItem();
-            ItemType itemType = item.getType();
-            int extraData = 0;
-            if (type == ParticleTypes.ITEM_CRACK) {
-                extraData = ItemRegistryModule.get().getInternalId(itemType);
-            } else if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
-                BlockType blockType = itemType.getBlock().orElse(null);
-                // Only block types are allowed
-                if (blockType != null) {
-                    int id = BlockRegistryModule.get().getStateInternalId(blockType.getDefaultState());
-                    int data = 0; // TODO: Retrieve data value from item stack
-                    extraData = data << 12 | id;
-                }
+        final Optional<BlockState> defaultBlockState;
+        if (type != ParticleTypes.ITEM_CRACK && (defaultBlockState = type.getDefaultOption(ParticleOptions.BLOCK_STATE)).isPresent()) {
+            final int state = getBlockState(effect, defaultBlockState);
+            if (state == 0) {
+                return EmptyCachedMessage.INSTANCE;
             }
-            if (extraData == 0) {
-                return CachedParticleEffect.EMPTY;
-            }
-            extra = new int[] { extraData };
-        } else if (effect instanceof BlockParticle) {
-            if (type == ParticleTypes.BLOCK_CRACK || type == ParticleTypes.BLOCK_DUST) {
-                BlockState blockState = ((BlockParticle) effect).getBlockState();
-                int id = BlockRegistryModule.get().getStateInternalId(blockState);
-                int data = BlockRegistryModule.get().getStateData(blockState);
-                extra = new int[] { data << 12 | id };
+            extra = new int[] { state };
+        }
+
+        final Optional<ItemStackSnapshot> defaultItemStackSnapshot;
+        if (extra == null && (defaultItemStackSnapshot = type.getDefaultOption(ParticleOptions.ITEM_STACK_SNAPSHOT)).isPresent()) {
+            final Optional<ItemStackSnapshot> optItemStackSnapshot = effect.getOption(ParticleOptions.ITEM_STACK_SNAPSHOT);
+            if (optItemStackSnapshot.isPresent()) {
+                final ItemStackSnapshot snapshot = optItemStackSnapshot.get();
+                // TODO: Item damage value
+                extra = new int[]{ItemRegistryModule.get().getInternalId(snapshot.getType()), 0};
             } else {
-                return CachedParticleEffect.EMPTY;
+                final Optional<BlockState> optBlockState = effect.getOption(ParticleOptions.BLOCK_STATE);
+                if (optBlockState.isPresent()) {
+                    final BlockState blockState = optBlockState.get();
+                    final Optional<ItemType> optItemType = blockState.getType().getItem();
+                    if (optItemType.isPresent()) {
+                        // TODO: Item damage value
+                        extra = new int[]{ItemRegistryModule.get().getInternalId(optItemType.get()), 0};
+                    } else {
+                        return EmptyCachedMessage.INSTANCE;
+                    }
+                } else {
+                    final ItemStackSnapshot snapshot = defaultItemStackSnapshot.get();
+                    extra = new int[]{ItemRegistryModule.get().getInternalId(snapshot.getType()), 0};
+                }
             }
         }
 
-        if (effect instanceof ResizableParticle) {
-            float size = ((ResizableParticle) effect).getSize();
+        if (extra == null) {
+            extra = new int[0];
+        }
+
+        final Optional<Double> defaultScale = type.getDefaultOption(ParticleOptions.SCALE);
+        final Optional<Color> defaultColor;
+        final Optional<NotePitch> defaultNote;
+        final Optional<Vector3d> defaultVelocity;
+        if (defaultScale.isPresent()) {
+            double scale = effect.getOption(ParticleOptions.SCALE).orElse(defaultScale.get());
 
             // The formula of the large explosion acts strange
             // Client formula: sizeClient = 1 - sizeServer * 0.5
             // The particle effect returns the client value so
             // Server formula: sizeServer = (-sizeClient * 2) + 2
-            if (type == ParticleTypes.EXPLOSION_LARGE) {
-                size = (-size * 2f) + 2f;
+            if (type == ParticleTypes.LARGE_EXPLOSION || type == ParticleTypes.SWEEP_ATTACK) {
+                scale = (-scale * 2f) + 2f;
             }
 
-            if (size == 0f) {
-                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
-                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
+            if (scale == 0f) {
+                return new CachedParticleMessage(internalId, offset, quantity, extra);
             }
 
-            f0 = size;
-        } else if (effect instanceof ColoredParticle) {
-            Color color0 = ((ColoredParticle) effect).getColor();
-            Color color1 = ((ParticleType.Colorable) type).getDefaultColor();
+            f0 = scale;
+        } else if ((defaultColor = type.getDefaultOption(ParticleOptions.COLOR)).isPresent()) {
+            final boolean isSpell = type == ParticleTypes.MOB_SPELL || type == ParticleTypes.AMBIENT_MOB_SPELL;
+            Color color = effect.getOption(ParticleOptions.COLOR).orElse(null);
 
-            if (color0.equals(color1)) {
-                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
-                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
+            if (!isSpell && (color == null || color.equals(defaultColor.get()))) {
+                return new CachedParticleMessage(internalId, offset, quantity, extra);
+            } else if (isSpell && color == null) {
+                color = defaultColor.get();
             }
 
-            f0 = color0.getRed() / 255f;
-            f1 = color0.getGreen() / 255f;
-            f2 = color0.getBlue() / 255f;
+            f0 = color.getRed() / 255f;
+            f1 = color.getGreen() / 255f;
+            f2 = color.getBlue() / 255f;
+
+            // Make sure that the x and z component are never 0 for these effects,
+            // they would trigger the slow horizontal velocity (unsupported on the server),
+            // but we already chose for the color, can't have both
+            if (isSpell) {
+                f0 = Math.max(f0, 0.001f);
+                f2 = Math.max(f0, 0.001f);
+            }
 
             // If the f0 value 0 is, the redstone will set it automatically to red 255
-            if (f0 == 0f && type == ParticleTypes.REDSTONE) {
+            if (f0 == 0f && type == ParticleTypes.REDSTONE_DUST) {
                 f0 = 0.00001f;
             }
-        } else if (effect instanceof NoteParticle) {
-            NotePitch note = ((NoteParticle) effect).getNote();
-            int internalId = ((LanternNotePitch) note).getInternalId();
+        } else if ((defaultNote = type.getDefaultOption(ParticleOptions.NOTE)).isPresent()) {
+            final NotePitch notePitch = effect.getOption(ParticleOptions.NOTE).orElse(defaultNote.get());
+            final float note = ((LanternNotePitch) notePitch).getInternalId();
 
-            if (internalId == 0) {
-                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
-                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
+            if (note == 0f) {
+                return new CachedParticleMessage(internalId, offset, quantity, extra);
             }
 
-            f0 = (float) internalId / 24f;
-        } else if (type.hasMotion()) {
-            Vector3f motion = effect.getMotion().toFloat();
+            f0 = note / 24f;
+        } else if ((defaultVelocity = type.getDefaultOption(ParticleOptions.VELOCITY)).isPresent()) {
+            final Vector3d velocity = effect.getOption(ParticleOptions.VELOCITY).orElse(defaultVelocity.get());
 
-            float mx = motion.getX();
-            float my = motion.getY();
-            float mz = motion.getZ();
+            f0 = velocity.getX();
+            f1 = velocity.getY();
+            f2 = velocity.getZ();
 
-            // The y value won't work for this effect, if the value isn't 0 the motion won't work
+            final Optional<Boolean> slowHorizontalVelocity = type.getDefaultOption(ParticleOptions.SLOW_HORIZONTAL_VELOCITY);
+            if (slowHorizontalVelocity.isPresent() &&
+                    effect.getOption(ParticleOptions.SLOW_HORIZONTAL_VELOCITY).orElse(slowHorizontalVelocity.get())) {
+                f0 = 0f;
+                f2 = 0f;
+            }
+
+            // The y value won't work for this effect, if the value isn't 0 the velocity won't work
             if (type == ParticleTypes.WATER_SPLASH) {
-                my = 0f;
+                f1 = 0f;
             }
 
-            if (mx == 0f && my == 0f && mz == 0f) {
-                return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
-                        type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
+            if (f0 == 0f && f1 == 0f && f2 == 0f) {
+                return new CachedParticleMessage(internalId, offset, quantity, extra);
             }
-
-            f0 = mx;
-            f1 = my;
-            f2 = mz;
         }
 
+        // Is this check necessary?
         if (f0 == 0f && f1 == 0f && f2 == 0f) {
-            return new CachedParticleEffect(Collections.singletonList(new MessagePlayOutSpawnParticle(
-                    type.getInternalId(), Vector3f.ZERO, offset, 0f, count, extra)), null);
+            return new CachedParticleMessage(internalId, offset, quantity, extra);
         }
 
-        final List<MessagePlayOutSpawnParticle> messages = new ArrayList<>(count);
-        if (offset.equals(Vector3f.ZERO)) {
-            for (int i = 0; i < count; i++) {
-                messages.add(new MessagePlayOutSpawnParticle(type.getInternalId(), Vector3f.ZERO, offset, 1f, 0, extra));
-            }
-            return new CachedParticleEffect(messages, null);
-        } else {
-            final Vector3f value = new Vector3f(f0, f1, f2);
-            for (int i = 0; i < count; i++) {
-                messages.add(new MessagePlayOutSpawnParticle(type.getInternalId(), Vector3f.ZERO, value, 1f, 0, extra));
-            }
-            return new CachedParticleEffect(messages, offset);
-        }
+        return new CachedOffsetParticleMessage(internalId, new Vector3f(f0, f1, f2), offset, quantity, extra);
     }
 
     @Override
     public void process(CodecContext context, MessagePlayOutParticleEffect message, List<Message> output) throws CodecException {
-        final CachedParticleEffect cached = this.cache.get(message.getParticleEffect());
-        final Vector3f position = message.getPosition().toFloat();
+        final ICachedMessage cached = this.cache.get(message.getParticleEffect());
+        cached.process(message.getPosition(), output);
+    }
 
-        if (cached.offset == null) {
-            for (MessagePlayOutSpawnParticle message0 : cached.messages) {
-                output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), position, message0.getOffset(),
-                        message0.getData(), message0.getCount(), message0.getExtra()));
-            }
-        } else {
-            Random random = new Random();
+    private static final class EmptyCachedMessage implements ICachedMessage {
 
-            float px = position.getX();
-            float py = position.getY();
-            float pz = position.getZ();
+        public static final EmptyCachedMessage INSTANCE = new EmptyCachedMessage();
 
-            float ox = cached.offset.getX();
-            float oy = cached.offset.getY();
-            float oz = cached.offset.getZ();
+        @Override
+        public void process(Vector3d position, List<Message> output) {
+        }
+    }
 
-            for (MessagePlayOutSpawnParticle message0 : cached.messages) {
-                double px0 = px + (random.nextFloat() * 2f - 1f) * ox;
-                double py0 = py + (random.nextFloat() * 2f - 1f) * oy;
-                double pz0 = pz + (random.nextFloat() * 2f - 1f) * oz;
+    private static final class CachedParticleMessage implements ICachedMessage {
 
-                output.add(new MessagePlayOutSpawnParticle(message0.getParticleId(), new Vector3f(px0, py0, pz0), message0.getOffset(),
-                        message0.getData(), message0.getCount(), message0.getExtra()));
+        private final int particleId;
+        private final Vector3f offsetData;
+        private final int count;
+        private final int[] extra;
+
+        private CachedParticleMessage(int particleId, Vector3f offsetData, int count, int[] extra) {
+            this.particleId = particleId;
+            this.offsetData = offsetData;
+            this.count = count;
+            this.extra = extra;
+        }
+
+        @Override
+        public void process(Vector3d position, List<Message> output) {
+            output.add(new MessagePlayOutSpawnParticle(this.particleId, position.toFloat(),
+                    this.offsetData, 0f, this.count, this.extra));
+        }
+    }
+
+    private static final class CachedOffsetParticleMessage implements ICachedMessage {
+
+        private final int particleId;
+        private final Vector3f offsetData;
+        private final Vector3f offset;
+        private final int count;
+        private final int[] extra;
+
+        private CachedOffsetParticleMessage(int particleId, Vector3f offsetData, Vector3f offset, int count, int[] extra) {
+            this.particleId = particleId;
+            this.offsetData = offsetData;
+            this.offset = offset;
+            this.count = count;
+            this.extra = extra;
+        }
+
+        @Override
+        public void process(Vector3d position, List<Message> output) {
+            final Random random = new Random();
+
+            if (this.offset.equals(Vector3f.ZERO)) {
+                final MessagePlayOutSpawnParticle message = new MessagePlayOutSpawnParticle(
+                        this.particleId, position.toFloat(), this.offsetData, 1f, 0, this.extra);
+                for (int i = 0; i < this.count; i++) {
+                    output.add(message);
+                }
+            } else {
+                final float px = (float) position.getX();
+                final float py = (float) position.getY();
+                final float pz = (float) position.getZ();
+
+                final float ox = this.offset.getX();
+                final float oy = this.offset.getY();
+                final float oz = this.offset.getZ();
+
+                for (int i = 0; i < this.count; i++) {
+                    final double px0 = px + (random.nextFloat() * 2f - 1f) * ox;
+                    final double py0 = py + (random.nextFloat() * 2f - 1f) * oy;
+                    final double pz0 = pz + (random.nextFloat() * 2f - 1f) * oz;
+
+                    output.add(new MessagePlayOutSpawnParticle(this.particleId, new Vector3f(px0, py0, pz0),
+                            this.offsetData, 1f, 0, this.extra));
+                }
             }
         }
     }
 
-    /**
-     * Represents a {@link ParticleEffect} that is cached.
-     */
-    private static class CachedParticleEffect {
+    private static final class CachedEffectMessage implements ICachedMessage {
 
-        static final CachedParticleEffect EMPTY = new CachedParticleEffect(Collections.emptyList(), null);
+        private final int type;
+        private final int data;
+        private final boolean broadcast;
 
-        /**
-         * If the offset isn't null, it means that all the returned messages should have
-         * a offset added to them before sending to the client.
-         */
-        @Nullable private final Vector3f offset;
-
-        /**
-         * The messages that are valid for a
-         */
-        private final List<MessagePlayOutSpawnParticle> messages;
-
-        private CachedParticleEffect(List<MessagePlayOutSpawnParticle> messages, @Nullable Vector3f offset) {
-            this.messages = messages;
-            this.offset = offset;
+        private CachedEffectMessage(int type, int data, boolean broadcast) {
+            this.broadcast = broadcast;
+            this.type = type;
+            this.data = data;
         }
+
+        @Override
+        public void process(Vector3d position, List<Message> output) {
+            output.add(new MessagePlayOutEffect(position.round().toInt(), this.type, this.data, this.broadcast));
+        }
+    }
+
+    private interface ICachedMessage {
+
+        void process(Vector3d position, List<Message> output);
     }
 }

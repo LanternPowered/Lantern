@@ -82,4 +82,16 @@ public final class DataQueries {
     public static final DataQuery LOCAL_DATE_DAY = of("LocalDateDay");
     public static final DataQuery ZONE_TIME_ID = of("ZoneDateTimeId");
 
+    // Particle Effects
+    public static final DataQuery PARTICLE_TYPE = of("Type");
+    public static final DataQuery PARTICLE_OPTIONS = of("Options");
+    public static final DataQuery PARTICLE_OPTION_KEY = of("Option");
+    public static final DataQuery PARTICLE_OPTION_VALUE = of("Value");
+
+    // Firework Effects
+    public static final DataQuery FIREWORK_SHAPE = of("Type");
+    public static final DataQuery FIREWORK_COLORS = of("Colors");
+    public static final DataQuery FIREWORK_FADE_COLORS = of("Fades");
+    public static final DataQuery FIREWORK_TRAILS = of("Trails");
+    public static final DataQuery FIREWORK_FLICKERS = of("Flickers");
 }

@@ -25,149 +25,94 @@
  */
 package org.lanternpowered.server.effect.particle;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.type.NotePitch;
-import org.spongepowered.api.effect.particle.BlockParticle;
-import org.spongepowered.api.effect.particle.ColoredParticle;
-import org.spongepowered.api.effect.particle.ItemParticle;
-import org.spongepowered.api.effect.particle.NoteParticle;
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.data.util.DataQueries;
+import org.spongepowered.api.data.DataSerializable;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleOption;
 import org.spongepowered.api.effect.particle.ParticleType;
-import org.spongepowered.api.effect.particle.ResizableParticle;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.util.Color;
 
-import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
-public class LanternParticleEffectBuilder extends AbstractParticleEffectBuilder<ParticleEffect, ParticleType, ParticleEffect.Builder>
-        implements ParticleEffect.Builder {
+@SuppressWarnings("unchecked")
+public class LanternParticleEffectBuilder extends AbstractDataBuilder<ParticleEffect> implements ParticleEffect.Builder {
+
+    private LanternParticleType type;
+    private Map<ParticleOption<?>, Object> options;
+
+    public LanternParticleEffectBuilder() {
+        super(ParticleEffect.class, 1);
+        this.reset();
+    }
 
     @Override
-    public LanternParticleEffect build() {
-        return new LanternParticleEffect(this.type, this.motion, this.offset, this.count);
+    protected Optional<ParticleEffect> buildContent(DataView container) throws InvalidDataException {
+        if (!container.contains(DataQueries.PARTICLE_TYPE, DataQueries.PARTICLE_OPTIONS)) {
+            return Optional.empty();
+        }
+        ParticleType particleType = container.getCatalogType(DataQueries.PARTICLE_TYPE, ParticleType.class).get();
+        Map<ParticleOption<?>, Object> options = new HashMap<>();
+        container.getViewList(DataQueries.PARTICLE_OPTIONS).get().forEach(view -> {
+            ParticleOption option = view.getCatalogType(DataQueries.PARTICLE_OPTION_KEY, ParticleOption.class).get();
+            Object value;
+            if (option.getValueType().isAssignableFrom(DataSerializable.class)) {
+                value = view.getSerializable(DataQueries.PARTICLE_OPTION_VALUE, option.getValueType()).get();
+            } else {
+                value = view.getObject(DataQueries.PARTICLE_OPTION_VALUE, option.getValueType()).get();
+            }
+            options.put(option, value);
+        });
+        return Optional.of(new LanternParticleEffect((LanternParticleType) particleType, options));
     }
 
-    public static class Colorable extends AbstractParticleEffectBuilder<ColoredParticle, ParticleType.Colorable, ColoredParticle.Builder> implements ColoredParticle.Builder {
-
-        @Nullable private Color color;
-
-        @Override
-        public LanternParticleEffectBuilder.Colorable reset() {
-            this.color = null;
-            super.reset();
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Colorable color(Color color) {
-            this.color = checkNotNull(color, "color");
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffect.Colorable build() {
-            return new LanternParticleEffect.Colorable(this.type, this.motion, this.offset, this.count,
-                    this.color == null ? ((ParticleType.Colorable) this.type).getDefaultColor() : this.color);
-        }
+    @Override
+    public ParticleEffect.Builder from(ParticleEffect particleEffect) {
+        this.type = (LanternParticleType) particleEffect.getType();
+        this.options = particleEffect.getOptions();
+        return this;
     }
 
-    public static class Resizable extends AbstractParticleEffectBuilder<ResizableParticle, ParticleType.Resizable, ResizableParticle.Builder> implements ResizableParticle.Builder {
-
-        @Nullable private Float size;
-
-        @Override
-        public LanternParticleEffectBuilder.Resizable reset() {
-            this.size = null;
-            super.reset();
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Resizable size(float size) {
-            this.size = size;
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffect.Resizable build() {
-            return new LanternParticleEffect.Resizable(this.type, this.motion, this.offset, this.count,
-                    this.size == null ? ((ParticleType.Resizable) this.type).getDefaultSize() : this.size);
-        }
+    @Override
+    public ParticleEffect.Builder type(ParticleType particleType) {
+        this.type = (LanternParticleType) checkNotNull(particleType, "particleType");
+        return this;
     }
 
-    public static class Note extends AbstractParticleEffectBuilder<NoteParticle, ParticleType.Note, NoteParticle.Builder> implements NoteParticle.Builder {
-
-        @Nullable private NotePitch note;
-
-        @Override
-        public LanternParticleEffectBuilder.Note note(NotePitch note) {
-            this.note = checkNotNull(note, "note");
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Note reset() {
-            this.note = null;
-            super.reset();
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffect.Note build() {
-            return new LanternParticleEffect.Note(this.type, this.motion, this.offset, this.count,
-                    this.note == null ? ((LanternParticleType.Note) this.type).getDefaultNote() : this.note);
-        }
+    @Override
+    public ParticleEffect.Builder reset() {
+        super.reset();
+        this.type = null;
+        this.options = new HashMap<>();
+        return this;
     }
 
-    public static class Item extends AbstractParticleEffectBuilder<ItemParticle, ParticleType.Item, ItemParticle.Builder> implements ItemParticle.Builder {
-
-        @Nullable private ItemStackSnapshot itemSnapshot;
-
-        @Override
-        public LanternParticleEffectBuilder.Item item(ItemStackSnapshot itemSnapshot) {
-            this.itemSnapshot = checkNotNull(itemSnapshot, "itemSnapshot").copy();
-            return this;
+    @Override
+    public <V> ParticleEffect.Builder option(ParticleOption<V> option, V value) throws IllegalArgumentException {
+        checkNotNull(option, "option");
+        checkNotNull(value, "value");
+        IllegalArgumentException exception = ((LanternParticleOption<V>) option).validateValue(value);
+        if (exception != null) {
+            throw exception;
         }
-
-        @Override
-        public LanternParticleEffectBuilder.Item reset() {
-            this.itemSnapshot = null;
-            super.reset();
-            return this;
+        if (value instanceof List) {
+            value = (V) ImmutableList.copyOf((List) value);
         }
-
-        @Override
-        public LanternParticleEffect.Item build() {
-            return new LanternParticleEffect.Item(this.type, this.motion, this.offset, this.count,
-                    this.itemSnapshot == null ? ((ParticleType.Item) this.type).getDefaultItem().createSnapshot() :
-                        this.itemSnapshot);
-        }
+        this.options.put(option, value);
+        return this;
     }
 
-    public static class Block extends AbstractParticleEffectBuilder<BlockParticle, ParticleType.Block, BlockParticle.Builder> implements BlockParticle.Builder {
-
-        @Nullable private BlockState blockState;
-
-        @Override
-        public LanternParticleEffectBuilder.Block block(BlockState blockState) {
-            this.blockState = checkNotNull(blockState, "blockState");
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffectBuilder.Block reset() {
-            this.blockState = null;
-            super.reset();
-            return this;
-        }
-
-        @Override
-        public LanternParticleEffect.Block build() {
-            return new LanternParticleEffect.Block(this.type, this.motion, this.offset, this.count,
-                    this.blockState == null ? ((ParticleType.Block) this.type).getDefaultBlockState() : this.blockState);
-        }
+    @Override
+    public ParticleEffect build() {
+        checkArgument(this.type != null, "ParticleType must be set");
+        return new LanternParticleEffect(this.type, this.options);
     }
-
 }

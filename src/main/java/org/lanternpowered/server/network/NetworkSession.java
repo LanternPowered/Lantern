@@ -325,7 +325,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         if (this.player != null) {
             this.leavePlayer();
         }
-        Lantern.getLogger().info("{} ({}) disconnected. Reason: {}", this.gameProfile == null ? "???" : this.gameProfile.getName().orElse("???"),
+        Lantern.getLogger().debug("{} ({}) disconnected. Reason: {}", this.gameProfile == null ? "???" : this.gameProfile.getName().orElse("???"),
                 this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
     }
 

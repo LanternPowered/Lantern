@@ -25,126 +25,56 @@
  */
 package org.lanternpowered.server.effect.particle;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.type.NotePitch;
-import org.spongepowered.api.effect.particle.BlockParticle;
-import org.spongepowered.api.effect.particle.ColoredParticle;
-import org.spongepowered.api.effect.particle.ItemParticle;
-import org.spongepowered.api.effect.particle.NoteParticle;
+import com.google.common.collect.ImmutableMap;
+import org.lanternpowered.server.data.util.DataQueries;
+import org.spongepowered.api.data.DataContainer;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleType;
-import org.spongepowered.api.effect.particle.ResizableParticle;
-import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.util.Color;
+import org.spongepowered.api.effect.particle.ParticleOption;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class LanternParticleEffect implements ParticleEffect {
 
-    private final ParticleType type;
-    private final Vector3d motion;
-    private final Vector3d offset;
-    private final int count;
+    private final LanternParticleType type;
+    private final Map<ParticleOption<?>, Object> options;
 
-    LanternParticleEffect(ParticleType type, Vector3d motion, Vector3d offset, int count) {
-        this.motion = motion;
-        this.offset = offset;
-        this.count = count;
+    public LanternParticleEffect(LanternParticleType type, Map<ParticleOption<?>, Object> options) {
+        this.options = ImmutableMap.copyOf(options);
         this.type = type;
     }
 
     @Override
-    public ParticleType getType() {
+    public LanternParticleType getType() {
         return this.type;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Vector3d getMotion() {
-        return this.motion;
-    }
-
-    @Override
-    public Vector3d getOffset() {
-        return this.offset;
+    public <V> Optional<V> getOption(ParticleOption<V> option) {
+        return Optional.ofNullable((V) this.options.get(option));
     }
 
     @Override
-    public int getCount() {
-        return this.count;
+    public Map<ParticleOption<?>, Object> getOptions() {
+        return this.options;
     }
 
-    public static class Colorable extends LanternParticleEffect implements ColoredParticle {
-
-        private final Color color;
-
-        Colorable(ParticleType type, Vector3d motion, Vector3d offset, int count, Color color) {
-            super(type, motion, offset, count);
-            this.color = color;
-        }
-
-        @Override
-        public Color getColor() {
-            return this.color;
-        }
+    @Override
+    public int getContentVersion() {
+        return 1;
     }
 
-    public static class Resizable extends LanternParticleEffect implements ResizableParticle {
-
-        private final float size;
-
-        Resizable(ParticleType type, Vector3d motion, Vector3d offset, int count, float size) {
-            super(type, motion, offset, count);
-            this.size = size;
-        }
-
-        @Override
-        public float getSize() {
-            return this.size;
-        }
+    @Override
+    public DataContainer toContainer() {
+        final DataContainer dataContainer = new MemoryDataContainer();
+        dataContainer.set(DataQueries.PARTICLE_TYPE, this.type);
+        dataContainer.set(DataQueries.PARTICLE_OPTIONS, this.options.entrySet().stream().map(entry -> new MemoryDataContainer()
+                .set(DataQueries.PARTICLE_OPTION_KEY, entry.getKey())
+                .set(DataQueries.PARTICLE_OPTION_VALUE, entry.getValue()))
+                .collect(Collectors.toList()));
+        return dataContainer;
     }
-
-    public static class Note extends LanternParticleEffect implements NoteParticle {
-
-        private final NotePitch note;
-
-        Note(ParticleType type, Vector3d motion, Vector3d offset, int count, NotePitch note) {
-            super(type, motion, offset, count);
-            this.note = note;
-        }
-
-        @Override
-        public NotePitch getNote() {
-            return this.note;
-        }
-    }
-
-    public static class Item extends LanternParticleEffect implements ItemParticle {
-
-        private final ItemStackSnapshot item;
-
-        Item(ParticleType type, Vector3d motion, Vector3d offset, int count, ItemStackSnapshot item) {
-            super(type, motion, offset, count);
-            this.item = item;
-        }
-
-        @Override
-        public ItemStackSnapshot getItem() {
-            return this.item.copy();
-        }
-    }
-
-    public static class Block extends LanternParticleEffect implements BlockParticle {
-
-        private final BlockState blockState;
-
-        Block(ParticleType type, Vector3d motion, Vector3d offset, int count, BlockState blockState) {
-            super(type, motion, offset, count);
-            this.blockState = blockState;
-        }
-
-        @Override
-        public BlockState getBlockState() {
-            return this.blockState;
-        }
-    }
-
 }

@@ -26,27 +26,42 @@
 package org.lanternpowered.server.effect.particle;
 
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.effect.particle.ParticleOption;
-import org.spongepowered.api.effect.particle.ParticleType;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.OptionalInt;
+import java.util.function.Function;
 
-public class LanternParticleType extends PluginCatalogType.Base implements ParticleType {
+import javax.annotation.Nullable;
+
+public class LanternParticleOption<V> extends PluginCatalogType.Base implements ParticleOption<V> {
 
     private final String name;
-    private final OptionalInt internalType;
-    private final Map<ParticleOption<?>, Object> options;
+    private final Class<V> valueType;
+    @Nullable private final Function<V, IllegalArgumentException> valueValidator;
 
-    public LanternParticleType(String pluginId, String id, String name,
-            OptionalInt internalType, Map<ParticleOption<?>, Object> options) {
+    public LanternParticleOption(String pluginId, String id, String name, Class<V> valueType,
+            @Nullable Function<V, IllegalArgumentException> valueValidator) {
         super(pluginId, id, name);
-        this.options = ImmutableMap.copyOf(options);
-        this.internalType = internalType;
+        this.valueValidator = valueValidator;
+        this.valueType = valueType;
         this.name = name;
+    }
+
+    public LanternParticleOption(String pluginId, String id, String name, Class<V> valueType) {
+        this(pluginId, id, name, valueType, null);
+    }
+
+    @Nullable
+    public IllegalArgumentException validateValue(V value) {
+        if (this.valueValidator != null) {
+            return this.valueValidator.apply(value);
+        }
+        return null;
+    }
+
+    @Override
+    public Class<V> getValueType() {
+        return this.valueType;
     }
 
     @Override
@@ -54,25 +69,9 @@ public class LanternParticleType extends PluginCatalogType.Base implements Parti
         return this.name;
     }
 
-    public OptionalInt getInternalType() {
-        return this.internalType;
-    }
-
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .omitNullValues()
-                .add("internalType", this.internalType.isPresent() ? this.internalType.getAsInt() : null);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <V> Optional<V> getDefaultOption(ParticleOption<V> option) {
-        return Optional.ofNullable((V) this.options.get(option));
-    }
-
-    @Override
-    public Map<ParticleOption<?>, Object> getDefaultOptions() {
-        return this.options;
+                .add("valueType", this.valueType);
     }
 }

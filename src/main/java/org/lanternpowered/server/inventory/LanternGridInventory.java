@@ -32,8 +32,10 @@ import com.flowpowered.math.vector.Vector2i;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.inventory.type.InventoryColumn;
@@ -330,5 +332,24 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
     @Override
     public Optional<InventoryColumn> getColumn(int x) {
         return Optional.ofNullable(this.columns.get(x));
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
+        if (property == InventoryDimension.class) {
+            //noinspection unchecked
+            return Optional.of((T) new InventoryDimension(this.rows.size(), this.columns.size()));
+        }
+        return super.tryGetProperty(property, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
+        final List<T> properties = super.tryGetProperties(property);
+        if (property == InventoryDimension.class) {
+            //noinspection unchecked
+            properties.add((T) new InventoryDimension(this.rows.size(), this.columns.size()));
+        }
+        return properties;
     }
 }

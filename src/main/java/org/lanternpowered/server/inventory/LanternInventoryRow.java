@@ -31,9 +31,14 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector2i;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.text.translation.Translation;
+
+import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 
@@ -98,5 +103,24 @@ public class LanternInventoryRow extends LanternInventory2D implements Inventory
         this.registerSlot(index, slot, true);
         this.slotsByPos.put(pos, (LanternSlot) slot);
         return slot;
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
+        if (property == InventoryDimension.class) {
+            //noinspection unchecked
+            return Optional.of((T) new InventoryDimension(this.size(), 1));
+        }
+        return super.tryGetProperty(property, key);
+    }
+
+    @Override
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
+        final List<T> properties = super.tryGetProperties(property);
+        if (property == InventoryDimension.class) {
+            //noinspection unchecked
+            properties.add((T) new InventoryDimension(this.size(), 1));
+        }
+        return properties;
     }
 }

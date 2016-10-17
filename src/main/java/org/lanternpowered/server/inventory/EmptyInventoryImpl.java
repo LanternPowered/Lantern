@@ -181,6 +181,11 @@ class EmptyInventoryImpl implements EmptyInventory, IInventory {
     }
 
     @Override
+    public boolean hasProperty(Class<? extends InventoryProperty<?, ?>> property) {
+        return false;
+    }
+
+    @Override
     public <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Inventory child, Class<T> property) {
         return Collections.emptyList();
     }
@@ -191,12 +196,12 @@ class EmptyInventoryImpl implements EmptyInventory, IInventory {
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, Object key) {
+    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, @Nullable Object key) {
         return Optional.empty();
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, Object key) {
+    public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key) {
         return Optional.empty();
     }
 

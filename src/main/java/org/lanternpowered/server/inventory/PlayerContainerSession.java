@@ -155,13 +155,15 @@ public class PlayerContainerSession {
                 } else {
                     this.cursorItem = null;
                 }
-                final List<Entity> entities = new ArrayList<>();
-                entities.add(this.createDroppedItem(oldCursorItemSnapshot));
+                if (LanternItemStack.toNullable(oldCursorItemSnapshot) != null) {
+                    final List<Entity> entities = new ArrayList<>();
+                    entities.add(this.createDroppedItem(oldCursorItemSnapshot));
 
-                final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities, this.player.getWorld());
-                Sponge.getEventManager().post(event1);
-                if (!event1.isCancelled()) {
-                    this.finishSpawnEntityEvent(event1);
+                    final SpawnEntityEvent event1 = SpongeEventFactory.createDropItemEventDispense(cause, entities, this.player.getWorld());
+                    Sponge.getEventManager().post(event1);
+                    if (!event1.isCancelled()) {
+                        this.finishSpawnEntityEvent(event1);
+                    }
                 }
             } else {
                 sendClose = false;

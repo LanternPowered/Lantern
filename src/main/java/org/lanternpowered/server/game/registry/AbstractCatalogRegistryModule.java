@@ -95,7 +95,7 @@ public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
         checkArgument(catalogType.getName() != null, "The catalog type name may not be null!");
         checkArgument((this.pattern == null ? defaultPattern : this.pattern).matcher(id).matches(),
                 "The catalog type id %s must match the regex: %s", id, this.patternValue == null ? defaultPatternValue : this.patternValue);
-        checkState(!this.types.containsKey(id), "There is already a catalog type registered with the id: %s" + id);
+        checkState(!this.types.containsKey(id), "There is already a catalog type registered with the id: %s", id);
     }
 
     /**

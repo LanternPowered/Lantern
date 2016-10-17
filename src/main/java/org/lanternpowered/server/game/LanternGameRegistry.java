@@ -130,6 +130,7 @@ import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryMod
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CollisionRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistryModule;
@@ -159,6 +160,7 @@ import org.lanternpowered.server.game.registry.type.world.WeatherTypeRegistryMod
 import org.lanternpowered.server.game.registry.type.world.WorldArchetypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.game.registry.util.RegistryHelper;
+import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
 import org.lanternpowered.server.item.firework.LanternFireworkEffectBuilder;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
@@ -281,6 +283,7 @@ import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShape;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
@@ -469,6 +472,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(EntityType.class, EntityTypeRegistryModule.get())
                 .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
+                .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())
@@ -508,6 +512,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
                 .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
                 .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
+                .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
                 ;
         this.registerFactories();
     }

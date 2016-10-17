@@ -39,8 +39,11 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.property.InventoryCapacity;
+import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
@@ -50,7 +53,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -74,34 +76,9 @@ public abstract class InventoryBase implements IInventory {
     /**
      * All the {@link InventoryProperty}s of this inventory mapped by their key.
      */
-    private final Map<PropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey = new HashMap<>();
+    private final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey = new HashMap<>();
 
     private final Set<IViewerListener> viewerListeners = new HashSet<>();
-
-    private static final class PropertyKey {
-
-        private final Class<? extends InventoryProperty> type;
-        @Nullable private final Object key;
-
-        private PropertyKey(Class<? extends InventoryProperty> type, @Nullable Object key) {
-            this.type = type;
-            this.key = key;
-        }
-
-        @Override
-        public boolean equals(Object other) {
-            if (!(other instanceof PropertyKey)) {
-                return false;
-            }
-            final PropertyKey other0 = (PropertyKey) other;
-            return other0.type == this.type && Objects.equals(other0.key, this.key);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(this.type, this.key);
-        }
-    }
 
     protected final EmptyInventory emptyInventory = this instanceof EmptyInventory ?
             (EmptyInventory) this : new EmptyInventoryImpl(this);
@@ -122,7 +99,7 @@ public abstract class InventoryBase implements IInventory {
     protected void registerProperty(InventoryProperty<?, ?> inventoryProperty) {
         checkNotNull(inventoryProperty, "inventoryProperty");
         this.inventoryPropertiesByClass.put(inventoryProperty.getClass(), inventoryProperty);
-        final PropertyKey propertyKey = new PropertyKey(inventoryProperty.getClass(), inventoryProperty.getKey());
+        final InventoryPropertyKey propertyKey = new InventoryPropertyKey(inventoryProperty.getClass(), inventoryProperty.getKey());
         this.inventoryPropertiesByKey.put(propertyKey, inventoryProperty);
     }
 
@@ -152,9 +129,14 @@ public abstract class InventoryBase implements IInventory {
     }
 
     @Override
+    public boolean hasProperty(Class<? extends InventoryProperty<?, ?>> property) {
+        return this.inventoryPropertiesByClass.containsKey(checkNotNull(property, "property"));
+    }
+
+    @Override
     public boolean hasProperty(InventoryProperty<?, ?> property) {
         checkNotNull(property, "property");
-        final PropertyKey propertyKey = new PropertyKey(property.getClass(), property.getKey());
+        final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property.getClass(), property.getKey());
         final InventoryProperty property1 = this.inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property1.equals(property)) {
             return true;
@@ -175,7 +157,7 @@ public abstract class InventoryBase implements IInventory {
         if (!(child instanceof InventoryBase)) {
             return false;
         }
-        final PropertyKey propertyKey = new PropertyKey(property.getClass(), property.getKey());
+        final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property.getClass(), property.getKey());
         final InventoryProperty property1 = ((InventoryBase) child).inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property1.equals(property)) {
             return true;
@@ -209,13 +191,14 @@ public abstract class InventoryBase implements IInventory {
         //noinspection unchecked
         properties.addAll((Collection<? extends T>) ((InventoryBase) child).inventoryPropertiesByClass.get(property));
         properties.addAll(this.tryGetProperties(child, property));
+        properties.addAll(this.tryGetProperties(property));
         return properties.build();
     }
 
     @Override
     public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key) {
         checkNotNull(property, "property");
-        final PropertyKey propertyKey = new PropertyKey(property, key);
+        final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property, key);
         final InventoryProperty<?, ?> property1 = this.inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property.isInstance(property1)) {
             return Optional.of(property.cast(property1));
@@ -224,7 +207,7 @@ public abstract class InventoryBase implements IInventory {
         if (parent != this && parent instanceof InventoryBase) {
             return ((InventoryBase) parent).tryGetProperty(this, property, key);
         }
-        return Optional.empty();
+        return this.tryGetProperty(property, key);
     }
 
     @Override
@@ -235,12 +218,35 @@ public abstract class InventoryBase implements IInventory {
             return Optional.empty();
         }
         final InventoryBase inventoryBase = (InventoryBase) child;
-        final PropertyKey propertyKey = new PropertyKey(property, key);
+        final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property, key);
         final InventoryProperty<?, ?> property1 = inventoryBase.inventoryPropertiesByKey.get(propertyKey);
         if (property1 != null && property.isInstance(property1)) {
             return Optional.of(property.cast(property1));
         }
         return this.tryGetProperty(child, property, key);
+    }
+
+    protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
+        if (property == InventoryTitle.class) {
+            //noinspection unchecked
+            return Optional.of((T) new InventoryTitle(Text.of(this.getName())));
+        } else if (property == InventoryCapacity.class) {
+            //noinspection unchecked
+            return Optional.of((T) new InventoryCapacity(this.capacity()));
+        }
+        return Optional.empty();
+    }
+
+    protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Class<T> property) {
+        final List<T> properties = new ArrayList<>();
+        if (property == InventoryTitle.class) {
+            //noinspection unchecked
+            properties.add((T) new InventoryTitle(Text.of(this.getName())));
+        } else if (property == InventoryCapacity.class) {
+            //noinspection unchecked
+            properties.add((T) new InventoryCapacity(this.capacity()));
+        }
+        return properties;
     }
 
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
@@ -306,7 +312,7 @@ public abstract class InventoryBase implements IInventory {
         checkNotNull(props, "props");
         return this.query(inventory -> {
             for (InventoryProperty<?,?> prop : props) {
-                if (((InventoryBase) inventory).hasProperty(prop)) {
+                if (((IInventory) inventory).hasProperty(prop)) {
                     return true;
                 }
             }
@@ -346,10 +352,45 @@ public abstract class InventoryBase implements IInventory {
     @Override
     public <T extends Inventory> T query(Object... args) {
         checkNotNull(args, "args");
+        // This madness, trying to
+        // cover all the cases
         return this.query(inventory -> {
             for (Object arg : args) {
-                if (inventory.equals(arg)) {
-                    return true;
+                if (arg instanceof Inventory) {
+                    if (inventory.equals(arg)) {
+                        return true;
+                    }
+                } else if (arg instanceof InventoryArchetype) {
+                    if (inventory.getArchetype().equals(arg)) {
+                        return true;
+                    }
+                } else if (arg instanceof ItemStack) {
+                    if (inventory.contains((ItemStack) arg)) {
+                        return true;
+                    }
+                } else if (arg instanceof Translation) {
+                    if (inventory.getName().equals(arg)) {
+                        return true;
+                    }
+                } else if (arg instanceof ItemType) {
+                    if (inventory.contains((ItemType) arg)) {
+                        return true;
+                    }
+                } else if (arg instanceof InventoryProperty<?,?>) {
+                    if (((IInventory) inventory).hasProperty((InventoryProperty<?, ?>) arg)) {
+                        return true;
+                    }
+                } else if (arg instanceof Class<?>) {
+                    final Class<?> clazz = (Class<?>) arg;
+                    if (InventoryProperty.class.isAssignableFrom(clazz)) {
+                        if (((IInventory) inventory).hasProperty((Class<? extends InventoryProperty<?, ?>>) clazz)) {
+                            return true;
+                        }
+                    } else if (Inventory.class.isAssignableFrom(clazz)) {
+                        if (clazz.isInstance(inventory)) {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;

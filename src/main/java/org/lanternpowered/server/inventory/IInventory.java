@@ -44,6 +44,8 @@ public interface IInventory extends Inventory {
     @Override
     IInventory parent();
 
+    boolean hasProperty(Class<? extends InventoryProperty<?,?>> property);
+
     boolean hasProperty(InventoryProperty<?,?> property);
 
     boolean hasProperty(Inventory child, InventoryProperty<?,?> property);

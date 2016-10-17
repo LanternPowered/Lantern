@@ -1366,7 +1366,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     private void checkAreaBounds(int x, int z) {
-        if (VecHelper.inBounds(x, z, this.areaMin, this.areaMax)) {
+        if (!VecHelper.inBounds(x, z, this.areaMin, this.areaMax)) {
             throw new PositionOutOfBoundsException(new Vector2i(x, z), this.areaMin, this.areaMax);
         }
     }

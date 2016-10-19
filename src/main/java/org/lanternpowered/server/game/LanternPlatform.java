@@ -32,7 +32,6 @@ import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.HashMap;
 import java.util.Map;

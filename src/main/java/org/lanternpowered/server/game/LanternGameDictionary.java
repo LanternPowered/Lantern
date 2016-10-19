@@ -33,7 +33,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.SetMultimap;
 import org.spongepowered.api.GameDictionary;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Set;
 

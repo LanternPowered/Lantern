@@ -147,7 +147,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@NonnullByDefault
 public class LanternGame implements Game {
 
     private final static boolean SCAN_CLASSPATH = PropertiesUtil.getProperties().getBooleanProperty("scanClasspath", false);
@@ -163,7 +162,7 @@ public class LanternGame implements Game {
 
     public static final String MINECRAFT_ID = "minecraft";
     public static final String MINECRAFT_NAME = "Minecraft";
-    public static final String MINECRAFT_VERSION = "16w41a";
+    public static final String MINECRAFT_VERSION = "16w42a";
 
     // The name of the config folder
     public static final String CONFIG_FOLDER = "config";

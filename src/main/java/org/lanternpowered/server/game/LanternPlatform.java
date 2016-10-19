@@ -38,7 +38,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@NonnullByDefault
 public class LanternPlatform implements Platform {
 
     public static final String API_NAME = firstNonNull(Platform.class.getPackage()

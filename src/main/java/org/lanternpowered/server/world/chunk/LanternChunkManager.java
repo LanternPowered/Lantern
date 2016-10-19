@@ -50,11 +50,9 @@ import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.FastSoftThreadLocal;
 import org.lanternpowered.server.util.ThreadHelper;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayImmutableBiomeBuffer;
-import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
@@ -1067,10 +1065,7 @@ public final class LanternChunkManager {
 
         @Override
         public void setBiome(int x, int y, int z, BiomeType biome) {
-            super.setBiome(x, y, z, biome);
-            if (biome instanceof VirtualBiomeType) {
-                biome = ((VirtualBiomeType) biome).getPersistedType();
-            }
+            super.setBiome(x, y, z, biome instanceof VirtualBiomeType ? ((VirtualBiomeType) biome).getPersistedType() : biome);
             this.biomeTypes[index(x, y, z)] = biome;
         }
 

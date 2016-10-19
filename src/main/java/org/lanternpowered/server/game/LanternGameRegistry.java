@@ -367,7 +367,6 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternGameRegistry implements GameRegistry {
 
     private final LanternGame game;

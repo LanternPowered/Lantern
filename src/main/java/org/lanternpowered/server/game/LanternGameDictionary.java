@@ -37,7 +37,6 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Set;
 
-@NonnullByDefault
 public final class LanternGameDictionary implements GameDictionary {
 
     private final SetMultimap<String, GameDictionary.Entry> map = HashMultimap.create();

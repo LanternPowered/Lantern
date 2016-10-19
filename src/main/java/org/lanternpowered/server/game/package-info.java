@@ -23,25 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.protocol;
-
-import org.lanternpowered.server.network.message.MessageRegistry;
-
-public interface Protocol {
-
-    int CURRENT_VERSION = 312;
-
-    /**
-     * Gets the inbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry inbound();
-
-    /**
-     * Gets the outbound message registry.
-     * 
-     * @return the registry
-     */
-    MessageRegistry outbound();
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.game;

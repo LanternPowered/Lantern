@@ -23,25 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile.vanilla;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Slot;
 
-public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
+import javax.annotation.Nullable;
 
-    protected final I inventory;
+public class AltParentProxySlot extends AltParentProxyInventory implements Slot {
 
-    protected LanternContainer() {
-        this.inventory = this.createInventory();
-        ((AbstractInventory) this.inventory).add(this);
+    protected AltParentProxySlot(@Nullable Inventory parent, Inventory delegate) {
+        super(parent, delegate);
     }
 
-    protected abstract I createInventory();
-
     @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return this.inventory;
+    public int getStackSize() {
+        return ((Slot) this.delegate).getStackSize();
     }
 }

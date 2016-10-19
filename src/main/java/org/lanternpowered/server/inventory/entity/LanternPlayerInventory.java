@@ -27,8 +27,9 @@ package org.lanternpowered.server.inventory.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.ChildrenInventoryBase;
-import org.lanternpowered.server.inventory.InventoryBase;
+import org.lanternpowered.server.inventory.AbstractInventory;
+import org.lanternpowered.server.inventory.AbstractChildrenInventory;
+import org.lanternpowered.server.inventory.AbstractMutableInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
 import org.lanternpowered.server.inventory.LanternGridInventory;
@@ -61,7 +62,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
     private final HumanMainInventory mainInventory;
     private final OffHandSlot offHandSlot;
 
-    private final Map<HumanInventoryView, InventoryBase> inventoryViews = new EnumMap<>(HumanInventoryView.class);
+    private final Map<HumanInventoryView, AbstractMutableInventory> inventoryViews = new EnumMap<>(HumanInventoryView.class);
 
     public LanternPlayerInventory(@Nullable Inventory parent, @Nullable Translation name, @Nullable Player player) {
         super(parent, name);
@@ -118,7 +119,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 this.generateMainView(this, this.mainInventory));
         this.inventoryViews.put(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR,
                 this.generateReverseMainAndHotbarView(this, this.mainInventory));
-        final InventoryBase priorityMainAndHotbarView = this.generatePriorityMainAndHotbarView(this, this.mainInventory);
+        final AbstractMutableInventory priorityMainAndHotbarView = this.generatePriorityMainAndHotbarView(this, this.mainInventory);
         this.inventoryViews.put(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR,
                 priorityMainAndHotbarView);
         this.inventoryViews.put(HumanInventoryView.ALL_PRIORITY_MAIN,
@@ -131,7 +132,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
         this.inventoryViews.put(HumanInventoryView.HOTBAR, this.hotbar);
     }
 
-    private InventoryBase generateRawInventoryView(HumanMainInventory mainInventory,
+    private AbstractMutableInventory generateRawInventoryView(HumanMainInventory mainInventory,
             LanternEquipmentInventory equipmentInventory, OffHandSlot offHandSlot) {
         return new LanternOrderedInventory(null, null) {
             {
@@ -149,33 +150,33 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
         };
     }
 
-    private InventoryBase generateMainView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
-        final List<InventoryBase> children = new ArrayList<>(mainInventory.getChildren());
+    private AbstractMutableInventory generateMainView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+        final List<AbstractInventory> children = new ArrayList<>(mainInventory.getChildren());
         children.removeAll(this.hotbar.getChildren());
-        return new ChildrenInventoryBase(parent, null, children);
+        return new AbstractChildrenInventory(parent, null, children);
     }
 
-    private InventoryBase generateReverseMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
-        final List<InventoryBase> children = new ArrayList<>(mainInventory.getChildren());
-        final List<InventoryBase> hotbarSlots = new ArrayList<>(this.hotbar.getChildren());
+    private AbstractMutableInventory generateReverseMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+        final List<AbstractInventory> children = new ArrayList<>(mainInventory.getChildren());
+        final List<AbstractInventory> hotbarSlots = new ArrayList<>(this.hotbar.getChildren());
         children.removeAll(hotbarSlots);
         Collections.reverse(children);
         Collections.reverse(hotbarSlots);
         children.addAll(0, hotbarSlots);
-        return new ChildrenInventoryBase(parent, null, children);
+        return new AbstractChildrenInventory(parent, null, children);
     }
 
-    private InventoryBase generatePriorityMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
-        final List<InventoryBase> children = new ArrayList<>(mainInventory.getChildren());
-        final List<InventoryBase> hotbarSlots =  new ArrayList<>(this.hotbar.getChildren());
+    private AbstractMutableInventory generatePriorityMainAndHotbarView(@Nullable Inventory parent, HumanMainInventory mainInventory) {
+        final List<AbstractInventory> children = new ArrayList<>(mainInventory.getChildren());
+        final List<AbstractInventory> hotbarSlots =  new ArrayList<>(this.hotbar.getChildren());
         children.removeAll(hotbarSlots);
         children.addAll(hotbarSlots);
-        return new ChildrenInventoryBase(parent, null, children);
+        return new AbstractChildrenInventory(parent, null, children);
     }
 
-    private InventoryBase generateAllPriorityMainView(HumanMainInventory mainInventory) {
-        final List<InventoryBase> children = new ArrayList<>(this.getChildren());
-        return new ChildrenInventoryBase(null, null) {
+    private AbstractMutableInventory generateAllPriorityMainView(HumanMainInventory mainInventory) {
+        final List<AbstractInventory> children = new ArrayList<>(this.getChildren());
+        return new AbstractChildrenInventory(null, null) {
             {
                 children.set(children.indexOf(mainInventory), generatePriorityMainAndHotbarView(this, mainInventory));
                 children.forEach(this::registerChild);
@@ -190,7 +191,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
      * @param inventoryView The inventory view
      * @return The inventory
      */
-    public InventoryBase getInventoryView(HumanInventoryView inventoryView) {
+    public AbstractMutableInventory getInventoryView(HumanInventoryView inventoryView) {
         return this.inventoryViews.get(checkNotNull(inventoryView, "inventoryView"));
     }
 

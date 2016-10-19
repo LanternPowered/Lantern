@@ -47,7 +47,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class LanternOrderedInventory extends ChildrenInventoryBase implements OrderedInventory {
+public class LanternOrderedInventory extends AbstractChildrenInventory implements OrderedInventory {
 
     /**
      * All the leaf {@link Slot}s of this inventory.

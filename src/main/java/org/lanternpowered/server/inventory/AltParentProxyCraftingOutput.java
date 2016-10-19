@@ -25,23 +25,15 @@
  */
 package org.lanternpowered.server.inventory;
 
-import org.spongepowered.api.effect.Viewer;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
 
-public interface IViewerListener {
+import javax.annotation.Nullable;
 
-    Result onViewerAdded(Viewer viewer, LanternContainer container);
+public class AltParentProxyCraftingOutput extends AltParentProxyOutputSlot implements CraftingOutput {
 
-    Result onViewerRemoved(Viewer viewer, LanternContainer container);
-
-    enum Result {
-        /**
-         * Don't do anything.
-         */
-        IGNORE,
-        /**
-         * The listener should be removed from
-         * the target container.
-         */
-        REMOVE_LISTENER,
+    protected AltParentProxyCraftingOutput(@Nullable Inventory parent,
+            Inventory delegate) {
+        super(parent, delegate);
     }
 }

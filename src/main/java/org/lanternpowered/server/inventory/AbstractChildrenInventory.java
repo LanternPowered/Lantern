@@ -29,6 +29,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.Iterables;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
@@ -49,17 +51,40 @@ import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
-public class ChildrenInventoryBase extends InventoryBase {
+public class AbstractChildrenInventory extends AbstractMutableInventory {
 
-    final List<InventoryBase> children;
+    private final Object2IntMap<AbstractInventory> childrenIndexes = new Object2IntOpenHashMap<>();
 
-    public ChildrenInventoryBase(@Nullable Inventory parent, @Nullable Translation name) {
+    /**
+     * All the children that are present in this {@link Inventory}.
+     */
+    private final List<AbstractInventory> children;
+
+    public AbstractChildrenInventory(@Nullable Inventory parent, @Nullable Translation name) {
         this(parent, name, new ArrayList<>());
     }
 
-    public ChildrenInventoryBase(@Nullable Inventory parent, @Nullable Translation name, List<InventoryBase> children) {
+    public AbstractChildrenInventory(@Nullable Inventory parent, @Nullable Translation name, List<AbstractInventory> children) {
         super(parent, name);
-        this.children = children;
+        this.children = checkNotNull(children, "children");
+    }
+
+    @Override
+    AbstractInventory getChild(int index) {
+        return index < 0 || index >= this.children.size() ? EmptyInventories.get(this) : this.children.get(index);
+    }
+
+    @Override
+    int getChildIndex(AbstractInventory inventory) {
+        return this.childrenIndexes.get(checkNotNull(inventory, "inventory"));
+    }
+
+    @Override
+    protected void finalizeContent() {
+        super.finalizeContent();
+        for (int i = 0; i < this.children.size(); i++) {
+            this.childrenIndexes.put(this.children.get(i), i);
+        }
     }
 
     /**
@@ -67,7 +92,7 @@ public class ChildrenInventoryBase extends InventoryBase {
      *
      * @return The children
      */
-    public List<InventoryBase> getChildren() {
+    public List<AbstractInventory> getChildren() {
         return Collections.unmodifiableList(this.children);
     }
 
@@ -79,8 +104,9 @@ public class ChildrenInventoryBase extends InventoryBase {
      */
     protected <T extends Inventory> T registerChild(T childInventory) {
         checkNotNull(childInventory, "childInventory");
-        checkArgument(!this.children.contains(childInventory), "The child is already registered");
-        this.children.add((InventoryBase) childInventory);
+        final AbstractInventory childInventory1 = (AbstractInventory) childInventory;
+        checkArgument(!this.children.contains(childInventory1), "The child is already registered");
+        this.children.add(childInventory1);
         return childInventory;
     }
 
@@ -99,19 +125,20 @@ public class ChildrenInventoryBase extends InventoryBase {
      */
     protected <T extends Inventory> T prioritizeChild(T childInventory) {
         checkNotNull(childInventory, "inventory");
-        checkArgument(this.children.contains(childInventory), "The inventory is not registered");
+        final AbstractInventory childInventory1 = (AbstractInventory) childInventory;
+        checkArgument(this.children.contains(childInventory1), "The inventory is not registered");
         if (this.children.size() == 1) {
             return childInventory;
         }
-        this.children.remove(childInventory);
-        this.children.add(0, (InventoryBase) childInventory);
+        this.children.remove(childInventory1);
+        this.children.add(0, childInventory1);
         return childInventory;
     }
 
     private FastOfferResult offerFast(ItemStack stack, List<Inventory> processed, boolean add) {
         FastOfferResult offerResult = null;
         // Loop through the slots
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             if (!add && processed.contains(inventory)) {
                 continue;
             }
@@ -136,10 +163,10 @@ public class ChildrenInventoryBase extends InventoryBase {
         FastOfferResult offerResult = null;
         List<Inventory> processed = new ArrayList<>();
         Inventory inventory = this.query(stack);
-        if (inventory instanceof ChildrenInventoryBase) {
-            offerResult = ((ChildrenInventoryBase) inventory).offerFast(stack, processed, true);
+        if (inventory instanceof AbstractChildrenInventory) {
+            offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
         }
-        if (offerResult != null && (stack = offerResult.getRest()) == null) {
+        if ((stack = offerResult.getRest()) == null) {
             return offerResult;
         }
         offerResult = this.offerFast(stack, processed, false);
@@ -148,9 +175,9 @@ public class ChildrenInventoryBase extends InventoryBase {
 
     private PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack, List<Inventory> processed, boolean add) {
         PeekOfferTransactionsResult peekResult = null;
-        List<SlotTransaction> transactions = new ArrayList<>();
+        final List<SlotTransaction> transactions = new ArrayList<>();
         // Loop through the slots
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             if (!add && processed.contains(inventory)) {
                 continue;
             }
@@ -178,8 +205,8 @@ public class ChildrenInventoryBase extends InventoryBase {
         PeekOfferTransactionsResult peekResult = null;
         List<Inventory> processed = new ArrayList<>();
         Inventory inventory = this.query(stack);
-        if (inventory instanceof ChildrenInventoryBase) {
-            peekResult = ((ChildrenInventoryBase) inventory).peekOfferFastTransactions(stack, processed, true);
+        if (inventory instanceof AbstractChildrenInventory) {
+            peekResult = ((AbstractChildrenInventory) inventory).peekOfferFastTransactions(stack, processed, true);
         }
         if (peekResult != null && (stack = peekResult.getOfferResult().getRest()) == null) {
             return peekResult;
@@ -200,12 +227,12 @@ public class ChildrenInventoryBase extends InventoryBase {
                 matches.add(inventory);
             }
             if (nested) {
-                Inventory inventory1 = ((InventoryBase) inventory).query(matcher, true);
+                Inventory inventory1 = ((AbstractMutableInventory) inventory).query(matcher, true);
                 if (!(inventory1 instanceof EmptyInventory)) {
                     matches.add(inventory1);
                 }
-            } else if (inventory instanceof ChildrenInventoryBase) {
-                matches.addAll(((ChildrenInventoryBase) inventory).queryInventories(matcher, false));
+            } else if (inventory instanceof AbstractChildrenInventory) {
+                matches.addAll(((AbstractChildrenInventory) inventory).queryInventories(matcher, false));
             }
         }
         // All the children were a match, we will return this
@@ -221,29 +248,15 @@ public class ChildrenInventoryBase extends InventoryBase {
         checkNotNull(matcher, "matcher");
         final List<Inventory> matches = queryInventories(matcher, nested);
         if (matches.isEmpty()) {
-            return (T) this.emptyInventory;
+            return (T) EmptyInventories.get(this);
         }
-        return (T) new ChildrenInventoryBase(null, null, Collections.unmodifiableList((List) matches));
+        return (T) new AbstractChildrenInventory(null, null, Collections.unmodifiableList((List) matches));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> Iterable<T> slots() {
         return (Iterable) Iterables.unmodifiableIterable(this.getSlotInventories());
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Inventory> T first() {
-        final Iterator<Inventory> it = this.iterator();
-        return (T) (it.hasNext() ? it.next() : this);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Inventory> T next() {
-        // TODO
-        return (T) this.emptyInventory;
     }
 
     @Override
@@ -308,7 +321,7 @@ public class ChildrenInventoryBase extends InventoryBase {
     public boolean contains(ItemStack stack) {
         checkNotNull(stack, "stack");
         // Loop through the inventories
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             if (inventory.contains(stack)) {
                 return true;
             }
@@ -320,7 +333,7 @@ public class ChildrenInventoryBase extends InventoryBase {
     public boolean contains(ItemType type) {
         checkNotNull(type, "type");
         // Loop through the inventories
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             if (inventory.contains(type)) {
                 return true;
             }
@@ -332,7 +345,7 @@ public class ChildrenInventoryBase extends InventoryBase {
 
         private final ItemStack itemStack;
 
-        public ItemMatcher(ItemStack itemStack) {
+        ItemMatcher(ItemStack itemStack) {
             this.itemStack = itemStack;
         }
 
@@ -346,7 +359,7 @@ public class ChildrenInventoryBase extends InventoryBase {
     public Optional<ItemStack> poll(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         // Loop through the children inventories
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             final Optional<ItemStack> itemStack = inventory.poll(matcher);
             if (itemStack.isPresent()) {
                 return itemStack;
@@ -364,7 +377,7 @@ public class ChildrenInventoryBase extends InventoryBase {
         }
         ItemStack stack = null;
         // Loop through the children inventories
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.poll(limit, matcher).orElse(null);
@@ -397,8 +410,8 @@ public class ChildrenInventoryBase extends InventoryBase {
     public Optional<ItemStack> peek(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         // Loop through the children inventories
-        for (InventoryBase inventory : this.children) {
-            Optional<ItemStack> itemStack = inventory.peek(matcher);
+        for (AbstractInventory inventory : this.children) {
+            final Optional<ItemStack> itemStack = inventory.peek(matcher);
             if (itemStack.isPresent()) {
                 return itemStack;
             }
@@ -410,8 +423,8 @@ public class ChildrenInventoryBase extends InventoryBase {
     public Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher) {
         checkNotNull(matcher, "matcher");
         // Loop through the children inventories
-        for (InventoryBase inventory : this.children) {
-            Optional<PeekPollTransactionsResult> peekResult = inventory.peekPollTransactions(matcher);
+        for (AbstractInventory inventory : this.children) {
+            final Optional<PeekPollTransactionsResult> peekResult = inventory.peekPollTransactions(matcher);
             if (peekResult.isPresent()) {
                 return peekResult;
             }
@@ -428,7 +441,7 @@ public class ChildrenInventoryBase extends InventoryBase {
         }
         ItemStack stack = null;
         // Loop through the children inventories
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             // Check whether the slot a item contains
             if (stack == null) {
                 stack = inventory.peek(limit, matcher).orElse(null);
@@ -479,7 +492,7 @@ public class ChildrenInventoryBase extends InventoryBase {
         }
         PeekPollTransactionsResult peekResult = null;
         // Loop through the children inventories
-        for (InventoryBase inventory : this.children) {
+        for (AbstractInventory inventory : this.children) {
             // Check whether the slot a item contains
             if (peekResult == null) {
                 peekResult = inventory.peekPollTransactions(limit, matcher).orElse(null);
@@ -519,7 +532,7 @@ public class ChildrenInventoryBase extends InventoryBase {
     @Override
     public boolean isValidItem(ItemStack stack) {
         checkNotNull(stack, "stack");
-        for (InventoryBase child : this.children) {
+        for (AbstractInventory child : this.children) {
             if (child.isValidItem(stack)) {
                 return true;
             }
@@ -530,7 +543,7 @@ public class ChildrenInventoryBase extends InventoryBase {
     @Override
     public boolean isChild(Inventory child) {
         checkNotNull(child, "child");
-        for (InventoryBase child0 : this.children) {
+        for (AbstractInventory child0 : this.children) {
             if (child0 == child) {
                 return true;
             }
@@ -544,7 +557,7 @@ public class ChildrenInventoryBase extends InventoryBase {
     @Override
     public int slotCount() {
         int slotCount = 0;
-        for (InventoryBase child : this.children) {
+        for (AbstractInventory child : this.children) {
             if (child instanceof Slot) {
                 slotCount++;
             } else {

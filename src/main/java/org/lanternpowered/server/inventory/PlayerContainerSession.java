@@ -512,7 +512,7 @@ public class PlayerContainerSession {
                 final Transaction<ItemStackSnapshot> cursorTransaction = new Transaction<>(cursorItem, cursorItem);
 
                 if (itemStack != null) {
-                    InventoryBase inventory;
+                    AbstractMutableInventory inventory;
 
                     final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
                     if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
@@ -575,9 +575,9 @@ public class PlayerContainerSession {
                     int quantity = cursorItem.getQuantity();
                     final int maxQuantity = cursorItem.getMaxStackQuantity();
                     if (quantity < maxQuantity) {
-                        final InventoryBase inventory;
+                        final AbstractMutableInventory inventory;
                         if (windowId != 0) {
-                            inventory = new ChildrenInventoryBase(null, null, Arrays.asList(
+                            inventory = new AbstractChildrenInventory(null, null, Arrays.asList(
                                     this.openContainer.openInventory, this.openContainer.playerInventory
                                             .getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR)));
                         } else {

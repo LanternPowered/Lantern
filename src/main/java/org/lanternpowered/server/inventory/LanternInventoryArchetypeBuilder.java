@@ -28,16 +28,10 @@ package org.lanternpowered.server.inventory;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.item.inventory.property.InventoryTitle;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TranslatableText;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,13 +39,9 @@ import java.util.Map;
 
 public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Builder {
 
-    private static final Translation DEFAULT_TRANSLATION = Lantern.getRegistry().getTranslationManager().get("Inventory");
-
-    private Translation title = DEFAULT_TRANSLATION;
-
     private final List<InventoryArchetype> types = new ArrayList<>();
     private final Map<String, InventoryProperty<String, ?>> inventoryPropertiesByName = new HashMap<>();
-    private final List<InventoryProperty<String, ?>> inventoryProperties = new ArrayList<>();
+    private final Map<Class<?>, InventoryProperty<String, ?>> inventoryProperties = new HashMap<>();
 
     @Override
     public LanternInventoryArchetypeBuilder from(InventoryArchetype value) {
@@ -60,8 +50,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         //noinspection unchecked
         this.inventoryPropertiesByName.putAll(value.getProperties());
         //noinspection unchecked
-        this.inventoryProperties.addAll((Collection) ((LanternInventoryArchetype) value).getPropertiesList());
-        this.title = ((LanternInventoryArchetype) value).getTranslation();
+        this.inventoryProperties.putAll((Map) ((LanternInventoryArchetype) value).getPropertiesByClass());
         return this;
     }
 
@@ -70,7 +59,6 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         this.types.clear();
         this.inventoryPropertiesByName.clear();
         this.inventoryProperties.clear();
-        this.title = DEFAULT_TRANSLATION;
         return this;
     }
 
@@ -80,21 +68,7 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
         if (key != null) {
             this.inventoryPropertiesByName.put(key, property);
         }
-        this.inventoryProperties.add(property);
-        if (property instanceof InventoryTitle) {
-            final Text title =  ((InventoryTitle) property).getValue();
-            checkNotNull(title);
-            if (title instanceof TranslatableText) {
-                final TranslatableText title1 = (TranslatableText) title;
-                if (title1.getArguments().isEmpty() && title1.getChildren().isEmpty()) {
-                    this.title = title1.getTranslation();
-                } else {
-                    this.title = Lantern.getRegistry().getTranslationManager().get(title.toPlain());
-                }
-            } else {
-                this.title = Lantern.getRegistry().getTranslationManager().get(title.toPlain());
-            }
-        }
+        this.inventoryProperties.put(property.getClass(), property);
         return this;
     }
 
@@ -131,9 +105,9 @@ public class LanternInventoryArchetypeBuilder implements InventoryArchetype.Buil
             pluginId = "minecraft";
         }
         final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryProperties = new HashMap<>();
-        this.inventoryProperties.forEach(property ->
+        this.inventoryProperties.values().forEach(property ->
                 inventoryProperties.put(new InventoryPropertyKey(property.getClass(), property.getKey()), property));
         //noinspection unchecked
-        return new LanternInventoryArchetype(pluginId, id, name, this.types, (Map) this.inventoryPropertiesByName, inventoryProperties, this.title);
+        return new LanternInventoryArchetype(pluginId, id, name, this.types, (Map) this.inventoryPropertiesByName, inventoryProperties);
     }
 }

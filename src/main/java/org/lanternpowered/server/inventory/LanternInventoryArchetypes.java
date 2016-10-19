@@ -23,25 +23,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile.vanilla;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.item.inventory.InventoryArchetype;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
+public final class LanternInventoryArchetypes {
 
-    protected final I inventory;
+    public static final InventoryArchetype EMPTY = DummyObjectProvider.createFor(InventoryArchetype.class, "EMPTY");
 
-    protected LanternContainer() {
-        this.inventory = this.createInventory();
-        ((AbstractInventory) this.inventory).add(this);
-    }
-
-    protected abstract I createInventory();
-
-    @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return this.inventory;
+    private LanternInventoryArchetypes() {
     }
 }

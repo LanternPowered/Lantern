@@ -23,25 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile.vanilla;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
+import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
+import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.api.item.inventory.type.OrderedInventory;
+import org.spongepowered.api.item.recipe.Recipe;
 
-public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
+import java.util.Optional;
 
-    protected final I inventory;
+import javax.annotation.Nullable;
 
-    protected LanternContainer() {
-        this.inventory = this.createInventory();
-        ((AbstractInventory) this.inventory).add(this);
+public class AltParentProxyCraftingInventory extends AltParentProxyGridInventory implements CraftingInventory {
+
+    protected AltParentProxyCraftingInventory(@Nullable Inventory parent,
+            OrderedInventory delegate) {
+        super(parent, delegate);
     }
 
-    protected abstract I createInventory();
+    @Override
+    public GridInventory getCraftingGrid() {
+        return ((CraftingInventory) this.delegate).getCraftingGrid();
+    }
 
     @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return this.inventory;
+    public CraftingOutput getResult() {
+        return ((CraftingInventory) this.delegate).getResult();
+    }
+
+    @Override
+    public Optional<Recipe> getRecipe() {
+        return ((CraftingInventory) this.delegate).getRecipe();
     }
 }

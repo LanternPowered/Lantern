@@ -33,7 +33,6 @@ import com.google.common.collect.Multimap;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
@@ -58,15 +57,21 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public abstract class InventoryBase implements IInventory {
+public abstract class AbstractMutableInventory extends AbstractInventory {
 
-    static class EmptyNameHolder {
+    static class NameHolder {
 
-        static final Translation EMPTY_NAME = Lantern.getRegistry().getTranslationManager().get("inventory.empty.title");
+        static final Translation EMPTY = Lantern.getRegistry().getTranslationManager().get("inventory.empty.title");
+        static final Translation DEFAULT = Lantern.getRegistry().getTranslationManager().get("inventory.name");
     }
 
+    /**
+     * The plugin container that created this {@link AbstractMutableInventory}.
+     */
+    @Nullable private PluginContainer pluginContainer;
+
     @Nullable private final Inventory parent;
-    @Nullable private final Translation name;
+    @Nullable private Translation name;
 
     /**
      * All the {@link InventoryProperty}s of this inventory mapped by their type.
@@ -78,14 +83,19 @@ public abstract class InventoryBase implements IInventory {
      */
     private final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey = new HashMap<>();
 
-    private final Set<IViewerListener> viewerListeners = new HashSet<>();
+    private final Set<ContainerViewListener> viewerListeners = new HashSet<>();
 
-    protected final EmptyInventory emptyInventory = this instanceof EmptyInventory ?
-            (EmptyInventory) this : new EmptyInventoryImpl(this);
-
-    public InventoryBase(@Nullable Inventory parent, @Nullable Translation name) {
+    public AbstractMutableInventory(@Nullable Inventory parent, @Nullable Translation name) {
         this.parent = parent;
         this.name = name;
+    }
+
+    void setName(@Nullable Translation name) {
+        this.name = name;
+    }
+
+    void setPluginContainer(@Nullable PluginContainer pluginContainer) {
+        this.pluginContainer = pluginContainer;
     }
 
     protected void finalizeContent() {
@@ -105,7 +115,7 @@ public abstract class InventoryBase implements IInventory {
 
     @Override
     public PluginContainer getPlugin() {
-        return null; // TODO
+        return this.pluginContainer == null ? Lantern.getMinecraftPlugin() : this.pluginContainer;
     }
 
     @Override
@@ -119,18 +129,21 @@ public abstract class InventoryBase implements IInventory {
     }
 
     @Override
-    public IInventory parent() {
-        return this.parent == null ? this : (IInventory) this.parent;
+    public AbstractInventory parent() {
+        return this.parent == null ? this : (AbstractInventory) this.parent;
     }
 
     @Override
     public Translation getName() {
-        return this.name == null ? EmptyNameHolder.EMPTY_NAME : this.name;
+        return this.name == null ? NameHolder.DEFAULT : this.name;
     }
 
     @Override
     public boolean hasProperty(Class<? extends InventoryProperty<?, ?>> property) {
-        return this.inventoryPropertiesByClass.containsKey(checkNotNull(property, "property"));
+        if (this.inventoryPropertiesByClass.containsKey(checkNotNull(property, "property"))) {
+            return true;
+        }
+        return super.hasProperty(property);
     }
 
     @Override
@@ -141,58 +154,38 @@ public abstract class InventoryBase implements IInventory {
         if (property1 != null && property1.equals(property)) {
             return true;
         }
-        final IInventory parent = this.parent();
-        if (parent != this && parent instanceof InventoryBase) {
-            //noinspection unchecked
-            final Optional<InventoryProperty<?, ?>> optProperty = ((InventoryBase) parent).tryGetProperty(
-                    this, (Class) property.getClass(), property.getKey());
-            return optProperty.isPresent() && optProperty.get().equals(property);
-        }
-        return false;
+        return super.hasProperty(property);
     }
 
     @Override
     public boolean hasProperty(Inventory child, InventoryProperty<?,?> property) {
         checkNotNull(property, "property");
-        if (!(child instanceof InventoryBase)) {
-            return false;
+        if (child instanceof AbstractMutableInventory) {
+            final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property.getClass(), property.getKey());
+            final InventoryProperty property1 = ((AbstractMutableInventory) child).inventoryPropertiesByKey.get(propertyKey);
+            if (property1 != null && property1.equals(property)) {
+                return true;
+            }
         }
-        final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property.getClass(), property.getKey());
-        final InventoryProperty property1 = ((InventoryBase) child).inventoryPropertiesByKey.get(propertyKey);
-        if (property1 != null && property1.equals(property)) {
-            return true;
-        }
-        //noinspection unchecked
-        final Optional<InventoryProperty<?, ?>> optProperty = this.tryGetProperty(
-                child, (Class) property.getClass(), property.getKey());
-        return optProperty.isPresent() && optProperty.get().equals(property);
+        return super.hasProperty(child, property);
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Class<T> property) {
-        checkNotNull(property, "property");
-        final IInventory parent = this.parent();
-        final ImmutableList.Builder<T> properties = ImmutableList.builder();
+    <T extends InventoryProperty<?, ?>> ImmutableList.Builder<T> getPropertiesBuilder(Class<T> property) {
+        final ImmutableList.Builder<T> builder = super.getPropertiesBuilder(property);
         //noinspection unchecked
-        properties.addAll((Collection<? extends T>) this.inventoryPropertiesByClass.get(property));
-        if (parent != this && parent instanceof InventoryBase) {
-            properties.addAll(((InventoryBase) parent).tryGetProperties(this, property));
-        }
-        return properties.build();
+        builder.addAll((Collection<? extends T>) this.inventoryPropertiesByClass.get(property));
+        return builder;
     }
 
     @Override
-    public <T extends InventoryProperty<?, ?>> Collection<T> getProperties(Inventory child, Class<T> property) {
-        checkNotNull(property, "property");
-        if (!(child instanceof InventoryBase)) {
-            return ImmutableList.of();
+    <T extends InventoryProperty<?, ?>> ImmutableList.Builder<T> getPropertiesBuilder(Inventory child, Class<T> property) {
+        final ImmutableList.Builder<T> builder = super.getPropertiesBuilder(child, property);
+        if (child instanceof AbstractMutableInventory) {
+            //noinspection unchecked
+            builder.addAll((Collection<? extends T>) ((AbstractMutableInventory) child).inventoryPropertiesByClass.get(property));
         }
-        final ImmutableList.Builder<T> properties = ImmutableList.builder();
-        //noinspection unchecked
-        properties.addAll((Collection<? extends T>) ((InventoryBase) child).inventoryPropertiesByClass.get(property));
-        properties.addAll(this.tryGetProperties(child, property));
-        properties.addAll(this.tryGetProperties(property));
-        return properties.build();
+        return builder;
     }
 
     @Override
@@ -203,27 +196,21 @@ public abstract class InventoryBase implements IInventory {
         if (property1 != null && property.isInstance(property1)) {
             return Optional.of(property.cast(property1));
         }
-        final IInventory parent = this.parent();
-        if (parent != this && parent instanceof InventoryBase) {
-            return ((InventoryBase) parent).tryGetProperty(this, property, key);
-        }
-        return this.tryGetProperty(property, key);
+        return super.getProperty(property, key);
     }
 
     @Override
     public <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, @Nullable Object key) {
         checkNotNull(child, "child");
         checkNotNull(property, "property");
-        if (!(child instanceof InventoryBase)) {
-            return Optional.empty();
-        }
-        final InventoryBase inventoryBase = (InventoryBase) child;
         final InventoryPropertyKey propertyKey = new InventoryPropertyKey(property, key);
-        final InventoryProperty<?, ?> property1 = inventoryBase.inventoryPropertiesByKey.get(propertyKey);
-        if (property1 != null && property.isInstance(property1)) {
-            return Optional.of(property.cast(property1));
+        if (child instanceof AbstractMutableInventory) {
+            final InventoryProperty<?, ?> property1 = ((AbstractMutableInventory) child).inventoryPropertiesByKey.get(propertyKey);
+            if (property1 != null && property.isInstance(property1)) {
+                return Optional.of(property.cast(property1));
+            }
         }
-        return this.tryGetProperty(child, property, key);
+        return super.getProperty(child, property, key);
     }
 
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
@@ -312,7 +299,7 @@ public abstract class InventoryBase implements IInventory {
         checkNotNull(props, "props");
         return this.query(inventory -> {
             for (InventoryProperty<?,?> prop : props) {
-                if (((IInventory) inventory).hasProperty(prop)) {
+                if (((AbstractInventory) inventory).hasProperty(prop)) {
                     return true;
                 }
             }
@@ -377,13 +364,13 @@ public abstract class InventoryBase implements IInventory {
                         return true;
                     }
                 } else if (arg instanceof InventoryProperty<?,?>) {
-                    if (((IInventory) inventory).hasProperty((InventoryProperty<?, ?>) arg)) {
+                    if (((AbstractInventory) inventory).hasProperty((InventoryProperty<?, ?>) arg)) {
                         return true;
                     }
                 } else if (arg instanceof Class<?>) {
                     final Class<?> clazz = (Class<?>) arg;
                     if (InventoryProperty.class.isAssignableFrom(clazz)) {
-                        if (((IInventory) inventory).hasProperty((Class<? extends InventoryProperty<?, ?>>) clazz)) {
+                        if (((AbstractInventory) inventory).hasProperty((Class<? extends InventoryProperty<?, ?>>) clazz)) {
                             return true;
                         }
                     } else if (Inventory.class.isAssignableFrom(clazz)) {
@@ -398,25 +385,28 @@ public abstract class InventoryBase implements IInventory {
     }
 
     @Override
-    public void add(IViewerListener listener) {
-        this.viewerListeners.add(checkNotNull(listener, "listener"));
+    public void add(ContainerViewListener listener) {
+        checkNotNull(listener, "listener");
+        this.viewerListeners.add(listener);
     }
 
+    @Override
     protected void addViewer(Viewer viewer, LanternContainer container) {
-        final Iterator<IViewerListener> it = this.viewerListeners.iterator();
+        final Iterator<ContainerViewListener> it = this.viewerListeners.iterator();
         while (it.hasNext()) {
-            final IViewerListener listener = it.next();
-            if (listener.onViewerAdded(viewer, container) == IViewerListener.Result.REMOVE_LISTENER) {
+            final ContainerViewListener listener = it.next();
+            if (listener.onViewerAdded(viewer, container) == ContainerViewListener.Result.REMOVE_LISTENER) {
                 it.remove();
             }
         }
     }
 
+    @Override
     protected void removeViewer(Viewer viewer, LanternContainer container) {
-        final Iterator<IViewerListener> it = this.viewerListeners.iterator();
+        final Iterator<ContainerViewListener> it = this.viewerListeners.iterator();
         while (it.hasNext()) {
-            final IViewerListener listener = it.next();
-            if (listener.onViewerRemoved(viewer, container) == IViewerListener.Result.REMOVE_LISTENER) {
+            final ContainerViewListener listener = it.next();
+            if (listener.onViewerRemoved(viewer, container) == ContainerViewListener.Result.REMOVE_LISTENER) {
                 it.remove();
             }
         }

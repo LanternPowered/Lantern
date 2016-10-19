@@ -28,18 +28,16 @@ package org.lanternpowered.server.inventory.slot;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.inventory.AbstractMutableInventory;
+import org.lanternpowered.server.inventory.EmptyInventories;
 import org.lanternpowered.server.inventory.FastOfferResult;
-import org.lanternpowered.server.inventory.IViewerListener;
-import org.lanternpowered.server.inventory.InventoryBase;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.inventory.PeekOfferTransactionsResult;
 import org.lanternpowered.server.inventory.PeekPollTransactionsResult;
 import org.lanternpowered.server.inventory.PeekSetTransactionsResult;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
-import org.lanternpowered.server.util.collect.EmptyIterator;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
-import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -55,7 +53,6 @@ import org.spongepowered.api.text.translation.Translation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -65,7 +62,7 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-public class LanternSlot extends InventoryBase implements Slot {
+public class LanternSlot extends AbstractMutableInventory implements Slot {
 
     /**
      * The item stack the is stored in this slot.
@@ -149,19 +146,6 @@ public class LanternSlot extends InventoryBase implements Slot {
     public <T extends Inventory> Iterable<T> slots() {
         // A slot cannot contain slots
         return Collections.emptyList();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Inventory> T first() {
-        return (T) this;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public <T extends Inventory> T next() {
-        // TODO
-        return (T) this.emptyInventory;
     }
 
     @Override
@@ -477,6 +461,44 @@ public class LanternSlot extends InventoryBase implements Slot {
         return resultBuilder.build();
     }
 
+    public InventoryTransactionResult set(@Nullable ItemStack stack, boolean force) {
+        stack = LanternItemStack.toNullable(stack);
+        boolean fail = false;
+        if (stack != null) {
+            if (stack.getQuantity() <= 0) {
+                stack = null;
+            } else {
+                fail = !force && !this.isValidItem(stack);
+            }
+        }
+        if (fail) {
+            return InventoryTransactionResult.builder()
+                    .type(InventoryTransactionResult.Type.FAILURE)
+                    .reject(stack)
+                    .build();
+        }
+        InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder()
+                .type(InventoryTransactionResult.Type.SUCCESS);
+        if (this.itemStack != null) {
+            resultBuilder.replace(this.itemStack);
+        }
+        if (stack != null) {
+            stack = stack.copy();
+            int quantity = stack.getQuantity();
+            if (quantity > this.maxStackSize) {
+                stack.setQuantity(this.maxStackSize);
+                // Create the rest stack that was rejected,
+                // because the inventory doesn't allow so many items
+                stack = stack.copy();
+                stack.setQuantity(quantity - this.maxStackSize);
+                resultBuilder.reject(stack);
+            }
+        }
+        this.itemStack = stack;
+        this.queueUpdate();
+        return resultBuilder.build();
+    }
+
     @Override
     public void clear() {
         this.itemStack = null;
@@ -528,13 +550,7 @@ public class LanternSlot extends InventoryBase implements Slot {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        return (T) this.emptyInventory;
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Iterator<Inventory> iterator() {
-        return EmptyIterator.get();
+        return (T) EmptyInventories.get(this);
     }
 
     /**

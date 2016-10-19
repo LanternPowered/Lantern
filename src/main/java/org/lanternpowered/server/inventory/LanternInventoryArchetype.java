@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
-import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collection;
 import java.util.List;
@@ -43,8 +42,6 @@ import javax.annotation.Nullable;
 
 public class LanternInventoryArchetype extends PluginCatalogType.Base implements InventoryArchetype {
 
-    private final Translation translation;
-
     private final Map<String, InventoryProperty<?,?>> inventoryPropertiesByName;
     private final Map<InventoryPropertyKey, InventoryProperty<?,?>> inventoryPropertiesByKey;
 
@@ -52,26 +49,26 @@ public class LanternInventoryArchetype extends PluginCatalogType.Base implements
 
     public LanternInventoryArchetype(String pluginId, String name, List<InventoryArchetype> childArchetypes,
             Map<String, InventoryProperty<?, ?>> inventoryPropertiesByName,
-            Map<InventoryPropertyKey, InventoryProperty<?, ?>> inventoryPropertiesByKey, Translation translation) {
+            Map<InventoryPropertyKey, InventoryProperty<?, ?>> inventoryPropertiesByKey) {
         super(pluginId, name);
         this.childArchetypes = ImmutableList.copyOf(childArchetypes);
         this.inventoryPropertiesByName = ImmutableMap.copyOf(inventoryPropertiesByName);
         this.inventoryPropertiesByKey = ImmutableMap.copyOf(inventoryPropertiesByKey);
-        this.translation = translation;
     }
 
     public LanternInventoryArchetype(String pluginId, String id, String name, List<InventoryArchetype> childArchetypes,
             Map<String, InventoryProperty<?, ?>> inventoryPropertiesByName,
-            Map<InventoryPropertyKey, InventoryProperty<?, ?>> inventoryPropertiesByKey, Translation translation) {
+            Map<InventoryPropertyKey, InventoryProperty<?, ?>> inventoryPropertiesByKey) {
         super(pluginId, id, name);
         this.childArchetypes = ImmutableList.copyOf(childArchetypes);
         this.inventoryPropertiesByName = ImmutableMap.copyOf(inventoryPropertiesByName);
         this.inventoryPropertiesByKey = ImmutableMap.copyOf(inventoryPropertiesByKey);
-        this.translation = translation;
     }
 
-    public Collection<InventoryProperty<?,?>> getPropertiesList() {
-        return this.inventoryPropertiesByKey.values();
+    public Map<Class<?>, InventoryProperty<?,?>> getPropertiesByClass() {
+        final ImmutableMap.Builder<Class<?>, InventoryProperty<?,?>> builder = ImmutableMap.builder();
+        this.inventoryPropertiesByKey.forEach((key, value) -> builder.put(value.getClass(), value));
+        return builder.build();
     }
 
     @Override
@@ -101,9 +98,5 @@ public class LanternInventoryArchetype extends PluginCatalogType.Base implements
             return Optional.of(property.cast(property1));
         }
         return Optional.empty();
-    }
-
-    public Translation getTranslation() {
-        return this.translation;
     }
 }

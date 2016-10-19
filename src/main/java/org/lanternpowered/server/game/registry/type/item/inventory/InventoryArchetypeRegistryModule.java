@@ -27,18 +27,31 @@ package org.lanternpowered.server.game.registry.type.item.inventory;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
 import org.lanternpowered.server.inventory.LanternInventoryArchetypeBuilder;
+import org.lanternpowered.server.inventory.LanternInventoryArchetypes;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryArchetypes;
 import org.spongepowered.api.item.inventory.property.AcceptsItems;
 import org.spongepowered.api.item.inventory.property.InventoryDimension;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 
+import java.util.List;
+
 public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModule<InventoryArchetype> {
 
     public InventoryArchetypeRegistryModule() {
         super(InventoryArchetypes.class);
+    }
+
+    @Override
+    public List<CatalogMappingData> getCatalogMappings() {
+        return ImmutableList.<CatalogMappingData>builder()
+                .addAll(super.getCatalogMappings())
+                .add(new CatalogMappingData(LanternInventoryArchetypes.class, this.provideCatalogMap()))
+                .build();
     }
 
     @Override
@@ -62,6 +75,15 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
         final InventoryArchetype menuRowArchetype = builder.property(new InventoryDimension(9, 1))
                 .build("sponge:menu_row", "Menu Row");
         this.register(menuRowArchetype);
+
+        final InventoryArchetype menuColumnArchetype = builder.property(new InventoryDimension(1, 9))
+                .build("sponge:menu_column", "Menu Column");
+        this.register(menuColumnArchetype);
+
+        final InventoryArchetype buttonArchetype = builder.reset()
+                .from(slotArchetype)
+                .build("sponge:menu_button", "Menu Button");
+        this.register(buttonArchetype);
 
         final InventoryArchetype menuGridArchetype = builder.reset()
                 .with(menuRowArchetype)
@@ -171,5 +193,47 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .property(new InventoryDimension(2, 1))
                 .build("minecraft:horse", "Horse");
         this.register(horseArchetype);
+
+        final InventoryArchetype horseWithChestArchetype = builder.reset()
+                .with(horseArchetype)
+                .with(new LanternInventoryArchetypeBuilder()
+                        .from(menuGridArchetype)
+                        .property(new InventoryDimension(5, 3))
+                        .build("horse_grid", "Horse Grid"))
+                .build("minecraft:horse_with_chest", "Horse with Chest");
+        this.register(horseWithChestArchetype);
+
+        final InventoryArchetype craftingArchetype = builder.reset()
+                .with(slotArchetype)
+                .with(new LanternInventoryArchetypeBuilder()
+                        .from(menuGridArchetype)
+                        .property(new InventoryDimension(2, 2))
+                        .build("minecraft:crafting_grid", "Crafting Grid"))
+                .property(InventoryTitle.of(t("container.crafting")))
+                .build("minecraft:crafting", "Crafting");
+        this.register(craftingArchetype);
+
+        final InventoryArchetype playerArchetype = builder.reset()
+                .with(craftingArchetype)
+                .with(new LanternInventoryArchetypeBuilder()
+                        .from(menuGridArchetype)
+                        .property(new InventoryDimension(1, 4))
+                        .build("minecraft:armor", "Armor"))
+                .with(new LanternInventoryArchetypeBuilder()
+                        .from(menuGridArchetype)
+                        .property(new InventoryDimension(9, 3)).build("minecraft:player_main", "Player Main"))
+                .with(new LanternInventoryArchetypeBuilder()
+                        .from(menuGridArchetype)
+                        .property(new InventoryDimension(9, 1)).build("minecraft:player_hotbar", "Player Hotbar"))
+                .build("minecraft:player", "Player");
+        this.register(playerArchetype);
+
+        final InventoryArchetype unknownArchetype = builder.reset()
+                .build("minecraft:unknown", "Unknown");
+        this.register(unknownArchetype);
+
+        final InventoryArchetype emptyArchetype = builder.reset()
+                .build("minecraft:empty", "Empty");
+        this.register(emptyArchetype);
     }
 }

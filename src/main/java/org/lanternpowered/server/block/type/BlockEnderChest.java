@@ -29,9 +29,8 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.entity.LanternEntity;
-import org.lanternpowered.server.inventory.IInventory;
-import org.lanternpowered.server.inventory.IViewerListener;
-import org.lanternpowered.server.inventory.LanternContainer;
+import org.lanternpowered.server.inventory.AbstractInventory;
+import org.lanternpowered.server.inventory.ContainerViewListener;
 import org.lanternpowered.server.item.ItemInteractionResult;
 import org.lanternpowered.server.item.ItemInteractionType;
 import org.spongepowered.api.block.BlockState;
@@ -39,7 +38,6 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.EnderChest;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityTypes;
-import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemType;
@@ -71,8 +69,8 @@ public class BlockEnderChest extends LanternBlockType implements IBlockContainer
         if (player != null) {
             final TileEntity tileEntity = location.getTileEntity().orElse(null);
             if (tileEntity instanceof EnderChest) {
-                final IInventory inventory = (IInventory) player.getEnderChestInventory();
-                inventory.add((IViewerListener) tileEntity);
+                final AbstractInventory inventory = (AbstractInventory) player.getEnderChestInventory();
+                inventory.add((ContainerViewListener) tileEntity);
                 player.openInventory(player.getEnderChestInventory(), Cause.source(player).build());
                 return ItemInteractionResult.success();
             }

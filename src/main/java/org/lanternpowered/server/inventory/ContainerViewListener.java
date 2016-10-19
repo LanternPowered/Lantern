@@ -23,25 +23,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile.vanilla;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
+import org.spongepowered.api.effect.Viewer;
 
-public abstract class LanternContainer<I extends TileEntityInventory<TileEntityCarrier>> extends LanternContainerBase implements TileEntityCarrier {
+public interface ContainerViewListener {
 
-    protected final I inventory;
+    /**
+     * Is called when the specified {@link Viewer} starts watching the {@link LanternContainer}.
+     *
+     * @param viewer The viewer
+     * @param container The container
+     * @return The result
+     */
+    Result onViewerAdded(Viewer viewer, LanternContainer container);
 
-    protected LanternContainer() {
-        this.inventory = this.createInventory();
-        ((AbstractInventory) this.inventory).add(this);
-    }
+    /**
+     * Is called when the specified {@link Viewer} stops watching the {@link LanternContainer}.
+     *
+     * @param viewer The viewer
+     * @param container The container
+     * @return The result
+     */
+    Result onViewerRemoved(Viewer viewer, LanternContainer container);
 
-    protected abstract I createInventory();
-
-    @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return this.inventory;
+    enum Result {
+        /**
+         * Don't do anything.
+         */
+        IGNORE,
+        /**
+         * The listener should be removed from
+         * the target container.
+         */
+        REMOVE_LISTENER,
     }
 }

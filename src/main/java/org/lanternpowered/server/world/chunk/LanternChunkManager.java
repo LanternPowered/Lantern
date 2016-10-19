@@ -61,8 +61,6 @@ import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.chunk.LanternChunk.ChunkSection;
 import org.lanternpowered.server.world.extent.ExtentBufferHelper;
 import org.lanternpowered.server.world.extent.SoftBufferExtentViewDownsize;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBiomeVolumeWorker;
-import org.lanternpowered.server.world.extent.worker.LanternMutableBlockVolumeWorker;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
@@ -82,11 +80,8 @@ import org.spongepowered.api.world.biome.BiomeTypes;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
-import org.spongepowered.api.world.extent.MutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
 import org.spongepowered.api.world.extent.StorageType;
-import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
-import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 import org.spongepowered.api.world.gen.BiomeGenerator;
 import org.spongepowered.api.world.gen.GenerationPopulator;
 import org.spongepowered.api.world.gen.Populator;
@@ -1062,11 +1057,6 @@ public final class LanternChunkManager {
         @Override
         protected int index(int x, int y, int z) {
             return (z & 0xf) << 4 | x & 0xf;
-        }
-
-        @Override
-        public MutableBiomeVolumeWorker<? extends MutableBiomeVolume> getBiomeWorker() {
-            return new LanternMutableBiomeVolumeWorker<>(this);
         }
 
         @Override

@@ -230,7 +230,7 @@ public class LanternGridInventory extends LanternInventory2D implements GridInve
     protected <T extends Inventory> T prioritizeChild(T childInventory) {
         checkNotNull(childInventory, "inventory");
         if (this.rows.contains(childInventory) || this.columns.contains(childInventory)) {
-            List<Inventory> children = new ArrayList<>(((LanternOrderedInventory) childInventory).children);
+            final List<Inventory> children = new ArrayList<>(((AbstractChildrenInventory) childInventory).getChildren());
             // Prioritize in backwards order
             Collections.reverse(children);
             children.forEach(this::prioritizeChild);

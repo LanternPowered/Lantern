@@ -25,108 +25,41 @@
  */
 package org.lanternpowered.server.inventory;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
-import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 
 import java.util.Optional;
 import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
 
 public interface IInventory extends Inventory {
 
     @Override
     IInventory parent();
 
-    boolean hasProperty(Class<? extends InventoryProperty<?,?>> property);
-
-    boolean hasProperty(InventoryProperty<?,?> property);
-
-    boolean hasProperty(Inventory child, InventoryProperty<?,?> property);
-
-    @Override
-    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Class<T> property, @Nullable Object key);
-
-    @Override
-    <T extends InventoryProperty<?, ?>> Optional<T> getProperty(Inventory child, Class<T> property, @Nullable Object key);
-
     /**
-     * Offers the {@link ItemStack} fast to this inventory, avoiding
-     * the creation of {@link InventoryTransactionResult}s.
+     * Adds a {@link ContainerViewListener} to this {@link Inventory}.
      *
-     * @param stack The item stack
-     * @return The fast offer result
+     * @param listener The listener
      */
-    FastOfferResult offerFast(ItemStack stack);
+    void add(ContainerViewListener listener);
 
-    PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack);
-
-    @Override
-    default Optional<ItemStack> poll() {
-        return this.poll(stack -> true);
-    }
-
-    default Optional<ItemStack> poll(ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.poll(stack -> stack.getItem().equals(itemType));
-    }
+    Optional<ItemStack> poll(ItemType itemType);
 
     Optional<ItemStack> poll(Predicate<ItemStack> matcher);
 
-    @Override
-    default Optional<ItemStack> poll(int limit) {
-        return this.poll(limit, stack -> true);
-    }
-
-    default Optional<ItemStack> poll(int limit, ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.poll(limit, stack -> stack.getItem().equals(itemType));
-    }
+    Optional<ItemStack> poll(int limit, ItemType itemType);
 
     Optional<ItemStack> poll(int limit, Predicate<ItemStack> matcher);
 
-    @Override
-    default Optional<ItemStack> peek() {
-        return this.peek(stack -> true);
-    }
-
-    default Optional<ItemStack> peek(ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.peek(stack -> stack.getItem().equals(itemType));
-    }
+    Optional<ItemStack> peek(ItemType itemType);
 
     Optional<ItemStack> peek(Predicate<ItemStack> matcher);
 
-    Optional<PeekPollTransactionsResult> peekPollTransactions(Predicate<ItemStack> matcher);
-
-    @Override
-    default Optional<ItemStack> peek(int limit) {
-        return this.peek(limit, stack -> true);
-    }
-
-    default Optional<ItemStack> peek(int limit, ItemType itemType) {
-        checkNotNull(itemType, "itemType");
-        return this.peek(limit, stack -> stack.getItem().equals(itemType));
-    }
+    Optional<ItemStack> peek(int limit, ItemType itemType);
 
     Optional<ItemStack> peek(int limit, Predicate<ItemStack> matcher);
-
-    Optional<PeekPollTransactionsResult> peekPollTransactions(int limit, Predicate<ItemStack> matcher);
-
-    /**
-     * Peeks for the result {@link SlotTransaction}s and {@link InventoryTransactionResult}
-     * that would occur if you try to set a item through {@link Inventory#set(ItemStack)}.
-     *
-     * @param itemStack The item stack to set
-     * @return The peeked transaction results
-     */
-    PeekSetTransactionsResult peekSetTransactions(@Nullable ItemStack itemStack);
 
     <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested);
 
@@ -156,5 +89,17 @@ public interface IInventory extends Inventory {
      */
     int slotCount();
 
-    void add(IViewerListener listener);
+    /**
+     * Gets whether this {@link Inventory} a property
+     * contains of the specified type.
+     *
+     * @param property The property type
+     * @return Whether a property exists
+     */
+    boolean hasProperty(Class<? extends InventoryProperty<?, ?>> property);
+
+    boolean hasProperty(InventoryProperty<?, ?> property);
+
+    boolean hasProperty(Inventory child, InventoryProperty<?, ?> property);
+
 }

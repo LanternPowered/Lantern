@@ -32,6 +32,7 @@ import com.google.common.collect.Maps;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.lanternpowered.server.world.biome.LanternBiomeType;
 import org.spongepowered.api.util.GuavaCollectors;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.gen.BiomeGenerator;
@@ -54,7 +55,10 @@ public final class LanternWorldGenerator implements WorldGenerator {
     private volatile GenerationPopulator baseGenerationPopulator;
     private volatile BiomeGenerator biomeGenerator;
 
-    public LanternWorldGenerator(GenerationPopulator baseGenerationPopulator, BiomeGenerator biomeGenerator) {
+    private final World world;
+
+    public LanternWorldGenerator(World world, BiomeGenerator biomeGenerator, GenerationPopulator baseGenerationPopulator) {
+        this.world = checkNotNull(world, "world");
         this.baseGenerationPopulator = checkNotNull(baseGenerationPopulator, "baseGenerationPopulator");
         this.biomeGenerator = checkNotNull(biomeGenerator, "biomeGenerator");
     }
@@ -102,7 +106,6 @@ public final class LanternWorldGenerator implements WorldGenerator {
     @Override
     public BiomeGenerationSettings getBiomeSettings(BiomeType type) {
         final LanternBiomeType biomeType = (LanternBiomeType) checkNotNull(type, "type");
-        return this.biomeGenSettings.computeIfAbsent(biomeType, t -> t.getDefaultGenerationSettings().copy());
+        return this.biomeGenSettings.computeIfAbsent(biomeType, t -> t.createDefaultGenerationSettings(this.world));
     }
-
 }

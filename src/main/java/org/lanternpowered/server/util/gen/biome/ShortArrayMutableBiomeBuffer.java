@@ -49,7 +49,7 @@ public class ShortArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer {
     private boolean detached;
     private final short[] biomes;
 
-    private void checkOpen() {
+    protected void checkOpen() {
         checkState(!this.detached, "Trying to use buffer after it's closed!");
     }
 
@@ -73,7 +73,7 @@ public class ShortArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer {
     public BiomeType getBiome(int x, int y, int z) {
         checkOpen();
         checkRange(x, y, z);
-        return BiomeRegistryModule.get().getByInternalId(this.biomes[this.index(x, y, z)]).orElse(BiomeTypes.OCEAN);
+        return BiomeRegistryModule.get().getByInternalId(this.biomes[index(x, y, z)]).orElse(BiomeTypes.OCEAN);
     }
 
     /**
@@ -83,7 +83,7 @@ public class ShortArrayMutableBiomeBuffer extends AbstractMutableBiomeBuffer {
      * @return The internal byte array.
      */
     public short[] detach() {
-        this.checkOpen();
+        checkOpen();
         this.detached = true;
         return this.biomes;
     }

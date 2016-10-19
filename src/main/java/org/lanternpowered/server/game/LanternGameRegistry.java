@@ -183,6 +183,9 @@ import org.lanternpowered.server.util.LanguageUtil;
 import org.lanternpowered.server.util.graph.DirectedGraph;
 import org.lanternpowered.server.util.graph.TopologicalOrder;
 import org.lanternpowered.server.world.LanternWorldArchetypeBuilder;
+import org.lanternpowered.server.world.biome.LanternBiomeGenerationSettings;
+import org.lanternpowered.server.world.biome.LanternBiomeGenerationSettingsBuilder;
+import org.lanternpowered.server.world.biome.LanternVirtualBiomeTypeBuilder;
 import org.lanternpowered.server.world.extent.LanternExtentBufferFactory;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.GameRegistry;
@@ -335,7 +338,9 @@ import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.SerializationBehavior;
 import org.spongepowered.api.world.WorldArchetype;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.VirtualBiomeType;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.extent.ExtentBufferFactory;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
@@ -513,6 +518,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
                 .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
                 .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
+                .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
+                .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
                 ;
         this.registerFactories();
     }

@@ -25,21 +25,25 @@
  */
 package org.lanternpowered.server.world.biome;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.VirtualBiomeType;
 
-public class LanternVirtualBiomeType extends LanternBiomeType implements VirtualBiomeType {
+import java.util.function.Function;
 
+public class LanternVirtualBiomeType extends AbstractBiomeType implements VirtualBiomeType {
+
+    private final Function<World, BiomeGenerationSettings> settingsFunction;
     private final BiomeType persistedType;
 
-    public LanternVirtualBiomeType(String pluginId, String identifier, BiomeType persistedType) {
-        super(pluginId, identifier);
-        checkNotNull(persistedType, "persistedType");
-        checkArgument(!(persistedType instanceof VirtualBiomeType), "The persisted type may not be virtual.");
+    LanternVirtualBiomeType(String pluginId, String identifier, String name,
+            Function<World, BiomeGenerationSettings> settingsFunction, BiomeType persistedType) {
+        super(pluginId, identifier, name);
+        this.settingsFunction = settingsFunction;
         this.persistedType = persistedType;
     }
 
@@ -51,5 +55,11 @@ public class LanternVirtualBiomeType extends LanternBiomeType implements Virtual
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
         return super.toStringHelper().add("persistedType", this.persistedType);
+    }
+
+    @Override
+    public BiomeGenerationSettings createDefaultGenerationSettings(World world) {
+        checkNotNull(world, "world");
+        return this.settingsFunction.apply(world);
     }
 }

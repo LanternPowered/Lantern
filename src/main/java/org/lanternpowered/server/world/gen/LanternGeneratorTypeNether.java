@@ -41,7 +41,7 @@ public class LanternGeneratorTypeNether extends LanternGeneratorType {
     public WorldGenerator createGenerator(World world) {
         SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(BiomeTypes.HELL);
         // TODO
-        return new LanternWorldGenerator(new FlatGenerationPopulator(FlatGeneratorType.getDefaultSettings(), this), biomeGenerator);
+        return new LanternWorldGenerator(world, biomeGenerator, new FlatGenerationPopulator(FlatGeneratorType.getDefaultSettings(), this));
     }
 
 }

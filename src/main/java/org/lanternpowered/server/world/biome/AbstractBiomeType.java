@@ -23,34 +23,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.world.gen.skylands;
+package org.lanternpowered.server.world.biome;
 
-import org.lanternpowered.server.world.gen.LanternGeneratorType;
-import org.lanternpowered.server.world.gen.LanternWorldGenerator;
-import org.spongepowered.api.extra.modifier.skylands.SkylandsBiomeGenerator;
-import org.spongepowered.api.extra.modifier.skylands.SkylandsGrassPopulator;
-import org.spongepowered.api.extra.modifier.skylands.SkylandsGroundCoverPopulator;
-import org.spongepowered.api.extra.modifier.skylands.SkylandsTerrainGenerator;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.gen.GenerationPopulator;
-import org.spongepowered.api.world.gen.WorldGenerator;
+import org.spongepowered.api.world.biome.BiomeGenerationSettings;
+import org.spongepowered.api.world.biome.BiomeType;
 
-import java.util.List;
+public abstract class AbstractBiomeType extends PluginCatalogType.Base implements BiomeType {
 
-public final class SkylandsGeneratorType extends LanternGeneratorType {
+    private double temperature;
+    private double humidity;
 
-    public SkylandsGeneratorType(String pluginId, String name) {
-        super(pluginId, name);
+    public AbstractBiomeType(String pluginId, String identifier) {
+        super(pluginId, identifier);
+    }
+
+    public AbstractBiomeType(String pluginId, String identifier, String name) {
+        super(pluginId, identifier, name);
     }
 
     @Override
-    public WorldGenerator createGenerator(World world) {
-        final LanternWorldGenerator generator = new LanternWorldGenerator(world, new SkylandsBiomeGenerator(), new SkylandsTerrainGenerator()
-        );
-        final List<GenerationPopulator> generatorPopulators = generator.getGenerationPopulators();
-        generatorPopulators.add(new SkylandsGroundCoverPopulator());
-        generatorPopulators.add(new SkylandsGrassPopulator());
-        return generator;
+    public double getTemperature() {
+        return this.temperature;
     }
 
+    @Override
+    public double getHumidity() {
+        return this.humidity;
+    }
+
+    public void setTemperature(double temperature) {
+        this.temperature = temperature;
+    }
+
+    public void setHumidity(double humidity) {
+        this.humidity = humidity;
+    }
 }

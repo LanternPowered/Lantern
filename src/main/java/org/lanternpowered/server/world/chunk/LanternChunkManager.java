@@ -50,8 +50,11 @@ import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.world.biome.BiomeRegistryModule;
 import org.lanternpowered.server.util.FastSoftThreadLocal;
 import org.lanternpowered.server.util.ThreadHelper;
+import org.lanternpowered.server.util.gen.biome.ObjectArrayImmutableBiomeBuffer;
+import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.block.AbstractMutableBlockBuffer;
 import org.lanternpowered.server.util.gen.block.AtomicShortArrayMutableBlockBuffer;
@@ -77,6 +80,7 @@ import org.spongepowered.api.world.ChunkTicketManager.PlayerLoadingTicket;
 import org.spongepowered.api.world.biome.BiomeGenerationSettings;
 import org.spongepowered.api.world.biome.BiomeType;
 import org.spongepowered.api.world.biome.BiomeTypes;
+import org.spongepowered.api.world.biome.VirtualBiomeType;
 import org.spongepowered.api.world.extent.Extent;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.ImmutableBlockVolume;
@@ -840,9 +844,22 @@ public final class LanternChunkManager {
         long chunkSeed = xSeed * chunkX + zSeed * chunkZ ^ worldSeed;
         random.setSeed(chunkSeed);
 
+        //noinspection ConstantConditions
+        final ChunkBiomeBuffer biomeBuffer = this.genBuffers.get().chunkBiomeBuffer;
+        biomeBuffer.reuse(new Vector3i(chunkX + 8, 0, chunkZ + 8));
+
+        // We ave to regenerate the biomes so that any
+        // virtual biomes can be passed to the populator.
+        final BiomeGenerator biomeGenerator = this.worldGenerator.getBiomeGenerator();
+        biomeGenerator.generateBiomes(biomeBuffer);
+
+        // Initialize the biomes into the chunk
+        final ImmutableBiomeVolume immutableBiomeVolume = biomeBuffer.getImmutableBiomeCopy();
+        chunk.initializeBiomes(biomeBuffer.detach().clone());
+
         // Using the biome at an arbitrary point within the chunk
         // ({16, 0, 16} in the vanilla game)
-        final BiomeType biomeType = chunk.getWorld().getBiome(chunkX + 16, 0, chunkZ + 16);
+        final BiomeType biomeType = immutableBiomeVolume.getBiome(chunkX + 16, 0, chunkZ + 16);
 
         // Get the generation settings
         final BiomeGenerationSettings biomeGenSettings = this.worldGenerator.getBiomeSettings(biomeType);
@@ -1051,7 +1068,17 @@ public final class LanternChunkManager {
         @Override
         public void setBiome(int x, int y, int z, BiomeType biome) {
             super.setBiome(x, y, z, biome);
-            this.biomeTypes[this.index(x, y, z)] = biome;
+            if (biome instanceof VirtualBiomeType) {
+                biome = ((VirtualBiomeType) biome).getPersistedType();
+            }
+            this.biomeTypes[index(x, y, z)] = biome;
+        }
+
+        @Override
+        public BiomeType getBiome(int x, int y, int z) {
+            checkOpen();
+            checkRange(x, y, z);
+            return this.biomeTypes[index(x, y, z)];
         }
 
         @Override
@@ -1063,6 +1090,12 @@ public final class LanternChunkManager {
         public void reuse(Vector3i start) {
             super.reuse(start);
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
+        }
+
+        @Override
+        public ImmutableBiomeVolume getImmutableBiomeCopy() {
+            checkOpen();
+            return new ObjectArrayImmutableBiomeBuffer(this.biomeTypes, this.start, this.size);
         }
     }
 

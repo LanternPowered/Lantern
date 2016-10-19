@@ -68,16 +68,17 @@ public final class FlatGeneratorType extends LanternGeneratorType {
     @Override
     public WorldGenerator createGenerator(World world) {
         final DataContainer generatorSettings = world.getProperties().getGeneratorSettings();
-        final FlatGeneratorSettings settings;
+        FlatGeneratorSettings settings = null;
         if (generatorSettings.contains(SETTINGS)) {
             settings = FlatGeneratorSettingsParser.fromString(generatorSettings.getString(SETTINGS).get());
-        } else {
+        }
+        if (settings == null) {
             settings = getDefaultSettings();
         }
         final SingleBiomeGenerator biomeGenerator = new SingleBiomeGenerator(settings.getBiomeType());
         final FlatGenerationPopulator populatorGenerator = new FlatGenerationPopulator(settings,
                 (LanternGeneratorType) world.getProperties().getGeneratorType());
-        return new LanternWorldGenerator(populatorGenerator, biomeGenerator);
+        return new LanternWorldGenerator(world, biomeGenerator, populatorGenerator);
     }
 
 }

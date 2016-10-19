@@ -48,11 +48,7 @@ public final class LanternBiomeGenerationSettings implements BiomeGenerationSett
     public LanternBiomeGenerationSettings() {
     }
 
-    /**
-     * Creates a copy of this biome generation settings.
-     * 
-     * @return the copy
-     */
+    @Override
     public LanternBiomeGenerationSettings copy() {
         final LanternBiomeGenerationSettings copy = new LanternBiomeGenerationSettings();
         copy.maxHeight = this.maxHeight;
@@ -108,5 +104,4 @@ public final class LanternBiomeGenerationSettings implements BiomeGenerationSett
     public <T extends Populator> List<T> getPopulators(Class<T> type) {
         return (List<T>) this.populators.stream().filter(type::isInstance).collect(GuavaCollectors.toImmutableList());
     }
-
 }

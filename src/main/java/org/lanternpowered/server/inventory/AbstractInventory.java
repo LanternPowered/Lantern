@@ -53,8 +53,10 @@ import javax.annotation.Nullable;
 
 public abstract class AbstractInventory implements IInventory {
 
+    protected abstract LanternEmptyInventory empty();
+
     AbstractInventory getChild(int index) {
-        return EmptyInventories.get(this);
+        return empty();
     }
 
     int getChildIndex(AbstractInventory inventory) {
@@ -97,7 +99,7 @@ public abstract class AbstractInventory implements IInventory {
     public <T extends Inventory> T next() {
         final AbstractInventory parent = parent();
         if (parent == this) {
-            return (T) EmptyInventories.get(this);
+            return (T) empty();
         }
         int index = parent.getChildIndex(this);
         checkState(index != -1);

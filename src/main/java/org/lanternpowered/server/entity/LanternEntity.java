@@ -149,7 +149,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     public LanternEntity(UUID uniqueId) {
         this.uniqueId = uniqueId;
-        this.registerKeys();
+        registerKeys();
         if (!bypassEntityTypeLookup) {
             this.entityType = (LanternEntityType) EntityTypeRegistryModule.get().getByClass(this.getClass()).orElseThrow(
                     () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
@@ -161,13 +161,13 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public void registerKeys() {
-        this.registerKey(Keys.DISPLAY_NAME, null);
-        this.registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
-        this.registerKey(Keys.VELOCITY, Vector3d.ZERO);
-        this.registerKey(Keys.FIRE_TICKS, 0).nonRemovableAttachedValueProcessor();
-        this.registerKey(Keys.FALL_DISTANCE, 0f).nonRemovableAttachedValueProcessor();
-        this.registerKey(LanternKeys.INVULNERABLE, false).nonRemovableAttachedValueProcessor();
-        this.registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.DISPLAY_NAME, null);
+        registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
+        registerKey(Keys.VELOCITY, Vector3d.ZERO);
+        registerKey(Keys.FIRE_TICKS, 0).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.FALL_DISTANCE, 0f).nonRemovableAttachedValueProcessor();
+        registerKey(LanternKeys.INVULNERABLE, false).nonRemovableAttachedValueProcessor();
+        registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).nonRemovableAttachedValueProcessor();
     }
 
     /**
@@ -202,8 +202,8 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public void remove() {
-        if (!this.isRemoved()) {
-            this.remove(RemoveState.DESTROYED);
+        if (!isRemoved()) {
+            remove(RemoveState.DESTROYED);
         }
     }
 
@@ -216,8 +216,8 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         checkNotNull(removeState, "removeState");
         this.removeState = removeState;
         if (removeState == RemoveState.DESTROYED) {
-            this.setVehicle(null);
-            this.clearPassengers();
+            setVehicle(null);
+            clearPassengers();
         }
     }
 
@@ -325,12 +325,12 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     public void setPosition(Vector3d position) {
-        this.setRawPosition(position);
+        setRawPosition(position);
     }
 
     public boolean setPositionAndWorld(World world, Vector3d position) {
-        this.setRawPosition(position);
-        this.setWorld((LanternWorld) world);
+        setRawPosition(position);
+        setWorld((LanternWorld) world);
         // TODO: Events
         return true;
     }
@@ -344,7 +344,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public boolean setLocation(Location<World> location) {
         checkNotNull(location, "location");
-        return this.setPositionAndWorld(location.getExtent(), location.getPosition());
+        return setPositionAndWorld(location.getExtent(), location.getPosition());
     }
 
     @Override
@@ -364,12 +364,12 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     @Override
     public void setRotation(Vector3d rotation) {
-        this.setRawRotation(rotation);
+        setRawRotation(rotation);
     }
 
     @Override
     public boolean transferToWorld(World world, Vector3d position) {
-        return this.setPositionAndWorld(checkNotNull(world, "world"), position);
+        return setPositionAndWorld(checkNotNull(world, "world"), position);
     }
 
     @Override
@@ -380,8 +380,8 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public boolean setTransform(Transform<World> transform) {
         checkNotNull(transform, "transform");
-        this.setLocationAndRotation(transform.getLocation(), transform.getRotation());
-        this.setScale(transform.getScale());
+        setLocationAndRotation(transform.getLocation(), transform.getRotation());
+        setScale(transform.getScale());
         // TODO: Events
         return true;
     }
@@ -391,9 +391,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         checkNotNull(location, "location");
         checkNotNull(rotation, "rotation");
 
-        this.setWorld((LanternWorld) location.getExtent());
-        this.setRawPosition(location.getPosition());
-        this.setRawRotation(rotation);
+        setWorld((LanternWorld) location.getExtent());
+        setRawPosition(location.getPosition());
+        setRawRotation(rotation);
         // TODO: Events
         return true;
     }
@@ -431,9 +431,9 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         }
         // TODO: No relative roll?
 
-        this.setWorld((LanternWorld) world);
-        this.setRawPosition(new Vector3d(x, y, z));
-        this.setRawRotation(new Vector3d(pitch, yaw, roll));
+        setWorld((LanternWorld) world);
+        setRawPosition(new Vector3d(x, y, z));
+        setRawRotation(new Vector3d(pitch, yaw, roll));
 
         // TODO: Events
         return true;

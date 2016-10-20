@@ -65,6 +65,8 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
         static final Translation DEFAULT = Lantern.getRegistry().getTranslationManager().get("inventory.name");
     }
 
+    private final LanternEmptyInventory emptyInventory = new LanternEmptyInventory(this);
+
     /**
      * The plugin container that created this {@link AbstractMutableInventory}.
      */
@@ -111,6 +113,11 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
         this.inventoryPropertiesByClass.put(inventoryProperty.getClass(), inventoryProperty);
         final InventoryPropertyKey propertyKey = new InventoryPropertyKey(inventoryProperty.getClass(), inventoryProperty.getKey());
         this.inventoryPropertiesByKey.put(propertyKey, inventoryProperty);
+    }
+
+    @Override
+    protected LanternEmptyInventory empty() {
+        return this.emptyInventory;
     }
 
     @Override

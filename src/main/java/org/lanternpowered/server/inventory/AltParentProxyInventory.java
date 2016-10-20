@@ -46,12 +46,18 @@ import javax.annotation.Nullable;
 
 public class AltParentProxyInventory extends AbstractInventory {
 
+    private final LanternEmptyInventory emptyInventory = new LanternEmptyInventory(this);
     protected final AbstractInventory delegate;
     @Nullable private final AbstractInventory parent;
 
     protected AltParentProxyInventory(@Nullable Inventory parent, Inventory delegate) {
         this.delegate = (AbstractInventory) checkNotNull(delegate, "delegate");
         this.parent = (AbstractInventory) parent;
+    }
+
+    @Override
+    protected LanternEmptyInventory empty() {
+        return this.emptyInventory;
     }
 
     @Override

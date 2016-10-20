@@ -71,7 +71,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
 
     @Override
     AbstractInventory getChild(int index) {
-        return index < 0 || index >= this.children.size() ? EmptyInventories.get(this) : this.children.get(index);
+        return index < 0 || index >= this.children.size() ? empty() : this.children.get(index);
     }
 
     @Override
@@ -160,17 +160,16 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     @Override
     public FastOfferResult offerFast(ItemStack stack) {
         checkNotNull(stack, "stack");
-        FastOfferResult offerResult = null;
-        List<Inventory> processed = new ArrayList<>();
-        Inventory inventory = this.query(stack);
+        final List<Inventory> processed = new ArrayList<>();
+        final Inventory inventory = query(stack);
         if (inventory instanceof AbstractChildrenInventory) {
-            offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
+            final FastOfferResult offerResult = ((AbstractChildrenInventory) inventory).offerFast(stack, processed, true);
+            if (offerResult.getRest() == null) {
+                return offerResult;
+            }
+            stack = offerResult.getRest();
         }
-        if ((stack = offerResult.getRest()) == null) {
-            return offerResult;
-        }
-        offerResult = this.offerFast(stack, processed, false);
-        return offerResult;
+        return offerFast(stack, processed, false);
     }
 
     private PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack, List<Inventory> processed, boolean add) {
@@ -202,16 +201,19 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     @Override
     public PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack) {
         checkNotNull(stack, "stack");
-        PeekOfferTransactionsResult peekResult = null;
-        List<Inventory> processed = new ArrayList<>();
-        Inventory inventory = this.query(stack);
+        final PeekOfferTransactionsResult peekResult;
+        final List<Inventory> processed = new ArrayList<>();
+        final Inventory inventory = query(stack);
         if (inventory instanceof AbstractChildrenInventory) {
             peekResult = ((AbstractChildrenInventory) inventory).peekOfferFastTransactions(stack, processed, true);
+            if (peekResult.getOfferResult().getRest() == null) {
+                return peekResult;
+            }
+            stack = peekResult.getOfferResult().getRest();
+        } else {
+            peekResult = null;
         }
-        if (peekResult != null && (stack = peekResult.getOfferResult().getRest()) == null) {
-            return peekResult;
-        }
-        PeekOfferTransactionsResult peekResult1 = this.peekOfferFastTransactions(stack, processed, false);
+        final PeekOfferTransactionsResult peekResult1 = peekOfferFastTransactions(stack, processed, false);
         if (peekResult != null) {
             peekResult1.getTransactions().addAll(peekResult.getTransactions());
         }
@@ -248,7 +250,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
         checkNotNull(matcher, "matcher");
         final List<Inventory> matches = queryInventories(matcher, nested);
         if (matches.isEmpty()) {
-            return (T) EmptyInventories.get(this);
+            return (T) empty();
         }
         return (T) new AbstractChildrenInventory(null, null, Collections.unmodifiableList((List) matches));
     }

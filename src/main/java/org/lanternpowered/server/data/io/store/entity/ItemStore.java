@@ -28,10 +28,10 @@ package org.lanternpowered.server.data.io.store.entity;
 import org.lanternpowered.server.data.io.store.ObjectSerializerRegistry;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.entity.LanternItem;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.inventory.ItemStack;
 
 public class ItemStore extends EntityStore<LanternItem> {
 
@@ -40,15 +40,15 @@ public class ItemStore extends EntityStore<LanternItem> {
 
     @Override
     public void serializeValues(LanternItem item, SimpleValueContainer valueContainer, DataView dataView) {
-        dataView.set(ITEM, ObjectSerializerRegistry.get().get(ItemStack.class).get()
-                .serialize(valueContainer.remove(Keys.REPRESENTED_ITEM).get().createStack()));
+        dataView.set(ITEM, ObjectSerializerRegistry.get().get(LanternItemStack.class).get()
+                .serialize((LanternItemStack) valueContainer.remove(Keys.REPRESENTED_ITEM).get().createStack()));
         valueContainer.remove(Keys.PICKUP_DELAY).ifPresent(v -> dataView.set(PICKUP_DELAY, v.shortValue()));
         super.serializeValues(item, valueContainer, dataView);
     }
 
     @Override
     public void deserializeValues(LanternItem item, SimpleValueContainer valueContainer, DataView dataView) {
-        valueContainer.set(Keys.REPRESENTED_ITEM, ObjectSerializerRegistry.get().get(ItemStack.class).get()
+        valueContainer.set(Keys.REPRESENTED_ITEM, ObjectSerializerRegistry.get().get(LanternItemStack.class).get()
                 .deserialize(dataView.getView(ITEM).get()).createSnapshot());
         valueContainer.set(Keys.PICKUP_DELAY, dataView.getInt(PICKUP_DELAY).orElse(0));
         super.deserializeValues(item, valueContainer, dataView);

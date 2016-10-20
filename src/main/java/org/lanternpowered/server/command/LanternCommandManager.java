@@ -284,12 +284,12 @@ public class LanternCommandManager implements CommandManager {
                 }
             }
         } catch (Throwable thr) {
-            Text.Builder excBuilder;
+            final Text.Builder excBuilder;
             if (thr instanceof TextMessageException) {
-                Text text = ((TextMessageException) thr).getText();
-                excBuilder = text == null ? Text.builder("null") : Text.builder();
+                final Text text = ((TextMessageException) thr).getText();
+                excBuilder = text == null ? Text.builder("null") : Text.builder().append(text);
             } else {
-                excBuilder = Text.builder(thr.getMessage());
+                excBuilder = Text.builder(String.valueOf(thr.getMessage()));
             }
             if (source.hasPermission("sponge.debug.hover-stacktrace")) {
                 final StringWriter writer = new StringWriter();
@@ -300,8 +300,8 @@ public class LanternCommandManager implements CommandManager {
                         .replace("\r", "\n")))); // I mean I guess somebody could be running this on like OS 9?
             }
             source.sendMessage(error(t("Error occurred while executing command: %s", excBuilder.build())));
-            this.log.error(LanternTexts.toLegacy(t("Error occurred while executing command '%s' for source %s: %s", commandLine, source.toString(),
-                    thr.getMessage())), thr);
+            this.log.error(LanternTexts.toLegacy(t("Error occurred while executing command '%s' for source %s: %s",
+                    commandLine, source.toString(), String.valueOf(thr.getMessage()))), thr);
         }
         return CommandResult.empty();
     }

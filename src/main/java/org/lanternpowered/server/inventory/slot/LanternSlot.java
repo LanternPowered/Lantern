@@ -29,7 +29,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.inventory.AbstractMutableInventory;
-import org.lanternpowered.server.inventory.EmptyInventories;
 import org.lanternpowered.server.inventory.FastOfferResult;
 import org.lanternpowered.server.inventory.LanternContainer;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -461,44 +460,6 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         return resultBuilder.build();
     }
 
-    public InventoryTransactionResult set(@Nullable ItemStack stack, boolean force) {
-        stack = LanternItemStack.toNullable(stack);
-        boolean fail = false;
-        if (stack != null) {
-            if (stack.getQuantity() <= 0) {
-                stack = null;
-            } else {
-                fail = !force && !this.isValidItem(stack);
-            }
-        }
-        if (fail) {
-            return InventoryTransactionResult.builder()
-                    .type(InventoryTransactionResult.Type.FAILURE)
-                    .reject(stack)
-                    .build();
-        }
-        InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder()
-                .type(InventoryTransactionResult.Type.SUCCESS);
-        if (this.itemStack != null) {
-            resultBuilder.replace(this.itemStack);
-        }
-        if (stack != null) {
-            stack = stack.copy();
-            int quantity = stack.getQuantity();
-            if (quantity > this.maxStackSize) {
-                stack.setQuantity(this.maxStackSize);
-                // Create the rest stack that was rejected,
-                // because the inventory doesn't allow so many items
-                stack = stack.copy();
-                stack.setQuantity(quantity - this.maxStackSize);
-                resultBuilder.reject(stack);
-            }
-        }
-        this.itemStack = stack;
-        this.queueUpdate();
-        return resultBuilder.build();
-    }
-
     @Override
     public void clear() {
         this.itemStack = null;
@@ -550,7 +511,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
-        return (T) EmptyInventories.get(this);
+        return (T) empty();
     }
 
     /**

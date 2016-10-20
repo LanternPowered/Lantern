@@ -54,7 +54,7 @@ public final class ObjectSerializerRegistry {
 
     private Optional<ObjectSerializer> findSerializer(Class<?> key) {
         ObjectSerializer store;
-        while (key != Object.class) {
+        while (key != Object.class && key != null) {
             store = this.objectSerializers.get(key);
             if (store != null) {
                 return Optional.of(store);

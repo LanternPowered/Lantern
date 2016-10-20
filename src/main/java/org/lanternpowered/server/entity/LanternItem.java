@@ -35,12 +35,13 @@ public class LanternItem extends LanternEntity implements Item {
 
     public LanternItem(UUID uniqueId) {
         super(uniqueId);
-        this.setEntityProtocolType(EntityProtocolTypes.ITEM);
+        setEntityProtocolType(EntityProtocolTypes.ITEM);
     }
 
     @Override
     public void registerKeys() {
         super.registerKeys();
-        this.registerKey(Keys.REPRESENTED_ITEM, null);
+        registerKey(Keys.REPRESENTED_ITEM, null);
+        registerKey(Keys.PICKUP_DELAY, 0);
     }
 }

@@ -50,7 +50,7 @@ public interface AbstractEquipable extends Equipable {
     @Override
     default boolean canEquip(EquipmentType type, @Nullable ItemStack equipment) {
         checkNotNull(type, "type");
-        final Inventory inventory = this.getInventory().query(SimpleEquipmentInventory.class);
+        final Inventory inventory = getInventory().query(SimpleEquipmentInventory.class);
         if (inventory instanceof EmptyInventory) {
             return false;
         }
@@ -63,7 +63,7 @@ public interface AbstractEquipable extends Equipable {
 
     @Override
     default Optional<ItemStack> getEquipped(EquipmentType type) {
-        final Inventory inventory = this.getInventory().query(SimpleEquipmentInventory.class);
+        final Inventory inventory = getInventory().query(SimpleEquipmentInventory.class);
         if (inventory instanceof EmptyInventory) {
             return Optional.empty();
         }
@@ -72,7 +72,7 @@ public interface AbstractEquipable extends Equipable {
 
     @Override
     default boolean equip(EquipmentType type, @Nullable ItemStack equipment) {
-        final Inventory inventory = this.getInventory().query(SimpleEquipmentInventory.class);
+        final Inventory inventory = getInventory().query(SimpleEquipmentInventory.class);
         if (inventory instanceof EmptyInventory) {
             return false;
         }

@@ -55,8 +55,8 @@ public class FireworkChargeItemTypeObjectSerializer extends ItemTypeObjectSerial
         valueContainer.remove(Keys.FIREWORK_EFFECTS).ifPresent(effects -> {
             if (!effects.isEmpty()) {
                 // Also serialize the extra explosion effects
-                if (effects.size() > 0) {
-                    dataView.set(EXTRA_EXPLOSIONS, effects.subList(0, effects.size()).stream()
+                if (effects.size() > 1) {
+                    dataView.set(EXTRA_EXPLOSIONS, effects.subList(1, effects.size()).stream()
                             .map(FireworkChargeItemTypeObjectSerializer::serializeExplosion).collect(Collectors.toList()));
                 }
                 dataView.set(EXPLOSION, serializeExplosion(effects.get(0)));

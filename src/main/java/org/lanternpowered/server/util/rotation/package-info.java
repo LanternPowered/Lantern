@@ -23,21 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.catalog;
-
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.CatalogType;
-
-abstract class AbstractCatalogType implements CatalogType {
-
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", getId())
-                .add("name", getName());
-    }
-
-    @Override
-    public String toString() {
-        return toStringHelper().toString();
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.util.rotation;

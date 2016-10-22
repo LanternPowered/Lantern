@@ -27,10 +27,8 @@ package org.lanternpowered.server.util.rotation;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.util.rotation.Rotation;
 
-@NonnullByDefault
 public final class LanternRotation extends SimpleCatalogType.Base implements Rotation {
 
     private final int angle;

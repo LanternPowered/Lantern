@@ -31,7 +31,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import java.net.URL;
 import java.nio.file.Path;
 
-public final class LanternAsset implements Asset {
+final class LanternAsset implements Asset {
 
     private final PluginContainer plugin;
     private final String id;

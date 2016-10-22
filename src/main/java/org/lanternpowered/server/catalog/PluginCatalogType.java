@@ -42,7 +42,7 @@ public interface PluginCatalogType extends CatalogType {
      */
     @Override
     default String getId() {
-        return this.getPluginId() + ':' + this.getName();
+        return getPluginId() + ':' + getName();
     }
 
     /**

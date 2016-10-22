@@ -27,6 +27,8 @@ package org.lanternpowered.server.network.forge.message.codec.handshake;
 
 import com.google.common.collect.Maps;
 import io.netty.handler.codec.CodecException;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.codec.EncoderException;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.forge.handshake.ForgeClientHandshakePhase;
 import org.lanternpowered.server.network.forge.handshake.ForgeServerHandshakePhase;
@@ -42,12 +44,12 @@ import java.util.Map;
 
 public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCustomPayload {
 
-    static final int FML_HANDSHAKE_SERVER_HELLO = 0;
-    static final int FML_HANDSHAKE_CLIENT_HELLO = 1;
-    static final int FML_HANDSHAKE_MOD_LIST = 2;
+    private static final int FML_HANDSHAKE_SERVER_HELLO = 0;
+    private static final int FML_HANDSHAKE_CLIENT_HELLO = 1;
+    private static final int FML_HANDSHAKE_MOD_LIST = 2;
     static final int FML_HANDSHAKE_REGISTRY_DATA = 3;
-    static final int FML_HANDSHAKE_ACK = -1;
-    static final int FML_HANDSHAKE_RESET = -2;
+    private static final int FML_HANDSHAKE_ACK = -1;
+    private static final int FML_HANDSHAKE_RESET = -2;
 
     // We will still use protocol 1, so we don't have to send
     // the overridden dimension id (maybe once we add support for that)
@@ -81,7 +83,7 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
             return new MessageResult("FML|HS", context.byteBufAlloc()
                     .buffer(1).writeByte((byte) FML_HANDSHAKE_RESET));
         }
-        return null;
+        throw new EncoderException("Unsupported message type: " + message);
     }
 
     @Override
@@ -112,11 +114,11 @@ public final class CodecPlayInOutCustomPayload extends AbstractCodecPlayInOutCus
                     // server -> client message: ignore
                     break;
                 default:
-                    throw new CodecException("Unknown forge handshake message with opcode: " + type);
+                    throw new DecoderException("Unknown forge handshake message with opcode: " + type);
             }
-            throw new CodecException("Received an unexpected forge message with opcode: " + type);
+            throw new DecoderException("Received an unexpected forge message with opcode: " + type);
         } else {
-            throw new CodecException("Received an unexpected message with channel: " + channel);
+            throw new DecoderException("Received an unexpected message with channel: " + channel);
         }
     }
 

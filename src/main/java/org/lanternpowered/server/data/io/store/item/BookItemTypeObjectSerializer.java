@@ -41,9 +41,9 @@ import java.util.stream.Collectors;
 
 public class BookItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
-    private static final DataQuery AUTHOR = DataQuery.of("author");
-    private static final DataQuery TITLE = DataQuery.of("title");
-    private static final DataQuery PAGES = DataQuery.of("pages");
+    public static final DataQuery AUTHOR = DataQuery.of("author");
+    public static final DataQuery TITLE = DataQuery.of("title");
+    public static final DataQuery PAGES = DataQuery.of("pages");
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {

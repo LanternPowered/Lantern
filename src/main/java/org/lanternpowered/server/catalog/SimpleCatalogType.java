@@ -36,7 +36,7 @@ public interface SimpleCatalogType extends CatalogType {
 
     @Override
     default String getName() {
-        return this.getId();
+        return getId();
     }
 
     abstract class Base extends CatalogTypeBase implements SimpleCatalogType {

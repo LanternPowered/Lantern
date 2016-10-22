@@ -228,7 +228,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             if (protocolState == ProtocolState.PLAY || protocolState == ProtocolState.FORGE_HANDSHAKE) {
                 this.keepAliveId = this.random.nextInt();
                 this.keepAliveTime = System.currentTimeMillis();
-                this.send(new MessageInOutKeepAlive(this.keepAliveId));
+                send(new MessageInOutKeepAlive(this.keepAliveId));
             }
         }, 0, 2, TimeUnit.SECONDS);
     }
@@ -275,7 +275,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     @SuppressWarnings("unchecked")
     public void messageReceived(Message message) {
         if (message instanceof MessageInOutKeepAlive) { // Special case
-            this.handleKeepAlive((MessageInOutKeepAlive) message);
+            handleKeepAlive((MessageInOutKeepAlive) message);
         } else if (message == NullMessage.INSTANCE) {
             // Ignore
         } else if (message instanceof BulkMessage) {
@@ -284,20 +284,20 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             final HandlerMessage handlerMessage = (HandlerMessage) message;
             if (AsyncHelper.isAsyncMessage(handlerMessage.getMessage()) ||
                     AsyncHelper.isAsyncHandler(handlerMessage.getHandler())) {
-                this.handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage());
+                handleMessage(handlerMessage.getHandler(), handlerMessage.getMessage());
             } else {
                 this.messageQueue.add(handlerMessage);
             }
         } else {
             final Class<? extends Message> messageClass = message.getClass();
-            final MessageRegistration registration = this.getProtocol().inbound().findByMessageType(messageClass).orElse(null);
+            final MessageRegistration registration = getProtocol().inbound().findByMessageType(messageClass).orElse(null);
             if (registration == null) {
                 throw new DecoderException("Failed to find a message registration for " + messageClass.getName() + "!");
             }
             registration.getHandler().ifPresent(handler -> {
                 final Handler handler1 = (Handler) handler;
                 if (AsyncHelper.isAsyncMessage(message) || AsyncHelper.isAsyncHandler(handler1)) {
-                    this.handleMessage(handler1, message);
+                    handleMessage(handler1, message);
                 } else {
                     this.messageQueue.add(new HandlerMessage(message, handler1));
                 }
@@ -340,9 +340,9 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             Lantern.getLogger().debug("A netty connection error occurred", cause);
 
             if (cause instanceof TimeoutException) {
-                this.closeChannel(t("disconnect.timeout"));
+                closeChannel(t("disconnect.timeout"));
             } else {
-                this.closeChannel(t("disconnect.genericReason", "Internal Exception: " + cause));
+                closeChannel(t("disconnect.genericReason", "Internal Exception: " + cause));
             }
         }
     }
@@ -367,7 +367,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
     @Override
     public InetSocketAddress getVirtualHost() {
-        return this.virtualHostAddress == null ? this.getAddress() : this.virtualHostAddress;
+        return this.virtualHostAddress == null ? getAddress() : this.virtualHostAddress;
     }
 
     /**
@@ -431,7 +431,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     public void pulse() {
         HandlerMessage entry;
         while ((entry = this.messageQueue.poll()) != null) {
-            this.handleMessage(entry.getHandler(), entry.getMessage());
+            handleMessage(entry.getHandler(), entry.getMessage());
         }
     }
 
@@ -734,7 +734,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.disconnectReason = reason;
         if (this.channel.isActive() && (this.protocolState == ProtocolState.PLAY ||
                 this.protocolState == ProtocolState.LOGIN || this.protocolState == ProtocolState.FORGE_HANDSHAKE)) {
-            this.sendWithFuture(new MessageOutDisconnect(reason)).addListener(ChannelFutureListener.CLOSE);
+            sendWithFuture(new MessageOutDisconnect(reason)).addListener(ChannelFutureListener.CLOSE);
         } else {
             this.channel.close();
         }
@@ -833,7 +833,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // Check whether the player is banned and kick if necessary
         Optional<BanEntry> optBanEntry = banConfig.getEntryByProfile(gameProfile);
         if (!optBanEntry.isPresent()) {
-            SocketAddress address = this.getChannel().remoteAddress();
+            final SocketAddress address = this.getChannel().remoteAddress();
             if (address instanceof InetSocketAddress) {
                 optBanEntry = banConfig.getEntryByIp(((InetSocketAddress) address).getAddress());
             }

@@ -68,7 +68,6 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +78,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public final class ProcessorPlayOutParticleEffect implements Processor<MessagePlayOutParticleEffect> {
 
     /**

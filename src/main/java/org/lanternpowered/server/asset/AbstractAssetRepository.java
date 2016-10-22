@@ -58,7 +58,7 @@ public abstract class AbstractAssetRepository implements AssetRepository {
     public Optional<Asset> get(Object plugin, String name) {
         checkNotNull(plugin, "plugin");
         checkNotNull(name, "name");
-        PluginContainer pluginContainer;
+        final PluginContainer pluginContainer;
         String pluginId;
         if (plugin instanceof String) {
             pluginId = (String) plugin;
@@ -75,9 +75,9 @@ public abstract class AbstractAssetRepository implements AssetRepository {
         final String pluginId0 = pluginId;
         final Path pathLowerCase = Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId).resolve(name.toLowerCase(Locale.ENGLISH));
         return this.loadedAssets.computeIfAbsent(pathLowerCase, path1 -> {
-            URL url = this.getAssetURL(pluginContainer, path1);
+            URL url = getAssetURL(pluginContainer, path1);
             if (url == null) {
-                url = this.getAssetURL(pluginContainer, Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId0).resolve(name));
+                url = getAssetURL(pluginContainer, Paths.get(DEFAULT_ASSET_DIR).resolve(pluginId0).resolve(name));
                 if (url == null) {
                     return Optional.empty();
                 }
@@ -90,9 +90,9 @@ public abstract class AbstractAssetRepository implements AssetRepository {
     public Optional<Asset> get(String id) {
         int index = id.indexOf(':');
         if (index == -1) {
-            return this.get(Lantern.getMinecraftPlugin(), id);
+            return get(Lantern.getMinecraftPlugin(), id);
         } else {
-            return this.get(id.substring(0, index), id.substring(index + 1));
+            return get(id.substring(0, index), id.substring(index + 1));
         }
     }
 

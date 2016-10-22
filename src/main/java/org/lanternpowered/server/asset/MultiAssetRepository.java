@@ -46,7 +46,7 @@ public class MultiAssetRepository implements AssetRepository {
      * @param assetRepository The asset repository
      */
     public void add(AssetRepository assetRepository) {
-        this.add(0, checkNotNull(assetRepository, "assetRepository"));
+        add(0, checkNotNull(assetRepository, "assetRepository"));
     }
 
     /**
@@ -66,7 +66,7 @@ public class MultiAssetRepository implements AssetRepository {
     @Override
     public Optional<Asset> get(Object plugin, String name) {
         for (AssetRepository repository : this.repositories) {
-            Optional<Asset> asset = repository.get(plugin, name);
+            final Optional<Asset> asset = repository.get(plugin, name);
             if (asset.isPresent()) {
                 return asset;
             }
@@ -77,7 +77,7 @@ public class MultiAssetRepository implements AssetRepository {
     @Override
     public Optional<Asset> get(String name) {
         for (AssetRepository repository : this.repositories) {
-            Optional<Asset> asset = repository.get(name);
+            final Optional<Asset> asset = repository.get(name);
             if (asset.isPresent()) {
                 return asset;
             }

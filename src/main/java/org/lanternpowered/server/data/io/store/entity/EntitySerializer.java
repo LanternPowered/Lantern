@@ -44,6 +44,7 @@ import java.util.UUID;
 
 public class EntitySerializer implements ObjectSerializer<LanternEntity> {
 
+    private static final DataQuery DATA_VERSION = DataQuery.of("DataVersion");
     private static final DataQuery ID = DataQuery.of("id");
 
     @Override
@@ -180,6 +181,10 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
     }
 
     private static String fixEntityId(DataView dataView, String id) {
+        // Fast fail if the data isn't old
+        if (dataView.getInt(DATA_VERSION).orElse(0) >= 704) {
+            return id;
+        }
         // Separate the horse entities
         if (id.equals("EntityHorse")) {
             final int type = dataView.getInt(HORSE_TYPE).get();
@@ -196,7 +201,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
             dataView.remove(MINECART_TYPE);
             return MINECART_ENTITY_IDS[type < 0 ? 0 : type >= MINECART_ENTITY_IDS.length ? 0 : type];
         } else if (id.equals("Zombie")) {
-            final int type = dataView.getInt(ZOMBIE_TYPE).get();
+            final int type = dataView.getInt(ZOMBIE_TYPE).orElse(0);
             // Profession
             if (type > 0 && type <= 5) {
                 dataView.set(ZombieVillagerStore.PROFESSION, type - 1);

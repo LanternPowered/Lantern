@@ -29,9 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Lists;
-import io.netty.buffer.ByteBuf;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.buffer.LanternByteBuffer;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.network.ChannelBinding;
@@ -47,7 +45,7 @@ import java.util.function.Consumer;
  * A simple raw data channel, the client side handlers will be ignored since
  * we will only provide a server implementation.
  */
-public class LanternRawDataChannel extends LanternChannelBinding implements ChannelBinding.RawDataChannel {
+final class LanternRawDataChannel extends LanternChannelBinding implements ChannelBinding.RawDataChannel {
 
     private final List<RawDataListener> serverDataListeners = Lists.newArrayList();
 
@@ -95,9 +93,10 @@ public class LanternRawDataChannel extends LanternChannelBinding implements Chan
 
     @Override
     void handlePayload(ByteBuffer buf, RemoteConnection connection) {
-        buf = buf.slice();
         for (RawDataListener listener : this.serverDataListeners) {
-            listener.handlePayload(buf.copy(), connection, Platform.Type.SERVER);
+            // We slice the buffer, to preserve the reader index for all the listeners,
+            // the buffer shouldn't be modified in any way
+            listener.handlePayload(buf.slice(), connection, Platform.Type.SERVER);
         }
     }
 }

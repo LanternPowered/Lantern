@@ -42,21 +42,22 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public final class HandlerForgeHandshakeInStart implements Handler<MessageForgeHandshakeInStart> {
 
     @Override
     public void handle(NetworkContext context, MessageForgeHandshakeInStart message) {
-        Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
-        NetworkSession session = context.getSession();
+        final Attribute<ForgeServerHandshakePhase> phase = context.getChannel().attr(ForgeHandshakePhase.PHASE);
+        final NetworkSession session = context.getSession();
         if (phase.get() != null && phase.get() != ForgeServerHandshakePhase.START) {
             session.disconnect(t("Retrieved unexpected forge handshake start message."));
             return;
         }
-        boolean fml = session.getChannel().attr(NetworkSession.FML_MARKER).get();
+        final boolean fml = session.getChannel().attr(NetworkSession.FML_MARKER).get();
 
-        Set<String> channels = Sets.newHashSet(Sponge.getChannelRegistrar()
+        final Set<String> channels = new HashSet<>(Sponge.getChannelRegistrar()
                 .getRegisteredChannels(Platform.Type.SERVER));
         if (fml) {
             channels.add("FML");

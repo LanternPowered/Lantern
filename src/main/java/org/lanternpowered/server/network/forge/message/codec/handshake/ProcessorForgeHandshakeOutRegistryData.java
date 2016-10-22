@@ -42,23 +42,23 @@ public final class ProcessorForgeHandshakeOutRegistryData implements Processor<M
 
     @Override
     public void process(CodecContext context, MessageForgeHandshakeOutRegistryData message, List<Message> output) throws CodecException {
-        Iterator<Entry> it = message.getEntries().iterator();
+        final Iterator<Entry> it = message.getEntries().iterator();
         if (!it.hasNext()) {
             throw new CodecException("There must be at least one entry present!");
         }
         while (it.hasNext()) {
-            Entry entry = it.next();
-            ByteBuffer buf = context.byteBufAlloc().buffer();
+            final Entry entry = it.next();
+            final ByteBuffer buf = context.byteBufAlloc().buffer();
             buf.writeByte((byte) CodecPlayInOutCustomPayload.FML_HANDSHAKE_REGISTRY_DATA);
             buf.writeBoolean(it.hasNext());
             buf.writeString(entry.getName());
-            Map<String, Integer> ids = entry.getIds();
+            final Map<String, Integer> ids = entry.getIds();
             buf.writeVarInt(ids.size());
             for (Map.Entry<String, Integer> en : ids.entrySet()) {
                 buf.writeString(en.getKey());
                 buf.writeVarInt(en.getValue());
             }
-            List<String> substitutions = entry.getSubstitutions();
+            final List<String> substitutions = entry.getSubstitutions();
             buf.writeVarInt(substitutions.size());
             substitutions.forEach(buf::writeString);
             output.add(new MessagePlayInOutChannelPayload("FML|HS", buf));

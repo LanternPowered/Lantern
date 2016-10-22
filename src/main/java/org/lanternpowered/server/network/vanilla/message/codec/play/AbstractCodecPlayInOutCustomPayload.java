@@ -48,13 +48,13 @@ import java.util.Set;
 
 public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Message> {
 
-    public static final AttributeKey<MultiPartMessage> FML_MULTI_PART_MESSAGE = AttributeKey.valueOf("fml-multi-part-message");
+    private static final AttributeKey<MultiPartMessage> FML_MULTI_PART_MESSAGE = AttributeKey.valueOf("fml-mpm");
 
     @Override
     public ByteBuffer encode(CodecContext context, Message message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
-        String channel;
-        ByteBuffer content;
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        final String channel;
+        final ByteBuffer content;
         if (message instanceof MessagePlayInOutChannelPayload) {
             final MessagePlayInOutChannelPayload message1 = (MessagePlayInOutChannelPayload) message;
             content = message1.getContent();
@@ -66,10 +66,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
             content = encodeChannels(((MessagePlayInOutUnregisterChannels) message).getChannels());
             channel = "UNREGISTER";
         } else {
-            MessageResult result = this.encode0(context, message);
-            if (result == null) {
-                throw new CodecException("Unsupported message type: " + message.getClass().getName());
-            }
+            final MessageResult result = encode0(context, message);
             channel = result.channel;
             content = result.byteBuf;
         }
@@ -131,13 +128,13 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
                 message0.offset += len;
                 message0.index++;
                 if (message0.index >= message0.parts) {
-                    final Message message = this.decode0(context, message0.channel, message0.buffer);
+                    final Message message = decode0(context, message0.channel, message0.buffer);
                     attribute.set(null);
                     return message;
                 }
             }
         } else {
-            return this.decode0(context, channel, content);
+            return decode0(context, channel, content);
         }
         return NullMessage.INSTANCE;
     }
@@ -152,7 +149,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
      * @param buffer the byte buffer
      * @return the channels
      */
-    static Set<String> decodeChannels(ByteBuffer buffer) {
+    private static Set<String> decodeChannels(ByteBuffer buffer) {
         byte[] bytes = new byte[buffer.available()];
         buffer.readBytes(bytes);
         return Sets.newHashSet(Splitter.on('\u0000').split(new String(bytes, StandardCharsets.UTF_8)));
@@ -164,7 +161,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
      * @param channels the channels
      * @return the byte buffer
      */
-    static ByteBuffer encodeChannels(Set<String> channels) {
+    private static ByteBuffer encodeChannels(Set<String> channels) {
         return ByteBufferAllocator.unpooled().wrappedBuffer(Joiner.on('\u0000').join(channels).getBytes(StandardCharsets.UTF_8));
     }
 
@@ -179,7 +176,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
         }
     }
 
-    protected static class MultiPartMessage {
+    private static class MultiPartMessage {
 
         private final String channel;
         private final ByteBuffer buffer;
@@ -188,7 +185,7 @@ public abstract class AbstractCodecPlayInOutCustomPayload implements Codec<Messa
         private int index;
         private int offset;
 
-        public MultiPartMessage(String channel, ByteBuffer buffer, int parts) {
+        MultiPartMessage(String channel, ByteBuffer buffer, int parts) {
             this.channel = channel;
             this.buffer = buffer;
             this.parts = parts;

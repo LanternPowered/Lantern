@@ -31,13 +31,12 @@ import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 import static org.lanternpowered.server.util.Conditions.checkPlugin;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutChannelPayload;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutRegisterChannels;
 import org.spongepowered.api.Platform;
@@ -53,11 +52,12 @@ import org.spongepowered.api.plugin.PluginContainer;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 
-public class LanternChannelRegistrar implements ChannelRegistrar {
+public final class LanternChannelRegistrar implements ChannelRegistrar {
 
-    private final Map<String, LanternChannelBinding> bindings = Maps.newConcurrentMap();
+    private final Map<String, LanternChannelBinding> bindings = new ConcurrentHashMap<>();
     private final Server server;
 
     public LanternChannelRegistrar(Server server) {
@@ -66,29 +66,29 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
 
     @Override
     public IndexedMessageChannel createChannel(Object plugin, String channel) throws ChannelRegistrationException {
-        return (IndexedMessageChannel) this.create(plugin, channel, false);
+        return (IndexedMessageChannel) create(plugin, channel, false);
     }
 
     @Override
     public LanternRawDataChannel createRawChannel(Object plugin, String channel) throws ChannelRegistrationException {
-        return (LanternRawDataChannel) this.create(plugin, channel, true);
+        return (LanternRawDataChannel) create(plugin, channel, true);
     }
 
     private LanternChannelBinding create(Object plugin, String channel, boolean rawChannel) throws ChannelRegistrationException {
-        PluginContainer container = checkPlugin(plugin, "plugin");
+        final PluginContainer container = checkPlugin(plugin, "plugin");
         checkNotNullOrEmpty(channel, "channel");
         checkArgument(channel.length() <= 20, "channel length may not be longer then 20");
-        if (!this.isChannelAvailable(channel)) {
+        if (!isChannelAvailable(channel)) {
             throw new ChannelRegistrationException("Channel with name \"" + channel + "\" is already registered!");
         }
-        LanternChannelBinding binding;
+        final LanternChannelBinding binding;
         if (rawChannel) {
             binding = new LanternRawDataChannel(this, channel, container);
         } else {
             binding = new LanternIndexedMessageChannel(this, channel, container);
         }
         binding.bound = true;
-        MessagePlayInOutRegisterChannels message = new MessagePlayInOutRegisterChannels(Sets.newHashSet(channel));
+        final MessagePlayInOutRegisterChannels message = new MessagePlayInOutRegisterChannels(Sets.newHashSet(channel));
         for (Player player : this.server.getOnlinePlayers()) {
             ((NetworkSession) player.getConnection()).send(message);
         }
@@ -97,7 +97,7 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
 
     @Override
     public void unbindChannel(ChannelBinding channel) {
-        LanternChannelBinding binding = (LanternChannelBinding) checkNotNull(channel, "channel");
+        final LanternChannelBinding binding = (LanternChannelBinding) checkNotNull(channel, "channel");
         if (binding.bound) {
             binding.bound = false;
             this.bindings.remove(channel.getName());
@@ -128,12 +128,12 @@ public class LanternChannelRegistrar implements ChannelRegistrar {
 
     void sendPayloadToAll(String channel, Consumer<ByteBuffer> payload) {
         checkNotNull(payload, "payload");
-        Iterator<Player> players = this.server.getOnlinePlayers().stream().filter(
+        final Iterator<Player> players = this.server.getOnlinePlayers().stream().filter(
                 player -> ((LanternPlayer) player).getConnection().getRegisteredChannels().contains(channel)).iterator();
         if (players.hasNext()) {
-            ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
+            final ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
-            Message msg = new MessagePlayInOutChannelPayload(channel, buf);
+            final Message msg = new MessagePlayInOutChannelPayload(channel, buf);
             players.forEachRemaining(player -> ((LanternPlayer) player).getConnection().send(msg));
         }
     }

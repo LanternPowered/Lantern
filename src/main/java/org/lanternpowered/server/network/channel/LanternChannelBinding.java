@@ -25,16 +25,17 @@
  */
 package org.lanternpowered.server.network.channel;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.spongepowered.api.network.ChannelBinding;
 import org.spongepowered.api.network.ChannelRegistrar;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 
-public abstract class LanternChannelBinding implements ChannelBinding {
+abstract class LanternChannelBinding implements ChannelBinding {
 
     final LanternChannelRegistrar registrar;
-    final PluginContainer owner;
+    private final PluginContainer owner;
     final String name;
 
     boolean bound;
@@ -61,4 +62,12 @@ public abstract class LanternChannelBinding implements ChannelBinding {
     }
 
     abstract void handlePayload(ByteBuffer buf, RemoteConnection connection);
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("plugin", this.owner)
+                .add("name", this.name)
+                .toString();
+    }
 }

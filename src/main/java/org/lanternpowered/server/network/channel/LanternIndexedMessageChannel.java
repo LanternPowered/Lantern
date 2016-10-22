@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Maps;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
@@ -51,7 +52,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public class LanternIndexedMessageChannel extends LanternChannelBinding implements ChannelBinding.IndexedMessageChannel {
+final class LanternIndexedMessageChannel extends LanternChannelBinding implements ChannelBinding.IndexedMessageChannel {
 
     private final class RegistrationLookup {
 
@@ -77,7 +78,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
     }
 
     private RegistrationLookup getRegistrations(Platform.Type side) {
-        RegistrationLookup registrations;
+        final RegistrationLookup registrations;
         if (this.registrations.containsKey(side)) {
             registrations = this.registrations.get(side);
         } else {
@@ -93,24 +94,24 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
 
     @Override
     public <M extends Message> void registerMessage(Class<M> messageClass, int messageId, MessageHandler<M> handler) {
-        this.register(messageClass, messageId, null, checkNotNull(handler, "handler"));
+        register(messageClass, messageId, null, checkNotNull(handler, "handler"));
     }
 
     @Override
     public <M extends Message> void registerMessage(Class<M> messageClass, int messageId, Platform.Type side, MessageHandler<M> handler) {
-        this.register(messageClass, messageId, checkNotNull(side, "side"), checkNotNull(handler, "handler"));
+        register(messageClass, messageId, checkNotNull(side, "side"), checkNotNull(handler, "handler"));
     }
 
     @Override
     public <M extends Message> void addHandler(Class<M> messageClass, Platform.Type side, MessageHandler<M> handler) {
-        this.applyHandler(this.getRegistrations(checkNotNull(side, "side")), messageClass, checkNotNull(handler, "handler"));
+        applyHandler(this.getRegistrations(checkNotNull(side, "side")), messageClass, checkNotNull(handler, "handler"));
     }
 
     @Override
     public <M extends Message> void addHandler(Class<M> messageClass, MessageHandler<M> handler) {
         checkNotNull(handler, "handler");
-        this.applyHandler(this.getRegistrations(Platform.Type.CLIENT), messageClass, handler);
-        this.applyHandler(this.getRegistrations(Platform.Type.SERVER), messageClass, handler);
+        applyHandler(this.getRegistrations(Platform.Type.CLIENT), messageClass, handler);
+        applyHandler(this.getRegistrations(Platform.Type.SERVER), messageClass, handler);
     }
 
     private <M extends Message> void applyHandler(RegistrationLookup lookup, Class<M> messageClass, MessageHandler<M> handler) {
@@ -124,22 +125,22 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         checkArgument(messageId >= 0 && messageId <= 255, "MessageId (" + messageId + ") must scale between 0 and 255");
         final byte messageId0 = (byte) messageId;
         if (side == null) {
-            this.validate(messageClass, messageId0, Platform.Type.CLIENT);
-            this.validate(messageClass, messageId0, Platform.Type.SERVER);
+            validate(messageClass, messageId0, Platform.Type.CLIENT);
+            validate(messageClass, messageId0, Platform.Type.SERVER);
         } else {
             checkArgument(side.isKnown(), "Platform side must be known");
-            this.validate(messageClass, messageId0, side);
+            validate(messageClass, messageId0, side);
         }
-        IndexedMessageRegistration registration = new IndexedMessageRegistration(messageClass);
+        final IndexedMessageRegistration registration = new IndexedMessageRegistration(messageClass);
         registration.opcode = messageId0;
         if (handler != null) {
             registration.handlers.add(handler);
         }
         if (side == null) {
-            this.applyRegistration(this.getRegistrations(Platform.Type.CLIENT), messageClass, messageId0, handler);
-            this.applyRegistration(this.getRegistrations(Platform.Type.SERVER), messageClass, messageId0, handler);
+            applyRegistration(this.getRegistrations(Platform.Type.CLIENT), messageClass, messageId0, handler);
+            applyRegistration(this.getRegistrations(Platform.Type.SERVER), messageClass, messageId0, handler);
         } else {
-            this.applyRegistration(this.getRegistrations(side), messageClass, messageId0, handler);
+            applyRegistration(this.getRegistrations(side), messageClass, messageId0, handler);
         }
     }
 
@@ -157,12 +158,12 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
         Constructor<?> constructor = null;
         try {
             constructor = messageClass.getConstructor();
-        } catch (NoSuchMethodException e) {
+        } catch (NoSuchMethodException ignored) {
         } catch (SecurityException e) {
-            e.printStackTrace();
+            throw Throwables.propagate(e);
         }
         checkState(constructor != null, "%s is missing a empty public constructor", messageClass.getName());
-        RegistrationLookup registrations = this.getRegistrations(Platform.Type.CLIENT);
+        final RegistrationLookup registrations = this.getRegistrations(Platform.Type.CLIENT);
         checkState(!registrations.classToRegistration.containsKey(messageClass) ||
                 registrations.classToRegistration.get(messageClass).opcode == null, "MessageClass (" +
                 messageClass.getName() + ") is already registered on the " + side.name().toLowerCase() + " side!");
@@ -178,11 +179,12 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
     }
 
     private void encode(Message message, ByteBuffer buf) {
-        IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER).classToRegistration.get(message.getClass());
+        final IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER).classToRegistration.get(message.getClass());
         checkArgument(registration != null, "The specified message type %s is not registered", message.getClass().getName());
 
         final ByteBuffer content = ByteBufferAllocator.unpooled().buffer();
         message.writeTo(content);
+        //noinspection ConstantConditions
         buf.writeByte(registration.opcode);
         buf.writeBytes(content);
     }
@@ -191,7 +193,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
     public void sendTo(Player player, Message message) {
         checkState(this.bound);
         checkNotNull(message, "message");
-        this.validateRegistration(message.getClass(), Platform.Type.CLIENT);
+        validateRegistration(message.getClass(), Platform.Type.CLIENT);
         this.registrar.sendPayload(player, this.name, buf -> encode(message, buf));
     }
 
@@ -199,23 +201,23 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
     public void sendToServer(Message message) {
         checkState(this.bound);
         checkNotNull(message, "message");
-        this.validateRegistration(message.getClass(), Platform.Type.SERVER);
+        validateRegistration(message.getClass(), Platform.Type.SERVER);
     }
 
     @Override
     public void sendToAll(Message message) {
         checkState(this.bound);
         checkNotNull(message, "message");
-        this.validateRegistration(message.getClass(), Platform.Type.CLIENT);
+        validateRegistration(message.getClass(), Platform.Type.CLIENT);
         this.registrar.sendPayloadToAll(this.name, buf -> encode(message, buf));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     void handlePayload(ByteBuffer buf, RemoteConnection connection) {
-        byte opcode = buf.readByte();
+        final byte opcode = buf.readByte();
 
-        IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER)
+        final IndexedMessageRegistration registration = this.getRegistrations(Platform.Type.SERVER)
                 .opcodeToRegistration.get(opcode);
         if (registration == null) {
             Lantern.getLogger().warn("Received unexpected message type with id: {}" +
@@ -223,7 +225,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
             return;
         }
 
-        Message message;
+        final Message message;
         try {
             message = registration.messageType.newInstance();
         } catch (Exception e) {
@@ -231,7 +233,7 @@ public class LanternIndexedMessageChannel extends LanternChannelBinding implemen
             return;
         }
 
-        ByteBuffer content = buf.slice();
+        final ByteBuffer content = buf.slice();
         try {
             message.readFrom(content);
         } catch (Exception e) {

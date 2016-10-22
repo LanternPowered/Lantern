@@ -53,9 +53,8 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
     {
-        final LogBlockItemTypeObjectSerializer logBlockItemTypeObjectSerializer = new LogBlockItemTypeObjectSerializer();
-        add(BlockTypes.LOG, logBlockItemTypeObjectSerializer);
-        add(BlockTypes.LOG2, logBlockItemTypeObjectSerializer);
+        add(BlockTypes.LOG, new Log1BlockItemTypeObjectSerializer());
+        add(BlockTypes.LOG2, new Log2BlockItemTypeObjectSerializer());
 
         add(ItemTypes.COAL, new CoalItemTypeObjectSerializer());
         add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());

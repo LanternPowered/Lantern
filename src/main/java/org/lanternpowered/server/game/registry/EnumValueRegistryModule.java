@@ -49,7 +49,7 @@ public class EnumValueRegistryModule<V extends CatalogType>
 
     private final Map<String, V> values = new HashMap<>();
     @Nullable private Set<V> unmodifiableValues;
-    private final Class<? extends Enum<?>> enumType;
+    final Class<? extends Enum<?>> enumType;
     @Nullable private final Class<?> catalogClass;
 
     public EnumValueRegistryModule(Class<? extends Enum<?>> enumType, @Nullable Class<?> catalogClass) {
@@ -57,10 +57,10 @@ public class EnumValueRegistryModule<V extends CatalogType>
         this.catalogClass = catalogClass;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void registerDefaults() {
         for (Enum<?> type : this.enumType.getEnumConstants()) {
+            //noinspection unchecked
             final V catalogType = (V) type;
             this.values.put(catalogType.getId().toLowerCase(Locale.ENGLISH), catalogType);
             this.values.put(type.name().toLowerCase(Locale.ENGLISH), catalogType);

@@ -121,6 +121,7 @@ import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModul
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
 import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleOptionRegistryModule;
@@ -435,7 +436,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(ShrubType.class, new EnumValueRegistryModule<>(LanternShrubType.class, ShrubTypes.class))
                 .registerModule(StoneType.class, new EnumValueRegistryModule<>(LanternStoneType.class, StoneTypes.class))
                 .registerModule(SlabType.class, new EnumValueRegistryModule<>(LanternSlabType.class, SlabTypes.class))
-                .registerModule(TreeType.class, new EnumValueRegistryModule<>(LanternTreeType.class, TreeTypes.class))
+                .registerModule(TreeType.class, TreeTypeRegistryModule.get())
                 .registerModule(WallType.class, new EnumValueRegistryModule<>(LanternWallType.class, WallTypes.class))
                 .registerModule(SkinPart.class, new SkinPartRegistryModule())
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())

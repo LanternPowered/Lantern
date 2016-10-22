@@ -23,28 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.data.type.LanternTreeType;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.EnumTrait;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.ItemType;
+import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
+import org.spongepowered.api.data.type.TreeType;
+import org.spongepowered.api.data.type.TreeTypes;
 
-import java.util.function.Function;
+public class TreeTypeRegistryModule extends InternalEnumValueRegistryModule<TreeType> {
 
-import javax.annotation.Nullable;
+    private static final TreeTypeRegistryModule INSTANCE = new TreeTypeRegistryModule();
 
-public class BlockLog1 extends BlockLog {
+    public static TreeTypeRegistryModule get() {
+        return INSTANCE;
+    }
 
-    @SuppressWarnings("unchecked")
-    public static final EnumTrait<LanternTreeType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,
-            LanternTreeType.OAK, LanternTreeType.SPRUCE, LanternTreeType.BIRCH, LanternTreeType.JUNGLE);
-
-    public BlockLog1(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, TYPE);
-        setDefaultState(getDefaultState().withTrait(TYPE, LanternTreeType.OAK).get());
+    private TreeTypeRegistryModule() {
+        super(LanternTreeType.class, TreeTypes.class);
     }
 }

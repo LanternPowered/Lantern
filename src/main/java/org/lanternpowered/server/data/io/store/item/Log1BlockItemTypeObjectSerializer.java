@@ -23,28 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.type;
+package org.lanternpowered.server.data.io.store.item;
 
-import org.lanternpowered.server.block.trait.LanternEnumTrait;
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.type.LanternTreeType;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.EnumTrait;
-import org.spongepowered.api.data.key.Key;
+import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.function.Function;
+public class Log1BlockItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
-import javax.annotation.Nullable;
+    @Override
+    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
+        dataView.set(DATA_VALUE, ((LanternTreeType) itemStack.get(Keys.TREE_TYPE).get()).getInternalId());
+    }
 
-public class BlockLog1 extends BlockLog {
-
-    @SuppressWarnings("unchecked")
-    public static final EnumTrait<LanternTreeType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,
-            LanternTreeType.OAK, LanternTreeType.SPRUCE, LanternTreeType.BIRCH, LanternTreeType.JUNGLE);
-
-    public BlockLog1(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, TYPE);
-        setDefaultState(getDefaultState().withTrait(TYPE, LanternTreeType.OAK).get());
+    @Override
+    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
+        valueContainer.set(Keys.TREE_TYPE, TreeTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get()).get());
     }
 }

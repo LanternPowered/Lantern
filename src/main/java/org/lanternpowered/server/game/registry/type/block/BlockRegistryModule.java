@@ -63,6 +63,8 @@ import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.item.type.Log1ItemType;
+import org.lanternpowered.server.item.type.Log2ItemType;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -218,70 +220,70 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
 
     @Override
     public void registerDefaults() {
-        this.register(0, new BlockAir("minecraft", "air", null));
-        this.register(1, new BlockStone("minecraft", "stone", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
+        register(0, new BlockAir("minecraft", "air", null));
+        register(1, new BlockStone("minecraft", "stone", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
                 (byte) blockState.getTraitValue(BlockStone.TYPE).get().getInternalId());
-        this.register(2, new BlockGrass("minecraft", "grass", DEFAULT_ITEM_TYPE_BUILDER));
-        this.register(3, new BlockDirt("minecraft", "dirt", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
+        register(2, new BlockGrass("minecraft", "grass", DEFAULT_ITEM_TYPE_BUILDER));
+        register(3, new BlockDirt("minecraft", "dirt", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
                 (byte) blockState.getTraitValue(BlockDirt.TYPE).get().getInternalId());
-        this.register(5, new BlockPlanks("minecraft", "planks", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
+        register(5, new BlockPlanks("minecraft", "planks", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
                 (byte) blockState.getTraitValue(BlockPlanks.TYPE).get().getInternalId());
-        this.register(6, new BlockSapling("minecraft", "sapling", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+        register(6, new BlockSapling("minecraft", "sapling", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final byte treeType = (byte) blockState.getTraitValue(BlockSapling.TYPE).get().getInternalId();
             final byte stage = blockState.getTraitValue(BlockSapling.STAGE).get().byteValue();
             return (byte) (stage << 3 | treeType);
         });
-        this.register(7, new BlockBedrock("minecraft", "bedrock", DEFAULT_ITEM_TYPE_BUILDER));
-        this.register(20, new BlockGlass("minecraft", "glass", DEFAULT_ITEM_TYPE_BUILDER));
-        this.register(12, new BlockSand("minecraft", "sand", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
+        register(7, new BlockBedrock("minecraft", "bedrock", DEFAULT_ITEM_TYPE_BUILDER));
+        register(20, new BlockGlass("minecraft", "glass", DEFAULT_ITEM_TYPE_BUILDER));
+        register(12, new BlockSand("minecraft", "sand", DEFAULT_ITEM_TYPE_BUILDER), blockState ->
                 (byte) blockState.getTraitValue(BlockSand.TYPE).get().getInternalId());
-        this.register(17, new BlockLog1("minecraft", "log", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+        register(17, new BlockLog1("minecraft", "log", Log1ItemType.ITEM_TYPE_BUILDER), blockState -> {
             final byte treeType = (byte) blockState.getTraitValue(BlockLog1.TYPE).get().getInternalId();
             final byte axis = (byte) blockState.getTraitValue(BlockLog.AXIS).get().getInternalId();
             return (byte) (axis << 2 | treeType);
         });
-        this.register(43, new BlockStoneSlab1("minecraft", "double_stone_slab", BlockSlabBase.ITEM_TYPE_BUILDER, true), blockState -> {
+        register(43, new BlockStoneSlab1("minecraft", "double_stone_slab", BlockSlabBase.ITEM_TYPE_BUILDER, true), blockState -> {
             final byte slabType = (byte) blockState.getTraitValue(BlockStoneSlab1.TYPE).get().getInternalId();
             final byte seamless = (byte) (blockState.getTraitValue(BlockStoneSlabBase.SEAMLESS).get() ? 1 : 0);
             return (byte) (seamless << 3 | slabType);
         });
-        this.register(44, new BlockStoneSlab1("minecraft", "stone_slab", BlockSlabBase.ITEM_TYPE_BUILDER, false), blockState -> {
+        register(44, new BlockStoneSlab1("minecraft", "stone_slab", BlockSlabBase.ITEM_TYPE_BUILDER, false), blockState -> {
             final byte slabType = (byte) blockState.getTraitValue(BlockStoneSlab1.TYPE).get().getInternalId();
             final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
             return (byte) (portion << 3 | slabType);
         });
-        this.register(54, new BlockChest("minecraft", "chest", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+        register(54, new BlockChest("minecraft", "chest", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
             return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
                     facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
         });
-        this.register(130, new BlockEnderChest("minecraft", "ender_chest", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+        register(130, new BlockEnderChest("minecraft", "ender_chest", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final Direction facing = blockState.getTraitValue(BlockChest.FACING).get();
             return (byte) (facing == Direction.NORTH ? 2 : facing == Direction.SOUTH ? 3 :
                     facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 2);
         });
-        this.register(162, new BlockLog2("minecraft", "log2", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+        register(162, new BlockLog2("minecraft", "log2", Log2ItemType.ITEM_TYPE_BUILDER), blockState -> {
             final byte treeType = (byte) (blockState.getTraitValue(BlockLog2.TYPE).get().getInternalId() - 4);
             final byte axis = (byte) blockState.getTraitValue(BlockLog.AXIS).get().getInternalId();
             return (byte) (axis << 2 | treeType);
         });
-        this.register(166, new BlockBarrier("minecraft", "barrier", DEFAULT_ITEM_TYPE_BUILDER));
-        this.register(181, new BlockStoneSlab2("minecraft", "double_stone_slab2", BlockSlabBase.ITEM_TYPE_BUILDER, true), blockState -> {
+        register(166, new BlockBarrier("minecraft", "barrier", DEFAULT_ITEM_TYPE_BUILDER));
+        register(181, new BlockStoneSlab2("minecraft", "double_stone_slab2", BlockSlabBase.ITEM_TYPE_BUILDER, true), blockState -> {
             final byte slabType = (byte) (blockState.getTraitValue(BlockStoneSlab2.TYPE).get().getInternalId() - 8);
             final byte seamless = (byte) (blockState.getTraitValue(BlockStoneSlabBase.SEAMLESS).get() ? 1 : 0);
             return (byte) (seamless << 3 | slabType);
         });
-        this.register(182, new BlockStoneSlab2("minecraft", "stone_slab2", BlockSlabBase.ITEM_TYPE_BUILDER, false), blockState -> {
+        register(182, new BlockStoneSlab2("minecraft", "stone_slab2", BlockSlabBase.ITEM_TYPE_BUILDER, false), blockState -> {
             final byte slabType = (byte) (blockState.getTraitValue(BlockStoneSlab2.TYPE).get().getInternalId() - 8);
             final byte portion = (byte) blockState.getTraitValue(BlockSlabBase.PORTION).get().getInternalId();
             return (byte) (portion << 3 | slabType);
         });
-        this.register(219, new BlockShulkerBox("minecraft", "white_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+        register(219, new BlockShulkerBox("minecraft", "white_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final Direction facing = blockState.getTraitValue(BlockShulkerBox.FACING).get();
             return (byte) (facing == Direction.DOWN ? 0 : facing == Direction.UP ? 1 : facing == Direction.NORTH ? 2 :
                     facing == Direction.SOUTH ? 3 : facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 0);
         });
-        this.register(220, new BlockShulkerBox("minecraft", "orange_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
+        register(220, new BlockShulkerBox("minecraft", "orange_shulker_box", DEFAULT_ITEM_TYPE_BUILDER), blockState -> {
             final Direction facing = blockState.getTraitValue(BlockShulkerBox.FACING).get();
             return (byte) (facing == Direction.DOWN ? 0 : facing == Direction.UP ? 1 : facing == Direction.NORTH ? 2 :
                     facing == Direction.SOUTH ? 3 : facing == Direction.WEST ? 4 : facing == Direction.EAST ? 5 : 0);

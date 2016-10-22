@@ -23,28 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.type;
+package org.lanternpowered.server.item.type;
 
-import org.lanternpowered.server.block.trait.LanternEnumTrait;
-import org.lanternpowered.server.data.type.LanternTreeType;
+import org.lanternpowered.server.block.LanternBlockType;
+import org.lanternpowered.server.data.value.AbstractValueContainer;
+import org.lanternpowered.server.item.BlockItemType;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.EnumTrait;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.TreeTypes;
 import org.spongepowered.api.item.ItemType;
 
 import java.util.function.Function;
 
-import javax.annotation.Nullable;
+public class Log1ItemType extends BlockItemType {
 
-public class BlockLog1 extends BlockLog {
+    public static final Function<BlockType, ItemType> ITEM_TYPE_BUILDER =
+            type -> new Log1ItemType(((LanternBlockType) type).getPluginId(), type.getName(), type);
 
-    @SuppressWarnings("unchecked")
-    public static final EnumTrait<LanternTreeType> TYPE = LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE,
-            LanternTreeType.OAK, LanternTreeType.SPRUCE, LanternTreeType.BIRCH, LanternTreeType.JUNGLE);
+    public Log1ItemType(String pluginId, String identifier, BlockType blockType) {
+        super(pluginId, identifier, blockType);
+    }
 
-    public BlockLog1(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
-        super(pluginId, identifier, itemTypeBuilder, TYPE);
-        setDefaultState(getDefaultState().withTrait(TYPE, LanternTreeType.OAK).get());
+    @Override
+    public void registerKeysFor(AbstractValueContainer valueContainer) {
+        super.registerKeysFor(valueContainer);
+        valueContainer.registerKey(Keys.TREE_TYPE, TreeTypes.OAK).nonRemovableAttachedValueProcessor();
     }
 }

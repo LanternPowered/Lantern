@@ -26,31 +26,23 @@
 package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.BlockType;
+import org.lanternpowered.server.data.type.LanternTreeType;
+import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public class LogBlockItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+public class Log2BlockItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        final BlockType blockType = itemStack.getItem().getBlock().get();
-        // TODO
-        final BlockState blockState = blockType.getDefaultState();//.with(Keys.TREE_TYPE, itemStack.get(Keys.TREE_TYPE).get()).get();
-        dataView.set(DATA_VALUE, BlockRegistryModule.get().getStateData(blockState));
+        dataView.set(DATA_VALUE, ((LanternTreeType) itemStack.get(Keys.TREE_TYPE).get()).getInternalId() - 4);
     }
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.deserializeValues(itemStack, valueContainer, dataView);
-        final BlockType blockType = itemStack.getItem().getBlock().get();
-        final BlockState blockState = BlockRegistryModule.get().getStateByTypeAndData(blockType,
-                dataView.getShort(DATA_VALUE).orElse((short) 0).byteValue()).get();
-        // TODO
-        // valueContainer.set(Keys.TREE_TYPE, blockState.get(Keys.TREE_TYPE).get());
+        valueContainer.set(Keys.TREE_TYPE, TreeTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get() + 4).get());
     }
 }

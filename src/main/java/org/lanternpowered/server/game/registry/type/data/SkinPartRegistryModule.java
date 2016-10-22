@@ -38,12 +38,12 @@ public final class SkinPartRegistryModule extends PluginCatalogRegistryModule<Sk
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternSkinPart("minecraft", "cape", 0));
-        this.register(new LanternSkinPart("minecraft", "jacket", 1));
-        this.register(new LanternSkinPart("minecraft", "left_sleeve", 2));
-        this.register(new LanternSkinPart("minecraft", "right_sleeve", 3));
-        this.register(new LanternSkinPart("minecraft", "left_pants_leg", 4));
-        this.register(new LanternSkinPart("minecraft", "right_pants_leg", 5));
-        this.register(new LanternSkinPart("minecraft", "hat", 6));
+        register(new LanternSkinPart("minecraft", "cape", 0));
+        register(new LanternSkinPart("minecraft", "jacket", 1));
+        register(new LanternSkinPart("minecraft", "left_sleeve", 2));
+        register(new LanternSkinPart("minecraft", "right_sleeve", 3));
+        register(new LanternSkinPart("minecraft", "left_pants_leg", 4));
+        register(new LanternSkinPart("minecraft", "right_pants_leg", 5));
+        register(new LanternSkinPart("minecraft", "hat", 6));
     }
 }

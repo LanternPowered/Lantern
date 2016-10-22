@@ -50,11 +50,11 @@ public final class ChatVisibilityRegistryModule extends AdditionalInternalPlugin
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternChatVisibility("minecraft", "full", 0,
+        register(new LanternChatVisibility("minecraft", "full", 0,
                 type -> true));
-        this.register(new LanternChatVisibility("minecraft", "system", 1,
+        register(new LanternChatVisibility("minecraft", "system", 1,
                 type -> type == ChatTypes.SYSTEM || type == ChatTypes.ACTION_BAR));
-        this.register(new LanternChatVisibility("minecraft", "hidden", 2,
+        register(new LanternChatVisibility("minecraft", "hidden", 2,
                 type -> false));
     }
 }

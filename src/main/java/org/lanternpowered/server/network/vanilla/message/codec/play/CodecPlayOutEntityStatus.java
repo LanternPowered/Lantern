@@ -32,6 +32,7 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetOpLevel;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
+import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutEntityStatus;
 
 public final class CodecPlayOutEntityStatus implements Codec<Message> {
 
@@ -47,6 +48,9 @@ public final class CodecPlayOutEntityStatus implements Codec<Message> {
         } else if (message instanceof MessagePlayOutSetOpLevel) {
             entityId = context.getChannel().attr(CodecPlayOutPlayerJoinGame.PLAYER_ENTITY_ID).get();
             action = 24 + Math.max(0, Math.min(4, ((MessagePlayOutSetOpLevel) message).getOpLevel()));
+        } else if (message instanceof MessagePlayOutEntityStatus) {
+            entityId = ((MessagePlayOutEntityStatus) message).getEntityId();
+            action = ((MessagePlayOutEntityStatus) message).getStatus();
         } else {
             throw new CodecException("Unsupported message type: " + message.getClass().getName());
         }

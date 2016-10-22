@@ -65,22 +65,22 @@ public final class WorldArchetypeRegistryModule extends AdditionalPluginCatalogR
                 .generateBonusChest(false)
                 .serializationBehavior(SerializationBehaviors.AUTOMATIC)
                 .build("minecraft:overworld", "Overworld");
-        this.register(overworld);
-        this.register(WorldArchetype.builder()
+        register(overworld);
+        register(WorldArchetype.builder()
                 .from(overworld)
                 .generator(GeneratorTypes.NETHER)
                 .dimension(DimensionTypes.NETHER)
                 .build("minecraft:the_nether", "The Nether"));
-        this.register(WorldArchetype.builder()
+        register(WorldArchetype.builder()
                 .from(overworld)
                 .generator(GeneratorTypes.THE_END)
                 .dimension(DimensionTypes.THE_END)
                 .build("minecraft:the_end", "The End"));
-        this.register(WorldArchetype.builder()
+        register(WorldArchetype.builder()
                 .from(overworld)
                 .generatorModifiers(WorldGeneratorModifiers.SKYLANDS)
                 .build("sponge:the_skylands", "The Skylands"));
-        this.register(WorldArchetype.builder()
+        register(WorldArchetype.builder()
                 .from(overworld)
                 .generatorModifiers(WorldGeneratorModifiers.VOID)
                 .build("sponge:the_void", "The Void"));

@@ -50,7 +50,7 @@ import javax.annotation.Nullable;
 
 public class LanternItemStack implements ItemStack, AbstractPropertyHolder, AbstractDataHolder {
 
-    private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
+    private final Map<Key<?>, KeyRegistration> rawValueMap;
     private final ItemType itemType;
 
     private int quantity;
@@ -68,8 +68,14 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     }
 
     public LanternItemStack(ItemType itemType, int quantity) {
+        this(itemType, quantity, new HashMap<>());
+        ((LanternItemType) itemType).registerKeysFor(this);
+    }
+
+    LanternItemStack(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap) {
         checkArgument(quantity >= 0, "quantity may not be negative");
         checkNotNull(itemType, "itemType");
+        this.rawValueMap = rawValueMap;
         this.quantity = quantity;
         this.itemType = itemType;
     }
@@ -130,8 +136,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     @Override
     public ItemStackSnapshot createSnapshot() {
-        // TODO: Copy data
-        return new LanternItemStackSnapshot(this.itemType, this.quantity);
+        return new LanternItemStackSnapshot(this.itemType, this.quantity, copyRawValueMap());
     }
 
     @Override
@@ -141,8 +146,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     @Override
     public LanternItemStack copy() {
-        // TODO: Copy data
-        return new LanternItemStack(this.itemType, this.quantity);
+        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap());
     }
 
     /**

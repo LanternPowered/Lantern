@@ -38,23 +38,29 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
 
-    private static final DataQuery IDENTIFIER = DataQuery.of("id");
-    private static final DataQuery QUANTITY = DataQuery.of("Count");
-    private static final DataQuery DATA = DataQuery.of("Damage");
-    private static final DataQuery TAG = DataQuery.of("tag");
+    public static final DataQuery IDENTIFIER = DataQuery.of("id");
+    public static final DataQuery QUANTITY = DataQuery.of("Count");
+    public static final DataQuery DATA = DataQuery.of("Damage");
+    public static final DataQuery TAG = DataQuery.of("tag");
 
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
     {
         final LogBlockItemTypeObjectSerializer logBlockItemTypeObjectSerializer = new LogBlockItemTypeObjectSerializer();
-        this.add(BlockTypes.LOG, logBlockItemTypeObjectSerializer);
-        this.add(BlockTypes.LOG2, logBlockItemTypeObjectSerializer);
+        add(BlockTypes.LOG, logBlockItemTypeObjectSerializer);
+        add(BlockTypes.LOG2, logBlockItemTypeObjectSerializer);
+
+        add(ItemTypes.COAL, new CoalItemTypeObjectSerializer());
+        add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());
+        add(ItemTypes.FIREWORKS, new FireworksItemTypeObjectSerializer());
+        add(ItemTypes.GOLDEN_APPLE, new GoldenAppleItemTypeObjectSerializer());
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {
@@ -76,7 +82,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         final ItemType itemType = ItemRegistryModule.get().getById(identifier).orElseThrow(
                 () -> new InvalidDataException("There is no item type with the id: " + identifier1));
         final LanternItemStack itemStack = new LanternItemStack(itemType);
-        this.deserialize(itemStack, dataView);
+        deserialize(itemStack, dataView);
         return itemStack;
     }
 
@@ -84,7 +90,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     public DataView serialize(LanternItemStack object) {
         final DataContainer dataContainer = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
         dataContainer.set(IDENTIFIER, object.getItem().getId());
-        this.serialize(object, dataContainer);
+        serialize(object, dataContainer);
         return dataContainer;
     }
 
@@ -111,19 +117,19 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
 
     @Override
     public void serializeValues(LanternItemStack object, SimpleValueContainer valueContainer, DataView dataView) {
-        super.serializeValues(object, valueContainer, dataView);
         final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getItem());
         if (serializer != null) {
             serializer.serializeValues(object, valueContainer, dataView);
         }
+        super.serializeValues(object, valueContainer, dataView);
     }
 
     @Override
     public void deserializeValues(LanternItemStack object, SimpleValueContainer valueContainer, DataView dataView) {
-        super.deserializeValues(object, valueContainer, dataView);
         final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getItem());
         if (serializer != null) {
             serializer.deserializeValues(object, valueContainer, dataView);
         }
+        super.deserializeValues(object, valueContainer, dataView);
     }
 }

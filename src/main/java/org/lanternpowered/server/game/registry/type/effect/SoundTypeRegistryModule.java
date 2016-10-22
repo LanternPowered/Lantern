@@ -53,7 +53,7 @@ public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegist
         for (int i = 0; i < array.size(); i++) {
             final String name = array.get(i).getAsString();
             final String id = name.replaceAll("\\.", "_");
-            this.register(new LanternSoundType("minecraft", id, name, i));
+            register(new LanternSoundType("minecraft", id, name, i));
         }
     }
 
@@ -61,7 +61,7 @@ public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegist
     public List<CatalogMappingData> getCatalogMappings() {
         return ImmutableList.<CatalogMappingData>builder()
                 .addAll(super.getCatalogMappings())
-                .add(new CatalogMappingData(LanternSoundTypes.class, this.provideCatalogMap()))
+                .add(new CatalogMappingData(LanternSoundTypes.class, provideCatalogMap()))
                 .build();
     }
 }

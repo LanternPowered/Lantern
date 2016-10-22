@@ -45,15 +45,15 @@ public final class GeneratorTypeRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternGeneratorTypeNether("minecraft", "nether"));
-        this.register(new FlatGeneratorType("minecraft", "flat"));
-        this.register(new DebugGeneratorType("minecraft", "debug"));
-        this.register(new SkylandsGeneratorType("sponge", "skylands"));
+        register(new LanternGeneratorTypeNether("minecraft", "nether"));
+        register(new FlatGeneratorType("minecraft", "flat"));
+        register(new DebugGeneratorType("minecraft", "debug"));
+        register(new SkylandsGeneratorType("sponge", "skylands"));
         // TODO: Add the misc generator types
-        this.register(new FlatGeneratorType("minecraft", "default"));
-        this.register(new FlatGeneratorType("minecraft", "overworld"));
-        this.register(new FlatGeneratorType("minecraft", "the_end"));
-        this.register(new FlatGeneratorType("minecraft", "large_biomes"));
-        this.register(new FlatGeneratorType("minecraft", "amplified"));
+        register(new FlatGeneratorType("minecraft", "default"));
+        register(new FlatGeneratorType("minecraft", "overworld"));
+        register(new FlatGeneratorType("minecraft", "the_end"));
+        register(new FlatGeneratorType("minecraft", "large_biomes"));
+        register(new FlatGeneratorType("minecraft", "amplified"));
     }
 }

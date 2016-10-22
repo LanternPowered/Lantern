@@ -45,6 +45,6 @@ public class AdditionalSimpleCatalogRegistryModule<T extends CatalogType> extend
 
     @Override
     public void registerAdditionalCatalog(T extraCatalog) {
-        this.register(extraCatalog);
+        register(extraCatalog);
     }
 }

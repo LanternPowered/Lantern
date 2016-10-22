@@ -38,10 +38,10 @@ public class InstrumentTypeRegistryModule extends PluginCatalogRegistryModule<In
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternInstrumentType("minecraft", "harp", 0));
-        this.register(new LanternInstrumentType("minecraft", "bass_drum", 1));
-        this.register(new LanternInstrumentType("minecraft", "snare", 2));
-        this.register(new LanternInstrumentType("minecraft", "high_hat", 3));
-        this.register(new LanternInstrumentType("minecraft", "bass_attack", 4));
+        register(new LanternInstrumentType("minecraft", "harp", 0));
+        register(new LanternInstrumentType("minecraft", "bass_drum", 1));
+        register(new LanternInstrumentType("minecraft", "snare", 2));
+        register(new LanternInstrumentType("minecraft", "high_hat", 3));
+        register(new LanternInstrumentType("minecraft", "bass_attack", 4));
     }
 }

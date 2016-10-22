@@ -547,6 +547,16 @@ public final class EntityParameters {
         }
     }
 
+    public static final class Fireworks {
+
+        public static final ParameterTypeCollection PARAMETERS = Base.PARAMETERS.copy();
+
+        public static final ParameterType<ItemStack> ITEM = PARAMETERS.newParameterType(ParameterValueTypes.ITEM_STACK);
+
+        private Fireworks() {
+        }
+    }
+
     private EntityParameters() {
     }
 }

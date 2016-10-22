@@ -60,7 +60,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
         builder.property(InventoryDimension.PROPERTY_NAM, new InventoryDimension(1, 1));
 
         final InventoryArchetype slotArchetype = builder.build("minecraft:slot", "Slot");
-        this.register(slotArchetype);
+        register(slotArchetype);
 
         // Differences from the sponge impl, slot indexes are
         // assigned in the order they are added.
@@ -74,16 +74,16 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
 
         final InventoryArchetype menuRowArchetype = builder.property(new InventoryDimension(9, 1))
                 .build("sponge:menu_row", "Menu Row");
-        this.register(menuRowArchetype);
+        register(menuRowArchetype);
 
         final InventoryArchetype menuColumnArchetype = builder.property(new InventoryDimension(1, 9))
                 .build("sponge:menu_column", "Menu Column");
-        this.register(menuColumnArchetype);
+        register(menuColumnArchetype);
 
         final InventoryArchetype buttonArchetype = builder.reset()
                 .from(slotArchetype)
                 .build("sponge:menu_button", "Menu Button");
-        this.register(buttonArchetype);
+        register(buttonArchetype);
 
         final InventoryArchetype menuGridArchetype = builder.reset()
                 .with(menuRowArchetype)
@@ -91,13 +91,13 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(menuRowArchetype)
                 .property(new InventoryDimension(9, 3))
                 .build("sponge:menu_grid", "Menu Grid");
-        this.register(menuGridArchetype);
+        register(menuGridArchetype);
 
         final InventoryArchetype chestArchetype = builder.reset()
                 .with(menuGridArchetype)
                 .property(InventoryTitle.of(t("container.chest")))
                 .build("minecraft:chest", "Chest");
-        this.register(chestArchetype);
+        register(chestArchetype);
 
         final InventoryArchetype doubleChestArchetype = builder.reset()
                 .with(chestArchetype)
@@ -105,7 +105,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .property(new InventoryDimension(9, 6))
                 .property(InventoryTitle.of(t("container.chestDouble")))
                 .build("minecraft:double_chest", "Double Chest");
-        this.register(doubleChestArchetype);
+        register(doubleChestArchetype);
 
         final InventoryArchetype furnaceArchetype = builder.reset()
                 .with(new LanternInventoryArchetypeBuilder()
@@ -122,14 +122,14 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .property(new InventoryTitle(t("container.furnace")))
                 .property(new InventoryDimension(3, 1))
                 .build("minecraft:furnace", "Furnace");
-        this.register(furnaceArchetype);
+        register(furnaceArchetype);
 
         final InventoryArchetype dispenserArchetype = builder.reset()
                 .with(menuGridArchetype)
                 .property(new InventoryDimension(3, 3))
                 .property(InventoryTitle.of(t("container.dispenser")))
                 .build("minecraft:dispenser", "Dispenser");
-        this.register(dispenserArchetype);
+        register(dispenserArchetype);
 
         final InventoryArchetype workbenchArchetype = builder.reset()
                 .with(new LanternInventoryArchetypeBuilder()
@@ -139,28 +139,28 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(slotArchetype)
                 .property(InventoryTitle.of(t("container.crafting")))
                 .build("minecraft:workbench", "Workbench");
-        this.register(workbenchArchetype);
+        register(workbenchArchetype);
 
         final InventoryArchetype brewingStandArchetype = builder.reset()
                 .with(menuRowArchetype)
                 .property(new InventoryDimension(5, 1))
                 .property(InventoryTitle.of(t("container.brewing")))
                 .build("minecraft:brewing_stand", "Brewing Stand");
-        this.register(brewingStandArchetype);
+        register(brewingStandArchetype);
 
         final InventoryArchetype hopperArchetype = builder.reset()
                 .with(menuRowArchetype)
                 .property(new InventoryDimension(5, 1))
                 .property(InventoryTitle.of(t("container.hopper")))
                 .build("minecraft:hopper", "Hopper");
-        this.register(hopperArchetype);
+        register(hopperArchetype);
 
         final InventoryArchetype beaconArchetype = builder.reset()
                 .with(slotArchetype)
                 .property(new InventoryDimension(1, 1))
                 .property(InventoryTitle.of(t("container.beacon")))
                 .build("minecraft:beacon", "Beacon");
-        this.register(beaconArchetype);
+        register(beaconArchetype);
 
         final InventoryArchetype enchantingTableArchetype = builder.reset()
                 .with(slotArchetype)
@@ -168,7 +168,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .property(new InventoryDimension(2, 1))
                 .property(InventoryTitle.of(t("container.enchant")))
                 .build("minecraft:enchanting_table", "Enchanting Table");
-        this.register(enchantingTableArchetype);
+        register(enchantingTableArchetype);
 
         final InventoryArchetype anvilArchetype = builder.reset()
                 .with(slotArchetype)
@@ -177,7 +177,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .property(new InventoryDimension(3, 1))
                 .property(InventoryTitle.of(t("container.repair")))
                 .build("minecraft:anvil", "Anvil");
-        this.register(anvilArchetype);
+        register(anvilArchetype);
 
         final InventoryArchetype villagerArchetype = builder.reset()
                 .with(slotArchetype)
@@ -185,14 +185,14 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                 .with(slotArchetype)
                 .property(new InventoryDimension(3, 1))
                 .build("minecraft:villager", "Villager");
-        this.register(villagerArchetype);
+        register(villagerArchetype);
 
         final InventoryArchetype horseArchetype = builder.reset()
                 .with(slotArchetype)
                 .with(slotArchetype)
                 .property(new InventoryDimension(2, 1))
                 .build("minecraft:horse", "Horse");
-        this.register(horseArchetype);
+        register(horseArchetype);
 
         final InventoryArchetype horseWithChestArchetype = builder.reset()
                 .with(horseArchetype)
@@ -201,7 +201,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                         .property(new InventoryDimension(5, 3))
                         .build("horse_grid", "Horse Grid"))
                 .build("minecraft:horse_with_chest", "Horse with Chest");
-        this.register(horseWithChestArchetype);
+        register(horseWithChestArchetype);
 
         final InventoryArchetype craftingArchetype = builder.reset()
                 .with(slotArchetype)
@@ -211,7 +211,7 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                         .build("minecraft:crafting_grid", "Crafting Grid"))
                 .property(InventoryTitle.of(t("container.crafting")))
                 .build("minecraft:crafting", "Crafting");
-        this.register(craftingArchetype);
+        register(craftingArchetype);
 
         final InventoryArchetype playerArchetype = builder.reset()
                 .with(craftingArchetype)
@@ -226,14 +226,14 @@ public class InventoryArchetypeRegistryModule extends PluginCatalogRegistryModul
                         .from(menuGridArchetype)
                         .property(new InventoryDimension(9, 1)).build("minecraft:player_hotbar", "Player Hotbar"))
                 .build("minecraft:player", "Player");
-        this.register(playerArchetype);
+        register(playerArchetype);
 
         final InventoryArchetype unknownArchetype = builder.reset()
                 .build("minecraft:unknown", "Unknown");
-        this.register(unknownArchetype);
+        register(unknownArchetype);
 
         final InventoryArchetype emptyArchetype = builder.reset()
                 .build("minecraft:empty", "Empty");
-        this.register(emptyArchetype);
+        register(emptyArchetype);
     }
 }

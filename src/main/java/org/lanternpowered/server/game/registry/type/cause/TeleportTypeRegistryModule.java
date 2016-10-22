@@ -38,10 +38,10 @@ public class TeleportTypeRegistryModule extends AdditionalPluginCatalogRegistryM
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternTeleportType("minecraft", "command"));
-        this.register(new LanternTeleportType("minecraft", "entity_teleport"));
-        this.register(new LanternTeleportType("minecraft", "plugin"));
-        this.register(new LanternTeleportType("minecraft", "portal"));
-        this.register(new LanternTeleportType("minecraft", "unknown"));
+        register(new LanternTeleportType("minecraft", "command"));
+        register(new LanternTeleportType("minecraft", "entity_teleport"));
+        register(new LanternTeleportType("minecraft", "plugin"));
+        register(new LanternTeleportType("minecraft", "portal"));
+        register(new LanternTeleportType("minecraft", "unknown"));
     }
 }

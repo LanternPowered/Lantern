@@ -38,7 +38,7 @@ public final class HandTypeRegistryModule extends SimpleCatalogRegistryModule<Ha
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternHandType("main_hand", "options.mainHand"));
-        this.register(new LanternHandType("off_hand", "hand.off"));
+        register(new LanternHandType("main_hand", "options.mainHand"));
+        register(new LanternHandType("off_hand", "hand.off"));
     }
 }

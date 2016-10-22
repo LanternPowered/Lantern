@@ -29,6 +29,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3f;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
+import com.github.benmanes.caffeine.cache.RemovalCause;
 import io.netty.handler.codec.CodecException;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -37,14 +38,25 @@ import org.lanternpowered.server.effect.particle.LanternParticleEffect;
 import org.lanternpowered.server.effect.particle.LanternParticleType;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
+import org.lanternpowered.server.network.entity.EntityProtocolManager;
+import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
+import org.lanternpowered.server.network.entity.vanilla.EntityParameters;
 import org.lanternpowered.server.network.message.Message;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.message.processor.Processor;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
+import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutEntityStatus;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOptions;
@@ -52,6 +64,7 @@ import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Direction;
@@ -61,7 +74,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
 
 @NonnullByDefault
 public final class ProcessorPlayOutParticleEffect implements Processor<MessagePlayOutParticleEffect> {
@@ -69,8 +85,10 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
     /**
      * Using a cache to bring the amount of operations down for spawning particles.
      */
-    private final LoadingCache<ParticleEffect, ICachedMessage> cache =
-            Caffeine.newBuilder().weakKeys().expireAfterAccess(3, TimeUnit.MINUTES).build(this::preProcess);
+    private final LoadingCache<ParticleEffect, ICachedMessage> cache = Caffeine.newBuilder()
+            .weakKeys().expireAfterAccess(3, TimeUnit.MINUTES)
+            .removalListener(this::processRemoval)
+            .build(this::preProcess);
 
     private final Object2IntMap<PotionEffectType> potionEffectTypeToId = new Object2IntOpenHashMap<>();
 
@@ -139,6 +157,14 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         }
     }
 
+    private void processRemoval(@Nullable ParticleEffect key, @Nullable ICachedMessage value, RemovalCause cause) {
+        if (value instanceof CachedFireworksMessage) {
+            final ByteBufParameterList parameterList = (ByteBufParameterList) ((CachedFireworksMessage) value)
+                    .entityMetadataMessage.getParameterList();
+            parameterList.getByteBuffer().ifPresent(ByteBuffer::release);
+        }
+    }
+
     private ICachedMessage preProcess(ParticleEffect effect0) {
         final LanternParticleEffect effect = (LanternParticleEffect) effect0;
         final LanternParticleType type = effect.getType();
@@ -147,7 +173,17 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
         // Special cases
         if (!internalType.isPresent()) {
             if (type == ParticleTypes.FIREWORKS) {
-                return EmptyCachedMessage.INSTANCE; // TODO
+                // Create the fireworks data item
+                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORKS);
+                itemStack.tryOffer(Keys.FIREWORK_EFFECTS, effect.getOptionOrDefault(ParticleOptions.FIREWORK_EFFECTS).get());
+
+                // Write the item to a parameter list
+                final ByteBufParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+                parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
+
+                parameterList.getByteBuffer().ifPresent(ByteBuffer::retain);
+
+                return new CachedFireworksMessage(new MessagePlayOutEntityMetadata(CachedFireworksMessage.ENTITY_ID, parameterList));
             } else if (type == ParticleTypes.FERTILIZER) {
                 final int quantity = effect.getOptionOrDefault(ParticleOptions.QUANTITY).get();
                 return new CachedEffectMessage(2005, quantity, false);
@@ -324,6 +360,40 @@ public final class ProcessorPlayOutParticleEffect implements Processor<MessagePl
 
         @Override
         public void process(Vector3d position, List<Message> output) {
+        }
+    }
+
+    private static final class CachedFireworksMessage implements ICachedMessage {
+
+        // Get the next free entity id
+        private static final int ENTITY_ID;
+        private static final UUID UNIQUE_ID;
+
+        private static final MessagePlayOutDestroyEntities DESTROY_ENTITY;
+        private static final MessagePlayOutEntityStatus TRIGGER_EFFECT;
+
+        static {
+            ENTITY_ID = EntityProtocolManager.acquireEntityId();
+            UNIQUE_ID = UUID.randomUUID();
+
+            DESTROY_ENTITY = new MessagePlayOutDestroyEntities(ENTITY_ID);
+            // The status index that is used to trigger the fireworks effect
+            TRIGGER_EFFECT = new MessagePlayOutEntityStatus(ENTITY_ID, 17);
+        }
+
+        private final MessagePlayOutEntityMetadata entityMetadataMessage;
+
+        private CachedFireworksMessage(MessagePlayOutEntityMetadata entityMetadataMessage) {
+            this.entityMetadataMessage = entityMetadataMessage;
+        }
+
+        @Override
+        public void process(Vector3d position, List<Message> output) {
+            // 76 -> The internal id used to spawn fireworks
+            output.add(new MessagePlayOutSpawnObject(ENTITY_ID, UNIQUE_ID, 76, 0, position, 0, 0, Vector3d.ZERO));
+            output.add(this.entityMetadataMessage);
+            output.add(TRIGGER_EFFECT);
+            output.add(DESTROY_ENTITY);
         }
     }
 

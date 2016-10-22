@@ -43,5 +43,6 @@ public class ProfessionRegistryModule extends PluginCatalogRegistryModule<Profes
         this.register(new LanternProfession("minecraft", "priest", 2));
         this.register(new LanternProfession("minecraft", "blacksmith", 3));
         this.register(new LanternProfession("minecraft", "butcher", 4));
+        this.register(new LanternProfession("minecraft", "nitwit", 5));
     }
 }

@@ -38,9 +38,9 @@ public final class SerializationBehaviorRegistryModule extends PluginCatalogRegi
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternSerializationBehavior("minecraft", "automatic", "Automatic"));
-        this.register(new LanternSerializationBehavior("minecraft", "manual", "Manual"));
-        this.register(new LanternSerializationBehavior("minecraft", "none", "None"));
+        register(new LanternSerializationBehavior("minecraft", "automatic", "Automatic"));
+        register(new LanternSerializationBehavior("minecraft", "manual", "Manual"));
+        register(new LanternSerializationBehavior("minecraft", "none", "None"));
     }
 }
 

@@ -33,10 +33,11 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public class LogBlockItemTypeObjectSerializer implements ItemTypeObjectSerializer {
+public class LogBlockItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
         final BlockType blockType = itemStack.getItem().getBlock().get();
         // TODO
         final BlockState blockState = blockType.getDefaultState();//.with(Keys.TREE_TYPE, itemStack.get(Keys.TREE_TYPE).get()).get();
@@ -45,6 +46,7 @@ public class LogBlockItemTypeObjectSerializer implements ItemTypeObjectSerialize
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
         final BlockType blockType = itemStack.getItem().getBlock().get();
         final BlockState blockState = BlockRegistryModule.get().getStateByTypeAndData(blockType,
                 dataView.getShort(DATA_VALUE).orElse((short) 0).byteValue()).get();

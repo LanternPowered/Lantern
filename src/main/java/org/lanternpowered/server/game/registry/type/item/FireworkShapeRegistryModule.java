@@ -32,16 +32,22 @@ import org.spongepowered.api.item.FireworkShapes;
 
 public class FireworkShapeRegistryModule extends InternalPluginCatalogRegistryModule<FireworkShape> {
 
-    public FireworkShapeRegistryModule() {
+    private static final FireworkShapeRegistryModule INSTANCE = new FireworkShapeRegistryModule();
+
+    public static FireworkShapeRegistryModule get() {
+        return INSTANCE;
+    }
+
+    private FireworkShapeRegistryModule() {
         super(FireworkShapes.class);
     }
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternFireworkShape("minecraft", "ball", 0));
-        this.register(new LanternFireworkShape("minecraft", "large_ball", 1));
-        this.register(new LanternFireworkShape("minecraft", "star", 2));
-        this.register(new LanternFireworkShape("minecraft", "creeper", 3));
-        this.register(new LanternFireworkShape("minecraft", "burst", 4));
+        register(new LanternFireworkShape("minecraft", "ball", 0));
+        register(new LanternFireworkShape("minecraft", "large_ball", 1));
+        register(new LanternFireworkShape("minecraft", "star", 2));
+        register(new LanternFireworkShape("minecraft", "creeper", 3));
+        register(new LanternFireworkShape("minecraft", "burst", 4));
     }
 }

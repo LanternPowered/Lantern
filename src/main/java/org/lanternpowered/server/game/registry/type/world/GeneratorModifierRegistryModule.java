@@ -39,7 +39,7 @@ public final class GeneratorModifierRegistryModule extends AdditionalPluginCatal
 
     @Override
     public void registerDefaults() {
-        this.register(new SkylandsWorldGeneratorModifier());
-        this.register(new VoidWorldGeneratorModifier());
+        register(new SkylandsWorldGeneratorModifier());
+        register(new VoidWorldGeneratorModifier());
     }
 }

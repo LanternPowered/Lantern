@@ -79,13 +79,13 @@ public final class ObjectStoreRegistry {
     }
 
     public ObjectStoreRegistry() {
-        this.register(LanternEntity.class, new EntityStore<>());
-        this.register(LanternItem.class, new ItemStore());
-        this.register(LanternLiving.class, new LivingStore<>());
-        this.register(LanternPlayer.class, new PlayerStore());
-        this.register(LanternItemStack.class, new ItemStackStore());
-        this.register(LanternTileEntity.class, new TileEntityObjectStore<>());
-        this.register(LanternContainer.class, new ContainerTileEntityStore<>());
+        register(LanternEntity.class, new EntityStore<>());
+        register(LanternItem.class, new ItemStore());
+        register(LanternLiving.class, new LivingStore<>());
+        register(LanternPlayer.class, new PlayerStore());
+        register(LanternItemStack.class, new ItemStackStore());
+        register(LanternTileEntity.class, new TileEntityObjectStore<>());
+        register(LanternContainer.class, new ContainerTileEntityStore<>());
     }
 
     /**

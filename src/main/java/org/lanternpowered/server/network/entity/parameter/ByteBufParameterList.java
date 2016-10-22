@@ -28,6 +28,8 @@ package org.lanternpowered.server.network.entity.parameter;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 
+import java.util.Optional;
+
 import javax.annotation.Nullable;
 
 /**
@@ -45,6 +47,10 @@ public class ByteBufParameterList extends AbstractParameterList {
         this.byteBufAllocator = byteBufAllocator;
     }
 
+    public Optional<ByteBuffer> getByteBuffer() {
+        return Optional.ofNullable(this.buf);
+    }
+
     private <T> void writeValueHeader(ParameterType<T> type) {
         if (this.buf == null) {
             this.buf = this.byteBufAllocator.buffer();
@@ -60,35 +66,35 @@ public class ByteBufParameterList extends AbstractParameterList {
 
     @Override
     public <T> void add(ParameterType<T> type, T value) {
-        this.writeValueHeader(type);
+        writeValueHeader(type);
         //noinspection ConstantConditions
         type.getValueType().serialize(this.buf, value);
     }
 
     @Override
     public void add(ParameterType<Byte> type, byte value) {
-        this.writeValueHeader(type);
+        writeValueHeader(type);
         //noinspection ConstantConditions
         this.buf.writeByte(value);
     }
 
     @Override
     public void add(ParameterType<Integer> type, int value) {
-        this.writeValueHeader(type);
+        writeValueHeader(type);
         //noinspection ConstantConditions
         this.buf.writeVarInt(value);
     }
 
     @Override
     public void add(ParameterType<Float> type, float value) {
-        this.writeValueHeader(type);
+        writeValueHeader(type);
         //noinspection ConstantConditions
         this.buf.writeFloat(value);
     }
 
     @Override
     public void add(ParameterType<Boolean> type, boolean value) {
-        this.writeValueHeader(type);
+        writeValueHeader(type);
         //noinspection ConstantConditions
         this.buf.writeBoolean(value);
     }

@@ -96,6 +96,12 @@ public abstract class SimpleKeyRegistration<V extends BaseValue<E>, E> implement
             this.valueProcessor = Collections.singletonList(valueProcessor);
             return this;
         }
+
+        public SingleProcessor<V, E> copy() {
+            final SingleProcessor<V, E> copy = new SingleProcessor<>(getKey());
+            copy.valueProcessor = this.valueProcessor;
+            return copy;
+        }
     }
 
     public static class MultipleProcessors<V extends BaseValue<E>, E> extends SimpleKeyRegistration<V, E> {

@@ -26,11 +26,11 @@
 package org.lanternpowered.server.game.registry.type.bossbar;
 
 import org.lanternpowered.server.boss.LanternBossBarOverlay;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarOverlay;
 import org.spongepowered.api.boss.BossBarOverlays;
 
-public final class BossBarOverlayRegistryModule extends AdditionalPluginCatalogRegistryModule<BossBarOverlay> {
+public final class BossBarOverlayRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<BossBarOverlay> {
 
     public BossBarOverlayRegistryModule() {
         super(BossBarOverlays.class);
@@ -38,10 +38,10 @@ public final class BossBarOverlayRegistryModule extends AdditionalPluginCatalogR
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternBossBarOverlay("minecraft", "progress", 0));
-        this.register(new LanternBossBarOverlay("minecraft", "notched_6", 1));
-        this.register(new LanternBossBarOverlay("minecraft", "notched_10", 2));
-        this.register(new LanternBossBarOverlay("minecraft", "notched_12", 3));
-        this.register(new LanternBossBarOverlay("minecraft", "notched_20", 4));
+        register(new LanternBossBarOverlay("minecraft", "progress", 0));
+        register(new LanternBossBarOverlay("minecraft", "notched_6", 1));
+        register(new LanternBossBarOverlay("minecraft", "notched_10", 2));
+        register(new LanternBossBarOverlay("minecraft", "notched_12", 3));
+        register(new LanternBossBarOverlay("minecraft", "notched_20", 4));
     }
 }

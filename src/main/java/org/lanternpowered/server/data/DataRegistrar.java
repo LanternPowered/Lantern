@@ -30,6 +30,7 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
+import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.property.PropertyRegistry;

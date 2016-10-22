@@ -47,26 +47,30 @@ import javax.annotation.Nullable;
 public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
         implements AlternateCatalogRegistryModule<T>, CatalogMappingDataHolder {
 
-    @Nullable Collection<T> values;
+    @Nullable private Collection<T> values;
     Map<String, T> types = new HashMap<>();
     @Nullable Function<T, String> mappingProvider;
-    @Nullable final Class<?> catalogClass;
-    @Nullable final String patternValue;
-    @Nullable final Pattern pattern;
-
-    public AbstractCatalogRegistryModule(@Nullable Class<?> catalogClass) {
-        this(catalogClass, null, null);
-    }
-
-    public AbstractCatalogRegistryModule(@Nullable Class<?> catalogClass, @Nullable String pattern) {
-        this(catalogClass, null, pattern);
-    }
+    @Nullable private final Class<?> catalogClass;
+    @Nullable private final String patternValue;
+    @Nullable private final Pattern pattern;
 
     public AbstractCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider) {
         this(catalogClass, mappingProvider, null);
     }
 
     public AbstractCatalogRegistryModule(Class<?> catalogClass, @Nullable Function<T, String> mappingProvider, @Nullable String pattern) {
+        this(mappingProvider, checkNotNull(catalogClass, "catalogClass"), pattern);
+    }
+
+    public AbstractCatalogRegistryModule(@Nullable Class<?> catalogClass) {
+        this(null, catalogClass, null);
+    }
+
+    public AbstractCatalogRegistryModule(@Nullable Class<?> catalogClass, @Nullable String pattern) {
+        this(null, catalogClass, pattern);
+    }
+
+    private AbstractCatalogRegistryModule(@Nullable Function<T, String> mappingProvider, @Nullable Class<?> catalogClass, @Nullable String pattern) {
         this.mappingProvider = mappingProvider;
         this.catalogClass = catalogClass;
         this.patternValue = pattern;
@@ -82,7 +86,7 @@ public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
      * changes will throw exceptions.
      */
     protected void finalizeContent() {
-        this.checkFinalizedContent();
+        checkFinalizedContent();
         this.types = ImmutableMap.copyOf(this.types);
         this.values = ImmutableSet.copyOf(this.types.values());
     }
@@ -112,6 +116,6 @@ public abstract class AbstractCatalogRegistryModule<T extends CatalogType>
 
     @Override
     public List<CatalogMappingData> getCatalogMappings() {
-        return this.catalogClass == null ? ImmutableList.of() : ImmutableList.of(new CatalogMappingData(this.catalogClass, this.provideCatalogMap()));
+        return this.catalogClass == null ? ImmutableList.of() : ImmutableList.of(new CatalogMappingData(this.catalogClass, provideCatalogMap()));
     }
 }

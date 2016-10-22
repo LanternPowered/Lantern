@@ -56,9 +56,9 @@ public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCat
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternDisplaySlot("minecraft", "list", null, 0));
-        this.register(new LanternDisplaySlot("minecraft", "sidebar", null, 1));
-        this.register(new LanternDisplaySlot("minecraft", "below_name", "belowName", null, 2));
+        register(new LanternDisplaySlot("minecraft", "list", null, 0));
+        register(new LanternDisplaySlot("minecraft", "sidebar", null, 1));
+        register(new LanternDisplaySlot("minecraft", "below_name", "belowName", null, 2));
         for (TextColor textColor : Sponge.getRegistry().getAllOf(TextColor.class)) {
             // There is not mapping for "none"
             if (textColor == TextColors.NONE) {
@@ -67,7 +67,7 @@ public final class DisplaySlotRegistryModule extends AdditionalInternalPluginCat
             final char character = FormattingCodeTextSerializer.FORMATS_TO_CODE.get(textColor);
             final String id = "below_name_" + textColor.getId();
             final String name = "sidebar.team." + textColor.getId();
-            this.register(new LanternDisplaySlot("minecraft", id, name, textColor, 3 + character));
+            register(new LanternDisplaySlot("minecraft", id, name, textColor, 3 + character));
         }
     }
 

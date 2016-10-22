@@ -54,8 +54,8 @@ public final class WeatherTypeRegistryModule extends AdditionalPluginCatalogRegi
     public void registerDefaults() {
         WeatherOptions.init();
         final LanternScriptGameRegistry scriptGameRegistry = LanternScriptGameRegistry.get();
-        this.register(scriptGameRegistry.construct("minecraft", "weather/clear.json", "clear", Weather.class));
-        this.register(scriptGameRegistry.construct("minecraft", "weather/rain.json", "rain", Weather.class));
-        this.register(scriptGameRegistry.construct("minecraft", "weather/thunder_storm.json", "thunder_storm", Weather.class));
+        register(scriptGameRegistry.construct("minecraft", "weather/clear.json", "clear", Weather.class));
+        register(scriptGameRegistry.construct("minecraft", "weather/rain.json", "rain", Weather.class));
+        register(scriptGameRegistry.construct("minecraft", "weather/thunder_storm.json", "thunder_storm", Weather.class));
     }
 }

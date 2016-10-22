@@ -250,6 +250,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
+import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutEntityStatus;
 
 final class ProtocolPlay extends ProtocolBase {
 
@@ -394,6 +395,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x19, CodecPlayOutSoundEffect.class, MessagePlayOutNamedSoundEffect.class);
         outbound.bind(0x1a, CodecOutDisconnect.class, MessageOutDisconnect.class);
         final CodecRegistration<Message, CodecPlayOutEntityStatus> codecPlayOutEntityStatus = outbound.bind(0x1b, CodecPlayOutEntityStatus.class);
+        codecPlayOutEntityStatus.bind(MessagePlayOutEntityStatus.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutSetOpLevel.class);
         codecPlayOutEntityStatus.bind(MessagePlayOutSetReducedDebug.class);
         // 0x1c

@@ -36,6 +36,10 @@ import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryMo
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
 import org.lanternpowered.server.item.LanternItemType;
+import org.lanternpowered.server.item.type.CoalItemType;
+import org.lanternpowered.server.item.type.FireworkChargeItemType;
+import org.lanternpowered.server.item.type.FireworksItemType;
+import org.lanternpowered.server.item.type.GoldenAppleItemType;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -93,7 +97,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     @Override
     public void registerDefaults() {
         final LanternItemType none = new LanternItemType("minecraft", "none");
-        this.register(0, none);
+        register(0, none);
+        register(263, new CoalItemType("minecraft", "coal", "coal"));
+        register(322, new GoldenAppleItemType("minecraft", "golden_apple", "appleGold"));
+        register(401, new FireworksItemType("minecraft", "fireworks", "fireworks"));
+        register(402, new FireworkChargeItemType("minecraft", "firework_charge", "fireworksCharge"));
         try {
             ReflectionHelper.setField(ItemStackSnapshot.class.getDeclaredField("NONE"), null,
                     new LanternItemStack(none, 0).createSnapshot());

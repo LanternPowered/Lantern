@@ -38,23 +38,23 @@ public class SpawnTypeRegistryModule extends AdditionalPluginCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternSpawnType("minecraft", "block_spawning"));
-        this.register(new LanternSpawnType("minecraft", "breeding"));
-        this.register(new LanternSpawnType("minecraft", "chunk_load"));
-        this.register(new LanternSpawnType("minecraft", "custom"));
-        this.register(new LanternSpawnType("minecraft", "dispense"));
-        this.register(new LanternSpawnType("minecraft", "dropped_item"));
-        this.register(new LanternSpawnType("minecraft", "experience"));
-        this.register(new LanternSpawnType("minecraft", "falling_block"));
-        this.register(new LanternSpawnType("minecraft", "mob_spawner"));
-        this.register(new LanternSpawnType("minecraft", "passive"));
-        this.register(new LanternSpawnType("minecraft", "placement"));
-        this.register(new LanternSpawnType("minecraft", "plugin"));
-        this.register(new LanternSpawnType("minecraft", "projectile"));
-        this.register(new LanternSpawnType("minecraft", "spawn_egg"));
-        this.register(new LanternSpawnType("minecraft", "structure"));
-        this.register(new LanternSpawnType("minecraft", "tnt_ignite"));
-        this.register(new LanternSpawnType("minecraft", "weather"));
-        this.register(new LanternSpawnType("minecraft", "world_spawner"));
+        register(new LanternSpawnType("minecraft", "block_spawning"));
+        register(new LanternSpawnType("minecraft", "breeding"));
+        register(new LanternSpawnType("minecraft", "chunk_load"));
+        register(new LanternSpawnType("minecraft", "custom"));
+        register(new LanternSpawnType("minecraft", "dispense"));
+        register(new LanternSpawnType("minecraft", "dropped_item"));
+        register(new LanternSpawnType("minecraft", "experience"));
+        register(new LanternSpawnType("minecraft", "falling_block"));
+        register(new LanternSpawnType("minecraft", "mob_spawner"));
+        register(new LanternSpawnType("minecraft", "passive"));
+        register(new LanternSpawnType("minecraft", "placement"));
+        register(new LanternSpawnType("minecraft", "plugin"));
+        register(new LanternSpawnType("minecraft", "projectile"));
+        register(new LanternSpawnType("minecraft", "spawn_egg"));
+        register(new LanternSpawnType("minecraft", "structure"));
+        register(new LanternSpawnType("minecraft", "tnt_ignite"));
+        register(new LanternSpawnType("minecraft", "weather"));
+        register(new LanternSpawnType("minecraft", "world_spawner"));
     }
 }

@@ -38,7 +38,7 @@ public final class HandPreferenceRegistryModule extends SimpleCatalogRegistryMod
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternHandPreference("left", "options.mainHand.left"));
-        this.register(new LanternHandPreference("right", "options.mainHand.right"));
+        register(new LanternHandPreference("left", "options.mainHand.left"));
+        register(new LanternHandPreference("right", "options.mainHand.right"));
     }
 }

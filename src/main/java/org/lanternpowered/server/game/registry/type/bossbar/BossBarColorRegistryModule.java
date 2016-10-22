@@ -26,11 +26,11 @@
 package org.lanternpowered.server.game.registry.type.bossbar;
 
 import org.lanternpowered.server.boss.LanternBossBarColor;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
 import org.spongepowered.api.boss.BossBarColor;
 import org.spongepowered.api.boss.BossBarColors;
 
-public final class BossBarColorRegistryModule extends AdditionalPluginCatalogRegistryModule<BossBarColor> {
+public final class BossBarColorRegistryModule extends AdditionalInternalPluginCatalogRegistryModule<BossBarColor> {
 
     public BossBarColorRegistryModule() {
         super(BossBarColors.class);
@@ -38,12 +38,12 @@ public final class BossBarColorRegistryModule extends AdditionalPluginCatalogReg
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternBossBarColor("minecraft", "pink", 0));
-        this.register(new LanternBossBarColor("minecraft", "blue", 1));
-        this.register(new LanternBossBarColor("minecraft", "red", 2));
-        this.register(new LanternBossBarColor("minecraft", "green", 3));
-        this.register(new LanternBossBarColor("minecraft", "yellow", 4));
-        this.register(new LanternBossBarColor("minecraft", "purple", 5));
-        this.register(new LanternBossBarColor("minecraft", "white", 6));
+        register(new LanternBossBarColor("minecraft", "pink", 0));
+        register(new LanternBossBarColor("minecraft", "blue", 1));
+        register(new LanternBossBarColor("minecraft", "red", 2));
+        register(new LanternBossBarColor("minecraft", "green", 3));
+        register(new LanternBossBarColor("minecraft", "yellow", 4));
+        register(new LanternBossBarColor("minecraft", "purple", 5));
+        register(new LanternBossBarColor("minecraft", "white", 6));
     }
 }

@@ -39,7 +39,7 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class BookItemTypeObjectSerializer implements ItemTypeObjectSerializer {
+public class BookItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     private static final DataQuery AUTHOR = DataQuery.of("author");
     private static final DataQuery TITLE = DataQuery.of("title");
@@ -47,6 +47,7 @@ public class BookItemTypeObjectSerializer implements ItemTypeObjectSerializer {
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
         valueContainer.get(Keys.BOOK_AUTHOR).ifPresent(text ->
                 dataView.set(AUTHOR, LanternTexts.toLegacy(text)));
         valueContainer.get(Keys.BOOK_PAGES).ifPresent(lines ->
@@ -57,6 +58,11 @@ public class BookItemTypeObjectSerializer implements ItemTypeObjectSerializer {
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
+        dataView.getString(AUTHOR).ifPresent(author -> valueContainer.set(Keys.BOOK_AUTHOR, LanternTexts.fromLegacy(author)));
+        dataView.getString(TITLE).ifPresent(title -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(title)));
+        dataView.getStringList(PAGES).ifPresent(lines -> valueContainer.set(Keys.BOOK_PAGES,
+                lines.stream().map(TextSerializers.JSON::deserialize).collect(Collectors.toList())));
     }
 
     public static void writeBookData(DataView dataView, BookView bookView, Locale locale) {

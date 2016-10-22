@@ -38,11 +38,11 @@ public final class CriterionRegistryModule extends AdditionalPluginCatalogRegist
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternCriterion("minecraft", "dummy"));
-        this.register(new LanternCriterion("minecraft", "trigger"));
-        this.register(new LanternCriterion("minecraft", "health"));
-        this.register(new LanternCriterion("minecraft", "player_kills", "playerKillCount"));
-        this.register(new LanternCriterion("minecraft", "total_kills", "totalKillCount"));
-        this.register(new LanternCriterion("minecraft", "deaths", "deathCount"));
+        register(new LanternCriterion("minecraft", "dummy"));
+        register(new LanternCriterion("minecraft", "trigger"));
+        register(new LanternCriterion("minecraft", "health"));
+        register(new LanternCriterion("minecraft", "player_kills", "playerKillCount"));
+        register(new LanternCriterion("minecraft", "total_kills", "totalKillCount"));
+        register(new LanternCriterion("minecraft", "deaths", "deathCount"));
     }
 }

@@ -66,15 +66,15 @@ public class CareerRegistryModule extends PluginCatalogRegistryModule<Career> {
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternCareer("minecraft", "farmer", Professions.FARMER));
-        this.register(new LanternCareer("minecraft", "fisherman", Professions.FARMER));
-        this.register(new LanternCareer("minecraft", "shepherd", Professions.FARMER));
-        this.register(new LanternCareer("minecraft", "fletcher", Professions.FARMER));
-        this.register(new LanternCareer("minecraft", "librarian", Professions.LIBRARIAN));
-        this.register(new LanternCareer("minecraft", "cleric", Professions.PRIEST));
-        this.register(new LanternCareer("minecraft", "armor", Professions.BLACKSMITH));
-        this.register(new LanternCareer("minecraft", "weapon", Professions.BLACKSMITH));
-        this.register(new LanternCareer("minecraft", "butcher", Professions.BUTCHER));
-        this.register(new LanternCareer("minecraft", "leather", Professions.BUTCHER));
+        register(new LanternCareer("minecraft", "farmer", Professions.FARMER));
+        register(new LanternCareer("minecraft", "fisherman", Professions.FARMER));
+        register(new LanternCareer("minecraft", "shepherd", Professions.FARMER));
+        register(new LanternCareer("minecraft", "fletcher", Professions.FARMER));
+        register(new LanternCareer("minecraft", "librarian", Professions.LIBRARIAN));
+        register(new LanternCareer("minecraft", "cleric", Professions.PRIEST));
+        register(new LanternCareer("minecraft", "armor", Professions.BLACKSMITH));
+        register(new LanternCareer("minecraft", "weapon", Professions.BLACKSMITH));
+        register(new LanternCareer("minecraft", "butcher", Professions.BUTCHER));
+        register(new LanternCareer("minecraft", "leather", Professions.BUTCHER));
     }
 }

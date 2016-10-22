@@ -38,9 +38,9 @@ public final class SelectorTypeRegistryModule extends AdditionalPluginCatalogReg
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternSelectorType("minecraft", "all_players", "a"));
-        this.register(new LanternSelectorType("minecraft", "all_entities", "e"));
-        this.register(new LanternSelectorType("minecraft", "nearest_player", "p"));
-        this.register(new LanternSelectorType("minecraft", "random", "r"));
+        register(new LanternSelectorType("minecraft", "all_players", "a"));
+        register(new LanternSelectorType("minecraft", "all_entities", "e"));
+        register(new LanternSelectorType("minecraft", "nearest_player", "p"));
+        register(new LanternSelectorType("minecraft", "random", "r"));
     }
 }

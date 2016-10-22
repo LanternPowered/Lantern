@@ -44,10 +44,10 @@ public final class GameModeRegistryModule extends AdditionalInternalPluginCatalo
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternGameMode("minecraft", "not_set", -1));
-        this.register(new LanternGameMode("minecraft", "survival", 0));
-        this.register(new LanternGameMode("minecraft", "creative", 1));
-        this.register(new LanternGameMode("minecraft", "adventure", 2));
-        this.register(new LanternGameMode("minecraft", "spectator", 3));
+        register(new LanternGameMode("minecraft", "not_set", -1));
+        register(new LanternGameMode("minecraft", "survival", 0));
+        register(new LanternGameMode("minecraft", "creative", 1));
+        register(new LanternGameMode("minecraft", "adventure", 2));
+        register(new LanternGameMode("minecraft", "spectator", 3));
     }
 }

@@ -38,19 +38,19 @@ public final class LocaleRegistryModule implements RegistryModule {
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        Field[] locales = Locales.class.getFields();
+        final Field[] locales = Locales.class.getFields();
         for (Field field : locales) {
-            int pos = field.getName().indexOf('_');
+            final int pos = field.getName().indexOf('_');
             if (pos < 0) {
                 continue;
             }
 
-            char[] c = field.getName().toCharArray();
+            final char[] c = field.getName().toCharArray();
             for (int i = 0; i < pos; i++) {
                 c[i] = Character.toLowerCase(c[i]);
             }
 
-            String code = new String(c);
+            final String code = new String(c);
             try {
                 LanguageUtil.LOCALE_CACHE.put(code, (Locale) field.get(null));
             } catch (IllegalAccessException ignored) {

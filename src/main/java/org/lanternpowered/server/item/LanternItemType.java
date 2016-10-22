@@ -32,7 +32,10 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.data.AbstractDataHolder;
+import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.LanternItemStack;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.entity.living.player.Player;
@@ -71,6 +74,10 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
     public LanternItemType(String pluginId, String identifier, Translation translation) {
         super(pluginId, identifier);
         this.translation = checkNotNull(translation, "translation");
+    }
+
+    public void registerKeysFor(AbstractValueContainer valueContainer) {
+
     }
 
     @Override

@@ -38,12 +38,12 @@ public class HorseColorRegistryModule extends PluginCatalogRegistryModule<HorseC
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternHorseColor("minecraft", "white", 0));
-        this.register(new LanternHorseColor("minecraft", "creamy", 1));
-        this.register(new LanternHorseColor("minecraft", "chestnut", 2));
-        this.register(new LanternHorseColor("minecraft", "brown", 3));
-        this.register(new LanternHorseColor("minecraft", "black", 4));
-        this.register(new LanternHorseColor("minecraft", "gray", 5));
-        this.register(new LanternHorseColor("minecraft", "dark_brown", 6));
+        register(new LanternHorseColor("minecraft", "white", 0));
+        register(new LanternHorseColor("minecraft", "creamy", 1));
+        register(new LanternHorseColor("minecraft", "chestnut", 2));
+        register(new LanternHorseColor("minecraft", "brown", 3));
+        register(new LanternHorseColor("minecraft", "black", 4));
+        register(new LanternHorseColor("minecraft", "gray", 5));
+        register(new LanternHorseColor("minecraft", "dark_brown", 6));
     }
 }

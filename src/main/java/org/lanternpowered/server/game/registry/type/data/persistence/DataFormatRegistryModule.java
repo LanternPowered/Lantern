@@ -40,8 +40,8 @@ public final class DataFormatRegistryModule extends SimpleCatalogRegistryModule<
 
     @Override
     public void registerDefaults() {
-        this.register(new HoconDataFormat("hocon"));
-        this.register(new JsonDataFormat("json"));
-        this.register(new NbtDataFormat("nbt"));
+        register(new HoconDataFormat("hocon"));
+        register(new JsonDataFormat("json"));
+        register(new NbtDataFormat("nbt"));
     }
 }

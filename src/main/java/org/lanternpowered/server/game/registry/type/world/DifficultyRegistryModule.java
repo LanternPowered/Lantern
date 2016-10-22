@@ -44,9 +44,9 @@ public final class DifficultyRegistryModule extends AdditionalInternalPluginCata
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternDifficulty("minecraft", "peaceful", 0));
-        this.register(new LanternDifficulty("minecraft", "easy", 1));
-        this.register(new LanternDifficulty("minecraft", "normal", 2));
-        this.register(new LanternDifficulty("minecraft", "hard", 3));
+        register(new LanternDifficulty("minecraft", "peaceful", 0));
+        register(new LanternDifficulty("minecraft", "easy", 1));
+        register(new LanternDifficulty("minecraft", "normal", 2));
+        register(new LanternDifficulty("minecraft", "hard", 3));
     }
 }

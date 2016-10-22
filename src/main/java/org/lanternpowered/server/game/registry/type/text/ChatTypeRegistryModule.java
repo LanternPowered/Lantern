@@ -38,8 +38,8 @@ public final class ChatTypeRegistryModule extends AdditionalPluginCatalogRegistr
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternChatType("minecraft", "chat"));
-        this.register(new LanternChatType("minecraft", "action_bar"));
-        this.register(new LanternChatType("minecraft", "system"));
+        register(new LanternChatType("minecraft", "chat"));
+        register(new LanternChatType("minecraft", "action_bar"));
+        register(new LanternChatType("minecraft", "system"));
     }
 }

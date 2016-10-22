@@ -55,7 +55,7 @@ public class SimpleCatalogRegistryModule<T extends CatalogType> extends Abstract
 
     @Override
     protected void finalizeContent() {
-        this.checkFinalizedContent();
+        checkFinalizedContent();
         // Merge the content to reduce hash lookups
         if (this.typesByName != null) {
             for (Map.Entry<String, T> entry : this.typesByName.entrySet()) {
@@ -68,7 +68,7 @@ public class SimpleCatalogRegistryModule<T extends CatalogType> extends Abstract
 
     @Override
     protected void register(T catalogType) {
-        this.validateCatalogType(catalogType, ID_PATTERN_VALUE, ID_PATTERN);
+        validateCatalogType(catalogType, ID_PATTERN_VALUE, ID_PATTERN);
         final String id = catalogType.getId();
         this.types.put(id, catalogType);
         final String name = catalogType.getName().toLowerCase(Locale.ENGLISH);

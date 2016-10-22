@@ -25,33 +25,42 @@
  */
 package org.lanternpowered.server.inventory;
 
+import org.lanternpowered.server.data.AbstractImmutableDataHolder;
+import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
-public class LanternItemStackSnapshot implements ItemStackSnapshot {
+public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmutableDataHolder<ItemStackSnapshot>, AbstractPropertyHolder {
 
+    private final Map<Key<?>, KeyRegistration> rawValueMap;
     private final ItemType itemType;
     // TODO: Hmm, inconsistency the the name with itemstack?
-    private final int count;
+    private final int quantity;
 
-    public LanternItemStackSnapshot(ItemType itemType, int count) {
+    public LanternItemStackSnapshot(ItemType itemType, int quantity) {
+        this(itemType, quantity, new HashMap<>());
+        ((LanternItemType) itemType).registerKeysFor(this);
+    }
+
+    LanternItemStackSnapshot(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap) {
+        this.rawValueMap = rawValueMap;
         this.itemType = itemType;
-        this.count = count;
+        this.quantity = quantity;
     }
 
     @Override
@@ -61,13 +70,12 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot {
 
     @Override
     public int getCount() {
-        return this.count;
+        return this.quantity;
     }
 
     @Override
     public ItemStack createStack() {
-        // TODO: Data
-        return new LanternItemStack(this.itemType, this.count);
+        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap());
     }
 
     @Override
@@ -87,6 +95,21 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot {
 
     @Override
     public DataContainer toContainer() {
+        return null;
+    }
+
+    @Override
+    public Map<Key<?>, KeyRegistration> getRawValueMap() {
+        return this.rawValueMap;
+    }
+
+    @Override
+    public boolean supports(Key<?> key) {
+        return false;
+    }
+
+    @Override
+    public ItemStackSnapshot copy() {
         return null;
     }
 
@@ -147,46 +170,6 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot {
 
     @Override
     public List<ImmutableDataManipulator<?, ?>> getContainers() {
-        return null;
-    }
-
-    @Override
-    public <T extends Property<?, ?>> Optional<T> getProperty(Class<T> propertyClass) {
-        return null;
-    }
-
-    @Override
-    public Collection<Property<?, ?>> getApplicableProperties() {
-        return null;
-    }
-
-    @Override
-    public <E> Optional<E> get(Key<? extends BaseValue<E>> key) {
-        return null;
-    }
-
-    @Override
-    public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key) {
-        return null;
-    }
-
-    @Override
-    public boolean supports(Key<?> key) {
-        return false;
-    }
-
-    @Override
-    public ItemStackSnapshot copy() {
-        return null;
-    }
-
-    @Override
-    public Set<Key<?>> getKeys() {
-        return null;
-    }
-
-    @Override
-    public Set<ImmutableValue<?>> getValues() {
         return null;
     }
 }

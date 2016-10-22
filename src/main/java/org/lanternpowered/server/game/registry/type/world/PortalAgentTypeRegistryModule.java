@@ -39,6 +39,6 @@ public class PortalAgentTypeRegistryModule extends AdditionalPluginCatalogRegist
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternPortalAgentType<>("minecraft", "default", EmptyPortalAgent.class, (world, type) -> new EmptyPortalAgent(type)));
+        register(new LanternPortalAgentType<>("minecraft", "default", EmptyPortalAgent.class, (world, type) -> new EmptyPortalAgent(type)));
     }
 }

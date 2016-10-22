@@ -38,7 +38,7 @@ public final class ObjectiveDisplayModeRegistryModule extends AdditionalPluginCa
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternObjectiveDisplayMode("minecraft", "integer"));
-        this.register(new LanternObjectiveDisplayMode("minecraft", "hearts"));
+        register(new LanternObjectiveDisplayMode("minecraft", "integer"));
+        register(new LanternObjectiveDisplayMode("minecraft", "hearts"));
     }
 }

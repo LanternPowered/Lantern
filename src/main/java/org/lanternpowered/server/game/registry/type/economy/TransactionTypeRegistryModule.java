@@ -37,8 +37,8 @@ public final class TransactionTypeRegistryModule extends AdditionalPluginCatalog
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternTransactionType("sponge", "deposit"));
-        this.register(new LanternTransactionType("sponge", "withdraw"));
-        this.register(new LanternTransactionType("sponge", "transfer"));
+        register(new LanternTransactionType("sponge", "deposit"));
+        register(new LanternTransactionType("sponge", "withdraw"));
+        register(new LanternTransactionType("sponge", "transfer"));
     }
 }

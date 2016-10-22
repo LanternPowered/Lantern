@@ -38,9 +38,9 @@ public final class VisibilityRegistryModule extends AdditionalPluginCatalogRegis
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternVisibility("minecraft", "always"));
-        this.register(new LanternVisibility("minecraft", "hide_for_own_team", "hideForOwnTeam"));
-        this.register(new LanternVisibility("minecraft", "hide_for_other_teams", "hideForOtherTeams"));
-        this.register(new LanternVisibility("minecraft", "never"));
+        register(new LanternVisibility("minecraft", "always"));
+        register(new LanternVisibility("minecraft", "hide_for_own_team", "hideForOwnTeam"));
+        register(new LanternVisibility("minecraft", "hide_for_other_teams", "hideForOtherTeams"));
+        register(new LanternVisibility("minecraft", "never"));
     }
 }

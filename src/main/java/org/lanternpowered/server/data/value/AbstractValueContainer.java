@@ -38,6 +38,7 @@ import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,7 +80,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         }
 
         @Override
-        public  ElementHolderKeyRegistration<V, E> addValueProcessor(ValueProcessor<V, E> valueProcessor) {
+        public ElementHolderKeyRegistration<V, E> addValueProcessor(ValueProcessor<V, E> valueProcessor) {
             super.addValueProcessor(valueProcessor);
             return this;
         }
@@ -332,9 +333,9 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     @Override
     default <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key, @Nullable E defaultValue) {
         checkNotNull(key, "key");
-        Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
+        final Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
         checkArgument(!map.containsKey(key), "The specified key (%s) is already registered.", key);
-        ElementHolderKeyRegistrationImpl<V, E> holder = new ElementHolderKeyRegistrationImpl<>(key);
+        final ElementHolderKeyRegistrationImpl<V, E> holder = new ElementHolderKeyRegistrationImpl<>(key);
         holder.set(defaultValue);
         map.put(key, holder);
         return holder;
@@ -343,10 +344,29 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     @Override
     default <V extends BaseValue<E>, E> KeyRegistration<V, E> registerKey(Key<? extends V> key) {
         checkNotNull(key, "key");
-        Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
+        final Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
         checkArgument(!map.containsKey(key), "The specified key (%s) is already registered.", key);
-        KeyRegistration<V, E> holder = new SimpleKeyRegistration.SingleProcessor<>(key);
+        final KeyRegistration<V, E> holder = new SimpleKeyRegistration.SingleProcessor<>(key);
         map.put(key, holder);
         return holder;
+    }
+
+    default Map<Key<?>, KeyRegistration> copyRawValueMap() {
+        final Map<Key<?>, KeyRegistration> copy = new HashMap<>();
+        final Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
+        for (Map.Entry<Key<?>, KeyRegistration> entry : map.entrySet()) {
+            final KeyRegistration registration = entry.getValue();
+            KeyRegistration registrationCopy;
+            if (registration instanceof ElementHolderKeyRegistration) {
+                //noinspection unchecked
+                final ElementHolderKeyRegistrationImpl element = new ElementHolderKeyRegistrationImpl(registration.getKey());
+                element.value = ((ElementHolderKeyRegistration) registration).get();
+                registrationCopy = element;
+            } else {
+                registrationCopy = ((SimpleKeyRegistration.SingleProcessor) registration).copy();
+            }
+            copy.put(entry.getKey(), registrationCopy);
+        }
+        return copy;
     }
 }

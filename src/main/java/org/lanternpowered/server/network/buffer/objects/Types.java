@@ -32,6 +32,9 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import io.netty.handler.codec.CodecException;
 import io.netty.handler.codec.DecoderException;
+import org.lanternpowered.server.data.io.store.ObjectStore;
+import org.lanternpowered.server.data.io.store.ObjectStoreRegistry;
+import org.lanternpowered.server.data.io.store.item.ItemStackStore;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -41,9 +44,12 @@ import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.text.gson.JsonTextSerializer;
 import org.lanternpowered.server.text.gson.JsonTextTranslatableSerializer;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
+
+import javax.annotation.Nullable;
 
 public final class Types {
 
@@ -155,17 +161,27 @@ public final class Types {
      * A item stack.
      */
     public static final Type<ItemStack> ITEM_STACK = Type.create(ItemStack.class, new ValueSerializer<ItemStack>() {
+
+        private final ObjectStore<LanternItemStack> store = ObjectStoreRegistry.get().get(LanternItemStack.class).get();
+
         @Override
-        public void write(ByteBuffer buf, ItemStack object) throws CodecException {
-            // TODO: Properly serialize the item stack data
-            buf.write(Types.RAW_ITEM_STACK, object == null ? null :
-                   new RawItemStack(ItemRegistryModule.get().getInternalId(object.getItem()), 0, object.getQuantity(), null));
+        public void write(ByteBuffer buf, @Nullable ItemStack object) throws CodecException {
+            if (object == null) {
+                buf.write(Types.RAW_ITEM_STACK, null);
+            } else {
+                final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+                this.store.serialize((LanternItemStack) object, dataView);
+                buf.write(Types.RAW_ITEM_STACK, new RawItemStack(ItemRegistryModule.get().getInternalId(object.getItem()),
+                        dataView.getShort(ItemStackStore.DATA).orElse((short) 0), object.getQuantity(),
+                        dataView.getView(ItemStackStore.TAG).orElse(null)));
+            }
         }
 
         @Override
         public ItemStack read(ByteBuffer buf) throws CodecException {
             // TODO: Properly deserialize the item stack data back
             RawItemStack rawItemStack = buf.read(Types.RAW_ITEM_STACK);
+            //noinspection ConstantConditions
             if (rawItemStack == null) {
                 return null;
             }

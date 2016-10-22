@@ -41,7 +41,7 @@ public final class BanTypeRegistryModule extends SimpleCatalogRegistryModule<Ban
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        this.register(new LanternBanType("profile", Ban.Profile.class));
-        this.register(new LanternBanType("ip", Ban.Ip.class));
+        register(new LanternBanType("profile", Ban.Profile.class));
+        register(new LanternBanType("ip", Ban.Ip.class));
     }
 }

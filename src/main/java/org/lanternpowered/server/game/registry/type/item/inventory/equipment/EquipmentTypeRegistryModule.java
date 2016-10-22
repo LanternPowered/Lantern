@@ -39,12 +39,12 @@ public final class EquipmentTypeRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternEquipmentType("minecraft", "all", type -> true));
-        this.register(new LanternEquipmentType("minecraft", "equipped"));
-        this.register(new LanternEquipmentTypeWorn("minecraft", "worn", type -> type instanceof LanternEquipmentTypeWorn));
-        this.register(new LanternEquipmentTypeWorn("minecraft", "boots"));
-        this.register(new LanternEquipmentTypeWorn("minecraft", "chestplate"));
-        this.register(new LanternEquipmentTypeWorn("minecraft", "headwear"));
-        this.register(new LanternEquipmentTypeWorn("minecraft", "leggings"));
+        register(new LanternEquipmentType("minecraft", "all", type -> true));
+        register(new LanternEquipmentType("minecraft", "equipped"));
+        register(new LanternEquipmentTypeWorn("minecraft", "worn", type -> type instanceof LanternEquipmentTypeWorn));
+        register(new LanternEquipmentTypeWorn("minecraft", "boots"));
+        register(new LanternEquipmentTypeWorn("minecraft", "chestplate"));
+        register(new LanternEquipmentTypeWorn("minecraft", "headwear"));
+        register(new LanternEquipmentTypeWorn("minecraft", "leggings"));
     }
 }

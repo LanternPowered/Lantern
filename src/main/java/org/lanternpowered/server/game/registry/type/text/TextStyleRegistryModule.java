@@ -41,11 +41,11 @@ public final class TextStyleRegistryModule extends SimpleCatalogRegistryModule<T
     @EarlyRegistration
     @Override
     public void registerDefaults() {
-        this.register(new LanternTextStyle("bold", true, null, null, null, null, TextConstants.BOLD));
-        this.register(new LanternTextStyle("italic", null, true, null, null, null, TextConstants.ITALIC));
-        this.register(new LanternTextStyle("underline", null, null, true, null, null, TextConstants.UNDERLINE));
-        this.register(new LanternTextStyle("strikethrough", null, null, null, true, null, TextConstants.STRIKETHROUGH));
-        this.register(new LanternTextStyle("obfuscated", null, null, null, null, true, TextConstants.OBFUSCATED));
-        this.register(new LanternTextStyle("reset", false, false, false, false, false, TextConstants.RESET));
+        register(new LanternTextStyle("bold", true, null, null, null, null, TextConstants.BOLD));
+        register(new LanternTextStyle("italic", null, true, null, null, null, TextConstants.ITALIC));
+        register(new LanternTextStyle("underline", null, null, true, null, null, TextConstants.UNDERLINE));
+        register(new LanternTextStyle("strikethrough", null, null, null, true, null, TextConstants.STRIKETHROUGH));
+        register(new LanternTextStyle("obfuscated", null, null, null, null, true, TextConstants.OBFUSCATED));
+        register(new LanternTextStyle("reset", false, false, false, false, false, TextConstants.RESET));
     }
 }

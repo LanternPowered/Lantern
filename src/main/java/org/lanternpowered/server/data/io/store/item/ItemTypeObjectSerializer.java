@@ -30,11 +30,13 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public interface ItemTypeObjectSerializer {
+public class ItemTypeObjectSerializer {
 
-    DataQuery DATA_VALUE = DataQuery.of("secretDataValue26853");
+    static DataQuery DATA_VALUE = DataQuery.of("dataVal007");
 
-    void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView);
+    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+    }
 
-    void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView);
+    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+    }
 }

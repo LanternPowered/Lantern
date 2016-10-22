@@ -38,9 +38,9 @@ public final class CollisionRuleRegistryModule extends AdditionalPluginCatalogRe
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternCollisionRule("minecraft", "always"));
-        this.register(new LanternCollisionRule("minecraft", "push_own_team", "pushOwnTeam"));
-        this.register(new LanternCollisionRule("minecraft", "push_other_teams", "pushOtherTeams"));
-        this.register(new LanternCollisionRule("minecraft", "never"));
+        register(new LanternCollisionRule("minecraft", "always"));
+        register(new LanternCollisionRule("minecraft", "push_own_team", "pushOwnTeam"));
+        register(new LanternCollisionRule("minecraft", "push_other_teams", "pushOtherTeams"));
+        register(new LanternCollisionRule("minecraft", "never"));
     }
 }

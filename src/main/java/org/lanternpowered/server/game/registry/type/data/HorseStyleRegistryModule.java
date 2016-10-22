@@ -38,10 +38,10 @@ public class HorseStyleRegistryModule extends PluginCatalogRegistryModule<HorseS
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternHorseStyle("minecraft", "none", 0));
-        this.register(new LanternHorseStyle("minecraft", "white", 1));
-        this.register(new LanternHorseStyle("minecraft", "whitefield", 2));
-        this.register(new LanternHorseStyle("minecraft", "white_dots", 3));
-        this.register(new LanternHorseStyle("minecraft", "black_dots", 4));
+        register(new LanternHorseStyle("minecraft", "none", 0));
+        register(new LanternHorseStyle("minecraft", "white", 1));
+        register(new LanternHorseStyle("minecraft", "whitefield", 2));
+        register(new LanternHorseStyle("minecraft", "white_dots", 3));
+        register(new LanternHorseStyle("minecraft", "black_dots", 4));
     }
 }

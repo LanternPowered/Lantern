@@ -75,11 +75,11 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
 
     @Override
     protected void register(T catalogType) {
-        this.register(catalogType, false);
+        register(catalogType, false);
     }
 
     protected void register(T catalogType, boolean disallowInbuiltPluginIds) {
-        this.validateCatalogType(catalogType, ID_PATTERN_VALUE, ID_PATTERN);
+        validateCatalogType(catalogType, ID_PATTERN_VALUE, ID_PATTERN);
         final String id = catalogType.getId();
         final int index = id.indexOf(':');
         final String pluginId = id.substring(0, index);
@@ -148,7 +148,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
         id = checkNotNull(id, "id").toLowerCase(Locale.ENGLISH);
         if (id.indexOf(':') == -1) {
             for (String pluginId : INBUILT_PLUGIN_IDS) {
-                T type = this.types.get(pluginId + ':' + id);
+                final T type = this.types.get(pluginId + ':' + id);
                 if (type != null) {
                     return Optional.of(type);
                 }
@@ -158,7 +158,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
             }
             return Optional.empty();
         }
-        T type = this.types.get(id);
+        final T type = this.types.get(id);
         if (type != null) {
             return Optional.of(type);
         }

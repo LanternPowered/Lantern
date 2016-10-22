@@ -107,6 +107,8 @@ import org.lanternpowered.server.game.registry.type.cause.SpawnTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.cause.TeleportTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArtRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandPreferenceRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModule;
@@ -203,6 +205,7 @@ import org.spongepowered.api.data.type.BigMushroomTypes;
 import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.BrickTypes;
 import org.spongepowered.api.data.type.Career;
+import org.spongepowered.api.data.type.CoalType;
 import org.spongepowered.api.data.type.ComparatorType;
 import org.spongepowered.api.data.type.ComparatorTypes;
 import org.spongepowered.api.data.type.DirtType;
@@ -211,6 +214,7 @@ import org.spongepowered.api.data.type.DisguisedBlockType;
 import org.spongepowered.api.data.type.DisguisedBlockTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.data.type.DoublePlantTypes;
+import org.spongepowered.api.data.type.GoldenApple;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.Hinge;
@@ -437,7 +441,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(TransactionType.class, new TransactionTypeRegistryModule())
                 .registerModule(ParticleType.class, new ParticleTypeRegistryModule())
                 .registerModule(ParticleOption.class, new ParticleOptionRegistryModule())
-                .registerModule(FireworkShape.class, new FireworkShapeRegistryModule())
+                .registerModule(FireworkShape.class, FireworkShapeRegistryModule.get())
                 .registerModule(PotionEffectType.class, PotionEffectTypeRegistryModule.get())
                 .registerModule(SoundCategory.class, new SoundCategoryRegistryModule())
                 .registerModule(SoundType.class, new SoundTypeRegistryModule())
@@ -475,6 +479,8 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(TileEntityType.class, TileEntityTypeRegistryModule.get())
                 .registerModule(EntityProtocolType.class, new EntityProtocolTypeRegistryModule())
                 .registerModule(InventoryArchetype.class, new InventoryArchetypeRegistryModule())
+                .registerModule(GoldenApple.class, GoldenAppleRegistryModule.get())
+                .registerModule(CoalType.class, CoalTypeRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

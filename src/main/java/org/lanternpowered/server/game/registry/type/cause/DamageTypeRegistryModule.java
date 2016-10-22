@@ -38,20 +38,20 @@ public class DamageTypeRegistryModule extends AdditionalPluginCatalogRegistryMod
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternDamageType("minecraft", "attack"));
-        this.register(new LanternDamageType("minecraft", "contact"));
-        this.register(new LanternDamageType("minecraft", "custom"));
-        this.register(new LanternDamageType("minecraft", "drown"));
-        this.register(new LanternDamageType("minecraft", "explosive"));
-        this.register(new LanternDamageType("minecraft", "fall"));
-        this.register(new LanternDamageType("minecraft", "fire"));
-        this.register(new LanternDamageType("minecraft", "generic"));
-        this.register(new LanternDamageType("minecraft", "hunger"));
-        this.register(new LanternDamageType("minecraft", "magic"));
-        this.register(new LanternDamageType("minecraft", "magma"));
-        this.register(new LanternDamageType("minecraft", "projectile"));
-        this.register(new LanternDamageType("minecraft", "suffocate"));
-        this.register(new LanternDamageType("minecraft", "sweeping_attack"));
-        this.register(new LanternDamageType("minecraft", "void"));
+        register(new LanternDamageType("minecraft", "attack"));
+        register(new LanternDamageType("minecraft", "contact"));
+        register(new LanternDamageType("minecraft", "custom"));
+        register(new LanternDamageType("minecraft", "drown"));
+        register(new LanternDamageType("minecraft", "explosive"));
+        register(new LanternDamageType("minecraft", "fall"));
+        register(new LanternDamageType("minecraft", "fire"));
+        register(new LanternDamageType("minecraft", "generic"));
+        register(new LanternDamageType("minecraft", "hunger"));
+        register(new LanternDamageType("minecraft", "magic"));
+        register(new LanternDamageType("minecraft", "magma"));
+        register(new LanternDamageType("minecraft", "projectile"));
+        register(new LanternDamageType("minecraft", "suffocate"));
+        register(new LanternDamageType("minecraft", "sweeping_attack"));
+        register(new LanternDamageType("minecraft", "void"));
     }
 }

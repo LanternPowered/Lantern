@@ -42,33 +42,33 @@ public final class PotionEffectTypeRegistryModule extends AdditionalInternalPlug
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternPotionEffectType("minecraft", "speed", 1, "moveSpeed"));
-        this.register(new LanternPotionEffectType("minecraft", "slowness", 2, "moveSlowdown"));
-        this.register(new LanternPotionEffectType("minecraft", "haste", 3, "digSpeed"));
-        this.register(new LanternPotionEffectType("minecraft", "mining_fatigue", 4, "digSlowDown"));
-        this.register(new LanternPotionEffectType("minecraft", "strength", 5, "damageBoost"));
-        this.register(new LanternPotionEffectType("minecraft", "instant_health", 6, "heal"));
-        this.register(new LanternPotionEffectType("minecraft", "instant_damage", 7, "harm"));
-        this.register(new LanternPotionEffectType("minecraft", "jump_boost", 8, "jump"));
-        this.register(new LanternPotionEffectType("minecraft", "nausea", 9, "confusion"));
-        this.register(new LanternPotionEffectType("minecraft", "regeneration", 10, "regeneration"));
-        this.register(new LanternPotionEffectType("minecraft", "resistance", 11, "resistance"));
-        this.register(new LanternPotionEffectType("minecraft", "fire_resistance", 12, "fireResistance"));
-        this.register(new LanternPotionEffectType("minecraft", "water_breathing", 13, "waterBreathing"));
-        this.register(new LanternPotionEffectType("minecraft", "invisibility", 14, "invisibility"));
-        this.register(new LanternPotionEffectType("minecraft", "blindness", 15, "blindness"));
-        this.register(new LanternPotionEffectType("minecraft", "night_vision", 16, "nightVision"));
-        this.register(new LanternPotionEffectType("minecraft", "hunger", 17, "hunger"));
-        this.register(new LanternPotionEffectType("minecraft", "weakness", 18, "weakness"));
-        this.register(new LanternPotionEffectType("minecraft", "poison", 19, "poison"));
-        this.register(new LanternPotionEffectType("minecraft", "wither", 20, "wither"));
-        this.register(new LanternPotionEffectType("minecraft", "health_boost", 21, "healthBoost"));
-        this.register(new LanternPotionEffectType("minecraft", "absorption", 22, "absorption"));
-        this.register(new LanternPotionEffectType("minecraft", "saturation", 23, "saturation"));
-        this.register(new LanternPotionEffectType("minecraft", "glowing", 24, "glowing"));
-        this.register(new LanternPotionEffectType("minecraft", "levitation", 25, "levitation"));
-        this.register(new LanternPotionEffectType("minecraft", "luck", 26, "luck"));
-        this.register(new LanternPotionEffectType("minecraft", "unluck", 27, "unluck"));
+        register(new LanternPotionEffectType("minecraft", "speed", 1, "moveSpeed"));
+        register(new LanternPotionEffectType("minecraft", "slowness", 2, "moveSlowdown"));
+        register(new LanternPotionEffectType("minecraft", "haste", 3, "digSpeed"));
+        register(new LanternPotionEffectType("minecraft", "mining_fatigue", 4, "digSlowDown"));
+        register(new LanternPotionEffectType("minecraft", "strength", 5, "damageBoost"));
+        register(new LanternPotionEffectType("minecraft", "instant_health", 6, "heal"));
+        register(new LanternPotionEffectType("minecraft", "instant_damage", 7, "harm"));
+        register(new LanternPotionEffectType("minecraft", "jump_boost", 8, "jump"));
+        register(new LanternPotionEffectType("minecraft", "nausea", 9, "confusion"));
+        register(new LanternPotionEffectType("minecraft", "regeneration", 10, "regeneration"));
+        register(new LanternPotionEffectType("minecraft", "resistance", 11, "resistance"));
+        register(new LanternPotionEffectType("minecraft", "fire_resistance", 12, "fireResistance"));
+        register(new LanternPotionEffectType("minecraft", "water_breathing", 13, "waterBreathing"));
+        register(new LanternPotionEffectType("minecraft", "invisibility", 14, "invisibility"));
+        register(new LanternPotionEffectType("minecraft", "blindness", 15, "blindness"));
+        register(new LanternPotionEffectType("minecraft", "night_vision", 16, "nightVision"));
+        register(new LanternPotionEffectType("minecraft", "hunger", 17, "hunger"));
+        register(new LanternPotionEffectType("minecraft", "weakness", 18, "weakness"));
+        register(new LanternPotionEffectType("minecraft", "poison", 19, "poison"));
+        register(new LanternPotionEffectType("minecraft", "wither", 20, "wither"));
+        register(new LanternPotionEffectType("minecraft", "health_boost", 21, "healthBoost"));
+        register(new LanternPotionEffectType("minecraft", "absorption", 22, "absorption"));
+        register(new LanternPotionEffectType("minecraft", "saturation", 23, "saturation"));
+        register(new LanternPotionEffectType("minecraft", "glowing", 24, "glowing"));
+        register(new LanternPotionEffectType("minecraft", "levitation", 25, "levitation"));
+        register(new LanternPotionEffectType("minecraft", "luck", 26, "luck"));
+        register(new LanternPotionEffectType("minecraft", "unluck", 27, "unluck"));
     }
 
     private static final class Holder {

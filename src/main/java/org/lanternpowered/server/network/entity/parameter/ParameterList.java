@@ -36,22 +36,22 @@ public interface ParameterList {
     <T> void add(ParameterType<T> type, T value);
 
     default <T> void addOptional(ParameterType<Optional<T>> type, @Nullable T value) {
-        this.add(type, Optional.ofNullable(value));
+        add(type, Optional.ofNullable(value));
     }
 
     default void add(ParameterType<Byte> type, byte value) {
-        this.add(type, (Byte) value);
+        add(type, (Byte) value);
     }
 
     default void add(ParameterType<Integer> type, int value) {
-        this.add(type, (Integer) value);
+        add(type, (Integer) value);
     }
 
     default void add(ParameterType<Float> type, float value) {
-        this.add(type, (Float) value);
+        add(type, (Float) value);
     }
 
     default void add(ParameterType<Boolean> type, boolean value) {
-        this.add(type, (Boolean) value);
+        add(type, (Boolean) value);
     }
 }

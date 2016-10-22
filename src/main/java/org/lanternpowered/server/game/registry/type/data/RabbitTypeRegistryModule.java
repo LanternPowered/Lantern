@@ -26,11 +26,11 @@
 package org.lanternpowered.server.game.registry.type.data;
 
 import org.lanternpowered.server.data.type.LanternRabbitType;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.RabbitTypes;
 
-public class RabbitTypeRegistryModule extends PluginCatalogRegistryModule<RabbitType> {
+public class RabbitTypeRegistryModule extends InternalPluginCatalogRegistryModule<RabbitType> {
 
     public RabbitTypeRegistryModule() {
         super(RabbitTypes.class);
@@ -38,12 +38,12 @@ public class RabbitTypeRegistryModule extends PluginCatalogRegistryModule<Rabbit
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternRabbitType("minecraft", "brown", 0));
-        this.register(new LanternRabbitType("minecraft", "white", 1));
-        this.register(new LanternRabbitType("minecraft", "black", 2));
-        this.register(new LanternRabbitType("minecraft", "black_and_white", 3));
-        this.register(new LanternRabbitType("minecraft", "gold", 4));
-        this.register(new LanternRabbitType("minecraft", "salt_and_pepper", 5));
-        this.register(new LanternRabbitType("minecraft", "killer", 99));
+        register(new LanternRabbitType("minecraft", "brown", 0));
+        register(new LanternRabbitType("minecraft", "white", 1));
+        register(new LanternRabbitType("minecraft", "black", 2));
+        register(new LanternRabbitType("minecraft", "black_and_white", 3));
+        register(new LanternRabbitType("minecraft", "gold", 4));
+        register(new LanternRabbitType("minecraft", "salt_and_pepper", 5));
+        register(new LanternRabbitType("minecraft", "killer", 99));
     }
 }

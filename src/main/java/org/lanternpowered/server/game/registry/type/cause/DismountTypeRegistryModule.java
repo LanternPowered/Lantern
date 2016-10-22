@@ -38,8 +38,8 @@ public class DismountTypeRegistryModule extends AdditionalPluginCatalogRegistryM
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternDismountType("minecraft", "death"));
-        this.register(new LanternDismountType("minecraft", "derail"));
-        this.register(new LanternDismountType("minecraft", "player"));
+        register(new LanternDismountType("minecraft", "death"));
+        register(new LanternDismountType("minecraft", "derail"));
+        register(new LanternDismountType("minecraft", "player"));
     }
 }

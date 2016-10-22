@@ -40,14 +40,14 @@ public final class RotationRegistryModule extends SimpleCatalogRegistryModule<Ro
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternRotation("top", 0));
-        this.register(new LanternRotation("top_right", 45));
-        this.register(new LanternRotation("right", 90));
-        this.register(new LanternRotation("bottom_right", 135));
-        this.register(new LanternRotation("bottom", 180));
-        this.register(new LanternRotation("bottom_left", 225));
-        this.register(new LanternRotation("left", 270));
-        this.register(new LanternRotation("top_left", 315));
+        register(new LanternRotation("top", 0));
+        register(new LanternRotation("top_right", 45));
+        register(new LanternRotation("right", 90));
+        register(new LanternRotation("bottom_right", 135));
+        register(new LanternRotation("bottom", 180));
+        register(new LanternRotation("bottom_left", 225));
+        register(new LanternRotation("left", 270));
+        register(new LanternRotation("top_left", 315));
     }
 
     public Optional<Rotation> getRotationFromDegree(int degrees) {
@@ -57,8 +57,8 @@ public final class RotationRegistryModule extends SimpleCatalogRegistryModule<Ro
         while (degrees > 360) {
             degrees -= 360;
         }
-        int angle = Math.round(degrees / 360 * 8) * 45;
-        for (Rotation rotation : this.getAll()) {
+        final int angle = Math.round(degrees / 360 * 8) * 45;
+        for (Rotation rotation : getAll()) {
             if (rotation.getAngle() == angle) {
                 return Optional.of(rotation);
             }

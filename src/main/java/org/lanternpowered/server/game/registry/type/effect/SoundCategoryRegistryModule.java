@@ -38,15 +38,15 @@ public final class SoundCategoryRegistryModule extends PluginCatalogRegistryModu
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternSoundCategory("minecraft", "master", 0));
-        this.register(new LanternSoundCategory("minecraft", "music", 1));
-        this.register(new LanternSoundCategory("minecraft", "record", 2));
-        this.register(new LanternSoundCategory("minecraft", "weather", 3));
-        this.register(new LanternSoundCategory("minecraft", "block", 4));
-        this.register(new LanternSoundCategory("minecraft", "hostile", 5));
-        this.register(new LanternSoundCategory("minecraft", "neutral", 6));
-        this.register(new LanternSoundCategory("minecraft", "player", 7));
-        this.register(new LanternSoundCategory("minecraft", "ambient", 8));
-        this.register(new LanternSoundCategory("minecraft", "voice", 9));
+        register(new LanternSoundCategory("minecraft", "master", 0));
+        register(new LanternSoundCategory("minecraft", "music", 1));
+        register(new LanternSoundCategory("minecraft", "record", 2));
+        register(new LanternSoundCategory("minecraft", "weather", 3));
+        register(new LanternSoundCategory("minecraft", "block", 4));
+        register(new LanternSoundCategory("minecraft", "hostile", 5));
+        register(new LanternSoundCategory("minecraft", "neutral", 6));
+        register(new LanternSoundCategory("minecraft", "player", 7));
+        register(new LanternSoundCategory("minecraft", "ambient", 8));
+        register(new LanternSoundCategory("minecraft", "voice", 9));
     }
 }

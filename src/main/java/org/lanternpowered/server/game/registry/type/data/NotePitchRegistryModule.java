@@ -73,7 +73,7 @@ public final class NotePitchRegistryModule extends SimpleCatalogRegistryModule<N
         for (String noteName : SORTED_NOTE_PITCHES) {
             final LanternNotePitch notePitch = new LanternNotePitch(noteName, entries.size());
             entries.add(notePitch);
-            this.register(notePitch);
+            register(notePitch);
         }
         for (int i = 0; i < entries.size(); i++) {
             entries.get(i).setNext(entries.get((i + 1) % entries.size()));

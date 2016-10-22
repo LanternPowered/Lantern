@@ -38,10 +38,10 @@ public final class ToolTypeRegistryModule extends PluginCatalogRegistryModule<To
 
     @Override
     public void registerDefaults() {
-        this.register(new LanternToolType("minecraft", "diamond"));
-        this.register(new LanternToolType("minecraft", "gold"));
-        this.register(new LanternToolType("minecraft", "iron"));
-        this.register(new LanternToolType("minecraft", "stone"));
-        this.register(new LanternToolType("minecraft", "wood"));
+        register(new LanternToolType("minecraft", "diamond"));
+        register(new LanternToolType("minecraft", "gold"));
+        register(new LanternToolType("minecraft", "iron"));
+        register(new LanternToolType("minecraft", "stone"));
+        register(new LanternToolType("minecraft", "wood"));
     }
 }

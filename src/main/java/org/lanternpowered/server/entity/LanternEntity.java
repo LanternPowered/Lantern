@@ -29,8 +29,8 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.component.BaseComponentHolder;
 import org.lanternpowered.server.component.misc.Health;
@@ -120,7 +120,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     private boolean onGround;
 
-    @Nullable private Vector2i lastChunkCoords;
+    @Nullable private Vector3i lastChunkCoords;
 
     /**
      * The base of the {@link AABB} of this entity.
@@ -227,11 +227,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     }
 
     @Nullable
-    public Vector2i getLastChunkCoords() {
+    public Vector3i getLastChunkSectionCoords() {
         return this.lastChunkCoords;
     }
 
-    public void setLastChunkCoords(@Nullable Vector2i coords) {
+    public void setLastChunkCoords(@Nullable Vector3i coords) {
         this.lastChunkCoords = coords;
     }
 

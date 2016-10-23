@@ -267,7 +267,7 @@ public class AnvilChunkIOService implements ChunkIOService {
             for (DataView entityView : entityViews) {
                 try {
                     final LanternEntity entity = entitySerializer.deserialize(entityView);
-                    chunk.addEntity(entity);
+                    chunk.addEntity(entity, entity.getPosition().getFloorY() >> 4);
                 } catch (InvalidDataException e) {
                     Lantern.getLogger().warn("Error loading entity in the chunk ({},{}) in the world {}",
                             x, z, this.getWorldProperties().getWorldName(), e);

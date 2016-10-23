@@ -27,6 +27,7 @@ package org.lanternpowered.server.inventory;
 
 import org.lanternpowered.server.data.AbstractImmutableDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.value.ElementHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.GameDictionary;
@@ -42,6 +43,7 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -171,5 +173,37 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
     @Override
     public List<ImmutableDataManipulator<?, ?>> getContainers() {
         return null;
+    }
+
+    public boolean isSimilar(ItemStackSnapshot itemStackSnapshot) {
+        if (this.itemType != itemStackSnapshot.getType()) {
+            return false;
+        }
+        final Map<Key<?>, KeyRegistration> rawValueMap = ((LanternItemStackSnapshot) itemStackSnapshot).rawValueMap;
+        for (Map.Entry<Key<?>, KeyRegistration> entry : rawValueMap.entrySet()) {
+            if (!this.rawValueMap.containsKey(entry.getKey())) {
+                return false;
+            }
+            final Object value1;
+            final KeyRegistration keyRegistration1 = entry.getValue();
+            if (!(keyRegistration1 instanceof ElementHolder)) {
+                //noinspection unchecked
+                value1 = itemStackSnapshot.get((Key) entry.getKey());
+            } else {
+                value1 = ((ElementHolder) keyRegistration1).get();
+            }
+            final Object value2;
+            final KeyRegistration keyRegistration2 = this.rawValueMap.get(entry.getKey());
+            if (!(keyRegistration2 instanceof ElementHolder)) {
+                //noinspection unchecked
+                value2 = itemStackSnapshot.get((Key) entry.getKey());
+            } else {
+                value2 = ((ElementHolder) keyRegistration2).get();
+            }
+            if (!Objects.equals(value1, value2)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

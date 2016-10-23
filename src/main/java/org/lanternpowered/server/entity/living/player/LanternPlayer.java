@@ -74,6 +74,7 @@ import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.title.LanternTitles;
+import org.lanternpowered.server.util.AABBs;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
@@ -228,7 +229,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         this.user = (LanternUser) Sponge.getServiceManager().provideUnchecked(UserStorageService.class)
                 .getOrCreate(gameProfile);
         this.user.setPlayer(this);
-        this.resetIdleTimeoutCounter();
+        resetIdleTimeoutCounter();
+        setBoundingBoxBase(AABBs.ofCenterExpansion(new Vector3d(0.6, 1.8, 0.6)));
     }
 
     public Set<LanternBossBar> getBossBars() {

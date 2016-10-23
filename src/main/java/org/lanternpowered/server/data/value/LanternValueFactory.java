@@ -94,6 +94,8 @@ public class LanternValueFactory implements ValueFactory {
     private final Map<Class<?>, ValueSupplier> valueSuppliers = new IdentityHashMap<>();
     private final Map<Key<?>, SimpleKeyRegistration> keyRegistrations = new HashMap<>();
 
+    private final static Comparator<Integer> COMPARATOR = Integer::compare;
+
     private LanternValueFactory() {
         this.registerSupplier(Value.class, ValueSupplier.<Value, Object>of(
                 (key, element) -> {
@@ -113,6 +115,19 @@ public class LanternValueFactory implements ValueFactory {
                     } else {
                         return new LanternValue<>(key, defElement, element);
                     }
+                }));
+        this.registerSupplier(MutableBoundedValue.class, ValueSupplier.of(
+                (key, element) -> {
+                    if (key.getElementToken().getRawType() == Integer.class) {
+                        return new LanternBoundedValue(key, element, COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    }
+                    throw new IllegalStateException();
+                },
+                (key, element, defElement) -> {
+                    if (key.getElementToken().getRawType() == Integer.class) {
+                        return new LanternBoundedValue(key, element, COMPARATOR, -Integer.MAX_VALUE, Integer.MAX_VALUE);
+                    }
+                    throw new IllegalStateException();
                 }));
         this.registerSupplier(ListValue.class, ValueSupplier.<ListValue, List<Object>>of(
                 LanternListValue::new, (key, element, defElement) -> new LanternListValue<>(key, defElement, element)));

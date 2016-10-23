@@ -727,7 +727,7 @@ public final class LanternChunkManager {
             return chunk;
         }
         // Try to load the chunk
-        this.load(chunk, cause, generate);
+        load(chunk, cause, generate);
         this.world.addEntities(chunk.getEntities());
         if (!this.ticketsByPos.containsKey(coords)) {
             this.pendingForUnload.add(new UnloadingChunkEntry(coords));

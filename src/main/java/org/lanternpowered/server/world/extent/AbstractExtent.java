@@ -76,10 +76,10 @@ public interface AbstractExtent extends Extent {
 
     @Override
     default MutableBiomeVolume getBiomeView(Vector3i newMin, Vector3i newMax) {
-        if (!this.containsBiome(newMin.getX(), newMin.getY(), newMin.getZ())) {
+        if (!containsBiome(newMin.getX(), newMin.getY(), newMin.getZ())) {
             throw new PositionOutOfBoundsException(newMin, getBiomeMin(), getBiomeMax());
         }
-        if (!this.containsBiome(newMax.getX(), newMax.getY(), newMax.getZ())) {
+        if (!containsBiome(newMax.getX(), newMax.getY(), newMax.getZ())) {
             throw new PositionOutOfBoundsException(newMax, getBiomeMin(), getBiomeMax());
         }
         return new MutableBiomeViewDownsize(this, newMin, newMax);
@@ -117,10 +117,10 @@ public interface AbstractExtent extends Extent {
 
     @Override
     default MutableBlockVolume getBlockView(Vector3i newMin, Vector3i newMax) {
-        if (!this.containsBlock(newMin.getX(), newMin.getY(), newMin.getZ())) {
+        if (!containsBlock(newMin.getX(), newMin.getY(), newMin.getZ())) {
             throw new PositionOutOfBoundsException(newMin, getBlockMin(), getBlockMax());
         }
-        if (!this.containsBlock(newMax.getX(), newMax.getY(), newMax.getZ())) {
+        if (!containsBlock(newMax.getX(), newMax.getY(), newMax.getZ())) {
             throw new PositionOutOfBoundsException(newMax, getBlockMin(), getBlockMax());
         }
         return new MutableBlockViewDownsize(this, newMin, newMax);

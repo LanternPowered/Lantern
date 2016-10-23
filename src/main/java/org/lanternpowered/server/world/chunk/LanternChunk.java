@@ -104,6 +104,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
@@ -379,7 +380,14 @@ public class LanternChunk implements AbstractExtent, Chunk {
     private boolean lightPopulated;
 
     // The set which contains all the entities in this chunk
-    private final Set<LanternEntity> entities = Sets.newConcurrentHashSet();
+    @SuppressWarnings("unchecked")
+    private final Set<LanternEntity>[] entities = new Set[CHUNK_SECTIONS];
+
+    {
+        for (int i = 0; i < this.entities.length; i++) {
+            this.entities[i] = Sets.newConcurrentHashSet();
+        }
+    }
 
     /**
      * The states that the chunk lock can have.
@@ -1044,11 +1052,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     @Override
-    public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
-        return null;
-    }
-
-    @Override
     public Set<EntityHit> getIntersectingEntities(Vector3d start, Vector3d end, Predicate<EntityHit> filter) {
         return null;
     }
@@ -1086,7 +1089,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public void removeScheduledUpdate(int x, int y, int z, ScheduledBlockUpdate update) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         this.scheduledBlockUpdateQueue.remove(update);
     }
 
@@ -1099,7 +1102,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             // TODO: Update
         }
 
-        this.getTileEntities().forEach(tileEntity -> ((LanternTileEntity) tileEntity).pulse());
+        getTileEntities().forEach(tileEntity -> ((LanternTileEntity) tileEntity).pulse());
     }
 
     @Override
@@ -1109,8 +1112,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
-        this.checkVolumeBounds(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkVolumeBounds(newMax.getX(), newMax.getY(), newMax.getZ());
+        checkVolumeBounds(newMin);
+        checkVolumeBounds(newMax);
         return new ExtentViewDownsize(this, newMin, newMax);
     }
 
@@ -1126,7 +1129,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Optional<UUID> getCreator(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         final int creatorId = this.trackerData.work(y >> 4, trackerDataMap ->
                 trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf)).creatorId, false);
         return this.world.getProperties().getTrackerIdAllocator().get(creatorId);
@@ -1134,7 +1137,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Optional<UUID> getNotifier(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         final int notifierId = this.trackerData.work(y >> 4, trackerDataMap ->
                 trackerDataMap.get((short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf)).notifierId, false);
         return this.world.getProperties().getTrackerIdAllocator().get(notifierId);
@@ -1142,7 +1145,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public void setCreator(int x, int y, int z, @Nullable UUID uuid) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         final int creatorId = uuid == null ? -1 : this.world.getProperties().getTrackerIdAllocator().get(uuid);
         this.trackerData.work(y >> 4, trackerDataMap -> {
             final short index = (short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
@@ -1165,7 +1168,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public void setNotifier(int x, int y, int z, @Nullable UUID uuid) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         final int notifierId = uuid == null ? -1 : this.world.getProperties().getTrackerIdAllocator().get(uuid);
         this.trackerData.work(y >> 4, trackerDataMap -> {
             final short index = (short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
@@ -1206,7 +1209,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 for (int y = minY; y <= maxY; y++) {
-                    final Optional<AABB> optAABB = this.getBlockSelectionBox(x, y, z);
+                    final Optional<AABB> optAABB = getBlockSelectionBox(x, y, z);
                     if (optAABB.isPresent()) {
                         final AABB aabb = optAABB.get();
                         if (aabb.intersects(box)) {
@@ -1221,7 +1224,62 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
-        return null;
+        checkNotNull(owner, "owner");
+        checkNotNull(box, "box");
+        final ImmutableSet.Builder<AABB> collisionBoxes = ImmutableSet.builder();
+        final int maxYSection = fixEntityYSection(((int) Math.ceil(box.getMax().getY() + 2.0)) >> 4);
+        final int minYSection = fixEntityYSection(((int) Math.floor(box.getMin().getY() - 2.0)) >> 4);
+        for (int i = minYSection; i <= maxYSection; i++) {
+            for (LanternEntity entity : this.entities[i]) {
+                final Optional<AABB> aabb = entity.getBoundingBox();
+                if (aabb.isPresent() && aabb.get().intersects(box)) {
+                    collisionBoxes.add(aabb.get());
+                }
+            }
+        }
+        final Vector3i min = box.getMin().toInt();
+        final Vector3i max = box.getMax().toInt();
+        for (int x = min.getX(); x <= max.getX(); x++) {
+            for (int y = min.getY(); y <= max.getY(); y++) {
+                for (int z = min.getZ(); z <= max.getZ(); z++) {
+                    final Optional<AABB> aabb = getBlockSelectionBox(x, y, z);
+                    if (aabb.isPresent() && aabb.get().intersects(box)) {
+                        collisionBoxes.add(aabb.get());
+                    }
+                }
+            }
+        }
+        return collisionBoxes.build();
+    }
+
+    @Override
+    public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
+        checkNotNull(box, "box");
+        checkNotNull(filter, "filter");
+        final ImmutableSet.Builder<Entity> entities = ImmutableSet.builder();
+        final int maxYSection = fixEntityYSection(((int) Math.ceil(box.getMax().getY() + 2.0)) >> 4);
+        final int minYSection = fixEntityYSection(((int) Math.floor(box.getMin().getY() - 2.0)) >> 4);
+        addIntersectingEntities(entities, maxYSection, minYSection, box, filter);
+        return entities.build();
+    }
+
+    public static int fixEntityYSection(int section) {
+        return section < 0 ? 0 : section > CHUNK_SECTIONS ? CHUNK_SECTIONS - 1 : section;
+    }
+
+    public void addIntersectingEntities(ImmutableSet.Builder<Entity> builder, int maxYSection, int minYSection, AABB box, Predicate<Entity> filter) {
+        for (int i = minYSection; i <= maxYSection; i++) {
+            for (LanternEntity entity : this.entities[i]) {
+                final Optional<AABB> aabb = entity.getBoundingBox();
+                if (aabb.isPresent()) {
+                    if (aabb.get().intersects(box) && filter.test(entity)) {
+                        builder.add(entity);
+                    }
+                } else if (box.contains(entity.getPosition()) && filter.test(entity)) {
+                    builder.add(entity);
+                }
+            }
+        }
     }
 
     @Override
@@ -1230,15 +1288,17 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     private void forEachEntity(Consumer<LanternEntity> consumer) {
-        final Iterator<LanternEntity> iterator = this.entities.iterator();
-        while (iterator.hasNext()) {
-            final LanternEntity entity = iterator.next();
-            // Only remove the entities that are "destroyed",
-            // the other ones can be resurrected after chunk loading
-            if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
-                iterator.remove();
-            } else {
-                consumer.accept(entity);
+        for (Set<LanternEntity> entities : this.entities) {
+            final Iterator<LanternEntity> iterator = entities.iterator();
+            while (iterator.hasNext()) {
+                final LanternEntity entity = iterator.next();
+                // Only remove the entities that are "destroyed",
+                // the other ones can be resurrected after chunk loading
+                if (entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
+                    iterator.remove();
+                } else {
+                    consumer.accept(entity);
+                }
             }
         }
     }
@@ -1248,7 +1308,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * were temporarily "disabled" (chunk being unloaded).
      */
     void resurrectEntities() {
-        this.forEachEntity(LanternEntity::resurrect);
+        forEachEntity(LanternEntity::resurrect);
     }
 
     /**
@@ -1256,15 +1316,15 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * temporarily "disabled" (chunk being unloaded).
      */
     void buryEntities() {
-        this.forEachEntity(entity -> entity.remove(LanternEntity.RemoveState.CHUNK_UNLOAD));
+        forEachEntity(entity -> entity.remove(LanternEntity.RemoveState.CHUNK_UNLOAD));
     }
 
-    public void addEntity(LanternEntity entity) {
-        this.entities.add(entity);
+    public void addEntity(LanternEntity entity, int section) {
+        this.entities[section].add(entity);
     }
 
-    public void removeEntity(LanternEntity entity) {
-        this.entities.remove(entity);
+    public void removeEntity(LanternEntity entity, int section) {
+        this.entities[section].remove(entity);
     }
 
     @Override
@@ -1282,13 +1342,13 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Collection<Entity> getEntities() {
         final ImmutableList.Builder<Entity> entities = ImmutableList.builder();
-        this.forEachEntity(entities::add);
+        forEachEntity(entities::add);
         return entities.build();
     }
 
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
-        return this.getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
+        return getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
     }
 
     @SuppressWarnings("unchecked")
@@ -1296,7 +1356,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public Entity createEntity(EntityType type, Vector3d position) {
         checkNotNull(position, "position");
         final LanternEntityType entityType = (LanternEntityType) checkNotNull(type, "type");
-        this.checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
+        checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
         //noinspection unchecked
         final LanternEntity entity = (LanternEntity) entityType.getEntityConstructor().apply(UUID.randomUUID());
         entity.setPositionAndWorld(this.world, position);
@@ -1312,7 +1372,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     @Override
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
         checkNotNull(position, "position");
-        this.checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
+        checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
         final Optional<Entity> optEntity = this.createEntity(entityContainer);
         if (optEntity.isPresent()) {
             ((LanternEntity) optEntity.get()).setPosition(position);
@@ -1344,12 +1404,12 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Collection<TileEntity> getTileEntities(Predicate<TileEntity> filter) {
-        return this.getTileEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableSet());
+        return getTileEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableSet());
     }
 
     @Override
     public Optional<TileEntity> getTileEntity(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         final short index = (short) ChunkSection.index(x & 0xf, y & 0xf, z & 0xf);
         return this.chunkSections.work(y >> 4, chunkSection -> {
             if (chunkSection == null) {
@@ -1372,15 +1432,19 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     private void checkBiomeBounds(int x, int y, int z) {
-        if (!this.containsBiome(x, y, z)) {
+        if (!containsBiome(x, y, z)) {
             throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.biomeMin, this.biomeMax);
         }
     }
 
     private void checkVolumeBounds(int x, int y, int z) {
-        if (!this.containsBlock(x, y, z)) {
+        if (!containsBlock(x, y, z)) {
             throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.min, this.max);
         }
+    }
+
+    private void checkVolumeBounds(Vector3i position) {
+        checkVolumeBounds(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
@@ -1405,17 +1469,17 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BlockState getBlock(int x, int y, int z) {
-        return BlockRegistryModule.get().getStateByInternalIdAndData(this.getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
+        return BlockRegistryModule.get().getStateByInternalIdAndData(getType(x, y, z)).orElse(BlockTypes.AIR.getDefaultState());
     }
 
     @Override
     public BlockType getBlockType(int x, int y, int z) {
-        return this.getBlock(x, y, z).getType();
+        return getBlock(x, y, z).getType();
     }
 
     @Override
     public void setBiome(int x, int y, int z, BiomeType biome) {
-        this.setBiomeId(x, y, z, BiomeRegistryModule.get().getInternalId(biome));
+        setBiomeId(x, y, z, BiomeRegistryModule.get().getInternalId(biome));
     }
 
     @Override
@@ -1440,22 +1504,22 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public BiomeType getBiome(int x, int y, int z) {
-        return BiomeRegistryModule.get().getByInternalId(this.getBiomeId(x, y, z)).orElse(BiomeTypes.OCEAN);
+        return BiomeRegistryModule.get().getByInternalId(getBiomeId(x, y, z)).orElse(BiomeTypes.OCEAN);
     }
 
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Direction direction, Class<T> propertyClass) {
-        return this.getProperty0(x, y, z, direction, propertyClass);
+        return getProperty0(x, y, z, direction, propertyClass);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Property<?, ?>> Optional<T> getProperty(int x, int y, int z, Class<T> propertyClass) {
-        return this.getProperty0(x, y, z, null, propertyClass);
+        return getProperty0(x, y, z, null, propertyClass);
     }
 
     private <T extends Property<?, ?>> Optional<T> getProperty0(int x, int y, int z, @Nullable Direction direction, Class<T> propertyClass) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return Optional.empty();
         }
@@ -1470,7 +1534,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             }
         }
         if (direction == null && !property.isPresent()) {
-            final Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);
             if (tileEntity.isPresent()) {
                 property = tileEntity.get().getProperty(propertyClass);
             }
@@ -1486,7 +1550,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         final Location<World> location = new Location<>(this.world, x, y, z);
         final ImmutableList.Builder<Property<?, ?>> builder = ImmutableList.builder();
         builder.addAll(LanternPropertyRegistry.getInstance().getPropertiesFor(location));
-        this.getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
+        getTileEntity(x, y, z).ifPresent(tile -> builder.addAll(tile.getApplicableProperties()));
         return builder.build();
     }
 
@@ -1513,10 +1577,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Optional.empty();
         }
-        final BlockState blockState = this.getBlock(x, y, z);
+        final BlockState blockState = getBlock(x, y, z);
         Optional<E> value = blockState.get(key);
         if (!value.isPresent()) {
-            final Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);
             if (tileEntity.isPresent()) {
                 value = tileEntity.get().get(key);
             }
@@ -1529,10 +1593,10 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return Optional.empty();
         }
-        final BlockState blockState = this.getBlock(x, y, z);
+        final BlockState blockState = getBlock(x, y, z);
         Optional<V> value = blockState.getValue(key);
         if (!value.isPresent()) {
-            final Optional<TileEntity> tileEntity = this.getTileEntity(x, y, z);
+            final Optional<TileEntity> tileEntity = getTileEntity(x, y, z);
             if (tileEntity.isPresent()) {
                 value = tileEntity.get().getValue(key);
             }

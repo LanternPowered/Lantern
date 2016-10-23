@@ -23,31 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.data.type.LanternArmorType;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.spongepowered.api.data.type.ArmorType;
+import org.spongepowered.api.data.type.ArmorTypes;
+import org.spongepowered.api.item.ItemTypes;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+public final class ArmorTypeRegistryModule extends PluginCatalogRegistryModule<ArmorType> {
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
-
-    private final String identifier;
-
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+    public ArmorTypeRegistryModule() {
+        super(ArmorTypes.class);
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public void registerDefaults() {
+        register(new LanternArmorType("minecraft", "chain"));
+        register(new LanternArmorType("minecraft", "diamond", () -> ItemTypes.DIAMOND));
+        register(new LanternArmorType("minecraft", "gold", () -> ItemTypes.GOLD_INGOT));
+        register(new LanternArmorType("minecraft", "iron", () -> ItemTypes.IRON_INGOT));
+        register(new LanternArmorType("minecraft", "leather", () -> ItemTypes.LEATHER));
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

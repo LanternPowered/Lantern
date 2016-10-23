@@ -38,6 +38,7 @@ import org.spongepowered.api.network.RawDataListener;
 import org.spongepowered.api.network.RemoteConnection;
 import org.spongepowered.api.plugin.PluginContainer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -47,7 +48,7 @@ import java.util.function.Consumer;
  */
 final class LanternRawDataChannel extends LanternChannelBinding implements ChannelBinding.RawDataChannel {
 
-    private final List<RawDataListener> serverDataListeners = Lists.newArrayList();
+    private final List<RawDataListener> serverDataListeners = new ArrayList<>();
 
     LanternRawDataChannel(LanternChannelRegistrar registrar, String name, PluginContainer owner) {
         super(registrar, name, owner);

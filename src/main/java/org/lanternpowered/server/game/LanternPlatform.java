@@ -58,7 +58,7 @@ public class LanternPlatform implements Platform {
 
         @Override
         public Object put(String key, Object value) {
-            checkArgument(!this.containsKey(key), "Cannot set the value of the existing key %s", key);
+            checkArgument(!containsKey(key), "Cannot set the value of the existing key %s", key);
             return super.put(key, value);
         }
     };
@@ -67,12 +67,12 @@ public class LanternPlatform implements Platform {
         this.implContainer = implContainer;
         this.apiContainer = apiContainer;
 
-        this.platformMap.put("Type", this.getType());
+        this.platformMap.put("Type", getType());
         this.platformMap.put("ApiName", apiContainer.getName());
         this.platformMap.put("ApiVersion", apiContainer.getVersion());
         this.platformMap.put("ImplementationName", implContainer.getName());
         this.platformMap.put("ImplementationVersion", implContainer.getVersion());
-        this.platformMap.put("MinecraftVersion", this.getMinecraftVersion());
+        this.platformMap.put("MinecraftVersion", getMinecraftVersion());
     }
 
     @Override
@@ -108,8 +108,8 @@ public class LanternPlatform implements Platform {
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .add("type", this.getType())
-                .add("executionType", this.getExecutionType())
+                .add("type", getType())
+                .add("executionType", getExecutionType())
                 .add("version", this.implContainer.getVersion())
                 .add("apiVersion", this.apiContainer.getVersion())
                 .add("minecraftVersion", this.getMinecraftVersion())

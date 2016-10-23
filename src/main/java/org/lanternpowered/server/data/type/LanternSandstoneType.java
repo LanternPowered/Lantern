@@ -59,7 +59,7 @@ public enum LanternSandstoneType implements SandstoneType, SimpleCatalogType, In
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

@@ -44,8 +44,8 @@ public final class BlockStone extends VariantBlock<LanternStoneType> {
 
     public BlockStone(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternStoneType.STONE).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternStoneType.STONE).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(1.5));
             builder.add(PropertyProviders.blastResistance(7.5));
         });

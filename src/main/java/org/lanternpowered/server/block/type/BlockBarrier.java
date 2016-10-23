@@ -37,6 +37,6 @@ public class BlockBarrier extends LanternBlockType {
 
     public BlockBarrier(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder);
-        this.modifyPropertyProviders(builder -> builder.add(PropertyProviderCollections.UNBREAKABLE));
+        modifyPropertyProviders(builder -> builder.add(PropertyProviderCollections.UNBREAKABLE));
     }
 }

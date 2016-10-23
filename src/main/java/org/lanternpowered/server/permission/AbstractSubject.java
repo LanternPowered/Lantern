@@ -60,43 +60,39 @@ public interface AbstractSubject extends Subject {
         Sponge.getServiceManager().provide(PermissionService.class).ifPresent(service -> SubjectSettingCallback.apply(this, service));
     }
 
+    default Subject tryGetSubject0() {
+        final Subject subject = getInternalSubject();
+        if (subject == null) {
+            throw new IllegalStateException("No subject present for " + getIdentifier());
+        }
+        return subject;
+    }
+
     @Override
     default SubjectCollection getContainingCollection() {
-        final Subject subject = this.getInternalSubject();
-        if (subject == null) {
-            throw new IllegalStateException("No subject present for " + this.getIdentifier());
-        }
-        return subject.getContainingCollection();
+        return tryGetSubject0().getContainingCollection();
     }
 
     @Override
     default SubjectData getSubjectData() {
-        final Subject subject = this.getInternalSubject();
-        if (subject == null) {
-            throw new IllegalStateException("No subject present for " + this.getIdentifier());
-        }
-        return subject.getSubjectData();
+        return tryGetSubject0().getSubjectData();
     }
 
     @Override
     default SubjectData getTransientSubjectData() {
-        final Subject subject = this.getInternalSubject();
-        if (subject == null) {
-            throw new IllegalStateException("No subject present for " + this.getIdentifier());
-        }
-        return subject.getTransientSubjectData();
+        return tryGetSubject0().getTransientSubjectData();
     }
 
     @Override
     default boolean hasPermission(Set<Context> contexts, String permission) {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         if (subject == null) {
-            return this.getPermissionDefault(permission).asBoolean();
+            return getPermissionDefault(permission).asBoolean();
         } else {
-            Tristate ret = this.getPermissionValue(contexts, permission);
+            Tristate ret = getPermissionValue(contexts, permission);
             switch (ret) {
                 case UNDEFINED:
-                    return this.getPermissionDefault(permission).asBoolean();
+                    return getPermissionDefault(permission).asBoolean();
                 default:
                     return ret.asBoolean();
             }
@@ -104,55 +100,50 @@ public interface AbstractSubject extends Subject {
     }
 
     @Override
-    default boolean hasPermission(String permission) {
-        return this.hasPermission(this.getActiveContexts(), permission);
-    }
-
-    @Override
     default Tristate getPermissionValue(Set<Context> contexts, String permission) {
-        final Subject subject = this.getInternalSubject();
-        return subject == null ? this.getPermissionDefault(permission) : subject.getPermissionValue(contexts, permission);
+        final Subject subject = getInternalSubject();
+        return subject == null ? getPermissionDefault(permission) : subject.getPermissionValue(contexts, permission);
     }
 
     @Override
     default boolean isChildOf(Subject parent) {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         return subject != null && subject.isChildOf(parent);
     }
 
     @Override
     default boolean isChildOf(Set<Context> contexts, Subject parent) {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         return subject != null && subject.isChildOf(contexts, parent);
     }
 
     @Override
     default List<Subject> getParents() {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         return subject == null ? Collections.emptyList() : subject.getParents();
     }
 
     @Override
     default List<Subject> getParents(Set<Context> contexts) {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         return subject == null ? Collections.emptyList() : subject.getParents(contexts);
     }
 
     @Override
     default Set<Context> getActiveContexts() {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         return subject == null ? Collections.emptySet() : subject.getActiveContexts();
     }
 
     @Override
     default Optional<String> getOption(String key) {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         return subject == null ? Optional.empty() : subject.getOption(key);
     }
 
     @Override
     default Optional<String> getOption(Set<Context> contexts, String key) {
-        final Subject subject = this.getInternalSubject();
+        final Subject subject = getInternalSubject();
         return subject == null ? Optional.empty() : subject.getOption(contexts, key);
     }
 }

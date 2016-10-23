@@ -56,7 +56,8 @@ public class BlockLog extends VariantBlock<LanternTreeType> {
     public BlockLog(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder,
             EnumTrait<LanternTreeType> treeTrait) {
         super(pluginId, identifier, itemTypeBuilder, treeTrait, AXIS);
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(AXIS, LanternLogAxis.X).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(2.0));
             builder.add(PropertyProviders.blastResistance(5.0));
             builder.add(PropertyProviders.flammableInfo(5, 5));

@@ -27,10 +27,7 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.type.BrickType;
 import org.spongepowered.api.data.type.ComparatorType;
-import org.spongepowered.api.text.translation.Translation;
 
 public enum LanternComparatorType implements ComparatorType, SimpleCatalogType, InternalCatalogType {
 
@@ -51,7 +48,7 @@ public enum LanternComparatorType implements ComparatorType, SimpleCatalogType, 
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

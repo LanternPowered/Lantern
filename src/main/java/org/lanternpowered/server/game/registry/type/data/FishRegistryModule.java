@@ -23,31 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.data.type.LanternFish;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.data.type.Fish;
+import org.spongepowered.api.data.type.Fishes;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+public class FishRegistryModule extends InternalPluginCatalogRegistryModule<Fish> {
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
+    private static final FishRegistryModule INSTANCE = new FishRegistryModule();
 
-    private final String identifier;
+    public static FishRegistryModule get() {
+        return INSTANCE;
+    }
 
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+    private FishRegistryModule() {
+        super(Fishes.class);
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public void registerDefaults() {
+        register(new LanternFish("minecraft", "cod", "item.fish.cod.raw.name", 0));
+        register(new LanternFish("minecraft", "salmon", "item.fish.salmon.raw.name", 1));
+        register(new LanternFish("minecraft", "clownfish", "item.fish.clownfish.raw.name", 2));
+        register(new LanternFish("minecraft", "pufferfish", "item.fish.pufferfish.raw.name", 3));
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

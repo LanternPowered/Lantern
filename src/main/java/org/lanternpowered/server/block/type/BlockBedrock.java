@@ -37,6 +37,6 @@ public class BlockBedrock extends LanternBlockType {
 
     public BlockBedrock(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder);
-        this.modifyPropertyProviders(builder -> builder.add(PropertyProviderCollections.UNBREAKABLE));
+        modifyPropertyProviders(builder -> builder.add(PropertyProviderCollections.UNBREAKABLE));
     }
 }

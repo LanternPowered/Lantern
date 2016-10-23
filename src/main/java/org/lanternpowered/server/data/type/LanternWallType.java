@@ -59,7 +59,7 @@ public enum LanternWallType implements WallType, SimpleCatalogType, InternalCata
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

@@ -59,12 +59,12 @@ public class VariantBlock<E extends CatalogType & Comparable<E>> extends Lantern
 
         this.variantTrait = variantTrait;
         String pluginPath = "";
-        if (!this.getPluginId().equalsIgnoreCase("minecraft")) {
-            pluginPath = this.getPluginId() + '.';
+        if (!getPluginId().equalsIgnoreCase("minecraft")) {
+            pluginPath = getPluginId() + '.';
         }
         for (E element : variantTrait.getPossibleValues()) {
             this.translations.put(element, Lantern.getRegistry().getTranslationManager().get(
-                    pluginPath + this.getTranslationKey(element)));
+                    pluginPath + getTranslationKey(element)));
         }
     }
 

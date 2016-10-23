@@ -23,31 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.data.type.LanternDyeColor;
+import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.DyeColors;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+public class DyeColorRegistryModule extends InternalEnumValueRegistryModule<DyeColor> {
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
+    private static final DyeColorRegistryModule INSTANCE = new DyeColorRegistryModule();
 
-    private final String identifier;
-
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+    public static DyeColorRegistryModule get() {
+        return INSTANCE;
     }
 
-    @Override
-    public String getId() {
-        return this.identifier;
+    private DyeColorRegistryModule() {
+        super(LanternDyeColor.class, DyeColors.class);
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

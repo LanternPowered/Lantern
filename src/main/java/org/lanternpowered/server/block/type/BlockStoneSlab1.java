@@ -46,7 +46,7 @@ public class BlockStoneSlab1 extends BlockStoneSlabBase {
 
     public BlockStoneSlab1(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder, boolean doubleSlab) {
         super(pluginId, identifier, "stoneSlab", itemTypeBuilder, doubleSlab, TYPE);
-        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternSlabType.STONE).get());
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternSlabType.STONE).get());
     }
 
     @Override

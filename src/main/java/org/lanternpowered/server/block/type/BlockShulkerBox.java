@@ -59,8 +59,8 @@ public class BlockShulkerBox extends LanternBlockType implements IBlockContainer
     public BlockShulkerBox(String pluginId, String identifier,
             @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, FACING);
-        this.modifyDefaultState(state -> state.withTrait(FACING, Direction.NORTH).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(FACING, Direction.NORTH).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(2.0));
             builder.add(PropertyProviders.blastResistance(10.0));
         });

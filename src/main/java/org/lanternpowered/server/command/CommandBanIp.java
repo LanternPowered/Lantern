@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 
 public final class CommandBanIp extends CommandProvider {
 
-    public static final Pattern IP_PATTERN = Pattern.compile(
+    static final Pattern IP_PATTERN = Pattern.compile(
             "^([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
             "([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\." +
@@ -106,7 +106,7 @@ public final class CommandBanIp extends CommandProvider {
                             .filter(player -> player.getConnection().getAddress().getAddress().equals(address))
                             .collect(Collectors.toList());
                     if (!playersToKick.isEmpty()) {
-                        Text kickReason = t("disconnect.ipBanned");
+                        final Text kickReason = t("disconnect.ipBanned");
                         for (LanternPlayer player : playersToKick) {
                             player.kick(kickReason);
                         }

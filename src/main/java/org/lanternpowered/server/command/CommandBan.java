@@ -77,10 +77,7 @@ public final class CommandBan extends CommandProvider {
                             } else {
                                 banService.addBan(ban);
                             }
-                            Optional<Player> player = Lantern.getServer().getPlayer(gameProfile.getUniqueId());
-                            if (player.isPresent()) {
-                                player.get().kick(t("disconnect.banned"));
-                            }
+                            Lantern.getServer().getPlayer(gameProfile.getUniqueId()).ifPresent(player -> player.kick(t("disconnect.banned")));
                             src.sendMessage(t("commands.ban.success", target));
                         } else {
                             src.sendMessage(t("commands.ban.failed", target));

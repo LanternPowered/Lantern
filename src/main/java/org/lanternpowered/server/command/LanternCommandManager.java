@@ -123,7 +123,7 @@ public class LanternCommandManager implements CommandManager {
 
         synchronized (this.lock) {
             // <namespace>:<alias> for all commands
-            List<String> aliasesWithPrefix = new ArrayList<>(aliases.size() * 2);
+            final List<String> aliasesWithPrefix = new ArrayList<>(aliases.size() * 2);
             for (String alias : aliases) {
                 final Collection<CommandMapping> ownedCommands = this.owners.get(container);
                 for (CommandMapping mapping : this.dispatcher.getAll(alias)) {
@@ -136,7 +136,7 @@ public class LanternCommandManager implements CommandManager {
                 aliasesWithPrefix.add(container.getId() + ':' + alias);
             }
 
-            Optional<CommandMapping> mapping = this.dispatcher.register(callable, aliasesWithPrefix, callback);
+            final Optional<CommandMapping> mapping = this.dispatcher.register(callable, aliasesWithPrefix, callback);
             if (mapping.isPresent()) {
                 this.owners.put(container, mapping.get());
                 this.reverseOwners.put(mapping.get(), container);
@@ -183,12 +183,11 @@ public class LanternCommandManager implements CommandManager {
 
     @Override
     public Set<CommandMapping> getOwnedBy(Object instance) {
-        Optional<PluginContainer> container = Sponge.getGame().getPluginManager().fromInstance(instance);
+        final Optional<PluginContainer> container = Sponge.getGame().getPluginManager().fromInstance(instance);
         if (!container.isPresent()) {
             throw new IllegalArgumentException("The provided plugin object does not have an associated plugin container "
                     + "(in other words, is 'plugin' actually your plugin object?)");
         }
-
         synchronized (this.lock) {
             return ImmutableSet.copyOf(this.owners.get(container.get()));
         }

@@ -44,8 +44,8 @@ public class BlockPlanks extends VariantBlock<LanternTreeType> {
 
     public BlockPlanks(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(2.0));
             builder.add(PropertyProviders.blastResistance(5.0));
             builder.add(PropertyProviders.flammableInfo(5, 20));

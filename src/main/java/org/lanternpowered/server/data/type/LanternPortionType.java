@@ -48,7 +48,7 @@ public enum LanternPortionType implements PortionType, SimpleCatalogType, Intern
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

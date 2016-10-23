@@ -42,6 +42,12 @@ public final class LanternEntityProtocolType<E extends LanternEntity> extends Pl
         return new LanternEntityProtocolType<>(pluginId, name, entityType, entityProtocolSupplier);
     }
 
+    public static <E extends LanternEntity> EntityProtocolType<E> of(String pluginId, String name,
+            Function<E, ? extends AbstractEntityProtocol<E>> entityProtocolSupplier) {
+        //noinspection unchecked
+        return of(pluginId, name, (Class<E>) LanternEntity.class, entityProtocolSupplier);
+    }
+
     private final Class<E> entityType;
     private final Function<E, AbstractEntityProtocol<E>> entityProtocolSupplier;
 

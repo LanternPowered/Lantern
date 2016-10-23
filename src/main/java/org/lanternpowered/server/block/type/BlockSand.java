@@ -45,8 +45,8 @@ public class BlockSand extends VariantBlock<LanternSandType> {
 
     public BlockSand(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternSandType.NORMAL).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternSandType.NORMAL).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(0.5));
             builder.add(PropertyProviders.blastResistance(2.5));
         });

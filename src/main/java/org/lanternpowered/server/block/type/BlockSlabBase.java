@@ -59,7 +59,7 @@ public abstract class BlockSlabBase extends LanternBlockType {
         super(pluginId, identifier, translationKey, itemTypeBuilder, ArrayUtils.add(blockTraits, variantTrait));
         this.variantTrait = variantTrait;
         this.doubleBlock = doubleBlock;
-        this.modifyPropertyProviders(builder -> {
+        modifyPropertyProviders(builder -> {
             if (!doubleBlock) {
                 builder.add(PropertyProviders.solidCube(false));
             }

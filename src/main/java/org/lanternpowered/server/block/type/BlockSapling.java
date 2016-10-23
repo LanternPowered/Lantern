@@ -26,7 +26,6 @@
 package org.lanternpowered.server.block.type;
 
 import org.lanternpowered.server.block.PropertyProviderCollections;
-import org.lanternpowered.server.block.PropertyProviders;
 import org.lanternpowered.server.block.trait.LanternEnumTrait;
 import org.lanternpowered.server.block.trait.LanternIntegerTrait;
 import org.lanternpowered.server.data.type.LanternTreeType;
@@ -49,8 +48,8 @@ public final class BlockSapling extends VariantBlock<LanternTreeType> {
 
     public BlockSapling(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE, STAGE);
-        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get().withTrait(STAGE, 0).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get().withTrait(STAGE, 0).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviderCollections.PASSABLE);
             builder.add(PropertyProviderCollections.INSTANT_BROKEN);
         });

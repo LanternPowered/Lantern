@@ -27,6 +27,7 @@ package org.lanternpowered.server.resourcepack;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Throwables;
 import com.google.common.hash.Hashing;
 import com.google.common.io.ByteStreams;
 import org.spongepowered.api.resourcepack.ResourcePack;
@@ -107,20 +108,20 @@ public final class LanternResourcePackFactory implements ResourcePackFactory {
     @Override
     public ResourcePack fromUri(URI uri) throws FileNotFoundException {
         try {
-            return this.fromUri(uri, false);
+            return fromUri(uri, false);
         } catch (FileNotFoundException e) {
             throw e;
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Throwables.propagate(e);
         }
     }
 
     @Override
     public ResourcePack fromUriUnchecked(URI uri) {
         try {
-            return this.fromUri(uri, true);
+            return fromUri(uri, true);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw Throwables.propagate(e);
         }
     }
 

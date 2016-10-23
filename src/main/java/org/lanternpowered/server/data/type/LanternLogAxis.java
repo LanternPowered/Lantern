@@ -81,7 +81,7 @@ public enum LanternLogAxis implements LogAxis, SimpleCatalogType, InternalCatalo
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
     static {

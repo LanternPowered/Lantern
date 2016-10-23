@@ -47,11 +47,11 @@ public abstract class BlockStoneSlabBase extends BlockSlabBase {
             @Nullable Function<BlockType, ItemType> itemTypeBuilder, boolean doubleSlab, EnumTrait<LanternSlabType> variantTrait) {
         super(pluginId, identifier, translationKey, itemTypeBuilder, doubleSlab, variantTrait,
                 doubleSlab ? SEAMLESS : PORTION);
-        this.modifyPropertyProviders(builder -> {
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(2.0));
             builder.add(PropertyProviders.blastResistance(10.0));
         });
-        this.modifyDefaultState(state -> {
+        modifyDefaultState(state -> {
             if (doubleSlab) {
                 return state.withTrait(SEAMLESS, false).get();
             } else {

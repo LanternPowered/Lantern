@@ -28,27 +28,39 @@ package org.lanternpowered.server.data.type;
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.type.SandType;
+import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.Color;
 
-public enum LanternSandType implements SandType, SimpleCatalogType, InternalCatalogType {
+public enum LanternDyeColor implements DyeColor, SimpleCatalogType, InternalCatalogType {
 
-    NORMAL          ("sand", "default"),
-    RED             ("red_sand", "red"),
+    WHITE           ("white", "white", Color.ofRgb(16777215)),
+    ORANGE          ("orange", "orange", Color.ofRgb(14188339)),
+    MAGENTA         ("magenta", "magenta", Color.ofRgb(11685080)),
+    LIGHT_BLUE      ("light_blue", "lightBlue", Color.ofRgb(6724056)),
+    YELLOW          ("yellow", "yellow", Color.ofRgb(15066419)),
+    LIME            ("lime", "lime", Color.ofRgb(8375321)),
+    PINK            ("pink", "pink", Color.ofRgb(15892389)),
+    GRAY            ("gray", "gray", Color.ofRgb(5000268)),
+    SILVER          ("silver", "silver", Color.ofRgb(10066329)),
+    CYAN            ("cyan", "cyan", Color.ofRgb(5013401)),
+    PURPLE          ("purple", "purple", Color.ofRgb(8339378)),
+    BLUE            ("blue", "blue", Color.ofRgb(3361970)),
+    BROWN           ("brown", "brown", Color.ofRgb(6704179)),
+    GREEN           ("green", "green", Color.ofRgb(6717235)),
+    RED             ("red", "red", Color.ofRgb(10040115)),
+    BLACK           ("black", "black", Color.ofRgb(1644825)),
     ;
 
     private final String identifier;
     private final Translation translation;
+    private final Color color;
 
-    LanternSandType(String identifier, String translationPart) {
+    LanternDyeColor(String identifier, String translationPart, Color color) {
         this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tile.sand." + translationPart + ".name");
+                "color." + translationPart + ".name");
         this.identifier = identifier;
-    }
-
-    @Override
-    public Translation getTranslation() {
-        return this.translation;
+        this.color = color;
     }
 
     @Override
@@ -57,8 +69,17 @@ public enum LanternSandType implements SandType, SimpleCatalogType, InternalCata
     }
 
     @Override
+    public Color getColor() {
+        return this.color;
+    }
+
+    @Override
+    public Translation getTranslation() {
+        return this.translation;
+    }
+
+    @Override
     public int getInternalId() {
         return ordinal();
     }
-
 }

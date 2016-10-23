@@ -60,8 +60,8 @@ public class BlockChest extends LanternBlockType implements IBlockContainer {
     public BlockChest(String pluginId, String identifier,
             @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, FACING);
-        this.modifyDefaultState(state -> state.withTrait(FACING, Direction.NORTH).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(FACING, Direction.NORTH).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(2.5));
             builder.add(PropertyProviders.blastResistance(12.5));
         });

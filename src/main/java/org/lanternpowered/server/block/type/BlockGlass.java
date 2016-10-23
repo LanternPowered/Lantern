@@ -26,19 +26,19 @@
 package org.lanternpowered.server.block.type;
 
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.PropertyProviderCollections;
 import org.lanternpowered.server.block.PropertyProviders;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.item.ItemType;
 
-import javax.annotation.Nullable;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class BlockGlass extends LanternBlockType {
 
     public BlockGlass(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder);
-        this.modifyPropertyProviders(builder -> {
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(0.3));
             builder.add(PropertyProviders.blastResistance(1.5));
         });

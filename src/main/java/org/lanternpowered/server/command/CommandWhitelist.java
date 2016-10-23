@@ -57,8 +57,8 @@ public final class CommandWhitelist extends CommandProvider {
                 .child(CommandSpec.builder()
                         .arguments(GenericArguments.string(Text.of("player")))
                         .executor((src, args) -> {
-                            String playerName = args.<String>getOne("player").get();
-                            WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
+                            final String playerName = args.<String>getOne("player").get();
+                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
                             Lantern.getGame().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
                                 if (error != null) {
                                     src.sendMessage(t("commands.whitelist.add.failed", playerName));
@@ -73,9 +73,9 @@ public final class CommandWhitelist extends CommandProvider {
                 .child(CommandSpec.builder()
                         .arguments(GenericArguments.string(Text.of("player")))
                         .executor((src, args) -> {
-                            String playerName = args.<String>getOne("player").get();
-                            WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
-                            Optional<UserEntry> entry = config.getEntryByName(playerName);
+                            final String playerName = args.<String>getOne("player").get();
+                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
+                            final Optional<UserEntry> entry = config.getEntryByName(playerName);
                             if (entry.isPresent()) {
                                 config.removeProfile(entry.get().getProfile());
                                 src.sendMessage(t("commands.whitelist.remove.success", playerName));
@@ -87,8 +87,8 @@ public final class CommandWhitelist extends CommandProvider {
                         .build(), "remove")
                 .child(CommandSpec.builder()
                         .executor((src, args) -> {
-                            WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
-                            List<String> whitelisted = config.getWhitelistedProfiles().stream()
+                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
+                            final List<String> whitelisted = config.getWhitelistedProfiles().stream()
                                     .map(p -> p.getName().get()).collect(Collectors.toList());
 
                             src.sendMessage(t("commands.whitelist.list", whitelisted.size(), Sponge.getServer().getOnlinePlayers().size()));
@@ -112,7 +112,7 @@ public final class CommandWhitelist extends CommandProvider {
                         .build(), "off")
                 .child(CommandSpec.builder()
                         .executor((src, args) -> {
-                            WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
+                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
                             try {
                                 config.load();
                             } catch (IOException e) {

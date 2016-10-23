@@ -25,40 +25,47 @@
  */
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.type.SandType;
+import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.data.type.CookedFish;
+import org.spongepowered.api.data.type.Fish;
 import org.spongepowered.api.text.translation.Translation;
 
-public enum LanternSandType implements SandType, SimpleCatalogType, InternalCatalogType {
+import java.util.Optional;
 
-    NORMAL          ("sand", "default"),
-    RED             ("red_sand", "red"),
-    ;
+import javax.annotation.Nullable;
 
-    private final String identifier;
-    private final Translation translation;
+public class LanternFish extends PluginCatalogType.Base.Translatable.Internal implements Fish {
 
-    LanternSandType(String identifier, String translationPart) {
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tile.sand." + translationPart + ".name");
-        this.identifier = identifier;
+    @Nullable private CookedFish cookedFish;
+
+    public LanternFish(String pluginId, String name, String translation, int internalId) {
+        super(pluginId, name, translation, internalId);
+    }
+
+    public LanternFish(String pluginId, String name, Translation translation, int internalId) {
+        super(pluginId, name, translation, internalId);
+    }
+
+    public LanternFish(String pluginId, String id, String name, String translation, int internalId) {
+        super(pluginId, id, name, translation, internalId);
+    }
+
+    public LanternFish(String pluginId, String id, String name, Translation translation, int internalId) {
+        super(pluginId, id, name, translation, internalId);
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper().omitNullValues().add("cookedFish", this.cookedFish == null ? null : this.cookedFish.getId());
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public Optional<CookedFish> getCookedFish() {
+        return Optional.ofNullable(this.cookedFish);
     }
 
-    @Override
-    public int getInternalId() {
-        return ordinal();
+    public void setCookedFish(@Nullable CookedFish cookedFish) {
+        this.cookedFish = cookedFish;
     }
-
 }

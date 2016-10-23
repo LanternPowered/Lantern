@@ -42,7 +42,7 @@ public abstract class AbstractSubjectBase implements AbstractSubject {
     @Override
     public Subject getInternalSubject() {
         if (this.subject == null) {
-            this.findPermissionSubject();
+            findPermissionSubject();
         }
         return this.subject;
     }

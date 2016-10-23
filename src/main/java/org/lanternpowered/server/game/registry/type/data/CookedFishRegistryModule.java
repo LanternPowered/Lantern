@@ -23,31 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.data.type.LanternCookedFish;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.data.type.CookedFish;
+import org.spongepowered.api.data.type.CookedFishes;
+import org.spongepowered.api.data.type.Fishes;
+import org.spongepowered.api.registry.util.RegistrationDependency;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+@RegistrationDependency(FishRegistryModule.class)
+public class CookedFishRegistryModule extends InternalPluginCatalogRegistryModule<CookedFish> {
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
+    private static final CookedFishRegistryModule INSTANCE = new CookedFishRegistryModule();
 
-    private final String identifier;
+    public static CookedFishRegistryModule get() {
+        return INSTANCE;
+    }
 
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+    private CookedFishRegistryModule() {
+        super(CookedFishes.class);
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public void registerDefaults() {
+        register(new LanternCookedFish("minecraft", "cod", "item.fish.cod.cooked.name", 0, Fishes.COD));
+        register(new LanternCookedFish("minecraft", "salmon", "item.fish.salmon.cooked.name", 1, Fishes.SALMON));
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

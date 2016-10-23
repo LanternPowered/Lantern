@@ -25,29 +25,43 @@
  */
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import static com.google.common.base.Preconditions.checkNotNull;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.data.type.ArmorType;
+import org.spongepowered.api.item.ItemType;
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
+import java.util.Optional;
+import java.util.function.Supplier;
 
-    private final String identifier;
+import javax.annotation.Nullable;
 
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+public class LanternArmorType extends PluginCatalogType.Base implements ArmorType {
+
+    @Nullable private final Supplier<ItemType> repairItemType;
+
+    public LanternArmorType(String pluginId, String name, Supplier<ItemType> repairItemType) {
+        super(pluginId, name);
+        this.repairItemType = checkNotNull(repairItemType, "repairItemType");
+    }
+
+    public LanternArmorType(String pluginId, String id, String name, Supplier<ItemType> repairItemType) {
+        super(pluginId, id, name);
+        this.repairItemType = checkNotNull(repairItemType, "repairItemType");
+    }
+
+    public LanternArmorType(String pluginId, String name) {
+        super(pluginId, name);
+        this.repairItemType = null;
+    }
+
+    public LanternArmorType(String pluginId, String id, String name) {
+        super(pluginId, id, name);
+        this.repairItemType = null;
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public Optional<ItemType> getRepairItemType() {
+        return this.repairItemType == null ? Optional.empty() : Optional.of(this.repairItemType.get());
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

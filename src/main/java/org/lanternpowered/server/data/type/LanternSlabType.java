@@ -66,7 +66,7 @@ public enum LanternSlabType implements SlabType, SimpleCatalogType, InternalCata
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

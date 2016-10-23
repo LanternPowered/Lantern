@@ -63,7 +63,7 @@ public enum LanternDisguisedBlockType implements DisguisedBlockType, SimpleCatal
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

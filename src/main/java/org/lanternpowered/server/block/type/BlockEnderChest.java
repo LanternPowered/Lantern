@@ -56,8 +56,8 @@ public class BlockEnderChest extends LanternBlockType implements IBlockContainer
     public BlockEnderChest(String pluginId, String identifier,
             @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, BlockChest.FACING);
-        this.modifyDefaultState(state -> state.withTrait(BlockChest.FACING, Direction.NORTH).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(BlockChest.FACING, Direction.NORTH).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(22.5));
             builder.add(PropertyProviders.blastResistance(1000.0));
         });

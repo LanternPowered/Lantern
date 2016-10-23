@@ -45,6 +45,6 @@ public class BlockLog1 extends BlockLog {
 
     public BlockLog1(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-        setDefaultState(getDefaultState().withTrait(TYPE, LanternTreeType.OAK).get());
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.OAK).get());
     }
 }

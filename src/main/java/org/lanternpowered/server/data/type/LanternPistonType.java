@@ -58,7 +58,7 @@ public enum LanternPistonType implements PistonType, SimpleCatalogType, Internal
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

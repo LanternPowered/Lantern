@@ -45,8 +45,8 @@ public final class BlockDirt extends VariantBlock<LanternDirtType> {
 
     public BlockDirt(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-        this.modifyDefaultState(state -> state.withTrait(TYPE, LanternDirtType.DIRT).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternDirtType.DIRT).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(0.5));
             builder.add(PropertyProviders.blastResistance(2.5));
         });

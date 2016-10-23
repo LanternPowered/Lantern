@@ -45,6 +45,6 @@ public class BlockLog2 extends BlockLog {
 
     public BlockLog2(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, TYPE);
-        this.setDefaultState(this.getDefaultState().withTrait(TYPE, LanternTreeType.ACACIA).get());
+        modifyDefaultState(state -> state.withTrait(TYPE, LanternTreeType.ACACIA).get());
     }
 }

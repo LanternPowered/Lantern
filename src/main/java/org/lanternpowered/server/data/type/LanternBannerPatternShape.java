@@ -25,29 +25,24 @@
  */
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.data.type.BannerPatternShape;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+public class LanternBannerPatternShape extends PluginCatalogType.Base implements BannerPatternShape {
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
+    private final String internalId;
 
-    private final String identifier;
-
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+    public LanternBannerPatternShape(String pluginId, String name, String internalId) {
+        super(pluginId, name);
+        this.internalId = internalId;
     }
 
-    @Override
-    public String getId() {
-        return this.identifier;
+    public LanternBannerPatternShape(String pluginId, String id, String name, String internalId) {
+        super(pluginId, id, name);
+        this.internalId = internalId;
     }
 
-    @Override
-    public int getInternalId() {
-        return ordinal();
+    public String getInternalId() {
+        return this.internalId;
     }
-
 }

@@ -44,8 +44,8 @@ public final class BlockGrass extends LanternBlockType {
 
     public BlockGrass(String pluginId, String identifier, @Nullable Function<BlockType, ItemType> itemTypeBuilder) {
         super(pluginId, identifier, itemTypeBuilder, SNOWY);
-        this.modifyDefaultState(state -> state.withTrait(SNOWY, false).get());
-        this.modifyPropertyProviders(builder -> {
+        modifyDefaultState(state -> state.withTrait(SNOWY, false).get());
+        modifyPropertyProviders(builder -> {
             builder.add(PropertyProviders.hardness(0.6));
             builder.add(PropertyProviders.blastResistance(3.0));
         });

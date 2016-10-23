@@ -25,29 +25,16 @@
  */
 package org.lanternpowered.server.data.type;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.data.type.PickupRule;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+public class LanternPickupRule extends PluginCatalogType.Base.Internal implements PickupRule {
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
-
-    private final String identifier;
-
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+    public LanternPickupRule(String pluginId, String name, int internalId) {
+        super(pluginId, name, internalId);
     }
 
-    @Override
-    public String getId() {
-        return this.identifier;
+    public LanternPickupRule(String pluginId, String id, String name, int internalId) {
+        super(pluginId, id, name, internalId);
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

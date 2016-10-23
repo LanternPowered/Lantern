@@ -28,14 +28,13 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.base.Predicates;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Iterables;
 import org.lanternpowered.server.game.LanternGame;
 import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.dispatcher.Disambiguator;
 import org.spongepowered.api.command.dispatcher.SimpleDispatcher;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.util.GuavaCollectors;
 
 import java.util.List;
 import java.util.Optional;
@@ -62,14 +61,14 @@ public final class LanternCommandDisambiguator implements Disambiguator {
         if (availableOptions.size() > 1) {
             final String chosenPlugin = this.game.getGlobalConfig().getCommandAliases().get(aliasUsed.toLowerCase());
             if (chosenPlugin != null) {
-                Optional<PluginContainer> container = this.game.getPluginManager().getPlugin(chosenPlugin);
+                final Optional<PluginContainer> container = this.game.getPluginManager().getPlugin(chosenPlugin);
                 if (!container.isPresent()) {
                     this.game.getServer().getConsole().sendMessage(t("Unable to find plugin '%s' for command '%s', falling back to default",
                             chosenPlugin, aliasUsed));
                 } else {
                     final Set<CommandMapping> ownedCommands = this.game.getCommandManager().getOwnedBy(container.get());
-                    final List<CommandMapping> ownedMatchingCommands = ImmutableList.copyOf(Iterables.filter(availableOptions,
-                            Predicates.in(ownedCommands)));
+                    final List<CommandMapping> ownedMatchingCommands = availableOptions.stream()
+                            .filter(Predicates.in(ownedCommands)::apply).collect(GuavaCollectors.toImmutableList());
                     if (ownedMatchingCommands.isEmpty()) {
                         this.game.getServer().getConsole().sendMessage(t("Plugin %s was specified as the preferred owner for %s, "
                                 + "but does not have any such command!", container.get().getName(), aliasUsed));

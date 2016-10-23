@@ -23,31 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
+import org.lanternpowered.server.data.type.LanternPickupRule;
+import org.lanternpowered.server.game.registry.InternalPluginCatalogRegistryModule;
+import org.spongepowered.api.data.type.PickupRule;
+import org.spongepowered.api.data.type.PickupRules;
 
-public enum LanternDoorHalf implements SimpleCatalogType, InternalCatalogType {
+public class PickupRuleRegistryModule extends InternalPluginCatalogRegistryModule<PickupRule> {
 
-    UPPER       ("upper"),
-    LOWER       ("lower"),
-    ;
+    private static final PickupRuleRegistryModule INSTANCE = new PickupRuleRegistryModule();
 
-    private final String identifier;
+    public static PickupRuleRegistryModule get() {
+        return INSTANCE;
+    }
 
-    LanternDoorHalf(String identifier) {
-        this.identifier = identifier;
+    private PickupRuleRegistryModule() {
+        super(PickupRules.class);
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public void registerDefaults() {
+        register(new LanternPickupRule("minecraft", "disallowed", 0));
+        register(new LanternPickupRule("minecraft", "allowed", 1));
+        register(new LanternPickupRule("minecraft", "creative_only", 2));
     }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

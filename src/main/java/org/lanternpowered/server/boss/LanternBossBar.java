@@ -117,7 +117,7 @@ public class LanternBossBar implements ServerBossBar {
         boolean update = this.color != color;
         this.color = checkNotNull(color, "color");
         if (update) {
-            this.sendStyleUpdate();
+            sendStyleUpdate();
         }
         return this;
     }
@@ -132,7 +132,7 @@ public class LanternBossBar implements ServerBossBar {
         boolean update = this.overlay != overlay;
         this.overlay = checkNotNull(overlay, "overlay");
         if (update) {
-            this.sendStyleUpdate();
+            sendStyleUpdate();
         }
         return this;
     }
@@ -155,7 +155,7 @@ public class LanternBossBar implements ServerBossBar {
         boolean update = this.darkenSky != darkenSky;
         this.darkenSky = darkenSky;
         if (update) {
-            this.sendMiscUpdate();
+            sendMiscUpdate();
         }
         return this;
     }
@@ -170,7 +170,7 @@ public class LanternBossBar implements ServerBossBar {
         boolean update = this.playEndBossMusic != playEndBossMusic;
         this.playEndBossMusic = playEndBossMusic;
         if (update) {
-            this.sendMiscUpdate();
+            sendMiscUpdate();
         }
         return this;
     }
@@ -185,7 +185,7 @@ public class LanternBossBar implements ServerBossBar {
         boolean update = this.createFog != createFog;
         this.createFog = createFog;
         if (update) {
-            this.sendMiscUpdate();
+            sendMiscUpdate();
         }
         return this;
     }
@@ -227,7 +227,7 @@ public class LanternBossBar implements ServerBossBar {
         checkNotNull(player, "player");
         final LanternPlayer player1 = (LanternPlayer) player;
         if (this.viewers.add(player1) && this.visible) {
-            this.resendBossBar(player1);
+            resendBossBar(player1);
         }
         return this;
     }

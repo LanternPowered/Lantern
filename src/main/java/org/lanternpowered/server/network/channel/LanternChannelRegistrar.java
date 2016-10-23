@@ -120,7 +120,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
         checkNotNull(payload, "payload");
         final NetworkSession session = ((LanternPlayer) player).getConnection();
         if (session.getRegisteredChannels().contains(channel)) {
-            ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
+            final ByteBuffer buf = ByteBufferAllocator.unpooled().buffer();
             payload.accept(buf);
             session.send(new MessagePlayInOutChannelPayload(channel, buf));
         }
@@ -139,7 +139,7 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
     }
 
     public void handlePlayload(ByteBuffer buf, String channel, RemoteConnection connection) {
-        LanternChannelBinding binding = this.bindings.get(channel);
+        final LanternChannelBinding binding = this.bindings.get(channel);
         if (binding != null) {
             binding.handlePayload(buf, connection);
         }

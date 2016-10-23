@@ -59,7 +59,7 @@ public enum LanternShrubType implements ShrubType, SimpleCatalogType, InternalCa
 
     @Override
     public int getInternalId() {
-        return this.ordinal();
+        return ordinal();
     }
 
 }

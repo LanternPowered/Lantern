@@ -38,6 +38,7 @@ import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
+import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
@@ -616,5 +617,14 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public EntityArchetype createArchetype() {
         return null;
+    }
+
+    /**
+     * Triggers the {@link EntityEvent} for this entity.
+     *
+     * @param event The event
+     */
+    public void triggerEvent(EntityEvent event) {
+        getWorld().getEntityProtocolManager().triggerEvent(this, event);
     }
 }

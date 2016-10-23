@@ -28,12 +28,14 @@ package org.lanternpowered.server.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
 import org.lanternpowered.server.util.AABBs;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -72,15 +74,15 @@ public class LanternItem extends LanternEntity implements Item {
         }
         if (this.counter++ % 20 == 0) {
             combineItemStacks();
-            if (delay != 32767 && delay <= 0) {
-                tryToPickupItems();
-            }
+        }
+        if (this.counter % 10 == 0 && delay != 32767 && delay <= 0) {
+            tryToPickupItems();
         }
     }
 
     private void tryToPickupItems() {
         final Set<Entity> entities = getWorld().getIntersectingEntities(
-                getBoundingBox().get().expand(1.0, 0.5, 1.0), entity -> entity != this && entity instanceof Carrier);
+                getBoundingBox().get().expand(2.0, 0.5, 2.0), entity -> entity != this && entity instanceof Carrier);
         if (entities.isEmpty()) {
             return;
         }
@@ -89,10 +91,19 @@ public class LanternItem extends LanternEntity implements Item {
             final Inventory inventory = ((Carrier) entity).getInventory();
             final InventoryTransactionResult result = inventory.offer(itemStack);
             final Collection<ItemStackSnapshot> rejected = result.getRejectedItems();
+            final int added;
             if (!rejected.isEmpty()) {
-                itemStack = rejected.iterator().next().createStack();
+                final ItemStack itemStack1 = rejected.iterator().next().createStack();
+                added = itemStack.getQuantity() - itemStack1.getQuantity();
+                itemStack = itemStack1;
             } else {
+                added = itemStack.getQuantity();
                 itemStack = null;
+            }
+            if (added != 0 && entity instanceof Living) {
+                triggerEvent(new CollectEntityEvent((Living) entity, added));
+            }
+            if (itemStack == null) {
                 break;
             }
         }

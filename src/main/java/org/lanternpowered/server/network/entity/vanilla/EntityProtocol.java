@@ -31,6 +31,9 @@ import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.LanternLiving;
+import org.lanternpowered.server.entity.event.CollectEntityEvent;
+import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
@@ -39,6 +42,7 @@ import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
 import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLookAndRelativeMove;
@@ -80,7 +84,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     @Override
     protected void destroy(EntityProtocolUpdateContext context) {
-        context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(this.getRootEntityId()));
+        context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(getRootEntityId()));
     }
 
     @Override
@@ -164,7 +168,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             this.lastVelZ = vz;
         }
         final ParameterList parameterList = context == EntityProtocolUpdateContext.empty() ?
-                this.fillParameters(false, EmptyParameterList.INSTANCE) : this.fillParameters(false);
+                fillParameters(false, EmptyParameterList.INSTANCE) : fillParameters(false);
         // There were parameters applied
         if (!parameterList.isEmpty()) {
             context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
@@ -173,17 +177,30 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     }
 
     @Override
+    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
+        if (event instanceof CollectEntityEvent) {
+            final LanternLiving collector = (LanternLiving) ((CollectEntityEvent) event).getCollector();
+            context.getId(collector).ifPresent(id -> {
+                final int count = ((CollectEntityEvent) event).getCollectedItemsCount();
+                context.sendToAll(() -> new MessagePlayOutEntityCollectItem(id, getRootEntityId(), count));
+            });
+        } else {
+            super.handleEvent(context, event);
+        }
+    }
+
+    @Override
     protected void postUpdate(EntityProtocolUpdateContext context) {
         final List<Entity> passengers = this.entity.getPassengers();
         if (!passengers.equals(this.lastPassengers)) {
             this.lastPassengers = passengers;
-            this.sendPassengers(context, passengers);
+            sendPassengers(context, passengers);
         }
     }
 
     @Override
     public void postSpawn(EntityProtocolUpdateContext context) {
-        this.sendPassengers(context, this.entity.getPassengers());
+        sendPassengers(context, this.entity.getPassengers());
     }
 
     private void sendPassengers(EntityProtocolUpdateContext context, List<Entity> passengers) {

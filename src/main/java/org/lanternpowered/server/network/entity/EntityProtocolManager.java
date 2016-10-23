@@ -34,6 +34,7 @@ import it.unimi.dsi.fastutil.ints.IntIterator;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.entity.Entity;
 
@@ -247,7 +248,7 @@ public final class EntityProtocolManager {
      */
     public void add(LanternEntity entity) {
         //noinspection ConstantConditions,unchecked
-        this.add(entity, (EntityProtocolType) entity.getEntityProtocolType());
+        add(entity, (EntityProtocolType) entity.getEntityProtocolType());
     }
 
     /**
@@ -329,16 +330,16 @@ public final class EntityProtocolManager {
     private static final int INTERACT_DELAY = 50;
 
     public void playerInteract(LanternPlayer player, int entityId, @Nullable Vector3d position) {
-        this.playerUseEntity(player, entityId, entityProtocol -> entityProtocol.playerInteract(player, entityId, position));
+        playerUseEntity(player, entityId, entityProtocol -> entityProtocol.playerInteract(player, entityId, position));
     }
 
     public void playerAttack(LanternPlayer player, int entityId) {
-        this.playerUseEntity(player, entityId, entityProtocol -> entityProtocol.playerAttack(player, entityId));
+        playerUseEntity(player, entityId, entityProtocol -> entityProtocol.playerAttack(player, entityId));
     }
 
     private void playerUseEntity(LanternPlayer player, int entityId,
             Consumer<AbstractEntityProtocol<?>> entityProtocolConsumer) {
-        this.getEntityProtocolById(entityId).ifPresent(entityProtocol -> {
+        getEntityProtocolById(entityId).ifPresent(entityProtocol -> {
             synchronized (entityProtocol.playerInteractTimes) {
                 final long time = entityProtocol.playerInteractTimes.getLong(player);
                 final long current = System.currentTimeMillis();
@@ -346,6 +347,14 @@ public final class EntityProtocolManager {
                     entityProtocolConsumer.accept(entityProtocol);
                     entityProtocol.playerInteractTimes.put(player, current);
                 }
+            }
+        });
+    }
+
+    public void triggerEvent(LanternEntity entity, EntityEvent event) {
+        getEntityProtocolByEntity(entity).ifPresent(entityProtocol -> {
+            synchronized (entityProtocol.entityEvents) {
+                entityProtocol.entityEvents.add(event);
             }
         });
     }

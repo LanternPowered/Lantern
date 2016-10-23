@@ -34,13 +34,17 @@ import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.objects.Object2LongMap;
 import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
 import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.event.EntityEvent;
+import org.lanternpowered.server.entity.event.EntityEventType;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.OptionalInt;
 import java.util.Set;
@@ -81,6 +85,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
     final Object2LongMap<Player> playerInteractTimes = new Object2LongOpenHashMap<>();
 
+    final List<EntityEvent> entityEvents = new ArrayList<>();
+
     public AbstractEntityProtocol(E entity) {
         this.entity = entity;
     }
@@ -112,7 +118,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         @Override
         public void sendToSelf(Supplier<Message> messageSupplier) {
             if (entity instanceof Player) {
-                this.sendToSelf(messageSupplier.get());
+                sendToSelf(messageSupplier.get());
             }
         }
 
@@ -124,7 +130,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         @Override
         public void sendToAll(Supplier<Message> message) {
             if (!this.trackers.isEmpty()) {
-                this.sendToAll(message.get());
+                sendToAll(message.get());
             }
         }
 
@@ -140,7 +146,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         @Override
         public void sendToAllExceptSelf(Supplier<Message> messageSupplier) {
             if (!this.trackers.isEmpty()) {
-                this.sendToAllExceptSelf(messageSupplier.get());
+                sendToAllExceptSelf(messageSupplier.get());
             }
         }
     }
@@ -199,8 +205,12 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         if (!this.trackers.isEmpty()) {
             // Destroy the entity on all the clients
             final SimpleEntityProtocolContext ctx = new SimpleEntityProtocolContext();
+            final TempEvents events = processEvents(true, true);
             ctx.trackers = this.trackers;
-            this.destroy(ctx);
+            if (events != null && events.deathOrAlive != null) {
+                events.deathOrAlive.forEach(event -> handleEvent(ctx, event));
+            }
+            destroy(ctx);
             this.trackers.clear();
             synchronized (this.playerInteractTimes) {
                 this.playerInteractTimes.clear();
@@ -225,10 +235,10 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      */
     protected void init(EntityProtocolInitContext context) {
         if (this.entity instanceof NetworkIdHolder) {
-            this.initRootId(((NetworkIdHolder) this.entity).getNetworkId());
+            initRootId(((NetworkIdHolder) this.entity).getNetworkId());
         } else {
             // Allocate the next free id
-            this.initRootId(context.acquire());
+            initRootId(context.acquire());
         }
     }
 
@@ -271,14 +281,14 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
             final LanternPlayer tracker = trackerIt.next();
             final boolean flag = players.remove(tracker);
             if (tracker != this.entity &&
-                    (!flag || !this.isVisible(pos, tracker))) {
+                    (!flag || !isVisible(pos, tracker))) {
                 trackerIt.remove();
                 removed.add(tracker);
             }
         }
 
         for (LanternPlayer tracker : players) {
-            if (tracker == this.entity || this.isVisible(pos, tracker)) {
+            if (tracker == this.entity || isVisible(pos, tracker)) {
                 added.add(tracker);
             }
         }
@@ -307,37 +317,96 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
     void updateTrackers(TrackerUpdateContextData contextData) {
         final SimpleEntityProtocolContext ctx = contextData.ctx;
+        final TempEvents events = processEvents(contextData.removed != null, true);
         if (contextData.removed != null) {
             ctx.trackers = contextData.removed;
-            this.destroy(ctx);
+            if (events != null && events.deathOrAlive != null) {
+                events.deathOrAlive.forEach(event -> handleEvent(ctx, event));
+            }
+            destroy(ctx);
             synchronized (this.playerInteractTimes) {
                 contextData.removed.forEach(this.playerInteractTimes::remove);
             }
         }
+        Set<LanternPlayer> trackers = null;
         if (contextData.update != null) {
             ctx.trackers = contextData.update;
-            this.update(ctx);
+            update(ctx);
+            if (events != null) {
+                trackers = contextData.added == null ? contextData.update : new HashSet<>(contextData.update);
+            }
         }
         if (contextData.added != null) {
             ctx.trackers = contextData.added;
-            this.spawn(ctx);
+            spawn(ctx);
+            if (events != null) {
+                if (trackers == null) {
+                    trackers = contextData.added;
+                } else {
+                    trackers.addAll(contextData.added);
+                }
+            }
         }
+        if (trackers != null) {
+            ctx.trackers = trackers;
+            events.alive.forEach(event -> handleEvent(ctx, event));
+        }
+    }
+
+    private final class TempEvents {
+
+        @Nullable private final List<EntityEvent> deathOrAlive;
+        private final List<EntityEvent> alive;
+
+        private TempEvents(@Nullable List<EntityEvent> deathOrAlive, List<EntityEvent> alive) {
+            this.deathOrAlive = deathOrAlive;
+            this.alive = alive;
+        }
+    }
+
+    @Nullable
+    private TempEvents processEvents(boolean death, boolean alive) {
+        if (!death && !alive) {
+            return null;
+        }
+        List<EntityEvent> aliveList = null;
+        synchronized (this.entityEvents) {
+            if (!this.entityEvents.isEmpty()) {
+                aliveList = new ArrayList<>(this.entityEvents);
+                this.entityEvents.clear();
+            }
+        }
+        if (aliveList == null) {
+            return null;
+        }
+        List<EntityEvent> deathOrAliveList = null;
+        if (death) {
+            for (EntityEvent event : aliveList) {
+                if (event.type() == EntityEventType.DEATH_OR_ALIVE) {
+                    if (deathOrAliveList == null) {
+                        deathOrAliveList = new ArrayList<>();
+                    }
+                    deathOrAliveList.add(event);
+                }
+            }
+        }
+        return new TempEvents(deathOrAliveList, aliveList);
     }
 
     void postUpdateTrackers(TrackerUpdateContextData contextData) {
         final SimpleEntityProtocolContext ctx = contextData.ctx;
         if (contextData.update != null) {
             ctx.trackers = contextData.update;
-            this.postUpdate(ctx);
+            postUpdate(ctx);
         }
         if (contextData.added != null) {
             ctx.trackers = contextData.added;
-            this.postSpawn(ctx);
+            postSpawn(ctx);
         }
     }
 
     private boolean isVisible(Vector3d pos, LanternPlayer tracker) {
-        return pos.distanceSquared(tracker.getPosition()) < this.trackingRange * this.trackingRange && this.isVisible(tracker);
+        return pos.distanceSquared(tracker.getPosition()) < this.trackingRange * this.trackingRange && isVisible(tracker);
     }
 
     /**
@@ -370,6 +439,9 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
      * @param context The entity update context
      */
     protected abstract void update(EntityProtocolUpdateContext context);
+
+    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
+    }
 
     /**
      * Post spawns the tracked entity. This method will be called after

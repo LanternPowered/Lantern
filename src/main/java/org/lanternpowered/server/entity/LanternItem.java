@@ -31,8 +31,9 @@ import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
-import org.lanternpowered.server.util.AABBs;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
@@ -42,19 +43,32 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.util.AABB;
 
 import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.annotation.Nullable;
+
 public class LanternItem extends LanternEntity implements Item {
+
+    private static final class EffectHolder {
+
+        private static final ParticleEffect DEATH_EFFECT =
+                ParticleEffect.builder().type(ParticleTypes.CLOUD).quantity(3).offset(Vector3d.ONE.mul(0.1)).build();
+    }
+
+    private static final AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.125, 0, -0.125), new Vector3d(0.125, 0.25, 0.125));
+    private static final int NO_DESPAWN_DELAY = 59536;
+    private static final int NO_PICKUP_DELAY = 32767;
 
     private int counter;
 
     public LanternItem(UUID uniqueId) {
         super(uniqueId);
         setEntityProtocolType(EntityProtocolTypes.ITEM);
-        setBoundingBoxBase(AABBs.ofCenterExpansion(new Vector3d(0.25, 0.25, 0.25)));
+        setBoundingBoxBase(BOUNDING_BOX_BASE);
     }
 
     @Override
@@ -62,22 +76,43 @@ public class LanternItem extends LanternEntity implements Item {
         super.registerKeys();
         registerKey(Keys.REPRESENTED_ITEM, null);
         registerKey(Keys.PICKUP_DELAY, 60);
+        registerKey(Keys.DESPAWN_DELAY, 6000);
     }
 
     @Override
     public void pulse() {
         super.pulse();
 
-        int delay = get(Keys.PICKUP_DELAY).orElse(0);
-        if (delay != 32767 && delay > 0) {
-            delay--;
-            tryOffer(Keys.PICKUP_DELAY, delay);
+        int pickupDelay = get(Keys.PICKUP_DELAY).orElse(0);
+        int despawnDelay = get(Keys.DESPAWN_DELAY).orElse(NO_DESPAWN_DELAY);
+        final int oldPickupDelay = pickupDelay;
+        final int oldDespawnDelay = despawnDelay;
+        if (pickupDelay != NO_PICKUP_DELAY && pickupDelay > 0) {
+            pickupDelay--;
+        }
+        if (despawnDelay != NO_DESPAWN_DELAY && despawnDelay > 0) {
+            despawnDelay--;
         }
         if (this.counter++ % 20 == 0) {
-            combineItemStacks();
+            final CombineData data = combineItemStacks(pickupDelay, despawnDelay);
+            if (data != null) {
+                pickupDelay = data.pickupDelay;
+                despawnDelay = data.despawnDelay;
+            }
         }
-        if (this.counter % 10 == 0 && delay != 32767 && delay <= 0) {
+        if (this.counter % 10 == 0 && pickupDelay != NO_PICKUP_DELAY && pickupDelay <= 0) {
             tryToPickupItems();
+        }
+        if (pickupDelay != oldPickupDelay) {
+            offer(Keys.PICKUP_DELAY, pickupDelay);
+        }
+        if (despawnDelay != oldDespawnDelay) {
+            offer(Keys.DESPAWN_DELAY, despawnDelay);
+        }
+        if (despawnDelay <= 0) {
+            // A death animation/particle?
+            getWorld().spawnParticles(EffectHolder.DEATH_EFFECT, getBoundingBox().get().getCenter());
+            remove();
         }
     }
 
@@ -118,10 +153,22 @@ public class LanternItem extends LanternEntity implements Item {
         }
     }
 
-    private void combineItemStacks() {
+    private final class CombineData {
+
+        private final int pickupDelay;
+        private final int despawnDelay;
+
+        private CombineData(int pickupDelay, int despawnDelay) {
+            this.despawnDelay = despawnDelay;
+            this.pickupDelay = pickupDelay;
+        }
+    }
+
+    @Nullable
+    private CombineData combineItemStacks(int pickupDelay, int despawnDelay) {
         ItemStackSnapshot itemStackSnapshot1 = get(Keys.REPRESENTED_ITEM).get();
         if (itemStackSnapshot1.getCount() >= itemStackSnapshot1.getType().getMaxStackQuantity()) {
-            return;
+            return null;
         }
         checkNotNull(getWorld());
         Set<Entity> entities = getWorld().getIntersectingEntities(
@@ -129,11 +176,15 @@ public class LanternItem extends LanternEntity implements Item {
         if (!entities.isEmpty()) {
             ItemStack itemStack = null;
             for (Entity entity : entities) {
+                final int pickupDelay1 = entity.get(Keys.PICKUP_DELAY).orElse(0);
+                if (pickupDelay1 == NO_PICKUP_DELAY) {
+                    continue;
+                }
                 final ItemStackSnapshot itemStackSnapshot2 = entity.get(Keys.REPRESENTED_ITEM).get();
+                if (itemStackSnapshot2.getCount() < itemStackSnapshot1.getCount()) {
+                    continue;
+                }
                 if (((LanternItemStackSnapshot) itemStackSnapshot1).isSimilar(itemStackSnapshot2)) {
-                    if (itemStackSnapshot1.getCount() < itemStackSnapshot2.getCount()) {
-                        continue;
-                    }
                     final int max = itemStackSnapshot1.getType().getMaxStackQuantity();
                     int quantity = itemStackSnapshot1.getCount() + itemStackSnapshot2.getCount();
                     if (quantity > max) {
@@ -148,6 +199,8 @@ public class LanternItem extends LanternEntity implements Item {
                         itemStack = itemStackSnapshot1.createStack();
                     }
                     itemStack.setQuantity(quantity);
+                    pickupDelay = Math.max(pickupDelay, pickupDelay1);
+                    despawnDelay = Math.max(despawnDelay, entity.get(Keys.DESPAWN_DELAY).orElse(NO_DESPAWN_DELAY));
                     if (quantity >= max) {
                         break;
                     }
@@ -155,7 +208,9 @@ public class LanternItem extends LanternEntity implements Item {
             }
             if (itemStack != null) {
                 offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+                return new CombineData(pickupDelay, despawnDelay);
             }
         }
+        return null;
     }
 }

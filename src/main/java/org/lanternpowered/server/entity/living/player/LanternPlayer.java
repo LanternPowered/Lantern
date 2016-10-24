@@ -115,6 +115,7 @@ import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.ChunkTicketManager;
@@ -135,6 +136,8 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 public class LanternPlayer extends LanternHumanoid implements AbstractSubject, Player, AbstractViewer, NetworkIdHolder {
+
+    private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -3), new Vector3d(0.3, 1.8, 0.3));
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
@@ -230,7 +233,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 .getOrCreate(gameProfile);
         this.user.setPlayer(this);
         resetIdleTimeoutCounter();
-        setBoundingBoxBase(AABBs.ofCenterExpansion(new Vector3d(0.6, 1.8, 0.6)));
+        setBoundingBoxBase(BOUNDING_BOX_BASE);
     }
 
     public Set<LanternBossBar> getBossBars() {

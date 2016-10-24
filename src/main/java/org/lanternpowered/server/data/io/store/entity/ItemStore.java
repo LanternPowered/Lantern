@@ -33,16 +33,24 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 
+import java.util.Optional;
+
 public class ItemStore extends EntityStore<LanternItem> {
 
     private static final DataQuery ITEM = DataQuery.of("Item");
     private static final DataQuery PICKUP_DELAY = DataQuery.of("PickupDelay");
+    private static final DataQuery LIFESPAN = DataQuery.of("Lifespan");
+    private static final DataQuery AGE = DataQuery.of("Age");
 
     @Override
     public void serializeValues(LanternItem item, SimpleValueContainer valueContainer, DataView dataView) {
         dataView.set(ITEM, ObjectSerializerRegistry.get().get(LanternItemStack.class).get()
                 .serialize((LanternItemStack) valueContainer.remove(Keys.REPRESENTED_ITEM).get().createStack()));
         valueContainer.remove(Keys.PICKUP_DELAY).ifPresent(v -> dataView.set(PICKUP_DELAY, v.shortValue()));
+        valueContainer.remove(Keys.DESPAWN_DELAY).ifPresent(v -> {
+            dataView.set(AGE, (short) 0);
+            dataView.set(LIFESPAN, v);
+        });
         super.serializeValues(item, valueContainer, dataView);
     }
 
@@ -51,6 +59,11 @@ public class ItemStore extends EntityStore<LanternItem> {
         valueContainer.set(Keys.REPRESENTED_ITEM, ObjectSerializerRegistry.get().get(LanternItemStack.class).get()
                 .deserialize(dataView.getView(ITEM).get()).createSnapshot());
         valueContainer.set(Keys.PICKUP_DELAY, dataView.getInt(PICKUP_DELAY).orElse(0));
+        final Optional<Integer> lifespan = dataView.getInt(LIFESPAN);
+        final Optional<Integer> age = dataView.getInt(AGE);
+        if (lifespan.isPresent() && age.isPresent()) {
+            valueContainer.set(Keys.DESPAWN_DELAY, lifespan.get() - age.get());
+        }
         super.deserializeValues(item, valueContainer, dataView);
     }
 }

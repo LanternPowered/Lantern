@@ -202,7 +202,7 @@ public class LanternValueFactory implements ValueFactory {
     public <V extends BaseValue<E>, E> V createValueForKey(Key<? extends V> key, E element) {
         checkNotNull(key, "key");
         checkNotNull(element, "element");
-        ValueSupplier supplier = this.valueSuppliers.get(key.getValueToken().getRawType());
+        final ValueSupplier supplier = this.valueSuppliers.get(key.getValueToken().getRawType());
         checkArgument(supplier != null, "The BaseValue type used by the key (" + key.getValueToken().getRawType().getName() + ") isn't supported.");
         return (V) supplier.get(key, element);
     }

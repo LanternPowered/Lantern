@@ -28,7 +28,9 @@ package org.lanternpowered.server.world.extent;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
+import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.util.gen.biome.AtomicObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ObjectArrayMutableBiomeBuffer;
 import org.lanternpowered.server.util.gen.biome.ShortArrayImmutableBiomeBuffer;
@@ -56,6 +58,22 @@ import org.spongepowered.api.world.extent.worker.MutableBiomeVolumeWorker;
 import org.spongepowered.api.world.extent.worker.MutableBlockVolumeWorker;
 
 public interface AbstractExtent extends Extent {
+
+    default void checkBiomeBounds(int x, int y, int z) {
+        if (!containsBiome(x, y, z)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), getBlockMin(), getBlockMax());
+        }
+    }
+
+    default void checkVolumeBounds(int x, int y, int z) {
+        if (!containsBlock(x, y, z)) {
+            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), getBlockMin(), getBlockMax());
+        }
+    }
+
+    default void checkVolumeBounds(Vector3i position) {
+        checkVolumeBounds(position.getX(), position.getY(), position.getZ());
+    }
 
     @Override
     default MutableBiomeVolumeWorker<? extends Extent> getBiomeWorker() {

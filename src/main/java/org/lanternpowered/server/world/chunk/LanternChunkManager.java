@@ -42,7 +42,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MapMaker;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.config.world.WorldConfig;
@@ -69,6 +68,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.util.GuavaCollectors;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.ChunkTicketManager;
 import org.spongepowered.api.world.ChunkTicketManager.EntityLoadingTicket;
@@ -105,6 +105,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Future;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -128,13 +129,13 @@ public final class LanternChunkManager {
     private static final long UNLOAD_DELAY = TimeUnit.SECONDS.toMillis(1);
 
     // All the attached tickets mapped by the forced chunk coordinates
-    private final Map<Vector2i, Set<ChunkLoadingTicket>> ticketsByPos = Maps.newConcurrentMap();
+    private final Map<Vector2i, Set<ChunkLoadingTicket>> ticketsByPos = new ConcurrentHashMap<>();
 
     // All the loading tickets that are still usable
     private final Set<LanternLoadingTicket> tickets = Sets.newConcurrentHashSet();
 
     // All the chunks that are loaded into the server
-    private final Map<Vector2i, LanternChunk> loadedChunks = Maps.newConcurrentMap();
+    private final Map<Vector2i, LanternChunk> loadedChunks = new ConcurrentHashMap<>();
 
     // A cache that can be used to get chunks that weren't unloaded
     // so much after all, because of active references to the chunk
@@ -168,7 +169,7 @@ public final class LanternChunkManager {
 
     // All the futures that will cause chunk loading/unloading, they are stored
     // here to allow them to be cancelled
-    private final Map<Vector2i, LanternChunkQueueTask> chunkQueueTasks = Maps.newConcurrentMap();
+    private final Map<Vector2i, LanternChunkQueueTask> chunkQueueTasks = new ConcurrentHashMap<>();
 
     // The chunk load executor
     private final ThreadPoolExecutor chunkTaskExecutor = new ThreadPoolExecutor(
@@ -204,7 +205,7 @@ public final class LanternChunkManager {
         public void setFuture(Future<Void> future) {
             this.future = future;
             synchronized (this) {
-                this.notifyAll();
+                notifyAll();
             }
         }
 
@@ -214,7 +215,7 @@ public final class LanternChunkManager {
             synchronized (this) {
                 while (this.future == null) {
                     try {
-                        this.wait();
+                        wait();
                     } catch (InterruptedException ignored) {
                     }
                 }
@@ -229,7 +230,7 @@ public final class LanternChunkManager {
             synchronized (this) {
                 while (this.future == null) {
                     try {
-                        this.wait();
+                        wait();
                     } catch (InterruptedException ignored) {
                     }
                 }
@@ -428,7 +429,7 @@ public final class LanternChunkManager {
      * @return the tickets
      */
     public int getTicketsForPlugin(Object plugin) {
-        return this.getTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
+        return getTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
     }
 
     /**
@@ -449,7 +450,7 @@ public final class LanternChunkManager {
      * @return the maximum amount of tickets
      */
     public int getMaxTicketsForPlugin(Object plugin) {
-        return this.getMaxTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
+        return getMaxTicketsForPlugin(checkPlugin(plugin, "plugin").getId());
     }
 
     /**
@@ -469,7 +470,7 @@ public final class LanternChunkManager {
      * @return the maximum amount of forced chunks
      */
     public int getMaxChunksForPluginTicket(Object plugin) {
-        return this.getMaxChunksForPluginTicket(checkPlugin(plugin, "plugin").getId());
+        return getMaxChunksForPluginTicket(checkPlugin(plugin, "plugin").getId());
     }
 
     /**
@@ -490,10 +491,10 @@ public final class LanternChunkManager {
      */
     public Optional<LoadingTicket> createTicket(Object plugin) {
         final String pluginId = checkPlugin(plugin, "plugin").getId();
-        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId)) {
+        if (getTicketsForPlugin(pluginId) >= getMaxTicketsForPlugin(pluginId)) {
             return Optional.empty();
         }
-        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final int maxChunks = getMaxChunksForPluginTicket(pluginId);
         final LanternLoadingTicket ticket = new LanternLoadingTicket(pluginId, this, maxChunks);
         this.tickets.add(ticket);
         return Optional.of(ticket);
@@ -507,10 +508,10 @@ public final class LanternChunkManager {
      */
     public Optional<EntityLoadingTicket> createEntityTicket(Object plugin) {
         final String pluginId = checkPlugin(plugin, "plugin").getId();
-        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId)) {
+        if (getTicketsForPlugin(pluginId) >= getMaxTicketsForPlugin(pluginId)) {
             return Optional.empty();
         }
-        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final int maxChunks = getMaxChunksForPluginTicket(pluginId);
         final LanternEntityLoadingTicket ticket = new LanternEntityLoadingTicket(
                 pluginId, this, maxChunks);
         this.tickets.add(ticket);
@@ -527,11 +528,11 @@ public final class LanternChunkManager {
     public Optional<PlayerLoadingTicket> createPlayerTicket(Object plugin, UUID player) {
         checkNotNull(player, "player");
         final String pluginId = checkPlugin(plugin, "plugin").getId();
-        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId) ||
+        if (getTicketsForPlugin(pluginId) >= getMaxTicketsForPlugin(pluginId) ||
                 this.chunkLoadService.getAvailableTickets(player) <= 0) {
             return Optional.empty();
         }
-        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final int maxChunks = getMaxChunksForPluginTicket(pluginId);
         final LanternPlayerLoadingTicket ticket = new LanternPlayerLoadingTicket(
                 pluginId, this, player, maxChunks);
         this.tickets.add(ticket);
@@ -548,11 +549,11 @@ public final class LanternChunkManager {
     public Optional<PlayerEntityLoadingTicket> createPlayerEntityTicket(Object plugin, UUID player) {
         checkNotNull(player, "player");
         final String pluginId = checkPlugin(plugin, "plugin").getId();
-        if (this.getTicketsForPlugin(pluginId) >= this.getMaxTicketsForPlugin(pluginId) ||
+        if (getTicketsForPlugin(pluginId) >= getMaxTicketsForPlugin(pluginId) ||
                 this.chunkLoadService.getAvailableTickets(player) <= 0) {
             return Optional.empty();
         }
-        final int maxChunks = this.getMaxChunksForPluginTicket(pluginId);
+        final int maxChunks = getMaxChunksForPluginTicket(pluginId);
         final LanternPlayerEntityLoadingTicket ticket = new LanternPlayerEntityLoadingTicket(
                 pluginId, this, player, maxChunks);
         this.tickets.add(ticket);
@@ -565,7 +566,7 @@ public final class LanternChunkManager {
      * @return the loaded chunks
      */
     public ImmutableSet<Chunk> getLoadedChunks() {
-        return ImmutableSet.copyOf(this.loadedChunks.values());
+        return this.loadedChunks.values().stream().filter(Chunk::isLoaded).collect(GuavaCollectors.toImmutableSet());
     }
 
     /**
@@ -577,7 +578,7 @@ public final class LanternChunkManager {
      */
     @Nullable
     public LanternChunk getChunk(Vector2i coords) {
-        return this.getChunk(coords, true);
+        return getChunk(coords, true);
     }
 
     @Nullable
@@ -591,7 +592,7 @@ public final class LanternChunkManager {
 
     @Nullable
     public LanternChunk getChunkIfLoaded(int x, int z) {
-        return this.getChunkIfLoaded(new Vector2i(x, z));
+        return getChunkIfLoaded(new Vector2i(x, z));
     }
 
     @Nullable
@@ -614,7 +615,7 @@ public final class LanternChunkManager {
      */
     @Nullable
     public LanternChunk getChunk(int x, int z) {
-        return this.getChunk(new Vector2i(x, z));
+        return getChunk(new Vector2i(x, z));
     }
 
     /**
@@ -626,7 +627,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrLoadChunk(int x, int z) {
-        return this.getOrCreateChunk(x, z, false);
+        return getOrCreateChunk(x, z, false);
     }
 
     /**
@@ -640,7 +641,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrCreateChunk(int x, int z, boolean generate) {
-        return this.getOrCreateChunk(x, z, () -> Cause.source(this.world).build(), generate);
+        return getOrCreateChunk(x, z, () -> Cause.source(this.world).build(), generate);
     }
 
     /**
@@ -652,7 +653,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrCreateChunk(int x, int z, Supplier<Cause> cause, boolean generate) {
-        return this.getOrCreateChunk(new Vector2i(x, z), cause, generate);
+        return getOrCreateChunk(new Vector2i(x, z), cause, generate);
     }
 
     /**
@@ -665,7 +666,7 @@ public final class LanternChunkManager {
      * @return the chunk
      */
     public LanternChunk getOrCreateChunk(Vector2i coords, Supplier<Cause> cause, boolean generate) {
-        return this.getOrCreateChunk(coords, cause, generate, true);
+        return getOrCreateChunk(coords, cause, generate, true);
     }
 
     /**
@@ -782,50 +783,50 @@ public final class LanternChunkManager {
         final Random random = populationData.random;
         // TODO: Populating must be done in the sync thread???
         for (Vector2i side : sides) {
-            this.lockInternally(side, populationData.lockTicket);
+            lockInternally(side, populationData.lockTicket);
         }
-        LanternChunk up = this.isChunkLoaded(sides[UP]);
-        LanternChunk right = this.isChunkLoaded(sides[RIGHT]);
-        LanternChunk rightUp = this.isChunkLoaded(sides[RIGHT_UP]);
+        LanternChunk up = isChunkLoaded(sides[UP]);
+        LanternChunk right = isChunkLoaded(sides[RIGHT]);
+        LanternChunk rightUp = isChunkLoaded(sides[RIGHT_UP]);
         if (up != null && right != null && rightUp != null) {
             if (!chunk.populating && !chunk.populated) {
-                this.populateChunk(chunk, cause, random);
+                populateChunk(chunk, cause, random);
             }
         }
-        LanternChunk left = this.isChunkLoaded(sides[LEFT]);
-        LanternChunk leftDown = this.isChunkLoaded(sides[LEFT_DOWN]);
-        LanternChunk down = this.isChunkLoaded(sides[DOWN]);
+        LanternChunk left = isChunkLoaded(sides[LEFT]);
+        LanternChunk leftDown = isChunkLoaded(sides[LEFT_DOWN]);
+        LanternChunk down = isChunkLoaded(sides[DOWN]);
         if (leftDown != null && left != null && down != null) {
             if (!leftDown.populating && !leftDown.populated) {
-                this.populateChunk(leftDown, cause, random);
+                populateChunk(leftDown, cause, random);
             }
         }
         if (up == null) { // Maybe it is loaded by now?
-            up = this.isChunkLoaded(sides[UP]);
+            up = isChunkLoaded(sides[UP]);
         }
         if (left == null) { // Maybe it is loaded by now?
-            left = this.isChunkLoaded(sides[LEFT]);
+            left = isChunkLoaded(sides[LEFT]);
         }
-        LanternChunk leftUp = this.isChunkLoaded(sides[LEFT_UP]);
+        LanternChunk leftUp = isChunkLoaded(sides[LEFT_UP]);
         if (left != null && leftUp != null && up != null) {
             if (!left.populating && !left.populated) {
-                this.populateChunk(left, cause, random);
+                populateChunk(left, cause, random);
             }
         }
         if (right == null) { // Maybe it is loaded by now?
-            right = this.isChunkLoaded(sides[RIGHT]);
+            right = isChunkLoaded(sides[RIGHT]);
         }
         if (down == null) { // Maybe it is loaded by now?
-            down = this.isChunkLoaded(sides[DOWN]);
+            down = isChunkLoaded(sides[DOWN]);
         }
-        LanternChunk rightDown = this.isChunkLoaded(sides[RIGHT_DOWN]);
+        LanternChunk rightDown = isChunkLoaded(sides[RIGHT_DOWN]);
         if (down != null && rightDown != null && right != null) {
             if (!down.populating && !down.populated) {
-                this.populateChunk(down, cause, random);
+                populateChunk(down, cause, random);
             }
         }
         for (Vector2i side : sides) {
-            this.unlockInternally(side, populationData.lockTicket);
+            unlockInternally(side, populationData.lockTicket);
         }
     }
 
@@ -972,7 +973,7 @@ public final class LanternChunkManager {
                 return success = false;
             }
             // Try to populate the chunk
-            this.tryPopulateSurroundingChunks(chunk, cause0);
+            tryPopulateSurroundingChunks(chunk, cause0);
             this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause0, chunk));
             this.world.getEventListener().onLoadChunk(chunk);
             return true;
@@ -1060,7 +1061,7 @@ public final class LanternChunkManager {
             super(Vector3i.ZERO, CHUNK_BIOME_VOLUME);
             this.biomeTypes = new BiomeType[CHUNK_AREA];
             Arrays.fill(this.biomeTypes, BiomeTypes.OCEAN);
-            this.detach();
+            detach();
         }
 
         @Override
@@ -1173,7 +1174,7 @@ public final class LanternChunkManager {
         chunk.lock.lock();
         try {
             chunk.lockState = LanternChunk.LockState.SAVING;
-            return this.save0(chunk);
+            return save0(chunk);
         } finally {
             chunk.lockState = LanternChunk.LockState.NONE;
             chunk.lockCondition.signalAll();
@@ -1200,7 +1201,7 @@ public final class LanternChunkManager {
      * @return true if it was successful
      */
     public boolean unload(int x, int z, Supplier<Cause> cause) {
-        return this.unload(new Vector2i(x, z), cause);
+        return unload(new Vector2i(x, z), cause);
     }
 
     /**
@@ -1211,14 +1212,14 @@ public final class LanternChunkManager {
      * @return true if it was successful
      */
     public boolean unload(Vector2i coords, Supplier<Cause> cause) {
-        return this.unload0(coords, cause, true);
+        return unload0(coords, cause, true);
     }
 
     private boolean unload0(Vector2i coords, Supplier<Cause> cause, boolean wait) {
         checkNotNull(cause, "cause");
         final LanternChunk chunk = this.getChunk(checkNotNull(coords, "coords"));
         if (chunk != null) {
-            return this.unload0(chunk, cause, wait);
+            return unload0(chunk, cause, wait);
         }
         return true;
     }
@@ -1233,7 +1234,7 @@ public final class LanternChunkManager {
     public boolean unload(LanternChunk chunk, Supplier<Cause> cause) {
         checkNotNull(chunk, "chunk");
         checkNotNull(cause, "cause");
-        return this.unload0(chunk, cause, true);
+        return unload0(chunk, cause, true);
     }
 
     private boolean unload0(LanternChunk chunk, Supplier<Cause> cause, boolean wait) {
@@ -1278,7 +1279,7 @@ public final class LanternChunkManager {
             this.reusableChunks.put(coords, chunk);
             // Bury the entities
             chunk.buryEntities();
-            this.save0(chunk);
+            save0(chunk);
             return true;
         } finally {
             chunk.lockState = LanternChunk.LockState.NONE;
@@ -1337,7 +1338,7 @@ public final class LanternChunkManager {
         final LanternChunk chunk = this.getChunk(coords, false);
         // The chunk at this coords is already loaded,
         // wa can call the event directly
-        this.lockInternally(coords, ticket);
+        lockInternally(coords, ticket);
         // Remove from unload through loadChunk
         this.pendingForUnload.removeIf(e -> e.coords.equals(coords));
         // Whether the chunk should be queued for loading
@@ -1354,7 +1355,7 @@ public final class LanternChunkManager {
             LanternChunkQueueTask task = this.chunkQueueTasks.get(coords);
             if (task == null || !(task.runnable instanceof LanternChunkLoadTask)) {
                 this.chunkQueueTasks.computeIfAbsent(coords, coords1 ->
-                        this.queueTask(coords1, new LanternChunkLoadTask(coords1)));
+                        queueTask(coords1, new LanternChunkLoadTask(coords1)));
             }
         }
         if  (callEvents) {
@@ -1371,8 +1372,8 @@ public final class LanternChunkManager {
      * @param coords the coordinates
      */
     void unforce(LanternLoadingTicket ticket, Vector2i coords, boolean callEvents) {
-        if (this.unlockInternally(coords, ticket)) {
-            final LanternChunk chunk = this.getChunk(coords, false);
+        if (unlockInternally(coords, ticket)) {
+            final LanternChunk chunk = getChunk(coords, false);
             // Try to cancel any queued chunk loadings
             if (chunk != null && chunk.lock.isLocked() && chunk.lockState == LanternChunk.LockState.LOADING) {
                 final LanternChunkQueueTask task = this.chunkQueueTasks.get(coords);
@@ -1415,7 +1416,7 @@ public final class LanternChunkManager {
         }
         for (Entry<Vector2i, LanternChunk> entry : this.loadedChunks.entrySet()) {
             // Save the chunk
-            this.save(entry.getValue());
+            save(entry.getValue());
         }
     }
 
@@ -1435,7 +1436,7 @@ public final class LanternChunkManager {
             this.game.getEventManager().post(SpongeEventFactory.createUnloadChunkEvent(
                     Cause.source(this.game.getMinecraftPlugin()).owner(this.world).build(), chunk));
             // Save the chunk
-            this.save(chunk);
+            save(chunk);
         }
         // Cleanup
         this.loadedChunks.clear();
@@ -1453,7 +1454,7 @@ public final class LanternChunkManager {
             this.pendingForUnload.poll();
             if (!this.ticketsByPos.containsKey(entry.coords)) {
                 // TODO: Create unload tasks
-                this.unload(entry.coords, () -> Cause.source(this.world).build());
+                unload(entry.coords, () -> Cause.source(this.world).build());
             }
         }
     }
@@ -1467,7 +1468,7 @@ public final class LanternChunkManager {
                 final LanternEntityLoadingTicket ticket0 = (LanternEntityLoadingTicket) ticket;
                 final EntityReference ref = ticket0.getEntityReference().orElse(null);
                 if (ref != null) {
-                    final LanternChunk chunk = this.getOrCreateChunk(ref.getChunkCoords(),
+                    final LanternChunk chunk = getOrCreateChunk(ref.getChunkCoords(),
                             () -> Cause.source(ticket0).owner(this.world).build(), true, true);
                     final Entity entity = chunk.getEntity(ref.getUniqueId()).orElse(null);
                     if (entity != null) {

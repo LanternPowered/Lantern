@@ -299,7 +299,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public void setWorld(@Nullable LanternWorld world) {
-        LanternWorld oldWorld = this.getWorld();
+        LanternWorld oldWorld = getWorld();
         if (oldWorld != world) {
             this.interactionHandler.reset();
         }
@@ -338,10 +338,10 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(LanternGame.IMPL_NAME));
                 // Send the player list
-                List<LanternTabListEntry> tabListEntries = new ArrayList<>();
-                LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);
+                final List<LanternTabListEntry> tabListEntries = new ArrayList<>();
+                final LanternTabListEntryBuilder thisBuilder = createTabListEntryBuilder(this);
                 for (Player player : Sponge.getServer().getOnlinePlayers()) {
-                    LanternTabListEntryBuilder builder = player == this ? thisBuilder : createTabListEntryBuilder((LanternPlayer) player);
+                    final LanternTabListEntryBuilder builder = player == this ? thisBuilder : createTabListEntryBuilder((LanternPlayer) player);
                     tabListEntries.add(builder.list(this.tabList).build());
                     if (player != this) {
                         player.getTabList().addEntry(thisBuilder.list(player.getTabList()).build());
@@ -369,15 +369,15 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             // Add the player to the world
             world.addPlayer(this);
             // Send the first chunks
-            this.pulseChunkChanges();
-            final Vector3d position = this.getPosition();
-            final Vector3d rotation = this.getRotation();
+            pulseChunkChanges();
+            final Vector3d position = getPosition();
+            final Vector3d rotation = getRotation();
             this.session.send(world.getProperties().createWorldBorderMessage());
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(),
                     (float) rotation.getY(), (float) rotation.getX(), Collections.emptySet(), 0));
-            this.setScoreboard(world.getScoreboard());
+            setScoreboard(world.getScoreboard());
             this.inventoryContainer.openInventoryForAndInitialize(this);
             this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
         } else {

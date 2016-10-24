@@ -40,6 +40,7 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 
 import java.util.Collection;
@@ -88,7 +89,10 @@ public class LanternItem extends LanternEntity implements Item {
         }
         ItemStack itemStack = get(Keys.REPRESENTED_ITEM).get().createStack();
         for (Entity entity : entities) {
-            final Inventory inventory = ((Carrier) entity).getInventory();
+            Inventory inventory = ((Carrier) entity).getInventory();
+            if (inventory instanceof PlayerInventory) {
+                inventory = ((PlayerInventory) inventory).getMain();
+            }
             final InventoryTransactionResult result = inventory.offer(itemStack);
             final Collection<ItemStackSnapshot> rejected = result.getRejectedItems();
             final int added;
@@ -130,10 +134,10 @@ public class LanternItem extends LanternEntity implements Item {
                     if (itemStackSnapshot1.getCount() < itemStackSnapshot2.getCount()) {
                         continue;
                     }
+                    final int max = itemStackSnapshot1.getType().getMaxStackQuantity();
                     int quantity = itemStackSnapshot1.getCount() + itemStackSnapshot2.getCount();
-                    if (quantity > itemStackSnapshot1.getType().getMaxStackQuantity()) {
+                    if (quantity > max) {
                         final ItemStack itemStack2 = itemStackSnapshot2.createStack();
-                        final int max = itemStackSnapshot1.getType().getMaxStackQuantity();
                         itemStack2.setQuantity(quantity - max);
                         entity.offer(Keys.REPRESENTED_ITEM, itemStack2.createSnapshot());
                         quantity = max;
@@ -144,7 +148,7 @@ public class LanternItem extends LanternEntity implements Item {
                         itemStack = itemStackSnapshot1.createStack();
                     }
                     itemStack.setQuantity(quantity);
-                    if (quantity > itemStackSnapshot1.getType().getMaxStackQuantity()) {
+                    if (quantity >= max) {
                         break;
                     }
                 }

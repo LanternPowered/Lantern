@@ -121,7 +121,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     private boolean onGround;
 
-    @Nullable private Vector3i lastChunkCoords;
+    @Nullable private volatile Vector3i lastChunkCoords;
 
     /**
      * The base of the {@link AABB} of this entity.
@@ -164,7 +164,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     public void registerKeys() {
         registerKey(Keys.DISPLAY_NAME, null);
         registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
-        registerKey(Keys.VELOCITY, Vector3d.ZERO);
+        registerKey(Keys.VELOCITY, Vector3d.ZERO).nonRemovableAttachedValueProcessor();
         registerKey(Keys.FIRE_TICKS, 0).nonRemovableAttachedValueProcessor();
         registerKey(Keys.FALL_DISTANCE, 0f).nonRemovableAttachedValueProcessor();
         registerKey(LanternKeys.INVULNERABLE, false).nonRemovableAttachedValueProcessor();

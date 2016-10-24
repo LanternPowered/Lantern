@@ -370,6 +370,14 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     public void removePlayer(LanternPlayer player) {
         this.players.remove(player);
+        this.entitiesByUniqueId.remove(player.getUniqueId());
+        final Vector3i lastChunkSection = player.getLastChunkSectionCoords();
+        LanternChunk chunk;
+        if (lastChunkSection != null && (chunk = this.chunkManager.getChunkIfLoaded(
+                lastChunkSection.getX(), lastChunkSection.getZ())) != null) {
+            chunk.removeEntity(player, lastChunkSection.getY());
+        }
+        this.entityProtocolManager.remove(player);
     }
 
     /**
@@ -383,12 +391,12 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public Location<World> getLocation(Vector3i position) {
-        return this.getLocation(position.getX(), position.getY(), position.getZ());
+        return getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
     public Location<World> getLocation(Vector3d position) {
-        return this.getLocation(position.getX(), position.getY(), position.getZ());
+        return getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     public int getHighestBlockAt(int x, int z) {
@@ -422,16 +430,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         return false;
     }
 
-    private void checkVolumeBounds(int x, int y, int z) {
-        if (!containsBlock(x, y, z)) {
-            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), BLOCK_MIN, BLOCK_MAX);
-        }
-    }
-
     @Override
     public Extent getExtentView(Vector3i newMin, Vector3i newMax) {
-        this.checkVolumeBounds(newMin.getX(), newMin.getY(), newMin.getZ());
-        this.checkVolumeBounds(newMax.getX(), newMax.getY(), newMax.getZ());
+        checkVolumeBounds(newMin);
+        checkVolumeBounds(newMax);
         return new ExtentViewDownsize(this, newMin, newMax);
     }
 
@@ -579,7 +581,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     public boolean spawnEntities(Iterable<? extends Entity> entities, Cause cause) {
         boolean spawned = true;
         for (Entity entity : entities) {
-            spawned &= this.spawnEntity(entity, cause);
+            spawned &= spawnEntity(entity, cause);
         }
         return spawned;
     }
@@ -1078,7 +1080,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         }
         final LanternEntity entity2 = (LanternEntity) entity;
         final Vector3i position = entity2.getPosition().toInt();
-        final Vector3i chunkPos = new Vector3i(position.getX() >> 4, position.getY() >> 4, position.getZ() >> 4);
+        final Vector3i chunkPos = new Vector3i(position.getX() >> 4, fixEntityYSection(position.getY() >> 4), position.getZ() >> 4);
         final LanternChunk chunk = (LanternChunk) loadChunk(chunkPos.getX(), 0, chunkPos.getZ(), true).get();
         chunk.addEntity(entity2, chunkPos.getY());
         return true;
@@ -1124,13 +1126,14 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
                 final Vector3i lastChunkSection = entity.getLastChunkSectionCoords();
                 entity.pulse();
                 final Vector3i pos = entity.getPosition().toInt();
-                final Vector3i newChunk = new Vector3i(pos.getX() >> 4, pos.getY() >> 4, pos.getZ() >> 4);
+                final Vector3i newChunk = new Vector3i(pos.getX() >> 4, fixEntityYSection(pos.getY() >> 4), pos.getZ() >> 4);
                 if (lastChunkSection == null || !lastChunkSection.equals(newChunk)) {
                     LanternChunk chunk;
-                    if (lastChunkSection != null && (chunk = this.chunkManager.getChunkIfLoaded(newChunk.getX(), newChunk.getZ())) != null) {
+                    if (lastChunkSection != null && (chunk = this.chunkManager.getChunkIfLoaded(
+                            lastChunkSection.getX(), lastChunkSection.getZ())) != null) {
                         chunk.removeEntity(entity, lastChunkSection.getY());
                     }
-                    chunk = this.chunkManager.getOrLoadChunk(newChunk.getX(), newChunk.getY());
+                    chunk = this.chunkManager.getOrLoadChunk(newChunk.getX(), newChunk.getZ());
                     chunk.addEntity(entity, newChunk.getY());
                     entity.setLastChunkCoords(newChunk);
                 }
@@ -1233,10 +1236,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         }
 
         // Pulse the entities
-        this.pulseEntities();
+        pulseEntities();
 
         // Pulse the tile entities
-        this.getLoadedChunks().forEach(chunk -> ((LanternChunk) chunk).pulse());
+        getLoadedChunks().forEach(chunk -> ((LanternChunk) chunk).pulse());
 
         // TODO: Maybe async?
         this.observedChunkManager.pulse();

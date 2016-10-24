@@ -782,7 +782,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @return the biome value
      */
     public short getBiomeId(int x, int y, int z) {
-        this.checkBiomeBounds(x, y, z);
+        checkBiomeBounds(x, y, z);
         if (!this.loaded) {
             return 0;
         }
@@ -808,7 +808,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @param biome the biome value
      */
     public void setBiomeId(int x, int y, int z, short biome) {
-        this.checkBiomeBounds(x, y, z);
+        checkBiomeBounds(x, y, z);
         if (!this.loaded) {
             return;
         }
@@ -822,7 +822,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     public short getType(Vector3i coordinates) {
-        return this.getType(coordinates.getX(), coordinates.getY(), coordinates.getZ());
+        return getType(coordinates.getX(), coordinates.getY(), coordinates.getZ());
     }
 
     /**
@@ -834,7 +834,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @return the block type
      */
     public short getType(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return 0;
         }
@@ -848,7 +848,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockState block, Cause cause) {
-        return this.setBlock(x, y, z, block, BlockChangeFlag.ALL, cause);
+        return setBlock(x, y, z, block, BlockChangeFlag.ALL, cause);
     }
 
     @Override
@@ -856,7 +856,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
         checkNotNull(block, "block");
         checkNotNull(flag, "flag");
         checkNotNull(cause, "cause");
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return false;
         }
@@ -969,7 +969,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     public void addBlockAction(int x, int y, int z, BlockType blockType, BlockAction blockAction) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return;
         }
@@ -987,7 +987,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @return the block light value
      */
     public byte getBlockLight(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return 0;
         }
@@ -1004,7 +1004,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
      * @return the sky light value
      */
     public byte getSkyLight(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return 15;
         }
@@ -1014,19 +1014,19 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Location<Chunk> getLocation(Vector3i position) {
-        return this.getLocation(position.getX(), position.getY(), position.getZ());
+        return getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
     public Location<Chunk> getLocation(Vector3d position) {
-        return this.getLocation(position.getX(), position.getY(), position.getZ());
+        return getLocation(position.getX(), position.getY(), position.getZ());
     }
 
     @Override
     public BlockSnapshot createSnapshot(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
-        return new LanternBlockSnapshot(new Location<>(this.world, x, y, z), this.getBlock(x, y, z),
-                this.getNotifier(x, y, z), this.getCreator(x, y, z));
+        checkVolumeBounds(x, y, z);
+        return new LanternBlockSnapshot(new Location<>(this.world, x, y, z), getBlock(x, y, z),
+                getNotifier(x, y, z), getCreator(x, y, z));
     }
 
     @Override
@@ -1067,7 +1067,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Collection<ScheduledBlockUpdate> getScheduledUpdates(int x, int y, int z) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         if (!this.loaded) {
             return Collections.emptyList();
         }
@@ -1079,7 +1079,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public ScheduledBlockUpdate addScheduledUpdate(int x, int y, int z, int priority, int ticks) {
-        this.checkVolumeBounds(x, y, z);
+        checkVolumeBounds(x, y, z);
         final int entryId = this.scheduledBlockUpdateCounter.getAndIncrement();
         final Location<World> location = new Location<>(this.world, new Vector3i(x, y, z));
         final LanternScheduledBlockUpdate update = new LanternScheduledBlockUpdate(entryId, location, ticks, priority);
@@ -1373,7 +1373,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public Optional<Entity> createEntity(DataContainer entityContainer, Vector3d position) {
         checkNotNull(position, "position");
         checkVolumeBounds(position.getFloorX(), position.getFloorY(), position.getFloorZ());
-        final Optional<Entity> optEntity = this.createEntity(entityContainer);
+        final Optional<Entity> optEntity = createEntity(entityContainer);
         if (optEntity.isPresent()) {
             ((LanternEntity) optEntity.get()).setPosition(position);
         }
@@ -1429,22 +1429,6 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!VecHelper.inBounds(x, z, this.areaMin, this.areaMax)) {
             throw new PositionOutOfBoundsException(new Vector2i(x, z), this.areaMin, this.areaMax);
         }
-    }
-
-    private void checkBiomeBounds(int x, int y, int z) {
-        if (!containsBiome(x, y, z)) {
-            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.biomeMin, this.biomeMax);
-        }
-    }
-
-    private void checkVolumeBounds(int x, int y, int z) {
-        if (!containsBlock(x, y, z)) {
-            throw new PositionOutOfBoundsException(new Vector3i(x, y, z), this.min, this.max);
-        }
-    }
-
-    private void checkVolumeBounds(Vector3i position) {
-        checkVolumeBounds(position.getX(), position.getY(), position.getZ());
     }
 
     @Override

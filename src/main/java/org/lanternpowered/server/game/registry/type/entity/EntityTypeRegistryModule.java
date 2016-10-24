@@ -33,6 +33,7 @@ import org.lanternpowered.server.entity.LanternItem;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.weather.LanternLightning;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.network.entity.EntityProtocolTypeRegistryModule;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -43,7 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@RegistrationDependency({ EntityProtocolTypeRegistryModule.class })
+@RegistrationDependency({ EntityProtocolTypeRegistryModule.class, KeyRegistryModule.class })
 public final class EntityTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<EntityType> {
 
     private static final EntityTypeRegistryModule INSTANCE = new EntityTypeRegistryModule();

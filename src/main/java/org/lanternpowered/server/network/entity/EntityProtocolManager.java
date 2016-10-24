@@ -102,7 +102,7 @@ public final class EntityProtocolManager {
         public int acquire() {
             final long stamp = allocatorLock.writeLock();
             try {
-                return this.acquire0();
+                return acquire0();
             } finally {
                 allocatorLock.unlockWrite(stamp);
             }
@@ -110,7 +110,7 @@ public final class EntityProtocolManager {
 
         @Override
         public int[] acquire(int count) {
-            return this.acquire(new int[count]);
+            return acquire(new int[count]);
         }
 
         @Override
@@ -119,7 +119,7 @@ public final class EntityProtocolManager {
             final long stamp = allocatorLock.writeLock();
             try {
                 for (int i = 0; i < array.length; i++) {
-                    array[i] = this.acquire0();
+                    array[i] = acquire0();
                 }
             } finally {
                 allocatorLock.unlockWrite(stamp);
@@ -129,7 +129,7 @@ public final class EntityProtocolManager {
 
         @Override
         public int[] acquireRow(int count) {
-            return this.acquireRow(new int[count]);
+            return acquireRow(new int[count]);
         }
 
         @Override

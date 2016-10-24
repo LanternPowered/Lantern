@@ -833,7 +833,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // Check whether the player is banned and kick if necessary
         Optional<BanEntry> optBanEntry = banConfig.getEntryByProfile(gameProfile);
         if (!optBanEntry.isPresent()) {
-            final SocketAddress address = this.getChannel().remoteAddress();
+            final SocketAddress address = getChannel().remoteAddress();
             if (address instanceof InetSocketAddress) {
                 optBanEntry = banConfig.getEntryByIp(((InetSocketAddress) address).getAddress());
             }

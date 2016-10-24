@@ -353,7 +353,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
 
         @Override
         public boolean test(ItemStack itemStack) {
-            return ((LanternItemStack) this.itemStack).isEqualToOther(itemStack);
+            return ((LanternItemStack) this.itemStack).isSimilar(itemStack);
         }
     }
 

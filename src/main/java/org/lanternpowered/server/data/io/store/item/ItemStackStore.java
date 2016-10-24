@@ -25,23 +25,33 @@
  */
 package org.lanternpowered.server.data.io.store.item;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.t;
+
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TranslatableText;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
 
@@ -49,6 +59,12 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     public static final DataQuery QUANTITY = DataQuery.of("Count");
     public static final DataQuery DATA = DataQuery.of("Damage");
     public static final DataQuery TAG = DataQuery.of("tag");
+
+    private static final DataQuery DISPLAY = DataQuery.of("display");
+    private static final DataQuery NAME = DataQuery.of("Name");
+    private static final DataQuery LOCALIZED_NAME = DataQuery.of("LocName");
+    private static final DataQuery LORE = DataQuery.of("Lore");
+    private static final DataQuery UNBREAKABLE = DataQuery.of("Unbreakable");
 
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
@@ -120,6 +136,34 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         if (serializer != null) {
             serializer.serializeValues(object, valueContainer, dataView);
         }
+        DataView displayView = null;
+        final Optional<Text> optDisplayName = valueContainer.get(Keys.DISPLAY_NAME);
+        if (optDisplayName.isPresent()) {
+            displayView = dataView.createView(DISPLAY);
+            final Text displayName = optDisplayName.get();
+            if (displayName instanceof TranslatableText) {
+                final TranslatableText name1 = (TranslatableText) displayName;
+                // We can only do this for translatable text without any formatting
+                if (name1.getArguments().isEmpty() && name1.getChildren().isEmpty() &&
+                        name1.getStyle().isEmpty() && name1.getColor() == TextColors.NONE) {
+                    displayView.set(LOCALIZED_NAME, name1.getTranslation().getId());
+                } else {
+                    displayView.set(NAME, LanternTexts.toLegacy(displayName));
+                }
+            } else {
+                displayView.set(NAME, LanternTexts.toLegacy(displayName));
+            }
+        }
+        final Optional<List<Text>> optLore = valueContainer.get(Keys.ITEM_LORE);
+        if (optLore.isPresent()) {
+            if (displayView == null) {
+                displayView = dataView.createView(DISPLAY);
+            }
+            displayView.set(LORE, optLore.get().stream().map(LanternTexts::toLegacy).collect(Collectors.toList()));
+        }
+        if (valueContainer.get(Keys.UNBREAKABLE).orElse(false)) {
+            dataView.set(UNBREAKABLE, (byte) 1);
+        }
         super.serializeValues(object, valueContainer, dataView);
     }
 
@@ -128,6 +172,20 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         final ItemTypeObjectSerializer serializer = this.itemTypeSerializers.get(object.getItem());
         if (serializer != null) {
             serializer.deserializeValues(object, valueContainer, dataView);
+        }
+        final Optional<DataView> optDisplayView = dataView.getView(DISPLAY);
+        if (optDisplayView.isPresent()) {
+            final DataView displayView = optDisplayView.get();
+            if (!valueContainer.get(Keys.DISPLAY_NAME).isPresent()) {
+                Optional<String> name = displayView.getString(NAME);
+                if (name.isPresent()) {
+                    valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(name.get()));
+                } else if ((name = displayView.getString(LOCALIZED_NAME)).isPresent()) {
+                    valueContainer.set(Keys.DISPLAY_NAME, t(name.get()));
+                }
+            }
+            dataView.getStringList(LORE).ifPresent(lore -> valueContainer.set(Keys.ITEM_LORE,
+                    lore.stream().map(LanternTexts::fromLegacy).collect(Collectors.toList())));
         }
         super.deserializeValues(object, valueContainer, dataView);
     }

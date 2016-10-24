@@ -48,11 +48,11 @@ public class BookItemTypeObjectSerializer extends ItemTypeObjectSerializer {
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        valueContainer.get(Keys.BOOK_AUTHOR).ifPresent(text ->
+        valueContainer.remove(Keys.BOOK_AUTHOR).ifPresent(text ->
                 dataView.set(AUTHOR, LanternTexts.toLegacy(text)));
-        valueContainer.get(Keys.BOOK_PAGES).ifPresent(lines ->
+        valueContainer.remove(Keys.BOOK_PAGES).ifPresent(lines ->
                 dataView.set(PAGES, lines.stream().map(TextSerializers.JSON::serialize).collect(Collectors.toList())));
-        valueContainer.get(Keys.DISPLAY_NAME).ifPresent(text ->
+        valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(text ->
                 dataView.set(TITLE, LanternTexts.toLegacy(text)));
     }
 

@@ -351,7 +351,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         if (LanternItemStack.toNullable(stack) == null) {
             return new FastOfferResult(stack, false);
         }
-        if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isEqualToOther(stack)
+        if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isSimilar(stack)
                 || this.itemStack.getQuantity() >= this.maxStackSize) || !this.isValidItem(stack)) {
             return new FastOfferResult(stack, false);
         }
@@ -386,7 +386,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         if (LanternItemStack.toNullable(stack) == null) {
             return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
         }
-        if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isEqualToOther(stack)
+        if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isSimilar(stack)
                 || this.itemStack.getQuantity() >= this.maxStackSize) || !this.isValidItem(stack)) {
             return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
         }
@@ -488,7 +488,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     @Override
     public boolean contains(ItemStack stack) {
         checkNotNull(stack, "stack");
-        return this.itemStack != null && ((LanternItemStack) this.itemStack).isEqualToOther(stack);
+        return this.itemStack != null && ((LanternItemStack) this.itemStack).isSimilar(stack);
     }
 
     @Override

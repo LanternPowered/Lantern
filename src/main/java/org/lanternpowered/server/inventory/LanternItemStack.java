@@ -27,15 +27,18 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.inventory.LanternItemStackSnapshot.compareRawDataMaps;
 
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -69,7 +72,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     public LanternItemStack(ItemType itemType, int quantity) {
         this(itemType, quantity, new HashMap<>());
-        ((LanternItemType) itemType).registerKeysFor(this);
+        registerKeys();
     }
 
     LanternItemStack(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap) {
@@ -78,6 +81,13 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
         this.rawValueMap = rawValueMap;
         this.quantity = quantity;
         this.itemType = itemType;
+    }
+
+    @Override
+    public void registerKeys() {
+        ((LanternItemType) this.itemType).registerKeysFor(this);
+        registerKey(Keys.DISPLAY_NAME, null);
+        registerKey(Keys.ITEM_LORE, null);
     }
 
     @Override
@@ -160,13 +170,9 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
      * @param that The other item stack
      * @return Whether the item stacks are equal
      */
-    public boolean isEqualToOther(ItemStack that) {
+    public boolean isSimilar(ItemStack that) {
         checkNotNull(that, "that");
-        if (!that.getItem().equals(this.itemType)) {
-            return false;
-        }
-        // TODO: Match data
-        return true;
+        return this.itemType == that.getItem() && compareRawDataMaps(this, (AbstractValueContainer) that);
     }
 
     @Nullable

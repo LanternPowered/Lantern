@@ -387,7 +387,7 @@ public class PlayerContainerSession {
                         if (optSlot.isPresent()) {
                             final LanternSlot slot = optSlot.get();
                             if (!(slot instanceof OutputSlot) && slot.isValidItem(this.cursorItem) && (slot.getRawItemStack() == null ||
-                                    ((LanternItemStack) this.cursorItem).isEqualToOther(slot.getRawItemStack())) && !this.dragSlots.contains(slot)) {
+                                    ((LanternItemStack) this.cursorItem).isSimilar(slot.getRawItemStack())) && !this.dragSlots.contains(slot)) {
                                 this.dragSlots.add(slot);
                             }
                         }
@@ -588,7 +588,7 @@ public class PlayerContainerSession {
                         // Try first to get enough unfinished stacks
                         PeekPollTransactionsResult peekResult = inventory.peekPollTransactions(maxQuantity - quantity, stack ->
                                 stack.getQuantity() < stack.getMaxStackQuantity() &&
-                                        ((LanternItemStack) cursorItem).isEqualToOther(stack)).orElse(null);
+                                        ((LanternItemStack) cursorItem).isSimilar(stack)).orElse(null);
                         if (peekResult != null) {
                             quantity += peekResult.getPeekedItem().getQuantity();
                             transactions.addAll(peekResult.getTransactions());
@@ -597,7 +597,7 @@ public class PlayerContainerSession {
                         if (quantity <= maxQuantity) {
                             peekResult = this.openContainer.peekPollTransactions(maxQuantity - quantity, stack ->
                                     stack.getQuantity() >= stack.getMaxStackQuantity() &&
-                                            ((LanternItemStack) cursorItem).isEqualToOther(stack)).orElse(null);
+                                            ((LanternItemStack) cursorItem).isSimilar(stack)).orElse(null);
                             if (peekResult != null) {
                                 quantity += peekResult.getPeekedItem().getQuantity();
                                 transactions.addAll(peekResult.getTransactions());

@@ -43,6 +43,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
 
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
+        setTickRate(1);
     }
 
     @Override

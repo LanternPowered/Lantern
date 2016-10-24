@@ -25,8 +25,11 @@
  */
 package org.lanternpowered.server.inventory;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.data.AbstractImmutableDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
+import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.item.LanternItemType;
@@ -175,28 +178,32 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
         return null;
     }
 
-    public boolean isSimilar(ItemStackSnapshot itemStackSnapshot) {
-        if (this.itemType != itemStackSnapshot.getType()) {
-            return false;
-        }
-        final Map<Key<?>, KeyRegistration> rawValueMap = ((LanternItemStackSnapshot) itemStackSnapshot).rawValueMap;
-        for (Map.Entry<Key<?>, KeyRegistration> entry : rawValueMap.entrySet()) {
-            if (!this.rawValueMap.containsKey(entry.getKey())) {
+    public boolean isSimilar(ItemStackSnapshot that) {
+        checkNotNull(that, "that");
+        return this.itemType == that.getType() && compareRawDataMaps(this, (AbstractValueContainer) that);
+    }
+
+    @SuppressWarnings("unchecked")
+    static boolean compareRawDataMaps(AbstractValueContainer container1, AbstractValueContainer container2) {
+        final Map<Key<?>, KeyRegistration> rawValueMap1 = container1.getRawValueMap();
+        final Map<Key<?>, KeyRegistration> rawValueMap2 = container2.getRawValueMap();
+        for (Map.Entry<Key<?>, KeyRegistration> entry : rawValueMap1.entrySet()) {
+            if (!rawValueMap2.containsKey(entry.getKey())) {
                 return false;
             }
             final Object value1;
             final KeyRegistration keyRegistration1 = entry.getValue();
             if (!(keyRegistration1 instanceof ElementHolder)) {
                 //noinspection unchecked
-                value1 = itemStackSnapshot.get((Key) entry.getKey());
+                value1 = container1.get((Key) entry.getKey());
             } else {
                 value1 = ((ElementHolder) keyRegistration1).get();
             }
             final Object value2;
-            final KeyRegistration keyRegistration2 = this.rawValueMap.get(entry.getKey());
+            final KeyRegistration keyRegistration2 = rawValueMap2.get(entry.getKey());
             if (!(keyRegistration2 instanceof ElementHolder)) {
                 //noinspection unchecked
-                value2 = itemStackSnapshot.get((Key) entry.getKey());
+                value2 = container2.get((Key) entry.getKey());
             } else {
                 value2 = ((ElementHolder) keyRegistration2).get();
             }

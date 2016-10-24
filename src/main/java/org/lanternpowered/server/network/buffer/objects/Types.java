@@ -179,7 +179,6 @@ public final class Types {
 
         @Override
         public ItemStack read(ByteBuffer buf) throws CodecException {
-            // TODO: Properly deserialize the item stack data back
             RawItemStack rawItemStack = buf.read(Types.RAW_ITEM_STACK);
             //noinspection ConstantConditions
             if (rawItemStack == null) {
@@ -189,7 +188,16 @@ public final class Types {
             if (itemType == null) {
                 return null;
             }
-            return new LanternItemStack(itemType, rawItemStack.getAmount());
+            final LanternItemStack itemStack = new LanternItemStack(itemType, rawItemStack.getAmount());
+            final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            dataView.set(ItemStackStore.DATA, rawItemStack.getData());
+            dataView.set(ItemStackStore.QUANTITY, rawItemStack.getAmount());
+            final DataView tag = rawItemStack.getDataView();
+            if (tag != null) {
+                dataView.set(ItemStackStore.TAG, tag);
+            }
+            this.store.deserialize(itemStack, dataView);
+            return itemStack;
         }
     });
 

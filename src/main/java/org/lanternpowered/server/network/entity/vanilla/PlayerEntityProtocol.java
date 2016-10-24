@@ -27,14 +27,19 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
 public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> {
 
     private boolean lastHasNoGravity;
+    private GameMode lastGameMode = GameModes.NOT_SET;
 
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
@@ -43,7 +48,18 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
-        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(this.getRootEntityId(), this.fillParameters(true)));
+        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillParameters(true)));
+        context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) getEntity().get(Keys.GAME_MODE).get()));
+    }
+
+    @Override
+    protected void update(EntityProtocolUpdateContext context) {
+        final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
+        if (gameMode != this.lastGameMode) {
+            context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+            this.lastGameMode = gameMode;
+        }
+        super.update(context);
     }
 
     @Override
@@ -57,7 +73,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
 
-        final boolean hasNoGravity = this.hasNoGravity();
+        final boolean hasNoGravity = hasNoGravity();
         if (hasNoGravity != this.lastHasNoGravity) {
             parameterList.add(EntityParameters.Base.NO_GRAVITY, hasNoGravity);
             this.lastHasNoGravity = hasNoGravity;

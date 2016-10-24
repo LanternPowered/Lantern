@@ -29,20 +29,24 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.collect.ImmutableMap;
 import org.lanternpowered.server.command.element.ChoicesElement;
-import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.world.rules.RuleHolder;
+import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.difficulty.Difficulty;
-import org.spongepowered.api.world.storage.WorldProperties;
 
-public final class CommandDifficulty extends CommandProvider {
+public class CommandGameMode extends CommandProvider {
 
-    public CommandDifficulty() {
-        super(2, "difficulty");
+    public CommandGameMode() {
+        super(2, "gamemode");
     }
 
     @Override
@@ -50,24 +54,37 @@ public final class CommandDifficulty extends CommandProvider {
         final ImmutableMap.Builder<String, Object> baseBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<String, Object> aliasesBuilder = ImmutableMap.builder();
 
-        for (Difficulty difficulty : Sponge.getRegistry().getAllOf(Difficulty.class)) {
-            baseBuilder.put(difficulty.getName(), difficulty);
-            aliasesBuilder.put(difficulty.getName().substring(0, 1), difficulty);
-            aliasesBuilder.put(((LanternDifficulty) difficulty).getInternalId() + "", difficulty);
+        for (GameMode gameMode : Sponge.getRegistry().getAllOf(GameMode.class)) {
+            // Ignore the not set game mode
+            if (gameMode == GameModes.NOT_SET) {
+                continue;
+            }
+            baseBuilder.put(gameMode.getName(), gameMode);
+            aliasesBuilder.put(((LanternGameMode) gameMode).getInternalId() + "", gameMode);
         }
+        aliasesBuilder.put("s", GameModes.SURVIVAL);
+        aliasesBuilder.put("c", GameModes.CREATIVE);
+        aliasesBuilder.put("a", GameModes.ADVENTURE);
+        aliasesBuilder.put("sp", GameModes.SPECTATOR);
 
         specBuilder
                 .arguments(
-                        GenericArguments.flags()
-                                .valueFlag(GenericArguments.world(CommandHelper.WORLD_KEY), "-world", "w")
-                                .buildWith(GenericArguments.none()),
-                        ChoicesElement.of(Text.of("difficulty"), baseBuilder.build(), aliasesBuilder.build(), false, true)
+                        ChoicesElement.of(Text.of("game-mode"), baseBuilder.build(), aliasesBuilder.build(), false, true),
+                        GenericArguments.playerOrSource(Text.of("player"))
                 )
                 .executor((src, args) -> {
-                    WorldProperties world = CommandHelper.getWorldProperties(src, args);
-                    Difficulty difficulty = args.<Difficulty>getOne("difficulty").get();
-                    world.setDifficulty(difficulty);
-                    src.sendMessage(t("commands.difficulty.success", difficulty.getName()));
+                    final GameMode gameMode = args.<GameMode>getOne("game-mode").get();
+                    final Player player = args.<Player>getOne("player").get();
+                    player.offer(Keys.GAME_MODE, gameMode);
+                    final Text gameModeText = Text.of(gameMode.getTranslation());
+                    if (player == src) {
+                        src.sendMessage(t("commands.gamemode.success.self", gameModeText));
+                    } else {
+                        if (((RuleHolder) player.getWorld()).getOrCreateRule(RuleTypes.SEND_COMMAND_FEEDBACK).getValue()) {
+                            player.sendMessage(t("gameMode.changed", gameModeText));
+                        }
+                        src.sendMessage(t("commands.gamemode.success.other", player.getName(), gameModeText));
+                    }
                     return CommandResult.success();
                 });
     }

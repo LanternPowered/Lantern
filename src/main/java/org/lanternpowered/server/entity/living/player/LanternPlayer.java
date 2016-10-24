@@ -36,6 +36,8 @@ import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
 import org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.data.value.ElementHolderChangeListener;
+import org.lanternpowered.server.data.value.IValueContainer;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternHumanoid;
@@ -68,6 +70,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.permission.AbstractSubject;
@@ -87,6 +90,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
@@ -137,7 +141,7 @@ import javax.annotation.Nullable;
 
 public class LanternPlayer extends LanternHumanoid implements AbstractSubject, Player, AbstractViewer, NetworkIdHolder {
 
-    private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -3), new Vector3d(0.3, 1.8, 0.3));
+    private final static AABB BOUNDING_BOX_BASE = new AABB(new Vector3d(-0.3, 0, -0.3), new Vector3d(0.3, 1.8, 0.3));
 
     private final LanternUser user;
     private final LanternGameProfile gameProfile;
@@ -264,16 +268,16 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public void registerKeys() {
         super.registerKeys();
-        this.registerKey(Keys.LAST_DATE_PLAYED, null);
-        this.registerKey(Keys.FIRST_DATE_PLAYED, null);
-        this.registerKey(Keys.IS_FLYING, false).nonRemovableAttachedValueProcessor();
-        this.registerKey(Keys.IS_SNEAKING, false).nonRemovableAttachedValueProcessor();
-        this.registerKey(Keys.FLYING_SPEED, 0.1).nonRemovableAttachedValueProcessor();
-        this.registerKey(Keys.CAN_FLY, false).nonRemovableAttachedValueProcessor();
-        this.registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();
-        this.registerKey(Keys.GAME_MODE, GameModes.NOT_SET).nonRemovableAttachedValueProcessor();
-        this.registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).nonRemovableAttachedValueProcessor();
-        this.registerKey(LanternKeys.SCORE, 0).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.LAST_DATE_PLAYED, null);
+        registerKey(Keys.FIRST_DATE_PLAYED, null);
+        registerKey(Keys.IS_FLYING, false).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.IS_SNEAKING, false).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.FLYING_SPEED, 0.1).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.CAN_FLY, false).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.GAME_MODE, GameModes.NOT_SET).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).nonRemovableAttachedValueProcessor();
+        registerKey(LanternKeys.SCORE, 0).nonRemovableAttachedValueProcessor();
     }
 
     @Nullable

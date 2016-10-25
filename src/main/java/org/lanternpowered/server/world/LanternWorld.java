@@ -458,6 +458,70 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
+    public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
+        final LanternChunk chunk = getChunkManager().getChunkIfLoaded(x >> 4, z >> 4);
+        return chunk == null ? Optional.empty() : chunk.getBlockSelectionBox(x, y, z);
+    }
+
+    @Override
+    public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
+        checkNotNull(owner, "owner");
+        return getIntersectingBlockCollisionBoxes(box, entity -> entity != owner);
+    }
+
+    @Override
+    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
+        return getIntersectingBlockCollisionBoxes(box, null);
+    }
+
+    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box, @Nullable Predicate<Entity> filter) {
+        checkNotNull(box, "box");
+        final ImmutableSet.Builder<AABB> boxes = ImmutableSet.builder();
+        int minY = box.getMin().getFloorY();
+        final int maxY = box.getMax().getFloorY();
+        if (minY >= LanternWorld.BLOCK_MAX.getY() || maxY < 0) {
+            return boxes.build();
+        }
+        minY = Math.max(0, minY);
+        final int maxX = box.getMax().getFloorX();
+        final int minX = box.getMin().getFloorX();
+        final int maxZ = box.getMax().getFloorZ();
+        final int minZ = box.getMin().getFloorZ();
+        final int maxChunkX = maxX >> 4;
+        final int minChunkX = minX >> 4;
+        final int maxChunkZ = maxZ >> 4;
+        final int minChunkZ = minZ >> 4;
+        final int maxChunkSection = maxY >> 4;
+        final int minChunkSection = minY >> 4;
+        for (int chunkX = minChunkX; chunkX <= maxChunkX; chunkX++) {
+            for (int chunkZ = minChunkZ; chunkZ <= maxChunkZ; chunkZ++) {
+                final LanternChunk chunk = getChunkManager().getChunkIfLoaded(chunkX, chunkZ);
+                if (chunk == null) {
+                    continue;
+                }
+                final int startX = Math.max(minX, chunkX << 4);
+                final int endX = Math.min(maxX, (chunkX << 4) | 0xf);
+                final int startZ = Math.max(minZ, chunkZ << 4);
+                final int endZ = Math.min(maxZ, (chunkZ << 4) | 0xf);
+                for (int x = startX; x <= endX; x++) {
+                    for (int z = startZ; z <= endZ; z++) {
+                        for (int y = minY; y <= maxY; y++) {
+                            final Optional<AABB> boundingBox = chunk.getBlockSelectionBox(x, y, z);
+                            if (boundingBox.isPresent() && boundingBox.get().intersects(box)) {
+                                boxes.add(boundingBox.get());
+                            }
+                        }
+                    }
+                }
+                if (filter != null) {
+                    chunk.addIntersectingEntitiesBoxes(boxes, maxChunkSection, minChunkSection, box, filter);
+                }
+            }
+        }
+        return boxes.build();
+    }
+
+    @Override
     public Set<Entity> getIntersectingEntities(AABB box, Predicate<Entity> filter) {
         checkNotNull(box, "box");
         checkNotNull(filter, "filter");
@@ -510,21 +574,6 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     }
 
     @Override
-    public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
-        return null;
-    }
-
-    @Override
-    public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
-        return null;
-    }
-
-    @Override
-    public Set<AABB> getIntersectingCollisionBoxes(Entity owner, AABB box) {
-        return null;
-    }
-
-    @Override
     public ArchetypeVolume createArchetypeVolume(Vector3i min, Vector3i max, Vector3i origin) {
         return null;
     }
@@ -546,13 +595,13 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
     @Override
     public Collection<Entity> getEntities() {
         final ImmutableList.Builder<Entity> entities = ImmutableList.builder();
-        this.forEachEntity(entities::add);
+        forEachEntity(entities::add);
         return entities.build();
     }
 
     @Override
     public Collection<Entity> getEntities(Predicate<Entity> filter) {
-        return this.getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
+        return getEntities().stream().filter(filter).collect(GuavaCollectors.toImmutableList());
     }
 
     @Override

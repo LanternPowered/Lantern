@@ -72,4 +72,9 @@ public class TimeUniverse implements Component {
             this.world.broadcast(() -> new MessagePlayOutWorldTime(moonPhase, this.timeData.getAge(), (int) time1, doDaylightCycle));
         }
     }
+
+    public MessagePlayOutWorldTime createUpdateTimeMessage() {
+        return new MessagePlayOutWorldTime(this.timeData.getMoonPhase(), this.timeData.getAge(), (int) this.timeData.getDayTime(),
+                this.world.getOrCreateRule(RuleTypes.DO_DAYLIGHT_CYCLE).getValue());
+    }
 }

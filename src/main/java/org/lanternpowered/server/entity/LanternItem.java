@@ -28,6 +28,7 @@ package org.lanternpowered.server.entity;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
@@ -44,8 +45,10 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.util.Direction;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -77,6 +80,7 @@ public class LanternItem extends LanternEntity implements Item {
         registerKey(Keys.REPRESENTED_ITEM, null);
         registerKey(Keys.PICKUP_DELAY, 60);
         registerKey(Keys.DESPAWN_DELAY, 6000);
+        registerKey(LanternKeys.GRAVITY_FACTOR, 0.002);
     }
 
     @Override
@@ -113,7 +117,41 @@ public class LanternItem extends LanternEntity implements Item {
             // A death animation/particle?
             getWorld().spawnParticles(EffectHolder.DEATH_EFFECT, getBoundingBox().get().getCenter());
             remove();
+        } else {
+            pulsePhysics();
         }
+    }
+
+    private void pulsePhysics() {
+        // Get the current velocity
+        Vector3d velocity = getVelocity();
+        // Update the position based on the velocity
+        setPosition(getPosition().add(velocity));
+
+        // We will check if there is a collision box under the entity
+        boolean ground = false;
+
+        final AABB thisBox = getBoundingBox().get().offset(0, -0.1, 0);
+        final Set<AABB> boxes = getWorld().getIntersectingBlockCollisionBoxes(thisBox);
+        for (AABB box : boxes) {
+            final Vector3d factor = box.getCenter().sub(thisBox.getCenter());
+            if (Direction.getClosest(factor).isUpright()) {
+                ground = true;
+            }
+        }
+        if (!ground) {
+            final Optional<Double> gravityFactor = get(LanternKeys.GRAVITY_FACTOR);
+            if (gravityFactor.isPresent()) {
+                // Apply the gravity factor
+                velocity = velocity.add(0, -gravityFactor.get(), 0);
+            }
+        }
+        velocity = velocity.mul(0.98, 0.98, 0.98);
+        if (ground) {
+            velocity = velocity.mul(1, -0.5, 1);
+        }
+        // Offer the velocity back
+        offer(Keys.VELOCITY, velocity);
     }
 
     private void tryToPickupItems() {

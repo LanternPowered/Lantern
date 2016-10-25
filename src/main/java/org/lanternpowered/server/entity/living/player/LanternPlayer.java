@@ -36,8 +36,6 @@ import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
 import org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.data.value.ElementHolderChangeListener;
-import org.lanternpowered.server.data.value.IValueContainer;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternHumanoid;
@@ -70,17 +68,16 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.text.title.LanternTitles;
-import org.lanternpowered.server.util.AABBs;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.LanternWorldProperties;
+import org.lanternpowered.server.world.TimeUniverse;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
 import org.lanternpowered.server.world.difficulty.LanternDifficulty;
 import org.lanternpowered.server.world.dimension.LanternDimensionType;
@@ -90,12 +87,10 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkinPart;
-import org.spongepowered.api.data.type.SkinParts;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.sound.SoundCategory;
 import org.spongepowered.api.effect.sound.SoundType;
@@ -120,6 +115,7 @@ import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.ChunkTicketManager;
@@ -306,7 +302,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public void setWorld(@Nullable LanternWorld world) {
-        LanternWorld oldWorld = getWorld();
+        final LanternWorld oldWorld = getWorld();
         if (oldWorld != world) {
             this.interactionHandler.reset();
         }
@@ -332,10 +328,10 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             oldWorld.removePlayer(this);
         }
         if (world != null) {
-            LanternGameMode gameMode = (LanternGameMode) this.get(Keys.GAME_MODE).get();
-            LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
-            LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
-            boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
+            final LanternGameMode gameMode = (LanternGameMode) this.get(Keys.GAME_MODE).get();
+            final LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
+            final LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
+            final boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
             // The player has joined the server
             //noinspection ConstantConditions
             if (oldWorld == null) {
@@ -373,20 +369,17 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
-            // Add the player to the world
-            world.addPlayer(this);
             // Send the first chunks
             pulseChunkChanges();
-            final Vector3d position = getPosition();
-            final Vector3d rotation = getRotation();
             this.session.send(world.getProperties().createWorldBorderMessage());
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
+            this.session.send(world.getComponent(TimeUniverse.class).get().createUpdateTimeMessage());
             this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
-            this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(),
-                    (float) rotation.getY(), (float) rotation.getX(), Collections.emptySet(), 0));
             setScoreboard(world.getScoreboard());
             this.inventoryContainer.openInventoryForAndInitialize(this);
             this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
+            // Add the player to the world
+            world.addPlayer(this);
         } else {
             this.session.getServer().removePlayer(this);
             this.bossBars.forEach(bossBar -> bossBar.removeRawPlayer(this));
@@ -412,7 +405,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public boolean setPositionAndWorld(World world, Vector3d position) {
         final LanternWorld oldWorld = this.getWorld();
-        boolean success = super.setPositionAndWorld(world, position);
+        final boolean success = super.setPositionAndWorld(world, position);
         if (success && world == oldWorld) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
         }
@@ -422,7 +415,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public void setPosition(Vector3d position) {
         super.setPosition(position);
-        final LanternWorld world = this.getWorld();
+        final LanternWorld world = getWorld();
         //noinspection ConstantConditions
         if (world != null) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));
@@ -432,7 +425,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     @Override
     public void setRotation(Vector3d rotation) {
         super.setRotation(rotation);
-        final LanternWorld world = this.getWorld();
+        final LanternWorld world = getWorld();
         //noinspection ConstantConditions
         if (world != null) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(0, 0, 0,
@@ -462,14 +455,14 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public boolean setLocationAndRotation(Location<World> location, Vector3d rotation) {
-        World oldWorld = this.getWorld();
-        boolean success = super.setLocationAndRotation(location, rotation);
+        final World oldWorld = getWorld();
+        final boolean success = super.setLocationAndRotation(location, rotation);
         if (success) {
-            World world = location.getExtent();
+            final World world = location.getExtent();
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
-                Vector3d pos = location.getPosition();
-                MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
+                final Vector3d pos = location.getPosition();
+                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
                         (float) rotation.getX(), (float) rotation.getY(), Collections.emptySet(), 0);
                 this.session.send(message);
             }
@@ -479,14 +472,14 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public boolean setLocationAndRotation(Location<World> location, Vector3d rotation, EnumSet<RelativePositions> relativePositions) {
-        World oldWorld = this.getWorld();
-        boolean success = super.setLocationAndRotation(location, rotation, relativePositions);
+        final World oldWorld = getWorld();
+        final boolean success = super.setLocationAndRotation(location, rotation, relativePositions);
         if (success) {
-            World world = location.getExtent();
+            final World world = location.getExtent();
             // Only send this if the world isn't changed, otherwise will the position be resend anyway
             if (oldWorld == world) {
-                Vector3d pos = location.getPosition();
-                MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
+                final Vector3d pos = location.getPosition();
+                final MessagePlayOutPlayerPositionAndLook message = new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
                         (float) rotation.getX(), (float) rotation.getY(), Sets.immutableEnumSet(relativePositions), 0);
                 this.session.send(message);
             }
@@ -511,7 +504,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         super.pulse();
 
         // TODO: Maybe async?
-        this.pulseChunkChanges();
+        pulseChunkChanges();
 
         // Pulse the interaction handler
         this.interactionHandler.pulse();
@@ -539,7 +532,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     }
 
     public void pulseChunkChanges() {
-        LanternWorld world = this.getWorld();
+        final LanternWorld world = getWorld();
+        //noinspection ConstantConditions
         if (world == null) {
             return;
         }

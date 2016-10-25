@@ -1191,21 +1191,24 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
-        return Optional.empty();
+        final BlockType type = getBlockType(x, y, z);
+        return type != BlockTypes.AIR ? Optional.of(new AABB(x, y, z, x + 1, y + 1, z + 1)) : Optional.empty();
     }
 
     @Override
     public Set<AABB> getIntersectingBlockCollisionBoxes(AABB box) {
         checkNotNull(box, "box");
+        final Vector3i min = box.getMin().toInt();
+        final Vector3i max = box.getMax().toInt();
+        checkVolumeBounds(min);
+        checkVolumeBounds(max);
         final ImmutableSet.Builder<AABB> builder = ImmutableSet.builder();
-        final Vector3d min = box.getMin();
-        final Vector3d max = box.getMax();
-        final int minX = min.getFloorX();
-        final int minY = min.getFloorY();
-        final int minZ = min.getFloorZ();
-        final int maxX = max.getFloorX();
-        final int maxY = max.getFloorY();
-        final int maxZ = max.getFloorZ();
+        final int minX = min.getX();
+        final int minY = min.getY();
+        final int minZ = min.getZ();
+        final int maxX = max.getX();
+        final int maxY = max.getY();
+        final int maxZ = max.getZ();
         for (int x = minX; x <= maxX; x++) {
             for (int z = minZ; z <= maxZ; z++) {
                 for (int y = minY; y <= maxY; y++) {
@@ -1277,6 +1280,22 @@ public class LanternChunk implements AbstractExtent, Chunk {
                     }
                 } else if (box.contains(entity.getPosition()) && filter.test(entity)) {
                     builder.add(entity);
+                }
+            }
+        }
+    }
+
+    public void addIntersectingEntitiesBoxes(ImmutableSet.Builder<AABB> builder, int maxYSection, int minYSection,
+            AABB box, Predicate<Entity> filter) {
+        for (int i = minYSection; i <= maxYSection; i++) {
+            for (LanternEntity entity : this.entities[i]) {
+                final Optional<AABB> aabb = entity.getBoundingBox();
+                if (aabb.isPresent()) {
+                    if (aabb.get().intersects(box) && filter.test(entity)) {
+                        builder.add(aabb.get());
+                    }
+                } else if (box.contains(entity.getPosition()) && filter.test(entity)) {
+                    builder.add(aabb.get());
                 }
             }
         }

@@ -766,7 +766,7 @@ public class PlayerContainerSession {
     }
 
     private Entity createDroppedItem(ItemStackSnapshot snapshot) {
-        final Entity entity = this.player.getWorld().createEntity(EntityTypes.ITEM, this.player.getPosition().add(0, 0.5, 0));
+        final Entity entity = this.player.getWorld().createEntity(EntityTypes.ITEM, this.player.getPosition());
         entity.offer(Keys.REPRESENTED_ITEM, snapshot);
         return entity;
     }

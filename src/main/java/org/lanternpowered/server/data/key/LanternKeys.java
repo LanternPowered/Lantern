@@ -60,6 +60,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("IsConverting"), "lantern:is_converting");
     public static final Key<SetValue<SkinPart>> DISPLAYED_SKIN_PARTS =
             makeSetKey(SkinPart.class, DataQuery.of("DisplayedSkinParts"), "lantern:displayed_skin_parts");
+    public static final Key<Value<Double>> GRAVITY_FACTOR =
+            makeValueKey(Double.class, DataQuery.of("GravityFactor"), "lantern:gravity_factor");
 
     private LanternKeys() {
     }

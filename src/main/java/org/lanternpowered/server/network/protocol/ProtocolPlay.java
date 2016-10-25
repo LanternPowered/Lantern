@@ -292,8 +292,7 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(playerMovementHandler.new HandlerPlayInPlayerMovementAndLook());
         inbound.bind(0x0e, CodecPlayInPlayerLook.class, MessagePlayInPlayerLook.class)
                 .bindHandler(playerMovementHandler.new HandlerPlayInPlayerLook());
-        inbound.bind(0x0f, CodecPlayInPlayerOnGroundState.class, MessagePlayInPlayerOnGroundState.class)
-                .bindHandler(playerMovementHandler.new HandlerPlayInGroundState());
+        inbound.bind(0x0f, CodecPlayInPlayerOnGroundState.class, MessagePlayInPlayerOnGroundState.class);
         // ...
         inbound.bind(0x12, CodecPlayInPlayerAbilities.class, MessagePlayInPlayerAbilities.class)
                 .bindHandler(new HandlerPlayInPlayerAbilities());

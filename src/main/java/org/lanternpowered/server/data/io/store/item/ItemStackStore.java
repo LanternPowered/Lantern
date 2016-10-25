@@ -30,32 +30,44 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
+import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.item.enchantment.LanternEnchantment;
 import org.lanternpowered.server.text.LanternTexts;
+import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
 import org.spongepowered.api.text.format.TextColors;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class ItemStackStore extends DataHolderStore<LanternItemStack> implements ObjectSerializer<LanternItemStack> {
 
-    public static final DataQuery IDENTIFIER = DataQuery.of("id");
+    private static final DataQuery IDENTIFIER = DataQuery.of("id");
     public static final DataQuery QUANTITY = DataQuery.of("Count");
     public static final DataQuery DATA = DataQuery.of("Damage");
     public static final DataQuery TAG = DataQuery.of("tag");
@@ -65,6 +77,11 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     private static final DataQuery LOCALIZED_NAME = DataQuery.of("LocName");
     private static final DataQuery LORE = DataQuery.of("Lore");
     private static final DataQuery UNBREAKABLE = DataQuery.of("Unbreakable");
+    private static final DataQuery CAN_DESTROY = DataQuery.of("CanDestroy");
+    private static final DataQuery ENCHANTMENTS = DataQuery.of("ench");
+    private static final DataQuery ENCHANTMENT_ID = DataQuery.of("id");
+    private static final DataQuery ENCHANTMENT_LEVEL = DataQuery.of("lvl");
+    private static final DataQuery STORED_ENCHANTMENTS = DataQuery.of("StoredEnchantments");
 
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
@@ -155,7 +172,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
             }
         }
         final Optional<List<Text>> optLore = valueContainer.get(Keys.ITEM_LORE);
-        if (optLore.isPresent()) {
+        if (optLore.isPresent() && !optLore.get().isEmpty()) {
             if (displayView == null) {
                 displayView = dataView.createView(DISPLAY);
             }
@@ -164,6 +181,12 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         if (valueContainer.get(Keys.UNBREAKABLE).orElse(false)) {
             dataView.set(UNBREAKABLE, (byte) 1);
         }
+        final Optional<Set<BlockType>> optBlockTypes = valueContainer.get(Keys.BREAKABLE_BLOCK_TYPES);
+        if (optBlockTypes.isPresent() && !optBlockTypes.get().isEmpty()) {
+            dataView.set(CAN_DESTROY, optBlockTypes.get().stream().map(CatalogType::getId).collect(Collectors.toSet()));
+        }
+        valueContainer.get(Keys.ITEM_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, ENCHANTMENTS, list));
+        valueContainer.get(Keys.STORED_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, STORED_ENCHANTMENTS, list));
         super.serializeValues(object, valueContainer, dataView);
     }
 
@@ -184,9 +207,55 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
                     valueContainer.set(Keys.DISPLAY_NAME, t(name.get()));
                 }
             }
-            dataView.getStringList(LORE).ifPresent(lore -> valueContainer.set(Keys.ITEM_LORE,
-                    lore.stream().map(LanternTexts::fromLegacy).collect(Collectors.toList())));
+            dataView.getStringList(LORE).ifPresent(lore -> {
+                if (!lore.isEmpty()) {
+                    valueContainer.set(Keys.ITEM_LORE,
+                            lore.stream().map(LanternTexts::fromLegacy).collect(Collectors.toList()));
+                }
+            });
         }
+        dataView.getStringList(CAN_DESTROY).ifPresent(types -> {
+            if (!types.isEmpty()) {
+                final Set<BlockType> blockTypes = new HashSet<>();
+                types.forEach(type -> BlockRegistryModule.get().getById(type).ifPresent(blockTypes::add));
+                valueContainer.set(Keys.BREAKABLE_BLOCK_TYPES, blockTypes);
+            }
+        });
+        deserializeEnchantments(dataView, ENCHANTMENTS, Keys.ITEM_ENCHANTMENTS, valueContainer);
+        deserializeEnchantments(dataView, STORED_ENCHANTMENTS, Keys.STORED_ENCHANTMENTS, valueContainer);
         super.deserializeValues(object, valueContainer, dataView);
+    }
+
+    private void serializeEnchantments(DataView dataView, DataQuery query, List<ItemEnchantment> enchantments) {
+        if (enchantments.isEmpty()) {
+            return;
+        }
+        final List<DataView> dataViews = new ArrayList<>();
+        for (ItemEnchantment enchantment : enchantments) {
+            final DataView enchantmentView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
+            enchantmentView.set(ENCHANTMENT_ID, (short) ((LanternEnchantment) enchantment.getEnchantment()).getInternalId());
+            enchantmentView.set(ENCHANTMENT_LEVEL, (short) enchantment.getLevel());
+            dataViews.add(enchantmentView);
+        }
+        dataView.set(query, dataViews);
+    }
+
+    private void deserializeEnchantments(DataView dataView, DataQuery query, Key<ListValue<ItemEnchantment>> key,
+            SimpleValueContainer valueContainer) {
+        dataView.getViewList(query).ifPresent(views -> {
+            if (!views.isEmpty()) {
+                final List<ItemEnchantment> itemEnchantments = new ArrayList<>();
+                views.forEach(view -> {
+                    final Optional<Enchantment> enchantment = EnchantmentRegistryModule.get().getByInternalId(view.getInt(ENCHANTMENT_ID).get());
+                    if (enchantment.isPresent()) {
+                        final int level = view.getInt(ENCHANTMENT_LEVEL).get();
+                        itemEnchantments.add(new ItemEnchantment(enchantment.get(), level));
+                    } else {
+                        Lantern.getLogger().warn("Attempted to deserialize a enchantment with unknown id: {}", view.getInt(ENCHANTMENT_ID).get());
+                    }
+                });
+                valueContainer.set(key, itemEnchantments);
+            }
+        });
     }
 }

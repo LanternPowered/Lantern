@@ -30,9 +30,10 @@ import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.property.block.GroundLuminancePropertyStore;
 import org.lanternpowered.server.data.property.block.SkyLuminancePropertyStore;
-import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
+import org.lanternpowered.server.item.enchantment.ItemEnchantmentDataBuilder;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.property.PropertyRegistry;
 import org.spongepowered.api.data.property.block.GroundLuminanceProperty;
 import org.spongepowered.api.data.property.block.SkyLuminanceProperty;
@@ -61,6 +62,7 @@ public class DataRegistrar {
         dataManager.registerBuilder(BookView.class, new BookViewDataBuilder());
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
+        dataManager.registerBuilder(ItemEnchantment.class, new ItemEnchantmentDataBuilder());
     }
 
     public static void finalizeRegistrations(Game game) {

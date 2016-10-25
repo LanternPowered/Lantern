@@ -45,6 +45,7 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.HardnessProperty;
 import org.spongepowered.api.data.property.block.UnbreakableProperty;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
@@ -156,10 +157,10 @@ public final class PlayerInteractionHandler {
             this.diggingBlock = blockPos;
             this.diggingBlockType = blockType;
 
-            this.diggingDuration = this.getDiggingDuration(blockPos, blockType);
+            this.diggingDuration = getDiggingDuration(blockPos, blockType);
             // The client won't send a finish message
             if (this.diggingDuration == 0) {
-                this.handleBrokenBlock();
+                handleBrokenBlock();
             } else {
                 this.diggingEndTime = this.diggingDuration == -1 ? -1 : System.nanoTime() + this.diggingDuration;
             }
@@ -169,7 +170,7 @@ public final class PlayerInteractionHandler {
             }
 
             if (this.lastBreakState != -1) {
-                this.sendBreakUpdate(-1);
+                sendBreakUpdate(-1);
             }
             this.diggingBlock = null;
             this.diggingBlockType = null;
@@ -198,7 +199,7 @@ public final class PlayerInteractionHandler {
         this.player.getWorld().setBlock(this.diggingBlock, BlockTypes.AIR.getDefaultState(),
                 Cause.source(this.player).build());
         if (this.lastBreakState != -1) {
-            this.sendBreakUpdate(-1);
+            sendBreakUpdate(-1);
         }
         this.diggingBlock = null;
         this.diggingBlockType = null;
@@ -210,6 +211,9 @@ public final class PlayerInteractionHandler {
      * @return The digging duration
      */
     private long getDiggingDuration(Vector3i pos, BlockType blockType) {
+        if (this.player.get(Keys.GAME_MODE).get() == GameModes.CREATIVE) {
+            return 0;
+        }
         final World world = this.player.getWorld();
         final Optional<UnbreakableProperty> optUnbreakableProperty = world.getProperty(pos, UnbreakableProperty.class);
         if (optUnbreakableProperty.isPresent() && optUnbreakableProperty.get().getValue() == Boolean.TRUE) {

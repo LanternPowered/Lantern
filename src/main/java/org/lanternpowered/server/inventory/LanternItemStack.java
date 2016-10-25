@@ -46,7 +46,9 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import javax.annotation.Nullable;
@@ -87,7 +89,9 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     public void registerKeys() {
         ((LanternItemType) this.itemType).registerKeysFor(this);
         registerKey(Keys.DISPLAY_NAME, null);
-        registerKey(Keys.ITEM_LORE, null);
+        registerKey(Keys.ITEM_LORE, Collections.emptyList());
+        registerKey(Keys.BREAKABLE_BLOCK_TYPES, new HashSet<>());
+        registerKey(Keys.ITEM_ENCHANTMENTS, Collections.emptyList());
     }
 
     @Override

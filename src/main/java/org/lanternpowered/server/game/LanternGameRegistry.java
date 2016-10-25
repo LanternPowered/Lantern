@@ -136,6 +136,7 @@ import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistry
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.player.GameModeRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.EnchantmentRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.FireworkShapeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.InventoryArchetypeRegistryModule;
@@ -297,6 +298,7 @@ import org.spongepowered.api.event.cause.entity.teleport.EntityTeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.PortalTeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
+import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.FireworkEffect;
 import org.spongepowered.api.item.FireworkShape;
 import org.spongepowered.api.item.ItemType;
@@ -498,6 +500,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DyeColor.class, DyeColorRegistryModule.get())
                 .registerModule(PickupRule.class, PickupRuleRegistryModule.get())
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())
+                .registerModule(Enchantment.class, EnchantmentRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

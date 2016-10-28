@@ -23,25 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.block.trait.BooleanTrait;
-import org.spongepowered.api.data.key.Keys;
+import org.lanternpowered.server.data.type.LanternSandstoneType;
+import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
+import org.spongepowered.api.data.type.SandstoneType;
+import org.spongepowered.api.data.type.SandstoneTypes;
 
-public final class LanternBooleanTraits {
+public class SandstoneTypeRegistryModule extends InternalEnumValueRegistryModule<SandstoneType> {
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+    private static final SandstoneTypeRegistryModule INSTANCE = new SandstoneTypeRegistryModule();
 
-    public static final BooleanTrait DECAYABLE = LanternBooleanTrait.of("decayable", Keys.DECAYABLE);
+    public static SandstoneTypeRegistryModule get() {
+        return INSTANCE;
+    }
 
-    public static final BooleanTrait CHECK_DECAY = LanternBooleanTrait.of("check_decay", LanternKeys.CHECK_DECAY);
-
-    public static final BooleanTrait IS_WET = LanternBooleanTrait.of("wet", Keys.IS_WET);
-
-    public static final BooleanTrait OCCUPIED = LanternBooleanTrait.of("occupied", Keys.OCCUPIED);
-
-    public static final BooleanTrait SEAMLESS = LanternBooleanTrait.of("seamless", Keys.SEAMLESS);
-
-    public static final BooleanTrait ENABLED = LanternBooleanTrait.of("enabled", LanternKeys.ENABLED);
+    private SandstoneTypeRegistryModule() {
+        super(LanternSandstoneType.class, SandstoneTypes.class);
+    }
 }

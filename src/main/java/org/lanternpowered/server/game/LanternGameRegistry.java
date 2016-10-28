@@ -124,7 +124,9 @@ import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule
 import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
@@ -459,10 +461,8 @@ public class LanternGameRegistry implements GameRegistry {
                         new EnumValueRegistryModule<PlantType>(LanternPlantType.class, PlantTypes.class) {})
                 .registerModule(PrismarineType.class,
                         new EnumValueRegistryModule<PrismarineType>(LanternPrismarineType.class, PrismarineTypes.class) {})
-                .registerModule(QuartzType.class,
-                        new EnumValueRegistryModule<QuartzType>(LanternQuartzType.class, QuartzTypes.class) {})
-                .registerModule(SandstoneType.class,
-                        new EnumValueRegistryModule<SandstoneType>(LanternSandstoneType.class, SandstoneTypes.class) {})
+                .registerModule(QuartzType.class, QuartzTypeRegistryModule.get())
+                .registerModule(SandstoneType.class, SandstoneTypeRegistryModule.get())
                 .registerModule(SandType.class,
                         new EnumValueRegistryModule<SandType>(LanternSandType.class, SandTypes.class) {})
                 .registerModule(ShrubType.class,

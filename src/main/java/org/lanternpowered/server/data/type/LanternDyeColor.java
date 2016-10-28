@@ -53,12 +53,14 @@ public enum LanternDyeColor implements DyeColor, SimpleCatalogType, InternalCata
     ;
 
     private final String identifier;
+    private final String translationBaseKey;
     private final Translation translation;
     private final Color color;
 
     LanternDyeColor(String identifier, String translationPart, Color color) {
         this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
                 "color." + translationPart + ".name");
+        this.translationBaseKey = translationPart;
         this.identifier = identifier;
         this.color = color;
     }
@@ -81,5 +83,9 @@ public enum LanternDyeColor implements DyeColor, SimpleCatalogType, InternalCata
     @Override
     public int getInternalId() {
         return ordinal();
+    }
+
+    public String getTranslationPart() {
+        return this.translationBaseKey;
     }
 }

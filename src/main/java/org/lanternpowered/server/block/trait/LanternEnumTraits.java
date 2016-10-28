@@ -27,8 +27,10 @@ package org.lanternpowered.server.block.trait;
 
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
+import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.data.type.LanternLogAxis;
 import org.lanternpowered.server.data.type.LanternPortionType;
+import org.lanternpowered.server.data.type.LanternQuartzType;
 import org.lanternpowered.server.data.type.LanternSandType;
 import org.lanternpowered.server.data.type.LanternSandstoneType;
 import org.lanternpowered.server.data.type.LanternSlabType;
@@ -76,6 +78,9 @@ public final class LanternEnumTraits {
     public static final EnumTrait<LanternSandstoneType> SANDSTONE_TYPE =
             LanternEnumTrait.of("type", (Key) Keys.SANDSTONE_TYPE, LanternSandstoneType.class);
 
+    public static final EnumTrait<LanternQuartzType> QUARTZ_TYPE =
+            LanternEnumTrait.of("variant", (Key) Keys.QUARTZ_TYPE, LanternQuartzType.class);
+
     public static final EnumTrait<LanternBedPart> BED_PART =
             LanternEnumTrait.of("type", (Key) Keys.SANDSTONE_TYPE, LanternBedPart.class);
 
@@ -94,6 +99,12 @@ public final class LanternEnumTraits {
 
     public static final EnumTrait<LanternSlabType> STONE_SLAB2_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.SLAB_TYPE, LanternSlabType.class, type -> type.ordinal() >= 8 && type.ordinal() < 16);
+
+    public static final EnumTrait<Direction> HOPPER_FACING =
+            LanternEnumTrait.of("variant", (Key) Keys.DIRECTION, Direction.DOWN, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
+
+    public static final EnumTrait<LanternDyeColor> DYE_COLOR =
+            LanternEnumTrait.of("variant", (Key) Keys.DYE_COLOR, LanternDyeColor.class);
 
     private LanternEnumTraits() {
     }

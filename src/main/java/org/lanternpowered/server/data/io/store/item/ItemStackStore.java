@@ -102,6 +102,15 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         final StoneSlab2ItemTypeObjectSerializer stoneSlab2Serializer = new StoneSlab2ItemTypeObjectSerializer();
         add(BlockTypes.STONE_SLAB2, stoneSlab2Serializer);
         add(BlockTypes.DOUBLE_STONE_SLAB2, stoneSlab2Serializer);
+        add(BlockTypes.QUARTZ_BLOCK, new QuartzItemTypeSerializer());
+        final SandstoneTypeItemTypeObjectSerializer sandstoneTypeSerializer = new SandstoneTypeItemTypeObjectSerializer();
+        add(BlockTypes.SANDSTONE, sandstoneTypeSerializer);
+        add(BlockTypes.RED_SANDSTONE, sandstoneTypeSerializer);
+        final DyeColorItemTypeObjectSerializer dyeColorSerializer = new DyeColorItemTypeObjectSerializer();
+        add(BlockTypes.WOOL, dyeColorSerializer);
+        add(BlockTypes.STAINED_HARDENED_CLAY, dyeColorSerializer);
+        add(BlockTypes.STAINED_GLASS, dyeColorSerializer);
+        add(BlockTypes.STAINED_GLASS_PANE, dyeColorSerializer);
 
         add(ItemTypes.COAL, new CoalItemTypeObjectSerializer());
         add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());

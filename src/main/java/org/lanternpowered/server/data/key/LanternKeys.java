@@ -70,6 +70,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("CheckDecay"), "lantern:check_decay");
     public static final Key<Value<LanternBedPart>> BED_PART =
             makeValueKey(LanternBedPart.class, DataQuery.of("BedPart"), "lantern:bed_part");
+    public static final Key<Value<Boolean>> ENABLED =
+            makeValueKey(Boolean.class, DataQuery.of("Enabled"), "lantern:enabled");
 
     private LanternKeys() {
     }

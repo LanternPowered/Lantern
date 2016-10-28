@@ -23,25 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.data.io.store.item;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.block.trait.BooleanTrait;
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.lanternpowered.server.data.type.LanternQuartzType;
+import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public final class LanternBooleanTraits {
+public class QuartzItemTypeSerializer extends ItemTypeObjectSerializer {
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+    @Override
+    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
+        LanternQuartzType quartzType = (LanternQuartzType) itemStack.get(Keys.QUARTZ_TYPE).get();
+        if (quartzType == LanternQuartzType.LINES_X || quartzType == LanternQuartzType.LINES_Z) {
+            quartzType = LanternQuartzType.LINES_Y;
+        }
+        dataView.set(DATA_VALUE, quartzType.getInternalId());
+    }
 
-    public static final BooleanTrait DECAYABLE = LanternBooleanTrait.of("decayable", Keys.DECAYABLE);
-
-    public static final BooleanTrait CHECK_DECAY = LanternBooleanTrait.of("check_decay", LanternKeys.CHECK_DECAY);
-
-    public static final BooleanTrait IS_WET = LanternBooleanTrait.of("wet", Keys.IS_WET);
-
-    public static final BooleanTrait OCCUPIED = LanternBooleanTrait.of("occupied", Keys.OCCUPIED);
-
-    public static final BooleanTrait SEAMLESS = LanternBooleanTrait.of("seamless", Keys.SEAMLESS);
-
-    public static final BooleanTrait ENABLED = LanternBooleanTrait.of("enabled", LanternKeys.ENABLED);
+    @Override
+    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
+        valueContainer.set(Keys.QUARTZ_TYPE, QuartzTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get()).get());
+    }
 }

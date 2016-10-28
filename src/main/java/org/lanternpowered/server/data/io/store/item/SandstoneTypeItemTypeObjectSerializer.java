@@ -23,25 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.data.io.store.item;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.block.trait.BooleanTrait;
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.lanternpowered.server.data.type.LanternSandstoneType;
+import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public final class LanternBooleanTraits {
+public class SandstoneTypeItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+    @Override
+    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
+        dataView.set(DATA_VALUE, ((LanternSandstoneType) itemStack.get(Keys.SANDSTONE_TYPE).get()).getInternalId());
+    }
 
-    public static final BooleanTrait DECAYABLE = LanternBooleanTrait.of("decayable", Keys.DECAYABLE);
-
-    public static final BooleanTrait CHECK_DECAY = LanternBooleanTrait.of("check_decay", LanternKeys.CHECK_DECAY);
-
-    public static final BooleanTrait IS_WET = LanternBooleanTrait.of("wet", Keys.IS_WET);
-
-    public static final BooleanTrait OCCUPIED = LanternBooleanTrait.of("occupied", Keys.OCCUPIED);
-
-    public static final BooleanTrait SEAMLESS = LanternBooleanTrait.of("seamless", Keys.SEAMLESS);
-
-    public static final BooleanTrait ENABLED = LanternBooleanTrait.of("enabled", LanternKeys.ENABLED);
+    @Override
+    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
+        valueContainer.set(Keys.SANDSTONE_TYPE, SandstoneTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get()).get());
+    }
 }

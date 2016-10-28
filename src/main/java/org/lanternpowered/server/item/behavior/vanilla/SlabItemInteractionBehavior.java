@@ -30,13 +30,15 @@ import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
 import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
+import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
-import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.EnumTrait;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
@@ -80,16 +82,21 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
         }
 
         BlockState state = location.getBlock();
-        BlockState blockState = null;
+        final BlockState.Builder stateBuilder = BlockState.builder();
+        stateBuilder.blockType(blockType);
+        //noinspection unchecked
+        context.get(Parameters.USED_ITEM_STACK).ifPresent(
+                itemStack -> itemStack.getValues().forEach(value -> stateBuilder.add((Key) value.getKey(), value.get())));
+        BlockState blockState = stateBuilder.build();
+        BlockSnapshotBuilder snapshotBuilder = null;
+
         boolean success = false;
         if (state.getType() == blockType) {
-            if (state.getTraitValue(this.variantTrait).get()
-                    .equals(state.getType().getDefaultState().getTraitValue(this.variantTrait).get())) {
+            if (state.getTraitValue(this.variantTrait).get().equals(blockState.getTraitValue(this.variantTrait).get())) {
                 final PortionType portionType = state.getTraitValue(LanternEnumTraits.PORTION_TYPE).get();
                 if ((blockFace == Direction.DOWN && portionType == PortionTypes.BOTTOM) ||
                         (blockFace == Direction.UP && portionType == PortionTypes.TOP)) {
-                    blockState = doubleSlabType.getDefaultState().withTrait(this.variantTrait,
-                            state.getTraitValue(this.variantTrait).get()).get();
+                    snapshotBuilder = BlockSnapshotBuilder.create().blockState(doubleSlabType.getDefaultState());
                     success = true;
                 }
             }
@@ -100,13 +107,11 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
             location = location.add(blockFace.getOpposite().asBlockOffset());
             state = location.getBlock();
             if (state.getType() == blockType) {
-                if (state.getTraitValue(this.variantTrait).get()
-                        .equals(state.getType().getDefaultState().getTraitValue(this.variantTrait).get())) {
+                if (state.getTraitValue(this.variantTrait).get().equals(blockState.getTraitValue(this.variantTrait).get())) {
                     final PortionType portionType = state.getTraitValue(LanternEnumTraits.PORTION_TYPE).get();
                     if ((blockFace == Direction.DOWN && portionType == PortionTypes.TOP) ||
                             (blockFace == Direction.UP && portionType == PortionTypes.BOTTOM)) {
-                        blockState = doubleSlabType.getDefaultState().withTrait(this.variantTrait,
-                                state.getTraitValue(this.variantTrait).get()).get();
+                        snapshotBuilder = BlockSnapshotBuilder.create().blockState(doubleSlabType.getDefaultState());
                         success = true;
                     }
                 }
@@ -115,7 +120,7 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
             }
         }
         if (success) {
-            if (blockState == null) {
+            if (snapshotBuilder == null) {
                 PortionType portionType;
                 if (blockFace == Direction.UP) {
                     portionType = PortionTypes.TOP;
@@ -129,11 +134,14 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
                         portionType = PortionTypes.BOTTOM;
                     }
                 }
-                blockState = halfSlabType.getDefaultState().withTrait(LanternEnumTraits.PORTION_TYPE, portionType).get();
+                snapshotBuilder = BlockSnapshotBuilder.create().blockState(halfSlabType.getDefaultState()).add(Keys.PORTION_TYPE, portionType);
             }
-            context.addBlockChange(BlockSnapshot.builder().from(location)
-                    .blockState(blockState)
-                    .build());
+            final BlockSnapshotBuilder snapshotBuilder1 = snapshotBuilder;
+            snapshotBuilder1.location(location);
+            //noinspection unchecked
+            context.get(Parameters.USED_ITEM_STACK).ifPresent(
+                    itemStack -> itemStack.getValues().forEach(value -> snapshotBuilder1.add((Key) value.getKey(), value.get())));
+            context.addBlockChange(snapshotBuilder1.build());
 
             final Optional<ItemStack> optItemStack = context.get(Parameters.USED_ITEM_STACK);
             if (optItemStack.isPresent()) {

@@ -45,6 +45,7 @@ import org.lanternpowered.server.attribute.LanternAttributeCalculator;
 import org.lanternpowered.server.attribute.LanternOperation;
 import org.lanternpowered.server.block.BlockSnapshotBuilder;
 import org.lanternpowered.server.block.LanternBlockSnapshotBuilder;
+import org.lanternpowered.server.block.LanternBlockStateBuilder;
 import org.lanternpowered.server.boss.LanternBossBarBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternBlockDamageSourceBuilder;
 import org.lanternpowered.server.cause.entity.damage.source.LanternDamageSourceBuilder;
@@ -125,6 +126,7 @@ import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModul
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
@@ -467,8 +469,7 @@ public class LanternGameRegistry implements GameRegistry {
                         new EnumValueRegistryModule<ShrubType>(LanternShrubType.class, ShrubTypes.class) {})
                 .registerModule(StoneType.class,
                         new EnumValueRegistryModule<StoneType>(LanternStoneType.class, StoneTypes.class) {})
-                .registerModule(SlabType.class,
-                        new EnumValueRegistryModule<SlabType>(LanternSlabType.class, SlabTypes.class) {})
+                .registerModule(SlabType.class, SlabTypeRegistryModule.get())
                 .registerModule(TreeType.class, TreeTypeRegistryModule.get())
                 .registerModule(WallType.class,
                         new EnumValueRegistryModule<WallType>(LanternWallType.class, WallTypes.class) {})
@@ -533,6 +534,7 @@ public class LanternGameRegistry implements GameRegistry {
         this.registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
                 .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
                 .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
+                .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
                 .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
                 .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
                 .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)

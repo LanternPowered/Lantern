@@ -36,6 +36,8 @@ import com.google.common.collect.ImmutableTable;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.trait.LanternBlockTrait;
+import org.lanternpowered.server.catalog.AbstractCatalogType;
+import org.lanternpowered.server.catalog.PluginCatalogType;
 import org.lanternpowered.server.data.property.AbstractDirectionRelativePropertyHolder;
 import org.lanternpowered.server.data.value.mutable.LanternValue;
 import org.spongepowered.api.CatalogType;
@@ -67,7 +69,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
-public final class LanternBlockState implements BlockState, AbstractDirectionRelativePropertyHolder {
+public final class LanternBlockState extends AbstractCatalogType implements PluginCatalogType, BlockState, AbstractDirectionRelativePropertyHolder {
 
     // A lookup table to get a specific state when you would change a value
     ImmutableTable<BlockTrait<?>, Comparable<?>, BlockState> propertyValueTable;
@@ -81,7 +83,8 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
     // The base block state
     private final LanternBlockStateMap baseState;
 
-    // The id of the block state
+    // The name of the block state
+    private final String name;
     private final String id;
 
     // Whether this state is extended
@@ -98,7 +101,7 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
         this.keyToBlockTrait = builder.build();
 
         StringBuilder idBuilder = new StringBuilder();
-        idBuilder.append(baseState.getBlockType().getId());
+        idBuilder.append(baseState.getBlockType().getId().substring(baseState.getBlockType().getPluginId().length() + 1));
         if (!traitValues.isEmpty()) {
             idBuilder.append('[');
             Joiner joiner = Joiner.on(',');
@@ -109,7 +112,8 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
             idBuilder.append(joiner.join(propertyValues));
             idBuilder.append(']');
         }
-        this.id = idBuilder.toString();
+        this.name = idBuilder.toString();
+        this.id = baseState.getBlockType().getPluginId() + ':' + this.name;
     }
 
     @Override
@@ -452,7 +456,12 @@ public final class LanternBlockState implements BlockState, AbstractDirectionRel
     }
 
     @Override
+    public String getPluginId() {
+        return this.baseState.getBlockType().getPluginId();
+    }
+
+    @Override
     public String getName() {
-        return this.id;
+        return this.name;
     }
 }

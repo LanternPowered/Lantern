@@ -67,7 +67,7 @@ public final class LanternEnumTraits {
     public static final EnumTrait<LanternDirtType> DIRT_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.DIRT_TYPE, LanternDirtType.class);
 
-    public static final EnumTrait<LanternTreeType> PLANKS_TYPE =
+    public static final EnumTrait<LanternTreeType> TREE_TYPE =
             LanternEnumTrait.of("variant", (Key) Keys.TREE_TYPE, LanternTreeType.class);
 
     public static final EnumTrait<LanternSandType> SAND_TYPE =
@@ -81,9 +81,6 @@ public final class LanternEnumTraits {
 
     public static final EnumTrait<Direction> HORIZONTAL_FACING =
             LanternEnumTrait.of("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST);
-
-    public static final EnumTrait<LanternTreeType> SAPLING_TYPE =
-            LanternEnumTrait.of("type", (Key) Keys.TREE_TYPE, LanternTreeType.class);
 
     public static final EnumTrait<Direction> FACING =
             LanternEnumTrait.of("facing", (Key) Keys.DIRECTION, Direction.DOWN, Direction.UP,

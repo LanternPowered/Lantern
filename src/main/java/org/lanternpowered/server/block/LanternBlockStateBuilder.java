@@ -46,9 +46,9 @@ public class LanternBlockStateBuilder extends AbstractDataBuilder<BlockState> im
 
     private BlockState blockState;
 
-    protected LanternBlockStateBuilder() {
+    public LanternBlockStateBuilder() {
         super(BlockState.class, 1);
-        this.reset();
+        reset();
     }
 
     @Override

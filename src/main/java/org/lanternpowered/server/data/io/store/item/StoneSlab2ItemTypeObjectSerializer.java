@@ -23,18 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.block;
+package org.lanternpowered.server.data.io.store.item;
 
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
-import org.spongepowered.api.block.BlockState;
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.lanternpowered.server.data.type.LanternSlabType;
+import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-public final class BlockStateRegistryModule extends PluginCatalogRegistryModule<BlockState> {
+public class StoneSlab2ItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
-    public BlockStateRegistryModule() {
-        super(null, "^[a-z][a-z0-9-_]+:[a-z][a-z0-9-_\\[\\]=,]+$");
+    @Override
+    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
+        dataView.set(DATA_VALUE, ((LanternSlabType) itemStack.get(Keys.SLAB_TYPE).get()).getInternalId() - 8);
     }
 
-    void registerState(BlockState catalogType) {
-        register(catalogType);
+    @Override
+    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
+        valueContainer.set(Keys.SLAB_TYPE, SlabTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get() + 8).get());
     }
 }

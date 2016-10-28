@@ -28,7 +28,7 @@ package org.lanternpowered.server.catalog;
 import com.google.common.base.MoreObjects;
 import org.spongepowered.api.CatalogType;
 
-abstract class AbstractCatalogType implements CatalogType {
+public abstract class AbstractCatalogType implements CatalogType {
 
     protected MoreObjects.ToStringHelper toStringHelper() {
         return MoreObjects.toStringHelper(this)

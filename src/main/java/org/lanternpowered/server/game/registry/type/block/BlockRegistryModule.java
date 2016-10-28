@@ -315,8 +315,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///    Planks   ///
         ///////////////////
         register(5, simpleBuilder()
-                        .trait(LanternEnumTraits.PLANKS_TYPE)
-                        .defaultState(state -> state.withTrait(LanternEnumTraits.PLANKS_TYPE, LanternTreeType.OAK).get())
+                        .trait(LanternEnumTraits.TREE_TYPE)
+                        .defaultState(state -> state.withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
                         .itemType(builder -> builder
                                 .keysProvider(valueContainer -> valueContainer
                                         .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
@@ -326,17 +326,17 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(hardness(2.0))
                                 .add(blastResistance(5.0))
                                 .add(flammableInfo(5, 20)))
-                        .translation(TranslationProvider.of(LanternEnumTraits.PLANKS_TYPE, type ->
+                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
                                 Lantern.getRegistry().getTranslationManager().get("tile.planks." + type.getTranslationKeyBase() + ".name")))
                         .build("minecraft", "planks"),
-                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.PLANKS_TYPE).get().getInternalId());
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.TREE_TYPE).get().getInternalId());
         ////////////////////
         ///    Sapling   ///
         ////////////////////
         register(6, simpleBuilder()
-                        .traits(LanternEnumTraits.SAPLING_TYPE, LanternIntegerTraits.SAPLING_GROWTH_STAGE)
+                        .traits(LanternEnumTraits.TREE_TYPE, LanternIntegerTraits.SAPLING_GROWTH_STAGE)
                         .defaultState(state -> state
-                                .withTrait(LanternEnumTraits.SAPLING_TYPE, LanternTreeType.OAK).get()
+                                .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get()
                                 .withTrait(LanternIntegerTraits.SAPLING_GROWTH_STAGE, 0).get())
                         .itemType(builder -> builder
                                 .keysProvider(valueContainer -> valueContainer
@@ -346,11 +346,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .properties(builder -> builder
                                 .add(PropertyProviderCollections.PASSABLE)
                                 .add(PropertyProviderCollections.INSTANT_BROKEN))
-                        .translation(TranslationProvider.of(LanternEnumTraits.SAPLING_TYPE, type ->
+                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
                                 Lantern.getRegistry().getTranslationManager().get("tile.sapling." + type.getTranslationKeyBase() + ".name")))
                         .build("minecraft", "sapling"),
                 blockState -> {
-                    final int type = blockState.getTraitValue(LanternEnumTraits.SAPLING_TYPE).get().getInternalId();
+                    final int type = blockState.getTraitValue(LanternEnumTraits.TREE_TYPE).get().getInternalId();
                     final int stage = blockState.getTraitValue(LanternIntegerTraits.SAPLING_GROWTH_STAGE).get();
                     return (byte) (stage << 3 | type);
                 });
@@ -570,6 +570,53 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.chest.name")
                         .build("minecraft", "chest"),
                 this::chestData);
+        //////////////////////////
+        /// Double Wooden Slab ///
+        //////////////////////////
+        register(125, simpleBuilder()
+                        .traits(LanternEnumTraits.TREE_TYPE)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
+                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type -> Lantern.getRegistry().getTranslationManager().get(
+                                "tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
+                        .itemType(builder -> builder
+                                .keysProvider(valueContainer -> valueContainer
+                                        .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
+                                )
+                        )
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(5.0)))
+                        .build("minecraft", "double_wooden_slab"),
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.TREE_TYPE).get().getInternalId());
+        //////////////////////////
+        ///     Wooden Slab    ///
+        //////////////////////////
+        register(126, simpleBuilder()
+                        .traits(LanternEnumTraits.PORTION_TYPE, LanternEnumTraits.TREE_TYPE)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.PORTION_TYPE, LanternPortionType.BOTTOM).get()
+                                .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
+                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type -> Lantern.getRegistry().getTranslationManager().get(
+                                "tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
+                        .itemType(builder -> builder
+                                .behaviors(pipeline -> pipeline
+                                        .add(new SlabItemInteractionBehavior<>(LanternEnumTraits.TREE_TYPE,
+                                                () -> BlockTypes.WOODEN_SLAB,
+                                                () -> BlockTypes.DOUBLE_WOODEN_SLAB)))
+                                .keysProvider(valueContainer -> valueContainer
+                                        .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
+                                )
+                        )
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(5.0)))
+                        .build("minecraft", "wooden_slab"),
+                blockState -> {
+                    final int type = blockState.getTraitValue(LanternEnumTraits.TREE_TYPE).get().getInternalId();
+                    final int portion = (byte) blockState.getTraitValue(LanternEnumTraits.PORTION_TYPE).get().getInternalId();
+                    return (byte) (portion << 3 | type);
+                });
         /////////////////////
         ///  Ender Chest  ///
         /////////////////////

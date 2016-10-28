@@ -23,26 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.item;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.type.LanternTreeType;
-import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.lanternpowered.server.data.type.LanternSlabType;
+import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
+import org.spongepowered.api.data.type.SlabType;
+import org.spongepowered.api.data.type.SlabTypes;
 
-public class Log1BlockItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+public class SlabTypeRegistryModule extends InternalEnumValueRegistryModule<SlabType> {
 
-    @Override
-    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.serializeValues(itemStack, valueContainer, dataView);
-        dataView.set(DATA_VALUE, ((LanternTreeType) itemStack.get(Keys.TREE_TYPE).get()).getInternalId());
+    private static final SlabTypeRegistryModule INSTANCE = new SlabTypeRegistryModule();
+
+    public static SlabTypeRegistryModule get() {
+        return INSTANCE;
     }
 
-    @Override
-    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.deserializeValues(itemStack, valueContainer, dataView);
-        valueContainer.set(Keys.TREE_TYPE, TreeTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get()).get());
+    private SlabTypeRegistryModule() {
+        super(LanternSlabType.class, SlabTypes.class);
     }
 }

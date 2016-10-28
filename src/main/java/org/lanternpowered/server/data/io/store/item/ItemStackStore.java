@@ -86,8 +86,22 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     private final Map<ItemType, ItemTypeObjectSerializer> itemTypeSerializers = new HashMap<>();
 
     {
-        add(BlockTypes.LOG, new Log1BlockItemTypeObjectSerializer());
-        add(BlockTypes.LOG2, new Log2BlockItemTypeObjectSerializer());
+        final TreeTypeItemTypeObjectSerializer treeTypeSerializer = new TreeTypeItemTypeObjectSerializer();
+        add(BlockTypes.LOG, treeTypeSerializer);
+        add(BlockTypes.WOODEN_SLAB, treeTypeSerializer);
+        add(BlockTypes.DOUBLE_WOODEN_SLAB, treeTypeSerializer);
+        add(BlockTypes.PLANKS, treeTypeSerializer);
+        add(BlockTypes.LEAVES, treeTypeSerializer);
+        add(BlockTypes.SAPLING, treeTypeSerializer);
+        final TreeType2ItemTypeObjectSerializer treeType2Serializer = new TreeType2ItemTypeObjectSerializer();
+        add(BlockTypes.LOG2, treeType2Serializer);
+        add(BlockTypes.LEAVES2, treeType2Serializer);
+        final StoneSlab1ItemTypeObjectSerializer stoneSlab1Serializer = new StoneSlab1ItemTypeObjectSerializer();
+        add(BlockTypes.STONE_SLAB, stoneSlab1Serializer);
+        add(BlockTypes.DOUBLE_STONE_SLAB, stoneSlab1Serializer);
+        final StoneSlab2ItemTypeObjectSerializer stoneSlab2Serializer = new StoneSlab2ItemTypeObjectSerializer();
+        add(BlockTypes.STONE_SLAB2, stoneSlab2Serializer);
+        add(BlockTypes.DOUBLE_STONE_SLAB2, stoneSlab2Serializer);
 
         add(ItemTypes.COAL, new CoalItemTypeObjectSerializer());
         add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());

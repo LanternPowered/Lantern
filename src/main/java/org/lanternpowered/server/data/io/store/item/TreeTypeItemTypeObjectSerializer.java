@@ -32,17 +32,17 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public class Log2BlockItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+public class TreeTypeItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        dataView.set(DATA_VALUE, ((LanternTreeType) itemStack.get(Keys.TREE_TYPE).get()).getInternalId() - 4);
+        dataView.set(DATA_VALUE, ((LanternTreeType) itemStack.get(Keys.TREE_TYPE).get()).getInternalId());
     }
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.deserializeValues(itemStack, valueContainer, dataView);
-        valueContainer.set(Keys.TREE_TYPE, TreeTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get() + 4).get());
+        valueContainer.set(Keys.TREE_TYPE, TreeTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get()).get());
     }
 }

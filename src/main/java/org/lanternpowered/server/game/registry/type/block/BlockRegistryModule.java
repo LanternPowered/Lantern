@@ -52,13 +52,14 @@ import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.DirectionalPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.LogAxisRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.OpeneableContainerInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.tile.LanternTileEntityTypes;
@@ -491,14 +492,26 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Dispenser  ///
         ////////////////////
         register(23, simpleBuilder()
+                        .traits(LanternEnumTraits.FACING, LanternBooleanTraits.TRIGGERED)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.FACING, Direction.NORTH).get()
+                                .withTrait(LanternBooleanTraits.TRIGGERED, false).get())
                         .itemType()
-                        // TODO: Direction
                         .properties(builder -> builder
                                 .add(hardness(3.5))
                                 .add(blastResistance(17.5)))
-                        .tileEntityType(() -> TileEntityTypes.DISPENSER)
+                        // .tileEntityType(() -> TileEntityTypes.DISPENSER)
                         .translation("tile.dispenser.name")
-                        .build("minecraft", "dispenser"));
+                        .behaviors(pipeline -> pipeline
+                                .add(new RotationPlacementBehavior()))
+                        .build("minecraft", "dispenser"),
+                blockState -> {
+                    int data = directionData(blockState.getTraitValue(LanternEnumTraits.FACING).get());
+                    if (blockState.getTraitValue(LanternBooleanTraits.TRIGGERED).get()) {
+                        data |= 0x8;
+                    }
+                    return (byte) data;
+                });
         ////////////////////
         ///   Sandstone  ///
         ////////////////////
@@ -585,6 +598,22 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.chest.name")
                         .build("minecraft", "chest"),
                 this::chestData);
+        ////////////////////
+        ///    Pumpkin   ///
+        ////////////////////
+        register(86, pumpkinBuilder()
+                        .translation("tile.pumpkin.name")
+                        .build("minecraft", "pumpkin"),
+                this::pumpkinData);
+        ////////////////////
+        ///  Lit Pumpkin ///
+        ////////////////////
+        register(91, pumpkinBuilder()
+                        .properties(builder -> builder
+                                .add(lightEmission(15)))
+                        .translation("tile.litpumpkin.name")
+                        .build("minecraft", "lit_pumpkin"),
+                this::pumpkinData);
         /////////////////////
         /// Stained Glass ///
         /////////////////////
@@ -729,6 +758,30 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(new QuartzLinesRotationPlacementBehavior()))
                         .build("minecraft", "quartz_block"),
                 blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.QUARTZ_TYPE).get().getInternalId());
+        ////////////////////
+        ///    Dropper   ///
+        ////////////////////
+        register(158, simpleBuilder()
+                        .traits(LanternEnumTraits.FACING, LanternBooleanTraits.TRIGGERED)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.FACING, Direction.NORTH).get()
+                                .withTrait(LanternBooleanTraits.TRIGGERED, false).get())
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(3.5))
+                                .add(blastResistance(17.5)))
+                        // .tileEntityType(() -> TileEntityTypes.DROPPER)
+                        .translation("tile.dropper.name")
+                        .behaviors(pipeline -> pipeline
+                                .add(new RotationPlacementBehavior()))
+                        .build("minecraft", "dropper"),
+                blockState -> {
+                    int data = directionData(blockState.getTraitValue(LanternEnumTraits.FACING).get());
+                    if (blockState.getTraitValue(LanternBooleanTraits.TRIGGERED).get()) {
+                        data |= 0x8;
+                    }
+                    return (byte) data;
+                });
         //////////////////////////////
         /// Stained Hardended Clay ///
         //////////////////////////////
@@ -950,6 +1003,38 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         }
     }
 
+    private int horizontalDirectionData(Direction direction) {
+        switch (direction) {
+            case SOUTH:
+                return 0;
+            case WEST:
+                return 1;
+            case NORTH:
+                return 2;
+            case EAST:
+                return 3;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
+
+    private BlockTypeBuilder pumpkinBuilder() {
+        return simpleBuilder()
+                .itemType()
+                .traits(LanternEnumTraits.HORIZONTAL_FACING)
+                .defaultState(state -> state
+                        .withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
+                .properties(builder -> builder
+                        .add(hardness(1.0))
+                        .add(blastResistance(5.0)))
+                .behaviors(pipeline -> pipeline
+                        .add(new HorizontalRotationPlacementBehavior()));
+    }
+
+    private byte pumpkinData(BlockState blockState) {
+        return (byte) horizontalDirectionData(blockState.getTraitValue(LanternEnumTraits.HORIZONTAL_FACING).get());
+    }
+
     private BlockTypeBuilder dyedBuilder(String translationKey) {
         return simpleBuilder()
                 .traits(LanternEnumTraits.DYE_COLOR)
@@ -1075,7 +1160,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .behaviors(pipeline -> pipeline
                         .add(new BlockSnapshotProviderPlaceBehavior())
                         .add(new SimplePlacementBehavior())
-                        .add(new DirectionalPlacementBehavior())
+                        .add(new OppositeFaceDirectionalPlacementBehavior())
                         .add(new OpeneableContainerInteractionBehavior())
                         .add(new SimpleBreakBehavior()));
         // TODO: Item drops?

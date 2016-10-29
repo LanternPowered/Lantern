@@ -44,4 +44,6 @@ public final class LanternBooleanTraits {
     public static final BooleanTrait SEAMLESS = LanternBooleanTrait.of("seamless", Keys.SEAMLESS);
 
     public static final BooleanTrait ENABLED = LanternBooleanTrait.of("enabled", LanternKeys.ENABLED);
+
+    public static final BooleanTrait TRIGGERED = LanternBooleanTrait.of("triggered", LanternKeys.TRIGGERED);
 }

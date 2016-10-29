@@ -75,6 +75,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("Enabled"), "lantern:enabled");
     public static final Key<Value<InventorySnapshot>> INVENTORY =
             makeValueKey(InventorySnapshot.class, DataQuery.of("Inventory"), "lantern:inventory");
+    public static final Key<Value<Boolean>> TRIGGERED =
+            makeValueKey(Boolean.class, DataQuery.of("Triggered"), "lantern:triggered");
 
     private LanternKeys() {
     }

@@ -435,7 +435,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public void setHeadRotation(Vector3d rotation) {
-        this.setRotation(rotation);
+        setRotation(rotation);
     }
 
     @Override

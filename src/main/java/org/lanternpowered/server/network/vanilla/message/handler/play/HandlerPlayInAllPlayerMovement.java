@@ -50,7 +50,7 @@ public final class HandlerPlayInAllPlayerMovement {
         public void handle(NetworkContext context, MessagePlayInPlayerMovementAndLook message) {
             final LanternPlayer player = context.getSession().getPlayer();
             player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
-            player.setRawRotation(new Vector3d(message.getPitch(), message.getYaw(), 0));
+            player.setRawRotation(toRotation(message.getPitch(), message.getYaw()));
         }
     }
 
@@ -59,7 +59,21 @@ public final class HandlerPlayInAllPlayerMovement {
         @Override
         public void handle(NetworkContext context, MessagePlayInPlayerLook message) {
             final LanternPlayer player = context.getSession().getPlayer();
-            player.setRawRotation(new Vector3d(message.getPitch(), message.getYaw(), 0));
+            player.setRawRotation(toRotation(message.getPitch(), message.getYaw()));
         }
+    }
+
+    private Vector3d toRotation(float yaw, float pitch) {
+        yaw %= 360.0f;
+        pitch %= 360.0f;
+        if (yaw < 180.0f) {
+            yaw += 360.0f;
+        } else if (yaw > 180.0f) {
+            yaw -= 360.0f;
+        }
+        if (pitch < 0) {
+            pitch += 360.0f;
+        }
+        return new Vector3d(yaw, pitch, 0);
     }
 }

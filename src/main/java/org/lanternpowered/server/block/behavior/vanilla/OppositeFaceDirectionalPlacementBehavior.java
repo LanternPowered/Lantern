@@ -33,7 +33,7 @@ import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.spongepowered.api.data.key.Keys;
 
-public class DirectionalPlacementBehavior implements PlaceBlockBehavior {
+public class OppositeFaceDirectionalPlacementBehavior implements PlaceBlockBehavior {
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {

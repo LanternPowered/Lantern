@@ -27,6 +27,7 @@ package org.lanternpowered.server.data.io.store.item;
 
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
+import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.data.io.store.ObjectSerializer;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.data.DataHolderStore;
@@ -111,6 +112,23 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(BlockTypes.STAINED_HARDENED_CLAY, dyeColorSerializer);
         add(BlockTypes.STAINED_GLASS, dyeColorSerializer);
         add(BlockTypes.STAINED_GLASS_PANE, dyeColorSerializer);
+        final ShulkerBoxItemObjectSerializer shulkerBoxSerializer = new ShulkerBoxItemObjectSerializer();
+        add(LanternBlockTypes.BLACK_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.BLUE_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.BROWN_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.CYAN_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.GRAY_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.GREEN_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.LIGHT_BLUE_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.LIME_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.MAGENTA_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.ORANGE_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.PINK_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.PURPLE_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.RED_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.SILVER_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.WHITE_SHULKER_BOX, shulkerBoxSerializer);
+        add(LanternBlockTypes.YELLOW_SHULKER_BOX, shulkerBoxSerializer);
 
         add(ItemTypes.COAL, new CoalItemTypeObjectSerializer());
         add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());

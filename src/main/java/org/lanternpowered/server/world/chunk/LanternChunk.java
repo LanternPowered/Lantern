@@ -35,6 +35,7 @@ import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.objects.ObjectIterator;
@@ -1029,8 +1030,9 @@ public class LanternChunk implements AbstractExtent, Chunk {
     public BlockSnapshot createSnapshot(int x, int y, int z) {
         final BlockState state = getBlock(x, y, z);
         final Location<World> loc = new Location<>(this.world, x, y, z);
+        // TODO: Tile entity data
         return new LanternBlockSnapshot(loc, state, ((LanternBlockType) state.getType()).getExtendedBlockStateProvider().get(state, loc, null),
-                getCreator(x, y, z), getNotifier(x, y, z));
+                getCreator(x, y, z), getNotifier(x, y, z), ImmutableMap.of());
     }
 
     @Override

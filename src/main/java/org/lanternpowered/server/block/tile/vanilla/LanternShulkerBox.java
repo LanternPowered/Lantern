@@ -26,13 +26,17 @@
 package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.block.LanternBlockTypes;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.sound.LanternSoundTypes;
+import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.util.Optional;
 import java.util.Random;
 
 public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory> {
@@ -42,7 +46,15 @@ public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory>
     @Override
     public void registerKeys() {
         super.registerKeys();
-        this.registerKey(Keys.DISPLAY_NAME, null);
+        registerKey(Keys.DISPLAY_NAME, null);
+        registerKey(LanternKeys.INVENTORY).applyValueProcessor(builder -> builder
+                .offerHandler(((key, valueContainer, inventorySnapshot) -> {
+                    this.inventory.clear();
+                    inventorySnapshot.offerTo(this.inventory);
+                    return DataTransactionResult.successNoData();
+                }))
+                .failAlwaysRemoveHandler()
+                .retrieveHandler((key, valueContainer) -> Optional.of(InventorySnapshot.ofInventory(this.inventory))));
     }
 
     @Override

@@ -67,15 +67,15 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         checkNotNull(element, "element");
 
         // Check the local key registration
-        KeyRegistration<BaseValue<E>, E> localKeyRegistration = this.getKeyRegistration(key);
+        KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
         if (localKeyRegistration == null) {
-            if (this.requiresKeyRegistration()) {
+            if (requiresKeyRegistration()) {
                 return DataTransactionResult.failNoData();
             }
         } else {
             List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
             if (!processors.isEmpty()) {
-                return this.offerWith(key, element, processors.get(0));
+                return offerWith(key, element, processors.get(0));
             }
         }
 
@@ -84,14 +84,14 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
-                    return this.offerWith(key, element, valueProcessor);
+                    return offerWith(key, element, valueProcessor);
                 }
             }
         }
 
         // Use the global processor
         if (localKeyRegistration != null && localKeyRegistration instanceof ElementHolder) {
-            return this.offerWith(key, element, ValueProcessor.getDefaultAttachedValueProcessor());
+            return offerWith(key, element, ValueProcessor.getDefaultAttachedValueProcessor());
         }
 
         // Check for the custom data manipulators

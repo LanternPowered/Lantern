@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableMap;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataView;
@@ -42,6 +43,8 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,6 +72,8 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
 
     @Nullable private UUID creator;
     @Nullable private UUID notifier;
+
+    private final Map<Key<?>, Object> tileEntityData = new HashMap<>();
 
     BlockSnapshotBuilder() {
         super(BlockSnapshot.class, 1);
@@ -158,6 +163,9 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         final Optional<BlockState> blockState = this.blockState.with(key, value);
         if (blockState.isPresent()) {
             this.blockState = blockState.get();
+        } else {
+            // TODO: Check if the key is supported???
+            this.tileEntityData.put(key, value);
         }
         return this;
     }
@@ -175,6 +183,10 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         this.worldUUID = blockLocation == null ? null : blockLocation.world.getUniqueId();
         //noinspection ConstantConditions
         this.position = blockLocation == null ? null : blockLocation.position;
+        this.tileEntityData.clear();
+        if (snapshot.tileEntityData != null) {
+            this.tileEntityData.putAll(snapshot.tileEntityData);
+        }
         return this;
     }
 
@@ -183,8 +195,8 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         checkState(this.blockState != null, "The block state must be set.");
         final LanternBlockSnapshot.BlockLocation blockLocation = this.worldUUID == null  || this.position == null ? null :
                 new LanternBlockSnapshot.BlockLocation(this.worldUUID, this.position);
-        return new LanternBlockSnapshot(blockLocation, this.blockState,
-                this.extendedBlockState, Optional.ofNullable(this.creator), Optional.ofNullable(this.notifier));
+        return new LanternBlockSnapshot(blockLocation, this.blockState, this.extendedBlockState, Optional.ofNullable(this.creator),
+                Optional.ofNullable(this.notifier), ImmutableMap.copyOf(this.tileEntityData));
     }
 
     @Override
@@ -200,6 +212,7 @@ public abstract class BlockSnapshotBuilder extends AbstractDataBuilder<BlockSnap
         this.worldUUID = null;
         this.notifier = null;
         this.creator = null;
+        this.tileEntityData.clear();
         return this;
     }
 }

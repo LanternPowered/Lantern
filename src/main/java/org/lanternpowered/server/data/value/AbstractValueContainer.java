@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
-import org.lanternpowered.server.util.functions.TriFunction;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.BaseValue;
@@ -137,7 +136,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     @SuppressWarnings("unchecked")
     @Nullable
     default <V extends BaseValue<E>, E> KeyRegistration<V, E> getKeyRegistration(Key<? extends BaseValue<E>> key) {
-        return this.getRawValueMap().get(key);
+        return getRawValueMap().get(key);
     }
 
     @SuppressWarnings("unchecked")
@@ -146,7 +145,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         checkNotNull(key, "key");
 
         // Check the local key registration
-        KeyRegistration<?, ?> localKeyRegistration = this.getKeyRegistration((Key) key);
+        KeyRegistration<?, ?> localKeyRegistration = getKeyRegistration((Key) key);
         if (localKeyRegistration == null) {
             if (this.requiresKeyRegistration()) {
                 return false;
@@ -333,7 +332,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     @Override
     default <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key, @Nullable E defaultValue) {
         checkNotNull(key, "key");
-        final Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
+        final Map<Key<?>, KeyRegistration> map = getRawValueMap();
         checkArgument(!map.containsKey(key), "The specified key (%s) is already registered.", key);
         final ElementHolderKeyRegistrationImpl<V, E> holder = new ElementHolderKeyRegistrationImpl<>(key);
         holder.set(defaultValue);
@@ -344,7 +343,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     @Override
     default <V extends BaseValue<E>, E> KeyRegistration<V, E> registerKey(Key<? extends V> key) {
         checkNotNull(key, "key");
-        final Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
+        final Map<Key<?>, KeyRegistration> map = getRawValueMap();
         checkArgument(!map.containsKey(key), "The specified key (%s) is already registered.", key);
         final KeyRegistration<V, E> holder = new SimpleKeyRegistration.SingleProcessor<>(key);
         map.put(key, holder);

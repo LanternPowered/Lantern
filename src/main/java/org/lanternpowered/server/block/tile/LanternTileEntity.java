@@ -61,6 +61,7 @@ public abstract class LanternTileEntity extends BaseComponentHolder implements T
             //noinspection ConstantConditions
             this.tileEntityType = null;
         }
+        registerKeys();
     }
 
     /**

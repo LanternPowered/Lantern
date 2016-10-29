@@ -72,7 +72,7 @@ public abstract class SimpleKeyRegistration<V extends BaseValue<E>, E> implement
     public KeyRegistration<V, E> applyValueProcessor(Consumer<ValueProcessor.Builder<V, E>> builderConsumer) {
         ValueProcessor.Builder<V, E> builder = ValueProcessor.builder();
         checkNotNull(builderConsumer, "builderConsumer").accept(builder);
-        return this.addValueProcessor(builder.build());
+        return addValueProcessor(builder.build());
     }
 
     public static class SingleProcessor<V extends BaseValue<E>, E> extends SimpleKeyRegistration<V, E> {

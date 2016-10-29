@@ -30,9 +30,37 @@ import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 public final class LanternBlockTypes {
 
+    public static final BlockType WHITE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "WHITE_SHULKER_BOX");
+
     public static final BlockType ORANGE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "ORANGE_SHULKER_BOX");
 
-    public static final BlockType WHITE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "WHITE_SHULKER_BOX");
+    public static final BlockType MAGENTA_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "MAGENTA_SHULKER_BOX");
+
+    public static final BlockType LIGHT_BLUE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "LIGHT_BLUE_SHULKER_BOX");
+
+    public static final BlockType YELLOW_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "YELLOW_SHULKER_BOX");
+
+    public static final BlockType LIME_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "LIME_SHULKER_BOX");
+
+    public static final BlockType PINK_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "PINK_SHULKER_BOX");
+
+    public static final BlockType GRAY_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "GRAY_SHULKER_BOX");
+
+    public static final BlockType SILVER_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "SILVER_SHULKER_BOX");
+
+    public static final BlockType CYAN_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "CYAN_SHULKER_BOX");
+
+    public static final BlockType PURPLE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "PURPLE_SHULKER_BOX");
+
+    public static final BlockType BLUE_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "BLUE_SHULKER_BOX");
+
+    public static final BlockType BROWN_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "BROWN_SHULKER_BOX");
+
+    public static final BlockType GREEN_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "GREEN_SHULKER_BOX");
+
+    public static final BlockType RED_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "RED_SHULKER_BOX");
+
+    public static final BlockType BLACK_SHULKER_BOX = DummyObjectProvider.createFor(BlockType.class, "BLACK_SHULKER_BOX");
 
     private LanternBlockTypes() {
     }

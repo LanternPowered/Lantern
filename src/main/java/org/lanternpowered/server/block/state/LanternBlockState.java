@@ -313,8 +313,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     public BlockSnapshot snapshotFor(Location<World> location) {
         final World world = location.getExtent();
         final Vector3i pos = location.getBlockPosition();
+        // TODO: Tile entity data
         return new LanternBlockSnapshot(location, this, this,
-                world.getCreator(pos), world.getNotifier(pos));
+                world.getCreator(pos), world.getNotifier(pos), ImmutableMap.of());
     }
 
     @Override

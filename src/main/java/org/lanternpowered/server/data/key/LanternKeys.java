@@ -31,6 +31,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
+import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.SkinPart;
@@ -72,6 +73,8 @@ public final class LanternKeys {
             makeValueKey(LanternBedPart.class, DataQuery.of("BedPart"), "lantern:bed_part");
     public static final Key<Value<Boolean>> ENABLED =
             makeValueKey(Boolean.class, DataQuery.of("Enabled"), "lantern:enabled");
+    public static final Key<Value<InventorySnapshot>> INVENTORY =
+            makeValueKey(InventorySnapshot.class, DataQuery.of("Inventory"), "lantern:inventory");
 
     private LanternKeys() {
     }

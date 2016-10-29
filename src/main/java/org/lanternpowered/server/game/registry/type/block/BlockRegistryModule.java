@@ -66,6 +66,7 @@ import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
 import org.lanternpowered.server.block.translation.SpongeTranslationProvider;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
@@ -82,6 +83,7 @@ import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryMo
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.lanternpowered.server.item.behavior.vanilla.SlabItemInteractionBehavior;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -1061,7 +1063,11 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         return builder()
                 .trait(LanternEnumTraits.FACING)
                 .defaultState(state -> state.withTrait(LanternEnumTraits.FACING, Direction.UP).get())
-                .itemType()
+                .itemType(builder -> builder
+                        .keysProvider(valueContainer -> valueContainer
+                                .registerKey(LanternKeys.INVENTORY, InventorySnapshot.EMPTY)
+                        )
+                )
                 .tileEntityType(() -> LanternTileEntityTypes.SHULKER_BOX)
                 .properties(builder -> builder
                         .add(hardness(2.0))

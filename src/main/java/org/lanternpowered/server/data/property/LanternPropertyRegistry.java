@@ -34,6 +34,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.lanternpowered.server.block.PropertyProviderCollection;
 import org.lanternpowered.server.data.property.block.BlockPropertyStore;
+import org.lanternpowered.server.data.property.item.ItemPropertyStore;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.PropertyHolder;
 import org.spongepowered.api.data.property.PropertyRegistry;
@@ -65,6 +66,15 @@ public class LanternPropertyRegistry implements PropertyRegistry {
         for (Class<? extends Property> entry : collection.keys()) {
             if (!this.propertyStoreMap.containsKey(entry)) {
                 register(entry, new BlockPropertyStore(entry));
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void registerItemPropertyStores(org.lanternpowered.server.item.PropertyProviderCollection collection) {
+        for (Class<? extends Property> entry : collection.keys()) {
+            if (!this.propertyStoreMap.containsKey(entry)) {
+                register(entry, new ItemPropertyStore(entry));
             }
         }
     }

@@ -35,6 +35,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
@@ -94,6 +95,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         super.register(itemType);
         this.internalIdByItemType.put(itemType, internalId);
         this.itemTypeByInternalId.put(internalId, itemType);
+        LanternPropertyRegistry.getInstance().registerItemPropertyStores(((LanternItemType) itemType).getPropertyProviderCollection());
     }
 
     @Override

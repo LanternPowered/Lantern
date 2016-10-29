@@ -44,6 +44,7 @@ import javax.annotation.Nullable;
 
 public class ItemTypeBuilderImpl implements ItemTypeBuilder {
 
+    @Nullable private PropertyProviderCollection.Builder propertiesBuilder;
     @Nullable private MutableBehaviorPipeline<Behavior> behaviorPipeline;
     @Nullable private TranslationProvider translationProvider;
     private Consumer<AbstractValueContainer> keysProvider = valueContainer -> {};
@@ -61,6 +62,23 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
     public ItemTypeBuilderImpl blockType(BlockType blockType) {
         checkNotNull(blockType, "blockType");
         this.blockType = blockType;
+        return this;
+    }
+
+    @Override
+    public ItemTypeBuilderImpl properties(PropertyProviderCollection collection) {
+        checkNotNull(collection, "collection");
+        this.propertiesBuilder = collection.toBuilder();
+        return this;
+    }
+
+    @Override
+    public ItemTypeBuilderImpl properties(Consumer<PropertyProviderCollection.Builder> consumer) {
+        checkNotNull(consumer, "consumer");
+        if (this.propertiesBuilder == null) {
+            this.propertiesBuilder = PropertyProviderCollection.builder();
+        }
+        consumer.accept(this.propertiesBuilder);
         return this;
     }
 
@@ -124,7 +142,13 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
             }
             translationProvider = TranslationProvider.of(Lantern.getRegistry().getTranslationManager().get(path));
         }
-        return new LanternItemType(pluginId, name, behaviorPipeline, translationProvider,
+        PropertyProviderCollection properties;
+        if (this.propertiesBuilder != null) {
+            properties = this.propertiesBuilder.build();
+        } else {
+            properties = PropertyProviderCollection.builder().build();
+        }
+        return new LanternItemType(pluginId, name, properties, behaviorPipeline, translationProvider,
                 this.keysProvider, this.blockType, this.maxStackQuantity);
     }
 }

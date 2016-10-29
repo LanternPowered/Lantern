@@ -40,6 +40,10 @@ public interface ItemTypeBuilder {
 
     ItemTypeBuilder blockType(BlockType blockType);
 
+    ItemTypeBuilder properties(PropertyProviderCollection collection);
+
+    ItemTypeBuilder properties(Consumer<PropertyProviderCollection.Builder> consumer);
+
     ItemTypeBuilder behaviors(BehaviorPipeline<Behavior> behaviorPipeline);
 
     ItemTypeBuilder behaviors(Consumer<MutableBehaviorPipeline<Behavior>> consumer);

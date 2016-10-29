@@ -27,6 +27,7 @@ package org.lanternpowered.server.block;
 
 import org.spongepowered.api.data.Property;
 
+@FunctionalInterface
 public interface PropertyProvider<T extends Property> extends ObjectProvider<T> {
 
 }

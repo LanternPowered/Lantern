@@ -23,16 +23,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block;
+package org.lanternpowered.server.item;
 
-import org.spongepowered.api.block.tileentity.TileEntity;
-
-import java.util.function.Supplier;
+import org.spongepowered.api.data.Property;
 
 @FunctionalInterface
-public interface TileEntityProvider extends ObjectProvider<TileEntity> {
+public interface PropertyProvider<T extends Property> extends ObjectProvider<T> {
 
-    static TileEntityProvider of(Supplier<TileEntity> supplier) {
-        return (blockState, location, face) -> supplier.get();
-    }
 }

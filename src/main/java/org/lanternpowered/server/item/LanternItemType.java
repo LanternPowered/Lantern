@@ -41,6 +41,7 @@ import javax.annotation.Nullable;
 
 public class LanternItemType extends PluginCatalogType.Base implements ItemType {
 
+    private final PropertyProviderCollection propertyProviderCollection;
     private final MutableBehaviorPipeline<Behavior> behaviorPipeline;
     private final TranslationProvider translationProvider;
     private final Consumer<AbstractValueContainer> keysProvider;
@@ -49,7 +50,8 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
 
     private final int maxStackQuantity;
 
-    LanternItemType(String pluginId, String name, MutableBehaviorPipeline<Behavior> behaviorPipeline,
+    LanternItemType(String pluginId, String name, PropertyProviderCollection propertyProviderCollection,
+            MutableBehaviorPipeline<Behavior> behaviorPipeline,
             TranslationProvider translationProvider, Consumer<AbstractValueContainer> keysProvider,
             @Nullable BlockType blockType, int maxStackQuantity) {
         super(pluginId, name);
@@ -57,6 +59,7 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
         this.maxStackQuantity = maxStackQuantity;
         this.behaviorPipeline = behaviorPipeline;
         this.translationProvider = translationProvider;
+        this.propertyProviderCollection = propertyProviderCollection;
         this.blockType = blockType;
     }
 
@@ -82,8 +85,7 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Property<?, ?>> Optional<T> getDefaultProperty(Class<T> propertyClass) {
-        // TODO
-        return Optional.empty();
+        return this.propertyProviderCollection.get(propertyClass).map(propertyProvider -> propertyProvider.get(this, null));
     }
 
     public MutableBehaviorPipeline<Behavior> getPipeline() {
@@ -92,5 +94,9 @@ public class LanternItemType extends PluginCatalogType.Base implements ItemType 
 
     public Consumer<AbstractValueContainer> getKeysProvider() {
         return this.keysProvider;
+    }
+
+    public PropertyProviderCollection getPropertyProviderCollection() {
+        return this.propertyProviderCollection;
     }
 }

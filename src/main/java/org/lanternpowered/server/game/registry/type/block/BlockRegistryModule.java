@@ -1152,6 +1152,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .keysProvider(valueContainer -> valueContainer
                                 .registerKey(LanternKeys.INVENTORY, InventorySnapshot.EMPTY)
                         )
+                        .maxStackQuantity(1)
                 )
                 .tileEntityType(() -> LanternTileEntityTypes.SHULKER_BOX)
                 .properties(builder -> builder

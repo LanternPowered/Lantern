@@ -23,27 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.item;
+package org.lanternpowered.server.util;
 
-import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.type.LanternCoalType;
-import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.CoalTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
+@FunctionalInterface
+public interface IntToIntFunction {
 
-public class CoalItemTypeObjectSerializer extends ItemTypeObjectSerializer {
-
-    @Override
-    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.serializeValues(itemStack, valueContainer, dataView);
-        valueContainer.get(Keys.COAL_TYPE).ifPresent(coalType -> dataView.set(DATA_VALUE, ((LanternCoalType) coalType).getInternalId()));
-    }
-
-    @Override
-    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.deserializeValues(itemStack, valueContainer, dataView);
-        valueContainer.set(Keys.COAL_TYPE, CoalTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get()).orElse(CoalTypes.COAL));
-    }
+    int apply(int value);
 }

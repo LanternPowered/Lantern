@@ -36,7 +36,8 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public class InternalEnumValueRegistryModule<V extends CatalogType> extends EnumValueRegistryModule<V> {
+public class InternalEnumValueRegistryModule<V extends CatalogType> extends EnumValueRegistryModule<V>
+        implements InternalCatalogRegistryModule<V> {
 
     private final Int2ObjectMap<V> byInternalId = new Int2ObjectOpenHashMap<>();
 
@@ -57,12 +58,7 @@ public class InternalEnumValueRegistryModule<V extends CatalogType> extends Enum
         }
     }
 
-    /**
-     * Gets the {@link V} by using the internal id.
-     *
-     * @param internalId The internal id
-     * @return The catalog type if present
-     */
+    @Override
     public Optional<V> getByInternalId(int internalId) {
         return Optional.ofNullable(this.byInternalId.get(internalId));
     }

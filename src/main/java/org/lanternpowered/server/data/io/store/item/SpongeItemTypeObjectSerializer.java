@@ -26,23 +26,21 @@
 package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.type.LanternDyeColor;
-import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-public class DyeColorItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+public class SpongeItemTypeObjectSerializer extends ItemTypeObjectSerializer {
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        dataView.set(DATA_VALUE, ((LanternDyeColor) itemStack.get(Keys.DYE_COLOR).get()).getInternalId());
+        dataView.set(DATA_VALUE, itemStack.get(Keys.IS_WET).get() ? 1 : 0);
     }
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.deserializeValues(itemStack, valueContainer, dataView);
-        valueContainer.set(Keys.DYE_COLOR, DyeColorRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get()).get());
+        valueContainer.set(Keys.IS_WET, dataView.getInt(DATA_VALUE).get() > 0);
     }
 }

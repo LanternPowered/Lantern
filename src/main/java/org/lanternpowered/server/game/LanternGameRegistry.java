@@ -66,7 +66,6 @@ import org.lanternpowered.server.data.DataRegistrar;
 import org.lanternpowered.server.data.type.LanternBigMushroomType;
 import org.lanternpowered.server.data.type.LanternBrickType;
 import org.lanternpowered.server.data.type.LanternComparatorType;
-import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDisguisedBlockType;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.data.type.LanternDoublePlantType;
@@ -76,11 +75,8 @@ import org.lanternpowered.server.data.type.LanternPistonType;
 import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
-import org.lanternpowered.server.data.type.LanternQuartzType;
 import org.lanternpowered.server.data.type.LanternSandType;
-import org.lanternpowered.server.data.type.LanternSandstoneType;
 import org.lanternpowered.server.data.type.LanternShrubType;
-import org.lanternpowered.server.data.type.LanternSlabType;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.data.value.LanternValueFactory;
@@ -111,6 +107,7 @@ import org.lanternpowered.server.game.registry.type.data.BannerPatternShapeRegis
 import org.lanternpowered.server.game.registry.type.data.CareerRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
@@ -126,9 +123,11 @@ import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModul
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.persistence.DataFormatRegistryModule;
@@ -223,7 +222,6 @@ import org.spongepowered.api.data.type.ComparatorType;
 import org.spongepowered.api.data.type.ComparatorTypes;
 import org.spongepowered.api.data.type.CookedFish;
 import org.spongepowered.api.data.type.DirtType;
-import org.spongepowered.api.data.type.DirtTypes;
 import org.spongepowered.api.data.type.DisguisedBlockType;
 import org.spongepowered.api.data.type.DisguisedBlockTypes;
 import org.spongepowered.api.data.type.DoublePlantType;
@@ -253,17 +251,14 @@ import org.spongepowered.api.data.type.PrismarineType;
 import org.spongepowered.api.data.type.PrismarineTypes;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.QuartzType;
-import org.spongepowered.api.data.type.QuartzTypes;
 import org.spongepowered.api.data.type.RabbitType;
 import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.data.type.SandTypes;
 import org.spongepowered.api.data.type.SandstoneType;
-import org.spongepowered.api.data.type.SandstoneTypes;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SlabType;
-import org.spongepowered.api.data.type.SlabTypes;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.type.ToolType;
@@ -428,8 +423,7 @@ public class LanternGameRegistry implements GameRegistry {
                         new EnumValueRegistryModule<BrickType>(LanternBrickType.class, BrickTypes.class) {})
                 .registerModule(ComparatorType.class,
                         new EnumValueRegistryModule<ComparatorType>(LanternComparatorType.class, ComparatorTypes.class) {})
-                .registerModule(DirtType.class,
-                        new EnumValueRegistryModule<DirtType>(LanternDirtType.class, DirtTypes.class) {})
+                .registerModule(DirtType.class, DirtTypeRegistryModule.get())
                 .registerModule(DisguisedBlockType.class,
                         new EnumValueRegistryModule<DisguisedBlockType>(LanternDisguisedBlockType.class, DisguisedBlockTypes.class) {})
                 .registerModule(LanternDoorHalf.class,
@@ -463,12 +457,10 @@ public class LanternGameRegistry implements GameRegistry {
                         new EnumValueRegistryModule<PrismarineType>(LanternPrismarineType.class, PrismarineTypes.class) {})
                 .registerModule(QuartzType.class, QuartzTypeRegistryModule.get())
                 .registerModule(SandstoneType.class, SandstoneTypeRegistryModule.get())
-                .registerModule(SandType.class,
-                        new EnumValueRegistryModule<SandType>(LanternSandType.class, SandTypes.class) {})
+                .registerModule(SandType.class, SandTypeRegistryModule.get())
                 .registerModule(ShrubType.class,
                         new EnumValueRegistryModule<ShrubType>(LanternShrubType.class, ShrubTypes.class) {})
-                .registerModule(StoneType.class,
-                        new EnumValueRegistryModule<StoneType>(LanternStoneType.class, StoneTypes.class) {})
+                .registerModule(StoneType.class, StoneTypeRegistryModule.get())
                 .registerModule(SlabType.class, SlabTypeRegistryModule.get())
                 .registerModule(TreeType.class, TreeTypeRegistryModule.get())
                 .registerModule(WallType.class,

@@ -38,7 +38,8 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends PluginCatalogRegistryModule<T> {
+public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends PluginCatalogRegistryModule<T>
+        implements InternalCatalogRegistryModule<T> {
 
     private final Int2ObjectMap<T> byInternalId = new Int2ObjectOpenHashMap<>();
 
@@ -72,12 +73,7 @@ public class InternalPluginCatalogRegistryModule<T extends CatalogType> extends 
         this.byInternalId.putIfAbsent(internalId, catalogType);
     }
 
-    /**
-     * Gets the {@link T} by using the internal id.
-     *
-     * @param internalId The internal id
-     * @return The catalog type if present
-     */
+    @Override
     public Optional<T> getByInternalId(int internalId) {
         return Optional.ofNullable(this.byInternalId.get(internalId));
     }

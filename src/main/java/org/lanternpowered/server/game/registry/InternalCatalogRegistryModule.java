@@ -23,26 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.item;
+package org.lanternpowered.server.game.registry;
 
-import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.lanternpowered.server.data.type.LanternTreeType;
-import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.registry.CatalogRegistryModule;
 
-public class TreeType2ItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+import java.util.Optional;
 
-    @Override
-    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.serializeValues(itemStack, valueContainer, dataView);
-        dataView.set(DATA_VALUE, ((LanternTreeType) itemStack.get(Keys.TREE_TYPE).get()).getInternalId() - 4);
-    }
+public interface InternalCatalogRegistryModule<T extends CatalogType> extends CatalogRegistryModule<T> {
 
-    @Override
-    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.deserializeValues(itemStack, valueContainer, dataView);
-        valueContainer.set(Keys.TREE_TYPE, TreeTypeRegistryModule.get().getByInternalId(dataView.getInt(DATA_VALUE).get() + 4).get());
-    }
+    /**
+     * Gets the {@link T} by using the internal id.
+     *
+     * @param internalId The internal id
+     * @return The catalog type if present
+     */
+    Optional<T> getByInternalId(int internalId);
 }

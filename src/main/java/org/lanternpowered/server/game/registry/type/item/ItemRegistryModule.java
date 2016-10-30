@@ -36,9 +36,13 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
+import org.lanternpowered.server.data.type.LanternDyeColor;
+import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -51,6 +55,10 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ArmorTypes;
 import org.spongepowered.api.data.type.CoalTypes;
+import org.spongepowered.api.data.type.CookedFishes;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.DyeColors;
+import org.spongepowered.api.data.type.Fishes;
 import org.spongepowered.api.data.type.GoldenApples;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.ToolTypes;
@@ -65,7 +73,14 @@ import org.spongepowered.api.util.Color;
 import java.util.Collections;
 import java.util.Optional;
 
-@RegistrationDependency({ BlockRegistryModule.class, ToolTypeRegistryModule.class, ArmorTypeRegistryModule.class, EquipmentTypeRegistryModule.class })
+@RegistrationDependency({
+        ArmorTypeRegistryModule.class,
+        BlockRegistryModule.class,
+        EquipmentTypeRegistryModule.class,
+        ToolTypeRegistryModule.class,
+        FishRegistryModule.class,
+        CookedFishRegistryModule.class
+})
 public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryModule<ItemType> implements ItemRegistry {
 
     private static class Holder {
@@ -558,6 +573,459 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .translation("item.bucketLava.name")
                 .maxStackQuantity(1)
                 .build("minecraft", "lava_bucket"));
+        ////////////////////
+        ///   Minecart   ///
+        ////////////////////
+        register(328, builder()
+                .translation("item.minecart.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "minecart"));
+        //////////////////
+        ///   Saddle   ///
+        //////////////////
+        register(329, builder()
+                .translation("item.saddle.name")
+                .build("minecraft", "saddle"));
+        /////////////////////
+        ///   Iron Door   ///
+        /////////////////////
+        register(330, builder()
+                .translation("item.doorIron.name")
+                .build("minecraft", "iron_door"));
+        ////////////////////
+        ///   Redstone   ///
+        ////////////////////
+        register(331, builder()
+                .translation("item.redstone.name")
+                .build("minecraft", "redstone"));
+        ////////////////////
+        ///   Snowball   ///
+        ////////////////////
+        register(332, builder()
+                .translation("item.snowball.name")
+                .build("minecraft", "snowball"));
+        ////////////////////
+        ///   Oak Boat   ///
+        ////////////////////
+        register(333, builder()
+                .translation("item.boat.oak.name")
+                .build("minecraft", "boat"));
+        ///////////////////
+        ///   Leather   ///
+        ///////////////////
+        register(334, builder()
+                .translation("item.leather.name")
+                .build("minecraft", "leather"));
+        ///////////////////////
+        ///   Milk Bucket   ///
+        ///////////////////////
+        register(335, builder()
+                .translation("item.milk.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "milk_bucket"));
+        /////////////////
+        ///   Brick   ///
+        /////////////////
+        register(336, builder()
+                .translation("item.brick.name")
+                .build("minecraft", "brick"));
+        /////////////////////
+        ///   Clay Ball   ///
+        /////////////////////
+        register(337, builder()
+                .translation("item.clay.name")
+                .build("minecraft", "clay_ball"));
+        /////////////////
+        ///   Reeds   ///
+        /////////////////
+        register(338, builder()
+                .translation("item.reeds.name")
+                .build("minecraft", "reeds"));
+        /////////////////
+        ///   Paper   ///
+        /////////////////
+        register(339, builder()
+                .translation("item.paper.name")
+                .build("minecraft", "paper"));
+        ////////////////
+        ///   Book   ///
+        ////////////////
+        register(340, builder()
+                .translation("item.book.name")
+                .build("minecraft", "book"));
+        //////////////////////
+        ///   Slime Ball   ///
+        //////////////////////
+        register(341, builder()
+                .translation("item.slimeball.name")
+                .build("minecraft", "slime_ball"));
+        //////////////////////////
+        ///   Chest Minecart   ///
+        //////////////////////////
+        register(342, builder()
+                .translation("item.minecartChest.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "chest_minecart"));
+        ////////////////////////////
+        ///   Furnace Minecart   ///
+        ////////////////////////////
+        register(343, builder()
+                .translation("item.minecartFurnace.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "furnace_minecart"));
+        ///////////////
+        ///   Egg   ///
+        ///////////////
+        register(344, builder()
+                .translation("item.egg.name")
+                .build("minecraft", "egg"));
+        ///////////////////
+        ///   Compass   ///
+        ///////////////////
+        register(345, builder()
+                .translation("item.compass.name")
+                .build("minecraft", "compass"));
+        ///////////////////////
+        ///   Fishing Rod   ///
+        ///////////////////////
+        register(346, builder()
+                .translation("item.fishingRod.name")
+                .build("minecraft", "fishing_rod"));
+        /////////////////
+        ///   Clock   ///
+        /////////////////
+        register(347, builder()
+                .translation("item.clock.name")
+                .build("minecraft", "clock"));
+        //////////////////////////
+        ///   Glowstone Dust   ///
+        //////////////////////////
+        register(348, builder()
+                .translation("item.yellowDust.name")
+                .build("minecraft", "glowstone_dust"));
+        ////////////////
+        ///   Fish   ///
+        ////////////////
+        register(349, builder()
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.FISH_TYPE, Fishes.COD).nonRemovableAttachedValueProcessor())
+                .translation(TranslationProvider.of(Fishes.COD, Keys.FISH_TYPE))
+                .build("minecraft", "fish"));
+        ///////////////////////
+        ///   Cooked Fish   ///
+        ///////////////////////
+        register(350, builder()
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.COOKED_FISH, CookedFishes.COD).nonRemovableAttachedValueProcessor())
+                .translation(TranslationProvider.of(CookedFishes.COD, Keys.COOKED_FISH))
+                .build("minecraft", "cooked_fish"));
+        ///////////////
+        ///   Dye   ///
+        ///////////////
+        register(351, builder()
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.DYE_COLOR, DyeColors.WHITE).nonRemovableAttachedValueProcessor())
+                .translation((itemType, itemStack) -> {
+                    final DyeColor dyeColor = itemStack == null ? DyeColors.WHITE : itemStack.get(Keys.DYE_COLOR).get();
+                    return Lantern.getRegistry().getTranslationManager().get(
+                            String.format("item.dyePowder.%s.name", ((LanternDyeColor) dyeColor).getTranslationPart()));
+                })
+                .build("minecraft", "dye"));
+        ////////////////
+        ///   Bone   ///
+        ////////////////
+        register(352, builder()
+                .translation("item.bone.name")
+                .build("minecraft", "bone"));
+        /////////////////
+        ///   Sugar   ///
+        /////////////////
+        register(353, builder()
+                .translation("item.sugar.name")
+                .build("minecraft", "sugar"));
+        ////////////////
+        ///   Cake   ///
+        ////////////////
+        register(354, builder()
+                .translation("item.cake.name")
+                .build("minecraft", "cake"));
+        ///////////////
+        ///   Bed   ///
+        ///////////////
+        register(355, builder()
+                .translation("item.bed.name")
+                .build("minecraft", "bed"));
+        ////////////////////
+        ///   Repeater   ///
+        ////////////////////
+        register(356, builder()
+                .translation("item.diode.name")
+                .build("minecraft", "repeater"));
+        //////////////////
+        ///   Cookie   ///
+        //////////////////
+        register(357, builder()
+                .translation("item.cookie.name")
+                .build("minecraft", "cookie"));
+        //////////////////////
+        ///   Filled Map   ///
+        //////////////////////
+        register(358, builder()
+                .translation("item.map.name")
+                .build("minecraft", "filled_map"));
+        //////////////////
+        ///   Shears   ///
+        //////////////////
+        register(359, builder()
+                .translation("item.shears.name")
+                .build("minecraft", "shears"));
+        /////////////////
+        ///   Melon   ///
+        /////////////////
+        register(360, builder()
+                .translation("item.melon.name")
+                .build("minecraft", "melon"));
+        /////////////////////////
+        ///   Pumpkin Seeds   ///
+        /////////////////////////
+        register(361, builder()
+                .translation("item.seeds_pumpkin.name")
+                .build("minecraft", "pumpkin_seeds"));
+        ///////////////////////
+        ///   Melon Seeds   ///
+        ///////////////////////
+        register(362, builder()
+                .translation("item.seeds_melon.name")
+                .build("minecraft", "melon_seeds"));
+        ////////////////
+        ///   Beef   ///
+        ////////////////
+        register(363, builder()
+                .translation("item.beefRaw.name")
+                .build("minecraft", "beef"));
+        ///////////////////////
+        ///   Cooked Beef   ///
+        ///////////////////////
+        register(364, builder()
+                .translation("item.beefCooked.name")
+                .build("minecraft", "cooked_beef"));
+        ///////////////////
+        ///   Chicken   ///
+        ///////////////////
+        register(365, builder()
+                .translation("item.chickenRaw.name")
+                .build("minecraft", "chicken"));
+        //////////////////////////
+        ///   Cooked Chicken   ///
+        //////////////////////////
+        register(366, builder()
+                .translation("item.chickenCooked.name")
+                .build("minecraft", "cooked_chicken"));
+        ////////////////////////
+        ///   Rotten Flesh   ///
+        ////////////////////////
+        register(367, builder()
+                .translation("item.rottenFlesh.name")
+                .build("minecraft", "rotten_flesh"));
+        ///////////////////////
+        ///   Ender Pearl   ///
+        ///////////////////////
+        register(368, builder()
+                .translation("item.enderPearl.name")
+                .build("minecraft", "ender_pearl"));
+        /////////////////////
+        ///   Blaze Rod   ///
+        /////////////////////
+        register(369, builder()
+                .translation("item.blazeRod.name")
+                .build("minecraft", "blaze_rod"));
+        //////////////////////
+        ///   Ghast Tear   ///
+        //////////////////////
+        register(370, builder()
+                .translation("item.ghastTear.name")
+                .build("minecraft", "ghast_tear"));
+        ///////////////////////
+        ///   Gold Nugget   ///
+        ///////////////////////
+        register(371, builder()
+                .translation("item.goldNugget.name")
+                .build("minecraft", "gold_nugget"));
+        ///////////////////////
+        ///   Nether Wart   ///
+        ///////////////////////
+        register(372, builder()
+                .translation("item.netherStalkSeeds.name")
+                .build("minecraft", "nether_wart"));
+        //////////////////
+        ///   Potion   ///
+        //////////////////
+        register(373, builder()
+                .translation("item.potion.name")
+                .build("minecraft", "potion"));
+        ////////////////////////
+        ///   Glass Bottle   ///
+        ////////////////////////
+        register(374, builder()
+                .translation("item.glassBottle.name")
+                .build("minecraft", "glass_bottle"));
+        //////////////////////
+        ///   Spider Eye   ///
+        //////////////////////
+        register(375, builder()
+                .translation("item.spiderEye.name")
+                .build("minecraft", "spider_eye"));
+        ////////////////////////////////
+        ///   Fermented Spider Eye   ///
+        ////////////////////////////////
+        register(376, builder()
+                .translation("item.fermentedSpiderEye.name")
+                .build("minecraft", "fermented_spider_eye"));
+        ////////////////////////
+        ///   Blaze Powder   ///
+        ////////////////////////
+        register(377, builder()
+                .translation("item.blazePowder.name")
+                .build("minecraft", "blaze_powder"));
+        ///////////////////////
+        ///   Magma Cream   ///
+        ///////////////////////
+        register(378, builder()
+                .translation("item.magmaCream.name")
+                .build("minecraft", "magma_cream"));
+        /////////////////////////
+        ///   Brewing Stand   ///
+        /////////////////////////
+        register(379, builder()
+                .translation("item.brewingStand.name")
+                .build("minecraft", "brewing_stand"));
+        ////////////////////
+        ///   Cauldron   ///
+        ////////////////////
+        register(380, builder()
+                .translation("item.cauldron.name")
+                .build("minecraft", "cauldron"));
+        /////////////////////
+        ///   Ender Eye   ///
+        /////////////////////
+        register(381, builder()
+                .translation("item.eyeOfEnder.name")
+                .build("minecraft", "ender_eye"));
+        //////////////////////////
+        ///   Speckled Melon   ///
+        //////////////////////////
+        register(382, builder()
+                .translation("item.speckledMelon.name")
+                .build("minecraft", "speckled_melon"));
+        /////////////////////
+        ///   Spawn Egg   ///
+        /////////////////////
+        register(383, builder()
+                .translation("item.monsterPlacer.name")
+                .build("minecraft", "spawn_egg"));
+        /////////////////////////////
+        ///   Experience Bottle   ///
+        /////////////////////////////
+        register(384, builder()
+                .translation("item.expBottle.name")
+                .build("minecraft", "experience_bottle"));
+        ///////////////////////
+        ///   Fire Charge   ///
+        ///////////////////////
+        register(385, builder()
+                .translation("item.fireball.name")
+                .build("minecraft", "fire_charge"));
+        /////////////////////////
+        ///   Writable Book   ///
+        /////////////////////////
+        register(386, builder()
+                .translation("item.writingBook.name")
+                .build("minecraft", "writable_book"));
+        ////////////////////////
+        ///   Written Book   ///
+        ////////////////////////
+        register(387, builder()
+                .translation("item.writtenBook.name")
+                .build("minecraft", "written_book"));
+        ///////////////////
+        ///   Emerald   ///
+        ///////////////////
+        register(388, builder()
+                .translation("item.emerald.name")
+                .build("minecraft", "emerald"));
+        //////////////////////
+        ///   Item Frame   ///
+        //////////////////////
+        register(389, builder()
+                .translation("item.frame.name")
+                .build("minecraft", "item_frame"));
+        //////////////////////
+        ///   Flower Pot   ///
+        //////////////////////
+        register(390, builder()
+                .translation("item.flowerPot.name")
+                .build("minecraft", "flower_pot"));
+        //////////////////
+        ///   Carrot   ///
+        //////////////////
+        register(391, builder()
+                .translation("item.carrots.name")
+                .build("minecraft", "carrot"));
+        //////////////////
+        ///   Potato   ///
+        //////////////////
+        register(392, builder()
+                .translation("item.potato.name")
+                .build("minecraft", "potato"));
+        ////////////////////////
+        ///   Baked Potato   ///
+        ////////////////////////
+        register(393, builder()
+                .translation("item.potatoBaked.name")
+                .build("minecraft", "baked_potato"));
+        ////////////////////////////
+        ///   Poisonous Potato   ///
+        ////////////////////////////
+        register(394, builder()
+                .translation("item.potatoPoisonous.name")
+                .build("minecraft", "poisonous_potato"));
+        ///////////////
+        ///   Map   ///
+        ///////////////
+        register(395, builder()
+                .translation("item.emptyMap.name")
+                .build("minecraft", "map"));
+        /////////////////////////
+        ///   Golden Carrot   ///
+        /////////////////////////
+        register(396, builder()
+                .translation("item.carrotGolden.name")
+                .build("minecraft", "golden_carrot"));
+        /////////////////
+        ///   Skull   ///
+        /////////////////
+        register(397, builder()
+                // TODO: Skull types
+                .translation("item.skull.char.name")
+                .build("minecraft", "skull"));
+        /////////////////////////////
+        ///   Carrot On A Stick   ///
+        /////////////////////////////
+        register(398, builder()
+                .translation("item.carrotOnAStick.name")
+                .build("minecraft", "carrot_on_a_stick"));
+        ///////////////////////
+        ///   Nether Star   ///
+        ///////////////////////
+        register(399, builder()
+                .translation("item.netherStar.name")
+                .build("minecraft", "nether_star"));
+        ///////////////////////
+        ///   Pumpkin Pie   ///
+        ///////////////////////
+        register(400, builder()
+                .translation("item.pumpkinPie.name")
+                .build("minecraft", "pumpkin_pie"));
         ////////////////////
         ///  Fireworks   ///
         ////////////////////

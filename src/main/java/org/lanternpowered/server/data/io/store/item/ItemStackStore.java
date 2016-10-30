@@ -34,8 +34,10 @@ import org.lanternpowered.server.data.io.store.data.DataHolderStore;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.CoalTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.CookedFishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
@@ -60,6 +62,7 @@ import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.SandstoneType;
+import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.value.mutable.ListValue;
@@ -159,6 +162,10 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());
         add(ItemTypes.FIREWORKS, new FireworksItemTypeObjectSerializer());
         add(ItemTypes.GOLDEN_APPLE, new DataValueItemTypeObjectSerializer<>(Keys.GOLDEN_APPLE_TYPE, GoldenAppleRegistryModule.get()));
+        add(ItemTypes.FISH, new DataValueItemTypeObjectSerializer<>(Keys.FISH_TYPE, FishRegistryModule.get()));
+        add(ItemTypes.COOKED_FISH, new DataValueItemTypeObjectSerializer<>(Keys.COOKED_FISH, CookedFishRegistryModule.get()));
+        add(ItemTypes.DYE, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
+                dataValue -> 15 - dataValue, internalId -> 15 - internalId));
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {

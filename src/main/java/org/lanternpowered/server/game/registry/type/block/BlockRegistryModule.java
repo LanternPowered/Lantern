@@ -32,6 +32,7 @@ import static org.lanternpowered.server.block.PropertyProviders.blastResistance;
 import static org.lanternpowered.server.block.PropertyProviders.flammableInfo;
 import static org.lanternpowered.server.block.PropertyProviders.hardness;
 import static org.lanternpowered.server.block.PropertyProviders.lightEmission;
+import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
@@ -84,6 +85,7 @@ import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryMo
 import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
+import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.lanternpowered.server.item.behavior.vanilla.SlabItemInteractionBehavior;
 import org.spongepowered.api.block.BlockState;
@@ -94,6 +96,7 @@ import org.spongepowered.api.block.trait.EnumTrait;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.util.Direction;
 
@@ -101,7 +104,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-@RegistrationDependency(KeyRegistryModule.class)
+@RegistrationDependency({
+        KeyRegistryModule.class,
+        EquipmentTypeRegistryModule.class
+})
 public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryModule<BlockType> implements BlockRegistry {
 
     private static final BlockRegistryModule INSTANCE = new BlockRegistryModule();
@@ -602,6 +608,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///    Pumpkin   ///
         ////////////////////
         register(86, pumpkinBuilder()
+                        .itemType(builder -> builder
+                                .properties(properties -> properties
+                                        .add(equipmentType(EquipmentTypes.HEADWEAR))))
                         .translation("tile.pumpkin.name")
                         .build("minecraft", "pumpkin"),
                 this::pumpkinData);

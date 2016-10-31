@@ -177,7 +177,9 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Override
     public BlockTypeBuilderImpl itemType(Consumer<ItemTypeBuilder> consumer) {
         checkNotNull(consumer, "consumer");
-        this.itemTypeBuilder = new ItemTypeBuilderImpl();
+        if (this.itemTypeBuilder == null) {
+            this.itemTypeBuilder = new ItemTypeBuilderImpl();
+        }
         consumer.accept(this.itemTypeBuilder);
         return this;
     }

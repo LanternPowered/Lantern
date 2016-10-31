@@ -67,6 +67,8 @@
  */
 package org.lanternpowered.server.data.io.anvil;
 
+import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
+import it.unimi.dsi.fastutil.booleans.BooleanList;
 import org.lanternpowered.server.game.Lantern;
 
 import java.io.BufferedInputStream;
@@ -79,7 +81,6 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
@@ -101,7 +102,7 @@ public class RegionFile {
     private RandomAccessFile file;
     private final int[] offsets;
     private final int[] chunkTimestamps;
-    private ArrayList<Boolean> sectorFree;
+    private BooleanList sectorFree;
     private final int regionX;
     private final int regionZ;
 
@@ -145,7 +146,7 @@ public class RegionFile {
 
         // set up the available sector map
         int nSectors = (int) (this.file.length() / SECTOR_BYTES);
-        this.sectorFree = new ArrayList<>(nSectors);
+        this.sectorFree = new BooleanArrayList(nSectors);
         for (int i = 0; i < nSectors; ++i) {
             this.sectorFree.add(true);
         }
@@ -333,12 +334,12 @@ public class RegionFile {
             if (runStart != -1) {
                 for (int i = runStart; i < this.sectorFree.size(); ++i) {
                     if (runLength != 0) {
-                        if (this.sectorFree.get(i)) {
+                        if (this.sectorFree.getBoolean(i)) {
                             runLength++;
                         } else {
                             runLength = 0;
                         }
-                    } else if (this.sectorFree.get(i)) {
+                    } else if (this.sectorFree.getBoolean(i)) {
                         runStart = i;
                         runLength = 1;
                     }

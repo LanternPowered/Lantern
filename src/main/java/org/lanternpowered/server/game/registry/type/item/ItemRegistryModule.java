@@ -725,11 +725,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(351, builder()
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.DYE_COLOR, DyeColors.WHITE).nonRemovableAttachedValueProcessor())
-                .translation((itemType, itemStack) -> {
-                    final DyeColor dyeColor = itemStack == null ? DyeColors.WHITE : itemStack.get(Keys.DYE_COLOR).get();
-                    return Lantern.getRegistry().getTranslationManager().get(
-                            String.format("item.dyePowder.%s.name", ((LanternDyeColor) dyeColor).getTranslationPart()));
-                })
+                .translation(coloredTranslation("item.dyePowder.%s.name", DyeColors.WHITE))
                 .build("minecraft", "dye"));
         ////////////////
         ///   Bone   ///
@@ -1045,12 +1041,380 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                         .registerKey(Keys.FIREWORK_EFFECTS, Collections.emptyList())
                 )
                 .build("minecraft", "firework_charge"));
+        //////////////////////////
+        ///   Enchanted Book   ///
+        //////////////////////////
+        register(403, builder()
+                .translation("item.enchantedBook.name")
+                .build("minecraft", "enchanted_book"));
+        //////////////////////
+        ///   Comparator   ///
+        //////////////////////
+        register(404, builder()
+                .translation("item.comparator.name")
+                .build("minecraft", "comparator"));
+        ///////////////////////
+        ///   Netherbrick   ///
+        ///////////////////////
+        register(405, builder()
+                .translation("item.netherbrick.name")
+                .build("minecraft", "netherbrick"));
+        //////////////////
+        ///   Quartz   ///
+        //////////////////
+        register(406, builder()
+                .translation("item.netherquartz.name")
+                .build("minecraft", "quartz"));
+        ////////////////////////
+        ///   TNT Minecart   ///
+        ////////////////////////
+        register(407, builder()
+                .translation("item.minecartTnt.name")
+                .build("minecraft", "tnt_minecart"));
+        ///////////////////////////
+        ///   Hopper Minecart   ///
+        ///////////////////////////
+        register(408, builder()
+                .translation("item.minecartHopper.name")
+                .build("minecraft", "hopper_minecart"));
+        ////////////////////////////
+        ///   Prismarine Shard   ///
+        ////////////////////////////
+        register(409, builder()
+                .translation("item.prismarineShard.name")
+                .build("minecraft", "prismarine_shard"));
+        ///////////////////////////////
+        ///   Prismarine Crystals   ///
+        ///////////////////////////////
+        register(410, builder()
+                .translation("item.prismarineCrystals.name")
+                .build("minecraft", "prismarine_crystals"));
+        //////////////////
+        ///   Rabbit   ///
+        //////////////////
+        register(411, builder()
+                .translation("item.rabbitRaw.name")
+                .build("minecraft", "rabbit"));
+        /////////////////////////
+        ///   Cooked Rabbit   ///
+        /////////////////////////
+        register(412, builder()
+                .translation("item.rabbitCooked.name")
+                .build("minecraft", "cooked_rabbit"));
+        ///////////////////////
+        ///   Rabbit Stew   ///
+        ///////////////////////
+        register(413, builder()
+                .translation("item.rabbitStew.name")
+                .build("minecraft", "rabbit_stew"));
+        ///////////////////////
+        ///   Rabbit Foot   ///
+        ///////////////////////
+        register(414, builder()
+                .translation("item.rabbitFoot.name")
+                .build("minecraft", "rabbit_foot"));
+        ///////////////////////
+        ///   Rabbit Hide   ///
+        ///////////////////////
+        register(415, builder()
+                .translation("item.rabbitHide.name")
+                .build("minecraft", "rabbit_hide"));
+        ///////////////////////
+        ///   Armor Stand   ///
+        ///////////////////////
+        register(416, builder()
+                .translation("item.armorStand.name")
+                .build("minecraft", "armor_stand"));
+        ////////////////////////////
+        ///   Iron Horse Armor   ///
+        ////////////////////////////
+        register(417, builder()
+                .translation("item.horsearmormetal.name")
+                .build("minecraft", "iron_horse_armor"));
+        //////////////////////////////
+        ///   Golden Horse Armor   ///
+        //////////////////////////////
+        register(418, builder()
+                .translation("item.horsearmorgold.name")
+                .build("minecraft", "golden_horse_armor"));
+        ///////////////////////////////
+        ///   Diamond Horse Armor   ///
+        ///////////////////////////////
+        register(419, builder()
+                .translation("item.horsearmordiamond.name")
+                .build("minecraft", "diamond_horse_armor"));
+        ////////////////
+        ///   Lead   ///
+        ////////////////
+        register(420, builder()
+                .translation("item.leash.name")
+                .build("minecraft", "lead"));
+        ////////////////////
+        ///   Name Tag   ///
+        ////////////////////
+        register(421, builder()
+                .translation("item.nameTag.name")
+                .build("minecraft", "name_tag"));
+        //////////////////////////////////
+        ///   Command Block Minecart   ///
+        //////////////////////////////////
+        register(422, builder()
+                .translation("item.minecartCommandBlock.name")
+                .build("minecraft", "command_block_minecart"));
+        //////////////////
+        ///   Mutton   ///
+        //////////////////
+        register(423, builder()
+                .translation("item.muttonRaw.name")
+                .build("minecraft", "mutton"));
+        /////////////////////////
+        ///   Cooked Mutton   ///
+        /////////////////////////
+        register(424, builder()
+                .translation("item.muttonCooked.name")
+                .build("minecraft", "cooked_mutton"));
+        //////////////////
+        ///   Banner   ///
+        //////////////////
+        register(425, builder()
+                .translation(coloredTranslation("item.banner.%s.name", DyeColors.WHITE))
+                .maxStackQuantity(16)
+                .build("minecraft", "banner"));
+        ///////////////////////
+        ///   End Crystal   ///
+        ///////////////////////
+        register(426, builder()
+                .translation("item.end_crystal.name")
+                .build("minecraft", "end_crystal"));
+        ///////////////////////
+        ///   Spruce Door   ///
+        ///////////////////////
+        register(427, builder()
+                .translation("item.doorSpruce.name")
+                .build("minecraft", "spruce_door"));
+        //////////////////////
+        ///   Bitch Door   ///
+        //////////////////////
+        register(428, builder()
+                .translation("item.doorBirch.name")
+                .build("minecraft", "birch_door"));
+        ///////////////////////
+        ///   Jungle Door   ///
+        ///////////////////////
+        register(429, builder()
+                .translation("item.doorJungle.name")
+                .build("minecraft", "jungle_door"));
+        ///////////////////////
+        ///   Acacia Door   ///
+        ///////////////////////
+        register(430, builder()
+                .translation("item.doorAcacia.name")
+                .build("minecraft", "acacia_door"));
+        /////////////////////////
+        ///   Dark Oak Door   ///
+        /////////////////////////
+        register(431, builder()
+                .translation("item.doorDarkOak.name")
+                .build("minecraft", "dark_oak_door"));
+        ////////////////////////
+        ///   Chorus Fruit   ///
+        ////////////////////////
+        register(432, builder()
+                .translation("item.chorusFruit.name")
+                .build("minecraft", "chorus_fruit"));
+        ///////////////////////////////
+        ///   Chorus Fruit Popped   ///
+        ///////////////////////////////
+        register(433, builder()
+                .translation("item.chorusFruitPopped.name")
+                .build("minecraft", "chorus_fruit_popped"));
+        ////////////////////
+        ///   Beetroot   ///
+        ////////////////////
+        register(434, builder()
+                .translation("item.beetroot.name")
+                .build("minecraft", "beetroot"));
+        //////////////////////////
+        ///   Beetroot Seeds   ///
+        //////////////////////////
+        register(435, builder()
+                .translation("item.beetroot_seeds.name")
+                .build("minecraft", "beetroot_seeds"));
+        /////////////////////////
+        ///   Beetroot Soup   ///
+        /////////////////////////
+        register(436, builder()
+                .translation("item.beetroot_soup.name")
+                .build("minecraft", "beetroot_soup"));
+        /////////////////////////
+        ///   Dragon Breath   ///
+        /////////////////////////
+        register(437, builder()
+                .translation("item.dragon_breath.name")
+                .build("minecraft", "dragon_breath"));
+        /////////////////////////
+        ///   Splash Potion   ///
+        /////////////////////////
+        register(438, builder()
+                .translation("item.splash_potion.name")
+                .build("minecraft", "splash_potion"));
+        //////////////////////////
+        ///   Spectral Arrow   ///
+        //////////////////////////
+        register(439, builder()
+                .translation("item.spectral_arrow.name")
+                .build("minecraft", "spectral_arrow"));
+        ////////////////////////
+        ///   Tipped Arrow   ///
+        ////////////////////////
+        register(440, builder()
+                .translation("item.tipped_arrow.name")
+                .build("minecraft", "tipped_arrow"));
+        ////////////////////////////
+        ///   Lingering Potion   ///
+        ////////////////////////////
+        register(441, builder()
+                .translation("item.lingering_potion.name")
+                .build("minecraft", "lingering_potion"));
+        //////////////////
+        ///   Shield   ///
+        //////////////////
+        register(442, durableBuilder()
+                .translation("item.shield.name")
+                .build("minecraft", "shield"));
+        //////////////////
+        ///   Elytra   ///
+        //////////////////
+        register(443, durableBuilder()
+                .translation("item.elytra.name")
+                .properties(builder -> builder
+                        .add(equipmentType(EquipmentTypes.CHESTPLATE)))
+                .build("minecraft", "elytra"));
+        ///////////////////////
+        ///   Spruce Boat   ///
+        ///////////////////////
+        register(444, builder()
+                .translation("item.boat.spruce.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "spruce_boat"));
+        //////////////////////
+        ///   Birch Boat   ///
+        //////////////////////
+        register(445, builder()
+                .translation("item.boat.birch.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "birch_boat"));
+        ///////////////////////
+        ///   Jungle Boat   ///
+        ///////////////////////
+        register(446, builder()
+                .translation("item.boat.jungle.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "jungle_boat"));
+        ///////////////////////
+        ///   Acacia Boat   ///
+        ///////////////////////
+        register(447, builder()
+                .translation("item.boat.acacia.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "acacia_boat"));
+        /////////////////////////
+        ///   Dark Oak Boat   ///
+        /////////////////////////
+        register(448, builder()
+                .translation("item.boat.dark_oak.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "dark_oak_boat"));
+        /////////////////
+        ///   Totem   ///
+        /////////////////
+        register(449, builder()
+                .translation("item.totem.name")
+                .maxStackQuantity(1)
+                .build("minecraft", "totem"));
+        /////////////////////////
+        ///   Shulker Shell   ///
+        /////////////////////////
+        register(450, builder()
+                .translation("item.shulkerShell.name")
+                .build("minecraft", "shulker_shell"));
+        /////////////////////
+        ///   Record 13   ///
+        /////////////////////
+        register(2256, recordBuilder("13")
+                .build("minecraft", "record_13"));
+        //////////////////////
+        ///   Record Cat   ///
+        //////////////////////
+        register(2257, recordBuilder("cat")
+                .build("minecraft", "record_cat"));
+        /////////////////////////
+        ///   Record Blocks   ///
+        /////////////////////////
+        register(2258, recordBuilder("blocks")
+                .build("minecraft", "record_blocks"));
+        ////////////////////////
+        ///   Record Chirp   ///
+        ////////////////////////
+        register(2259, recordBuilder("chirp")
+                .build("minecraft", "record_chirp"));
+        //////////////////////
+        ///   Record Far   ///
+        //////////////////////
+        register(2260, recordBuilder("far")
+                .build("minecraft", "record_far"));
+        ///////////////////////
+        ///   Record Mall   ///
+        ///////////////////////
+        register(2261, recordBuilder("mall")
+                .build("minecraft", "record_mall"));
+        //////////////////////////
+        ///   Record Mellohi   ///
+        //////////////////////////
+        register(2262, recordBuilder("mellohi")
+                .build("minecraft", "record_mellohi"));
+        ///////////////////////
+        ///   Record Stal   ///
+        ///////////////////////
+        register(2263, recordBuilder("stal")
+                .build("minecraft", "record_stal"));
+        /////////////////////
+        ///   Record Strad   ///
+        /////////////////////
+        register(2264, recordBuilder("strad")
+                .build("minecraft", "record_strad"));
+        ///////////////////////
+        ///   Record Ward   ///
+        ///////////////////////
+        register(2265, recordBuilder("ward")
+                .build("minecraft", "record_ward"));
+        /////////////////////
+        ///   Record 11   ///
+        /////////////////////
+        register(2266, recordBuilder("11")
+                .build("minecraft", "record_11"));
+        ///////////////////////
+        ///   Record Wait   ///
+        ///////////////////////
+        register(2267, recordBuilder("wait")
+                .build("minecraft", "record_wait"));
         try {
             ReflectionHelper.setField(ItemStackSnapshot.class.getDeclaredField("NONE"), null,
                     new LanternItemStack(none, 0).createSnapshot());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private ItemTypeBuilder recordBuilder(String name) {
+        return builder()
+                .maxStackQuantity(1)
+                .translation(String.format("item.record.%s.desc", name));
+    }
+
+    private TranslationProvider coloredTranslation(String pattern, DyeColor defaultColor) {
+        return (itemType, itemStack) -> Lantern.getRegistry().getTranslationManager().get(String.format(pattern,
+                ((LanternDyeColor) (itemStack == null ? defaultColor : itemStack.get(Keys.DYE_COLOR).get())).getTranslationPart()));
     }
 
     private ItemTypeBuilder durableBuilder() {

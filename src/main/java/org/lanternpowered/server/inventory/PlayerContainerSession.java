@@ -522,6 +522,7 @@ public class PlayerContainerSession {
                     AbstractMutableInventory inventory;
 
                     final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
+                    PeekOfferTransactionsResult result;
                     if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
                             (windowId == 0 && !mainInventory.isChild(slot))) {
                         if (slot.isReverseShiftClickOfferOrder()) {
@@ -529,19 +530,25 @@ public class PlayerContainerSession {
                         } else {
                             inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR);
                         }
+                        result = inventory.peekOfferFastTransactions(itemStack.copy());
                     } else {
                         inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
                                 ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
-                        if (!inventory.isValidItem(itemStack)) {
+                        result = inventory.peekOfferFastTransactions(itemStack.copy());
+                        if (result.getOfferResult().getRest() != null) {
                             if (slot.parent() instanceof LanternHotbar) {
                                 inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN);
                             } else {
                                 inventory = this.openContainer.playerInventory.getHotbar();
                             }
+                            PeekOfferTransactionsResult result1 = inventory.peekOfferFastTransactions(result.getOfferResult().getRest());
+                            if (result1.getOfferResult().isSuccess()) {
+                                result1.getTransactions().addAll(result.getTransactions());
+                                result = result1;
+                            }
                         }
                     }
 
-                    final PeekOfferTransactionsResult result = inventory.peekOfferFastTransactions(itemStack.copy());
                     if (result.getOfferResult().isSuccess()) {
                         transactions.addAll(result.getTransactions());
                         final ItemStack rest = result.getOfferResult().getRest();
@@ -564,7 +571,7 @@ public class PlayerContainerSession {
                             cause, cursorTransaction, this.openContainer, transactions);
                 }
 
-                this.finishInventoryEvent(event);
+                finishInventoryEvent(event);
             } else {
                 Lantern.getLogger().warn("Unknown slot index {} in container {}", slotIndex, this.openContainer);
             }

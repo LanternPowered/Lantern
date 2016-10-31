@@ -27,8 +27,8 @@ package org.lanternpowered.server.inventory.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.AbstractChildrenInventory;
+import org.lanternpowered.server.inventory.AbstractInventory;
 import org.lanternpowered.server.inventory.AbstractMutableInventory;
 import org.lanternpowered.server.inventory.LanternCraftingInventory;
 import org.lanternpowered.server.inventory.LanternEquipmentInventory;
@@ -70,27 +70,28 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
 
         this.registerChild(new LanternCraftingInventory(this) {
             {
-                this.registerSlot(new LanternCraftingOutput(this));
-                this.registerChild(new LanternGridInventory(this) {
+                registerSlot(new LanternCraftingOutput(this));
+                registerChild(new LanternGridInventory(this) {
                     {
                         for (int y = 0; y < 2; y++) {
                             for (int x = 0; x < 2; x++) {
-                                this.registerSlotAt(x, y, new LanternCraftingInput(this));
+                                registerSlotAt(x, y, new LanternCraftingInput(this));
                             }
                         }
-                        this.finalizeContent();
+                        finalizeContent();
                     }
                 });
-                this.finalizeContent();
+                finalizeContent();
             }
         });
         this.equipmentInventory = this.registerChild(new LanternEquipmentInventory(this, player) {
             {
-                this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.HEADWEAR));
-                this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.CHESTPLATE));
-                this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.LEGGINGS));
-                this.registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.BOOTS));
-                this.finalizeContent();
+                registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.HEADWEAR));
+                registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.CHESTPLATE));
+                registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.LEGGINGS));
+                registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.BOOTS));
+                this.slots.forEach(slot -> slot.setMaxStackSize(1));
+                finalizeContent();
             }
         });
         this.mainInventory = this.registerChild(new HumanMainInventory(this, null) {
@@ -108,8 +109,8 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                         this.finalizeContent();
                     }
                 });
-                this.finalizeContent();
-                this.prioritizeChild(hotbar);
+                finalizeContent();
+                prioritizeChild(hotbar);
             }
         });
         this.offHandSlot = this.registerChild(new OffHandSlot(this, null));
@@ -136,16 +137,16 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
             LanternEquipmentInventory equipmentInventory, OffHandSlot offHandSlot) {
         return new LanternOrderedInventory(null, null) {
             {
-                this.registerChild(new HumanMainInventory(this, null) {
+                registerChild(new HumanMainInventory(this, null) {
                     {
-                        this.registerRow(0, hotbar);
+                        registerRow(0, hotbar);
                         for (int i = 0; i < 3; i++) {
-                            this.registerRow(i + 1, mainInventory.getRow(i).get());
+                            registerRow(i + 1, mainInventory.getRow(i).get());
                         }
                     }
                 });
-                this.registerChild(equipmentInventory);
-                this.registerChild(offHandSlot);
+                registerChild(equipmentInventory);
+                registerChild(offHandSlot);
             }
         };
     }

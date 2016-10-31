@@ -1003,6 +1003,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .translation("item.skull.char.name")
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.SKULL_TYPE, SkullTypes.SKELETON))
+                .properties(builder -> builder
+                        .add(equipmentType(EquipmentTypes.HEADWEAR)))
                 .build("minecraft", "skull"));
         /////////////////////////////
         ///   Carrot On A Stick   ///

@@ -253,30 +253,31 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
                 fail = !this.isValidItem(stack);
             }
         }
-        List<SlotTransaction> transactions = new ArrayList<>();
+        final List<SlotTransaction> transactions = new ArrayList<>();
         if (fail) {
             return new PeekSetTransactionsResult(transactions, InventoryTransactionResult.builder()
                     .type(InventoryTransactionResult.Type.FAILURE)
                     .reject(stack)
                     .build());
         }
-        InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder()
+        final InventoryTransactionResult.Builder resultBuilder = InventoryTransactionResult.builder()
                 .type(InventoryTransactionResult.Type.SUCCESS);
-        ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(this.itemStack);
+        final ItemStackSnapshot oldItem = LanternItemStack.toSnapshot(this.itemStack);
         if (this.itemStack != null) {
             resultBuilder.replace(this.itemStack);
         }
         ItemStackSnapshot newItem = ItemStackSnapshot.NONE;
         if (stack != null) {
-            int quantity = stack.getQuantity();
-            if (quantity > this.maxStackSize) {
+            final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
+            final int quantity = stack.getQuantity();
+            if (quantity > maxStackSize) {
                 stack = stack.copy();
-                stack.setQuantity(this.maxStackSize);
+                stack.setQuantity(maxStackSize);
                 newItem = LanternItemStack.toSnapshot(stack);
                 // Create the rest stack that was rejected,
                 // because the inventory doesn't allow so many items
                 stack = stack.copy();
-                stack.setQuantity(quantity - this.maxStackSize);
+                stack.setQuantity(quantity - maxStackSize);
                 resultBuilder.reject(stack);
             } else {
                 newItem = LanternItemStack.toSnapshot(stack);
@@ -287,25 +288,25 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     }
 
     protected boolean doesAllowItem(ItemType type) {
-        return this.doesAllowEquipmentType(type) &&
-                this.doesAcceptItemType(type);
+        return doesAllowEquipmentType(type) &&
+                doesAcceptItemType(type);
     }
 
     protected boolean doesAllowEquipmentType(ItemType type) {
-        return this.doesAllowEquipmentTypeWithProperty(() -> type.getDefaultProperty(EquipmentProperty.class));
+        return doesAllowEquipmentTypeWithProperty(() -> type.getDefaultProperty(EquipmentProperty.class));
     }
 
     protected boolean doesAllowEquipmentType(ItemStack stack) {
-        return this.doesAllowEquipmentTypeWithProperty(() -> stack.getProperty(EquipmentProperty.class));
+        return doesAllowEquipmentTypeWithProperty(() -> stack.getProperty(EquipmentProperty.class));
     }
 
     protected boolean doesAllowEquipmentTypeWithProperty(Supplier<Optional<EquipmentProperty>> equipmentPropertySupplier) {
-        return this.doesAllowEquipmentType(() -> equipmentPropertySupplier.get()
+        return doesAllowEquipmentType(() -> equipmentPropertySupplier.get()
                 .flatMap(property -> Optional.ofNullable(property.getValue())));
     }
 
     protected boolean doesAllowEquipmentType(Supplier<Optional<EquipmentType>> equipmentTypeSupplier) {
-        Collection<EquipmentSlotType> properties = this.getProperties(this.parent(), EquipmentSlotType.class);
+        Collection<EquipmentSlotType> properties = getProperties(parent(), EquipmentSlotType.class);
         if (properties.isEmpty()) {
             return true;
         }
@@ -323,11 +324,11 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     }
 
     protected boolean doesAcceptItemType(ItemStack stack) {
-        return this.doesAcceptItemType(stack.getItem());
+        return doesAcceptItemType(stack.getItem());
     }
 
     protected boolean doesAcceptItemType(ItemType itemType) {
-        Collection<AcceptsItems> acceptsItemsProperties = this.getProperties(this.parent(), AcceptsItems.class);
+        Collection<AcceptsItems> acceptsItemsProperties = getProperties(parent(), AcceptsItems.class);
         // All items will be accepted if there are no properties of this type
         if (acceptsItemsProperties.isEmpty()) {
             return true;
@@ -351,22 +352,23 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         if (LanternItemStack.toNullable(stack) == null) {
             return new FastOfferResult(stack, false);
         }
+        final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
         if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isSimilar(stack)
-                || this.itemStack.getQuantity() >= this.maxStackSize) || !this.isValidItem(stack)) {
+                || this.itemStack.getQuantity() >= maxStackSize) || !this.isValidItem(stack)) {
             return new FastOfferResult(stack, false);
         }
         // Get the amount of space we have left
-        int availableSpace = this.itemStack == null ? this.maxStackSize :
-                this.maxStackSize - this.itemStack.getQuantity();
-        int quantity = stack.getQuantity();
+        final int availableSpace = this.itemStack == null ? maxStackSize :
+                maxStackSize - this.itemStack.getQuantity();
+        final int quantity = stack.getQuantity();
         if (quantity > availableSpace) {
             if (this.itemStack == null) {
                 this.itemStack = stack.copy();
             }
-            this.itemStack.setQuantity(this.maxStackSize);
+            this.itemStack.setQuantity(maxStackSize);
             stack = stack.copy();
             stack.setQuantity(quantity - availableSpace);
-            this.queueUpdate();
+            queueUpdate();
             return new FastOfferResult(stack, true);
         } else {
             if (this.itemStack == null) {
@@ -374,7 +376,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
             } else {
                 this.itemStack.setQuantity(this.itemStack.getQuantity() + quantity);
             }
-            this.queueUpdate();
+            queueUpdate();
             return FastOfferResult.SUCCESS;
         }
     }
@@ -382,18 +384,19 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     @Override
     public PeekOfferTransactionsResult peekOfferFastTransactions(ItemStack stack) {
         checkNotNull(stack, "stack");
-        List<SlotTransaction> transactions = new ArrayList<>();
+        final List<SlotTransaction> transactions = new ArrayList<>();
         if (LanternItemStack.toNullable(stack) == null) {
             return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
         }
+        final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
         if (this.itemStack != null && (!((LanternItemStack) this.itemStack).isSimilar(stack)
-                || this.itemStack.getQuantity() >= this.maxStackSize) || !this.isValidItem(stack)) {
+                || this.itemStack.getQuantity() >= maxStackSize) || !this.isValidItem(stack)) {
             return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, false));
         }
         // Get the amount of space we have left
-        int availableSpace = this.itemStack == null ? this.maxStackSize :
-                this.maxStackSize - this.itemStack.getQuantity();
-        int quantity = stack.getQuantity();
+        final int availableSpace = this.itemStack == null ? maxStackSize :
+                maxStackSize - this.itemStack.getQuantity();
+        final int quantity = stack.getQuantity();
         if (quantity > availableSpace) {
             ItemStack newStack;
             if (this.itemStack == null) {
@@ -401,14 +404,14 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
             } else {
                 newStack = this.itemStack.copy();
             }
-            newStack.setQuantity(this.maxStackSize);
+            newStack.setQuantity(maxStackSize);
             stack = stack.copy();
             stack.setQuantity(quantity - availableSpace);
             transactions.add(new SlotTransaction(this, LanternItemStack.toSnapshot(this.itemStack),
                     newStack.createSnapshot()));
             return new PeekOfferTransactionsResult(transactions, new FastOfferResult(stack, true));
         } else {
-            ItemStack newStack;
+            final ItemStack newStack;
             if (this.itemStack == null) {
                 newStack = stack.copy();
             } else {
@@ -429,7 +432,7 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
             if (stack.getQuantity() <= 0) {
                 stack = null;
             } else {
-                fail = !this.isValidItem(stack);
+                fail = !isValidItem(stack);
             }
         }
         if (fail) {
@@ -445,18 +448,19 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
         }
         if (stack != null) {
             stack = stack.copy();
-            int quantity = stack.getQuantity();
-            if (quantity > this.maxStackSize) {
-                stack.setQuantity(this.maxStackSize);
+            final int maxStackSize = Math.min(stack.getMaxStackQuantity(), this.maxStackSize);
+            final int quantity = stack.getQuantity();
+            if (quantity > maxStackSize) {
+                stack.setQuantity(maxStackSize);
                 // Create the rest stack that was rejected,
                 // because the inventory doesn't allow so many items
                 stack = stack.copy();
-                stack.setQuantity(quantity - this.maxStackSize);
+                stack.setQuantity(quantity - maxStackSize);
                 resultBuilder.reject(stack);
             }
         }
         this.itemStack = stack;
-        this.queueUpdate();
+        queueUpdate();
         return resultBuilder.build();
     }
 

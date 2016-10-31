@@ -229,7 +229,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
                 matches.add(inventory);
             }
             if (nested) {
-                Inventory inventory1 = ((AbstractMutableInventory) inventory).query(matcher, true);
+                Inventory inventory1 = ((AbstractInventory) inventory).query(matcher, true);
                 if (!(inventory1 instanceof EmptyInventory)) {
                     matches.add(inventory1);
                 }

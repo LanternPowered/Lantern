@@ -66,17 +66,17 @@ public class LanternEquipmentSlot extends LanternFilteringSlot implements Equipm
 
     public LanternEquipmentSlot(@Nullable Inventory parent, EquipmentType... equipmentTypes) {
         super(parent, null, new SimpleEquipmentItemFilter(ImmutableSet.copyOf(Arrays.asList(equipmentTypes))));
-        this.registerContent();
+        registerContent();
     }
 
     public LanternEquipmentSlot(@Nullable Inventory parent, Translation name, EquipmentType... equipmentTypes) {
         super(parent, name, new SimpleEquipmentItemFilter(ImmutableSet.copyOf(Arrays.asList(equipmentTypes))));
-        this.registerContent();
+        registerContent();
     }
 
     public LanternEquipmentSlot(@Nullable Inventory parent, @Nullable Translation name, @Nullable EquipmentItemFilter itemFilter) {
         super(parent, name, itemFilter);
-        this.registerContent();
+        registerContent();
     }
 
     private void registerContent() {

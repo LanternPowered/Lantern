@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.buffer.objects;
 
+import static org.lanternpowered.server.text.LanternTexts.fixJson;
+
 import com.flowpowered.math.vector.Vector3f;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.gson.Gson;
@@ -102,23 +104,6 @@ public final class Types {
 
     public static final Gson TEXT_GSON = JsonTextSerializer.applyTo(new GsonBuilder(),
             Lantern.getGame().getRegistry().getTranslationManager(), true).create();
-
-    /**
-     * The client doesn't like it when the server just sends a
-     * primitive json string, so we put it as one entry in an array
-     * to avoid errors.
-     *
-     * @param json the json
-     * @return the result json
-     */
-    private static String fixJson(String json) {
-        char start = json.charAt(0);
-        if (start == '[' || start == '{') {
-            return json;
-        } else {
-            return '[' + json + ']';
-        }
-    }
 
     /**
      * A utf-8 encoded text prefixed by the length in var-int.

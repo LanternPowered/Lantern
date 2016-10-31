@@ -51,6 +51,7 @@ import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.TranslationProvider;
 import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.ArmorType;
@@ -935,12 +936,21 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         register(386, builder()
                 .translation("item.writingBook.name")
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.BOOK_PAGES, null))
                 .build("minecraft", "writable_book"));
         ////////////////////////
         ///   Written Book   ///
         ////////////////////////
         register(387, builder()
                 .translation("item.writtenBook.name")
+                .keysProvider(valueContainer -> {
+                    valueContainer.registerKey(Keys.BOOK_PAGES, null);
+                    valueContainer.registerKey(Keys.BOOK_AUTHOR, null);
+                    valueContainer.registerKey(Keys.GENERATION, null);
+                })
+                .behaviors(pipeline -> pipeline
+                        .add(new OpenHeldBookBehavior()))
                 .build("minecraft", "written_book"));
         ///////////////////
         ///   Emerald   ///

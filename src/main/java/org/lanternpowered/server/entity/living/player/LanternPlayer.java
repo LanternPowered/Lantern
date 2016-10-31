@@ -34,7 +34,7 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import org.lanternpowered.server.boss.LanternBossBar;
 import org.lanternpowered.server.data.io.store.entity.PlayerStore;
-import org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer;
+import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
@@ -104,7 +104,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -119,7 +118,6 @@ import org.spongepowered.api.text.chat.ChatVisibilities;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.util.AABB;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.RelativePositions;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.ChunkTicketManager;
@@ -693,8 +691,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     public void spawnParticles(ParticleEffect particleEffect, Vector3d position, int radius) {
         checkNotNull(position, "position");
         checkNotNull(particleEffect, "particleEffect");
-        if (this.getLocation().getPosition().distanceSquared(position) < radius * radius) {
-            this.spawnParticles(particleEffect, position);
+        if (getPosition().distanceSquared(position) < radius * radius) {
+            spawnParticles(particleEffect, position);
         }
     }
 
@@ -717,7 +715,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         checkNotNull(bookView, "bookView");
 
         final DataView dataView = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
-        BookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);
+        WrittenBookItemTypeObjectSerializer.writeBookData(dataView, bookView, this.locale);
 
         // Written book internal id
         final RawItemStack rawItemStack = new RawItemStack(387, 0, 1, dataView);

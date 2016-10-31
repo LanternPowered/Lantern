@@ -39,30 +39,33 @@ import org.spongepowered.api.text.serializer.TextSerializers;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-public class BookItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+public class WrittenBookItemTypeObjectSerializer extends WritableBookItemTypeObjectSerializer {
 
     public static final DataQuery AUTHOR = DataQuery.of("author");
     public static final DataQuery TITLE = DataQuery.of("title");
-    public static final DataQuery PAGES = DataQuery.of("pages");
+    private static final DataQuery GENERATION = DataQuery.of("generation");
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        valueContainer.remove(Keys.BOOK_AUTHOR).ifPresent(text ->
-                dataView.set(AUTHOR, LanternTexts.toLegacy(text)));
         valueContainer.remove(Keys.BOOK_PAGES).ifPresent(lines ->
                 dataView.set(PAGES, lines.stream().map(TextSerializers.JSON::serialize).collect(Collectors.toList())));
+        valueContainer.remove(Keys.BOOK_AUTHOR).ifPresent(text ->
+                dataView.set(AUTHOR, LanternTexts.toLegacy(text)));
         valueContainer.remove(Keys.DISPLAY_NAME).ifPresent(text ->
                 dataView.set(TITLE, LanternTexts.toLegacy(text)));
+        valueContainer.remove(Keys.GENERATION).ifPresent(value ->
+                dataView.set(GENERATION, value));
     }
 
     @Override
     public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.deserializeValues(itemStack, valueContainer, dataView);
+        dataView.getStringList(PAGES).ifPresent(lines -> valueContainer.set(Keys.BOOK_PAGES,
+                lines.stream().map(TextSerializers.JSON::deserializeUnchecked).collect(Collectors.toList())));
         dataView.getString(AUTHOR).ifPresent(author -> valueContainer.set(Keys.BOOK_AUTHOR, LanternTexts.fromLegacy(author)));
         dataView.getString(TITLE).ifPresent(title -> valueContainer.set(Keys.DISPLAY_NAME, LanternTexts.fromLegacy(title)));
-        dataView.getStringList(PAGES).ifPresent(lines -> valueContainer.set(Keys.BOOK_PAGES,
-                lines.stream().map(TextSerializers.JSON::deserialize).collect(Collectors.toList())));
+        dataView.getInt(GENERATION).ifPresent(value -> valueContainer.set(Keys.GENERATION, value));
     }
 
     public static void writeBookData(DataView dataView, BookView bookView, Locale locale) {

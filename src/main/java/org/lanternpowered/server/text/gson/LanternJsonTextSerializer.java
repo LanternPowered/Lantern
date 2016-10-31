@@ -26,6 +26,7 @@
 package org.lanternpowered.server.text.gson;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.LanternTexts.fixJson;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -54,7 +55,7 @@ public final class LanternJsonTextSerializer implements TextSerializer {
 
     @Override
     public String serialize(Text text) {
-        return this.gson.toJson(checkNotNull(text, "text"));
+        return fixJson(this.gson.toJson(checkNotNull(text, "text")));
     }
 
     @Override
@@ -62,7 +63,7 @@ public final class LanternJsonTextSerializer implements TextSerializer {
         try {
             return this.gson.fromJson(checkNotNull(input, "input"), Text.class);
         } catch (JsonSyntaxException e) {
-            throw new TextParseException(e);
+            throw new TextParseException("Attempted to parse invalid json: " + input, e);
         }
     }
 }

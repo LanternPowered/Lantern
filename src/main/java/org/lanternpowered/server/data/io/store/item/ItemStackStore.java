@@ -169,6 +169,8 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(ItemTypes.BANNER, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
                 dataValue -> 15 - dataValue, internalId -> 15 - internalId));
         add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));
+        add(ItemTypes.WRITABLE_BOOK, new WritableBookItemTypeObjectSerializer());
+        add(ItemTypes.WRITTEN_BOOK, new WrittenBookItemTypeObjectSerializer());
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {

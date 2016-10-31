@@ -23,41 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.text;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInEditBook;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
-public class LanternTexts {
+import java.util.stream.Collectors;
 
-    @SuppressWarnings("deprecation")
-    public static String toLegacy(Text text) {
-        return TextSerializers.LEGACY_FORMATTING_CODE.serialize(text);
-    }
+public class HandlerPlayInEditBook implements Handler<MessagePlayInEditBook> {
 
-    public static String toPlain(Text text) {
-        return TextSerializers.PLAIN.serialize(text);
-    }
+    @Override
+    public void handle(NetworkContext context, MessagePlayInEditBook message) {
+        final LanternPlayer player = context.getSession().getPlayer();
+        final LanternSlot slot = player.getInventory().getHotbar().getSelectedSlot();
 
-    @SuppressWarnings("deprecation")
-    public static Text fromLegacy(String text) {
-        return TextSerializers.LEGACY_FORMATTING_CODE.deserialize(text);
-    }
-
-    /**
-     * The client doesn't like it when the server just sends a
-     * primitive json string, so we put it as one entry in an array
-     * to avoid errors.
-     *
-     * @param json the json
-     * @return the result json
-     */
-    public static String fixJson(String json) {
-        final char start = json.charAt(0);
-        if (start == '[' || start == '{') {
-            return json;
-        } else {
-            return '[' + json + ']';
+        final ItemStack itemStack = slot.peek().orElse(null);
+        if (itemStack != null && itemStack.getItem() == ItemTypes.WRITABLE_BOOK) {
+            itemStack.offer(Keys.BOOK_PAGES, message.getPages().stream().map(Text::of).collect(Collectors.toList()));
+            slot.set(itemStack);
         }
     }
 }

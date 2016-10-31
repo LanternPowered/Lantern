@@ -114,6 +114,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldBorder;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInDropHeldItem;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInEditBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPickItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerLook;
@@ -122,6 +123,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerOnGroundState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityAttack;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityInteract;
@@ -326,8 +328,10 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInEditCommandBlock.Block.class); // TODO: Handler
         inbound.bind(MessagePlayInEditCommandBlock.AdvancedBlock.class); // TODO: Handler
         inbound.bind(MessagePlayInEditCommandBlock.Entity.class); // TODO: Handler
-        inbound.bind(MessagePlayInEditBook.class); // TODO: Handler
-        inbound.bind(MessagePlayInSignBook.class); // TODO: Handler
+        inbound.bind(MessagePlayInEditBook.class)
+                .bindHandler(new HandlerPlayInEditBook());
+        inbound.bind(MessagePlayInSignBook.class)
+                .bindHandler(new HandlerPlayInSignBook());
         inbound.bind(MessagePlayInPickItem.class)
                 .bindHandler(new HandlerPlayInPickItem());
         inbound.bind(MessagePlayInOutChannelPayload.class)

@@ -23,41 +23,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.text;
+package org.lanternpowered.server.data.io.store.item;
 
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
-public class LanternTexts {
+import java.util.stream.Collectors;
 
-    @SuppressWarnings("deprecation")
-    public static String toLegacy(Text text) {
-        return TextSerializers.LEGACY_FORMATTING_CODE.serialize(text);
+public class WritableBookItemTypeObjectSerializer extends ItemTypeObjectSerializer {
+
+    public static final DataQuery PAGES = DataQuery.of("pages");
+
+    @Override
+    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
+        valueContainer.remove(Keys.BOOK_PAGES).ifPresent(lines ->
+                dataView.set(PAGES, lines.stream().map(Text::toPlain).collect(Collectors.toList())));
     }
 
-    public static String toPlain(Text text) {
-        return TextSerializers.PLAIN.serialize(text);
-    }
-
-    @SuppressWarnings("deprecation")
-    public static Text fromLegacy(String text) {
-        return TextSerializers.LEGACY_FORMATTING_CODE.deserialize(text);
-    }
-
-    /**
-     * The client doesn't like it when the server just sends a
-     * primitive json string, so we put it as one entry in an array
-     * to avoid errors.
-     *
-     * @param json the json
-     * @return the result json
-     */
-    public static String fixJson(String json) {
-        final char start = json.charAt(0);
-        if (start == '[' || start == '{') {
-            return json;
-        } else {
-            return '[' + json + ']';
-        }
+    @Override
+    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
+        dataView.getStringList(PAGES).ifPresent(lines -> valueContainer.set(Keys.BOOK_PAGES,
+                lines.stream().map(Text::of).collect(Collectors.toList())));
     }
 }

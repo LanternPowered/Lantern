@@ -46,6 +46,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TranslatableText;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 
 public final class JsonTextSerializer extends JsonTextBaseSerializer implements JsonDeserializer<Text>, JsonSerializer<Text> {
 
@@ -87,6 +88,11 @@ public final class JsonTextSerializer extends JsonTextBaseSerializer implements 
     public Text deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
         if (json.isJsonPrimitive()) {
             return context.deserialize(json, LiteralText.class);
+        }
+        if (json.isJsonArray()) {
+            final Text.Builder builder = Text.builder();
+            builder.append(context.<Text[]>deserialize(json, Text[].class));
+            return builder.build();
         }
         final JsonObject obj = json.getAsJsonObject();
         if (obj.has(TEXT)) {

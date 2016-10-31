@@ -25,9 +25,9 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import static org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer.AUTHOR;
-import static org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer.PAGES;
-import static org.lanternpowered.server.data.io.store.item.BookItemTypeObjectSerializer.TITLE;
+import static org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer.AUTHOR;
+import static org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer.PAGES;
+import static org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer.TITLE;
 
 import com.flowpowered.math.vector.Vector3i;
 import io.netty.handler.codec.CodecException;

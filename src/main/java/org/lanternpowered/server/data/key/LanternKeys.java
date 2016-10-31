@@ -31,6 +31,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
+import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
@@ -79,6 +80,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("Triggered"), "lantern:triggered");
     public static final Key<Value<Boolean>> IS_ELYTRA_FLYING =
             makeValueKey(Boolean.class, DataQuery.of("IsElytraFlying"), "lantern:is_elytra_flying");
+    public static final Key<Value<PotionType>> POTION_TYPE =
+            makeValueKey(PotionType.class, DataQuery.of("PotionType"), "lantern:potion_type");
 
     private LanternKeys() {
     }

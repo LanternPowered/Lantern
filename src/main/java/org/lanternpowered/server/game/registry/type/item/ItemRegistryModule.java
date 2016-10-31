@@ -35,8 +35,10 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternDyeColor;
+import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
@@ -71,9 +73,11 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.text.translation.Translation;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.function.Function;
 
 @RegistrationDependency({
         ArmorTypeRegistryModule.class,
@@ -856,8 +860,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         ///   Potion   ///
         //////////////////
-        register(373, potionEffectsBuilder()
-                .translation("item.potion.name")
+        register(373, potionEffectsBuilder(PotionType::getTranslation)
+                .maxStackQuantity(1)
                 .build("minecraft", "potion"));
         ////////////////////////
         ///   Glass Bottle   ///
@@ -1267,8 +1271,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         ///   Splash Potion   ///
         /////////////////////////
-        register(438, potionEffectsBuilder()
+        register(438, potionEffectsBuilder(PotionType::getSplashTranslation)
                 .translation("item.splash_potion.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "splash_potion"));
         //////////////////////////
         ///   Spectral Arrow   ///
@@ -1279,14 +1284,15 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////
         ///   Tipped Arrow   ///
         ////////////////////////
-        register(440, potionEffectsBuilder()
+        register(440, potionEffectsBuilder(PotionType::getTippedArrowTranslation)
                 .translation("item.tipped_arrow.name")
                 .build("minecraft", "tipped_arrow"));
         ////////////////////////////
         ///   Lingering Potion   ///
         ////////////////////////////
-        register(441, potionEffectsBuilder()
+        register(441, potionEffectsBuilder(PotionType::getLingeringTranslation)
                 .translation("item.lingering_potion.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "lingering_potion"));
         //////////////////
         ///   Shield   ///
@@ -1420,13 +1426,22 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         }
     }
 
-    private ItemTypeBuilder potionEffectsBuilder() {
+    private ItemTypeBuilder potionEffectsBuilder(Function<PotionType, Translation> translationFunction) {
         return builder()
+                .translation((itemType, itemStack) -> {
+                    if (itemStack != null) {
+                        final PotionType potionType = itemStack.get(LanternKeys.POTION_TYPE).orElse(null);
+                        if (potionType != null) {
+                            return translationFunction.apply(potionType);
+                        }
+                    }
+                    return Lantern.getRegistry().getTranslationManager().get("item.potion.name");
+                })
                 .keysProvider(valueContainer -> {
                     valueContainer.registerKey(Keys.COLOR, null);
                     valueContainer.registerKey(Keys.POTION_EFFECTS, null);
-                })
-                .maxStackQuantity(1);
+                    valueContainer.registerKey(LanternKeys.POTION_TYPE, null);
+                });
     }
 
     private ItemTypeBuilder recordBuilder(String name) {

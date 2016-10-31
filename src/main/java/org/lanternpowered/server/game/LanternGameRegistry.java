@@ -82,6 +82,7 @@ import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
 import org.lanternpowered.server.effect.potion.LanternPotionEffectBuilder;
+import org.lanternpowered.server.effect.potion.PotionType;
 import org.lanternpowered.server.effect.sound.LanternSoundTypeBuilder;
 import org.lanternpowered.server.entity.living.player.tab.LanternTabListEntryBuilder;
 import org.lanternpowered.server.game.registry.CatalogMappingData;
@@ -136,6 +137,7 @@ import org.lanternpowered.server.game.registry.type.economy.TransactionTypeRegis
 import org.lanternpowered.server.game.registry.type.effect.ParticleOptionRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.ParticleTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.PotionEffectTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.effect.PotionTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundCategoryRegistryModule;
 import org.lanternpowered.server.game.registry.type.effect.SoundTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.entity.EntityTypeRegistryModule;
@@ -405,9 +407,45 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     public void registerDefaults() {
+        registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
+                .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
+                .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
+                .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
+                .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
+                .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
+                .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)
+                .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(Lantern.getGame().getScheduler()))
+                .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
+                .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)
+                .registerBuilderSupplier(Selector.Builder.class, LanternSelectorBuilder::new)
+                .registerBuilderSupplier(Objective.Builder.class, LanternObjectiveBuilder::new)
+                .registerBuilderSupplier(Scoreboard.Builder.class, LanternScoreboardBuilder::new)
+                .registerBuilderSupplier(Team.Builder.class, LanternTeamBuilder::new)
+                .registerBuilderSupplier(ServerBossBar.Builder.class, LanternBossBarBuilder::new)
+                .registerBuilderSupplier(BlockSpawnCause.Builder.class, LanternBlockSpawnCauseBuilder::new)
+                .registerBuilderSupplier(BreedingSpawnCause.Builder.class, LanternBreedingSpawnCauseBuilder::new)
+                .registerBuilderSupplier(EntitySpawnCause.Builder.class, LanternEntitySpawnCauseBuilder::new)
+                .registerBuilderSupplier(MobSpawnerSpawnCause.Builder.class, LanternMobSpawnerSpawnCauseBuilder::new)
+                .registerBuilderSupplier(SpawnCause.Builder.class, LanternSpawnCauseBuilder::new)
+                .registerBuilderSupplier(WeatherSpawnCause.Builder.class, LanternWeatherSpawnCauseBuilder::new)
+                .registerBuilderSupplier(EntityTeleportCause.Builder.class, LanternEntityTeleportCauseBuilder::new)
+                .registerBuilderSupplier(PortalTeleportCause.Builder.class, LanternPortalTeleportCauseBuilder::new)
+                .registerBuilderSupplier(TeleportCause.Builder.class, LanternTeleportCauseBuilder::new)
+                .registerBuilderSupplier(BlockDamageSource.Builder.class, LanternBlockDamageSourceBuilder::new)
+                .registerBuilderSupplier(DamageSource.Builder.class, LanternDamageSourceBuilder::new)
+                .registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
+                .registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
+                .registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
+                .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
+                .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
+                .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
+                .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
+                .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
+                .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
+        ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
-        this.registerModule(LanternOperation.class, new AttributeOperationRegistryModule())
+        registerModule(LanternOperation.class, new AttributeOperationRegistryModule())
                 .registerModule(LanternAttribute.class, new AttributeRegistryModule())
                 .registerModule(new AttributeTargetRegistryModule())
                 .registerModule(BlockType.class, BlockRegistryModule.get())
@@ -518,6 +556,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())
                 .registerModule(Enchantment.class, EnchantmentRegistryModule.get())
                 .registerModule(SkullType.class, SkullTypeRegistryModule.get())
+                .registerModule(PotionType.class, PotionTypeRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())
@@ -525,42 +564,6 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(DoubleValueProviderType.class, DoubleValueProviderTypeRegistryModule.get())
                 .registerModule(FloatValueProviderType.class, FloatValueProviderTypeRegistryModule.get())
                 .registerModule(IntValueProviderType.class, IntValueProviderTypeRegistryModule.get())
-                ;
-        this.registerBuilderSupplier(LanternAttributeBuilder.class, LanternAttributeBuilder::new)
-                .registerBuilderSupplier(BlockSnapshot.Builder.class, LanternBlockSnapshotBuilder::new)
-                .registerBuilderSupplier(BlockSnapshotBuilder.class, LanternBlockSnapshotBuilder::new)
-                .registerBuilderSupplier(BlockState.Builder.class, LanternBlockStateBuilder::new)
-                .registerBuilderSupplier(WorldArchetype.Builder.class, LanternWorldArchetypeBuilder::new)
-                .registerBuilderSupplier(ParticleEffect.Builder.class, LanternParticleEffectBuilder::new)
-                .registerBuilderSupplier(PotionEffect.Builder.class, LanternPotionEffectBuilder::new)
-                .registerBuilderSupplier(Task.Builder.class, () -> new LanternTaskBuilder(Lantern.getGame().getScheduler()))
-                .registerBuilderSupplier(Ban.Builder.class, BanBuilder::new)
-                .registerBuilderSupplier(TabListEntry.Builder.class, LanternTabListEntryBuilder::new)
-                .registerBuilderSupplier(Selector.Builder.class, LanternSelectorBuilder::new)
-                .registerBuilderSupplier(Objective.Builder.class, LanternObjectiveBuilder::new)
-                .registerBuilderSupplier(Scoreboard.Builder.class, LanternScoreboardBuilder::new)
-                .registerBuilderSupplier(Team.Builder.class, LanternTeamBuilder::new)
-                .registerBuilderSupplier(ServerBossBar.Builder.class, LanternBossBarBuilder::new)
-                .registerBuilderSupplier(BlockSpawnCause.Builder.class, LanternBlockSpawnCauseBuilder::new)
-                .registerBuilderSupplier(BreedingSpawnCause.Builder.class, LanternBreedingSpawnCauseBuilder::new)
-                .registerBuilderSupplier(EntitySpawnCause.Builder.class, LanternEntitySpawnCauseBuilder::new)
-                .registerBuilderSupplier(MobSpawnerSpawnCause.Builder.class, LanternMobSpawnerSpawnCauseBuilder::new)
-                .registerBuilderSupplier(SpawnCause.Builder.class, LanternSpawnCauseBuilder::new)
-                .registerBuilderSupplier(WeatherSpawnCause.Builder.class, LanternWeatherSpawnCauseBuilder::new)
-                .registerBuilderSupplier(EntityTeleportCause.Builder.class, LanternEntityTeleportCauseBuilder::new)
-                .registerBuilderSupplier(PortalTeleportCause.Builder.class, LanternPortalTeleportCauseBuilder::new)
-                .registerBuilderSupplier(TeleportCause.Builder.class, LanternTeleportCauseBuilder::new)
-                .registerBuilderSupplier(BlockDamageSource.Builder.class, LanternBlockDamageSourceBuilder::new)
-                .registerBuilderSupplier(DamageSource.Builder.class, LanternDamageSourceBuilder::new)
-                .registerBuilderSupplier(EntityDamageSource.Builder.class, LanternEntityDamageSourceBuilder::new)
-                .registerBuilderSupplier(FallingBlockDamageSource.Builder.class, LanternFallingBlockDamageSourceBuilder::new)
-                .registerBuilderSupplier(IndirectEntityDamageSource.Builder.class, LanternIndirectEntityDamageSourceBuilder::new)
-                .registerBuilderSupplier(RespawnLocation.Builder.class, RespawnLocation.Builder::new)
-                .registerBuilderSupplier(SoundType.Builder.class, LanternSoundTypeBuilder::new)
-                .registerBuilderSupplier(FireworkEffect.Builder.class, LanternFireworkEffectBuilder::new)
-                .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
-                .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
-                .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
                 ;
         this.registerFactories();
     }

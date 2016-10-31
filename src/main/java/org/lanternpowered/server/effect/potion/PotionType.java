@@ -23,26 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item;
+package org.lanternpowered.server.effect.potion;
 
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.text.translation.Translatable;
 import org.spongepowered.api.text.translation.Translation;
 
-@FunctionalInterface
-public interface TranslationProvider extends ObjectProvider<Translation> {
+import java.util.List;
 
-    static TranslationProvider of(Translation translation) {
-        return (itemType, itemStack) -> translation;
-    }
+public interface PotionType extends CatalogType, Translatable {
 
-    static <E extends Translatable> TranslationProvider of(E defaultValue, Key<? extends BaseValue<E>> key) {
-        return (itemType, itemStack) -> itemStack == null ? defaultValue.getTranslation() : itemStack.get(key).get().getTranslation();
-    }
+    List<PotionEffect> getEffects();
 
-    static TranslationProvider of(ObjectProvider<String> provider) {
-        return (itemType, itemStack) -> Lantern.getRegistry().getTranslationManager().get(provider.get(itemType, itemStack));
-    }
+    Translation getLingeringTranslation();
+
+    Translation getSplashTranslation();
+
+    Translation getTippedArrowTranslation();
 }

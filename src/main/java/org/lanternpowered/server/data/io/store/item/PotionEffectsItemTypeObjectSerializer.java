@@ -27,6 +27,8 @@ package org.lanternpowered.server.data.io.store.item;
 
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.data.io.store.misc.PotionEffectSerializer;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.game.registry.type.effect.PotionTypeRegistryModule;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
@@ -39,6 +41,7 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
 
     private static final DataQuery COLOR = DataQuery.of("CustomPotionColor");
     private static final DataQuery EFFECTS = DataQuery.of("CustomPotionEffects");
+    private static final DataQuery POTION = DataQuery.of("Potion");
 
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
@@ -50,6 +53,7 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
             }
             dataView.set(EFFECTS, effects.stream().map(PotionEffectSerializer::serialize).collect(Collectors.toList()));
         });
+        itemStack.get(LanternKeys.POTION_TYPE).ifPresent(potionType -> dataView.set(POTION, potionType.getId()));
     }
 
     @Override
@@ -65,5 +69,7 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
                     .filter(effect -> effect != null)
                     .collect(Collectors.toList()));
         });
+        dataView.getString(POTION).ifPresent(id -> PotionTypeRegistryModule.get().getById(id).ifPresent(
+                potionType -> valueContainer.set(LanternKeys.POTION_TYPE, potionType)));
     }
 }

@@ -40,7 +40,6 @@ import org.spongepowered.api.util.annotation.NonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
-@NonnullByDefault
 public final class DataUtil {
 
     public static DataView checkDataExists(final DataView dataView, final DataQuery query) throws InvalidDataException {

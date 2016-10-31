@@ -856,7 +856,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         ///   Potion   ///
         //////////////////
-        register(373, builder()
+        register(373, potionEffectsBuilder()
                 .translation("item.potion.name")
                 .build("minecraft", "potion"));
         ////////////////////////
@@ -1267,7 +1267,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         ///   Splash Potion   ///
         /////////////////////////
-        register(438, builder()
+        register(438, potionEffectsBuilder()
                 .translation("item.splash_potion.name")
                 .build("minecraft", "splash_potion"));
         //////////////////////////
@@ -1279,13 +1279,13 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////
         ///   Tipped Arrow   ///
         ////////////////////////
-        register(440, builder()
+        register(440, potionEffectsBuilder()
                 .translation("item.tipped_arrow.name")
                 .build("minecraft", "tipped_arrow"));
         ////////////////////////////
         ///   Lingering Potion   ///
         ////////////////////////////
-        register(441, builder()
+        register(441, potionEffectsBuilder()
                 .translation("item.lingering_potion.name")
                 .build("minecraft", "lingering_potion"));
         //////////////////
@@ -1418,6 +1418,15 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private ItemTypeBuilder potionEffectsBuilder() {
+        return builder()
+                .keysProvider(valueContainer -> {
+                    valueContainer.registerKey(Keys.COLOR, null);
+                    valueContainer.registerKey(Keys.POTION_EFFECTS, null);
+                })
+                .maxStackQuantity(1);
     }
 
     private ItemTypeBuilder recordBuilder(String name) {

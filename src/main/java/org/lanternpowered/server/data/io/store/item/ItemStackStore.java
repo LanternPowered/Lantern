@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data.io.store.item;
 
+import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import org.lanternpowered.server.block.LanternBlockTypes;
@@ -89,7 +90,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
     public static final DataQuery DATA = DataQuery.of("Damage");
     public static final DataQuery TAG = DataQuery.of("tag");
 
-    private static final DataQuery DISPLAY = DataQuery.of("display");
+    static final DataQuery DISPLAY = DataQuery.of("display");
     private static final DataQuery NAME = DataQuery.of("Name");
     private static final DataQuery LOCALIZED_NAME = DataQuery.of("LocName");
     private static final DataQuery LORE = DataQuery.of("Lore");
@@ -171,6 +172,16 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));
         add(ItemTypes.WRITABLE_BOOK, new WritableBookItemTypeObjectSerializer());
         add(ItemTypes.WRITTEN_BOOK, new WrittenBookItemTypeObjectSerializer());
+        final ColoredLeatherItemTypeObjectSerializer leatherSerializer = new ColoredLeatherItemTypeObjectSerializer();
+        add(ItemTypes.LEATHER_BOOTS, leatherSerializer);
+        add(ItemTypes.LEATHER_CHESTPLATE, leatherSerializer);
+        add(ItemTypes.LEATHER_HELMET, leatherSerializer);
+        add(ItemTypes.LEATHER_LEGGINGS, leatherSerializer);
+        final PotionEffectsItemTypeObjectSerializer potionEffectsSerializer = new PotionEffectsItemTypeObjectSerializer();
+        add(ItemTypes.POTION, potionEffectsSerializer);
+        add(ItemTypes.SPLASH_POTION, potionEffectsSerializer);
+        add(ItemTypes.LINGERING_POTION, potionEffectsSerializer);
+        add(ItemTypes.TIPPED_ARROW, potionEffectsSerializer);
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {
@@ -234,7 +245,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         DataView displayView = null;
         final Optional<Text> optDisplayName = valueContainer.get(Keys.DISPLAY_NAME);
         if (optDisplayName.isPresent()) {
-            displayView = dataView.createView(DISPLAY);
+            displayView = getOrCreateView(dataView, DISPLAY);
             final Text displayName = optDisplayName.get();
             if (displayName instanceof TranslatableText) {
                 final TranslatableText name1 = (TranslatableText) displayName;
@@ -252,7 +263,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         final Optional<List<Text>> optLore = valueContainer.get(Keys.ITEM_LORE);
         if (optLore.isPresent() && !optLore.get().isEmpty()) {
             if (displayView == null) {
-                displayView = dataView.createView(DISPLAY);
+                displayView = getOrCreateView(dataView, DISPLAY);
             }
             displayView.set(LORE, optLore.get().stream().map(LanternTexts::toLegacy).collect(Collectors.toList()));
         }

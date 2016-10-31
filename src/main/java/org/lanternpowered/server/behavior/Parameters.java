@@ -32,6 +32,7 @@ import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -62,8 +63,7 @@ public final class Parameters {
 
     public static final Parameter<ItemType> ITEM_TYPE = Parameter.of(ItemType.class, "ItemType");
 
-    // TODO: Move this???
-    public static final Parameter<ItemStack> RESULT_ITEM_STACK = Parameter.of(ItemStack.class, "ResultItemStack");
+    public static final Parameter<Slot> USED_SLOT = Parameter.of(Slot.class, "UsedSlot");
 
     public static final Parameter<Player> PLAYER = Parameter.of(Player.class, "Player");
 

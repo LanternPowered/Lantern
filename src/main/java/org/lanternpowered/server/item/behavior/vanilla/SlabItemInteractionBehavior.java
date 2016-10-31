@@ -42,7 +42,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -143,12 +142,7 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
                     itemStack -> itemStack.getValues().forEach(value -> snapshotBuilder1.add((Key) value.getKey(), value.get())));
             context.addBlockChange(snapshotBuilder1.build());
 
-            final Optional<ItemStack> optItemStack = context.get(Parameters.USED_ITEM_STACK);
-            if (optItemStack.isPresent()) {
-                final ItemStack itemStack = optItemStack.get().copy();
-                itemStack.setQuantity(itemStack.getQuantity() - 1);
-                context.set(Parameters.RESULT_ITEM_STACK, itemStack);
-            }
+            context.get(Parameters.USED_SLOT).ifPresent(slot -> slot.poll(1));
             return BehaviorResult.SUCCESS;
         }
 

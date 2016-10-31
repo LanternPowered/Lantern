@@ -54,8 +54,11 @@ public class ArmorQuickEquipInteractionBehavior implements InteractWithItemBehav
         final PeekOfferTransactionsResult result = player.getInventory().getEquipment().peekOfferFastTransactions(itemStack.copy());
         if (result.getOfferResult().isSuccess()) {
             final List<SlotTransaction> transactions = result.getTransactions();
-            final LanternSlot slot = player.getInventory().getHotbar().getSelectedSlot();
-            transactions.add(new SlotTransaction(slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(result.getOfferResult().getRest())));
+            final LanternSlot slot = (LanternSlot) context.get(Parameters.USED_SLOT).orElse(null);
+            if (slot != null) {
+                transactions.add(new SlotTransaction(
+                        slot, itemStack.createSnapshot(), LanternItemStack.toSnapshot(result.getOfferResult().getRest())));
+            }
             final ChangeInventoryEvent.Equipment event = SpongeEventFactory.createChangeInventoryEventEquipment(
                     Cause.source(player).build(), player.getInventory(), result.getTransactions());
             if (event.isCancelled()) {

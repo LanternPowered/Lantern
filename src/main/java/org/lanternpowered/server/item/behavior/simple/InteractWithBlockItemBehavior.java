@@ -34,7 +34,6 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.PlaceBlockBehavior;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -66,12 +65,7 @@ public class InteractWithBlockItemBehavior implements InteractWithItemBehavior {
                 (context1, behavior1) -> behavior1.tryPlace(pipeline, context1));
 
         if (success) {
-            final Optional<ItemStack> optItemStack = context.get(Parameters.USED_ITEM_STACK);
-            if (optItemStack.isPresent()) {
-                final ItemStack itemStack = optItemStack.get().copy();
-                itemStack.setQuantity(itemStack.getQuantity() - 1);
-                context.set(Parameters.RESULT_ITEM_STACK, itemStack);
-            }
+            context.get(Parameters.USED_SLOT).ifPresent(slot -> slot.poll(1));
             return BehaviorResult.SUCCESS;
         }
 

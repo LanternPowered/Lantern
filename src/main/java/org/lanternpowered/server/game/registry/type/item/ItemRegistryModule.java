@@ -70,7 +70,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
-import org.spongepowered.api.util.Color;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -1438,10 +1437,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     }
 
     private ItemTypeBuilder leatherArmorBuilder(EquipmentType equipmentType) {
-        final Color leatherColor = Color.ofRgb(10511680);
         return armorBuilder(ArmorTypes.LEATHER, equipmentType)
                 .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.COLOR, leatherColor));
+                        .registerKey(Keys.COLOR, null));
     }
 
     private ItemTypeBuilder armorBuilder(ArmorType armorType, EquipmentType equipmentType) {

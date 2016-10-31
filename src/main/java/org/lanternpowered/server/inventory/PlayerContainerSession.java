@@ -51,6 +51,7 @@ import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
@@ -64,6 +65,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -525,7 +527,7 @@ public class PlayerContainerSession {
                     final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
                     PeekOfferTransactionsResult result;
                     if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
-                            (windowId == 0 && !mainInventory.isChild(slot))) {
+                            (windowId == 0 && !mainInventory.isChild(slot) && slot != this.openContainer.playerInventory.getOffhand())) {
                         if (slot.isReverseShiftClickOfferOrder()) {
                             inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
                         } else {
@@ -533,8 +535,12 @@ public class PlayerContainerSession {
                         }
                         result = inventory.peekOfferFastTransactions(itemStack.copy());
                     } else {
-                        inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
-                                ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
+                        Predicate<Inventory> filter = inv -> inv instanceof Slot &&
+                                ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot);
+                        if (slot != this.openContainer.playerInventory.getOffhand()) {
+                            filter = filter.and(inv -> !mainInventory.isChild(inv));
+                        }
+                        inventory = this.openContainer.openInventory.query(filter, false);
                         result = inventory.peekOfferFastTransactions(itemStack.copy());
                         if (result.getOfferResult().getRest() != null) {
                             if (slot.parent() instanceof LanternHotbar) {

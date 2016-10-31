@@ -60,6 +60,7 @@ import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.data.type.Fishes;
 import org.spongepowered.api.data.type.GoldenApples;
+import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.ToolTypes;
 import org.spongepowered.api.item.ItemType;
@@ -97,6 +98,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
 
     private ItemRegistryModule() {
         super(ItemTypes.class);
+        this.internalIdByItemType.defaultReturnValue(-1);
     }
 
     /**
@@ -116,10 +118,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     @Override
     public int getInternalId(ItemType itemType) {
         checkNotNull(itemType, "itemType");
-        if (this.internalIdByItemType.containsKey(itemType)) {
-            return this.internalIdByItemType.get(itemType);
-        }
-        return -1;
+        return this.internalIdByItemType.getInt(itemType);
     }
 
     @Override
@@ -1001,8 +1000,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///   Skull   ///
         /////////////////
         register(397, builder()
-                // TODO: Skull types
                 .translation("item.skull.char.name")
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.SKULL_TYPE, SkullTypes.SKELETON))
                 .build("minecraft", "skull"));
         /////////////////////////////
         ///   Carrot On A Stick   ///

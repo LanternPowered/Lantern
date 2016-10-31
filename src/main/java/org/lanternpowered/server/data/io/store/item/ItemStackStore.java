@@ -41,6 +41,7 @@ import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.TreeTypeRegistryModule;
@@ -62,7 +63,6 @@ import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.SandstoneType;
-import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.value.mutable.ListValue;
@@ -166,6 +166,9 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(ItemTypes.COOKED_FISH, new DataValueItemTypeObjectSerializer<>(Keys.COOKED_FISH, CookedFishRegistryModule.get()));
         add(ItemTypes.DYE, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
                 dataValue -> 15 - dataValue, internalId -> 15 - internalId));
+        add(ItemTypes.BANNER, new DataValueItemTypeObjectSerializer<>(Keys.DYE_COLOR, DyeColorRegistryModule.get(),
+                dataValue -> 15 - dataValue, internalId -> 15 - internalId));
+        add(ItemTypes.SKULL, new DataValueItemTypeObjectSerializer<>(Keys.SKULL_TYPE, SkullTypeRegistryModule.get()));
     }
 
     private void add(ItemType itemType, ItemTypeObjectSerializer serializer) {

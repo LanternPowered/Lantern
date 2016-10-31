@@ -126,6 +126,7 @@ import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModul
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ToolTypeRegistryModule;
@@ -258,6 +259,7 @@ import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.SkinPart;
+import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.StoneType;
 import org.spongepowered.api.data.type.StoneTypes;
@@ -515,6 +517,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(PickupRule.class, PickupRuleRegistryModule.get())
                 .registerModule(BannerPatternShape.class, BannerPatternShapeRegistryModule.get())
                 .registerModule(Enchantment.class, EnchantmentRegistryModule.get())
+                .registerModule(SkullType.class, SkullTypeRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

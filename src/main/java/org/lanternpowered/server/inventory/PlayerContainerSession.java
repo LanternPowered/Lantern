@@ -481,7 +481,8 @@ public class PlayerContainerSession {
                             transactions.addAll(result.getTransactions());
                         } else {
                             final PeekSetTransactionsResult result1 = slot.peekSetTransactions(this.cursorItem);
-                            if (result1.getTransactionResult().getType().equals(InventoryTransactionResult.Type.SUCCESS)) {
+                            if (result1.getTransactionResult().getType().equals(InventoryTransactionResult.Type.SUCCESS) &&
+                                    result1.getTransactionResult().getRejectedItems().isEmpty()) {
                                 final Collection<ItemStackSnapshot> replaceItems = result1.getTransactionResult().getReplacedItems();
                                 if (!replaceItems.isEmpty()) {
                                     setCursorItem(replaceItems.iterator().next().createStack());

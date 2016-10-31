@@ -50,6 +50,7 @@ import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.TranslationProvider;
+import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractionBehavior;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.ArmorType;
@@ -1291,6 +1292,8 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .translation("item.elytra.name")
                 .properties(builder -> builder
                         .add(equipmentType(EquipmentTypes.CHESTPLATE)))
+                .behaviors(pipeline -> pipeline
+                        .add(new ArmorQuickEquipInteractionBehavior()))
                 .build("minecraft", "elytra"));
         ///////////////////////
         ///   Spruce Boat   ///
@@ -1445,7 +1448,9 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         return durableBuilder()
                 .properties(builder -> builder
                         .add(armorType(armorType))
-                        .add(equipmentType(equipmentType)));
+                        .add(equipmentType(equipmentType)))
+                .behaviors(pipeline -> pipeline
+                        .add(new ArmorQuickEquipInteractionBehavior()));
     }
 
     private ItemTypeBuilder builder() {

@@ -345,4 +345,53 @@ public final class PlayerInteractionHandler {
             }
         }
     }
+
+    public void handleItemInteraction(MessagePlayInPlayerUseItem message) {
+        final HandType handType = message.getHandType();
+        // Ignore the off hand interaction type for now, a main hand message
+        // will always be send before this message. So we will only listen for
+        // the main hand message.
+        if (handType == HandTypes.OFF_HAND) {
+            return;
+        }
+
+        // Try the action of the hotbar item first
+        final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
+        final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
+
+        final BehaviorContextImpl context = new BehaviorContextImpl(Cause.source(this.player).build());
+        context.set(Parameters.PLAYER, this.player);
+
+        final BehaviorContextImpl.Snapshot snapshot = context.createSnapshot();
+        Optional<ItemStack> handItem = hotbarSlot.peek();
+        if (handItem.isPresent()) {
+            final LanternItemType itemType = (LanternItemType) handItem.get().getItem();
+            context.set(Parameters.USED_ITEM_STACK, handItem.get());
+            context.set(Parameters.ITEM_TYPE, itemType);
+            context.set(Parameters.INTERACTION_HAND, HandTypes.MAIN_HAND);
+
+            if (context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
+                    (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx))) {
+                context.get(Parameters.RESULT_ITEM_STACK).ifPresent(hotbarSlot::set);
+                context.accept();
+                return;
+            }
+
+            context.restoreSnapshot(snapshot);
+        }
+
+        handItem = offHandSlot.peek();
+        if (handItem.isPresent()) {
+            final LanternItemType itemType = (LanternItemType) handItem.get().getItem();
+            context.set(Parameters.USED_ITEM_STACK, handItem.get());
+            context.set(Parameters.ITEM_TYPE, itemType);
+            context.set(Parameters.INTERACTION_HAND, HandTypes.OFF_HAND);
+
+            if (context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
+                    (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx))) {
+                context.get(Parameters.RESULT_ITEM_STACK).ifPresent(offHandSlot::set);
+                context.accept();
+            }
+        }
+    }
 }

@@ -121,6 +121,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovementAndLook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerOnGroundState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityAttack;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityInteract;
@@ -315,7 +316,8 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(0x1b, CodecPlayInSpectate.class, MessagePlayInSpectate.class); // TODO: Handler
         inbound.bind(0x1c, CodecPlayInPlayerBlockPlacement.class, MessagePlayInPlayerBlockPlacement.class)
                 .bindHandler(new HandlerPlayInPlayerBlockPlacement());
-        inbound.bind(0x1d, CodecPlayInPlayerUseItem.class, MessagePlayInPlayerUseItem.class); // TODO: Handler
+        inbound.bind(0x1d, CodecPlayInPlayerUseItem.class, MessagePlayInPlayerUseItem.class)
+                .bindHandler(new HandlerPlayInPlayerUseItem());
 
         // Provided by CodecPlayInOutCustomPayload
         inbound.bind(MessagePlayInOutBrand.class); // TODO: Handler

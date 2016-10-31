@@ -30,6 +30,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 import com.flowpowered.math.vector.Vector3d;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
@@ -244,10 +245,6 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         return false;
     }
 
-    protected boolean isElytraFlying() {
-        return false;
-    }
-
     /**
      * Fills the {@link ParameterList} with parameters to spawn the {@link Entity} on
      * the client.
@@ -288,7 +285,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (this.entity.get(Keys.GLOWING).orElse(false)) {
             flags |= 0x40;
         }
-        if (this.isElytraFlying()) {
+        if (this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false)) {
             flags |= 0x80;
         }
         return flags;

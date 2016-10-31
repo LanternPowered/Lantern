@@ -36,6 +36,8 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSprint;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerVehicleJump;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestHorseInventory;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInStartElytraFlying;
 
 public final class CodecPlayInPlayerAction implements Codec<Message> {
 
@@ -66,6 +68,10 @@ public final class CodecPlayInPlayerAction implements Codec<Message> {
             // Open inventory, there is another message that sends this and this one will
             // be removed in 1.9, so ignoring it.
             return NullMessage.INSTANCE;
+        } else if (action == 7) {
+            return new MessagePlayInRequestHorseInventory();
+        } else if (action == 8) {
+            return new MessagePlayInStartElytraFlying();
         }
         throw new CodecException("Unknown action type: " + action);
     }

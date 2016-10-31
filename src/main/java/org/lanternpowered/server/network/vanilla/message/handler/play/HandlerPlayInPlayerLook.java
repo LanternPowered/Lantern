@@ -30,40 +30,17 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerLook;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovement;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerMovementAndLook;
 
-public final class HandlerPlayInAllPlayerMovement {
+public class HandlerPlayInPlayerLook implements Handler<MessagePlayInPlayerLook> {
 
-    public class HandlerPlayInPlayerMovement implements Handler<MessagePlayInPlayerMovement> {
-
-        @Override
-        public void handle(NetworkContext context, MessagePlayInPlayerMovement message) {
-            final LanternPlayer player = context.getSession().getPlayer();
-            player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
-        }
+    @Override
+    public void handle(NetworkContext context, MessagePlayInPlayerLook message) {
+        final LanternPlayer player = context.getSession().getPlayer();
+        player.setRawRotation(toRotation(message.getPitch(), message.getYaw()));
+        player.handleOnGroundState(message.isOnGround());
     }
 
-    public class HandlerPlayInPlayerMovementAndLook implements Handler<MessagePlayInPlayerMovementAndLook> {
-
-        @Override
-        public void handle(NetworkContext context, MessagePlayInPlayerMovementAndLook message) {
-            final LanternPlayer player = context.getSession().getPlayer();
-            player.setRawPosition(new Vector3d(message.getX(), message.getY(), message.getZ()));
-            player.setRawRotation(toRotation(message.getPitch(), message.getYaw()));
-        }
-    }
-
-    public class HandlerPlayInPlayerLook implements Handler<MessagePlayInPlayerLook> {
-
-        @Override
-        public void handle(NetworkContext context, MessagePlayInPlayerLook message) {
-            final LanternPlayer player = context.getSession().getPlayer();
-            player.setRawRotation(toRotation(message.getPitch(), message.getYaw()));
-        }
-    }
-
-    private Vector3d toRotation(float yaw, float pitch) {
+    static Vector3d toRotation(float yaw, float pitch) {
         yaw %= 360.0f;
         pitch %= 360.0f;
         if (yaw < 180.0f) {

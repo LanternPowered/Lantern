@@ -98,9 +98,13 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
@@ -273,6 +277,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();
         registerKey(Keys.GAME_MODE, GameModes.NOT_SET).nonRemovableAttachedValueProcessor();
         registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).nonRemovableAttachedValueProcessor();
+        registerKey(LanternKeys.IS_ELYTRA_FLYING, false).nonRemovableAttachedValueProcessor();
         registerKey(LanternKeys.SCORE, 0).nonRemovableAttachedValueProcessor();
     }
 
@@ -915,5 +920,21 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     public PlayerInventoryContainer getInventoryContainer() {
         return this.inventoryContainer;
+    }
+
+    public void handleOnGroundState(boolean state) {
+        setOnGround(state);
+        if (state) {
+            offer(LanternKeys.IS_ELYTRA_FLYING, false);
+        }
+    }
+
+    public void handleStartElytraFlying() {
+        // Check for the elytra item
+        if (getInventory().getEquipment().getSlot(EquipmentTypes.CHESTPLATE)
+                .get().peek().map(ItemStack::getItem).orElse(null) != ItemTypes.ELYTRA) {
+            return;
+        }
+        offer(LanternKeys.IS_ELYTRA_FLYING, true);
     }
 }

@@ -243,7 +243,7 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
             serializer.serializeValues(object, valueContainer, dataView);
         }
         DataView displayView = null;
-        final Optional<Text> optDisplayName = valueContainer.get(Keys.DISPLAY_NAME);
+        final Optional<Text> optDisplayName = valueContainer.remove(Keys.DISPLAY_NAME);
         if (optDisplayName.isPresent()) {
             displayView = getOrCreateView(dataView, DISPLAY);
             final Text displayName = optDisplayName.get();
@@ -260,22 +260,22 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
                 displayView.set(NAME, LanternTexts.toLegacy(displayName));
             }
         }
-        final Optional<List<Text>> optLore = valueContainer.get(Keys.ITEM_LORE);
+        final Optional<List<Text>> optLore = valueContainer.remove(Keys.ITEM_LORE);
         if (optLore.isPresent() && !optLore.get().isEmpty()) {
             if (displayView == null) {
                 displayView = getOrCreateView(dataView, DISPLAY);
             }
             displayView.set(LORE, optLore.get().stream().map(LanternTexts::toLegacy).collect(Collectors.toList()));
         }
-        if (valueContainer.get(Keys.UNBREAKABLE).orElse(false)) {
+        if (valueContainer.remove(Keys.UNBREAKABLE).orElse(false)) {
             dataView.set(UNBREAKABLE, (byte) 1);
         }
-        final Optional<Set<BlockType>> optBlockTypes = valueContainer.get(Keys.BREAKABLE_BLOCK_TYPES);
+        final Optional<Set<BlockType>> optBlockTypes = valueContainer.remove(Keys.BREAKABLE_BLOCK_TYPES);
         if (optBlockTypes.isPresent() && !optBlockTypes.get().isEmpty()) {
             dataView.set(CAN_DESTROY, optBlockTypes.get().stream().map(CatalogType::getId).collect(Collectors.toSet()));
         }
-        valueContainer.get(Keys.ITEM_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, ENCHANTMENTS, list));
-        valueContainer.get(Keys.STORED_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, STORED_ENCHANTMENTS, list));
+        valueContainer.remove(Keys.ITEM_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, ENCHANTMENTS, list));
+        valueContainer.remove(Keys.STORED_ENCHANTMENTS).ifPresent(list -> serializeEnchantments(dataView, STORED_ENCHANTMENTS, list));
         super.serializeValues(object, valueContainer, dataView);
     }
 

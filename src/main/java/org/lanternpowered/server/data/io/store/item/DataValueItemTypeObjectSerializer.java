@@ -68,7 +68,7 @@ public class DataValueItemTypeObjectSerializer<T extends CatalogType> extends It
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        final Optional<T> type = valueContainer.get(this.key);
+        final Optional<T> type = valueContainer.remove(this.key);
         if (type.isPresent()) {
             int internalId = ((InternalCatalogType) type.get()).getInternalId();
             if (this.internalIdToDataValue != null) {

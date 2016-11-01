@@ -23,32 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.io.store.item;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import static org.lanternpowered.server.data.io.store.item.ItemStackStore.DISPLAY;
-import static org.lanternpowered.server.data.util.DataUtil.getOrCreateView;
-
-import org.lanternpowered.server.data.io.store.SimpleValueContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSprint;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.Color;
 
-public class ColoredLeatherItemTypeObjectSerializer extends ItemTypeObjectSerializer {
-
-    private static final DataQuery COLOR = DataQuery.of("color");
+public final class HandlerPlayInPlayerSprint implements Handler<MessagePlayInPlayerSprint> {
 
     @Override
-    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.serializeValues(itemStack, valueContainer, dataView);
-        valueContainer.remove(Keys.COLOR).ifPresent(color -> getOrCreateView(dataView, DISPLAY).set(COLOR, color.getRgb()));
-    }
-
-    @Override
-    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
-        super.deserializeValues(itemStack, valueContainer, dataView);
-        dataView.getView(DISPLAY).ifPresent(view -> view.getInt(COLOR).ifPresent(
-                value -> valueContainer.set(Keys.COLOR, Color.ofRgb(value))));
+    public void handle(NetworkContext context, MessagePlayInPlayerSprint message) {
+        context.getSession().getPlayer().offer(Keys.IS_SPRINTING, message.isSprinting());
     }
 }

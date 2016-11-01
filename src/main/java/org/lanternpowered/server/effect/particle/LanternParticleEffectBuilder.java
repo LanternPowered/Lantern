@@ -77,7 +77,7 @@ public class LanternParticleEffectBuilder extends AbstractDataBuilder<ParticleEf
     @Override
     public ParticleEffect.Builder from(ParticleEffect particleEffect) {
         this.type = (LanternParticleType) particleEffect.getType();
-        this.options = particleEffect.getOptions();
+        this.options = new HashMap<>(particleEffect.getOptions());
         return this;
     }
 

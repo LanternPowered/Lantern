@@ -233,7 +233,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         return parameterList;
     }
 
-    protected boolean isCrouched() {
+    protected boolean isSneaking() {
         return false;
     }
 
@@ -270,13 +270,13 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (this.entity.get(Keys.FIRE_TICKS).orElse(0) > 0) {
             flags |= 0x01;
         }
-        if (this.isCrouched()) {
+        if (isSneaking()) {
             flags |= 0x02;
         }
-        if (this.isSprinting()) {
+        if (isSprinting()) {
             flags |= 0x08;
         }
-        if (this.isUsingItem()) {
+        if (isUsingItem()) {
             flags |= 0x10;
         }
         if (this.entity.get(Keys.INVISIBLE).orElse(false)) {
@@ -298,7 +298,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
      * @param parameterList The parameter list to fill
      */
     protected void update(ParameterList parameterList) {
-        final byte flags = this.packFlags();
+        final byte flags = packFlags();
         if (flags != this.lastFlags) {
             parameterList.add(EntityParameters.Base.FLAGS, flags);
             this.lastFlags = flags;

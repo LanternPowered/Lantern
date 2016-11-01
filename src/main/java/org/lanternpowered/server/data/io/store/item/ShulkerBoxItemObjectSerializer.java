@@ -41,7 +41,7 @@ public class ShulkerBoxItemObjectSerializer extends ItemTypeObjectSerializer {
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        final List<DataView> itemDataViews = InventorySnapshotSerializer.serialize(valueContainer.get(LanternKeys.INVENTORY).get());
+        final List<DataView> itemDataViews = InventorySnapshotSerializer.serialize(valueContainer.remove(LanternKeys.INVENTORY).get());
         if (!itemDataViews.isEmpty()) {
             dataView.set(ITEMS, itemDataViews);
         }

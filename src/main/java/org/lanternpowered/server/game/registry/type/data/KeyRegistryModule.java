@@ -59,7 +59,7 @@ import org.spongepowered.api.data.type.DoublePlantType;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.Fish;
 import org.spongepowered.api.data.type.GoldenApple;
-import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
@@ -183,7 +183,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         register(makeValueKey(Boolean.class, of("Disarmed"), "sponge:disarmed"));
         register(makeValueKey(DisguisedBlockType.class, of("DisguisedBlockType"), "sponge:disguised_block_type"));
         register(makeValueKey(Text.class, of("DisplayName"), "sponge:display_name"));
-        register(makeValueKey(HandType.class, of("DominantHand"), "sponge:dominant_hand"));
+        register(makeValueKey(HandPreference.class, of("DominantHand"), "sponge:dominant_hand"));
         register(makeValueKey(DoublePlantType.class, of("DoublePlantType"), "sponge:double_plant_type"));
         register(makeValueKey(DyeColor.class, of("DyeColor"), "sponge:dye_color"));
         register(makeValueKey(Boolean.class, of("ElderGuardian"), "sponge:elder_guardian"));
@@ -214,6 +214,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
         register(makeValueKey(Integer.class, of("FuseDuration"), "sponge:fuse_duration"));
         register(makeValueKey(GameMode.class, of("GameMode"), "sponge:game_mode"));
         register(makeMutableBoundedValueKey(Integer.class, of("Generation"), "sponge:generation"));
+        register(makeValueKey(Boolean.class, of("Glowing"), "sponge:glowing"));
         register(makeValueKey(GoldenApple.class, of("GoldenAppleType"), "sponge:golden_apple_type"));
         register(makeMutableBoundedValueKey(Integer.class, of("GrowthStage"), "sponge:growth_stage"));
         register(makeValueKey(Boolean.class, of("HasGravity"), "sponge:has_gravity"));
@@ -369,7 +370,7 @@ public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
                     throw new RuntimeException(e);
                 }
                 if (object instanceof Key) {
-                    this.register((Key) object);
+                    register((Key) object);
                 }
             }
         }

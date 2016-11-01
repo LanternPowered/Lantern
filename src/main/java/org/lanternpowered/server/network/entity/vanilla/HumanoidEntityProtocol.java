@@ -104,4 +104,14 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
             this.lastSkinParts = skinParts;
         }
     }
+
+    @Override
+    protected boolean isSneaking() {
+        return this.entity.get(Keys.IS_SNEAKING).orElse(false);
+    }
+
+    @Override
+    protected boolean isSprinting() {
+        return this.entity.get(Keys.IS_SPRINTING).orElse(false);
+    }
 }

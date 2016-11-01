@@ -167,6 +167,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         registerKey(Keys.VELOCITY, Vector3d.ZERO).nonRemovableAttachedValueProcessor();
         registerKey(Keys.FIRE_TICKS, 0).nonRemovableAttachedValueProcessor();
         registerKey(Keys.FALL_DISTANCE, 0f).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.GLOWING, false).nonRemovableAttachedValueProcessor();
         registerKey(LanternKeys.INVULNERABLE, false).nonRemovableAttachedValueProcessor();
         registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).nonRemovableAttachedValueProcessor();
     }

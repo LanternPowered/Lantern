@@ -37,7 +37,7 @@ public class QuartzItemTypeSerializer extends ItemTypeObjectSerializer {
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        LanternQuartzType quartzType = (LanternQuartzType) itemStack.get(Keys.QUARTZ_TYPE).get();
+        LanternQuartzType quartzType = (LanternQuartzType) valueContainer.remove(Keys.QUARTZ_TYPE).get();
         if (quartzType == LanternQuartzType.LINES_X || quartzType == LanternQuartzType.LINES_Z) {
             quartzType = LanternQuartzType.LINES_Y;
         }

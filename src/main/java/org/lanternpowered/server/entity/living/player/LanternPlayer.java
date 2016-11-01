@@ -270,6 +270,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.FIRST_DATE_PLAYED, null);
         registerKey(Keys.IS_FLYING, false).nonRemovableAttachedValueProcessor();
         registerKey(Keys.IS_SNEAKING, false).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.IS_SPRINTING, false).nonRemovableAttachedValueProcessor();
         registerKey(Keys.FLYING_SPEED, 0.1).nonRemovableAttachedValueProcessor();
         registerKey(Keys.CAN_FLY, false).nonRemovableAttachedValueProcessor();
         registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();

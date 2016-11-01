@@ -25,12 +25,17 @@
  */
 package org.lanternpowered.server.data.io.store.data;
 
+import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.lanternpowered.server.data.persistence.DataTypeSerializer;
+import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolder;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
+import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -40,8 +45,11 @@ import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class CompositeValueContainerStore<T extends S, S extends CompositeValueStore<S, H>, H extends ValueContainer<?>> implements ObjectStore<T> {
+
+    private static final DataQuery VALUES = DataQuery.of("Values");
 
     @SuppressWarnings("unchecked")
     @Override
@@ -50,7 +58,33 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
             final AbstractValueContainer<S> valueContainer = (AbstractValueContainer) object;
             final SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
 
-            this.deserializeValues(object, simpleValueContainer, dataView);
+            deserializeValues(object, simpleValueContainer, dataView);
+            final Optional<DataView> optDataView = dataView.getView(VALUES);
+            if (optDataView.isPresent()) {
+                final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
+                final DataView valuesView = optDataView.get();
+                for (Map.Entry<DataQuery, Object> entry : valuesView.getValues(false).entrySet()) {
+                    final Key key = KeyRegistryModule.get().getById(entry.getKey().toString()).orElse(null);
+                    if (key == null) {
+                        Lantern.getLogger().warn("Unable to deserialize the data value with key: {} because it doesn't exist.",
+                                entry.getKey().toString());
+                    } else {
+                        final TypeToken<?> typeToken = key.getElementToken();
+                        final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager().getTypeSerializer(typeToken).orElse(null);
+                        if (dataTypeSerializer == null) {
+                            Lantern.getLogger().warn("Unable to deserialize the data key value: {}, "
+                                    + "no supported deserializer exists.", key.getId());
+                        } else {
+                            if (simpleValueContainer.get(key).isPresent()) {
+                                Lantern.getLogger().warn("Duplicate usage of the key: {}", key.getId());
+                            } else {
+                                simpleValueContainer.set(key, dataTypeSerializer.deserialize(typeToken, context, entry.getValue()));
+                            }
+                        }
+                    }
+                }
+            }
+
             for (Map.Entry<Key<?>, Object> entry : simpleValueContainer.getValues().entrySet()) {
                 final ElementHolder elementHolder = valueContainer.getElementHolder((Key) entry.getKey());
                 if (elementHolder != null) {
@@ -63,7 +97,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
 
             final List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
             if (additionalManipulators != null) {
-                this.deserializeAdditionalData(object, additionalManipulators, dataView);
+                deserializeAdditionalData(object, additionalManipulators, dataView);
             }
         } else {
             // Not sure what to do
@@ -87,11 +121,33 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 }
             }
 
-            this.serializeValues(object, simpleValueContainer, dataView);
+            // Serialize the values, all written values will be removed from
+            // the simple value container
+            serializeValues(object, simpleValueContainer, dataView);
+
+            // Write the rest to the Values tag
+            final Map<Key<?>, Object> values = simpleValueContainer.getValues();
+            if (!values.isEmpty()) {
+                final DataView valuesView = dataView.createView(VALUES);
+                final DataTypeSerializerContext context = Lantern.getGame().getDataManager().getTypeSerializerContext();
+                for (Map.Entry<Key<?>, Object> entry : values.entrySet()) {
+                    final TypeToken<?> typeToken = entry.getKey().getElementToken();
+                    final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager().getTypeSerializer(typeToken).orElse(null);
+                    if (dataTypeSerializer == null) {
+                        Lantern.getLogger().warn("Unable to serialize the data key value: " + entry.getKey());
+                    } else {
+                        valuesView.set(DataQuery.of(entry.getKey().getId()),
+                                dataTypeSerializer.serialize(typeToken, context, entry.getValue()));
+                    }
+                }
+                if (valuesView.isEmpty()) {
+                    dataView.remove(VALUES);
+                }
+            }
 
             final List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
             if (additionalManipulators != null) {
-                this.serializeAdditionalData(object, additionalManipulators, dataView);
+                serializeAdditionalData(object, additionalManipulators, dataView);
             }
         } else {
             // Not sure what to do

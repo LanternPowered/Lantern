@@ -97,6 +97,8 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     private static final DataQuery SATURATION = DataQuery.of("foodSaturationLevel");
     private static final DataQuery FOOD_LEVEL = DataQuery.of("foodLevel");
     private static final DataQuery FOOD_TICK_TIMER = DataQuery.of("foodTickTimer"); // TODO
+    private static final DataQuery IS_ELYTRA_FLYING = DataQuery.of("FallFlying");
+    private static final DataQuery IS_GLOWING = DataQuery.of("Glowing");
 
     // TODO: Use this more globally?
     private static final DataQuery DATA_VERSION = DataQuery.of("DataVersion");
@@ -150,7 +152,6 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     public void serialize(T entity, DataView dataView) {
         dataView.set(DATA_VERSION, CURRENT_DATA_VERSION);
         dataView.set(POSITION, toDoubleList(entity.getPosition()));
-        dataView.set(VELOCITY, toDoubleList(entity.getVelocity()));
         final Vector3d rotation = entity.getRotation();
         // Yaw, Pitch, Roll (X, Y, Z) - Index 0 and 1 are swapped!
         dataView.set(ROTATION, Lists.newArrayList((float) rotation.getY(), (float) rotation.getX(), (float) rotation.getZ()));
@@ -171,6 +172,7 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
     public void serializeValues(T object, SimpleValueContainer valueContainer, DataView dataView) {
         // Here will we remove all the vanilla properties and delegate the
         // rest through the default serialization system
+        valueContainer.remove(Keys.VELOCITY).ifPresent(v -> dataView.set(VELOCITY, toDoubleList(v)));
         valueContainer.remove(Keys.FIRE_TICKS).ifPresent(v -> dataView.set(FIRE_TICKS, v));
         valueContainer.remove(Keys.FALL_DISTANCE).ifPresent(v -> dataView.set(FALL_DISTANCE, v));
         valueContainer.remove(Keys.HEALTH).ifPresent(v -> dataView.set(HEALTH, v.floatValue()));
@@ -203,6 +205,8 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         valueContainer.remove(Keys.FOOD_LEVEL).ifPresent(v -> dataView.set(FOOD_LEVEL, v));
         valueContainer.remove(Keys.EXHAUSTION).ifPresent(v -> dataView.set(EXHAUSTION, v.floatValue()));
         valueContainer.remove(Keys.SATURATION).ifPresent(v -> dataView.set(SATURATION, v.floatValue()));
+        valueContainer.remove(LanternKeys.IS_ELYTRA_FLYING).ifPresent(v -> dataView.set(IS_ELYTRA_FLYING, (byte) (v ? 1 : 0)));
+        valueContainer.remove(Keys.GLOWING).ifPresent(v -> dataView.set(IS_GLOWING, (byte) (v ? 1 : 0)));
         super.serializeValues(object, valueContainer, dataView);
     }
 
@@ -257,6 +261,8 @@ public class EntityStore<T extends LanternEntity> extends DataHolderStore<T> imp
         dataView.getInt(FOOD_LEVEL).ifPresent(v -> valueContainer.set(Keys.FOOD_LEVEL, v));
         dataView.getDouble(EXHAUSTION).ifPresent(v -> valueContainer.set(Keys.EXHAUSTION, v));
         dataView.getDouble(SATURATION).ifPresent(v -> valueContainer.set(Keys.SATURATION, v));
+        dataView.getInt(IS_ELYTRA_FLYING).ifPresent(v -> valueContainer.set(LanternKeys.IS_ELYTRA_FLYING, v > 0));
+        dataView.getInt(IS_GLOWING).ifPresent(v -> valueContainer.set(Keys.GLOWING, v > 0));
 
         super.deserializeValues(object, valueContainer, dataView);
     }

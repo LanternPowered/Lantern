@@ -122,6 +122,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerMovementAndLook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerOnGroundState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSprint;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInStartElytraFlying;
@@ -365,7 +366,8 @@ final class ProtocolPlay extends ProtocolBase {
         // Provided by CodecPlayInPlayerVehicleControls or CodecPlayInPlayerAction
         inbound.bind(MessagePlayInPlayerSneak.class)
                 .bindHandler(new HandlerPlayInPlayerSneak());
-        inbound.bind(MessagePlayInPlayerSprint.class); // TODO: Handler
+        inbound.bind(MessagePlayInPlayerSprint.class)
+                .bindHandler(new HandlerPlayInPlayerSprint());
         inbound.bind(MessagePlayInPlayerVehicleJump.class); // TODO: Handler
         // Provided by CodecPlayInPlayerVehicleControls
         inbound.bind(MessagePlayInPlayerVehicleMovement.class); // TODO: Handler

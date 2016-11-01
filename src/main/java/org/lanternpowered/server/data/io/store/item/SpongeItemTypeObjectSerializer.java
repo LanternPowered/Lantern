@@ -35,7 +35,7 @@ public class SpongeItemTypeObjectSerializer extends ItemTypeObjectSerializer {
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        dataView.set(DATA_VALUE, itemStack.get(Keys.IS_WET).get() ? 1 : 0);
+        dataView.set(DATA_VALUE, valueContainer.remove(Keys.IS_WET).get() ? 1 : 0);
     }
 
     @Override

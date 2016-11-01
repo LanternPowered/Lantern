@@ -49,7 +49,14 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
 
     @Override
     public LanternEntity deserialize(DataView dataView) throws InvalidDataException {
-        final String id = fixEntityId(dataView, dataView.getString(ID).get());
+        String id0 = dataView.getString(ID).get();
+        final String id;
+        // Fast fail if the data isn't old
+        if (dataView.getInt(DATA_VERSION).orElse(0) < 704) {
+            id = fixEntityId(dataView, id0);
+        } else {
+            id = id0;
+        }
         dataView.remove(ID);
 
         final LanternEntityType entityType = (LanternEntityType) Sponge.getRegistry().getType(EntityType.class, id).orElseThrow(
@@ -180,11 +187,7 @@ public class EntitySerializer implements ObjectSerializer<LanternEntity> {
         put("minecraft:zombie_villager", "ZombieVillager");
     }
 
-    private static String fixEntityId(DataView dataView, String id) {
-        // Fast fail if the data isn't old
-        if (dataView.getInt(DATA_VERSION).orElse(0) >= 704) {
-            return id;
-        }
+    public static String fixEntityId(DataView dataView, String id) {
         // Separate the horse entities
         if (id.equals("EntityHorse")) {
             final int type = dataView.getInt(HORSE_TYPE).get();

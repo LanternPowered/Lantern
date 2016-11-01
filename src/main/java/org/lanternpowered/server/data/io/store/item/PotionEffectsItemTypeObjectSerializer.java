@@ -46,14 +46,14 @@ public class PotionEffectsItemTypeObjectSerializer extends ItemTypeObjectSeriali
     @Override
     public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
         super.serializeValues(itemStack, valueContainer, dataView);
-        itemStack.get(Keys.COLOR).ifPresent(color -> dataView.set(COLOR, color.getRgb()));
-        itemStack.get(Keys.POTION_EFFECTS).ifPresent(effects -> {
+        valueContainer.remove(Keys.COLOR).ifPresent(color -> dataView.set(COLOR, color.getRgb()));
+        valueContainer.remove(Keys.POTION_EFFECTS).ifPresent(effects -> {
             if (effects.isEmpty()) {
                 return;
             }
             dataView.set(EFFECTS, effects.stream().map(PotionEffectSerializer::serialize).collect(Collectors.toList()));
         });
-        itemStack.get(LanternKeys.POTION_TYPE).ifPresent(potionType -> dataView.set(POTION, potionType.getId()));
+        valueContainer.remove(LanternKeys.POTION_TYPE).ifPresent(potionType -> dataView.set(POTION, potionType.getId()));
     }
 
     @Override

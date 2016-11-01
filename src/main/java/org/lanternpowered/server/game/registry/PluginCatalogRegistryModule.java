@@ -53,7 +53,7 @@ public class PluginCatalogRegistryModule<T extends CatalogType> extends Abstract
     /**
      * The order of the ids matter, lower value has higher priority for setting mappings.
      */
-    private static final List<String> INBUILT_PLUGIN_IDS = Arrays.asList(LanternGame.MINECRAFT_ID, LanternGame.API_ID);
+    private static final List<String> INBUILT_PLUGIN_IDS = Arrays.asList(LanternGame.MINECRAFT_ID, LanternGame.SPONGE_PLATFORM_ID);
 
     @Nullable private Map<String, T> typesByName = null;
 

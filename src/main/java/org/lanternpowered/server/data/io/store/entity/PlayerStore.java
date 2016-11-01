@@ -125,6 +125,8 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
 
     @Override
     public void serializeValues(LanternPlayer player, SimpleValueContainer valueContainer, DataView dataView) {
+        valueContainer.remove(Keys.IS_SPRINTING);
+        valueContainer.remove(Keys.IS_SNEAKING);
         final DataView abilities = dataView.createView(ABILITIES);
         abilities.set(FLYING, (byte) (valueContainer.remove(Keys.IS_FLYING).orElse(false) ? 1 : 0));
         abilities.set(FLYING_SPEED, valueContainer.remove(Keys.FLYING_SPEED).orElse(0.1).floatValue());
@@ -150,6 +152,7 @@ public class PlayerStore extends LivingStore<LanternPlayer> {
         dataView.set(RESPAWN_LOCATIONS, respawnLocationViews);
         dataView.set(GAME_MODE, ((LanternGameMode) valueContainer.remove(Keys.GAME_MODE).orElse(GameModes.NOT_SET)).getInternalId());
         dataView.set(SELECTED_ITEM_SLOT, player.getInventory().getHotbar().getSelectedSlotIndex());
+        dataView.set(SCORE, valueContainer.remove(LanternKeys.SCORE).get());
 
         // Serialize the player inventory
         dataView.set(INVENTORY, serializePlayerInventory(player.getInventory()));

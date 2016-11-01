@@ -1014,7 +1014,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///   Skull   ///
         /////////////////
         register(397, builder()
-                .translation("item.skull.char.name")
+                .translation(TranslationProvider.of(SkullTypes.SKELETON, Keys.SKULL_TYPE))
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.SKULL_TYPE, SkullTypes.SKELETON))
                 .properties(builder -> builder
@@ -1056,12 +1056,16 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.FIREWORK_EFFECTS, Collections.emptyList())
                 )
+                .maxStackQuantity(1)
                 .build("minecraft", "firework_charge"));
         //////////////////////////
         ///   Enchanted Book   ///
         //////////////////////////
         register(403, builder()
                 .translation("item.enchantedBook.name")
+                .keysProvider(valueContainer -> valueContainer
+                        .registerKey(Keys.STORED_ENCHANTMENTS, null))
+                .maxStackQuantity(1)
                 .build("minecraft", "enchanted_book"));
         //////////////////////
         ///   Comparator   ///
@@ -1086,12 +1090,14 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////
         register(407, builder()
                 .translation("item.minecartTnt.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "tnt_minecart"));
         ///////////////////////////
         ///   Hopper Minecart   ///
         ///////////////////////////
         register(408, builder()
                 .translation("item.minecartHopper.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "hopper_minecart"));
         ////////////////////////////
         ///   Prismarine Shard   ///
@@ -1176,6 +1182,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////////////////
         register(422, builder()
                 .translation("item.minecartCommandBlock.name")
+                .maxStackQuantity(1)
                 .build("minecraft", "command_block_minecart"));
         //////////////////
         ///   Mutton   ///

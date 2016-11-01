@@ -29,6 +29,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.inventory.LanternItemStackSnapshot.compareRawDataMaps;
 
+import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.data.AbstractDataHolder;
 import org.lanternpowered.server.data.property.AbstractPropertyHolder;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
@@ -177,6 +178,14 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     public boolean isSimilar(ItemStack that) {
         checkNotNull(that, "that");
         return this.itemType == that.getItem() && compareRawDataMaps(this, (AbstractValueContainer) that);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("type", this.itemType.getId())
+                .add("quantity", this.quantity)
+                .toString();
     }
 
     @Nullable

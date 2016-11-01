@@ -525,9 +525,10 @@ public class PlayerContainerSession {
                     AbstractMutableInventory inventory;
 
                     final HumanMainInventory mainInventory = this.openContainer.playerInventory.getMain();
+                    final boolean offhand = slot == this.openContainer.playerInventory.getOffhand();
                     PeekOfferTransactionsResult result;
                     if ((windowId != 0 && this.openContainer.openInventory.getSlotIndex(slot) != -1) ||
-                            (windowId == 0 && !mainInventory.isChild(slot) && slot != this.openContainer.playerInventory.getOffhand())) {
+                            (windowId == 0 && !mainInventory.isChild(slot) && !offhand)) {
                         if (slot.isReverseShiftClickOfferOrder()) {
                             inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR);
                         } else {
@@ -535,15 +536,11 @@ public class PlayerContainerSession {
                         }
                         result = inventory.peekOfferFastTransactions(itemStack.copy());
                     } else {
-                        Predicate<Inventory> filter = inv -> inv instanceof Slot &&
-                                ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot);
-                        if (slot != this.openContainer.playerInventory.getOffhand()) {
-                            filter = filter.and(inv -> !mainInventory.isChild(inv));
-                        }
-                        inventory = this.openContainer.openInventory.query(filter, false);
+                        inventory = this.openContainer.openInventory.query(inv -> !mainInventory.isChild(inv) && inv instanceof Slot &&
+                                ((LanternSlot) inv).doesAllowShiftClickOffer() && !(inv instanceof OutputSlot), false);
                         result = inventory.peekOfferFastTransactions(itemStack.copy());
                         if (result.getOfferResult().getRest() != null) {
-                            if (slot.parent() instanceof LanternHotbar) {
+                            if (slot.parent() instanceof LanternHotbar || offhand) {
                                 inventory = this.openContainer.playerInventory.getInventoryView(HumanInventoryView.MAIN);
                             } else {
                                 inventory = this.openContainer.playerInventory.getHotbar();

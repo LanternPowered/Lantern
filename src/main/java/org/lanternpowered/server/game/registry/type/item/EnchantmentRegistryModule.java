@@ -71,5 +71,6 @@ public class EnchantmentRegistryModule extends InternalPluginCatalogRegistryModu
         register(new LanternEnchantment("minecraft", "luck_of_the_sea", "enchantment.lootBonusFishing", 61));
         register(new LanternEnchantment("minecraft", "lure", "enchantment.fishingSpeed", 62));
         register(new LanternEnchantment("minecraft", "mending", "enchantment.mending", 70));
+        register(new LanternEnchantment("minecraft", "vanishing_curse", "enchantment.vanishing_curse", 71));
     }
 }

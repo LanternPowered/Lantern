@@ -27,49 +27,48 @@ package org.lanternpowered.server.data.type;
 
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.data.type.RailDirection;
 
-public enum LanternPlantType implements PlantType, SimpleCatalogType, InternalCatalogType {
+public enum LanternRailDirection implements SimpleCatalogType, RailDirection, InternalCatalogType {
 
-    DANDELION           (0, "dandelion", "dandelion"),
-    POPPY               (16, "poppy", "poppy"),
-    BLUE_ORCHID         (17, "blue_orchid", "blueOrchid"),
-    ALLIUM              (18, "allium", "allium"),
-    HOUSTONIA           (19, "houstonia", "houstonia"),
-    RED_TULIP           (20, "red_tulip", "tulipRed"),
-    ORANGE_TULIP        (21, "orange_tulip", "tulipOrange"),
-    WHITE_TULIP         (22, "white_tulip", "tulipWhite"),
-    PINK_TULIP          (23, "pink_tulip", "tulipPink"),
-    OXEYE_DAISY         (24, "oxeye_daisy", "oxeyeDaisy")
+    NORTH_SOUTH         ("north_south"),
+    EAST_WEST           ("east_west"),
+    ASCENDING_EAST      ("ascending_east"),
+    ASCENDING_WEST      ("ascending_west"),
+    ASCENDING_NORTH     ("ascending_north"),
+    ASCENDING_SOUTH     ("ascending_south"),
+    SOUTH_EAST          ("south_east"),
+    SOUTH_WEST          ("south_west"),
+    NORTH_WEST          ("north_west"),
+    NORTH_EAST          ("north_east"),
     ;
 
-    private final String identifier;
-    private final Translation translation;
+    private final String id;
+    private RailDirection next;
 
-    private final byte internalId;
-
-    LanternPlantType(int internalId, String identifier, String translationPart) {
-        final String part0 = internalId < 16 ? "flower1" : "flower2";
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tile."  + part0 + "." + translationPart + ".name");
-        this.internalId = (byte) internalId;
-        this.identifier = identifier;
+    LanternRailDirection(String id) {
+        this.id = id;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public RailDirection cycleNext() {
+        return this.next;
     }
 
     @Override
     public String getId() {
-        return this.identifier;
+        return this.id;
     }
 
     @Override
     public int getInternalId() {
-        return this.internalId;
+        return ordinal();
+    }
+
+    static {
+        final LanternRailDirection[] values = values();
+        for (int i = 0; i < values.length; i++) {
+            values[i].next = values[(i + 1) % values.length];
+        }
     }
 }

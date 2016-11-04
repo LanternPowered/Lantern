@@ -51,6 +51,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
@@ -72,6 +73,12 @@ public final class LanternChannelRegistrar implements ChannelRegistrar {
     @Override
     public LanternRawDataChannel createRawChannel(Object plugin, String channel) throws ChannelRegistrationException {
         return (LanternRawDataChannel) create(plugin, channel, true);
+    }
+
+    @Override
+    public Optional<ChannelBinding> getChannel(String channel) {
+        checkNotNull(channel, "channel");
+        return Optional.ofNullable(this.bindings.get(channel));
     }
 
     private LanternChannelBinding create(Object plugin, String channel, boolean rawChannel) throws ChannelRegistrationException {

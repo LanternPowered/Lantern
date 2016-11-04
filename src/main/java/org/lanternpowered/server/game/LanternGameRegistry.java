@@ -75,9 +75,7 @@ import org.lanternpowered.server.data.type.LanternPistonType;
 import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
-import org.lanternpowered.server.data.type.LanternSandType;
 import org.lanternpowered.server.data.type.LanternShrubType;
-import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
@@ -121,11 +119,14 @@ import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ProfessionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.QuartzTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.RabbitTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.RailDirectionRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkinPartRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
@@ -255,8 +256,8 @@ import org.spongepowered.api.data.type.PrismarineTypes;
 import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.data.type.RabbitType;
+import org.spongepowered.api.data.type.RailDirection;
 import org.spongepowered.api.data.type.SandType;
-import org.spongepowered.api.data.type.SandTypes;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.ShrubType;
 import org.spongepowered.api.data.type.ShrubTypes;
@@ -264,7 +265,6 @@ import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.data.type.StoneType;
-import org.spongepowered.api.data.type.StoneTypes;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.data.type.WallType;
@@ -491,15 +491,13 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(ArmorType.class, new ArmorTypeRegistryModule())
                 .registerModule(PistonType.class,
                         new EnumValueRegistryModule<PistonType>(LanternPistonType.class, PistonTypes.class) {})
-                .registerModule(PlantType.class,
-                        new EnumValueRegistryModule<PlantType>(LanternPlantType.class, PlantTypes.class) {})
+                .registerModule(PlantType.class, PlantTypeRegistryModule.get())
                 .registerModule(PrismarineType.class,
                         new EnumValueRegistryModule<PrismarineType>(LanternPrismarineType.class, PrismarineTypes.class) {})
                 .registerModule(QuartzType.class, QuartzTypeRegistryModule.get())
                 .registerModule(SandstoneType.class, SandstoneTypeRegistryModule.get())
                 .registerModule(SandType.class, SandTypeRegistryModule.get())
-                .registerModule(ShrubType.class,
-                        new EnumValueRegistryModule<ShrubType>(LanternShrubType.class, ShrubTypes.class) {})
+                .registerModule(ShrubType.class, ShrubTypeRegistryModule.get())
                 .registerModule(StoneType.class, StoneTypeRegistryModule.get())
                 .registerModule(SlabType.class, SlabTypeRegistryModule.get())
                 .registerModule(TreeType.class, TreeTypeRegistryModule.get())
@@ -557,6 +555,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(Enchantment.class, EnchantmentRegistryModule.get())
                 .registerModule(SkullType.class, SkullTypeRegistryModule.get())
                 .registerModule(PotionType.class, PotionTypeRegistryModule.get())
+                .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

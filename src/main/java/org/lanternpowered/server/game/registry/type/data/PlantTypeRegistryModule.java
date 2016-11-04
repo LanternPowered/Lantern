@@ -23,29 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.game.registry.type.data;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.block.trait.BooleanTrait;
-import org.spongepowered.api.data.key.Keys;
+import org.lanternpowered.server.data.type.LanternPlantType;
+import org.lanternpowered.server.game.registry.InternalEnumValueRegistryModule;
+import org.spongepowered.api.data.type.PlantType;
+import org.spongepowered.api.data.type.PlantTypes;
 
-public final class LanternBooleanTraits {
+public class PlantTypeRegistryModule extends InternalEnumValueRegistryModule<PlantType> {
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+    private static final PlantTypeRegistryModule INSTANCE = new PlantTypeRegistryModule();
 
-    public static final BooleanTrait DECAYABLE = LanternBooleanTrait.of("decayable", Keys.DECAYABLE);
+    public static PlantTypeRegistryModule get() {
+        return INSTANCE;
+    }
 
-    public static final BooleanTrait CHECK_DECAY = LanternBooleanTrait.of("check_decay", LanternKeys.CHECK_DECAY);
-
-    public static final BooleanTrait IS_WET = LanternBooleanTrait.of("wet", Keys.IS_WET);
-
-    public static final BooleanTrait OCCUPIED = LanternBooleanTrait.of("occupied", Keys.OCCUPIED);
-
-    public static final BooleanTrait SEAMLESS = LanternBooleanTrait.of("seamless", Keys.SEAMLESS);
-
-    public static final BooleanTrait ENABLED = LanternBooleanTrait.of("enabled", LanternKeys.ENABLED);
-
-    public static final BooleanTrait TRIGGERED = LanternBooleanTrait.of("triggered", LanternKeys.TRIGGERED);
-
-    public static final BooleanTrait POWERED = LanternBooleanTrait.of("powered", Keys.POWERED);
+    private PlantTypeRegistryModule() {
+        super(LanternPlantType.class, PlantTypes.class);
+    }
 }

@@ -29,10 +29,13 @@ import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.data.type.LanternLogAxis;
+import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternQuartzType;
+import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.LanternSandType;
 import org.lanternpowered.server.data.type.LanternSandstoneType;
+import org.lanternpowered.server.data.type.LanternShrubType;
 import org.lanternpowered.server.data.type.LanternSlabType;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
@@ -105,6 +108,23 @@ public final class LanternEnumTraits {
 
     public static final EnumTrait<LanternDyeColor> DYE_COLOR =
             LanternEnumTrait.of("variant", (Key) Keys.DYE_COLOR, LanternDyeColor.class);
+
+    public static final EnumTrait<LanternRailDirection> STRAIGHT_RAIL_DIRECTION =
+            LanternEnumTrait.of("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class, type ->
+                    type != LanternRailDirection.NORTH_EAST && type != LanternRailDirection.NORTH_WEST &&
+                            type != LanternRailDirection.SOUTH_EAST && type != LanternRailDirection.SOUTH_WEST);
+
+    public static final EnumTrait<LanternRailDirection> RAIL_DIRECTION =
+            LanternEnumTrait.of("shape", (Key) Keys.RAIL_DIRECTION, LanternRailDirection.class);
+
+    public static final EnumTrait<LanternShrubType> SHRUB_TYPE =
+            LanternEnumTrait.of("type", (Key) Keys.SHRUB_TYPE, LanternShrubType.class);
+
+    public static final EnumTrait<LanternPlantType> YELLOW_FLOWER_TYPE =
+            LanternEnumTrait.of("type", (Key) Keys.PLANT_TYPE, LanternPlantType.class, type -> type.getInternalId() < 16);
+
+    public static final EnumTrait<LanternPlantType> RED_FLOWER_TYPE =
+            LanternEnumTrait.of("type", (Key) Keys.PLANT_TYPE, LanternPlantType.class, type -> type.getInternalId() >= 16);
 
     private LanternEnumTraits() {
     }

@@ -40,8 +40,10 @@ import org.lanternpowered.server.game.registry.type.data.DirtTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.DyeColorRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.FishRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.GoldenAppleRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.PlantTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SandstoneTypeRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.ShrubTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SkullTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.SlabTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.StoneTypeRegistryModule;
@@ -158,6 +160,10 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         add(BlockTypes.STONE, new DataValueItemTypeObjectSerializer<>(Keys.STONE_TYPE, StoneTypeRegistryModule.get()));
         add(BlockTypes.SAND, new DataValueItemTypeObjectSerializer<>(Keys.SAND_TYPE, SandTypeRegistryModule.get()));
         add(BlockTypes.SPONGE, new SpongeItemTypeObjectSerializer());
+        add(BlockTypes.TALLGRASS, new DataValueItemTypeObjectSerializer<>(Keys.SHRUB_TYPE, ShrubTypeRegistryModule.get()));
+        add(BlockTypes.YELLOW_FLOWER, new DataValueItemTypeObjectSerializer<>(Keys.PLANT_TYPE, PlantTypeRegistryModule.get()));
+        add(BlockTypes.RED_FLOWER, new DataValueItemTypeObjectSerializer<>(Keys.PLANT_TYPE, PlantTypeRegistryModule.get(),
+                dataValue -> dataValue + 16, internalId -> internalId - 16));
 
         add(ItemTypes.COAL, new DataValueItemTypeObjectSerializer<>(Keys.COAL_TYPE, CoalTypeRegistryModule.get()));
         add(ItemTypes.FIREWORK_CHARGE, new FireworkChargeItemTypeObjectSerializer());

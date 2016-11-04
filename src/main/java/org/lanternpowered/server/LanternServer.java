@@ -178,7 +178,13 @@ public class LanternServer implements Server {
 
     // The executor service for the server ticks
     private final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
-            runnable -> new Thread(runnable, "server"));
+            runnable -> {
+                final Thread thread = new Thread(runnable, "server");
+                this.mainThread = thread;
+                return thread;
+            });
+
+    private Thread mainThread;
 
     // The world manager
     private LanternWorldManager worldManager;
@@ -660,6 +666,11 @@ public class LanternServer implements Server {
     @Override
     public void setPlayerIdleTimeout(int timeout) {
         this.game.getGlobalConfig().setPlayerIdleTimeout(timeout);
+    }
+
+    @Override
+    public boolean isMainThread() {
+        return Thread.currentThread() == this.mainThread;
     }
 
     @Override

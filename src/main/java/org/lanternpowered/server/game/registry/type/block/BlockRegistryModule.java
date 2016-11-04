@@ -28,10 +28,13 @@ package org.lanternpowered.server.game.registry.type.block;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.block.PropertyProviderCollections.INSTANT_BROKEN;
+import static org.lanternpowered.server.block.PropertyProviderCollections.PASSABLE;
 import static org.lanternpowered.server.block.PropertyProviders.blastResistance;
 import static org.lanternpowered.server.block.PropertyProviders.flammableInfo;
 import static org.lanternpowered.server.block.PropertyProviders.hardness;
 import static org.lanternpowered.server.block.PropertyProviders.lightEmission;
+import static org.lanternpowered.server.block.PropertyProviders.replaceable;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 
 import com.google.common.collect.ImmutableList;
@@ -53,12 +56,12 @@ import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimplePlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.ChestPlacementBehavior;
-import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.EnderChestInteractionBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HopperPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.HorizontalRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.LogAxisRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.OpeneableContainerInteractionBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
@@ -73,10 +76,13 @@ import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDirtType;
 import org.lanternpowered.server.data.type.LanternDyeColor;
+import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternQuartzType;
+import org.lanternpowered.server.data.type.LanternRailDirection;
 import org.lanternpowered.server.data.type.LanternSandType;
 import org.lanternpowered.server.data.type.LanternSandstoneType;
+import org.lanternpowered.server.data.type.LanternShrubType;
 import org.lanternpowered.server.data.type.LanternSlabType;
 import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
@@ -357,8 +363,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 )
                         )
                         .properties(builder -> builder
-                                .add(PropertyProviderCollections.PASSABLE)
-                                .add(PropertyProviderCollections.INSTANT_BROKEN))
+                                .add(PASSABLE)
+                                .add(INSTANT_BROKEN))
                         .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
                                 Lantern.getRegistry().getTranslationManager().get("tile.sapling." + type.getTranslationKeyBase() + ".name")))
                         .build("minecraft", "sapling"),
@@ -572,6 +578,89 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                     }
                     return (byte) type;
                 });
+        //////////////////////
+        ///   Golden Rail  ///
+        //////////////////////
+        register(27, simpleBuilder()
+                        .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
+                                .withTrait(LanternBooleanTraits.POWERED, false).get())
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.7))
+                                .add(blastResistance(3.5)))
+                        .translation("tile.goldenRail.name")
+                        .build("minecraft", "golden_rail"),
+                blockState -> {
+                    int type = blockState.getTraitValue(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION).get().getInternalId();
+                    if (blockState.getTraitValue(LanternBooleanTraits.POWERED).get()) {
+                        type |= 0x8;
+                    }
+                    return (byte) type;
+                });
+        ////////////////////////
+        ///   Detector Rail  ///
+        ////////////////////////
+        register(28, simpleBuilder()
+                        .traits(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternBooleanTraits.POWERED)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
+                                .withTrait(LanternBooleanTraits.POWERED, false).get())
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(0.7))
+                                .add(blastResistance(3.5)))
+                        .translation("tile.detectorRail.name")
+                        .build("minecraft", "detector_rail"),
+                blockState -> {
+                    int type = blockState.getTraitValue(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION).get().getInternalId();
+                    if (blockState.getTraitValue(LanternBooleanTraits.POWERED).get()) {
+                        type |= 0x8;
+                    }
+                    return (byte) type;
+                });
+        // TODO: 29
+        ///////////////
+        ///   Web   ///
+        ///////////////
+        register(30, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(4.0))
+                                .add(blastResistance(20.0)))
+                        .translation("tile.web.name")
+                        .build("minecraft", "web"));
+        //////////////////////
+        ///   Tall Grass   ///
+        //////////////////////
+        register(31, simpleBuilder()
+                        .traits(LanternEnumTraits.SHRUB_TYPE)
+                            .defaultState(state -> state
+                                    .withTrait(LanternEnumTraits.SHRUB_TYPE, LanternShrubType.DEAD_BUSH).get())
+                        .itemType(builder -> builder
+                                .keysProvider(valueContainer -> valueContainer
+                                        .registerKey(Keys.SHRUB_TYPE, LanternShrubType.DEAD_BUSH)))
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN)
+                                .add(PASSABLE)
+                                .add(replaceable(true)))
+                        .translation("tile.tallgrass.name")
+                        .build("minecraft", "tallgrass"),
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.SHRUB_TYPE).get().getInternalId());
+        /////////////////////
+        ///   Dead Bush   ///
+        /////////////////////
+        register(32, simpleBuilder()
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN)
+                                .add(PASSABLE)
+                                .add(replaceable(true)))
+                        .itemType()
+                        .translation("tile.deadbush.name")
+                        .build("minecraft", "deadbush"));
+        // TODO: 33
+        // TODO: 34
         ///////////////////
         ///     Wool    ///
         ///////////////////
@@ -581,6 +670,39 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(4.0)))
                         .build("minecraft", "wool"),
                 this::dyedData);
+        // TODO: 36
+        /////////////////////////
+        ///   Yellow Flower   ///
+        /////////////////////////
+        register(37, simpleBuilder()
+                        .traits(LanternEnumTraits.YELLOW_FLOWER_TYPE)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.YELLOW_FLOWER_TYPE, LanternPlantType.DANDELION).get())
+                        .itemType(builder -> builder
+                                .keysProvider(valueContainer -> valueContainer
+                                        .registerKey(Keys.PLANT_TYPE, LanternPlantType.DANDELION)))
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN)
+                                .add(PASSABLE))
+                        .translation(TranslationProvider.of(LanternEnumTraits.YELLOW_FLOWER_TYPE))
+                        .build("minecraft", "yellow_flower"),
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.YELLOW_FLOWER_TYPE).get().getInternalId());
+        //////////////////////
+        ///   Red Flower   ///
+        //////////////////////
+        register(38, simpleBuilder()
+                        .traits(LanternEnumTraits.RED_FLOWER_TYPE)
+                        .defaultState(state -> state
+                                .withTrait(LanternEnumTraits.RED_FLOWER_TYPE, LanternPlantType.POPPY).get())
+                        .itemType(builder -> builder
+                                .keysProvider(valueContainer -> valueContainer
+                                        .registerKey(Keys.PLANT_TYPE, LanternPlantType.POPPY)))
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN)
+                                .add(PASSABLE))
+                        .translation(TranslationProvider.of(LanternEnumTraits.RED_FLOWER_TYPE))
+                        .build("minecraft", "red_flower"),
+                blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.RED_FLOWER_TYPE).get().getInternalId());
         ///////////////////////////
         /// Double Stone Slab 1 ///
         ///////////////////////////

@@ -250,13 +250,13 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                 translationProvider, behaviorPipeline, this.tileEntityProvider, extendedBlockStateProvider);
         // Override the default solid cube property provider if necessary
         final PropertyProvider<SolidCubeProperty> provider = properties.build().get(SolidCubeProperty.class).orElse(null);
+        ObjectProvider<AABB> boundingBoxProvider = this.boundingBoxProvider;
+        if (boundingBoxProvider instanceof SimpleObjectProvider) {
+            //noinspection unchecked
+            boundingBoxProvider = new CachedSimpleObjectProvider(blockType, ((SimpleObjectProvider) boundingBoxProvider).getProvider());
+        }
         //noinspection ConstantConditions
         if (provider instanceof ConstantObjectProvider && provider.get(null, null, null).getValue()) {
-            ObjectProvider<AABB> boundingBoxProvider = this.boundingBoxProvider;
-            if (boundingBoxProvider instanceof SimpleObjectProvider) {
-                //noinspection unchecked
-                boundingBoxProvider = new CachedSimpleObjectProvider(blockType, ((SimpleObjectProvider) boundingBoxProvider).getProvider());
-            }
             if (boundingBoxProvider instanceof ConstantObjectProvider) {
                 //noinspection ConstantConditions
                 final AABB aabb = boundingBoxProvider.get(null, null, null);
@@ -328,6 +328,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                 properties.add(solidCube(((blockState, location, face) -> isSolid(boundingBoxProvider1.get(blockState, location, face)))));
             }
         }
+        blockType.setBoundingBoxProvider(boundingBoxProvider);
         blockType.setPropertyProviderCollection(properties.build());
         if (this.defaultStateProvider != null) {
             blockType.setDefaultBlockState(this.defaultStateProvider.apply(blockType.getDefaultState()));

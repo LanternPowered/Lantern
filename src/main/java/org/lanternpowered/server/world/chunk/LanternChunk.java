@@ -43,9 +43,13 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortMap;
 import it.unimi.dsi.fastutil.shorts.Short2ShortOpenHashMap;
+import org.lanternpowered.server.block.CachedSimpleObjectProvider;
+import org.lanternpowered.server.block.ConstantObjectProvider;
 import org.lanternpowered.server.block.LanternBlockSnapshot;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternScheduledBlockUpdate;
+import org.lanternpowered.server.block.ObjectProvider;
+import org.lanternpowered.server.block.SimpleObjectProvider;
 import org.lanternpowered.server.block.TileEntityProvider;
 import org.lanternpowered.server.block.action.BlockAction;
 import org.lanternpowered.server.block.tile.ITileEntityRefreshBehavior;
@@ -1201,8 +1205,16 @@ public class LanternChunk implements AbstractExtent, Chunk {
 
     @Override
     public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
-        final BlockType type = getBlockType(x, y, z);
-        return type != BlockTypes.AIR ? Optional.of(new AABB(x, y, z, x + 1, y + 1, z + 1)) : Optional.empty();
+        final BlockState block = getBlock(x, y, z);
+        if (block.getType() == BlockTypes.AIR) {
+            return Optional.empty();
+        }
+        final ObjectProvider<AABB> aabbObjectProvider = ((LanternBlockType) block.getType()).getBoundingBoxProvider();
+        if (aabbObjectProvider instanceof ConstantObjectProvider || aabbObjectProvider instanceof CachedSimpleObjectProvider
+                || aabbObjectProvider instanceof SimpleObjectProvider) {
+            return Optional.of(aabbObjectProvider.get(block, null, null).offset(x, y, z));
+        }
+        return Optional.of(aabbObjectProvider.get(block, new Location<>(this.world, x, y, z), null).offset(x, y, z));
     }
 
     @Override

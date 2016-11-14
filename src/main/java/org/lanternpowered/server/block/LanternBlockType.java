@@ -86,6 +86,8 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
      */
     private boolean tickRandomly;
 
+    private ObjectProvider<AABB> boundingBoxProvider;
+
     LanternBlockType(String pluginId, String name, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
             @Nullable TileEntityProvider tileEntityProvider, ExtendedBlockStateProvider extendedBlockStateProvider) {
@@ -229,5 +231,13 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
 
     void setPropertyProviderCollection(PropertyProviderCollection propertyProviderCollection) {
         this.propertyProviderCollection = propertyProviderCollection;
+    }
+
+    public ObjectProvider<AABB> getBoundingBoxProvider() {
+        return this.boundingBoxProvider;
+    }
+
+    public void setBoundingBoxProvider(ObjectProvider<AABB> boundingBoxProvider) {
+        this.boundingBoxProvider = boundingBoxProvider;
     }
 }

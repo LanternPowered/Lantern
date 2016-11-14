@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.RandomTickBehavior;
@@ -38,6 +39,7 @@ import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.AABB;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -46,10 +48,12 @@ import javax.annotation.Nullable;
 
 public class LanternBlockType extends PluginCatalogType.Base implements BlockType, AbstractPropertyHolder {
 
+    public static final AABB DEFAULT_BOUNDING_BOX = new AABB(Vector3d.ZERO, Vector3d.ONE);
+
     /**
      * The property provider collection.
      */
-    private final PropertyProviderCollection propertyProviderCollection;
+    private PropertyProviderCollection propertyProviderCollection;
 
     /**
      * The block state map.
@@ -82,11 +86,10 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
      */
     private boolean tickRandomly;
 
-    LanternBlockType(String pluginId, String name, PropertyProviderCollection propertyProviderCollection, Iterable<BlockTrait<?>> blockTraits,
+    LanternBlockType(String pluginId, String name, Iterable<BlockTrait<?>> blockTraits,
             TranslationProvider translationProvider, MutableBehaviorPipeline<Behavior> behaviorPipeline,
             @Nullable TileEntityProvider tileEntityProvider, ExtendedBlockStateProvider extendedBlockStateProvider) {
         super(pluginId, name);
-        this.propertyProviderCollection = propertyProviderCollection;
         this.translationProvider = translationProvider;
         this.behaviorPipeline = behaviorPipeline;
         this.tileEntityProvider = tileEntityProvider;
@@ -96,12 +99,11 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
         this.defaultBlockState = this.blockStateBase.getBaseState();
     }
 
-    LanternBlockType(String pluginId, String id, String name, PropertyProviderCollection propertyProviderCollection,
+    LanternBlockType(String pluginId, String id, String name,
             Iterable<BlockTrait<?>> blockTraits, TranslationProvider translationProvider,
             MutableBehaviorPipeline<Behavior> behaviorPipeline, @Nullable TileEntityProvider tileEntityProvider,
             ExtendedBlockStateProvider extendedBlockStateProvider) {
         super(pluginId, id, name);
-        this.propertyProviderCollection = propertyProviderCollection;
         this.translationProvider = translationProvider;
         this.behaviorPipeline = behaviorPipeline;
         this.tileEntityProvider = tileEntityProvider;
@@ -223,5 +225,9 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
 
     public ExtendedBlockStateProvider getExtendedBlockStateProvider() {
         return this.extendedBlockStateProvider;
+    }
+
+    void setPropertyProviderCollection(PropertyProviderCollection propertyProviderCollection) {
+        this.propertyProviderCollection = propertyProviderCollection;
     }
 }

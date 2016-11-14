@@ -50,6 +50,7 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.block.PropertyProviderCollections;
 import org.lanternpowered.server.block.TranslationProvider;
+import org.lanternpowered.server.block.aabb.TorchAABB;
 import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
@@ -64,6 +65,7 @@ import org.lanternpowered.server.block.behavior.vanilla.OpeneableContainerIntera
 import org.lanternpowered.server.block.behavior.vanilla.OppositeFaceDirectionalPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.QuartzLinesRotationPlacementBehavior;
 import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavior;
+import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.tile.LanternTileEntityTypes;
@@ -703,6 +705,45 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation(TranslationProvider.of(LanternEnumTraits.RED_FLOWER_TYPE))
                         .build("minecraft", "red_flower"),
                 blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.RED_FLOWER_TYPE).get().getInternalId());
+        //////////////////////////
+        ///   Brown Mushroom   ///
+        //////////////////////////
+        register(39, simpleBuilder()
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN)
+                                .add(PASSABLE)
+                                .add(lightEmission(1)))
+                        .translation("tile.mushroom.name")
+                        .build("minecraft", "brown_mushroom"));
+        ////////////////////////
+        ///   Red Mushroom   ///
+        ////////////////////////
+        register(40, simpleBuilder()
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN)
+                                .add(PASSABLE))
+                        .translation("tile.mushroom.name")
+                        .build("minecraft", "red_mushroom"));
+        //////////////////////
+        ///   Gold Block   ///
+        //////////////////////
+        register(41, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(3.0))
+                                .add(blastResistance(10.0)))
+                        .translation("tile.blockGold.name")
+                        .build("minecraft", "gold_block"));
+        //////////////////////
+        ///   Iron Block   ///
+        //////////////////////
+        register(42, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(5.0))
+                                .add(blastResistance(10.0)))
+                        .translation("tile.blockIron.name")
+                        .build("minecraft", "iron_block"));
         ///////////////////////////
         /// Double Stone Slab 1 ///
         ///////////////////////////
@@ -719,6 +760,93 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .translation("tile.stoneSlab.name")
                         .build("minecraft", "stone_slab"),
                 blockState -> stoneSlabData(blockState, blockState.getTraitValue(LanternEnumTraits.STONE_SLAB1_TYPE).get().getInternalId()));
+        ///////////////////////
+        ///   Brick Block   ///
+        ///////////////////////
+        register(45, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(10.0)))
+                        .translation("tile.brick.name")
+                        .build("minecraft", "brick_block"));
+        ///////////////
+        ///   TNT   ///
+        ///////////////
+        register(46, simpleBuilder()
+                        .trait(LanternBooleanTraits.EXPLODE)
+                        .defaultState(state -> state
+                                .withTrait(LanternBooleanTraits.EXPLODE, false).get())
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN))
+                        .translation("tile.tnt.name")
+                        .build("minecraft", "tnt"),
+                blockState -> (byte) (blockState.getTraitValue(LanternBooleanTraits.EXPLODE).get() ? 1 : 0));
+        /////////////////////
+        ///   Bookshelf   ///
+        /////////////////////
+        register(47, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(1.5))
+                                .add(blastResistance(7.5)))
+                        .translation("tile.bookshelf.name")
+                        .build("minecraft", "bookshelf"));
+        /////////////////////////////
+        ///   Mossy Cobblestone   ///
+        /////////////////////////////
+        register(48, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(2.0))
+                                .add(blastResistance(10.0)))
+                        .translation("tile.stoneMoss.name")
+                        .build("minecraft", "mossy_cobblestone"));
+        ////////////////////
+        ///   Obsidian   ///
+        ////////////////////
+        register(49, simpleBuilder()
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(hardness(50.0))
+                                .add(blastResistance(2000.0)))
+                        .translation("tile.obsidian.name")
+                        .build("minecraft", "obsidian"));
+        /////////////////
+        ///   Torch   ///
+        /////////////////
+        register(50, builder()
+                        .trait(LanternEnumTraits.TORCH_FACING)
+                            .defaultState(state -> state
+                                    .withTrait(LanternEnumTraits.TORCH_FACING, Direction.UP).get())
+                        .itemType()
+                        .properties(builder -> builder
+                                .add(INSTANT_BROKEN))
+                        .translation("tile.torch.name")
+                        .boundingBox(TorchAABB::provider)
+                        .behaviors(pipeline -> pipeline
+                                .add(new BlockSnapshotProviderPlaceBehavior())
+                                .add(new TorchPlacementBehavior())
+                                .add(new SimpleBreakBehavior()))
+                        .build("minecraft", "torch"),
+                blockState -> {
+                    final Direction direction = blockState.getTraitValue(LanternEnumTraits.TORCH_FACING).get();
+                    switch (direction) {
+                        case EAST:
+                            return (byte) 1;
+                        case WEST:
+                            return (byte) 2;
+                        case SOUTH:
+                            return (byte) 3;
+                        case NORTH:
+                            return (byte) 4;
+                        case UP:
+                            return (byte) 5;
+                        default:
+                            throw new IllegalArgumentException();
+                    }
+                });
         ////////////////////
         ///     Chest    ///
         ////////////////////

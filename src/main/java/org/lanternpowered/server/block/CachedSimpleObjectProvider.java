@@ -23,34 +23,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.property.block;
+package org.lanternpowered.server.block;
 
-import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.PropertyProvider;
-import org.lanternpowered.server.data.property.common.AbstractBlockPropertyStore;
+import com.google.common.collect.Lists;
+import org.lanternpowered.server.block.state.LanternBlockState;
 import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.data.Property;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Optional;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-public final class BlockPropertyStore<T extends Property<?,?>> extends AbstractBlockPropertyStore<T> {
+public class CachedSimpleObjectProvider<T> implements ObjectProvider<T> {
 
-    private final Class<T> propertyType;
+    private final Object[] values;
 
-    public BlockPropertyStore(Class<T> propertyType) {
-        this.propertyType = propertyType;
+    CachedSimpleObjectProvider(LanternBlockType blockType, Function<BlockState, T> simpleObjectProvider) {
+        final Collection<BlockState> blockStates = blockType.getAllStates();
+        final Object[] values = new Object[blockStates.size()];
+        for (BlockState blockState : blockStates) {
+            values[((LanternBlockState) blockState).getInternalId()] = simpleObjectProvider.apply(blockState);
+        }
+        this.values = values;
     }
 
     @Override
-    protected Optional<T> getFor(BlockState blockState, @Nullable Location<World> location,
-             @Nullable Direction direction) {
-        final Optional<PropertyProvider<T>> provider = ((LanternBlockType) blockState.getType())
-                .getPropertyProviderCollection().get(this.propertyType);
-        return provider.isPresent() ? Optional.of(provider.get().get(blockState, location, direction)) : Optional.empty();
+    public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
+        //noinspection unchecked
+        return (T) this.values[((LanternBlockState) blockState).getInternalId()];
+    }
+
+    public List<T> getValues() {
+        //noinspection unchecked
+        return (List) Lists.newArrayList(this.values);
     }
 }

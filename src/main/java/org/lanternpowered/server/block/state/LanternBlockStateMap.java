@@ -126,8 +126,12 @@ public final class LanternBlockStateMap {
             state.propertyValueTable = tableBuilder.build();
         });
 
-        this.blockStates.stream().map(state -> (LanternBlockState) state)
-                .forEach(state -> state.extended = blockType.getExtendedBlockStateProvider().remove(state) != state);
+        int internalId = 0;
+        for (BlockState blockState : this.blockStates) {
+            final LanternBlockState blockState1 = (LanternBlockState) blockState;
+            blockState1.extended = blockType.getExtendedBlockStateProvider().remove(blockState) != blockState;
+            blockState1.internalId = internalId++;
+        }
     }
 
     public LanternBlockType getBlockType() {

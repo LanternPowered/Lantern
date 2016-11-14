@@ -34,12 +34,19 @@ import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.AABB;
 
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface BlockTypeBuilder {
+
+    BlockTypeBuilder boundingBox(AABB boundingBox);
+
+    BlockTypeBuilder boundingBox(Function<BlockState, AABB> boundingBoxProvider);
+
+    BlockTypeBuilder boundingBox(ObjectProvider<AABB> boundingBoxProvider);
 
     BlockTypeBuilder defaultState(Function<BlockState, BlockState> function);
 

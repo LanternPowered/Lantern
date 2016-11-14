@@ -23,31 +23,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.block;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.block.trait.BooleanTrait;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-public final class LanternBooleanTraits {
+import java.util.function.Function;
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+import javax.annotation.Nullable;
 
-    public static final BooleanTrait DECAYABLE = LanternBooleanTrait.of("decayable", Keys.DECAYABLE);
+public class SimpleObjectProvider<T> implements ObjectProvider<T> {
 
-    public static final BooleanTrait CHECK_DECAY = LanternBooleanTrait.of("check_decay", LanternKeys.CHECK_DECAY);
+    private final Function<BlockState, T> provider;
 
-    public static final BooleanTrait IS_WET = LanternBooleanTrait.of("wet", Keys.IS_WET);
+    public SimpleObjectProvider(Function<BlockState, T> provider) {
+        this.provider = provider;
+    }
 
-    public static final BooleanTrait OCCUPIED = LanternBooleanTrait.of("occupied", Keys.OCCUPIED);
+    @Override
+    public T get(BlockState blockState, @Nullable Location<World> location, @Nullable Direction face) {
+        return this.provider.apply(blockState);
+    }
 
-    public static final BooleanTrait SEAMLESS = LanternBooleanTrait.of("seamless", Keys.SEAMLESS);
-
-    public static final BooleanTrait ENABLED = LanternBooleanTrait.of("enabled", LanternKeys.ENABLED);
-
-    public static final BooleanTrait TRIGGERED = LanternBooleanTrait.of("triggered", LanternKeys.TRIGGERED);
-
-    public static final BooleanTrait POWERED = LanternBooleanTrait.of("powered", Keys.POWERED);
-
-    public static final BooleanTrait EXPLODE = LanternBooleanTrait.of("explode", LanternKeys.EXPLODE);
+    public Function<BlockState, T> getProvider() {
+        return this.provider;
+    }
 }

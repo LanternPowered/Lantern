@@ -66,7 +66,7 @@ public class LanternBlockStateBuilder extends AbstractDataBuilder<BlockState> im
     @SuppressWarnings("rawtypes")
     @Override
     public LanternBlockStateBuilder add(DataManipulator<?, ?> manipulator) {
-        return this.add((ImmutableDataManipulator) manipulator.asImmutable());
+        return add(manipulator.asImmutable());
     }
 
     @Override

@@ -62,7 +62,7 @@ public final class PropertyProviderCollection {
      * @return The property provider if found, otherwise {@link Optional#empty()}.
      */
     @SuppressWarnings("unchecked")
-    public <T extends Property> Optional<PropertyProvider<? extends T>> get(Class<T> propertyType) {
+    public <T extends Property> Optional<PropertyProvider<T>> get(Class<T> propertyType) {
         return Optional.ofNullable((PropertyProvider) this.propertyProviders.get(
                 checkNotNull(propertyType, "propertyType")));
     }

@@ -87,6 +87,9 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
     private final String name;
     private final String id;
 
+    // A internal id that is used for faster lookups
+    int internalId;
+
     // Whether this state is extended
     boolean extended;
 
@@ -114,6 +117,10 @@ public final class LanternBlockState extends AbstractCatalogType implements Plug
         }
         this.name = idBuilder.toString();
         this.id = baseState.getBlockType().getPluginId() + ':' + this.name;
+    }
+
+    public int getInternalId() {
+        return this.internalId;
     }
 
     @Override

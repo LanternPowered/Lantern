@@ -34,6 +34,7 @@ import static org.lanternpowered.server.block.PropertyProviders.matter;
 import static org.lanternpowered.server.block.PropertyProviders.passable;
 import static org.lanternpowered.server.block.PropertyProviders.replaceable;
 import static org.lanternpowered.server.block.PropertyProviders.solidCube;
+import static org.lanternpowered.server.block.PropertyProviders.solidSide;
 import static org.lanternpowered.server.block.PropertyProviders.statisticsTracked;
 import static org.lanternpowered.server.block.PropertyProviders.surrogateBlock;
 import static org.lanternpowered.server.block.PropertyProviders.unbreakable;
@@ -54,6 +55,7 @@ public final class PropertyProviderCollections {
             .add(lightEmission(0))
             .add(passable(false))
             .add(solidCube(true))
+            .add(solidSide(true))
             .add(gravityAffected(false))
             .add(unbreakable(false))
             .add(replaceable(false))
@@ -64,6 +66,7 @@ public final class PropertyProviderCollections {
     public static final PropertyProviderCollection PASSABLE = PropertyProviderCollection.builder()
             .add(passable(true))
             .add(solidCube(false))
+            .add(solidSide(false))
             .build();
 
     public static final PropertyProviderCollection UNBREAKABLE = PropertyProviderCollection.builder()

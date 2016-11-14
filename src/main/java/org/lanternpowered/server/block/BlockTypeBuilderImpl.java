@@ -26,11 +26,16 @@
 package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.block.LanternBlockType.DEFAULT_BOUNDING_BOX;
+import static org.lanternpowered.server.block.PropertyProviders.solidCube;
+import static org.lanternpowered.server.block.PropertyProviders.solidSide;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
+import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.ItemTypeBuilder;
@@ -41,13 +46,16 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityType;
 import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.data.property.block.SolidCubeProperty;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -65,6 +73,24 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Nullable private TranslationProvider translationProvider;
     @Nullable private TileEntityProvider tileEntityProvider;
     @Nullable private ItemTypeBuilder itemTypeBuilder;
+    private ObjectProvider<AABB> boundingBoxProvider = new ConstantObjectProvider<>(LanternBlockType.DEFAULT_BOUNDING_BOX);
+
+    @Override
+    public BlockTypeBuilder boundingBox(AABB boundingBox) {
+        checkNotNull(boundingBox, "boundingBox");
+        return boundingBox(new ConstantObjectProvider<>(boundingBox));
+    }
+
+    @Override
+    public BlockTypeBuilder boundingBox(Function<BlockState, AABB> boundingBoxProvider) {
+        return boundingBox(new SimpleObjectProvider<>(boundingBoxProvider));
+    }
+
+    @Override
+    public BlockTypeBuilder boundingBox(ObjectProvider<AABB> boundingBoxProvider) {
+        this.boundingBoxProvider = checkNotNull(boundingBoxProvider, "boundingBoxProvider");
+        return this;
+    }
 
     @Override
     public BlockTypeBuilder defaultState(Function<BlockState, BlockState> function) {
@@ -200,11 +226,11 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             }
             translationProvider = TranslationProvider.of(Lantern.getRegistry().getTranslationManager().get(path));
         }
-        PropertyProviderCollection properties;
+        PropertyProviderCollection.Builder properties;
         if (this.propertiesBuilder != null) {
-            properties = this.propertiesBuilder.build();
+            properties = this.propertiesBuilder;
         } else {
-            properties = PropertyProviderCollections.DEFAULT;
+            properties = PropertyProviderCollections.DEFAULT.toBuilder();
         }
         ExtendedBlockStateProvider extendedBlockStateProvider = this.extendedBlockStateProvider;
         if (extendedBlockStateProvider == null) {
@@ -220,8 +246,89 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
                 }
             };
         }
-        final LanternBlockType blockType = new LanternBlockType(pluginId, id, properties, this.traits,
+        final LanternBlockType blockType = new LanternBlockType(pluginId, id, this.traits,
                 translationProvider, behaviorPipeline, this.tileEntityProvider, extendedBlockStateProvider);
+        // Override the default solid cube property provider if necessary
+        final PropertyProvider<SolidCubeProperty> provider = properties.build().get(SolidCubeProperty.class).orElse(null);
+        //noinspection ConstantConditions
+        if (provider instanceof ConstantObjectProvider && provider.get(null, null, null).getValue()) {
+            ObjectProvider<AABB> boundingBoxProvider = this.boundingBoxProvider;
+            if (boundingBoxProvider instanceof SimpleObjectProvider) {
+                //noinspection unchecked
+                boundingBoxProvider = new CachedSimpleObjectProvider(blockType, ((SimpleObjectProvider) boundingBoxProvider).getProvider());
+            }
+            if (boundingBoxProvider instanceof ConstantObjectProvider) {
+                //noinspection ConstantConditions
+                final AABB aabb = boundingBoxProvider.get(null, null, null);
+                final boolean isSolid = isSolid(aabb);
+                if (isSolid) {
+                    properties.add(solidCube(true));
+                    properties.add(solidSide(true));
+                } else {
+                    properties.add(solidCube(false));
+                    final BitSet solidSides = compileSidePropertyBitSet(aabb);
+                    // Check if all the direction bits are set
+                    final byte[] bytes = solidSides.toByteArray();
+                    if (bytes.length == 0 || bytes[0] != (1 << DIRECTION_INDEXES) - 1) {
+                        properties.add(solidSide((blockState, location, face) -> {
+                            final int index = getDirectionIndex(face);
+                            return index != -1 && solidSides.get(index);
+                        }));
+                    } else {
+                        properties.add(solidSide(false));
+                    }
+                }
+            } else if (boundingBoxProvider instanceof CachedSimpleObjectProvider) {
+                final List<AABB> values = ((CachedSimpleObjectProvider<AABB>) boundingBoxProvider).getValues();
+                final BitSet bitSet = new BitSet();
+                int count = 0;
+                for (int i = 0; i < values.size(); i++) {
+                    if (isSolid(values.get(i))) {
+                        bitSet.set(i);
+                        count++;
+                    }
+                }
+                final boolean flag1 = count == values.size();
+                final boolean flag2 = count == 0;
+                // Use the best possible solid cube property
+                if (flag1) {
+                    properties.add(solidCube(true));
+                    properties.add(solidSide(false));
+                } else if (flag2) {
+                    properties.add(solidCube(false));
+                } else {
+                    properties.add(solidCube(((blockState, location, face) -> bitSet.get(((LanternBlockState) blockState).getInternalId()))));
+                }
+                if (!flag1) {
+                    final BitSet[] solidSides = new BitSet[values.size()];
+                    int solidCount = 0;
+                    for (int i = 0; i < values.size(); i++) {
+                        solidSides[i] = compileSidePropertyBitSet(values.get(i));
+                        // Check if all the direction bits are set
+                        final byte[] bytes = solidSides[i].toByteArray();
+                        if (bytes.length != 0 && bytes[0] == (1 << DIRECTION_INDEXES) - 1) {
+                            solidCount++;
+                        }
+                    }
+                    if (solidCount == 0) {
+                        properties.add(solidSide(false));
+                    } else {
+                        properties.add(solidSide((blockState, location, face) -> {
+                            final int index = getDirectionIndex(face);
+                            if (index == -1) {
+                                return false;
+                            }
+                            final int state = ((LanternBlockState) blockState).getInternalId();
+                            return solidSides[state].get(index);
+                        }));
+                    }
+                }
+            } else {
+                final ObjectProvider<AABB> boundingBoxProvider1 = boundingBoxProvider;
+                properties.add(solidCube(((blockState, location, face) -> isSolid(boundingBoxProvider1.get(blockState, location, face)))));
+            }
+        }
+        blockType.setPropertyProviderCollection(properties.build());
         if (this.defaultStateProvider != null) {
             blockType.setDefaultBlockState(this.defaultStateProvider.apply(blockType.getDefaultState()));
         }
@@ -237,5 +344,73 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             blockType.setItemType(itemType);
         }
         return blockType;
+    }
+
+    private static boolean isSolid(AABB boundingBox) {
+        return boundingBox.getMin().equals(DEFAULT_BOUNDING_BOX.getMin()) && boundingBox.getMax().equals(DEFAULT_BOUNDING_BOX.getMax());
+    }
+
+    private static BitSet compileSidePropertyBitSet(AABB boundingBox) {
+        final BitSet bitSet = new BitSet(DIRECTION_INDEXES);
+
+        final Vector3d min = boundingBox.getMin();
+        final Vector3d max = boundingBox.getMax();
+
+        boolean flag = min.getX() == 0.0 && min.getZ() == 0.0 && max.getX() == 1.0 && max.getZ() == 1.0;
+        if (min.getY() == 0.0 && flag) {
+            bitSet.set(INDEX_DOWN);
+        }
+        if (max.getY() == 1.0 && flag) {
+            bitSet.set(INDEX_UP);
+        }
+
+        flag = min.getY() == 0.0 && min.getZ() == 0.0 && max.getY() >= 1.0 && max.getZ() >= 1.0;
+        if (min.getX() == 0.0 && flag) {
+            bitSet.set(INDEX_WEST);
+        }
+        if (max.getX() == 1.0 && flag) {
+            bitSet.set(INDEX_EAST);
+        }
+
+        flag = min.getX() == 0.0 && min.getY() == 0.0 && max.getX() >= 1.0 && max.getY() >= 1.0;
+        if (min.getZ() == 0.0 && flag) {
+            bitSet.set(INDEX_NORTH);
+        }
+        if (max.getZ() == 1.0 && flag) {
+            bitSet.set(INDEX_SOUTH);
+        }
+
+        return bitSet;
+    }
+
+    private static final int DIRECTION_INDEXES = 6;
+
+    private static final int INDEX_NORTH = 0;
+    private static final int INDEX_SOUTH = 1;
+    private static final int INDEX_WEST = 2;
+    private static final int INDEX_EAST = 3;
+    private static final int INDEX_UP = 4;
+    private static final int INDEX_DOWN = 5;
+
+    private static int getDirectionIndex(@Nullable Direction direction) {
+        if (direction == null) {
+            return -1;
+        }
+        switch (direction) {
+            case NORTH:
+                return 0;
+            case SOUTH:
+                return 1;
+            case WEST:
+                return 2;
+            case EAST:
+                return 3;
+            case UP:
+                return 4;
+            case DOWN:
+                return 5;
+            default:
+                return -1;
+        }
     }
 }

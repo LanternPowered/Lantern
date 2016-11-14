@@ -23,31 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.trait;
+package org.lanternpowered.server.block.aabb;
 
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.block.trait.BooleanTrait;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.util.Direction;
 
-public final class LanternBooleanTraits {
+public final class TorchAABB {
 
-    public static final BooleanTrait SNOWY = LanternBooleanTrait.of("snowy", Keys.SNOWED);
+    private static final AABB UP = new AABB(0.4, 0.0, 0.4, 0.6, 0.6, 0.6);
+    private static final AABB NORTH = new AABB(0.35, 0.2, 0.7, 0.65, 0.8, 1.0);
+    private static final AABB EAST = new AABB(0.0, 0.2, 0.35, 0.3, 0.8, 0.65);
+    private static final AABB SOUTH = new AABB(0.35, 0.2, 0.0, 0.65, 0.8, 0.3);
+    private static final AABB WEST = new AABB(0.7, 0.2, 0.35, 1.0, 0.8, 0.65);
 
-    public static final BooleanTrait DECAYABLE = LanternBooleanTrait.of("decayable", Keys.DECAYABLE);
-
-    public static final BooleanTrait CHECK_DECAY = LanternBooleanTrait.of("check_decay", LanternKeys.CHECK_DECAY);
-
-    public static final BooleanTrait IS_WET = LanternBooleanTrait.of("wet", Keys.IS_WET);
-
-    public static final BooleanTrait OCCUPIED = LanternBooleanTrait.of("occupied", Keys.OCCUPIED);
-
-    public static final BooleanTrait SEAMLESS = LanternBooleanTrait.of("seamless", Keys.SEAMLESS);
-
-    public static final BooleanTrait ENABLED = LanternBooleanTrait.of("enabled", LanternKeys.ENABLED);
-
-    public static final BooleanTrait TRIGGERED = LanternBooleanTrait.of("triggered", LanternKeys.TRIGGERED);
-
-    public static final BooleanTrait POWERED = LanternBooleanTrait.of("powered", Keys.POWERED);
-
-    public static final BooleanTrait EXPLODE = LanternBooleanTrait.of("explode", LanternKeys.EXPLODE);
+    public static AABB provider(BlockState blockState) {
+        final Direction direction = blockState.get(Keys.DIRECTION).get();
+        switch (direction) {
+            case UP:
+                return UP;
+            case NORTH:
+                return NORTH;
+            case EAST:
+                return EAST;
+            case SOUTH:
+                return SOUTH;
+            case WEST:
+                return WEST;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
 }

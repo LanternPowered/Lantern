@@ -126,6 +126,9 @@ public final class LanternEnumTraits {
     public static final EnumTrait<LanternPlantType> RED_FLOWER_TYPE =
             LanternEnumTrait.of("type", (Key) Keys.PLANT_TYPE, LanternPlantType.class, type -> type.getInternalId() >= 16);
 
+    public static final EnumTrait<Direction> TORCH_FACING =
+            LanternEnumTrait.of("facing", (Key) Keys.DIRECTION, Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP);
+
     private LanternEnumTraits() {
     }
 }

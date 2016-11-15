@@ -26,7 +26,6 @@
 package org.lanternpowered.server.block;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-import static org.lanternpowered.server.block.LanternBlockType.DEFAULT_BOUNDING_BOX;
 import static org.lanternpowered.server.block.PropertyProviders.solidCube;
 import static org.lanternpowered.server.block.PropertyProviders.solidSide;
 
@@ -35,6 +34,7 @@ import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
+import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
 import org.lanternpowered.server.game.Lantern;
@@ -73,7 +73,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     @Nullable private TranslationProvider translationProvider;
     @Nullable private TileEntityProvider tileEntityProvider;
     @Nullable private ItemTypeBuilder itemTypeBuilder;
-    private ObjectProvider<AABB> boundingBoxProvider = new ConstantObjectProvider<>(LanternBlockType.DEFAULT_BOUNDING_BOX);
+    private ObjectProvider<AABB> boundingBoxProvider = new ConstantObjectProvider<>(BoundingBoxes.DEFAULT);
 
     @Override
     public BlockTypeBuilder boundingBox(AABB boundingBox) {
@@ -83,6 +83,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
 
     @Override
     public BlockTypeBuilder boundingBox(Function<BlockState, AABB> boundingBoxProvider) {
+        checkNotNull(boundingBoxProvider, "boundingBoxProvider");
         return boundingBox(new SimpleObjectProvider<>(boundingBoxProvider));
     }
 
@@ -326,6 +327,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             } else {
                 final ObjectProvider<AABB> boundingBoxProvider1 = boundingBoxProvider;
                 properties.add(solidCube(((blockState, location, face) -> isSolid(boundingBoxProvider1.get(blockState, location, face)))));
+                properties.add(solidSide(((blockState, location, face) -> isSideSolid(boundingBoxProvider1.get(blockState, location, face), face))));
             }
         }
         blockType.setBoundingBoxProvider(boundingBoxProvider);
@@ -348,40 +350,51 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
     }
 
     private static boolean isSolid(AABB boundingBox) {
-        return boundingBox.getMin().equals(DEFAULT_BOUNDING_BOX.getMin()) && boundingBox.getMax().equals(DEFAULT_BOUNDING_BOX.getMax());
+        return boundingBox.getMin().equals(BoundingBoxes.DEFAULT.getMin()) && boundingBox.getMax().equals(BoundingBoxes.DEFAULT.getMax());
     }
 
     private static BitSet compileSidePropertyBitSet(AABB boundingBox) {
         final BitSet bitSet = new BitSet(DIRECTION_INDEXES);
+        if (isSideSolid(boundingBox, Direction.DOWN)) {
+            bitSet.set(INDEX_DOWN);
+        }
+        if (isSideSolid(boundingBox, Direction.UP)) {
+            bitSet.set(INDEX_UP);
+        }
+        if (isSideSolid(boundingBox, Direction.WEST)) {
+            bitSet.set(INDEX_WEST);
+        }
+        if (isSideSolid(boundingBox, Direction.EAST)) {
+            bitSet.set(INDEX_EAST);
+        }
+        if (isSideSolid(boundingBox, Direction.NORTH)) {
+            bitSet.set(INDEX_NORTH);
+        }
+        if (isSideSolid(boundingBox, Direction.SOUTH)) {
+            bitSet.set(INDEX_SOUTH);
+        }
+        return bitSet;
+    }
 
+    private static boolean isSideSolid(AABB boundingBox, @Nullable Direction face) {
         final Vector3d min = boundingBox.getMin();
         final Vector3d max = boundingBox.getMax();
 
-        boolean flag = min.getX() == 0.0 && min.getZ() == 0.0 && max.getX() == 1.0 && max.getZ() == 1.0;
-        if (min.getY() == 0.0 && flag) {
-            bitSet.set(INDEX_DOWN);
+        if (face == Direction.NORTH) {
+            return min.getZ() == 0.0 && min.getX() == 0.0 && min.getY() == 0.0 && max.getX() >= 1.0 && max.getY() >= 1.0;
+        } else if (face == Direction.SOUTH) {
+            return min.getZ() == 1.0 && min.getX() == 0.0 && min.getY() == 0.0 && max.getX() >= 1.0 && max.getY() >= 1.0;
+        } else if (face == Direction.WEST) {
+            return min.getZ() == 0.0 && min.getY() == 0.0 && min.getZ() == 0.0 && max.getY() >= 1.0 && max.getZ() >= 1.0;
+        } else if (face == Direction.EAST) {
+            return min.getZ() == 1.0 && min.getY() == 0.0 && min.getZ() == 0.0 && max.getY() >= 1.0 && max.getZ() >= 1.0;
+        } else if (face == Direction.DOWN) {
+            return min.getZ() == 0.0 && min.getX() == 0.0 && min.getZ() == 0.0 && max.getX() == 1.0 && max.getZ() == 1.0;
+        } else if (face == Direction.UP) {
+            return min.getZ() == 1.0 && min.getX() == 0.0 && min.getZ() == 0.0 && max.getX() == 1.0 && max.getZ() == 1.0;
+        } else {
+            return false;
         }
-        if (max.getY() == 1.0 && flag) {
-            bitSet.set(INDEX_UP);
-        }
-
-        flag = min.getY() == 0.0 && min.getZ() == 0.0 && max.getY() >= 1.0 && max.getZ() >= 1.0;
-        if (min.getX() == 0.0 && flag) {
-            bitSet.set(INDEX_WEST);
-        }
-        if (max.getX() == 1.0 && flag) {
-            bitSet.set(INDEX_EAST);
-        }
-
-        flag = min.getX() == 0.0 && min.getY() == 0.0 && max.getX() >= 1.0 && max.getY() >= 1.0;
-        if (min.getZ() == 0.0 && flag) {
-            bitSet.set(INDEX_NORTH);
-        }
-        if (max.getZ() == 1.0 && flag) {
-            bitSet.set(INDEX_SOUTH);
-        }
-
-        return bitSet;
     }
 
     private static final int DIRECTION_INDEXES = 6;

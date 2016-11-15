@@ -50,7 +50,7 @@ import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.block.PropertyProviderCollections;
 import org.lanternpowered.server.block.TranslationProvider;
-import org.lanternpowered.server.block.aabb.TorchAABB;
+import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.behavior.simple.BlockSnapshotProviderPlaceBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBlockDropsProviderBehavior;
 import org.lanternpowered.server.block.behavior.simple.SimpleBreakBehavior;
@@ -589,7 +589,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
                                 .withTrait(LanternBooleanTraits.POWERED, false).get())
                         .itemType()
+                        .boundingBox(BoundingBoxes::rail)
                         .properties(builder -> builder
+                                .add(PASSABLE)
                                 .add(hardness(0.7))
                                 .add(blastResistance(3.5)))
                         .translation("tile.goldenRail.name")
@@ -610,7 +612,9 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .withTrait(LanternEnumTraits.STRAIGHT_RAIL_DIRECTION, LanternRailDirection.NORTH_SOUTH).get()
                                 .withTrait(LanternBooleanTraits.POWERED, false).get())
                         .itemType()
+                        .boundingBox(BoundingBoxes::rail)
                         .properties(builder -> builder
+                                .add(PASSABLE)
                                 .add(hardness(0.7))
                                 .add(blastResistance(3.5)))
                         .translation("tile.detectorRail.name")
@@ -629,6 +633,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         register(30, simpleBuilder()
                         .itemType()
                         .properties(builder -> builder
+                                .add(PASSABLE)
                                 .add(hardness(4.0))
                                 .add(blastResistance(20.0)))
                         .translation("tile.web.name")
@@ -643,6 +648,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .itemType(builder -> builder
                                 .keysProvider(valueContainer -> valueContainer
                                         .registerKey(Keys.SHRUB_TYPE, LanternShrubType.DEAD_BUSH)))
+                        .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
                                 .add(PASSABLE)
@@ -658,6 +664,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(INSTANT_BROKEN)
                                 .add(PASSABLE)
                                 .add(replaceable(true)))
+                        .boundingBox(BoundingBoxes.bush())
                         .itemType()
                         .translation("tile.deadbush.name")
                         .build("minecraft", "deadbush"));
@@ -683,6 +690,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .itemType(builder -> builder
                                 .keysProvider(valueContainer -> valueContainer
                                         .registerKey(Keys.PLANT_TYPE, LanternPlantType.DANDELION)))
+                        .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
                                 .add(PASSABLE))
@@ -699,6 +707,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .itemType(builder -> builder
                                 .keysProvider(valueContainer -> valueContainer
                                         .registerKey(Keys.PLANT_TYPE, LanternPlantType.POPPY)))
+                        .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
                                 .add(PASSABLE))
@@ -709,6 +718,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Brown Mushroom   ///
         //////////////////////////
         register(39, simpleBuilder()
+                        .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
                                 .add(PASSABLE)
@@ -719,6 +729,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
         ///   Red Mushroom   ///
         ////////////////////////
         register(40, simpleBuilder()
+                        .boundingBox(BoundingBoxes.bush())
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN)
                                 .add(PASSABLE))
@@ -758,6 +769,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 () -> BlockTypes.STONE_SLAB,
                 () -> BlockTypes.DOUBLE_STONE_SLAB)
                         .translation("tile.stoneSlab.name")
+                        .boundingBox(BoundingBoxes::slab)
                         .build("minecraft", "stone_slab"),
                 blockState -> stoneSlabData(blockState, blockState.getTraitValue(LanternEnumTraits.STONE_SLAB1_TYPE).get().getInternalId()));
         ///////////////////////
@@ -824,7 +836,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .properties(builder -> builder
                                 .add(INSTANT_BROKEN))
                         .translation("tile.torch.name")
-                        .boundingBox(TorchAABB::provider)
+                        .boundingBox(BoundingBoxes::torch)
                         .behaviors(pipeline -> pipeline
                                 .add(new BlockSnapshotProviderPlaceBehavior())
                                 .add(new TorchPlacementBehavior())
@@ -920,6 +932,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                         .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
                                 )
                         )
+                        .boundingBox(BoundingBoxes::slab)
                         .properties(builder -> builder
                                 .add(hardness(2.0))
                                 .add(blastResistance(5.0)))
@@ -942,6 +955,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(3000.0))
                                 .add(lightEmission(7)))
                         .translation("tile.enderChest.name")
+                        .boundingBox(BoundingBoxes.chest())
                         .behaviors(pipeline -> pipeline
                                 .add(new HorizontalRotationPlacementBehavior())
                                 .add(new EnderChestInteractionBehavior()))
@@ -1112,6 +1126,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 () -> BlockTypes.STONE_SLAB2,
                 () -> BlockTypes.DOUBLE_STONE_SLAB2)
                         .translation("tile.stoneSlab2.name")
+                        .boundingBox(BoundingBoxes::slab)
                         .build("minecraft", "stone_slab2"),
                 blockState -> stoneSlabData(blockState, blockState.getTraitValue(LanternEnumTraits.STONE_SLAB2_TYPE).get().getInternalId() - 8));
         ///////////////////////////
@@ -1392,6 +1407,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .defaultState(state -> state.withTrait(LanternEnumTraits.HORIZONTAL_FACING, Direction.NORTH).get())
                 .itemType()
                 .tileEntityType(() -> TileEntityTypes.CHEST)
+                .boundingBox(BoundingBoxes::doubleChest)
                 .properties(builder -> builder
                         .add(hardness(2.5))
                         .add(blastResistance(12.5)))

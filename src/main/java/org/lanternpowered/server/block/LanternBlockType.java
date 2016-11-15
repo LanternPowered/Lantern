@@ -25,7 +25,6 @@
  */
 package org.lanternpowered.server.block;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.block.behavior.types.RandomTickBehavior;
@@ -47,8 +46,6 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 public class LanternBlockType extends PluginCatalogType.Base implements BlockType, AbstractPropertyHolder {
-
-    public static final AABB DEFAULT_BOUNDING_BOX = new AABB(Vector3d.ZERO, Vector3d.ONE);
 
     /**
      * The property provider collection.
@@ -237,7 +234,7 @@ public class LanternBlockType extends PluginCatalogType.Base implements BlockTyp
         return this.boundingBoxProvider;
     }
 
-    public void setBoundingBoxProvider(ObjectProvider<AABB> boundingBoxProvider) {
+    void setBoundingBoxProvider(ObjectProvider<AABB> boundingBoxProvider) {
         this.boundingBoxProvider = boundingBoxProvider;
     }
 }

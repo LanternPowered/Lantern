@@ -42,7 +42,6 @@ import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorContextImpl;
-import org.lanternpowered.server.behavior.Parameter;
 import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.block.LanternBlockType;

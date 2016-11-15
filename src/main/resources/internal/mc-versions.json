@@ -510,5 +510,13 @@
     {
         "version": 313,
         "name": "16w43a"
+    },
+    {
+        "version": 314,
+        "name": "1.11-pre1"
+    },
+    {
+        "version": 315,
+        "name": "1.11"
     }
 ]

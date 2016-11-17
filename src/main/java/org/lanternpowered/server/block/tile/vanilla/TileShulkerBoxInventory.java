@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.game.Lantern;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.translation.Translation;
@@ -41,6 +42,6 @@ public final class TileShulkerBoxInventory extends TileChestInventory {
 
     public TileShulkerBoxInventory(@Nullable Inventory parent, @Nullable Translation name,
             @Nullable TileEntityCarrier carrier) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.shulkerBox") : name, carrier);
+        super(parent, name == null ? tr("container.shulkerBox") : name, carrier);
     }
 }

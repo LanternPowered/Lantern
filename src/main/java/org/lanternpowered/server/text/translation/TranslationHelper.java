@@ -40,7 +40,7 @@ public final class TranslationHelper {
      * @return The translatable text
      */
     public static Text t(String key, Object... args) {
-        return Text.of(Lantern.getGame().getRegistry().getTranslationManager().get(key), args);
+        return Text.of(tr(key), args);
     }
 
     /**
@@ -52,7 +52,7 @@ public final class TranslationHelper {
      * @return The translatable text builder
      */
     public static Text.Builder tb(String key, Object... args) {
-        return Text.builder(Lantern.getGame().getRegistry().getTranslationManager().get(key), args);
+        return Text.builder(tr(key), args);
     }
 
     public static Translation tr(String key) {
@@ -60,7 +60,7 @@ public final class TranslationHelper {
     }
 
     public static Translation tr(String key, Object... args) {
-        return Lantern.getGame().getRegistry().getTranslationManager().get(String.format(key, args));
+        return tr(String.format(key, args));
     }
 
     private TranslationHelper() {

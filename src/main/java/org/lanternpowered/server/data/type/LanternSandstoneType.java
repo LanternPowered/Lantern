@@ -25,9 +25,10 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -42,8 +43,7 @@ public enum LanternSandstoneType implements SandstoneType, SimpleCatalogType, In
     private final Translation translation;
 
     LanternSandstoneType(String identifier, String translationPart) {
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tile.sandStone." + translationPart + ".name");
+        this.translation = tr("tile.sandStone.%s.name", translationPart);
         this.identifier = identifier;
     }
 

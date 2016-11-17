@@ -25,9 +25,10 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SlabType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -49,8 +50,7 @@ public enum LanternSlabType implements SlabType, SimpleCatalogType, InternalCata
 
     LanternSlabType(String identifier, String translationPart) {
         final int blockNumber = this.ordinal() / 8;
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tile.stoneSlab" + (blockNumber > 0 ? blockNumber : "") + "." + translationPart + ".name");
+        this.translation = tr("tile.stoneSlab%s.%s.name", blockNumber > 0 ? blockNumber + "" : "", translationPart);
         this.identifier = identifier;
     }
 

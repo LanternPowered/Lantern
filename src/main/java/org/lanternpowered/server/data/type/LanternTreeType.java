@@ -25,9 +25,10 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.TreeType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -47,8 +48,7 @@ public enum LanternTreeType implements TreeType, SimpleCatalogType, InternalCata
 
     LanternTreeType(String identifier, String translationPart) {
         this.translationKeyBase = translationPart;
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tree." + this.translationKeyBase);
+        this.translation = tr("tree.%s", translationPart);
         this.identifier = identifier;
     }
 

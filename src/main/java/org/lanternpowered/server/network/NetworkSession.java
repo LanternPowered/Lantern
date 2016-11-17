@@ -323,10 +323,17 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
         // The player was able to spawn before the connection closed
         if (this.player != null) {
-            this.leavePlayer();
+            leavePlayer();
+            //noinspection ConstantConditions
+            Lantern.getLogger().debug("{} ({}) disconnected. Reason: {}", this.gameProfile.getName().orElse("Unknown"),
+                    this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
+        } else if (getProtocolState() != ProtocolState.STATUS) { // Ignore the status requests
+            // The player left before he was able to connect
+            //noinspection ConstantConditions
+            Lantern.getLogger().debug("A player{} failed to join from {}. Reason: {}", this.gameProfile == null ? "" :
+                            " (" + this.gameProfile.getName().orElse("Unknown") + ')',
+                    this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
         }
-        Lantern.getLogger().debug("{} ({}) disconnected. Reason: {}", this.gameProfile == null ? "???" : this.gameProfile.getName().orElse("???"),
-                this.channel.remoteAddress(), LanternTexts.toLegacy(this.disconnectReason));
     }
 
     @Override
@@ -881,9 +888,12 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         Sponge.getEventManager().post(loginEvent);
         if (loginEvent.isCancelled()) {
-            this.disconnect(loginEvent.isMessageCancelled() ? t("disconnect.disconnected") : loginEvent.getMessage());
+            disconnect(loginEvent.isMessageCancelled() ? t("disconnect.disconnected") : loginEvent.getMessage());
             return;
         }
+
+        Lantern.getLogger().debug("The player {} successfully to joined from {}.",
+                this.gameProfile.getName().orElse("Unknown"), this.channel.remoteAddress());
 
         // Update the first join and last played data
         final Instant lastJoined = Instant.now();

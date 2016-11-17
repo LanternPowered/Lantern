@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.game.Lantern;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.inventory.LanternOrderedInventory;
 import org.lanternpowered.server.inventory.block.IChestInventory;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -37,7 +38,7 @@ public class TileDoubleChestInventory extends LanternOrderedInventory implements
 
     public TileDoubleChestInventory(@Nullable Inventory parent, @Nullable Translation name,
             IChestInventory upperInventory, IChestInventory lowerInventory) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.chestDouble") : name);
+        super(parent, name == null ? tr("container.chestDouble") : name);
         this.registerChild(upperInventory);
         this.registerChild(lowerInventory);
         this.finalizeContent();

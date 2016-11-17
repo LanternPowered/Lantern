@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.text.xml;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.Text;
@@ -52,13 +54,12 @@ public class Tr extends Element {
 
     @Override
     public Text.Builder toText() throws Exception {
-        ImmutableList.Builder<Object> build = ImmutableList.builder();
+        final ImmutableList.Builder<Object> build = ImmutableList.builder();
         for (Object child : this.mixedContent) {
-            build.add(this.builderFromObject(child).build());
+            build.add(builderFromObject(child).build());
         }
-        Translation translation = Lantern.getGame().getRegistry().getTranslationManager().get(this.key);
-        Text.Builder builder = Text.builder(translation, build.build().toArray());
-        this.applyTextActions(builder);
+        final Text.Builder builder = Text.builder(tr(this.key), build.build().toArray());
+        applyTextActions(builder);
         return builder;
     }
 

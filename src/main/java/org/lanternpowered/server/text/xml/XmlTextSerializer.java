@@ -54,7 +54,7 @@ public class XmlTextSerializer implements TextSerializer, LanternTextSerializer 
         try {
             CONTEXT = JAXBContext.newInstance(Element.class);
         } catch (JAXBException e) {
-            ExceptionInInitializerError err = new ExceptionInInitializerError("Error creating JAXB context: " + e);
+            final ExceptionInInitializerError err = new ExceptionInInitializerError("Error creating JAXB context: " + e);
             err.initCause(e);
             throw err;
         }
@@ -71,7 +71,7 @@ public class XmlTextSerializer implements TextSerializer, LanternTextSerializer 
     public String serialize(Text text, Locale locale) {
         final StringWriter writer = new StringWriter();
         try {
-            Marshaller marshaller = CONTEXT.createMarshaller();
+            final Marshaller marshaller = CONTEXT.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
             marshaller.marshal(Element.fromText(text, locale), writer);
         } catch (JAXBException e) {
@@ -86,8 +86,8 @@ public class XmlTextSerializer implements TextSerializer, LanternTextSerializer 
      */
     @SuppressWarnings("unchecked")
     private static <T> T unmarshal(JAXBContext ctx, String strData, boolean flgWhitespaceAware) throws Exception {
-        UnmarshallerHandler uh = ctx.createUnmarshaller().getUnmarshallerHandler();
-        XMLReader xr = XMLReaderFactory.createXMLReader();
+        final UnmarshallerHandler uh = ctx.createUnmarshaller().getUnmarshallerHandler();
+        final XMLReader xr = XMLReaderFactory.createXMLReader();
         xr.setContentHandler(flgWhitespaceAware ? new WhitespaceAwareUnmarshallerHandler(uh) : uh);
         xr.setErrorHandler(new DefaultHandler());
         xr.parse(new InputSource(new StringReader(strData)));

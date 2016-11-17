@@ -26,10 +26,10 @@
 package org.lanternpowered.server.catalog;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
 import com.google.common.base.MoreObjects;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -89,7 +89,7 @@ public interface PluginCatalogType extends CatalogType {
             private final Translation translation;
 
             public Translatable(String pluginId, String name, String translation) {
-                this(pluginId, name, Lantern.getRegistry().getTranslationManager().get(translation));
+                this(pluginId, name, tr(translation));
             }
 
             public Translatable(String pluginId, String name, Translation translation) {
@@ -98,7 +98,7 @@ public interface PluginCatalogType extends CatalogType {
             }
 
             public Translatable(String pluginId, String id, String name, String translation) {
-                this(pluginId, id, name, Lantern.getRegistry().getTranslationManager().get(translation));
+                this(pluginId, id, name, tr(translation));
             }
 
             public Translatable(String pluginId, String id, String name, Translation translation) {

@@ -91,21 +91,21 @@ public abstract class Element {
         if (this.mixedContent.size() == 0) {
             builder = Text.builder();
         } else if (this.mixedContent.size() == 1) { // then we are a thin wrapper around the child
-            builder = this.builderFromObject(this.mixedContent.get(0));
+            builder = builderFromObject(this.mixedContent.get(0));
         } else {
             if (this.mixedContent.get(0) instanceof String) {
-                builder = this.builderFromObject(this.mixedContent.get(0));
+                builder = builderFromObject(this.mixedContent.get(0));
                 this.mixedContent.remove(0);
             } else {
                 builder = Text.builder();
             }
             for (Object child : this.mixedContent) {
-                builder.append(this.builderFromObject(child).build());
+                builder.append(builderFromObject(child).build());
             }
         }
 
-        this.modifyBuilder(builder);
-        this.applyTextActions(builder);
+        modifyBuilder(builder);
+        applyTextActions(builder);
 
         return builder;
     }

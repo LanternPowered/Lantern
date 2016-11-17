@@ -25,11 +25,12 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import com.google.common.collect.ImmutableSet;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -49,8 +50,7 @@ public final class LanternSkinPart extends PluginCatalogType.Base implements Ski
         super(pluginId, name);
         this.mask = index << 1;
         this.index = index;
-        this.translation =  Lantern.getGame().getRegistry().getTranslationManager().get(
-                "options.modelPart." + name);
+        this.translation =  tr("options.modelPart.%s", name);
         // Add to the lookup
         // TODO: Should this be moved to the registry?
         lookup.put(index, this);

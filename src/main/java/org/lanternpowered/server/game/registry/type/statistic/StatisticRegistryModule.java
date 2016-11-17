@@ -23,42 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.game.registry.type.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.statistic.Statistic;
+import org.spongepowered.api.statistic.Statistics;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
-import org.spongepowered.api.text.translation.Translation;
+@RegistrationDependency(StatisticGroupRegistryModule.class)
+public final class StatisticRegistryModule extends AdditionalPluginCatalogRegistryModule<Statistic> {
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+    private static final StatisticRegistryModule INSTANCE = new StatisticRegistryModule();
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
+    public static StatisticRegistryModule get() {
+        return INSTANCE;
+    }
 
-    private final String identifier;
-    private final Translation translation;
-
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
+    private StatisticRegistryModule() {
+        super(Statistics.class);
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public void registerDefaults() {
     }
-
-    @Override
-    public String getId() {
-        return this.identifier;
-    }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

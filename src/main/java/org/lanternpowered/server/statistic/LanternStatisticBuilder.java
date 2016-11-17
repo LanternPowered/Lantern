@@ -23,42 +23,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
-
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.statistic.Statistic;
+import org.spongepowered.api.statistic.StatisticFormat;
+import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.text.translation.Translation;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+import javax.annotation.Nullable;
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
-
-    private final String identifier;
-    private final Translation translation;
-
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
-    }
+public class LanternStatisticBuilder extends AbstractStatisticBuilder<Statistic, Statistic.Builder> implements Statistic.Builder {
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    Statistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
+            @Nullable StatisticFormat format) {
+        return new LanternStatistic(pluginId, id, name, translation, group, format);
     }
-
-    @Override
-    public String getId() {
-        return this.identifier;
-    }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

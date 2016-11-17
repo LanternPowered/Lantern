@@ -112,7 +112,7 @@ public class LanternPlatform implements Platform {
                 .add("executionType", getExecutionType())
                 .add("version", this.implContainer.getVersion())
                 .add("apiVersion", this.apiContainer.getVersion())
-                .add("minecraftVersion", this.getMinecraftVersion())
+                .add("minecraftVersion", getMinecraftVersion())
                 .toString();
     }
 }

@@ -26,6 +26,7 @@
 package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
@@ -61,8 +62,8 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
 
     static class NameHolder {
 
-        static final Translation EMPTY = Lantern.getRegistry().getTranslationManager().get("inventory.empty.title");
-        static final Translation DEFAULT = Lantern.getRegistry().getTranslationManager().get("inventory.name");
+        static final Translation EMPTY = tr("inventory.empty.title");
+        static final Translation DEFAULT = tr("inventory.name");
     }
 
     private final LanternEmptyInventory emptyInventory = new LanternEmptyInventory(this);

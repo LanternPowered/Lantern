@@ -25,9 +25,10 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -51,9 +52,7 @@ public enum LanternPlantType implements PlantType, SimpleCatalogType, InternalCa
     private final byte internalId;
 
     LanternPlantType(int internalId, String identifier, String translationPart) {
-        final String part0 = internalId < 16 ? "flower1" : "flower2";
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tile."  + part0 + "." + translationPart + ".name");
+        this.translation = tr("tile.%s.%s.name", internalId < 16 ? "flower1" : "flower2", translationPart);
         this.internalId = (byte) internalId;
         this.identifier = identifier;
     }

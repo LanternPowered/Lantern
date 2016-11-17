@@ -26,9 +26,9 @@
 package org.lanternpowered.server.effect.potion;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -47,8 +47,8 @@ public class LanternPotionEffectType extends PluginCatalogType.Base.Translatable
 
     public LanternPotionEffectType(String pluginId, String id, String name, int internalId, String translationKey) {
         this(pluginId, id, name, internalId,
-                Lantern.getRegistry().getTranslationManager().get("effect." + translationKey),
-                Lantern.getRegistry().getTranslationManager().get("potion.effect." + name));
+                tr("effect.%s", translationKey),
+                tr("potion.effect.%s", name));
     }
 
     public LanternPotionEffectType(String pluginId, String id, String name, int internalId,

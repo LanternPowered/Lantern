@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.item.PropertyProviders.armorType;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
@@ -1442,7 +1443,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                             return translationFunction.apply(potionType);
                         }
                     }
-                    return Lantern.getRegistry().getTranslationManager().get("item.potion.name");
+                    return tr("item.potion.name");
                 })
                 .keysProvider(valueContainer -> {
                     valueContainer.registerKey(Keys.COLOR, null);
@@ -1458,7 +1459,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     }
 
     private TranslationProvider coloredTranslation(String pattern, DyeColor defaultColor) {
-        return (itemType, itemStack) -> Lantern.getRegistry().getTranslationManager().get(String.format(pattern,
+        return (itemType, itemStack) -> tr(String.format(pattern,
                 ((LanternDyeColor) (itemStack == null ? defaultColor : itemStack.get(Keys.DYE_COLOR).get())).getTranslationPart()));
     }
 

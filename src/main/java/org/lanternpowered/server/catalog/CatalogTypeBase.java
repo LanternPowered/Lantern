@@ -26,9 +26,9 @@
 package org.lanternpowered.server.catalog;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -57,7 +57,7 @@ public abstract class CatalogTypeBase extends AbstractCatalogType implements Cat
         private final Translation translation;
 
         public Translatable(String identifier, String name, String translation) {
-            this(identifier, name, Lantern.getRegistry().getTranslationManager().get(translation));
+            this(identifier, name, tr(translation));
         }
 
         public Translatable(String identifier, String name, Translation translation) {

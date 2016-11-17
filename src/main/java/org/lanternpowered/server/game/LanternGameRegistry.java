@@ -72,10 +72,8 @@ import org.lanternpowered.server.data.type.LanternDoublePlantType;
 import org.lanternpowered.server.data.type.LanternHinge;
 import org.lanternpowered.server.data.type.LanternLogAxis;
 import org.lanternpowered.server.data.type.LanternPistonType;
-import org.lanternpowered.server.data.type.LanternPlantType;
 import org.lanternpowered.server.data.type.LanternPortionType;
 import org.lanternpowered.server.data.type.LanternPrismarineType;
-import org.lanternpowered.server.data.type.LanternShrubType;
 import org.lanternpowered.server.data.type.LanternWallType;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.effect.particle.LanternParticleEffectBuilder;
@@ -153,6 +151,10 @@ import org.lanternpowered.server.game.registry.type.scoreboard.CriterionRegistry
 import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.ObjectiveDisplayModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.VisibilityRegistryModule;
+import org.lanternpowered.server.game.registry.type.statistic.AchievementRegistryModule;
+import org.lanternpowered.server.game.registry.type.statistic.StatisticFormatRegistryModule;
+import org.lanternpowered.server.game.registry.type.statistic.StatisticGroupRegistryModule;
+import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatVisibilityRegistryModule;
@@ -192,6 +194,12 @@ import org.lanternpowered.server.script.function.condition.ConditionTypeRegistry
 import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
+import org.lanternpowered.server.statistic.LanternBlockStatisticBuilder;
+import org.lanternpowered.server.statistic.LanternEntityStatisticBuilder;
+import org.lanternpowered.server.statistic.LanternItemStatisticBuilder;
+import org.lanternpowered.server.statistic.LanternStatisticBuilder;
+import org.lanternpowered.server.statistic.LanternTeamStatisticBuilder;
+import org.lanternpowered.server.statistic.achievement.LanternAchievementBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
@@ -248,7 +256,6 @@ import org.spongepowered.api.data.type.PickupRule;
 import org.spongepowered.api.data.type.PistonType;
 import org.spongepowered.api.data.type.PistonTypes;
 import org.spongepowered.api.data.type.PlantType;
-import org.spongepowered.api.data.type.PlantTypes;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.data.type.PrismarineType;
@@ -260,7 +267,6 @@ import org.spongepowered.api.data.type.RailDirection;
 import org.spongepowered.api.data.type.SandType;
 import org.spongepowered.api.data.type.SandstoneType;
 import org.spongepowered.api.data.type.ShrubType;
-import org.spongepowered.api.data.type.ShrubTypes;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.type.SlabType;
@@ -336,8 +342,10 @@ import org.spongepowered.api.statistic.BlockStatistic;
 import org.spongepowered.api.statistic.EntityStatistic;
 import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
+import org.spongepowered.api.statistic.StatisticFormat;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.statistic.TeamStatistic;
+import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 import org.spongepowered.api.text.format.TextColor;
@@ -442,6 +450,12 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
                 .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
                 .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
+                .registerBuilderSupplier(Achievement.Builder.class, LanternAchievementBuilder::new)
+                .registerBuilderSupplier(BlockStatistic.Builder.class, LanternBlockStatisticBuilder::new)
+                .registerBuilderSupplier(EntityStatistic.Builder.class, LanternEntityStatisticBuilder::new)
+                .registerBuilderSupplier(ItemStatistic.Builder.class, LanternItemStatisticBuilder::new)
+                .registerBuilderSupplier(Statistic.Builder.class, LanternStatisticBuilder::new)
+                .registerBuilderSupplier(TeamStatistic.Builder.class, LanternTeamStatisticBuilder::new)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
@@ -556,6 +570,10 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(SkullType.class, SkullTypeRegistryModule.get())
                 .registerModule(PotionType.class, PotionTypeRegistryModule.get())
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
+                .registerModule(Achievement.class, AchievementRegistryModule.get())
+                .registerModule(StatisticFormat.class, StatisticFormatRegistryModule.get())
+                .registerModule(StatisticGroup.class, StatisticGroupRegistryModule.get())
+                .registerModule(Statistic.class, StatisticRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
                 .registerModule(ActionType.class, ActionTypeRegistryModule.get())

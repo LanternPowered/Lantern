@@ -36,6 +36,7 @@ import static org.lanternpowered.server.block.PropertyProviders.hardness;
 import static org.lanternpowered.server.block.PropertyProviders.lightEmission;
 import static org.lanternpowered.server.block.PropertyProviders.replaceable;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
@@ -348,7 +349,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(blastResistance(5.0))
                                 .add(flammableInfo(5, 20)))
                         .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
-                                Lantern.getRegistry().getTranslationManager().get("tile.planks." + type.getTranslationKeyBase() + ".name")))
+                                tr("tile.planks." + type.getTranslationKeyBase() + ".name")))
                         .build("minecraft", "planks"),
                 blockState -> (byte) blockState.getTraitValue(LanternEnumTraits.TREE_TYPE).get().getInternalId());
         ////////////////////
@@ -368,7 +369,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                                 .add(PASSABLE)
                                 .add(INSTANT_BROKEN))
                         .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
-                                Lantern.getRegistry().getTranslationManager().get("tile.sapling." + type.getTranslationKeyBase() + ".name")))
+                                tr("tile.sapling." + type.getTranslationKeyBase() + ".name")))
                         .build("minecraft", "sapling"),
                 blockState -> {
                     final int type = blockState.getTraitValue(LanternEnumTraits.TREE_TYPE).get().getInternalId();
@@ -901,8 +902,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .traits(LanternEnumTraits.TREE_TYPE)
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
-                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type -> Lantern.getRegistry().getTranslationManager().get(
-                                "tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
+                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
+                                tr("tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
                         .itemType(builder -> builder
                                 .keysProvider(valueContainer -> valueContainer
                                         .registerKey(Keys.TREE_TYPE, LanternTreeType.OAK)
@@ -921,8 +922,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .defaultState(state -> state
                                 .withTrait(LanternEnumTraits.PORTION_TYPE, LanternPortionType.BOTTOM).get()
                                 .withTrait(LanternEnumTraits.TREE_TYPE, LanternTreeType.OAK).get())
-                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type -> Lantern.getRegistry().getTranslationManager().get(
-                                "tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
+                        .translation(TranslationProvider.of(LanternEnumTraits.TREE_TYPE, type ->
+                                tr("tile.woodSlab." + type.getTranslationKeyBase() + ".name")))
                         .itemType(builder -> builder
                                 .behaviors(pipeline -> pipeline
                                         .add(new SlabItemInteractionBehavior<>(LanternEnumTraits.TREE_TYPE,
@@ -1322,8 +1323,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .properties(builder -> builder
                         .add(hardness(0.8))
                         .add(blastResistance(4.0)))
-                .translation(TranslationProvider.of(LanternEnumTraits.DYE_COLOR, color -> Lantern.getRegistry().getTranslationManager().get(
-                        String.format(translationKey, color.getTranslationPart()))));
+                .translation(TranslationProvider.of(LanternEnumTraits.DYE_COLOR, color ->
+                        tr(String.format(translationKey, color.getTranslationPart()))));
     }
 
     private byte dyedData(BlockState blockState) {
@@ -1350,8 +1351,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(hardness(0.2))
                         .add(blastResistance(1.0))
                         .add(flammableInfo(30, 60)))
-                .translation(TranslationProvider.of(enumTrait, type -> Lantern.getRegistry().getTranslationManager().get(
-                        "tile.leaves." + ((LanternTreeType) type).getTranslationKeyBase() + ".name")));
+                .translation(TranslationProvider.of(enumTrait, type ->
+                        tr("tile.leaves." + ((LanternTreeType) type).getTranslationKeyBase() + ".name")));
     }
 
     private byte leavesData(BlockState blockState, int type) {
@@ -1384,8 +1385,8 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         .add(hardness(2.0))
                         .add(blastResistance(5.0))
                         .add(flammableInfo(5, 5)))
-                .translation(TranslationProvider.of(enumTrait, type -> Lantern.getRegistry().getTranslationManager().get(
-                        "tile.log." + ((LanternTreeType) type).getTranslationKeyBase() + ".name")))
+                .translation(TranslationProvider.of(enumTrait, type ->
+                        tr("tile.log." + ((LanternTreeType) type).getTranslationKeyBase() + ".name")))
                 .behaviors(pipeline -> pipeline
                         .add(new LogAxisRotationPlacementBehavior())
                         .add(new SimpleBlockDropsProviderBehavior(/* No items yet? */)));

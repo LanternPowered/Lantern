@@ -23,42 +23,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.statistic.EntityStatistic;
+import org.spongepowered.api.statistic.StatisticFormat;
+import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.text.translation.Translation;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+import javax.annotation.Nullable;
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
+public class LanternEntityStatisticBuilder extends AbstractStatisticBuilder<EntityStatistic, EntityStatistic.Builder>
+        implements EntityStatistic.Builder {
 
-    private final String identifier;
-    private final Translation translation;
+    private EntityType entityType;
 
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
+    @Override
+    public LanternEntityStatisticBuilder entity(EntityType entity) {
+        this.entityType = checkNotNull(entity, "entity");
+        return this;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public LanternEntityStatisticBuilder from(EntityStatistic value) {
+        super.from(value);
+        this.entityType = value.getEntityType();
+        return this;
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public LanternEntityStatisticBuilder reset() {
+        super.reset();
+        this.entityType = null;
+        return this;
     }
+
 
     @Override
-    public int getInternalId() {
-        return ordinal();
+    EntityStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
+            @Nullable StatisticFormat format) {
+        checkState(this.entityType != null, "The entityType must be set");
+        return new LanternEntityStatistic(pluginId, id, name, translation, group, format, this.entityType);
     }
-
 }

@@ -23,42 +23,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.statistic.StatisticFormat;
+import org.spongepowered.api.statistic.StatisticGroup;
+import org.spongepowered.api.statistic.TeamStatistic;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.translation.Translation;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+import javax.annotation.Nullable;
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
+public class LanternTeamStatisticBuilder extends AbstractStatisticBuilder<TeamStatistic, TeamStatistic.Builder>
+        implements TeamStatistic.Builder {
 
-    private final String identifier;
-    private final Translation translation;
+    private TextColor teamColor;
 
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
+    @Override
+    public TeamStatistic.Builder teamColor(TextColor color) {
+        this.teamColor = checkNotNull(color, "color");
+        return this;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public LanternTeamStatisticBuilder from(TeamStatistic value) {
+        super.from(value);
+        this.teamColor = value.getTeamColor();
+        return this;
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public LanternTeamStatisticBuilder reset() {
+        super.reset();
+        this.teamColor = null;
+        return this;
     }
+
 
     @Override
-    public int getInternalId() {
-        return ordinal();
+    TeamStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
+            @Nullable StatisticFormat format) {
+        checkState(this.teamColor != null, "The teamColor must be set");
+        return new LanternTeamStatistic(pluginId, id, name, translation, group, format, this.teamColor);
     }
-
 }

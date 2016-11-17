@@ -23,42 +23,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.statistic.ItemStatistic;
+import org.spongepowered.api.statistic.StatisticFormat;
+import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.text.translation.Translation;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+import javax.annotation.Nullable;
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
+public class LanternItemStatisticBuilder extends AbstractStatisticBuilder<ItemStatistic, ItemStatistic.Builder>
+        implements ItemStatistic.Builder {
 
-    private final String identifier;
-    private final Translation translation;
+    private ItemType itemType;
 
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
+    @Override
+    public ItemStatistic.Builder item(ItemType item) {
+        this.itemType = checkNotNull(item, "item");
+        return this;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public LanternItemStatisticBuilder from(ItemStatistic value) {
+        super.from(value);
+        this.itemType = value.getItemType();
+        return this;
     }
 
     @Override
-    public String getId() {
-        return this.identifier;
+    public LanternItemStatisticBuilder reset() {
+        super.reset();
+        this.itemType = null;
+        return this;
     }
+
 
     @Override
-    public int getInternalId() {
-        return ordinal();
+    ItemStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
+            @Nullable StatisticFormat format) {
+        checkState(this.itemType != null, "The itemType must be set");
+        return new LanternItemStatistic(pluginId, id, name, translation, group, format, this.itemType);
     }
-
 }

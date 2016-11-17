@@ -26,10 +26,9 @@
 package org.lanternpowered.server.effect.potion;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.text.translation.TranslationManager;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -46,10 +45,9 @@ public class LanternPotionType extends PluginCatalogType.Base.Translatable.Inter
 
     public LanternPotionType(String pluginId, String name, String translationPattern, int internalId) {
         super(pluginId, name, String.format(translationPattern, "potion"), internalId);
-        final TranslationManager translationManager = Lantern.getRegistry().getTranslationManager();
-        this.lingeringTranslation = translationManager.get(String.format(translationPattern, "lingering_potion"));
-        this.splashTranslation = translationManager.get(String.format(translationPattern, "splash_potion"));
-        this.tippedArrowTranslation = translationManager.get(String.format(translationPattern, "tipped_arrow"));
+        this.lingeringTranslation = tr(translationPattern, "lingering_potion");
+        this.splashTranslation = tr(translationPattern, "splash_potion");
+        this.tippedArrowTranslation = tr(translationPattern, "tipped_arrow");
     }
 
     @Override

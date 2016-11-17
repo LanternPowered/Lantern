@@ -23,42 +23,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.spongepowered.api.statistic.StatisticFormat;
 
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
-import org.spongepowered.api.text.translation.Translation;
+import java.util.function.LongFunction;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+public class LanternStatisticFormat extends PluginCatalogType.Base implements StatisticFormat {
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
+    private final LongFunction<String> formatter;
 
-    private final String identifier;
-    private final Translation translation;
+    public LanternStatisticFormat(String pluginId, String name, LongFunction<String> formatter) {
+        super(pluginId, name);
+        this.formatter = formatter;
+    }
 
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
+    public LanternStatisticFormat(String pluginId, String id, String name, LongFunction<String> formatter) {
+        super(pluginId, id, name);
+        this.formatter = formatter;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public String format(long value) {
+        return this.formatter.apply(value);
     }
-
-    @Override
-    public String getId() {
-        return this.identifier;
-    }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

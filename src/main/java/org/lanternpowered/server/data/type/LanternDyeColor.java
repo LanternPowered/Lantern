@@ -25,9 +25,10 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.Color;
@@ -58,8 +59,7 @@ public enum LanternDyeColor implements DyeColor, SimpleCatalogType, InternalCata
     private final Color color;
 
     LanternDyeColor(String identifier, String translationPart, Color color) {
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "color." + translationPart + ".name");
+        this.translation = tr("color." + translationPart + ".name");
         this.translationBaseKey = translationPart;
         this.identifier = identifier;
         this.color = color;

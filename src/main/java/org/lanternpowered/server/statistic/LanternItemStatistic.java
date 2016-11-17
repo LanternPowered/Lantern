@@ -23,42 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
-
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.statistic.ItemStatistic;
+import org.spongepowered.api.statistic.StatisticFormat;
+import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.text.translation.Translation;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+import javax.annotation.Nullable;
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
+public class LanternItemStatistic extends LanternStatistic implements ItemStatistic {
 
-    private final String identifier;
-    private final Translation translation;
+    private final ItemType itemType;
 
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
+    LanternItemStatistic(String pluginId, String id, String name, Translation translation,
+            StatisticGroup group, @Nullable StatisticFormat format, ItemType itemType) {
+        super(pluginId, id, name, translation, group, format);
+        this.itemType = itemType;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public ItemType getItemType() {
+        return this.itemType;
     }
-
-    @Override
-    public String getId() {
-        return this.identifier;
-    }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

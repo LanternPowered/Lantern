@@ -26,8 +26,8 @@
 package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 
 public class LanternInventoryBuilder implements Inventory.Builder {
 
-    private static final Translation DEFAULT_TRANSLATION = Lantern.getRegistry().getTranslationManager().get("Inventory");
+    private static final Translation DEFAULT_TRANSLATION = tr("Inventory");
 
     @Nullable private Carrier carrier;
     private InventoryArchetype inventoryArchetype;
@@ -143,7 +143,7 @@ public class LanternInventoryBuilder implements Inventory.Builder {
                     return value1.getTranslation();
                 }
             }
-            return Lantern.getRegistry().getTranslationManager().get(value.toPlain());
+            return tr(value.toPlain());
         }
         return DEFAULT_TRANSLATION;
     }

@@ -97,13 +97,13 @@ abstract class AbstractPluginContainer implements PluginContainer {
     public String toString() {
         return MoreObjects.toStringHelper("Plugin")
                 .omitNullValues()
-                .add("id", this.getId())
-                .add("name", this.getName())
-                .add("version", this.getVersion().orElse(null))
-                .add("description", this.getDescription().orElse(null))
-                .add("url", this.getUrl().orElse(null))
-                .add("authors", this.getAuthors().isEmpty() ? null : this.getAuthors())
-                .add("source", this.getSource().orElse(null))
+                .add("id", getId())
+                .add("name", getName())
+                .add("version", getVersion().orElse(null))
+                .add("description", getDescription().orElse(null))
+                .add("url", getUrl().orElse(null))
+                .add("authors", getAuthors().isEmpty() ? null : getAuthors())
+                .add("source", getSource().orElse(null))
                 .toString();
     }
 }

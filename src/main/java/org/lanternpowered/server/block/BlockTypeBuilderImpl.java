@@ -28,6 +28,7 @@ package org.lanternpowered.server.block;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.lanternpowered.server.block.PropertyProviders.solidCube;
 import static org.lanternpowered.server.block.PropertyProviders.solidSide;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
@@ -37,7 +38,6 @@ import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineI
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
 import org.lanternpowered.server.block.state.LanternBlockState;
 import org.lanternpowered.server.block.tile.LanternTileEntityType;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.item.ItemTypeBuilder;
 import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.behavior.simple.InteractWithBlockItemBehavior;
@@ -163,7 +163,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
 
     @Override
     public BlockTypeBuilderImpl translation(String translation) {
-        return translation(Lantern.getRegistry().getTranslationManager().get(translation));
+        return translation(tr(translation));
     }
 
     @Override
@@ -225,7 +225,7 @@ public class BlockTypeBuilderImpl implements BlockTypeBuilder {
             if (!pluginId.equals("minecraft")) {
                 path = pluginId + '.' + path;
             }
-            translationProvider = TranslationProvider.of(Lantern.getRegistry().getTranslationManager().get(path));
+            translationProvider = TranslationProvider.of(tr(path));
         }
         PropertyProviderCollection.Builder properties;
         if (this.propertiesBuilder != null) {

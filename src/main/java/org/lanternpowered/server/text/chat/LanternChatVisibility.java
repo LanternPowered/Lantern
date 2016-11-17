@@ -25,8 +25,9 @@
  */
 package org.lanternpowered.server.text.chat;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
 
@@ -37,8 +38,7 @@ public final class LanternChatVisibility extends PluginCatalogType.Base.Translat
     private final Predicate<ChatType> chatTypePredicate;
 
     public LanternChatVisibility(String pluginId, String name, int internalId, Predicate<ChatType> chatTypePredicate) {
-        super(pluginId, name, Lantern.getGame().getRegistry().getTranslationManager().get(
-                "options.chat.visibility." + name), internalId);
+        super(pluginId, name, tr("options.chat.visibility." + name), internalId);
         this.chatTypePredicate = chatTypePredicate;
     }
 

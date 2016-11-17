@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.SimpleCatalogType;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.HandPreference;
@@ -34,7 +36,7 @@ public class LanternHandPreference extends SimpleCatalogType.Base.Translatable i
 
     public LanternHandPreference(String identifier, String translationKey) {
         // The used translations are not available in vanilla minecraft
-        this(identifier, Lantern.getRegistry().getTranslationManager().get(translationKey));
+        this(identifier, tr(translationKey));
     }
 
     public LanternHandPreference(String identifier, Translation translation) {

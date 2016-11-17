@@ -23,42 +23,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.type;
+package org.lanternpowered.server.statistic;
 
-import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
-
-import org.lanternpowered.server.catalog.InternalCatalogType;
-import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.spongepowered.api.data.type.PistonType;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.statistic.EntityStatistic;
+import org.spongepowered.api.statistic.ItemStatistic;
+import org.spongepowered.api.statistic.StatisticFormat;
+import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.text.translation.Translation;
 
-public enum LanternPistonType implements PistonType, SimpleCatalogType, InternalCatalogType {
+import javax.annotation.Nullable;
 
-    NORMAL          ("normal", "pistonBase"),
-    STICKY          ("sticky", "pistonStickyBase"),
-    ;
+public class LanternEntityStatistic extends LanternStatistic implements EntityStatistic {
 
-    private final String identifier;
-    private final Translation translation;
+    private final EntityType entityType;
 
-    LanternPistonType(String identifier, String translationPart) {
-        this.translation = tr("tile." + translationPart + ".name");
-        this.identifier = identifier;
+    LanternEntityStatistic(String pluginId, String id, String name, Translation translation,
+            StatisticGroup group, @Nullable StatisticFormat format, EntityType entityType) {
+        super(pluginId, id, name, translation, group, format);
+        this.entityType = entityType;
     }
 
     @Override
-    public Translation getTranslation() {
-        return this.translation;
+    public EntityType getEntityType() {
+        return this.entityType;
     }
-
-    @Override
-    public String getId() {
-        return this.identifier;
-    }
-
-    @Override
-    public int getInternalId() {
-        return ordinal();
-    }
-
 }

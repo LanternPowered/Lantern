@@ -27,13 +27,13 @@ package org.lanternpowered.server.item;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.MutableBehaviorPipeline;
 import org.lanternpowered.server.behavior.pipeline.impl.MutableBehaviorPipelineImpl;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -102,7 +102,7 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
     @Override
     public ItemTypeBuilderImpl translation(String translation) {
         checkNotNull(translation, "translation");
-        return translation(Lantern.getRegistry().getTranslationManager().get(translation));
+        return translation(tr(translation));
     }
 
     @Override
@@ -140,7 +140,7 @@ public class ItemTypeBuilderImpl implements ItemTypeBuilder {
             if (!pluginId.equals("minecraft")) {
                 path = pluginId + '.' + path;
             }
-            translationProvider = TranslationProvider.of(Lantern.getRegistry().getTranslationManager().get(path));
+            translationProvider = TranslationProvider.of(tr(path));
         }
         PropertyProviderCollection properties;
         if (this.propertiesBuilder != null) {

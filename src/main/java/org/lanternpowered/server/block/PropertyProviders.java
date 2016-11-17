@@ -28,6 +28,7 @@ package org.lanternpowered.server.block;
 import org.lanternpowered.server.block.property.FlameInfoProperty;
 import org.lanternpowered.server.block.property.FlameInfo;
 import org.lanternpowered.server.block.property.SolidSideProperty;
+import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.property.block.BlastResistanceProperty;
 import org.spongepowered.api.data.property.block.FlammableProperty;
 import org.spongepowered.api.data.property.block.GravityAffectedProperty;
@@ -79,6 +80,13 @@ public final class PropertyProviders {
         for (MatterProperty.Matter matter : MatterProperty.Matter.values()) {
             MATTER_PROPERTIES.put(matter, new MatterProperty(matter));
         }
+    }
+
+    public static PropertyProviderCollection constant(Property<?,?> property) {
+        //noinspection unchecked
+        return PropertyProviderCollection.builder()
+                .add(property.getClass(), new ConstantPropertyProvider(property))
+                .build();
     }
 
     public static PropertyProviderCollection matter(MatterProperty.Matter constant) {

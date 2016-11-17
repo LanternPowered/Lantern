@@ -25,9 +25,10 @@
  */
 package org.lanternpowered.server.data.type;
 
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.catalog.SimpleCatalogType;
-import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.data.type.QuartzType;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -44,8 +45,7 @@ public enum LanternQuartzType implements QuartzType, SimpleCatalogType, Internal
     private final Translation translation;
 
     LanternQuartzType(String identifier, String translationPart) {
-        this.translation = Lantern.getGame().getRegistry().getTranslationManager().get(
-                "tile.quartzBlock." + translationPart + ".name");
+        this.translation = tr("tile.quartzBlock.%s.name", translationPart);
         this.identifier = identifier;
     }
 

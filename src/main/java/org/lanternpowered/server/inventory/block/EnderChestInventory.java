@@ -25,7 +25,8 @@
  */
 package org.lanternpowered.server.inventory.block;
 
-import org.lanternpowered.server.game.Lantern;
+import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
+
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.text.translation.Translation;
 
@@ -38,6 +39,6 @@ public class EnderChestInventory extends ChestInventory {
     }
 
     public EnderChestInventory(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name == null ? Lantern.getRegistry().getTranslationManager().get("container.enderchest") : name, 3);
+        super(parent, name == null ? tr("container.enderchest") : name, 3);
     }
 }

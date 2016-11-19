@@ -264,17 +264,19 @@ public final class AchievementRegistryModule extends AdditionalPluginCatalogRegi
     }
 
     private LanternAchievementBuilder vanillaBuilder(String identifier, String unlocalizedName) {
+        final String internalId = String.format("achievement.%s", unlocalizedName);
         final Statistic statistic = ((LanternStatisticBuilder) new LanternStatisticBuilder()
-                .internalId(String.format("achievement.%s", unlocalizedName))
+                .internalId(internalId)
                 .name(identifier)
                 .group(StatisticGroups.HIDDEN)
-                .translation(tr("achievement.%s", unlocalizedName)))
+                .translation(tr(internalId)))
                 .build();
         StatisticRegistryModule.get().register(statistic);
         return new LanternAchievementBuilder()
+                .internalId(internalId)
                 .name(identifier)
-                .translation(tr("achievement.%s", unlocalizedName))
-                .description(tr("achievement.%s.desc"))
+                .translation(tr(internalId))
+                .description(tr("%s.desc", internalId))
                 .sourceStatistic(statistic)
                 .targetValue(1);
     }

@@ -105,7 +105,7 @@ public final class StatisticMap {
                     if (entries == null) {
                         entries = new HashSet<>();
                     }
-                    entries.add(new MessagePlayOutStatistics.Entry(entry.getKey(), (int) value));
+                    entries.add(new MessagePlayOutStatistics.Entry(achievement.getInternalId(), (int) value));
                 }
             }
         }

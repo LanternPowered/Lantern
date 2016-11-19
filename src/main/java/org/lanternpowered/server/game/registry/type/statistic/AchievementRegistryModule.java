@@ -31,9 +31,12 @@ import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 import com.google.common.base.Throwables;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.statistic.LanternStatistic;
+import org.lanternpowered.server.statistic.LanternStatisticBuilder;
 import org.lanternpowered.server.statistic.achievement.LanternAchievement;
 import org.lanternpowered.server.statistic.achievement.LanternAchievementBuilder;
 import org.spongepowered.api.registry.util.RegistrationDependency;
+import org.spongepowered.api.statistic.Statistic;
+import org.spongepowered.api.statistic.StatisticGroups;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.statistic.achievement.Achievements;
 
@@ -90,243 +93,189 @@ public final class AchievementRegistryModule extends AdditionalPluginCatalogRegi
 
     @Override
     public void registerDefaults() {
-        final LanternAchievementBuilder builder = new LanternAchievementBuilder();
-
-        final Achievement openInventory = builder.reset().name("minecraft:open_inventory")
-                .translation(tr("achievement.openInventory"))
-                .description(tr("achievement.openInventory.desc"))
+        final Achievement openInventory = vanillaBuilder("minecraft:open_inventory", "openInventory")
                 .build();
         register(openInventory);
 
-        final Achievement mineWood = builder.reset().name("minecraft:mine_wood")
-                .translation(tr("achievement.mineWood"))
-                .description(tr("achievement.mineWood.desc"))
+        final Achievement mineWood = vanillaBuilder("minecraft:mine_wood", "mineWood")
                 .parent(openInventory)
                 .build();
         register(mineWood);
 
-        final Achievement buildWorkbench = builder.reset().name("minecraft:build_workbench")
-                .translation(tr("achievement.buildWorkBench"))
-                .description(tr("achievement.buildWorkBench.desc"))
+        final Achievement buildWorkbench = vanillaBuilder("minecraft:build_workbench", "buildWorkBench")
                 .parent(mineWood)
                 .build();
         register(buildWorkbench);
 
-        final Achievement buildPickaxe = builder.reset().name("minecraft:build_pickaxe")
-                .translation(tr("achievement.buildPickaxe"))
-                .description(tr("achievement.buildPickaxe.desc"))
+        final Achievement buildPickaxe = vanillaBuilder("minecraft:build_pickaxe", "buildPickaxe")
                 .parent(buildWorkbench)
                 .build();
         register(buildPickaxe);
 
-        final Achievement buildFurnace = builder.reset().name("minecraft:build_furnace")
-                .translation(tr("achievement.buildFurnace"))
-                .description(tr("achievement.buildFurnace.desc"))
+        final Achievement buildFurnace = vanillaBuilder("minecraft:build_furnace", "buildFurnace")
                 .parent(buildPickaxe)
                 .build();
         register(buildFurnace);
 
-        final Achievement acquireIron = builder.reset().name("minecraft:acquire_iron")
-                .translation(tr("achievement.acquireIron"))
-                .description(tr("achievement.acquireIron.desc"))
+        final Achievement acquireIron = vanillaBuilder("minecraft:acquire_iron", "acquireIron")
                 .parent(buildFurnace)
                 .build();
         register(acquireIron);
 
-        final Achievement buildHoe = builder.reset().name("minecraft:build_hoe")
-                .translation(tr("achievement.buildHoe"))
-                .description(tr("achievement.buildHoe.desc"))
+        final Achievement buildHoe = vanillaBuilder("minecraft:build_hoe", "buildHoe")
                 .parent(buildWorkbench)
                 .build();
         register(buildHoe);
 
-        final Achievement makeBread = builder.reset().name("minecraft:make_bread")
-                .translation(tr("achievement.makeBread"))
-                .description(tr("achievement.makeBread.desc"))
+        final Achievement makeBread = vanillaBuilder("minecraft:make_bread", "makeBread")
                 .parent(buildHoe)
                 .build();
         register(makeBread);
 
-        final Achievement bakeCake = builder.reset().name("minecraft:bake_cake")
-                .translation(tr("achievement.bakeCake"))
-                .description(tr("achievement.bakeCake.desc"))
+        final Achievement bakeCake = vanillaBuilder("minecraft:bake_cake", "bakeCake")
                 .parent(buildHoe)
                 .build();
         register(bakeCake);
 
-        final Achievement buildBetterPickaxe = builder.reset().name("minecraft:build_better_pickaxe")
-                .translation(tr("achievement.buildBetterPickaxe"))
-                .description(tr("achievement.buildBetterPickaxe.desc"))
+        final Achievement buildBetterPickaxe = vanillaBuilder("minecraft:build_better_pickaxe", "buildBetterPickaxe")
                 .parent(buildHoe)
                 .build();
         register(buildBetterPickaxe);
 
-        final Achievement cookFish = builder.reset().name("minecraft:cook_fish")
-                .translation(tr("achievement.cookFish"))
-                .description(tr("achievement.cookFish.desc"))
+        final Achievement cookFish = vanillaBuilder("minecraft:cook_fish", "cookFish")
                 .parent(buildFurnace)
                 .build();
         register(cookFish);
 
-        final Achievement onARail = builder.reset().name("minecraft:on_a_rail")
-                .translation(tr("achievement.onARail"))
-                .description(tr("achievement.onARail.desc"))
+        final Achievement onARail = vanillaBuilder("minecraft:on_a_rail", "onARail")
                 .parent(acquireIron)
                 .build();
         register(onARail);
 
-        final Achievement buildSword = builder.reset().name("minecraft:build_sword")
-                .translation(tr("achievement.buildSword"))
-                .description(tr("achievement.buildSword.desc"))
+        final Achievement buildSword = vanillaBuilder("minecraft:build_sword", "buildSword")
                 .parent(buildWorkbench)
                 .build();
         register(buildSword);
 
-        final Achievement killEnemy = builder.reset().name("minecraft:kill_enemy")
-                .translation(tr("achievement.killEnemy"))
-                .description(tr("achievement.killEnemy.desc"))
+        final Achievement killEnemy = vanillaBuilder("minecraft:kill_enemy", "killEnemy")
                 .parent(buildSword)
                 .build();
         register(killEnemy);
 
-        final Achievement killCow = builder.reset().name("minecraft:kill_cow")
-                .translation(tr("achievement.killCow"))
-                .description(tr("achievement.killCow.desc"))
+        final Achievement killCow = vanillaBuilder("minecraft:kill_cow", "killCow")
                 .parent(buildSword)
                 .build();
         register(killCow);
 
-        final Achievement flyPig = builder.reset().name("minecraft:fly_pig")
-                .translation(tr("achievement.flyPig"))
-                .description(tr("achievement.flyPig.desc"))
+        final Achievement flyPig = vanillaBuilder("minecraft:fly_pig", "flyPig")
                 .parent(killCow)
                 .build();
         register(flyPig);
 
-        final Achievement snipeSkeleton = builder.reset().name("minecraft:snipe_skeleton")
-                .translation(tr("achievement.snipeSkeleton"))
-                .description(tr("achievement.snipeSkeleton.desc"))
+        final Achievement snipeSkeleton = vanillaBuilder("minecraft:snipe_skeleton", "snipeSkeleton")
                 .parent(killEnemy)
                 .build();
         register(snipeSkeleton);
 
-        final Achievement getDiamonds = builder.reset().name("minecraft:get_diamonds")
-                .translation(tr("achievement.diamonds"))
-                .description(tr("achievement.diamonds.desc"))
+        final Achievement getDiamonds = vanillaBuilder("minecraft:get_diamonds", "diamonds")
                 .parent(acquireIron)
                 .build();
         register(getDiamonds);
 
-        final Achievement diamondsToYou = builder.reset().name("minecraft:diamonds_to_you")
-                .translation(tr("achievement.diamondsToYou"))
-                .description(tr("achievement.diamondsToYou.desc"))
+        final Achievement diamondsToYou = vanillaBuilder("minecraft:diamonds_to_you", "diamondsToYou")
                 .parent(getDiamonds)
                 .build();
         register(diamondsToYou);
 
-        final Achievement netherPortal = builder.reset().name("minecraft:nether_portal")
-                .translation(tr("achievement.portal"))
-                .description(tr("achievement.portal.desc"))
+        final Achievement netherPortal = vanillaBuilder("minecraft:nether_portal", "portal")
                 .parent(getDiamonds)
                 .build();
         register(netherPortal);
 
-        final Achievement ghastReturn = builder.reset().name("minecraft:ghast_return")
-                .translation(tr("achievement.ghast"))
-                .description(tr("achievement.ghast.desc"))
+        final Achievement ghastReturn = vanillaBuilder("minecraft:ghast_return", "ghast")
                 .parent(netherPortal)
                 .build();
         register(ghastReturn);
 
-        final Achievement getBlazeRod = builder.reset().name("minecraft:get_blaze_rod")
-                .translation(tr("achievement.blazeRod"))
-                .description(tr("achievement.blazeRod.desc"))
+        final Achievement getBlazeRod = vanillaBuilder("minecraft:get_blaze_rod", "blazeRod")
                 .parent(netherPortal)
                 .build();
         register(getBlazeRod);
 
-        final Achievement brewPotion = builder.reset().name("minecraft:brew_potion")
-                .translation(tr("achievement.potion"))
-                .description(tr("achievement.potion.desc"))
+        final Achievement brewPotion = vanillaBuilder("minecraft:brew_potion", "potion")
                 .parent(getBlazeRod)
                 .build();
         register(brewPotion);
 
-        final Achievement endPortal = builder.reset().name("minecraft:end_portal")
-                .translation(tr("achievement.theEnd"))
-                .description(tr("achievement.theEnd.desc"))
+        final Achievement endPortal = vanillaBuilder("minecraft:end_portal", "theEnd")
                 .parent(getBlazeRod)
                 .build();
         register(endPortal);
 
-        final Achievement theEnd = builder.reset().name("minecraft:the_end")
-                .translation(tr("achievement.theEnd2"))
-                .description(tr("achievement.theEnd2.desc"))
+        final Achievement theEnd = vanillaBuilder("minecraft:the_end", "theEnd2")
                 .parent(endPortal)
                 .build();
         register(theEnd);
 
-        final Achievement enchantments = builder.reset().name("minecraft:enchantments")
-                .translation(tr("achievement.enchantments"))
-                .description(tr("achievement.enchantments.desc"))
+        final Achievement enchantments = vanillaBuilder("minecraft:enchantments", "enchantments")
                 .parent(getDiamonds)
                 .build();
         register(enchantments);
 
-        final Achievement overkill = builder.reset().name("minecraft:overkill")
-                .translation(tr("achievement.overkill"))
-                .description(tr("achievement.overkill.desc"))
+        final Achievement overkill = vanillaBuilder("minecraft:overkill", "overkill")
                 .parent(enchantments)
                 .build();
         register(overkill);
 
-        final Achievement bookcase = builder.reset().name("minecraft:bookcase")
-                .translation(tr("achievement.bookcase"))
-                .description(tr("achievement.bookcase.desc"))
+        final Achievement bookcase = vanillaBuilder("minecraft:bookcase", "bookcase")
                 .parent(enchantments)
                 .build();
         register(bookcase);
 
-        final Achievement breedCow = builder.reset().name("minecraft:breed_cow")
-                .translation(tr("achievement.breedCow"))
-                .description(tr("achievement.breedCow.desc"))
+        final Achievement breedCow = vanillaBuilder("minecraft:breed_cow", "breedCow")
                 .parent(killCow)
                 .build();
         register(breedCow);
 
-        final Achievement spawnWither = builder.reset().name("minecraft:spawn_wither")
-                .translation(tr("achievement.spawnWither"))
-                .description(tr("achievement.spawnWither.desc"))
+        final Achievement spawnWither = vanillaBuilder("minecraft:spawn_wither", "spawnWither")
                 .parent(theEnd)
                 .build();
         register(spawnWither);
 
-        final Achievement killWither = builder.reset().name("minecraft:kill_wither")
-                .translation(tr("achievement.killWither"))
-                .description(tr("achievement.killWither.desc"))
+        final Achievement killWither = vanillaBuilder("minecraft:kill_wither", "killWither")
                 .parent(spawnWither)
                 .build();
         register(killWither);
 
-        final Achievement fullBeacon = builder.reset().name("minecraft:full_beacon")
-                .translation(tr("achievement.fullBeacon"))
-                .description(tr("achievement.fullBeacon.desc"))
+        final Achievement fullBeacon = vanillaBuilder("minecraft:full_beacon", "fullBeacon")
                 .parent(killWither)
                 .build();
         register(fullBeacon);
 
-        final Achievement exploreAllBiomes = builder.reset().name("minecraft:explore_all_biomes")
-                .translation(tr("achievement.exploreAllBiomes"))
-                .description(tr("achievement.exploreAllBiomes.desc"))
+        final Achievement exploreAllBiomes = vanillaBuilder("minecraft:explore_all_biomes", "exploreAllBiomes")
                 .parent(endPortal)
                 .build();
         register(exploreAllBiomes);
 
-        final Achievement overpowered = builder.reset().name("minecraft:overpowered")
-                .translation(tr("achievement.overpowered"))
-                .description(tr("achievement.overpowered.desc"))
+        final Achievement overpowered = vanillaBuilder("minecraft:overpowered", "overpowered")
                 .parent(buildBetterPickaxe)
                 .build();
         register(overpowered);
+    }
+
+    private LanternAchievementBuilder vanillaBuilder(String identifier, String unlocalizedName) {
+        final Statistic statistic = ((LanternStatisticBuilder) new LanternStatisticBuilder()
+                .internalId(String.format("achievement.%s", unlocalizedName))
+                .name(identifier)
+                .group(StatisticGroups.HIDDEN)
+                .translation(tr("achievement.%s", unlocalizedName)))
+                .build();
+        StatisticRegistryModule.get().register(statistic);
+        return new LanternAchievementBuilder()
+                .name(identifier)
+                .translation(tr("achievement.%s", unlocalizedName))
+                .description(tr("achievement.%s.desc"))
+                .sourceStatistic(statistic)
+                .targetValue(1);
     }
 }

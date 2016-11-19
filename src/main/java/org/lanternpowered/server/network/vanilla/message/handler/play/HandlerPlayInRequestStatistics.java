@@ -23,20 +23,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
-import org.spongepowered.api.text.translation.Translation;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.NetworkSession;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInRequestStatistics;
 
-import javax.annotation.Nullable;
-
-public class LanternStatisticBuilder extends AbstractStatisticBuilder<Statistic, Statistic.Builder> implements Statistic.Builder {
+public class HandlerPlayInRequestStatistics implements Handler<MessagePlayInRequestStatistics> {
 
     @Override
-    Statistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
-        return new LanternStatistic(pluginId, id, name, translation, group, format, internalId);
+    public void handle(NetworkContext context, MessagePlayInRequestStatistics message) {
+        final NetworkSession session = context.getSession();
+        session.send(session.getPlayer().getStatisticMap().createStatisticsMessage());
     }
 }

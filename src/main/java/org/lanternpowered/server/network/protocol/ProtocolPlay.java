@@ -124,6 +124,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSprint;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSignBook;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInStartElytraFlying;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInUseEntityAttack;
@@ -358,7 +359,8 @@ final class ProtocolPlay extends ProtocolBase {
         inbound.bind(MessagePlayInOpenInventory.class)
                 .bindHandler(new HandlerPlayInOpenInventory());
         inbound.bind(MessagePlayInPerformRespawn.class); // TODO: Handler
-        inbound.bind(MessagePlayInRequestStatistics.class); // TODO: Handler
+        inbound.bind(MessagePlayInRequestStatistics.class)
+                .bindHandler(new HandlerPlayInRequestStatistics());
         // Provided by CodecPlayInPlayerAction
         inbound.bind(MessagePlayInLeaveBed.class);// TODO: Handler
         inbound.bind(MessagePlayInStartElytraFlying.class)

@@ -44,6 +44,7 @@ public class LanternStatistic extends PluginCatalogType.Base.Translatable implem
 
     private final StatisticGroup group;
     @Nullable private final StatisticFormat format;
+    private final String internalId;
 
     /**
      * All the achievements that depend on this statistic, and the
@@ -52,8 +53,9 @@ public class LanternStatistic extends PluginCatalogType.Base.Translatable implem
     private Set<LanternAchievement> updateAchievements = new HashSet<>();
 
     LanternStatistic(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format) {
+            StatisticGroup group, @Nullable StatisticFormat format, String internalId) {
         super(pluginId, id, name, translation);
+        this.internalId = internalId;
         this.group = group;
         this.format = format;
     }
@@ -80,5 +82,9 @@ public class LanternStatistic extends PluginCatalogType.Base.Translatable implem
 
     public Set<LanternAchievement> getUpdateAchievements() {
         return Collections.unmodifiableSet(this.updateAchievements);
+    }
+
+    public String getInternalId() {
+        return this.internalId;
     }
 }

@@ -64,8 +64,8 @@ public class LanternEntityStatisticBuilder extends AbstractStatisticBuilder<Enti
 
     @Override
     EntityStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format) {
+            @Nullable StatisticFormat format, String internalId) {
         checkState(this.entityType != null, "The entityType must be set");
-        return new LanternEntityStatistic(pluginId, id, name, translation, group, format, this.entityType);
+        return new LanternEntityStatistic(pluginId, id, name, translation, group, format, this.entityType, internalId);
     }
 }

@@ -38,8 +38,8 @@ public class LanternBlockStatistic extends LanternStatistic implements BlockStat
     private final BlockType blockType;
 
     LanternBlockStatistic(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format, BlockType blockType) {
-        super(pluginId, id, name, translation, group, format);
+            StatisticGroup group, @Nullable StatisticFormat format, BlockType blockType, String internalId) {
+        super(pluginId, id, name, translation, group, format, internalId);
         this.blockType = blockType;
     }
 

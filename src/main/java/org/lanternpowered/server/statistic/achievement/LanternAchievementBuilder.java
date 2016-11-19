@@ -45,6 +45,7 @@ public class LanternAchievementBuilder implements Achievement.Builder {
     @Nullable private Achievement parent;
     @Nullable private Statistic sourceStatistic;
     private long targetValue;
+    @Nullable private String internalId;
 
     public LanternAchievementBuilder() {
         reset();
@@ -108,6 +109,11 @@ public class LanternAchievementBuilder implements Achievement.Builder {
         return this;
     }
 
+    public LanternAchievementBuilder internalId(String internalId) {
+        this.internalId = checkNotNull(internalId, "internalId");
+        return this;
+    }
+
     public LanternAchievement build() throws IllegalStateException {
         checkNotNull(this.name, "name");
         checkNotNull(this.translation, "translation");
@@ -122,8 +128,9 @@ public class LanternAchievementBuilder implements Achievement.Builder {
             pluginId = this.name.substring(0, index).toLowerCase();
             name = this.name.substring(index + 1);
         }
+        final String internalId = this.internalId == null ? pluginId + ':' + name.toLowerCase(Locale.ENGLISH) : this.internalId;
         return new LanternAchievement(pluginId, name.toLowerCase(Locale.ENGLISH), name,
-                this.translation, this.parent, this.description, this.sourceStatistic, this.targetValue);
+                this.translation, internalId, this.parent, this.description, this.sourceStatistic, this.targetValue);
     }
 
     @Override

@@ -44,6 +44,7 @@ public final class PlayerIO {
 
     private final static Path SPONGE_PLAYER_DATA_FOLDER = Paths.get("data", "sponge");
     private final static Path PLAYER_DATA_FOLDER = Paths.get("playerdata");
+    private final static Path STATISTICS_FOLDER = Paths.get("stats");
 
     public static void load(Path dataFolder, LanternPlayer player) throws IOException {
         final String fileName = player.getUniqueId().toString() + ".dat";
@@ -62,6 +63,11 @@ public final class PlayerIO {
 
             final ObjectStore<LanternPlayer> objectStore = ObjectStoreRegistry.get().get(LanternPlayer.class).get();
             objectStore.deserialize(player, dataContainer);
+        }
+
+        final Path statisticsFile = dataFolder.resolve(STATISTICS_FOLDER).resolve(player.getUniqueId().toString() + ".json");
+        if (Files.exists(statisticsFile)) {
+            player.getStatisticMap().load(statisticsFile);
         }
     }
 
@@ -92,6 +98,9 @@ public final class PlayerIO {
         } else {
             Files.deleteIfExists(dataFile);
         }
+
+        final Path statisticsFile = dataFolder.resolve(STATISTICS_FOLDER).resolve(player.getUniqueId().toString() + ".json");
+        player.getStatisticMap().save(statisticsFile);
     }
 
     private PlayerIO() {

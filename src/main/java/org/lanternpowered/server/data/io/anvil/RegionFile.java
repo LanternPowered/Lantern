@@ -67,9 +67,9 @@
  */
 package org.lanternpowered.server.data.io.anvil;
 
-import it.unimi.dsi.fastutil.booleans.BooleanArrayList;
-import it.unimi.dsi.fastutil.booleans.BooleanList;
 import org.lanternpowered.server.game.Lantern;
+import org.slf4j.Marker;
+import org.slf4j.MarkerFactory;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -81,6 +81,7 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.BitSet;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.GZIPInputStream;
@@ -89,6 +90,8 @@ import java.util.zip.InflaterInputStream;
 import javax.annotation.Nullable;
 
 public class RegionFile {
+
+    private static final Marker REGION_FILE_MARKER = MarkerFactory.getMarker("REGION_FILE");
 
     private static final int VERSION_GZIP = 1;
     private static final int VERSION_DEFLATE = 2;
@@ -101,16 +104,14 @@ public class RegionFile {
 
     private RandomAccessFile file;
     private final int[] offsets;
-    private final int[] chunkTimestamps;
-    private BooleanList sectorFree;
+    private final BitSet freeSectors;
     private final int regionX;
     private final int regionZ;
 
-    public RegionFile(Path path, int regionX, int regionZ) throws IOException {
+    RegionFile(Path path, int regionX, int regionZ) throws IOException {
         this.regionX = regionX;
         this.regionZ = regionZ;
         this.offsets = new int[SECTOR_INTS];
-        this.chunkTimestamps = new int[SECTOR_INTS];
 
         long lastModified = 0;
         if (Files.isRegularFile(path)) {
@@ -125,7 +126,7 @@ public class RegionFile {
         if (this.file.length() < 2 * SECTOR_BYTES) {
             if (lastModified != 0) {
                 // Only give a warning if the region file existed beforehand
-                Lantern.getLogger().warn("Region \"{}\" under 8K: {} increasing by {}",
+                Lantern.getLogger().warn(REGION_FILE_MARKER, "Region \"{}\" under 8K: {} increasing by {}",
                         path, this.file.length(), 2 * SECTOR_BYTES - this.file.length());
             }
 
@@ -136,7 +137,7 @@ public class RegionFile {
 
         // if the file size is not a multiple of 4KB, grow it
         if ((this.file.length() & 0xfff) != 0) {
-            Lantern.getLogger().warn("Region \"{}\" not aligned: {} increasing by {}",
+            Lantern.getLogger().warn(REGION_FILE_MARKER, "Region \"{}\" not aligned: {} increasing by {}",
                     path, this.file.length(), SECTOR_BYTES - (this.file.length() & 0xfff));
 
             for (long i = this.file.length() & 0xfff; i < SECTOR_BYTES; ++i) {
@@ -145,36 +146,35 @@ public class RegionFile {
         }
 
         // set up the available sector map
-        int nSectors = (int) (this.file.length() / SECTOR_BYTES);
-        this.sectorFree = new BooleanArrayList(nSectors);
-        for (int i = 0; i < nSectors; ++i) {
-            this.sectorFree.add(true);
-        }
+        final int nSectors = (int) (this.file.length() / SECTOR_BYTES);
+        this.freeSectors = new BitSet(nSectors);
+        this.freeSectors.set(2, nSectors);
 
-        this.sectorFree.set(0, false); // chunk offset table
-        this.sectorFree.set(1, false); // for the last modified info
+        // Don't set the following sectors
+        // 0 - chunk offset table
+        // 1 - for the last modified
 
         // read offsets from offset table
         this.file.seek(0);
         for (int i = 0; i < SECTOR_INTS; ++i) {
-            int offset = this.file.readInt();
+            final int offset = this.file.readInt();
             this.offsets[i] = offset;
 
-            int startSector = (offset >> 8);
-            int numSectors = (offset & 0xff);
+            final int startSector = (offset >> 8);
+            final int numSectors = (offset & 0xff);
 
-            if (offset != 0 && startSector >= 0 && startSector + numSectors <= this.sectorFree.size()) {
+            if (offset != 0 && startSector >= 0 && startSector + numSectors <= nSectors) {
                 for (int sectorNum = 0; sectorNum < numSectors; ++sectorNum) {
-                    this.sectorFree.set(startSector + sectorNum, false);
+                    this.freeSectors.set(startSector + sectorNum, false);
                 }
             } else if (offset != 0) {
-                Lantern.getLogger().warn("Region \"{}\": offsets[{}] = {} -> {},{} does not fit",
+                Lantern.getLogger().warn(REGION_FILE_MARKER, "Region \"{}\": offsets[{}] = {} -> {},{} does not fit",
                         path, i, offset, startSector, numSectors);
             }
         }
         // read timestamps from timestamp table
         for (int i = 0; i < SECTOR_INTS; ++i) {
-            this.chunkTimestamps[i] = this.file.readInt();
+            this.file.readInt();
         }
     }
 
@@ -187,37 +187,37 @@ public class RegionFile {
      * @return whether the chunk data exists
      */
     public synchronized boolean hasChunk(int x, int z) {
-        this.checkBounds(x, z);
+        checkBounds(x, z);
 
         try {
-            int offset = this.getOffset(x, z);
+            final int offset = getOffset(x, z);
             if (offset == 0) {
                 // Does not exist
                 return false;
             }
 
-            int sectorNumber = offset >> 8;
-            int numSectors = offset & 0xff;
-            if (sectorNumber + numSectors > this.sectorFree.size()) {
-                this.logWarning();
+            final int sectorNumber = offset >> 8;
+            final int numSectors = offset & 0xff;
+            if (sectorNumber + numSectors > this.freeSectors.size()) {
+                logWarning();
                 return false;
             }
 
             this.file.seek(sectorNumber * SECTOR_BYTES);
-            int length = this.file.readInt();
+            final int length = this.file.readInt();
             if (length > SECTOR_BYTES * numSectors) {
-                this.logWarning();
+                logWarning();
                 return false;
             }
 
-            byte version = this.file.readByte();
+            final byte version = this.file.readByte();
             if (version == VERSION_GZIP || version == VERSION_DEFLATE) {
                 return true;
             }
         } catch (IOException ignored) {
         }
 
-        this.logWarning();
+        logWarning();
         return false;
     }
 
@@ -227,42 +227,42 @@ public class RegionFile {
      */
     @Nullable
     public synchronized DataInputStream getChunkDataInputStream(int x, int z) {
-        this.checkBounds(x, z);
+        checkBounds(x, z);
 
         try {
-            int offset = this.getOffset(x, z);
+            final int offset = getOffset(x, z);
             if (offset == 0) {
                 // Does not exist
                 return null;
             }
 
-            int sectorNumber = offset >> 8;
-            int numSectors = offset & 0xff;
-            if (sectorNumber + numSectors > this.sectorFree.size()) {
-                this.logWarning();
+            final int sectorNumber = offset >> 8;
+            final int numSectors = offset & 0xff;
+            if (sectorNumber + numSectors > this.freeSectors.size()) {
+                logWarning();
                 return null;
             }
 
             this.file.seek(sectorNumber * SECTOR_BYTES);
-            int length = this.file.readInt();
+            final int length = this.file.readInt();
             if (length > SECTOR_BYTES * numSectors) {
-                this.logWarning();
+                logWarning();
                 return null;
             }
 
-            byte version = this.file.readByte();
+            final byte version = this.file.readByte();
             if (version == VERSION_GZIP) {
-                byte[] data = new byte[length - 1];
+                final byte[] data = new byte[length - 1];
                 this.file.read(data);
                 return new DataInputStream(new BufferedInputStream(new GZIPInputStream(new ByteArrayInputStream(data))));
             } else if (version == VERSION_DEFLATE) {
-                byte[] data = new byte[length - 1];
+                final byte[] data = new byte[length - 1];
                 this.file.read(data);
                 return new DataInputStream(new BufferedInputStream(new InflaterInputStream(new ByteArrayInputStream(data))));
             }
         } catch (IOException ignored) {
         }
-        this.logWarning();
+        logWarning();
         return null;
     }
 
@@ -270,12 +270,12 @@ public class RegionFile {
         // Use the debug level, there is no need to spam the console with
         // corrupt file errors that cannot be fixed
         // But might be useful for debugging purposes
-        Lantern.getLogger().debug("An error occurred loading the region file ({};{}), is the file corrupt?",
+        Lantern.getLogger().debug(REGION_FILE_MARKER, "An error occurred loading the region file ({};{}), is the file corrupt?",
                 this.regionX, this.regionZ);
     }
 
     public DataOutputStream getChunkDataOutputStream(int x, int z) {
-        this.checkBounds(x, z);
+        checkBounds(x, z);
         return new DataOutputStream(new BufferedOutputStream(new DeflaterOutputStream(
                 new ChunkBuffer(x, z), new Deflater(Deflater.BEST_SPEED))));
     }
@@ -284,12 +284,12 @@ public class RegionFile {
      * lets chunk writing be multithreaded by not locking the whole file as a
      * chunk is serializing -- only writes when serialization is over
      */
-    class ChunkBuffer extends ByteArrayOutputStream {
+    private class ChunkBuffer extends ByteArrayOutputStream {
 
         private final int x;
         private final int z;
 
-        public ChunkBuffer(int x, int z) {
+        ChunkBuffer(int x, int z) {
             super(8096); // initialize to 8KB
             this.x = x;
             this.z = z;
@@ -305,12 +305,12 @@ public class RegionFile {
         }
     }
 
-    /* write a chunk at (x,z) with length bytes of data to disk */
+    // write a chunk at (x,z) with length bytes of data to disk
     protected synchronized void write(int x, int z, byte[] data, int length) throws IOException {
-        int offset = this.getOffset(x, z);
+        final int offset = getOffset(x, z);
         int sectorNumber = offset >> 8;
-        int sectorsAllocated = offset & 0xff;
-        int sectorsNeeded = (length + CHUNK_HEADER_SIZE) / SECTOR_BYTES + 1;
+        final int sectorsAllocated = offset & 0xff;
+        final int sectorsNeeded = (length + CHUNK_HEADER_SIZE) / SECTOR_BYTES + 1;
 
         // maximum chunk size is 1MB
         if (sectorsNeeded >= 256) {
@@ -318,28 +318,28 @@ public class RegionFile {
         }
 
         if (sectorNumber != 0 && sectorsAllocated == sectorsNeeded) {
-            /* we can simply overwrite the old sectors */
-            this.write(sectorNumber, data, length);
+            // we can simply overwrite the old sectors
+            write(sectorNumber, data, length);
         } else {
-            /* we need to allocate new sectors */
+            // we need to allocate new sectors
 
-            /* mark the sectors previously used for this chunk as free */
+            // mark the sectors previously used for this chunk as free
             for (int i = 0; i < sectorsAllocated; ++i) {
-                this.sectorFree.set(sectorNumber + i, true);
+                this.freeSectors.set(sectorNumber + i, true);
             }
 
-            /* scan for a free space large enough to store this chunk */
-            int runStart = this.sectorFree.indexOf(true);
+            // scan for a free space large enough to store this chunk
+            int runStart = this.freeSectors.nextSetBit(0);
             int runLength = 0;
             if (runStart != -1) {
-                for (int i = runStart; i < this.sectorFree.size(); ++i) {
+                for (int i = runStart; i < this.freeSectors.size(); ++i) {
                     if (runLength != 0) {
-                        if (this.sectorFree.getBoolean(i)) {
+                        if (this.freeSectors.get(i)) {
                             runLength++;
                         } else {
                             runLength = 0;
                         }
-                    } else if (this.sectorFree.getBoolean(i)) {
+                    } else if (this.freeSectors.get(i)) {
                         runStart = i;
                         runLength = 1;
                     }
@@ -350,33 +350,31 @@ public class RegionFile {
             }
 
             if (runLength >= sectorsNeeded) {
-                /* we found a free space large enough */
+                // we found a free space large enough
                 sectorNumber = runStart;
-                this.setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
+                setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
                 for (int i = 0; i < sectorsNeeded; ++i) {
-                    this.sectorFree.set(sectorNumber + i, false);
+                    this.freeSectors.set(sectorNumber + i, false);
                 }
-                this.write(sectorNumber, data, length);
+                write(sectorNumber, data, length);
             } else {
-                /*
-                 * no free space large enough found -- we need to grow the
-                 * file
-                 */
+                // no free space large enough found -- we need to grow the file
                 this.file.seek(this.file.length());
-                sectorNumber = this.sectorFree.size();
+                sectorNumber = this.freeSectors.size();
+                int size = this.freeSectors.size();
                 for (int i = 0; i < sectorsNeeded; ++i) {
                     this.file.write(EMPTY_SECTOR);
-                    this.sectorFree.add(false);
+                    this.freeSectors.set(size++, false);
                 }
 
-                this.write(sectorNumber, data, length);
-                this.setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
+                write(sectorNumber, data, length);
+                setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
             }
         }
-        this.setTimestamp(x, z, (int) (System.currentTimeMillis() / 1000L));
+        setTimestamp(x, z, (int) (System.currentTimeMillis() / 1000L));
     }
 
-    /* write a chunk data to the region file at specified sector number */
+    // write a chunk data to the region file at specified sector number
     private void write(int sectorNumber, byte[] data, int length) throws IOException {
         this.file.seek(sectorNumber * SECTOR_BYTES);
         this.file.writeInt(length + 1); // chunk length
@@ -384,7 +382,7 @@ public class RegionFile {
         this.file.write(data, 0, length); // chunk data
     }
 
-    /* is this an invalid chunk coordinate? */
+    // is this an invalid chunk coordinate?
     private void checkBounds(int x, int z) {
         if (x < 0 || x >= 32 || z < 0 || z >= 32) {
             throw new IllegalArgumentException("Chunk out of bounds: (" + x + ", " + z + ")");
@@ -402,7 +400,6 @@ public class RegionFile {
     }
 
     private void setTimestamp(int x, int z, int value) throws IOException {
-        this.chunkTimestamps[x + z * 32] = value;
         this.file.seek(SECTOR_BYTES + (x + z * 32) * 4);
         this.file.writeInt(value);
     }

@@ -38,8 +38,8 @@ public class LanternItemStatistic extends LanternStatistic implements ItemStatis
     private final ItemType itemType;
 
     LanternItemStatistic(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format, ItemType itemType) {
-        super(pluginId, id, name, translation, group, format);
+            StatisticGroup group, @Nullable StatisticFormat format, ItemType itemType, String internalId) {
+        super(pluginId, id, name, translation, group, format, internalId);
         this.itemType = itemType;
     }
 

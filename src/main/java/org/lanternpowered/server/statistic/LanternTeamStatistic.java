@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.statistic;
 
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.statistic.StatisticFormat;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.statistic.TeamStatistic;
@@ -38,13 +39,19 @@ public class LanternTeamStatistic extends LanternStatistic implements TeamStatis
     private final TextColor teamColor;
 
     LanternTeamStatistic(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format, TextColor teamColor) {
-        super(pluginId, id, name, translation, group, format);
+            StatisticGroup group, @Nullable StatisticFormat format, TextColor teamColor, String internalId) {
+        super(pluginId, id, name, translation, group, format, internalId);
         this.teamColor = teamColor;
     }
 
     @Override
     public TextColor getTeamColor() {
         return this.teamColor;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("teamColor", this.teamColor.getId());
     }
 }

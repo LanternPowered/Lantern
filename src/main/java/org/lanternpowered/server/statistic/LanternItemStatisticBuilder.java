@@ -64,8 +64,8 @@ public class LanternItemStatisticBuilder extends AbstractStatisticBuilder<ItemSt
 
     @Override
     ItemStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format) {
+            @Nullable StatisticFormat format, String internalId) {
         checkState(this.itemType != null, "The itemType must be set");
-        return new LanternItemStatistic(pluginId, id, name, translation, group, format, this.itemType);
+        return new LanternItemStatistic(pluginId, id, name, translation, group, format, this.itemType, internalId);
     }
 }

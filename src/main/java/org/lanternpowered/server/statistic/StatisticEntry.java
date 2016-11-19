@@ -25,18 +25,56 @@
  */
 package org.lanternpowered.server.statistic;
 
-import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
-import org.spongepowered.api.text.translation.Translation;
-
 import javax.annotation.Nullable;
 
-public class LanternStatisticBuilder extends AbstractStatisticBuilder<Statistic, Statistic.Builder> implements Statistic.Builder {
+public final class StatisticEntry {
 
-    @Override
-    Statistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
-        return new LanternStatistic(pluginId, id, name, translation, group, format, internalId);
+    private final Object lock = new Object();
+    @Nullable private final LanternStatistic statistic;
+    private long value = 0;
+    private boolean dirty;
+
+    StatisticEntry(LanternStatistic statistic) {
+        this.statistic = statistic;
+    }
+
+    public long get() {
+        synchronized (this.lock) {
+            return this.value;
+        }
+    }
+
+    public void set(long value) {
+        synchronized (this.lock) {
+            if (this.value != value) {
+                this.value = value;
+                this.dirty = true;
+            }
+        }
+    }
+
+    public long add(long value) {
+        synchronized (this.lock) {
+            value = this.value + value;
+            this.value = value;
+            return value;
+        }
+    }
+
+    boolean isDirty(boolean reset) {
+        synchronized (this.lock) {
+            if (this.dirty) {
+                if (reset) {
+                    this.dirty = false;
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+
+    @Nullable
+    public LanternStatistic getStatistic() {
+        return this.statistic;
     }
 }

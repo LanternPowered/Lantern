@@ -26,9 +26,7 @@
 package org.lanternpowered.server.statistic;
 
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.statistic.EntityStatistic;
-import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.StatisticFormat;
 import org.spongepowered.api.statistic.StatisticGroup;
 import org.spongepowered.api.text.translation.Translation;
@@ -40,8 +38,8 @@ public class LanternEntityStatistic extends LanternStatistic implements EntitySt
     private final EntityType entityType;
 
     LanternEntityStatistic(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format, EntityType entityType) {
-        super(pluginId, id, name, translation, group, format);
+            StatisticGroup group, @Nullable StatisticFormat format, EntityType entityType, String internalId) {
+        super(pluginId, id, name, translation, group, format, internalId);
         this.entityType = entityType;
     }
 

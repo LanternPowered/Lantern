@@ -63,8 +63,8 @@ public class LanternBlockStatisticBuilder extends AbstractStatisticBuilder<Block
 
     @Override
     BlockStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format) {
+            @Nullable StatisticFormat format, String internalId) {
         checkState(this.blockType != null, "The blockType must be set");
-        return new LanternBlockStatistic(pluginId, id, name, translation, group, format, this.blockType);
+        return new LanternBlockStatistic(pluginId, id, name, translation, group, format, this.blockType, internalId);
     }
 }

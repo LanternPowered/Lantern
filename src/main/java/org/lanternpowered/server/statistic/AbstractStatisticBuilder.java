@@ -46,6 +46,7 @@ public abstract class AbstractStatisticBuilder<T extends Statistic, B extends St
     private Translation translation;
     private StatisticGroup group;
     @Nullable private StatisticFormat format;
+    @Nullable private String internalId;
 
     public AbstractStatisticBuilder() {
         reset();
@@ -64,6 +65,7 @@ public abstract class AbstractStatisticBuilder<T extends Statistic, B extends St
         this.translation = null;
         this.group = null;
         this.format = null;
+        this.internalId = null;
         return (B) this;
     }
 
@@ -91,6 +93,11 @@ public abstract class AbstractStatisticBuilder<T extends Statistic, B extends St
         return (B) this;
     }
 
+    public B internalId(String internalId) {
+        this.internalId = checkNotNull(internalId, "internalId");
+        return (B) this;
+    }
+
     public T build() throws IllegalStateException {
         checkState(this.name != null, "The name must be set");
         checkState(this.translation != null, "The translation must be set");
@@ -105,12 +112,13 @@ public abstract class AbstractStatisticBuilder<T extends Statistic, B extends St
             pluginId = this.name.substring(0, index).toLowerCase();
             name = this.name.substring(index + 1);
         }
+        final String internalId = this.internalId == null ? pluginId + ':' + name.toLowerCase(Locale.ENGLISH) : this.internalId;
         final StatisticFormat format = this.format == null ? this.group.getDefaultStatisticFormat() : this.format;
-        return build(pluginId, name.toLowerCase(Locale.ENGLISH), name, this.translation, this.group, format);
+        return build(pluginId, name.toLowerCase(Locale.ENGLISH), name, this.translation, this.group, format, internalId);
     }
 
     abstract T build(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format);
+            StatisticGroup group, @Nullable StatisticFormat format, String internalId);
 
     @Override
     public T buildAndRegister() throws IllegalStateException {

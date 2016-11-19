@@ -64,8 +64,8 @@ public class LanternTeamStatisticBuilder extends AbstractStatisticBuilder<TeamSt
 
     @Override
     TeamStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format) {
+            @Nullable StatisticFormat format, String internalId) {
         checkState(this.teamColor != null, "The teamColor must be set");
-        return new LanternTeamStatistic(pluginId, id, name, translation, group, format, this.teamColor);
+        return new LanternTeamStatistic(pluginId, id, name, translation, group, format, this.teamColor, internalId);
     }
 }

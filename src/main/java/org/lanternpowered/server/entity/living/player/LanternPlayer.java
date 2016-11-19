@@ -70,9 +70,11 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics;
 import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
+import org.lanternpowered.server.statistic.StatisticMap;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
@@ -85,6 +87,7 @@ import org.lanternpowered.server.world.rules.RuleTypes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Keys;
@@ -109,6 +112,8 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.statistic.Statistic;
+import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
@@ -146,6 +151,9 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     private final NetworkSession session;
 
     private final LanternTabList tabList = new LanternTabList(this);
+
+    // The statistics of this player
+    private final StatisticMap statisticMap = new StatisticMap();
 
     // The entity id that will be used for the client
     private int networkEntityId = -1;
@@ -278,6 +286,13 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).nonRemovableAttachedValueProcessor();
         registerKey(LanternKeys.IS_ELYTRA_FLYING, false).nonRemovableAttachedValueProcessor();
         registerKey(LanternKeys.SCORE, 0).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
+                .offerHandler((key, valueContainer, map) -> {
+                    this.statisticMap.setStatisticValues(map);
+                    return DataTransactionResult.successNoData();
+                })
+                .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
+                .failAlwaysRemoveHandler());
     }
 
     @Nullable
@@ -355,6 +370,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     }
                 }
                 this.tabList.init(tabListEntries);
+                this.session.send(this.statisticMap.createAchievementsMessage(true));
             } else {
                 //noinspection ConstantConditions
                 if (oldWorld != null && oldWorld != world) {
@@ -516,6 +532,12 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         // Stream the inventory updates
         final LanternContainer container = this.containerSession.getOpenContainer();
         (container == null ? this.inventoryContainer : container).streamSlotChanges();
+
+        // Update achievements
+        final MessagePlayOutStatistics achievementsMessage = this.statisticMap.createAchievementsMessage(false);
+        if (achievementsMessage != null) {
+            this.session.send(achievementsMessage);
+        }
     }
 
     /**
@@ -935,5 +957,23 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             return;
         }
         offer(LanternKeys.IS_ELYTRA_FLYING, true);
+    }
+
+    public StatisticMap getStatisticMap() {
+        return this.statisticMap;
+    }
+
+    public void triggerAchievement(Achievement achievement) {
+        // TODO: You can currently only trigger achievements with a source statistic (vanilla achievements)
+        achievement.getSourceStatistic().ifPresent(statistic -> {
+            final Optional<Achievement> parent = achievement.getParent();
+            if (parent.isPresent()) {
+                final Optional<Statistic> statistic1 = parent.get().getSourceStatistic();
+                if (statistic1.isPresent() && this.statisticMap.get(statistic).get() < parent.get().getStatisticTargetValue().get()) {
+                    return;
+                }
+            }
+            this.statisticMap.get(statistic).set(achievement.getStatisticTargetValue().get());
+        });
     }
 }

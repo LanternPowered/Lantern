@@ -48,13 +48,15 @@ public class LanternAchievement extends PluginCatalogType.Base.Translatable impl
     private final Translation description;
     @Nullable private final Statistic sourceStatistic;
     private final long statisticTargetValue;
+    private final String internalId;
 
-    LanternAchievement(String pluginId, String id, String name, Translation translation,
+    LanternAchievement(String pluginId, String id, String name, Translation translation, String internalId,
             @Nullable Achievement parent, Translation description, @Nullable Statistic sourceStatistic, long statisticTargetValue) {
         super(pluginId, id, name, translation);
         this.sourceStatistic = sourceStatistic;
         this.statisticTargetValue = statisticTargetValue;
         this.description = description;
+        this.internalId = internalId;
         this.parent = parent;
     }
 
@@ -98,5 +100,9 @@ public class LanternAchievement extends PluginCatalogType.Base.Translatable impl
                 .omitNullValues()
                 .add("sourceStatistic", getSourceStatistic().orElse(null))
                 .add("statisticTargetValue", getStatisticTargetValue().orElse(null));
+    }
+
+    public String getInternalId() {
+        return this.internalId;
     }
 }

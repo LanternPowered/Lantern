@@ -25,10 +25,17 @@
  */
 package org.lanternpowered.server.game.registry.type.statistic;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
+import org.lanternpowered.server.statistic.LanternStatistic;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.Statistics;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 @RegistrationDependency(StatisticGroupRegistryModule.class)
 public final class StatisticRegistryModule extends AdditionalPluginCatalogRegistryModule<Statistic> {
@@ -39,11 +46,28 @@ public final class StatisticRegistryModule extends AdditionalPluginCatalogRegist
         return INSTANCE;
     }
 
+    private final Map<String, Statistic> byInternalId = new HashMap<>();
+
     private StatisticRegistryModule() {
         super(Statistics.class);
     }
 
     @Override
+    protected void register(Statistic catalogType) {
+        super.register(catalogType);
+    }
+
+    @Override
+    protected void register(Statistic catalogType, boolean disallowInbuiltPluginIds) {
+        super.register(catalogType, disallowInbuiltPluginIds);
+        this.byInternalId.put(((LanternStatistic) catalogType).getInternalId(), catalogType);
+    }
+
+    @Override
     public void registerDefaults() {
+    }
+
+    public Optional<Statistic> getByInternalId(String internalId) {
+        return Optional.ofNullable(this.byInternalId.get(checkNotNull(internalId, "internalId")));
     }
 }

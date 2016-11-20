@@ -82,7 +82,7 @@ public final class ImmutableDataCachingUtil {
         // We can't really use the generic typing here because it's complicated...
         try {
             // Let's get the key
-            return (T) ImmutableDataCachingUtil.manipulatorCache.get(key, (Callable<ImmutableDataManipulator<?, ?>>) () -> {
+            return (T) ImmutableDataCachingUtil.manipulatorCache.get(key, () -> {
                 try {
                     return createUnsafeInstance(immutableClass, args);
                 } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {

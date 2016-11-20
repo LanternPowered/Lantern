@@ -23,13 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.manipulator.mutable.common;
+package org.lanternpowered.server.data.manipulator.mutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.manipulator.ManipulatorHelper;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.lanternpowered.server.data.value.ElementHolder;
+import org.lanternpowered.server.data.value.ElementHolderKeyRegistration;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.lanternpowered.server.data.value.LanternValueFactory;
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
@@ -44,6 +45,7 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.BoundedValue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -52,13 +54,19 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class AbstractData<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> implements AbstractValueContainer<M>, DataManipulator<M, I> {
+import javax.annotation.Nullable;
+
+public abstract class AbstractData<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> implements AbstractValueContainer<M>,
+        IDataManipulator<M, I> {
 
     private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
     private final Class<M> manipulatorType;
+    private final Class<I> immutableManipulatorType;
 
-    public AbstractData(Class<M> manipulatorType) {
+    public AbstractData(Class<M> manipulatorType, Class<I> immutableManipulatorType) {
+        this.immutableManipulatorType = immutableManipulatorType;
         this.manipulatorType = manipulatorType;
+        registerKeys();
     }
 
     @Override
@@ -69,7 +77,7 @@ public class AbstractData<M extends DataManipulator<M, I>, I extends ImmutableDa
     @SuppressWarnings("unchecked")
     @Override
     public Optional<M> fill(DataHolder dataHolder, MergeFunction overlap) {
-        return Optional.of(checkNotNull(overlap, "overlap").merge(this.copy(), dataHolder.get(this.manipulatorType).orElse(null)));
+        return Optional.of(checkNotNull(overlap, "overlap").merge(copy(), dataHolder.get(this.manipulatorType).orElse(null)));
     }
 
     @Override
@@ -94,15 +102,15 @@ public class AbstractData<M extends DataManipulator<M, I>, I extends ImmutableDa
         checkNotNull(value, "value");
 
         // Check the local key registration
-        KeyRegistration<BaseValue<E>, E> localKeyRegistration = this.getKeyRegistration(key);
+        KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
         if (localKeyRegistration == null) {
-            if (this.requiresKeyRegistration()) {
-                this.throwUnsupportedKeyException(key);
+            if (requiresKeyRegistration()) {
+                throwUnsupportedKeyException(key);
             }
         } else {
             List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
             if (!processors.isEmpty()) {
-                return this.setWith(key, value, processors.get(0));
+                return setWith(key, value, processors.get(0));
             }
         }
 
@@ -111,17 +119,17 @@ public class AbstractData<M extends DataManipulator<M, I>, I extends ImmutableDa
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
-                    return this.setWith(key, value, valueProcessor);
+                    return setWith(key, value, valueProcessor);
                 }
             }
         }
 
         // Use the global processor
         if (localKeyRegistration != null && localKeyRegistration instanceof ElementHolder) {
-            return this.setWith(key, value, ValueProcessor.getDefaultAttachedValueProcessor());
+            return setWith(key, value, ValueProcessor.getDefaultAttachedValueProcessor());
         }
 
-        this.throwUnsupportedKeyException(key);
+        throwUnsupportedKeyException(key);
         return (M) this;
     }
 
@@ -189,6 +197,16 @@ public class AbstractData<M extends DataManipulator<M, I>, I extends ImmutableDa
     @Override
     public M copy() {
         return null;
+    }
+
+    @Override
+    public Class<I> getImmutableType() {
+        return this.immutableManipulatorType;
+    }
+
+    @Override
+    public Class<M> getMutableType() {
+        return this.manipulatorType;
     }
 
     public static abstract class AbstractManipulatorDataBuilder<T extends AbstractData> extends AbstractDataBuilder<T> {

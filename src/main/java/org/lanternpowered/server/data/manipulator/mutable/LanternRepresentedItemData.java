@@ -23,36 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.mutable;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableRepresentedItemData;
+import org.spongepowered.api.data.manipulator.mutable.RepresentedItemData;
+import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+public class LanternRepresentedItemData extends AbstractData<RepresentedItemData, ImmutableRepresentedItemData> implements RepresentedItemData {
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
-
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    public LanternRepresentedItemData() {
+        super(RepresentedItemData.class, ImmutableRepresentedItemData.class);
     }
 
     @Override
     public void registerKeys() {
-        super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
+        registerKey(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE).notRemovable();
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
+    public Value<ItemStackSnapshot> item() {
+        return getValue(Keys.REPRESENTED_ITEM).get();
     }
 }

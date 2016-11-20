@@ -150,7 +150,7 @@ public class RegionFile {
         this.freeSectors = new BitSet(nSectors);
         this.freeSectors.set(2, nSectors);
 
-        // Don't set the following sectors
+        // don't set the following sectors
         // 0 - chunk offset table
         // 1 - for the last modified
 
@@ -172,10 +172,10 @@ public class RegionFile {
                         path, i, offset, startSector, numSectors);
             }
         }
-        // read timestamps from timestamp table
-        for (int i = 0; i < SECTOR_INTS; ++i) {
-            this.file.readInt();
-        }
+        // read timestamps from timestamp table -- the timestamps aren't used, so there is no need to read them
+        // for (int i = 0; i < SECTOR_INTS; ++i) {
+        //     this.file.readInt();
+        // }
     }
 
     /**

@@ -25,9 +25,12 @@
  */
 package org.lanternpowered.server.data.value;
 
+import static org.lanternpowered.server.data.value.processor.ValueProcessor.getNonRemovableDefaultAttachedValueProcessor;
+
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
 import org.spongepowered.api.data.value.BaseValue;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public interface ElementHolderKeyRegistration<V extends BaseValue<E>, E> extends KeyRegistration<V, E>, ElementHolder<E> {
@@ -56,8 +59,8 @@ public interface ElementHolderKeyRegistration<V extends BaseValue<E>, E> extends
      *
      * @return The key registration for chaining
      */
-    default ElementHolderKeyRegistration<V, E> nonRemovableAttachedValueProcessor() {
-        return this.addValueProcessor(ValueProcessor.getNonRemovableDefaultAttachedValueProcessor());
+    default ElementHolderKeyRegistration<V, E> notRemovable() {
+        return addValueProcessor(getNonRemovableDefaultAttachedValueProcessor());
     }
 
 }

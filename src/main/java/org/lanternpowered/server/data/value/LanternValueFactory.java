@@ -291,7 +291,7 @@ public class LanternValueFactory implements ValueFactory {
         private E minimum;
         private E maximum;
         private E defaultValue;
-        private E value;
+        @Nullable private E value;
 
         public LanternBoundedValueBuilder(Key<? extends BoundedValue<E>> key) {
             this.key = checkNotNull(key);
@@ -307,6 +307,7 @@ public class LanternValueFactory implements ValueFactory {
         @Override
         public BoundedValueBuilder<E> minimum(E minimum) {
             this.minimum = checkNotNull(minimum);
+            //noinspection ConstantConditions
             if (this.comparator == null && minimum instanceof Comparable) {
                 this.comparator = (o1, o2) -> ((Comparable<E>) o1).compareTo(o2);
             }
@@ -317,6 +318,7 @@ public class LanternValueFactory implements ValueFactory {
         @Override
         public BoundedValueBuilder<E> maximum(E maximum) {
             this.maximum = checkNotNull(maximum);
+            //noinspection ConstantConditions
             if (this.comparator == null && maximum instanceof Comparable) {
                 this.comparator = (o1, o2) -> ((Comparable<E>) o1).compareTo(o2);
             }

@@ -29,6 +29,7 @@ import org.lanternpowered.server.data.value.processor.ValueProcessor;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.Value;
 
@@ -36,6 +37,13 @@ import javax.annotation.Nullable;
 
 public interface IValueContainer<C extends ValueContainer<C>> extends ValueContainer<C> {
 
+    /**
+     * Gets the {@link ElementHolder} of the specified {@link Key}.
+     *
+     * @param key The key
+     * @param <E> The element type
+     * @return The element holder
+     */
     @Nullable
     <E> ElementHolder<E> getElementHolder(Key<? extends BaseValue<E>> key);
 
@@ -57,6 +65,24 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
      */
     <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key, @Nullable E defaultValue);
 
+    <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key);
+
+    // Bounded value register methods
+
+    <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, E minimum, E maximum);
+
+    <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, Key<? extends BaseValue<E>> minimum, Key<? extends BaseValue<E>> maximum);
+
+    <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, E minimum, Key<? extends BaseValue<E>> maximum);
+
+    <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, Key<? extends BaseValue<E>> minimum, E maximum);
+
+    // Keys that don't use a direct internal element
+
     /**
      * Registers a {@link Key} without a {@link Value} attached to it. This means that there
      * won't be any data attached to the {@link Key}, but it will use a {@link ValueProcessor} to
@@ -69,7 +95,7 @@ public interface IValueContainer<C extends ValueContainer<C>> extends ValueConta
      * @param <V> the value type
      * @param <E> the element type
      */
-    <V extends BaseValue<E>, E> KeyRegistration<V, E> registerKey(Key<? extends V> key);
+    <V extends BaseValue<E>, E> KeyRegistration<V, E> registerProcessorKey(Key<? extends V> key);
 
     /**
      * All the {@link Key}s and {@link ElementHolderChangeListener}s should be registered inside this method.

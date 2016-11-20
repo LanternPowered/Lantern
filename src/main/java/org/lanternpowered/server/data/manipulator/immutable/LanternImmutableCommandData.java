@@ -23,51 +23,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.immutable;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableCommandData;
+import org.spongepowered.api.data.manipulator.mutable.CommandData;
+import org.spongepowered.api.data.value.immutable.ImmutableOptionalValue;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.text.Text;
 
-import java.util.UUID;
+import java.util.Optional;
 
-public class LanternLiving extends LanternEntity implements Living {
+public class LanternImmutableCommandData extends AbstractImmutableData<ImmutableCommandData, CommandData> implements ImmutableCommandData {
 
-    private Vector3d headRotation = Vector3d.ZERO;
-
-    public LanternLiving(UUID uniqueId) {
-        super(uniqueId);
+    public LanternImmutableCommandData() {
+        super(ImmutableCommandData.class, CommandData.class);
     }
 
     @Override
     public void registerKeys() {
-        super.registerKeys();
-        registerKey(Keys.MAX_AIR, 200, 0, Integer.MAX_VALUE);
-        registerKey(Keys.REMAINING_AIR, 200, 0, Keys.MAX_AIR);
-        registerKey(Keys.MAX_HEALTH, 20.0, 0.0, 1024.0);
-        registerKey(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH);
-        registerKey(Keys.POTION_EFFECTS, null);
-    }
-
-    protected void setRawHeadRotation(Vector3d rotation) {
-        this.headRotation = checkNotNull(rotation, "rotation");
+        registerKey(Keys.COMMAND, "").notRemovable();
+        registerKey(Keys.SUCCESS_COUNT, 0).notRemovable();
+        registerKey(Keys.TRACKS_OUTPUT, true).notRemovable();
+        registerKey(Keys.LAST_COMMAND_OUTPUT, Optional.empty()).notRemovable();
     }
 
     @Override
-    public Vector3d getHeadRotation() {
-        return this.headRotation;
+    public ImmutableValue<String> storedCommand() {
+        return getImmutableValue(Keys.COMMAND).get();
     }
 
     @Override
-    public void setHeadRotation(Vector3d rotation) {
-        this.setRawHeadRotation(rotation);
+    public ImmutableValue<Integer> successCount() {
+        return getImmutableValue(Keys.SUCCESS_COUNT).get();
     }
 
     @Override
-    public Text getTeamRepresentation() {
-        return Text.of(this.getUniqueId().toString());
+    public ImmutableValue<Boolean> doesTrackOutput() {
+        return getImmutableValue(Keys.TRACKS_OUTPUT).get();
+    }
+
+    @Override
+    public ImmutableOptionalValue<Text> lastOutput() {
+        return (ImmutableOptionalValue<Text>) getImmutableValue(Keys.LAST_COMMAND_OUTPUT).get();
     }
 }

@@ -40,7 +40,6 @@ import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
 import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.effect.potion.PotionType;
-import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.game.registry.type.block.BlockRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.ArmorTypeRegistryModule;
@@ -713,7 +712,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////
         register(349, builder()
                 .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.FISH_TYPE, Fishes.COD).nonRemovableAttachedValueProcessor())
+                        .registerKey(Keys.FISH_TYPE, Fishes.COD).notRemovable())
                 .translation(TranslationProvider.of(Fishes.COD, Keys.FISH_TYPE))
                 .build("minecraft", "fish"));
         ///////////////////////
@@ -721,7 +720,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(350, builder()
                 .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.COOKED_FISH, CookedFishes.COD).nonRemovableAttachedValueProcessor())
+                        .registerKey(Keys.COOKED_FISH, CookedFishes.COD).notRemovable())
                 .translation(TranslationProvider.of(CookedFishes.COD, Keys.COOKED_FISH))
                 .build("minecraft", "cooked_fish"));
         ///////////////
@@ -729,7 +728,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////
         register(351, builder()
                 .keysProvider(valueContainer -> valueContainer
-                        .registerKey(Keys.DYE_COLOR, DyeColors.WHITE).nonRemovableAttachedValueProcessor())
+                        .registerKey(Keys.DYE_COLOR, DyeColors.WHITE).notRemovable())
                 .translation(coloredTranslation("item.dyePowder.%s.name", DyeColors.WHITE))
                 .build("minecraft", "dye"));
         ////////////////

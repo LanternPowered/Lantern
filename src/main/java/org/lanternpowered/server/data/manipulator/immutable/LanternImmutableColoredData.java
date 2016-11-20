@@ -23,4 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.data.manipulator.immutable.common;
+package org.lanternpowered.server.data.manipulator.immutable;
+
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableColoredData;
+import org.spongepowered.api.data.manipulator.mutable.ColoredData;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.util.Color;
+
+public class LanternImmutableColoredData extends AbstractImmutableData<ImmutableColoredData, ColoredData> implements ImmutableColoredData {
+
+    public LanternImmutableColoredData() {
+        super(ImmutableColoredData.class, ColoredData.class);
+    }
+
+    @Override
+    public void registerKeys() {
+        registerKey(Keys.COLOR, Color.WHITE).notRemovable();
+    }
+
+    @Override
+    public ImmutableValue<Color> color() {
+        return getValue(Keys.COLOR).get().asImmutable();
+    }
+}

@@ -23,4 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-@org.spongepowered.api.util.annotation.NonnullByDefault package org.lanternpowered.server.data.manipulator.mutable.common;
+package org.lanternpowered.server.data.manipulator.immutable;
+
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
+import org.spongepowered.api.data.manipulator.mutable.ListData;
+import org.spongepowered.api.data.value.immutable.ImmutableListValue;
+
+import java.util.List;
+
+public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>>
+        extends AbstractImmutableData<I, M> implements ImmutableListData<E, I, M> {
+
+    private final Key<ImmutableListValue<E>> listKey;
+
+    public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ImmutableListValue<E>> listKey) {
+        super(immutableManipulatorType, manipulatorType);
+        registerKey(listKey).notRemovable();
+        this.listKey = listKey;
+    }
+
+    @Override
+    public ImmutableListValue<E> getListValue() {
+        return getValue(this.listKey).get();
+    }
+
+    @Override
+    public List<E> asList() {
+        return get(this.listKey).get();
+    }
+}

@@ -47,7 +47,7 @@ public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory>
     public void registerKeys() {
         super.registerKeys();
         registerKey(Keys.DISPLAY_NAME, null);
-        registerKey(LanternKeys.INVENTORY).applyValueProcessor(builder -> builder
+        registerProcessorKey(LanternKeys.INVENTORY).applyValueProcessor(builder -> builder
                 .offerHandler(((key, valueContainer, inventorySnapshot) -> {
                     this.inventory.clear();
                     inventorySnapshot.offerTo(this.inventory);

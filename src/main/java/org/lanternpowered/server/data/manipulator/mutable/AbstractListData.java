@@ -23,36 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.mutable;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
+import org.spongepowered.api.data.manipulator.mutable.ListData;
+import org.spongepowered.api.data.value.mutable.ListValue;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
+public abstract class AbstractListData<E, M extends ListData<E, M, I>, I extends ImmutableListData<E, I, M>> extends AbstractData<M, I>
+        implements ListData<E, M, I> {
 
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    private final Key<ListValue<E>> listKey;
+
+    public AbstractListData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<ListValue<E>> listKey, List<E> defaultList) {
+        super(manipulatorType, immutableManipulatorType);
+        registerKey(listKey, defaultList).notRemovable();
+        this.listKey = listKey;
     }
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
+    public ListValue<E> getListValue() {
+        return getValue(this.listKey).get();
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
+    public List<E> asList() {
+        return get(this.listKey).get();
     }
 }

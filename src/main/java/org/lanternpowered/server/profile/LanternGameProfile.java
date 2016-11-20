@@ -50,6 +50,9 @@ import javax.annotation.Nullable;
 @ConfigSerializable
 public final class LanternGameProfile implements GameProfile {
 
+    public static final UUID UNKNOWN_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final LanternGameProfile UNKNOWN = new LanternGameProfile(UNKNOWN_UUID, null);
+
     private static final DataQuery NAME = DataQuery.of("Name");
     private static final DataQuery UNIQUE_ID = DataQuery.of("UniqueId");
     private static final DataQuery PROPERTIES = DataQuery.of("Properties");

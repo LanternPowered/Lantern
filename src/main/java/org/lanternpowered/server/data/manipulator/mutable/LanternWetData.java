@@ -23,36 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.mutable;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableWetData;
+import org.spongepowered.api.data.manipulator.mutable.WetData;
+import org.spongepowered.api.data.value.mutable.Value;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+public class LanternWetData extends AbstractData<WetData, ImmutableWetData> implements WetData {
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
-
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    public LanternWetData() {
+        super(WetData.class, ImmutableWetData.class);
     }
 
     @Override
     public void registerKeys() {
-        super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
+        registerKey(Keys.IS_WET, false).notRemovable();
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
+    public Value<Boolean> wet() {
+        return getValue(Keys.IS_WET).get();
     }
 }

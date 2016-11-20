@@ -70,7 +70,7 @@ public abstract class SimpleKeyRegistration<V extends BaseValue<E>, E> implement
     @SuppressWarnings("unchecked")
     @Override
     public KeyRegistration<V, E> applyValueProcessor(Consumer<ValueProcessor.Builder<V, E>> builderConsumer) {
-        ValueProcessor.Builder<V, E> builder = ValueProcessor.builder();
+        final ValueProcessor.Builder<V, E> builder = ValueProcessor.builder();
         checkNotNull(builderConsumer, "builderConsumer").accept(builder);
         return addValueProcessor(builder.build());
     }

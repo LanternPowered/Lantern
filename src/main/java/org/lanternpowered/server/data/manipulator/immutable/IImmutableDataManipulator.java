@@ -23,36 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.immutable;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
+import org.spongepowered.api.data.manipulator.DataManipulator;
+import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+public interface IImmutableDataManipulator<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
+        extends ImmutableDataManipulator<I, M>, IDataManipulatorBase<M, I> {
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
-
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
-    }
-
-    @Override
-    public void registerKeys() {
-        super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
-    }
 }

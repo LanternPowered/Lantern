@@ -276,17 +276,17 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         super.registerKeys();
         registerKey(Keys.LAST_DATE_PLAYED, null);
         registerKey(Keys.FIRST_DATE_PLAYED, null);
-        registerKey(Keys.IS_FLYING, false).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.IS_SNEAKING, false).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.IS_SPRINTING, false).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.FLYING_SPEED, 0.1).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.CAN_FLY, false).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.GAME_MODE, GameModes.NOT_SET).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).nonRemovableAttachedValueProcessor();
-        registerKey(LanternKeys.IS_ELYTRA_FLYING, false).nonRemovableAttachedValueProcessor();
-        registerKey(LanternKeys.SCORE, 0).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
+        registerKey(Keys.IS_FLYING, false).notRemovable();
+        registerKey(Keys.IS_SNEAKING, false).notRemovable();
+        registerKey(Keys.IS_SPRINTING, false).notRemovable();
+        registerKey(Keys.FLYING_SPEED, 0.1).notRemovable();
+        registerKey(Keys.CAN_FLY, false).notRemovable();
+        registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).notRemovable();
+        registerKey(Keys.GAME_MODE, GameModes.NOT_SET).notRemovable();
+        registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).notRemovable();
+        registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
+        registerKey(LanternKeys.SCORE, 0).notRemovable();
+        registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
                     this.statisticMap.setStatisticValues(map);
                     return DataTransactionResult.successNoData();
@@ -969,7 +969,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             final Optional<Achievement> parent = achievement.getParent();
             if (parent.isPresent()) {
                 final Optional<Statistic> statistic1 = parent.get().getSourceStatistic();
-                if (statistic1.isPresent() && this.statisticMap.get(statistic).get() < parent.get().getStatisticTargetValue().get()) {
+                if (statistic1.isPresent() && this.statisticMap.get(statistic1.get()).get() < parent.get().getStatisticTargetValue().get()) {
                     return;
                 }
             }

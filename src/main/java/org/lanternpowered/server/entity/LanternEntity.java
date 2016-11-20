@@ -164,12 +164,12 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     public void registerKeys() {
         registerKey(Keys.DISPLAY_NAME, null);
         registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
-        registerKey(Keys.VELOCITY, Vector3d.ZERO).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.FIRE_TICKS, 0).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.FALL_DISTANCE, 0f).nonRemovableAttachedValueProcessor();
-        registerKey(Keys.GLOWING, false).nonRemovableAttachedValueProcessor();
-        registerKey(LanternKeys.INVULNERABLE, false).nonRemovableAttachedValueProcessor();
-        registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).nonRemovableAttachedValueProcessor();
+        registerKey(Keys.VELOCITY, Vector3d.ZERO).notRemovable();
+        registerKey(Keys.FIRE_TICKS, 0).notRemovable();
+        registerKey(Keys.FALL_DISTANCE, 0f).notRemovable();
+        registerKey(Keys.GLOWING, false).notRemovable();
+        registerKey(LanternKeys.INVULNERABLE, false).notRemovable();
+        registerKey(LanternKeys.PORTAL_COOLDOWN_TICKS, 0).notRemovable();
     }
 
     /**

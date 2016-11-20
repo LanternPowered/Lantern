@@ -23,36 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.mutable;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableFireworkRocketData;
+import org.spongepowered.api.data.manipulator.mutable.FireworkRocketData;
+import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+public class LanternFireworkRocketData extends AbstractData<FireworkRocketData, ImmutableFireworkRocketData> implements FireworkRocketData {
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
-
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    public LanternFireworkRocketData() {
+        super(FireworkRocketData.class, ImmutableFireworkRocketData.class);
     }
 
     @Override
     public void registerKeys() {
-        super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
+        registerKey(Keys.FIREWORK_FLIGHT_MODIFIER, 0).notRemovable();
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
+    public MutableBoundedValue<Integer> flightModifier() {
+        return getValue(Keys.FIREWORK_FLIGHT_MODIFIER).get();
     }
 }

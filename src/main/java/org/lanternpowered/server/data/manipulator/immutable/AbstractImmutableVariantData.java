@@ -23,36 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.immutable;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
+import org.spongepowered.api.data.manipulator.mutable.VariantData;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.mutable.Value;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.UUID;
+public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariantData<E, I, M>, M extends VariantData<E, M, I>>
+        extends AbstractImmutableData<I, M> implements ImmutableVariantData<E, I, M> {
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
+    private final Key<? extends Value<E>> variantKey;
 
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    public AbstractImmutableVariantData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<? extends Value<E>> variantKey) {
+        super(immutableManipulatorType, manipulatorType);
+        this.variantKey = variantKey;
+        registerKey(variantKey).notRemovable();
     }
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
+    public ImmutableValue<E> type() {
+        return getValue(this.variantKey).get().asImmutable();
     }
 }

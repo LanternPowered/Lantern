@@ -30,11 +30,15 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
+import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.data.value.ValueContainer;
+import org.spongepowered.api.data.value.immutable.ImmutableBoundedValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.HashMap;
@@ -44,6 +48,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
@@ -67,7 +72,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         @Nullable
         @Override
         public synchronized E set(@Nullable E value) {
-            E oldValue = this.value;
+            final E oldValue = this.value;
             this.value = value;
             return oldValue;
         }
@@ -99,9 +104,9 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         @Override
         public ElementHolderKeyRegistration<V, E> applyAttachedValueProcessor(
                 Consumer<ValueProcessor.AttachedElementBuilder<V, E>> attachedElementBuilderConsumer) {
-            ValueProcessor.AttachedElementBuilder<V, E> builder = ValueProcessor.attachedElementBuilder();
+            final ValueProcessor.AttachedElementBuilder<V, E> builder = ValueProcessor.attachedElementBuilder();
             checkNotNull(attachedElementBuilderConsumer, "attachedElementBuilderConsumer").accept(builder);
-            return this.addValueProcessor(builder.build());
+            return addValueProcessor(builder.build());
         }
     }
 
@@ -246,15 +251,15 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         checkNotNull(key, "key");
 
         // Check the local key registration
-        KeyRegistration<BaseValue<E>, E> localKeyRegistration = this.getKeyRegistration(key);
+        KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
         if (localKeyRegistration == null) {
-            if (this.requiresKeyRegistration()) {
+            if (requiresKeyRegistration()) {
                 return Optional.empty();
             }
         } else {
-            List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
+            final List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
             if (!processors.isEmpty()) {
-                return this.getValueWith(key, processors.get(0));
+                return getValueWith(key, processors.get(0));
             }
         }
 
@@ -263,18 +268,18 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
-                    return this.getValueWith(key, valueProcessor);
+                    return getValueWith(key, valueProcessor);
                 }
             }
         }
 
         // Use the global processor
         if (localKeyRegistration != null && localKeyRegistration instanceof ElementHolder) {
-            return this.getValueWith(key, ValueProcessor.getDefaultAttachedValueProcessor());
+            return getValueWith(key, ValueProcessor.getDefaultAttachedValueProcessor());
         }
 
         // Check for the custom data manipulators
-        List<DataManipulator<?, ?>> manipulators = this.getRawAdditionalManipulators();
+        final List<DataManipulator<?, ?>> manipulators = getRawAdditionalManipulators();
         // Custom data is supported by this container
         if (manipulators != null) {
             for (DataManipulator<?, ?> dataManipulator : manipulators) {
@@ -289,9 +294,9 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
 
     @Override
     default Set<Key<?>> getKeys() {
-        ImmutableSet.Builder<Key<?>> keys = ImmutableSet.builder();
-        keys.addAll(this.getRawValueMap().keySet());
-        List<DataManipulator<?, ?>> manipulators = this.getRawAdditionalManipulators();
+        final ImmutableSet.Builder<Key<?>> keys = ImmutableSet.builder();
+        keys.addAll(getRawValueMap().keySet());
+        final List<DataManipulator<?, ?>> manipulators = getRawAdditionalManipulators();
         if (manipulators != null) {
             manipulators.forEach(manipulator -> keys.addAll(manipulator.getKeys()));
         }
@@ -301,15 +306,15 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     @SuppressWarnings("unchecked")
     @Override
     default Set<ImmutableValue<?>> getValues() {
-        ImmutableSet.Builder<ImmutableValue<?>> values = ImmutableSet.builder();
-        for (Map.Entry<Key<?>, KeyRegistration> entry : this.getRawValueMap().entrySet()) {
-            Key key = entry.getKey();
-            Optional<BaseValue> optValue = this.getValue(key);
+        final ImmutableSet.Builder<ImmutableValue<?>> values = ImmutableSet.builder();
+        for (Map.Entry<Key<?>, KeyRegistration> entry : getRawValueMap().entrySet()) {
+            final Key key = entry.getKey();
+            final Optional<BaseValue> optValue = getValue(key);
             if (optValue.isPresent()) {
                 values.add(ValueHelper.toImmutable(optValue.get()));
             }
         }
-        List<DataManipulator<?, ?>> manipulators = this.getRawAdditionalManipulators();
+        final List<DataManipulator<?, ?>> manipulators = getRawAdditionalManipulators();
         // Custom data is supported by this container
         if (manipulators != null) {
             for (DataManipulator<?, ?> dataManipulator : manipulators) {
@@ -322,7 +327,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     @SuppressWarnings("unchecked")
     @Override
     default <E> ElementHolder<E> getElementHolder(Key<? extends BaseValue<E>> key) {
-        Object object = this.getRawValueMap().get(checkNotNull(key, "key"));
+        final Object object = getRawValueMap().get(checkNotNull(key, "key"));
         if (object instanceof ElementHolder) {
             return (ElementHolder<E>) object;
         }
@@ -341,7 +346,130 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     }
 
     @Override
-    default <V extends BaseValue<E>, E> KeyRegistration<V, E> registerKey(Key<? extends V> key) {
+    default <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key) {
+        return registerKey(key, null);
+    }
+
+    default <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKeySupplied(Key<? extends V> key,
+            E defaultValue, Supplier<E> minimumSupplier, Supplier<E> maximumSupplier) {
+        // TODO: Permit absent bounded values
+        final ElementHolderKeyRegistration<V, E> registration = registerKey(key, defaultValue);
+        final boolean immutable = key.getValueToken().getRawType().isAssignableFrom(ImmutableValue.class);
+        registration.applyValueProcessor(builder -> builder.offerHandler((key1, valueContainer, element) -> {
+            final E minimum = minimumSupplier.get();
+            final E maximum = maximumSupplier.get();
+            final ImmutableBoundedValue<E> newValue = LanternValueFactory.boundedBuilder(key)
+                    .actualValue(element)
+                    .defaultValue(defaultValue)
+                    .maximum(maximum)
+                    .minimum(minimum)
+                    .build().asImmutable();
+            if (element.compareTo(maximum) > 0 || element.compareTo(minimum) < 0) {
+                return DataTransactionResult.errorResult(newValue);
+            }
+            final E oldElement = registration.set(element);
+            if (oldElement == null) {
+                return DataTransactionResult.successResult(newValue);
+            }
+            return DataTransactionResult.successReplaceResult(newValue,
+                    LanternValueFactory.boundedBuilder(key)
+                            .actualValue(oldElement)
+                            .defaultValue(defaultValue)
+                            .maximum(maximum)
+                            .minimum(minimum)
+                            .build().asImmutable());
+        }).retrieveHandler((key1, valueContainer) -> {
+            E element = registration.get();
+            if (element == null) {
+                return Optional.empty();
+            } else {
+                final E minimum = minimumSupplier.get();
+                if (element.compareTo(minimum) < 0) {
+                    registration.set(minimum);
+                    element = minimum;
+                } else {
+                    final E maximum = maximumSupplier.get();
+                    if (element.compareTo(minimum) > 0) {
+                        registration.set(maximum);
+                        element = maximum;
+                    }
+                }
+                return Optional.of(element);
+            }
+        }).valueRetrieveHandler((key1, valueContainer) -> {
+            E element = registration.get();
+            if (element == null) {
+                return Optional.empty();
+            } else {
+                final E minimum = minimumSupplier.get();
+                final E maximum = maximumSupplier.get();
+                if (element.compareTo(minimum) < 0) {
+                    registration.set(minimum);
+                    element = minimum;
+                } else if (element.compareTo(minimum) > 0) {
+                    registration.set(maximum);
+                    element = maximum;
+                }
+                final MutableBoundedValue<E> value = LanternValueFactory.boundedBuilder(key)
+                        .actualValue(element)
+                        .defaultValue(defaultValue)
+                        .maximum(maximum)
+                        .minimum(minimum)
+                        .build();
+                //noinspection unchecked
+                return Optional.of((V) (immutable ? value.asImmutable() : value));
+            }
+        }).removeHandler((key1, valueContainer) -> {
+            E element = registration.get();
+            if (element == null) {
+                return DataTransactionResult.failNoData();
+            }
+            final E minimum = minimumSupplier.get();
+            final E maximum = maximumSupplier.get();
+            return DataTransactionResult.failResult(LanternValueFactory.boundedBuilder(key)
+                    .actualValue(element)
+                    .defaultValue(defaultValue)
+                    .maximum(maximum)
+                    .minimum(minimum)
+                    .build().asImmutable());
+        }));
+        return registration;
+    }
+
+    @Override
+    default <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, E minimum, E maximum) {
+        return registerKeySupplied(key, defaultValue,
+                () -> minimum,
+                () -> maximum);
+    }
+
+    @Override
+    default <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, Key<? extends BaseValue<E>> minimum, Key<? extends BaseValue<E>> maximum) {
+        return registerKeySupplied(key, defaultValue,
+                () -> get(minimum).get(),
+                () -> get(maximum).get());
+    }
+
+    @Override
+    default <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, E minimum, Key<? extends BaseValue<E>> maximum) {
+        return registerKeySupplied(key, defaultValue,
+                () -> minimum,
+                () -> get(maximum).get());
+    }
+
+    @Override
+    default <V extends BoundedValue<E>, E extends Comparable<E>> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key,
+            E defaultValue, Key<? extends BaseValue<E>> minimum, E maximum) {
+        return registerKeySupplied(key, defaultValue,
+                () -> get(minimum).get(),
+                () -> maximum);
+    }
+
+    @Override
+    default <V extends BaseValue<E>, E> KeyRegistration<V, E> registerProcessorKey(Key<? extends V> key) {
         checkNotNull(key, "key");
         final Map<Key<?>, KeyRegistration> map = getRawValueMap();
         checkArgument(!map.containsKey(key), "The specified key (%s) is already registered.", key);

@@ -23,36 +23,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.manipulator.mutable;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.lanternpowered.server.data.key.LanternKeys;
-import org.spongepowered.api.entity.living.Humanoid;
-import org.spongepowered.api.entity.projectile.Projectile;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableCommandData;
+import org.spongepowered.api.data.manipulator.mutable.CommandData;
+import org.spongepowered.api.data.value.mutable.OptionalValue;
+import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.text.Text;
 
-import java.util.HashSet;
 import java.util.Optional;
-import java.util.UUID;
 
-public abstract class LanternHumanoid extends LanternLiving implements Humanoid, AbstractArmorEquipable {
+public class LanternCommandData extends AbstractData<CommandData, ImmutableCommandData> implements CommandData {
 
-    public LanternHumanoid(UUID uniqueId) {
-        super(uniqueId);
+    public LanternCommandData() {
+        super(CommandData.class, ImmutableCommandData.class);
     }
 
     @Override
     public void registerKeys() {
-        super.registerKeys();
-        registerKey(LanternKeys.DISPLAYED_SKIN_PARTS, new HashSet<>()).notRemovable();
+        registerKey(Keys.COMMAND, "").notRemovable();
+        registerKey(Keys.SUCCESS_COUNT, 0).notRemovable();
+        registerKey(Keys.TRACKS_OUTPUT, true).notRemovable();
+        registerKey(Keys.LAST_COMMAND_OUTPUT, Optional.empty()).notRemovable();
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass) {
-        return null;
+    public Value<String> storedCommand() {
+        return getValue(Keys.COMMAND).get();
     }
 
     @Override
-    public <T extends Projectile> Optional<T> launchProjectile(Class<T> projectileClass, Vector3d velocity) {
-        return null;
+    public Value<Integer> successCount() {
+        return getValue(Keys.SUCCESS_COUNT).get();
+    }
+
+    @Override
+    public Value<Boolean> doesTrackOutput() {
+        return getValue(Keys.TRACKS_OUTPUT).get();
+    }
+
+    @Override
+    public OptionalValue<Text> lastOutput() {
+        return getValue(Keys.LAST_COMMAND_OUTPUT).get();
     }
 }

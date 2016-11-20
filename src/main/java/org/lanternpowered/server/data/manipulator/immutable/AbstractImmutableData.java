@@ -23,12 +23,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.manipulator.immutable.common;
+package org.lanternpowered.server.data.manipulator.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import org.lanternpowered.server.data.manipulator.ManipulatorHelper;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
+import org.lanternpowered.server.data.value.ElementHolderKeyRegistration;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -38,17 +39,32 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.BoundedValue;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
+import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.Nullable;
+
 public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
-        implements AbstractValueContainer<I>, ImmutableDataManipulator<I, M> {
+        implements AbstractValueContainer<I>, IImmutableDataManipulator<I, M> {
 
     private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
-    private final Map<Key<?>, Optional<BaseValue<?>>> cachedValues = new ConcurrentHashMap<>();
+    private final Map<Key<?>, Optional> cachedValues = new ConcurrentHashMap<>();
+    private final Map<Key<?>, Optional> cachedImmutableValues = new ConcurrentHashMap<>();
+
+    private final Class<M> manipulatorType;
+    private final Class<I> immutableManipulatorType;
+
+    public AbstractImmutableData(Class<I> immutableManipulatorType, Class<M> manipulatorType) {
+        this.immutableManipulatorType = immutableManipulatorType;
+        this.manipulatorType = manipulatorType;
+        registerKeys();
+    }
 
     @Override
     public Map<Key<?>, KeyRegistration> getRawValueMap() {
@@ -61,6 +77,22 @@ public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M e
         // Cache the values if needed, to avoid unneeded object creation
         return (Optional) this.cachedValues.computeIfAbsent(checkNotNull(key, "key"),
                 key1 -> (Optional) AbstractValueContainer.super.getValue((Key) key1));
+    }
+
+    public <E, R extends ImmutableValue<E>> Optional<R> getImmutableValue(Key<? extends BaseValue<E>> key) {
+        //noinspection unchecked
+        return this.cachedImmutableValues.computeIfAbsent(key, key1 -> {
+            //noinspection unchecked
+            final Optional<? extends BaseValue<E>> optValue = AbstractValueContainer.super.getValue((Key) key1);
+            if (optValue.isPresent()) {
+                if (optValue.get() instanceof ImmutableValue) {
+                    return optValue;
+                } else {
+                    return Optional.of(((Value<E>) optValue.get()).asImmutable());
+                }
+            }
+            return Optional.empty();
+        });
     }
 
     @Override
@@ -76,6 +108,20 @@ public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M e
     @Override
     public DataContainer toContainer() {
         return ManipulatorHelper.toContainer(this);
+    }
+
+    @Override public <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key) {
+        return null;
+    }
+
+    @Override
+    public Class<I> getImmutableType() {
+        return this.immutableManipulatorType;
+    }
+
+    @Override
+    public Class<M> getMutableType() {
+        return this.manipulatorType;
     }
 
     public static abstract class AbstractImmutableManipulatorDataBuilder<T extends AbstractImmutableData> extends AbstractDataBuilder<T> {

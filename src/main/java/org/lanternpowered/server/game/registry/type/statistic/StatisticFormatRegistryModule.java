@@ -27,7 +27,6 @@ package org.lanternpowered.server.game.registry.type.statistic;
 
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.lanternpowered.server.statistic.LanternStatisticFormat;
-import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.statistic.StatisticFormat;
 import org.spongepowered.api.statistic.StatisticFormats;
 

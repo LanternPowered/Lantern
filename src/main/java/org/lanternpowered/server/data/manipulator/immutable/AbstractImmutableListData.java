@@ -25,27 +25,35 @@
  */
 package org.lanternpowered.server.data.manipulator.immutable;
 
+import org.lanternpowered.server.data.manipulator.mutable.IListData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
 import org.spongepowered.api.data.value.immutable.ImmutableListValue;
+import org.spongepowered.api.data.value.mutable.ListValue;
 
 import java.util.List;
 
 public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>>
         extends AbstractImmutableData<I, M> implements ImmutableListData<E, I, M> {
 
-    private final Key<ImmutableListValue<E>> listKey;
+    private final Key<? extends ListValue<E>> listKey;
 
-    public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ImmutableListValue<E>> listKey) {
+    public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey) {
         super(immutableManipulatorType, manipulatorType);
         registerKey(listKey).notRemovable();
         this.listKey = listKey;
     }
 
+    public AbstractImmutableListData(M manipulator) {
+        super(manipulator);
+        //noinspection unchecked
+        this.listKey = ((IListData<E, M, I>) manipulator).getListKey();
+    }
+
     @Override
     public ImmutableListValue<E> getListValue() {
-        return getValue(this.listKey).get();
+        return (ImmutableListValue<E>) getImmutableValue(this.listKey).get();
     }
 
     @Override

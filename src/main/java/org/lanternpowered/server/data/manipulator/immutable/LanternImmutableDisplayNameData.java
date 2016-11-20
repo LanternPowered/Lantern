@@ -25,33 +25,30 @@
  */
 package org.lanternpowered.server.data.manipulator.immutable;
 
-import org.lanternpowered.server.data.manipulator.mutable.IVariantData;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
-import org.spongepowered.api.data.manipulator.mutable.VariantData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableDisplayNameData;
+import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.text.Text;
 
-public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariantData<E, I, M>, M extends VariantData<E, M, I>>
-        extends AbstractImmutableData<I, M> implements ImmutableVariantData<E, I, M> {
+public class LanternImmutableDisplayNameData extends AbstractImmutableData<ImmutableDisplayNameData, DisplayNameData>
+        implements ImmutableDisplayNameData {
 
-    private final Key<? extends Value<E>> variantKey;
-
-    public AbstractImmutableVariantData(Class<I> immutableManipulatorType, Class<M> manipulatorType,
-            Key<? extends Value<E>> variantKey, E defaultValue) {
-        super(immutableManipulatorType, manipulatorType);
-        this.variantKey = variantKey;
-        registerKey(variantKey, defaultValue).notRemovable();
+    public LanternImmutableDisplayNameData() {
+        super(ImmutableDisplayNameData.class, DisplayNameData.class);
     }
 
-    public AbstractImmutableVariantData(M manipulator) {
+    public LanternImmutableDisplayNameData(DisplayNameData manipulator) {
         super(manipulator);
-        //noinspection unchecked
-        this.variantKey = ((IVariantData<E, M, I>) manipulator).getVariantKey();
     }
 
     @Override
-    public ImmutableValue<E> type() {
-        return getValue(this.variantKey).get().asImmutable();
+    public void registerKeys() {
+        registerKey(Keys.DISPLAY_NAME, Text.EMPTY).notRemovable();
+    }
+
+    @Override
+    public ImmutableValue<Text> displayName() {
+        return getImmutableValue(Keys.DISPLAY_NAME).get();
     }
 }

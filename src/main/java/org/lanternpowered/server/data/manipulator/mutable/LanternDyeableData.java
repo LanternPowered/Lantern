@@ -36,4 +36,12 @@ public class LanternDyeableData extends AbstractVariantData<DyeColor, DyeableDat
     public LanternDyeableData() {
         super(DyeableData.class, ImmutableDyeableData.class, Keys.DYE_COLOR, DyeColors.WHITE);
     }
+
+    public LanternDyeableData(ImmutableDyeableData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternDyeableData(DyeableData manipulator) {
+        super(manipulator);
+    }
 }

@@ -37,6 +37,14 @@ public class LanternDisplayNameData extends AbstractData<DisplayNameData, Immuta
         super(DisplayNameData.class, ImmutableDisplayNameData.class);
     }
 
+    public LanternDisplayNameData(ImmutableDisplayNameData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternDisplayNameData(DisplayNameData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.DISPLAY_NAME, Text.EMPTY).notRemovable();

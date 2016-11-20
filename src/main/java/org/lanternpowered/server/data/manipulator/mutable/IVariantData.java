@@ -23,35 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.manipulator.immutable;
+package org.lanternpowered.server.data.manipulator.mutable;
 
-import org.lanternpowered.server.data.manipulator.mutable.IVariantData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
 import org.spongepowered.api.data.manipulator.mutable.VariantData;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
-public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariantData<E, I, M>, M extends VariantData<E, M, I>>
-        extends AbstractImmutableData<I, M> implements ImmutableVariantData<E, I, M> {
+public interface IVariantData<E, T extends VariantData<E, T, I>, I extends ImmutableVariantData<E, I, T>> extends VariantData<E, T, I> {
 
-    private final Key<? extends Value<E>> variantKey;
-
-    public AbstractImmutableVariantData(Class<I> immutableManipulatorType, Class<M> manipulatorType,
-            Key<? extends Value<E>> variantKey, E defaultValue) {
-        super(immutableManipulatorType, manipulatorType);
-        this.variantKey = variantKey;
-        registerKey(variantKey, defaultValue).notRemovable();
-    }
-
-    public AbstractImmutableVariantData(M manipulator) {
-        super(manipulator);
-        //noinspection unchecked
-        this.variantKey = ((IVariantData<E, M, I>) manipulator).getVariantKey();
-    }
-
-    @Override
-    public ImmutableValue<E> type() {
-        return getValue(this.variantKey).get().asImmutable();
-    }
+    Key<? extends Value<E>> getVariantKey();
 }

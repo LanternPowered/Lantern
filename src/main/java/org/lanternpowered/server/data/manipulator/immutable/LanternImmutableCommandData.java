@@ -40,6 +40,10 @@ public class LanternImmutableCommandData extends AbstractImmutableData<Immutable
         super(ImmutableCommandData.class, CommandData.class);
     }
 
+    public LanternImmutableCommandData(CommandData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.COMMAND, "").notRemovable();

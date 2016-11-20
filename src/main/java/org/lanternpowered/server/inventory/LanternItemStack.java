@@ -88,7 +88,7 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     @Override
     public void registerKeys() {
-        ((LanternItemType) itemType).getKeysProvider().accept(this);
+        ((LanternItemType) this.itemType).getKeysProvider().accept(this);
         registerKey(Keys.DISPLAY_NAME, null);
         registerKey(Keys.ITEM_LORE, Collections.emptyList());
         registerKey(Keys.BREAKABLE_BLOCK_TYPES, new HashSet<>());

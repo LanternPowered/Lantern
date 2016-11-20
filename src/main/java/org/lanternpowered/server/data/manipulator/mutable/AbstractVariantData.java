@@ -25,24 +25,52 @@
  */
 package org.lanternpowered.server.data.manipulator.mutable;
 
+import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
+import org.lanternpowered.server.data.manipulator.immutable.IImmutableVariantData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
 import org.spongepowered.api.data.manipulator.mutable.VariantData;
 import org.spongepowered.api.data.value.mutable.Value;
 
-public abstract class AbstractVariantData<E, T extends VariantData<E, T, I>, I extends ImmutableVariantData<E, I, T>>
-        extends AbstractData<T, I> implements VariantData<E, T, I> {
+public class AbstractVariantData<E, M extends VariantData<E, M, I>, I extends ImmutableVariantData<E, I, M>>
+        extends AbstractData<M, I> implements IVariantData<E, M, I> {
 
     private final Key<? extends Value<E>> variantKey;
 
-    public AbstractVariantData(Class<T> manipulatorType, Class<I> immutableManipulatorType, Key<? extends Value<E>> variantKey, E defaultVariant) {
+    public AbstractVariantData(Class<M> manipulatorType, Class<I> immutableManipulatorType, Key<? extends Value<E>> variantKey, E defaultVariant) {
         super(manipulatorType, immutableManipulatorType);
         registerKey(variantKey, defaultVariant).notRemovable();
         this.variantKey = variantKey;
     }
 
+    public AbstractVariantData(I manipulator) {
+        //noinspection unchecked
+        this((IDataManipulatorBase<M, I>) manipulator);
+    }
+
+    public AbstractVariantData(M manipulator) {
+        //noinspection unchecked
+        this((IDataManipulatorBase<M, I>) manipulator);
+    }
+
+    protected AbstractVariantData(IDataManipulatorBase<M, I> manipulator) {
+        super(manipulator);
+        if (manipulator instanceof IVariantData) {
+            //noinspection unchecked
+            this.variantKey = ((IVariantData<E, M, I>) manipulator).getVariantKey();
+        } else {
+            //noinspection unchecked
+            this.variantKey = ((IImmutableVariantData<E, I, M>) manipulator).getVariantKey();
+        }
+    }
+
     @Override
     public Value<E> type() {
         return getValue(this.variantKey).get();
+    }
+
+    @Override
+    public Key<? extends Value<E>> getVariantKey() {
+        return this.variantKey;
     }
 }

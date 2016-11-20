@@ -37,6 +37,14 @@ public class LanternColoredData extends AbstractData<ColoredData, ImmutableColor
         super(ColoredData.class, ImmutableColoredData.class);
     }
 
+    public LanternColoredData(ImmutableColoredData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternColoredData(ColoredData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.COLOR, Color.WHITE).notRemovable();

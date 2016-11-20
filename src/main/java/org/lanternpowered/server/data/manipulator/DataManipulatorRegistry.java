@@ -31,34 +31,55 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipulator;
 import org.lanternpowered.server.data.manipulator.immutable.LanternImmutableColoredData;
 import org.lanternpowered.server.data.manipulator.immutable.LanternImmutableCommandData;
+import org.lanternpowered.server.data.manipulator.immutable.LanternImmutableDisplayNameData;
+import org.lanternpowered.server.data.manipulator.immutable.LanternImmutableDyeableData;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.manipulator.mutable.LanternColoredData;
 import org.lanternpowered.server.data.manipulator.mutable.LanternCommandData;
+import org.lanternpowered.server.data.manipulator.mutable.LanternDisplayNameData;
+import org.lanternpowered.server.data.manipulator.mutable.LanternDyeableData;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableColoredData;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableCommandData;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableDisplayNameData;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableDyeableData;
 import org.spongepowered.api.data.manipulator.mutable.ColoredData;
 import org.spongepowered.api.data.manipulator.mutable.CommandData;
+import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
+import org.spongepowered.api.data.manipulator.mutable.DyeableData;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DataManipulatorRegistry {
 
+    private static final DataManipulatorRegistry INSTANCE = new DataManipulatorRegistry();
+
+    public static DataManipulatorRegistry get() {
+        return INSTANCE;
+    }
+
     {
-        register(ColoredData.class, LanternColoredData::new, ImmutableColoredData.class, LanternImmutableColoredData::new);
-        register(CommandData.class, LanternCommandData::new, ImmutableCommandData.class, LanternImmutableCommandData::new);
+        register(ColoredData.class, LanternColoredData::new, LanternColoredData::new, LanternColoredData::new,
+                ImmutableColoredData.class, LanternImmutableColoredData::new, LanternImmutableColoredData::new);
+        register(CommandData.class, LanternCommandData::new, LanternCommandData::new, LanternCommandData::new,
+                ImmutableCommandData.class, LanternImmutableCommandData::new, LanternImmutableCommandData::new);
+        register(DisplayNameData.class, LanternDisplayNameData::new, LanternDisplayNameData::new, LanternDisplayNameData::new,
+                ImmutableDisplayNameData.class, LanternImmutableDisplayNameData::new, LanternImmutableDisplayNameData::new);
+        register(DyeableData.class, LanternDyeableData::new, LanternDyeableData::new, LanternDyeableData::new,
+                ImmutableDyeableData.class, LanternImmutableDyeableData::new, LanternImmutableDyeableData::new);
     }
 
     private final Map<Class, DataManipulatorRegistration> registrationByClass = new HashMap<>();
 
     public <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> DataManipulatorRegistration<M, I> register(
-            Class<M> manipulatorType, Supplier<M> manipulatorSupplier,
-            Class<I> immutableManipulatorType, Supplier<I> immutableManipulatorSupplier) {
+            Class<M> manipulatorType, Supplier<M> manipulatorSupplier, Function<M, M> manipulatorCopyFunction, Function<I, M> immutableToMutableFunction,
+            Class<I> immutableManipulatorType, Supplier<I> immutableManipulatorSupplier, Function<M, I> mutableToImmutableFunction) {
         checkNotNull(manipulatorType, "manipulatorType");
         checkNotNull(manipulatorSupplier, "manipulatorSupplier");
         checkNotNull(immutableManipulatorType, "immutableManipulatorType");
@@ -77,10 +98,11 @@ public class DataManipulatorRegistry {
         //noinspection unchecked
         final Class<I> immutableManipulatorType1 = ((IImmutableDataManipulator<I, M>) immutableManipulator).getImmutableType();
         checkArgument(immutableManipulatorType1 == immutableManipulatorType,
-                "The mutable data manipulator returns a different manipulator type, expected %s, but got %s",
+                "The immutable data manipulator returns a different manipulator type, expected %s, but got %s",
                 immutableManipulatorType, immutableManipulatorType1);
         final DataManipulatorRegistration<M, I> registration = new DataManipulatorRegistration<>(
-                manipulatorType, manipulatorSupplier, immutableManipulatorType, immutableManipulatorSupplier);
+                manipulatorType, manipulatorSupplier, manipulatorCopyFunction, immutableToMutableFunction,
+                immutableManipulatorType, immutableManipulatorSupplier, mutableToImmutableFunction);
         this.registrationByClass.put(manipulatorType, registration);
         this.registrationByClass.put(immutableManipulatorType, registration);
         return registration;

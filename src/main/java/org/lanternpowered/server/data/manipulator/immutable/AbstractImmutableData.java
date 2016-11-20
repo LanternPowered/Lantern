@@ -27,9 +27,11 @@ package org.lanternpowered.server.data.manipulator.immutable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.manipulator.ManipulatorHelper;
+import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.lanternpowered.server.data.value.ElementHolderKeyRegistration;
 import org.lanternpowered.server.data.value.KeyRegistration;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
@@ -39,7 +41,6 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
@@ -48,12 +49,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Nullable;
-
 public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
         implements AbstractValueContainer<I>, IImmutableDataManipulator<I, M> {
 
-    private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
+    private final Map<Key<?>, KeyRegistration> rawValueMap;
     private final Map<Key<?>, Optional> cachedValues = new ConcurrentHashMap<>();
     private final Map<Key<?>, Optional> cachedImmutableValues = new ConcurrentHashMap<>();
 
@@ -63,7 +62,22 @@ public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M e
     public AbstractImmutableData(Class<I> immutableManipulatorType, Class<M> manipulatorType) {
         this.immutableManipulatorType = immutableManipulatorType;
         this.manipulatorType = manipulatorType;
+        this.rawValueMap = new HashMap<>();
         registerKeys();
+    }
+
+    public AbstractImmutableData(M manipulator) {
+        //noinspection unchecked
+        final IDataManipulator<M, I> iDataManipulator = (IDataManipulator<M, I>) manipulator;
+        this.immutableManipulatorType = iDataManipulator.getImmutableType();
+        this.manipulatorType = iDataManipulator.getMutableType();
+        if (manipulator instanceof AbstractValueContainer) {
+            //noinspection unchecked
+            this.rawValueMap = ((AbstractValueContainer) manipulator).copyRawValueMap();
+        } else {
+            throw new IllegalArgumentException(
+                    "The default DataManipulator's should extend AbstractValueContainer, others are currently unsupported.");
+        }
     }
 
     @Override
@@ -97,7 +111,9 @@ public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M e
 
     @Override
     public M asMutable() {
-        return null;
+        final DataManipulatorRegistration<M, I> registration = DataManipulatorRegistry.get().getByImmutable(this.immutableManipulatorType).get();
+        //noinspection unchecked
+        return registration.getImmutableToMutableFunction().apply((I) this);
     }
 
     @Override
@@ -108,10 +124,6 @@ public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M e
     @Override
     public DataContainer toContainer() {
         return ManipulatorHelper.toContainer(this);
-    }
-
-    @Override public <V extends BaseValue<E>, E> ElementHolderKeyRegistration<V, E> registerKey(Key<? extends V> key) {
-        return null;
     }
 
     @Override

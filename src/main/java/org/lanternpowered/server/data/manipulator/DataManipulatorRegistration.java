@@ -29,21 +29,29 @@ import com.google.common.base.MoreObjects;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public final class DataManipulatorRegistration<M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> {
 
     private final Class<M> manipulatorType;
     private final Supplier<M> manipulatorSupplier;
+    private final Function<M, M> manipulatorCopyFunction;
+    private final Function<I, M> immutableToMutableFunction;
     private final Class<I> immutableManipulatorType;
     private final Supplier<I> immutableManipulatorSupplier;
+    private final Function<M, I> mutableToImmutableFunction;
 
-    DataManipulatorRegistration(Class<M> manipulatorType, Supplier<M> manipulatorSupplier, Class<I> immutableManipulatorType,
-            Supplier<I> immutableManipulatorSupplier) {
+    DataManipulatorRegistration(
+            Class<M> manipulatorType, Supplier<M> manipulatorSupplier, Function<M, M> manipulatorCopyFunction, Function<I, M> immutableToMutableFunction,
+            Class<I> immutableManipulatorType, Supplier<I> immutableManipulatorSupplier, Function<M, I> mutableToImmutableFunction) {
         this.manipulatorType = manipulatorType;
         this.manipulatorSupplier = manipulatorSupplier;
+        this.manipulatorCopyFunction = manipulatorCopyFunction;
+        this.immutableToMutableFunction = immutableToMutableFunction;
         this.immutableManipulatorType = immutableManipulatorType;
         this.immutableManipulatorSupplier = immutableManipulatorSupplier;
+        this.mutableToImmutableFunction = mutableToImmutableFunction;
     }
 
     public Class<M> getManipulatorType() {
@@ -60,6 +68,18 @@ public final class DataManipulatorRegistration<M extends DataManipulator<M, I>, 
 
     public Supplier<I> getImmutableManipulatorSupplier() {
         return this.immutableManipulatorSupplier;
+    }
+
+    public Function<M, M> getManipulatorCopyFunction() {
+        return this.manipulatorCopyFunction;
+    }
+
+    public Function<I, M> getImmutableToMutableFunction() {
+        return this.immutableToMutableFunction;
+    }
+
+    public Function<M, I> getMutableToImmutableFunction() {
+        return this.mutableToImmutableFunction;
     }
 
     @Override

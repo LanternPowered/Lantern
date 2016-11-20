@@ -25,33 +25,20 @@
  */
 package org.lanternpowered.server.data.manipulator.immutable;
 
-import org.lanternpowered.server.data.manipulator.mutable.IVariantData;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.immutable.ImmutableVariantData;
-import org.spongepowered.api.data.manipulator.mutable.VariantData;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.ImmutableDyeableData;
+import org.spongepowered.api.data.manipulator.mutable.DyeableData;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.DyeColors;
 
-public abstract class AbstractImmutableVariantData<E, I extends ImmutableVariantData<E, I, M>, M extends VariantData<E, M, I>>
-        extends AbstractImmutableData<I, M> implements ImmutableVariantData<E, I, M> {
+public class LanternImmutableDyeableData extends AbstractImmutableVariantData<DyeColor, ImmutableDyeableData, DyeableData>
+        implements ImmutableDyeableData {
 
-    private final Key<? extends Value<E>> variantKey;
-
-    public AbstractImmutableVariantData(Class<I> immutableManipulatorType, Class<M> manipulatorType,
-            Key<? extends Value<E>> variantKey, E defaultValue) {
-        super(immutableManipulatorType, manipulatorType);
-        this.variantKey = variantKey;
-        registerKey(variantKey, defaultValue).notRemovable();
+    public LanternImmutableDyeableData() {
+        super(ImmutableDyeableData.class, DyeableData.class, Keys.DYE_COLOR, DyeColors.WHITE);
     }
 
-    public AbstractImmutableVariantData(M manipulator) {
+    public LanternImmutableDyeableData(DyeableData manipulator) {
         super(manipulator);
-        //noinspection unchecked
-        this.variantKey = ((IVariantData<E, M, I>) manipulator).getVariantKey();
-    }
-
-    @Override
-    public ImmutableValue<E> type() {
-        return getValue(this.variantKey).get().asImmutable();
     }
 }

@@ -28,6 +28,8 @@ package org.lanternpowered.server.data.io.store.data;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.io.store.ObjectStore;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipulator;
+import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.persistence.DataTypeSerializer;
 import org.lanternpowered.server.data.persistence.DataTypeSerializerContext;
 import org.lanternpowered.server.data.value.AbstractValueContainer;
@@ -42,6 +44,7 @@ import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,7 +58,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
     @Override
     public void deserialize(T object, DataView dataView) {
         if (object instanceof AbstractValueContainer) {
-            final AbstractValueContainer<S> valueContainer = (AbstractValueContainer) object;
+            final AbstractValueContainer<S, H> valueContainer = (AbstractValueContainer) object;
             final SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
 
             deserializeValues(object, simpleValueContainer, dataView);
@@ -95,9 +98,9 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 }
             }
 
-            final List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
+            final Map<Class<?>, H> additionalManipulators = valueContainer.getRawAdditionalContainers();
             if (additionalManipulators != null) {
-                deserializeAdditionalData(object, additionalManipulators, dataView);
+                deserializeAdditionalData(object, new ArrayList<>(additionalManipulators.values()), dataView);
             }
         } else {
             // Not sure what to do
@@ -108,7 +111,7 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
     @Override
     public void serialize(T object, DataView dataView) {
         if (object instanceof AbstractValueContainer) {
-            final AbstractValueContainer<S> valueContainer = (AbstractValueContainer) object;
+            final AbstractValueContainer<S, H> valueContainer = (AbstractValueContainer) object;
             final SimpleValueContainer simpleValueContainer = new SimpleValueContainer(new HashMap<>());
 
             for (Map.Entry<Key<?>, KeyRegistration> entry : valueContainer.getRawValueMap().entrySet()) {
@@ -145,9 +148,19 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                 }
             }
 
-            final List<DataManipulator<?,?>> additionalManipulators = valueContainer.getRawAdditionalManipulators();
-            if (additionalManipulators != null) {
-                serializeAdditionalData(object, additionalManipulators, dataView);
+            final Map<Class<?>, H> additionalContainers = valueContainer.getRawAdditionalContainers();
+            if (additionalContainers != null) {
+                final List<H> dataManipulators = new ArrayList<>();
+                serializeAdditionalData(object, dataManipulators, dataView);
+                for (H additionalContainer : dataManipulators) {
+                    if (additionalContainer instanceof IDataManipulator) {
+                        additionalContainers.put(((IDataManipulator) additionalContainer).getMutableType(), additionalContainer);
+                    } else if (additionalContainer instanceof IImmutableDataManipulator) {
+                        additionalContainers.put(((IImmutableDataManipulator) additionalContainer).getImmutableType(), additionalContainer);
+                    } else {
+                        additionalContainers.put(additionalContainer.getClass(), additionalContainer);
+                    }
+                }
             }
         } else {
             // Not sure what to do
@@ -161,17 +174,17 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
      * @param manipulators The data manipulators
      * @param dataView The data view
      */
-    public void serializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
+    public void serializeAdditionalData(T object, List<H> manipulators, DataView dataView) {
     }
 
     /**
-     * Deserializes all the {@link DataManipulator}s from the {@link DataView}
+     * Deserializes all the {@link ValueContainer<H>}s from the {@link DataView}
      * and puts them into the {@link List}.
      *
-     * @param manipulators The data manipulators
+     * @param valueContainers The value containers
      * @param dataView The data view
      */
-    public void deserializeAdditionalData(T object, List<DataManipulator<?, ?>> manipulators, DataView dataView) {
+    public void deserializeAdditionalData(T object, List<H> valueContainers, DataView dataView) {
     }
 
     /**

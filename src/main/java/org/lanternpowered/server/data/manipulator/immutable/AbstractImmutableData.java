@@ -50,7 +50,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AbstractImmutableData<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
-        implements AbstractValueContainer<I>, IImmutableDataManipulator<I, M> {
+        implements AbstractValueContainer<I, M>, IImmutableDataManipulator<I, M> {
 
     private final Map<Key<?>, KeyRegistration> rawValueMap;
     private final Map<Key<?>, Optional> cachedValues = new ConcurrentHashMap<>();

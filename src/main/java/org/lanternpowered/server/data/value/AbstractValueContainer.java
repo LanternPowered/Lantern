@@ -32,7 +32,6 @@ import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.data.value.processor.ValueProcessor;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.BoundedValue;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -48,11 +47,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import javax.annotation.Nullable;
 
-public interface AbstractValueContainer<C extends ValueContainer<C>> extends IValueContainer<C> {
+public interface AbstractValueContainer<C extends ValueContainer<C>, H extends ValueContainer<?>> extends IValueContainer<C> {
 
     /**
      * Some {@link ValueProcessor}'s may want to depend on the fact that
@@ -121,13 +121,13 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     }
 
     /**
-     * Gets the raw list with all the custom data manipulators,
+     * Gets the raw list with all the custom value containers,
      * this may be null if custom data isn't supported.
      *
-     * @return the raw data manipulators
+     * @return The raw value containers
      */
     @Nullable
-    default List<DataManipulator<?, ?>> getRawAdditionalManipulators() {
+    default Map<Class<?>, H> getRawAdditionalContainers() {
         return null;
     }
 
@@ -150,9 +150,9 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         checkNotNull(key, "key");
 
         // Check the local key registration
-        KeyRegistration<?, ?> localKeyRegistration = getKeyRegistration((Key) key);
+        final KeyRegistration<?, ?> localKeyRegistration = getKeyRegistration((Key) key);
         if (localKeyRegistration == null) {
-            if (this.requiresKeyRegistration()) {
+            if (requiresKeyRegistration()) {
                 return false;
             }
         } else if (!localKeyRegistration.getValueProcessors().isEmpty()) {
@@ -160,7 +160,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         }
 
         // Check the global key registrations
-        KeyRegistration<?, ?> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration((Key) key);
+        final KeyRegistration<?, ?> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration((Key) key);
         if (keyRegistration != null) {
             for (ValueProcessor<?,?> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
@@ -174,12 +174,12 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
             return true;
         }
 
-        // Check for the custom data manipulators
-        List<DataManipulator<?, ?>> manipulators = this.getRawAdditionalManipulators();
+        // Check for the custom value containers
+        final Map<Class<?>, H> valueContainers = getRawAdditionalContainers();
         // Custom data is supported by this container
-        if (manipulators != null) {
-            for (DataManipulator<?, ?> dataManipulator : manipulators) {
-                if (dataManipulator.supports(key)) {
+        if (valueContainers != null) {
+            for (H valueContainer : valueContainers.values()) {
+                if (valueContainer.supports(key)) {
                     return true;
                 }
             }
@@ -199,40 +199,40 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         checkNotNull(key, "key");
 
         // Check the local key registration
-        KeyRegistration<BaseValue<E>, E> localKeyRegistration = this.getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
         if (localKeyRegistration == null) {
-            if (this.requiresKeyRegistration()) {
+            if (requiresKeyRegistration()) {
                 return Optional.empty();
             }
         } else {
-            List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
+            final List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
             if (!processors.isEmpty()) {
-                return this.getWith(key, processors.get(0));
+                return getWith(key, processors.get(0));
             }
         }
 
         // Check the global key registrations
-        KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
-                    return this.getWith(key, valueProcessor);
+                    return getWith(key, valueProcessor);
                 }
             }
         }
 
         // Use the global processor
         if (localKeyRegistration != null && localKeyRegistration instanceof ElementHolder) {
-            return this.getWith(key, ValueProcessor.getDefaultAttachedValueProcessor());
+            return getWith(key, ValueProcessor.getDefaultAttachedValueProcessor());
         }
 
-        // Check for the custom data manipulators
-        List<DataManipulator<?, ?>> manipulators = this.getRawAdditionalManipulators();
+        // Check for the custom value containers
+        final Map<Class<?>, H> valueContainers = getRawAdditionalContainers();
         // Custom data is supported by this container
-        if (manipulators != null) {
-            for (DataManipulator<?, ?> dataManipulator : manipulators) {
-                if (dataManipulator.supports(key)) {
-                    return dataManipulator.get(key);
+        if (valueContainers != null) {
+            for (H valueContainer : valueContainers.values()) {
+                if (valueContainer.supports(key)) {
+                    return valueContainer.get(key);
                 }
             }
         }
@@ -251,7 +251,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         checkNotNull(key, "key");
 
         // Check the local key registration
-        KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
         if (localKeyRegistration == null) {
             if (requiresKeyRegistration()) {
                 return Optional.empty();
@@ -264,7 +264,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         }
 
         // Check the global key registrations
-        KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
@@ -279,12 +279,12 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
         }
 
         // Check for the custom data manipulators
-        final List<DataManipulator<?, ?>> manipulators = getRawAdditionalManipulators();
+        final Map<Class<?>, H> valueContainers = getRawAdditionalContainers();
         // Custom data is supported by this container
-        if (manipulators != null) {
-            for (DataManipulator<?, ?> dataManipulator : manipulators) {
-                if (dataManipulator.supports(key)) {
-                    return dataManipulator.getValue(key);
+        if (valueContainers != null) {
+            for (H valueContainer : valueContainers.values()) {
+                if (valueContainer.supports(key)) {
+                    return valueContainer.getValue(key);
                 }
             }
         }
@@ -296,9 +296,9 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
     default Set<Key<?>> getKeys() {
         final ImmutableSet.Builder<Key<?>> keys = ImmutableSet.builder();
         keys.addAll(getRawValueMap().keySet());
-        final List<DataManipulator<?, ?>> manipulators = getRawAdditionalManipulators();
+        final Map<Class<?>, ? extends H> manipulators = getRawAdditionalContainers();
         if (manipulators != null) {
-            manipulators.forEach(manipulator -> keys.addAll(manipulator.getKeys()));
+            manipulators.values().forEach(manipulator -> keys.addAll(manipulator.getKeys()));
         }
         return keys.build();
     }
@@ -314,11 +314,11 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
                 values.add(ValueHelper.toImmutable(optValue.get()));
             }
         }
-        final List<DataManipulator<?, ?>> manipulators = getRawAdditionalManipulators();
+        final Map<Class<?>, H> valueContainers = getRawAdditionalContainers();
         // Custom data is supported by this container
-        if (manipulators != null) {
-            for (DataManipulator<?, ?> dataManipulator : manipulators) {
-                values.addAll(dataManipulator.getValues());
+        if (valueContainers != null) {
+            for (H valueContainer : valueContainers.values()) {
+                values.addAll(valueContainer.getValues());
             }
         }
         return values.build();
@@ -480,7 +480,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
 
     default Map<Key<?>, KeyRegistration> copyRawValueMap() {
         final Map<Key<?>, KeyRegistration> copy = new HashMap<>();
-        final Map<Key<?>, KeyRegistration> map = this.getRawValueMap();
+        final Map<Key<?>, KeyRegistration> map = getRawValueMap();
         for (Map.Entry<Key<?>, KeyRegistration> entry : map.entrySet()) {
             final KeyRegistration registration = entry.getValue();
             KeyRegistration registrationCopy;
@@ -493,6 +493,47 @@ public interface AbstractValueContainer<C extends ValueContainer<C>> extends IVa
                 registrationCopy = ((SimpleKeyRegistration.SingleProcessor) registration).copy();
             }
             copy.put(entry.getKey(), registrationCopy);
+        }
+        return copy;
+    }
+
+    @Nullable
+    default Map<Class<?>, H> copyRawAdditionalManipulators() {
+        return copyRawAdditionalManipulators(HashMap::new);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    default Map<Class<?>, H> copyRawAdditionalManipulators(Supplier<Map<Class<?>, ? extends H>> supplier) {
+        final Map<Class<?>, H> map = getRawAdditionalContainers();
+        if (map == null) {
+            return null;
+        }
+        final Map copy = supplier.get();
+        for (Map.Entry<Class<?>, H> entry : map.entrySet()) {
+            copy.put(entry.getKey(), entry.getValue().copy());
+        }
+        return copy;
+    }
+
+    @Nullable
+    default <R extends ValueContainer<?>> Map<Class<?>, R> copyConvertedRawAdditionalManipulators(Function<H, R> converter) {
+        // No method reference here, thanks intellij...
+        //noinspection Convert2MethodRef
+        return copyConvertedRawAdditionalManipulators(converter, () -> new HashMap<>());
+    }
+
+    @SuppressWarnings("unchecked")
+    @Nullable
+    default <R extends ValueContainer<?>> Map<Class<?>, R> copyConvertedRawAdditionalManipulators(Function<H, R> converter,
+            Supplier<Map<Class<?>, R>> supplier) {
+        final Map<Class<?>, H> map = getRawAdditionalContainers();
+        if (map == null) {
+            return null;
+        }
+        final Map copy = supplier.get();
+        for (Map.Entry<Class<?>, H> entry : map.entrySet()) {
+            copy.put(entry.getKey(), ((Function) converter).apply(entry.getValue()));
         }
         return copy;
     }

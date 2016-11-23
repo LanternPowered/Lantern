@@ -29,7 +29,7 @@ import org.lanternpowered.server.data.value.AbstractValueContainer;
 import org.spongepowered.api.data.value.ValueContainer;
 import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S>,
+public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
         ImmutableValueStore<S, H> {
 
 }

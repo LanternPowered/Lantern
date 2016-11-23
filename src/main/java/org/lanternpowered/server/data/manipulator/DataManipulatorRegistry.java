@@ -38,6 +38,7 @@ import org.lanternpowered.server.data.manipulator.mutable.LanternColoredData;
 import org.lanternpowered.server.data.manipulator.mutable.LanternCommandData;
 import org.lanternpowered.server.data.manipulator.mutable.LanternDisplayNameData;
 import org.lanternpowered.server.data.manipulator.mutable.LanternDyeableData;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableColoredData;
@@ -51,8 +52,10 @@ import org.spongepowered.api.data.manipulator.mutable.DyeableData;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -100,9 +103,10 @@ public class DataManipulatorRegistry {
         checkArgument(immutableManipulatorType1 == immutableManipulatorType,
                 "The immutable data manipulator returns a different manipulator type, expected %s, but got %s",
                 immutableManipulatorType, immutableManipulatorType1);
+        final Set<Key<?>> requiredKeys = new HashSet<>(manipulator.getKeys());
         final DataManipulatorRegistration<M, I> registration = new DataManipulatorRegistration<>(
                 manipulatorType, manipulatorSupplier, manipulatorCopyFunction, immutableToMutableFunction,
-                immutableManipulatorType, immutableManipulatorSupplier, mutableToImmutableFunction);
+                immutableManipulatorType, immutableManipulatorSupplier, mutableToImmutableFunction, requiredKeys);
         this.registrationByClass.put(manipulatorType, registration);
         this.registrationByClass.put(immutableManipulatorType, registration);
         return registration;

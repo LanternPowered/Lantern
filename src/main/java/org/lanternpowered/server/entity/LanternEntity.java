@@ -51,6 +51,7 @@ import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityArchetype;
@@ -77,6 +78,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
@@ -96,6 +98,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     // The raw value map
     private final Map<Key<?>, KeyRegistration> rawValueMap = new HashMap<>();
+    private final Map<Class<?>, DataManipulator<?, ?>> rawAdditionalManipulators = new ConcurrentHashMap<>();
 
     // The world this entity is located in, may be null
     private LanternWorld world;
@@ -288,6 +291,11 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
     @Override
     public Map<Key<?>, KeyRegistration> getRawValueMap() {
         return this.rawValueMap;
+    }
+
+    @Override
+    public Map<Class<?>, DataManipulator<?, ?>> getRawAdditionalContainers() {
+        return this.rawAdditionalManipulators;
     }
 
     @Override

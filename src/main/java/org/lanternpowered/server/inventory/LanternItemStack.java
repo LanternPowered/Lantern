@@ -40,6 +40,7 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
@@ -51,12 +52,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Nullable;
 
 public class LanternItemStack implements ItemStack, AbstractPropertyHolder, AbstractDataHolder {
 
     private final Map<Key<?>, KeyRegistration> rawValueMap;
+    private final Map<Class<?>, DataManipulator<?, ?>> rawAdditionalManipulators;
     private final ItemType itemType;
 
     private int quantity;
@@ -74,13 +77,15 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     }
 
     public LanternItemStack(ItemType itemType, int quantity) {
-        this(itemType, quantity, new HashMap<>());
+        this(itemType, quantity, new HashMap<>(), new ConcurrentHashMap<>());
         registerKeys();
     }
 
-    LanternItemStack(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap) {
+    LanternItemStack(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap,
+            Map<Class<?>, DataManipulator<?, ?>> rawAdditionalManipulators) {
         checkArgument(quantity >= 0, "quantity may not be negative");
         checkNotNull(itemType, "itemType");
+        this.rawAdditionalManipulators = rawAdditionalManipulators;
         this.rawValueMap = rawValueMap;
         this.quantity = quantity;
         this.itemType = itemType;
@@ -119,6 +124,11 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
     }
 
     @Override
+    public Map<Class<?>, DataManipulator<?, ?>> getRawAdditionalContainers() {
+        return this.rawAdditionalManipulators;
+    }
+
+    @Override
     public Map<Key<?>, KeyRegistration> getRawValueMap() {
         return this.rawValueMap;
     }
@@ -151,7 +161,9 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     @Override
     public ItemStackSnapshot createSnapshot() {
-        return new LanternItemStackSnapshot(this.itemType, this.quantity, copyRawValueMap());
+        //noinspection ConstantConditions
+        return new LanternItemStackSnapshot(this.itemType, this.quantity, copyRawValueMap(),
+                copyConvertedRawAdditionalManipulators(DataManipulator::asImmutable));
     }
 
     @Override
@@ -161,7 +173,8 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
 
     @Override
     public LanternItemStack copy() {
-        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap());
+        //noinspection ConstantConditions
+        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap(), copyRawAdditionalManipulators(ConcurrentHashMap::new));
     }
 
     /**

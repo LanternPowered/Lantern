@@ -26,9 +26,11 @@
 package org.lanternpowered.server.data.manipulator;
 
 import com.google.common.base.MoreObjects;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -41,10 +43,13 @@ public final class DataManipulatorRegistration<M extends DataManipulator<M, I>, 
     private final Class<I> immutableManipulatorType;
     private final Supplier<I> immutableManipulatorSupplier;
     private final Function<M, I> mutableToImmutableFunction;
+    private final Set<Key<?>> requiredKeys;
 
     DataManipulatorRegistration(
-            Class<M> manipulatorType, Supplier<M> manipulatorSupplier, Function<M, M> manipulatorCopyFunction, Function<I, M> immutableToMutableFunction,
-            Class<I> immutableManipulatorType, Supplier<I> immutableManipulatorSupplier, Function<M, I> mutableToImmutableFunction) {
+            Class<M> manipulatorType, Supplier<M> manipulatorSupplier, Function<M, M> manipulatorCopyFunction,
+            Function<I, M> immutableToMutableFunction,
+            Class<I> immutableManipulatorType, Supplier<I> immutableManipulatorSupplier, Function<M, I> mutableToImmutableFunction,
+            Set<Key<?>> requiredKeys) {
         this.manipulatorType = manipulatorType;
         this.manipulatorSupplier = manipulatorSupplier;
         this.manipulatorCopyFunction = manipulatorCopyFunction;
@@ -52,6 +57,7 @@ public final class DataManipulatorRegistration<M extends DataManipulator<M, I>, 
         this.immutableManipulatorType = immutableManipulatorType;
         this.immutableManipulatorSupplier = immutableManipulatorSupplier;
         this.mutableToImmutableFunction = mutableToImmutableFunction;
+        this.requiredKeys = requiredKeys;
     }
 
     public Class<M> getManipulatorType() {
@@ -80,6 +86,10 @@ public final class DataManipulatorRegistration<M extends DataManipulator<M, I>, 
 
     public Function<M, I> getMutableToImmutableFunction() {
         return this.mutableToImmutableFunction;
+    }
+
+    public Set<Key<?>> getRequiredKeys() {
+        return this.requiredKeys;
     }
 
     @Override

@@ -36,6 +36,7 @@ import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
@@ -48,21 +49,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmutableDataHolder<ItemStackSnapshot>, AbstractPropertyHolder {
 
     private final Map<Key<?>, KeyRegistration> rawValueMap;
+    private final Map<Class<?>, ImmutableDataManipulator<?, ?>> rawAdditionalManipulators;
     private final ItemType itemType;
     // TODO: Hmm, inconsistency the the name with itemstack?
     private final int quantity;
 
     public LanternItemStackSnapshot(ItemType itemType, int quantity) {
-        this(itemType, quantity, new HashMap<>());
+        this(itemType, quantity, new HashMap<>(), new HashMap<>());
         ((LanternItemType) itemType).getKeysProvider().accept(this);
     }
 
-    LanternItemStackSnapshot(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap) {
+    LanternItemStackSnapshot(ItemType itemType, int quantity, Map<Key<?>, KeyRegistration> rawValueMap,
+            Map<Class<?>, ImmutableDataManipulator<?, ?>> rawAdditionalManipulators) {
+        this.rawAdditionalManipulators = rawAdditionalManipulators;
         this.rawValueMap = rawValueMap;
         this.itemType = itemType;
         this.quantity = quantity;
@@ -80,7 +85,9 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
 
     @Override
     public ItemStack createStack() {
-        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap());
+        //noinspection ConstantConditions,Convert2MethodRef
+        return new LanternItemStack(this.itemType, this.quantity, copyRawValueMap(),
+                copyConvertedRawAdditionalManipulators(ImmutableDataManipulator::asMutable, () -> new ConcurrentHashMap<>()));
     }
 
     @Override

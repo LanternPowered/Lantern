@@ -30,20 +30,26 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternItemStackSnapshot;
 import org.lanternpowered.server.network.entity.EntityProtocolTypes;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.statistic.achievement.Achievements;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 
@@ -175,10 +181,28 @@ public class LanternItem extends LanternEntity implements Item {
                 itemStack = itemStack1;
             } else {
                 added = itemStack.getQuantity();
-                itemStack = null;
             }
             if (added != 0 && entity instanceof Living) {
+                // Trigger achievements
+                if (entity instanceof Player) {
+                    final LanternPlayer player = (LanternPlayer) entity;
+                    final ItemType itemType = itemStack.getItem();
+                    if (itemType == BlockTypes.LOG.getItem().get() ||
+                            itemType == BlockTypes.LOG2.getItem().get()) {
+                        player.triggerAchievement(Achievements.MINE_WOOD);
+                    } else if (itemType == ItemTypes.LEATHER) {
+                        player.triggerAchievement(Achievements.KILL_COW);
+                    } else if (itemType == ItemTypes.DIAMOND) {
+                        player.triggerAchievement(Achievements.GET_DIAMONDS);
+                    } else if (itemType == ItemTypes.BLAZE_ROD) {
+                        player.triggerAchievement(Achievements.GET_BLAZE_ROD);
+                    }
+                }
+
                 triggerEvent(new CollectEntityEvent((Living) entity, added));
+            }
+            if (rejected.isEmpty()) {
+                itemStack = null;
             }
             if (itemStack == null) {
                 break;

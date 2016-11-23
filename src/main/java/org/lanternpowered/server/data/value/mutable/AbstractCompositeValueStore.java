@@ -45,10 +45,11 @@ import org.spongepowered.api.data.value.mutable.CompositeValueStore;
 import org.spongepowered.api.event.cause.Cause;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>, H extends ValueContainer<?>>
-        extends AbstractValueContainer<S>, CompositeValueStore<S, H> {
+        extends AbstractValueContainer<S, H>, CompositeValueStore<S, H> {
 
     @SuppressWarnings("unchecked")
     default <E> DataTransactionResult offerWith(Key<? extends BaseValue<E>> key, E element, ValueProcessor<BaseValue<E>, E> processor) {
@@ -57,7 +58,7 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
 
     @Override
     default <E> DataTransactionResult offer(Key<? extends BaseValue<E>> key, E value, Cause cause) {
-        return this.offer(key, value);
+        return offer(key, value);
     }
 
     @SuppressWarnings("unchecked")
@@ -67,20 +68,20 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         checkNotNull(element, "element");
 
         // Check the local key registration
-        KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
         if (localKeyRegistration == null) {
             if (requiresKeyRegistration()) {
                 return DataTransactionResult.failNoData();
             }
         } else {
-            List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
+            final List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
             if (!processors.isEmpty()) {
                 return offerWith(key, element, processors.get(0));
             }
         }
 
         // Check the global key registrations
-        KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
@@ -95,15 +96,22 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         }
 
         // Check for the custom data manipulators
-        List<DataManipulator<?, ?>> manipulators = this.getRawAdditionalManipulators();
+        final Map<Class<?>, H> valueContainers = getRawAdditionalContainers();
         // Custom data is supported by this container
-        if (manipulators != null) {
-            for (DataManipulator<?, ?> dataManipulator : manipulators) {
-                if (dataManipulator.supports(key)) {
-                    ImmutableValue oldImmutableValue = ValueHelper.toImmutable((BaseValue) dataManipulator.getValue((Key) key).get());
-                    dataManipulator.set(key, element);
-                    ImmutableValue immutableValue = ValueHelper.toImmutable((BaseValue) dataManipulator.getValue((Key) key).get());
-                    return DataTransactionResult.successReplaceResult(immutableValue, oldImmutableValue);
+        if (valueContainers != null) {
+            for (H valueContainer : valueContainers.values()) {
+                if (valueContainer.supports(key)) {
+                    if (valueContainer instanceof CompositeValueStore) {
+                        return ((CompositeValueStore) valueContainer).offer(key, element);
+                    } else if (valueContainer instanceof DataManipulator) {
+                        final ImmutableValue oldImmutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                        ((DataManipulator) valueContainer).set(key, element);
+                        final ImmutableValue immutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                        return DataTransactionResult.successReplaceResult(immutableValue, oldImmutableValue);
+                    } else {
+                        final ImmutableValue immutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                        return DataTransactionResult.failResult(immutableValue);
+                    }
                 }
             }
         }
@@ -120,47 +128,53 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
     @Override
     default <E> DataTransactionResult offer(BaseValue<E> value) {
         checkNotNull(value, "value");
-        Key<? extends BaseValue<E>> key = value.getKey();
-        E element = value.get();
+        final Key<? extends BaseValue<E>> key = value.getKey();
+        final E element = value.get();
 
         // Check the local key registration
-        KeyRegistration<BaseValue<E>, E> localKeyRegistration = this.getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> localKeyRegistration = getKeyRegistration(key);
         if (localKeyRegistration == null) {
-            if (this.requiresKeyRegistration()) {
+            if (requiresKeyRegistration()) {
                 return DataTransactionResult.failNoData();
             }
         } else {
-            List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
+            final List<ValueProcessor<BaseValue<E>, E>> processors = localKeyRegistration.getValueProcessors();
             if (!processors.isEmpty()) {
-                return this.offerWith(value, processors.get(0));
+                return offerWith(value, processors.get(0));
             }
         }
 
         // Check the global key registrations
-        KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
+        final KeyRegistration<BaseValue<E>, E> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration(key);
         if (keyRegistration != null) {
             for (ValueProcessor<BaseValue<E>, E> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
-                    return this.offerWith(value, valueProcessor);
+                    return offerWith(value, valueProcessor);
                 }
             }
         }
 
         // Use the global processor
         if (localKeyRegistration != null && localKeyRegistration instanceof ElementHolder) {
-            return this.offerWith(value, ValueProcessor.getDefaultAttachedValueProcessor());
+            return offerWith(value, ValueProcessor.getDefaultAttachedValueProcessor());
         }
 
         // Check for the custom data manipulators
-        List<DataManipulator<?, ?>> manipulators = this.getRawAdditionalManipulators();
+        final Map<Class<?>, H> valueContainers = getRawAdditionalContainers();
         // Custom data is supported by this container
-        if (manipulators != null) {
-            for (DataManipulator<?, ?> dataManipulator : manipulators) {
-                if (dataManipulator.supports(key)) {
-                    ImmutableValue oldImmutableValue = ValueHelper.toImmutable((BaseValue) dataManipulator.getValue((Key) key).get());
-                    dataManipulator.set(key, element);
-                    ImmutableValue immutableValue = ValueHelper.toImmutable(value);
-                    return DataTransactionResult.successReplaceResult(immutableValue, oldImmutableValue);
+        if (valueContainers != null) {
+            for (H valueContainer : valueContainers.values()) {
+                if (valueContainer.supports(key)) {
+                    final ImmutableValue oldImmutableValue = ValueHelper.toImmutable((BaseValue) valueContainer.getValue((Key) key).get());
+                    if (valueContainer instanceof CompositeValueStore) {
+                        return ((CompositeValueStore) valueContainer).offer(key, element);
+                    } else if (valueContainer instanceof DataManipulator) {
+                        ((DataManipulator) valueContainer).set(key, element);
+                        final ImmutableValue immutableValue = ValueHelper.toImmutable(value);
+                        return DataTransactionResult.successReplaceResult(immutableValue, oldImmutableValue);
+                    } else {
+                        return DataTransactionResult.failResult(ValueHelper.toImmutable(value));
+                    }
                 }
             }
         }
@@ -185,31 +199,31 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         checkNotNull(key, "key");
 
         // Check the local key registration
-        KeyRegistration<?, ?> localKeyRegistration = this.getKeyRegistration((Key) key);
+        final KeyRegistration<?, ?> localKeyRegistration = getKeyRegistration((Key) key);
         if (localKeyRegistration == null) {
-            if (this.requiresKeyRegistration()) {
+            if (requiresKeyRegistration()) {
                 return DataTransactionResult.failNoData();
             }
         } else {
-            List<? extends ValueProcessor<? extends BaseValue<?>, ?>> processors = localKeyRegistration.getValueProcessors();
+            final List<? extends ValueProcessor<? extends BaseValue<?>, ?>> processors = localKeyRegistration.getValueProcessors();
             if (!processors.isEmpty()) {
-                return this.removeWith(key, processors.get(0));
+                return removeWith(key, processors.get(0));
             }
         }
 
         // Check the global key registrations
-        KeyRegistration<?, ?> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration((Key) key);
+        final KeyRegistration<?, ?> keyRegistration = LanternValueFactory.getInstance().getKeyRegistration((Key) key);
         if (keyRegistration != null) {
             for (ValueProcessor<?, ?> valueProcessor : keyRegistration.getValueProcessors()) {
                 if (valueProcessor.getApplicableTester().test((Key) key, this)) {
-                    return this.removeWith(key, valueProcessor);
+                    return removeWith(key, valueProcessor);
                 }
             }
         }
 
         // Use the global processor
         if (localKeyRegistration != null && localKeyRegistration instanceof ElementHolder) {
-            return this.removeWith(key, ValueProcessor.getDefaultAttachedValueProcessor());
+            return removeWith(key, ValueProcessor.getDefaultAttachedValueProcessor());
         }
 
         // Custom data container doesn't support their data to be removed
@@ -222,12 +236,12 @@ public interface AbstractCompositeValueStore<S extends CompositeValueStore<S, H>
         if (result.getReplacedData().isEmpty() && result.getSuccessfulData().isEmpty()) {
             return DataTransactionResult.successNoData();
         }
-        DataTransactionResult.Builder builder = DataTransactionResult.builder();
+        final DataTransactionResult.Builder builder = DataTransactionResult.builder();
         for (ImmutableValue<?> replaced : result.getReplacedData()) {
-            builder.absorbResult(this.offer(replaced));
+            builder.absorbResult(offer(replaced));
         }
         for (ImmutableValue<?> successful : result.getSuccessfulData()) {
-            builder.absorbResult(this.remove(successful));
+            builder.absorbResult(remove(successful));
         }
         return builder.build();
     }

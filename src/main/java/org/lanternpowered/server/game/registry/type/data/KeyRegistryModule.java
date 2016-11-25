@@ -39,7 +39,7 @@ import static org.spongepowered.api.data.DataQuery.of;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.key.Key;
@@ -114,7 +114,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public final class KeyRegistryModule extends PluginCatalogRegistryModule<Key> {
+public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModule<Key> {
 
     public static KeyRegistryModule get() {
         return Holder.INSTANCE;

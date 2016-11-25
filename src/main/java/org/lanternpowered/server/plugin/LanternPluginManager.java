@@ -70,9 +70,16 @@ public final class LanternPluginManager implements PluginManager {
         this.plugins.put(plugin.getId(), plugin);
     }
 
+    private void registerPluginInstance(PluginContainer plugin) {
+        checkNotNull(plugin, "plugin");
+        this.pluginInstances.put(plugin.getInstance().orElseThrow(
+                () -> new IllegalStateException("Plugin instance missing.")), plugin);
+
+    }
+
     public void registerPluginInstances() {
         for (Map.Entry<String, PluginContainer> entry : this.plugins.entrySet()) {
-            entry.getValue().getInstance().ifPresent(obj -> this.pluginInstances.put(obj, entry.getValue()));
+            entry.getValue().getInstance().ifPresent(instance -> registerPluginInstance(entry.getValue()));
         }
     }
 
@@ -99,7 +106,7 @@ public final class LanternPluginManager implements PluginManager {
             Files.createDirectories(this.pluginsFolder);
         }
 
-        Map<String, PluginCandidate> plugins = pluginScanner.getPlugins();
+        final Map<String, PluginCandidate> plugins = pluginScanner.getPlugins();
         this.game.getLogger().info("{} plugin(s) found", plugins.size());
 
         try {
@@ -180,7 +187,8 @@ public final class LanternPluginManager implements PluginManager {
             final Class<?> pluginClass = Class.forName(candidate.getPluginClass());
             final PluginContainer container = new LanternPluginContainer(id, pluginClass, metadata.getName(), metadata.getVersion(),
                     metadata.getDescription(), metadata.getUrl(), metadata.getAuthors(), candidate.getSource());
-            this.registerPlugin(container);
+            registerPlugin(container);
+            registerPluginInstance(container);
             this.game.getEventManager().registerListeners(container, container.getInstance().get());
 
             this.game.getLogger().info("Loaded plugin: {} {} (from {})", name, version, candidate.getDisplaySource());

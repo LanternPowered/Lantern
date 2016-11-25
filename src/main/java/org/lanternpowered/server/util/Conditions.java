@@ -54,6 +54,7 @@ public final class Conditions {
      * @throws IllegalArgumentException - If reference is invalid
      */
     public static PluginContainer checkPlugin(Object object, @Nullable Object message) {
+        //noinspection ConstantConditions
         checkState(Lantern.getGame() != null, NOT_AVAILABLE);
         checkNotNull(object, message);
 
@@ -61,7 +62,7 @@ public final class Conditions {
             return (PluginContainer) object;
         }
 
-        Optional<PluginContainer> container = Sponge.getPluginManager().fromInstance(object);
+        final Optional<PluginContainer> container = Sponge.getPluginManager().fromInstance(object);
         checkArgument(container.isPresent(), (message != null ? message + ": " : "") + "invalid plugin (%s)", object);
         return container.get();
     }

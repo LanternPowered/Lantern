@@ -67,6 +67,9 @@ import javax.annotation.Nullable;
 
 final class PluginScanner {
 
+    private static final String ID_WARNING = "Plugin IDs should be lowercase, and only contain characters from "
+            + "a-z, dashes or underscores, start with a lowercase letter, and not exceed 64 characters.";
+
     private static final String CLASS_EXTENSION = ".class";
     private static final String JAR_EXTENSION = ".jar";
 
@@ -137,7 +140,7 @@ final class PluginScanner {
         }
     }
 
-    void visitClasspathFile(Path path) {
+    private void visitClasspathFile(Path path) {
         if (CLASS_FILE.matches(path)) {
             try (InputStream in = Files.newInputStream(path)) {
                 PluginCandidate candidate = scanClassFile(in, null);
@@ -169,10 +172,10 @@ final class PluginScanner {
         }
     }
 
-    void scanJar(Path path, boolean classpath) {
+    private void scanJar(Path path, boolean classpath) {
         logger.trace("Scanning {} for plugins", path);
 
-        List<PluginCandidate> candidates = new ArrayList<>();
+        final List<PluginCandidate> candidates = new ArrayList<>();
         List<PluginMetadata> metadata = null;
 
         // Open the zip file so we can scan it for plugins
@@ -213,7 +216,7 @@ final class PluginScanner {
                     continue;
                 }
 
-                PluginCandidate candidate = scanClassFile(jar, path);
+                final PluginCandidate candidate = scanClassFile(jar, path);
                 if (candidate != null) {
                     candidates.add(candidate);
                 }
@@ -224,8 +227,10 @@ final class PluginScanner {
         }
 
         if (!candidates.isEmpty()) {
+            boolean success = false;
+
             for (PluginCandidate candidate : candidates) {
-                addCandidate(candidate);
+                success |= addCandidate(candidate);
 
                 // Find matching plugin metadata
                 if (metadata != null) {
@@ -245,9 +250,9 @@ final class PluginScanner {
                 }
             }
 
-            if (metadata == null) {
-                logger.warn("{} is missing a valid {} file. This is not a problem when testing plugins,"
-                        + "however it is recommended to include one in public plugins.\n"
+            if (!success) {
+                logger.warn("{} is missing a valid {} file."
+                        + "This is not a problem when testing plugins, however it is recommended to include one in public plugins.\n"
                         + "Please see https://docs.spongepowered.org/master/en/plugin/plugin-meta.html for details.", path, METADATA_FILE);
             }
         } else if (!classpath) {
@@ -256,39 +261,37 @@ final class PluginScanner {
         }
     }
 
-    private void addCandidate(PluginCandidate candidate) {
+    private boolean addCandidate(PluginCandidate candidate) {
         final String pluginClass = candidate.getPluginClass();
         final String id = candidate.getId();
 
         if (!ID_PATTERN.matcher(id).matches()) {
-            logger.error("Found plugin with invalid plugin ID '{}' from {}. Plugin IDs should be lowercase, and only contain characters from "
-                            + "a-z, dashes, underscores or dots.\n"
-                            + "The plugin will be still loaded currently, however this will be removed in SpongeAPI 5.0. "
-                            + "Please notify the author to update the plugin as soon as possible.",
-                    id, candidate.getDisplaySource());
-            // return; // TODO
+            logger.error("Skipping plugin with invalid plugin ID '{}' from {}. " + ID_WARNING, id, candidate.getSource());
+            return false;
         }
 
-        if (this.pluginClasses.add(pluginClass)) {
-            if (this.plugins.containsKey(id)) {
-                logger.error("Skipping plugin with duplicate plugin ID '{}' from {}", id, candidate.getDisplaySource());
-                return;
-            }
-
-            this.plugins.put(id, candidate);
-        } else {
-            logger.error("Skipping duplicate plugin class {} from {}", pluginClass, candidate.getDisplaySource());
+        if (this.plugins.containsKey(id)) {
+            logger.error("Skipping plugin with duplicate plugin ID '{}' from {}", id, candidate.getSource());
+            return false;
         }
+
+        if (!this.pluginClasses.add(pluginClass)) {
+            logger.error("Skipping duplicate plugin class {} from {}", pluginClass, candidate.getSource());
+            return false;
+        }
+
+        this.plugins.put(id, candidate);
+        return true;
     }
 
     private PluginCandidate scanClassFile(InputStream in, @Nullable Path source) throws IOException {
-        ClassReader reader = new ClassReader(in);
-        PluginClassVisitor visitor = new PluginClassVisitor();
+        final ClassReader reader = new ClassReader(in);
+        final PluginClassVisitor visitor = new PluginClassVisitor();
 
         try {
             reader.accept(visitor, ClassReader.SKIP_CODE | ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES);
 
-            PluginMetadata metadata = visitor.getMetadata();
+            final PluginMetadata metadata = visitor.getMetadata();
             if (metadata == null) {
                 return null; // Not a plugin class
             }

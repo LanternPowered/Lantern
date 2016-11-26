@@ -35,7 +35,7 @@ abstract class WarningAnnotationVisitor extends AnnotationVisitor {
 
     final String className;
 
-    protected WarningAnnotationVisitor(int api, String className) {
+    WarningAnnotationVisitor(int api, String className) {
         super(api);
         this.className = className;
     }

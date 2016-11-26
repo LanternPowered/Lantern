@@ -51,6 +51,7 @@ public class LanternPlatform implements Platform {
 
     private final PluginContainer apiContainer;
     private final PluginContainer implContainer;
+    private final PluginContainer minecraftContainer;
 
     private final Map<String, Object> platformMap = new HashMap<String, Object>() {
 
@@ -63,7 +64,8 @@ public class LanternPlatform implements Platform {
         }
     };
 
-    LanternPlatform(PluginContainer apiContainer, PluginContainer implContainer) {
+    LanternPlatform(PluginContainer apiContainer, PluginContainer implContainer, PluginContainer minecraftContainer) {
+        this.minecraftContainer = minecraftContainer;
         this.implContainer = implContainer;
         this.apiContainer = apiContainer;
 
@@ -103,6 +105,11 @@ public class LanternPlatform implements Platform {
     @Override
     public Type getExecutionType() {
         return Type.SERVER;
+    }
+
+    @Override
+    public PluginContainer getContainer(Component component) {
+        return this.minecraftContainer;
     }
 
     @Override

@@ -360,7 +360,7 @@ public class LanternGame implements Game {
         this.implContainer = new SimplePluginContainer(IMPL_ID, LanternPlatform.IMPL_NAME, implVersion, () -> this.server);
 
         // Create the platform instance
-        this.platform = new LanternPlatform(this.apiContainer, this.implContainer);
+        this.platform = new LanternPlatform(this.apiContainer, this.implContainer, this.minecraft);
 
         this.minecraftVersionCache = new MinecraftVersionCache();
         this.minecraftVersionCache.load();

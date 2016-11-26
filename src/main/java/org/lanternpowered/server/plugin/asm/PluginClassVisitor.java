@@ -38,7 +38,7 @@ public final class PluginClassVisitor extends ClassVisitor {
     private static final String PLUGIN_DESCRIPTOR = "Lorg/spongepowered/api/plugin/Plugin;";
 
     private String className;
-    private PluginAnnotationVisitor annotationVisitor;
+    @Nullable private PluginAnnotationVisitor annotationVisitor;
 
     public PluginClassVisitor() {
         super(ASM5);
@@ -62,7 +62,6 @@ public final class PluginClassVisitor extends ClassVisitor {
         if (visible && desc.equals(PLUGIN_DESCRIPTOR)) {
             return this.annotationVisitor = new PluginAnnotationVisitor(className);
         }
-
         return null;
     }
 

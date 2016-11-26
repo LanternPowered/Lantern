@@ -2,11 +2,9 @@
 buildscript {
     repositories {
         maven {
-            name = 'sponge'
             url = 'http://repo.spongepowered.org/maven'
         }
         maven {
-            name = 'eclipse-staging'
             url = 'https://repo.eclipse.org/content/repositories/eclipse-staging'
         }
         maven {
@@ -98,6 +96,7 @@ evaluationDependsOn api.path
 
 configurations {
     fastutil
+    //noinspection All
     compile {
         extendsFrom fastutil
     }
@@ -107,30 +106,39 @@ configurations {
 dependencies {
     compile api
 
-    compile 'org.spongepowered:plugin-meta:0.1.1'
+    // Useful libraries
+    compile 'org.apache.commons:commons-lang3:3.4'
+    compile 'com.google.guava:guava:18.0'
+
+    // Json library
+    compile 'com.google.code.gson:gson:2.3.1'
+
+    // Network
+    compile 'io.netty:netty-all:4.1.1.Final'
+
+    // Logging
     compile 'org.apache.logging.log4j:log4j-slf4j-impl:2.5'
     compile 'org.apache.logging.log4j:log4j-core:2.5'
     compile 'org.apache.logging.log4j:log4j-api:2.5'
-    compile 'org.ow2.asm:asm-all:5.0.3'
-    compile 'org.apache.commons:commons-lang3:3.4'
-    compile 'org.mariadb.jdbc:mariadb-java-client:1.4.6'
+
+    // Console
     compile 'org.fusesource.jansi:jansi:1.12'
+    compile 'jline:jline:2.14.2'
+
+    // Fastutil
+    fastutil 'it.unimi.dsi:fastutil:7.0.12'
+
+    // Database connectors
+    compile 'com.zaxxer:HikariCP:2.4.7'
+    compile 'org.mariadb.jdbc:mariadb-java-client:1.4.6'
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
     compile 'com.h2database:h2:1.4.192'
-    compile 'com.zaxxer:HikariCP:2.4.7'
-    compile 'com.google.guava:guava:18.0'
-    compile 'com.google.inject:guice:4.0'
-    compile 'com.google.code.gson:gson:2.3.1'
-    compile 'com.flowpowered:flow-math:1.0.1'
-    compile 'com.flowpowered:flow-noise:1.0.1-SNAPSHOT'
-    compile 'io.netty:netty-all:4.1.1.Final'
+
+    // Scripting
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
-    fastutil 'it.unimi.dsi:fastutil:7.0.12'
-    compile 'ninja.leaping.configurate:configurate-core:3.2'
-    compile 'ninja.leaping.configurate:configurate-gson:3.2'
-    compile 'ninja.leaping.configurate:configurate-hocon:3.2'
-    compile 'ninja.leaping.configurate:configurate-yaml:3.2'
-    compile 'jline:jline:2.14.2'
+
+    // Asm
+    compile 'org.ow2.asm:asm-all:5.0.3'
 
     testCompile 'junit:junit:4.11'
     testCompile 'org.mockito:mockito-core:1.9.0'

@@ -28,11 +28,12 @@ package org.lanternpowered.server.game.registry.type.economy;
 import org.lanternpowered.server.economy.LanternTransactionType;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
+import org.spongepowered.api.service.economy.transaction.TransactionTypes;
 
 public final class TransactionTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<TransactionType> {
 
     public TransactionTypeRegistryModule() {
-        super(TransactionType.class);
+        super(TransactionTypes.class);
     }
 
     @Override

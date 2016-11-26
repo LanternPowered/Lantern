@@ -31,6 +31,7 @@ import static com.google.common.base.Preconditions.checkState;
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.plugin.meta.PluginDependency;
 import org.spongepowered.plugin.meta.PluginMetadata;
 import org.spongepowered.plugin.meta.version.DefaultArtifactVersion;
 import org.spongepowered.plugin.meta.version.InvalidVersionSpecificationException;
@@ -164,7 +165,7 @@ public final class PluginCandidate {
         this.versions = new HashMap<>();
         this.missingRequirements = new HashMap<>();
 
-        for (PluginMetadata.Dependency dependency : this.metadata.getRequiredDependencies()) {
+        for (PluginDependency dependency : this.metadata.collectRequiredDependencies()) {
             final String id = dependency.getId();
             if (this.id.equals(id)) {
                 Lantern.getLogger().warn("Plugin '{}' from {} requires itself to be loaded. "
@@ -174,7 +175,7 @@ public final class PluginCandidate {
 
             final String version = dependency.getVersion();
 
-            PluginContainer loaded = loadedPlugins.get(id);
+            final PluginContainer loaded = loadedPlugins.get(id);
             if (loaded != null) {
                 if (!verifyVersionRange(id, version, loaded.getVersion().orElse(null))) {
                     this.missingRequirements.put(id, version);
@@ -183,7 +184,7 @@ public final class PluginCandidate {
                 continue;
             }
 
-            PluginCandidate candidate = candidates.get(id);
+            final PluginCandidate candidate = candidates.get(id);
             if (candidate != null && verifyVersionRange(id, version, candidate.getMetadata().getVersion())) {
                 this.requirements.add(candidate);
                 continue;
@@ -192,24 +193,27 @@ public final class PluginCandidate {
             this.missingRequirements.put(id, version);
         }
 
-        collectOptionalDependencies(this.metadata.getLoadAfter(), loadedPlugins, candidates);
+        final Map<PluginDependency.LoadOrder, Set<PluginDependency>> dependencies = this.metadata.groupDependenciesByLoadOrder();
+        collectOptionalDependencies(dependencies.get(PluginDependency.LoadOrder.BEFORE), loadedPlugins, candidates);
 
-        // TODO: Load before dependencies
-        //collectOptionalDependencies(this.metadata.getLoadBefore(), loadedPlugins, candidates, false);
-
-        if (!this.metadata.getLoadBefore().isEmpty()) {
-            //this.invalid = true;
+        final Set<PluginDependency> loadAfter = dependencies.get(PluginDependency.LoadOrder.AFTER);
+        if (loadAfter != null && !loadAfter.isEmpty()) {
+            this.invalid = true;
             Lantern.getLogger().error("Invalid dependency with load order BEFORE on plugin '{}' from {}. "
                             + "This is currently not supported for Sponge plugins! Requested dependencies: {}",
-                    this.id, getDisplaySource(), this.metadata.getLoadBefore());
+                    this.id, getDisplaySource(), loadAfter);
         }
 
         return isLoadable();
     }
 
-    private void collectOptionalDependencies(Iterable<PluginMetadata.Dependency> dependencies,
+    private void collectOptionalDependencies(@Nullable Iterable<PluginDependency> dependencies,
             Map<String, PluginContainer> loadedPlugins, Map<String, PluginCandidate> candidates) {
-        for (PluginMetadata.Dependency dependency : dependencies) {
+        if (dependencies == null) {
+            return;
+        }
+
+        for (PluginDependency dependency : dependencies) {
             final String id = dependency.getId();
             if (this.id.equals(id)) {
                 Lantern.getLogger().error("Plugin '{}' from {} cannot have a dependency on itself. This is redundant and should be "
@@ -225,13 +229,6 @@ public final class PluginCandidate {
                 if (!verifyVersionRange(id, version, loaded.getVersion().orElse(null))) {
                     this.missingRequirements.put(id, version);
                 }
-
-                //if (allowLoaded) {
-                /*} else {
-                    VanillaLaunch.getLogger().error("Cannot have before dependency on loaded plugin '{}' from plugin '{}'", id, this.id);
-                    this.invalid = true;
-                }*/
-
                 continue;
             }
 

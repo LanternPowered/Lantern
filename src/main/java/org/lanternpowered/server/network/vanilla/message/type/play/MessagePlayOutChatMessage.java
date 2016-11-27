@@ -32,19 +32,23 @@ import org.spongepowered.api.text.chat.ChatType;
 public final class MessagePlayOutChatMessage implements Message {
 
     private final LocalizedText message;
-    private final ChatType chatType;
+    private final Type type;
 
-    public MessagePlayOutChatMessage(LocalizedText message, ChatType chatType) {
-        this.chatType = chatType;
+    public MessagePlayOutChatMessage(LocalizedText message, Type type) {
         this.message = message;
+        this.type = type;
     }
 
     public LocalizedText getMessage() {
         return this.message;
     }
 
-    public ChatType getChatType() {
-        return this.chatType;
+    public Type getType() {
+        return this.type;
     }
 
+    public enum Type {
+        CHAT,
+        SYSTEM,
+    }
 }

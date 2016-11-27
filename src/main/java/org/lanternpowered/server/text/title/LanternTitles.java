@@ -55,13 +55,13 @@ public final class LanternTitles {
         if (title.isReset()) {
             builder.add(new MessagePlayOutTitle.Reset());
         }
-        Optional<Integer> fadeIn = title.getFadeIn();
-        Optional<Integer> stay = title.getStay();
-        Optional<Integer> fadeOut = title.getFadeOut();
+        final Optional<Integer> fadeIn = title.getFadeIn();
+        final Optional<Integer> stay = title.getStay();
+        final Optional<Integer> fadeOut = title.getFadeOut();
         if (fadeIn.isPresent() || stay.isPresent() || fadeOut.isPresent()) {
             builder.add(new MessagePlayOutTitle.SetTimes(fadeIn.orElse(20), stay.orElse(60), fadeOut.orElse(20)));
         }
-        if (title.getTitle().isPresent() || title.getSubtitle().isPresent()) {
+        if (title.getTitle().isPresent() || title.getSubtitle().isPresent() || title.getActionBar().isPresent()) {
             return new LocaleCacheValue(builder.build(), title);
         } else {
             return new CacheValue(builder.build());
@@ -79,7 +79,6 @@ public final class LanternTitles {
         public List<Message> getMessages(Locale locale) {
             return this.messages;
         }
-
     }
 
     private static class LocaleCacheValue extends CacheValue {
@@ -108,6 +107,10 @@ public final class LanternTitles {
                 text = title.getSubtitle();
                 if (text.isPresent()) {
                     builder.add(new MessagePlayOutTitle.SetSubtitle(new LocalizedText(text.get(), locale)));
+                }
+                text = title.getActionBar();
+                if (text.isPresent()) {
+                    builder.add(new MessagePlayOutTitle.SetActionbarTitle(new LocalizedText(text.get(), locale)));
                 }
                 return builder.build();
             });

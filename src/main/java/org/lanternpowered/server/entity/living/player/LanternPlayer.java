@@ -57,12 +57,10 @@ import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
-import org.lanternpowered.server.network.objects.LocalizedText;
 import org.lanternpowered.server.network.objects.RawItemStack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutBrand;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerJoinGame;
@@ -75,6 +73,7 @@ import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.statistic.StatisticMap;
+import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
 import org.lanternpowered.server.world.LanternWorld;
@@ -685,7 +684,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         checkNotNull(message, "message");
         checkNotNull(type, "type");
         if (this.chatVisibility.isVisible(type)) {
-            this.session.send(new MessagePlayOutChatMessage(new LocalizedText(message, this.locale), type));
+            this.session.send(((LanternChatType) type).getMessageProvider().apply(message, this.locale));
         }
     }
 

@@ -36,7 +36,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.lanternpowered.api.world.weather.WeatherUniverse;
 import org.lanternpowered.server.behavior.Behavior;
@@ -53,6 +52,7 @@ import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.ChunkIOService;
 import org.lanternpowered.server.data.io.ScoreboardIO;
 import org.lanternpowered.server.data.io.anvil.AnvilChunkIOService;
+import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSerializer;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -64,9 +64,11 @@ import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolManager;
 import org.lanternpowered.server.network.entity.EntityProtocolType;
 import org.lanternpowered.server.network.message.Message;
-import org.lanternpowered.server.network.objects.LocalizedText;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
+import org.lanternpowered.server.network.objects.RawItemStack;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutParticleEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetWindowSlot;
+import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.util.VecHelper;
 import org.lanternpowered.server.world.chunk.ChunkLoadingTicket;
@@ -91,11 +93,13 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
+import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -141,6 +145,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -1025,10 +1030,10 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         checkNotNull(type, "chatType");
         checkNotNull(message, "message");
         if (!this.players.isEmpty()) {
-            final Map<Locale, Message> netwMessages = Maps.newHashMap();
+            final Map<Locale, Message> networkMessages = new HashMap<>();
             for (LanternPlayer player : this.players) {
-                player.getConnection().send(netwMessages.computeIfAbsent(player.getLocale(),
-                        locale -> new MessagePlayOutChatMessage(new LocalizedText(message, locale), type)));
+                player.getConnection().send(networkMessages.computeIfAbsent(player.getLocale(),
+                        locale -> ((LanternChatType) type).getMessageProvider().apply(message, locale)));
             }
         }
     }
@@ -1044,7 +1049,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void sendBookView(BookView bookView) {
-
+        checkNotNull(bookView, "bookView");
+        this.players.forEach(player -> player.sendBookView(bookView));
     }
 
     @Override

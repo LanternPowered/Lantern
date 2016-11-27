@@ -23,29 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.game.registry.type.data;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.buffer.objects.Types;
-import org.lanternpowered.server.network.objects.LocalizedText;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutChatMessage;
-import org.lanternpowered.server.text.LanternTextSerializer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.chat.ChatType;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.serializer.TextSerializers;
+import org.lanternpowered.server.data.type.LanternLlamaVariant;
+import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.spongepowered.api.data.type.LlamaVariant;
+import org.spongepowered.api.data.type.LlamaVariants;
 
-public final class CodecPlayOutChatMessage implements Codec<MessagePlayOutChatMessage> {
+public class LlamaVariantRegistryModule extends PluginCatalogRegistryModule<LlamaVariant> {
 
-    @SuppressWarnings("deprecation")
+    public LlamaVariantRegistryModule() {
+        super(LlamaVariants.class);
+    }
+
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutChatMessage message) throws CodecException {
-        final ByteBuffer buf = context.byteBufAlloc().buffer();
-        buf.write(Types.LOCALIZED_TEXT, message.getMessage());
-        buf.writeByte((byte) message.getType().ordinal());
-        return buf;
+    public void registerDefaults() {
+        register(new LanternLlamaVariant("minecraft", "creamy", 0));
+        register(new LanternLlamaVariant("minecraft", "white", 1));
+        register(new LanternLlamaVariant("minecraft", "brown", 2));
+        register(new LanternLlamaVariant("minecraft", "gray", 3));
     }
 }

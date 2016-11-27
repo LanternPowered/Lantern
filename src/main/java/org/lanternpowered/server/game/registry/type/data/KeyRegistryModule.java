@@ -64,6 +64,7 @@ import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.HorseVariant;
+import org.spongepowered.api.data.type.LlamaVariant;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
 import org.spongepowered.api.data.type.OcelotType;
@@ -255,6 +256,7 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("ItemDurability"), "sponge:item_durability"));
         register(makeListKey(ItemEnchantment.class, of("ItemEnchantments"), "sponge:item_enchantments"));
         register(makeListKey(Text.class, of("ItemLore"), "sponge:item_lore"));
+        register(makeValueKey(Boolean.class, of("JohnnyVindicator"), "sponge:johnny_vindicator"));
         register(makeMutableBoundedValueKey(Integer.class, of("KnockbackStrength"), "sponge:knockback_strength"));
         register(makeOptionalKey(Living.class, of("LastAttacker"), "sponge:last_attacker"));
         register(makeOptionalKey(Text.class, of("LastCommandOutput"), "sponge:last_command_output"));
@@ -264,6 +266,8 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeValueKey(EntitySnapshot.class, of("LeashHolder"), "sponge:leash_holder"));
         register(makeValueKey(Vector3d.class, of("LeftArmRotation"), "sponge:left_arm_rotation"));
         register(makeValueKey(Vector3d.class, of("LeftLegRotation"), "sponge:left_leg_rotation"));
+        register(makeMutableBoundedValueKey(Integer.class, of("LlamaStrength"), "sponge:llama_strength"));
+        register(makeValueKey(LlamaVariant.class, of("LlamaVariant"), "sponge:llama_variant"));
         register(makeValueKey(String.class, of("LockToken"), "sponge:lock_token"));
         register(makeValueKey(LogAxis.class, of("LogAxis"), "sponge:log_axis"));
         register(makeMutableBoundedValueKey(Integer.class, of("MaxAir"), "sponge:max_air"));
@@ -281,8 +285,8 @@ public final class KeyRegistryModule extends AdditionalPluginCatalogRegistryModu
         register(makeMutableBoundedValueKey(Integer.class, of("PassedCookTime"), "sponge:passed_cook_time"));
         register(makeListKey(EntitySnapshot.class, of("Passengers"), "sponge:passengers"));
         register(makeValueKey(Boolean.class, of("Persists"), "sponge:persists"));
-        register(makeValueKey(PickupRule.class, of("PickupRule"), "sponge:pickup_rule"));
         register(makeMutableBoundedValueKey(Integer.class, of("PickupDelay"), "sponge:pickup_delay"));
+        register(makeValueKey(PickupRule.class, of("PickupRule"), "sponge:pickup_rule"));
         register(makeValueKey(Boolean.class, of("PigSaddle"), "sponge:pig_saddle"));
         register(makeValueKey(PistonType.class, of("PistonType"), "sponge:piston_type"));
         register(makeSetKey(BlockType.class, of("PlaceableBlocks"), "sponge:placeable_blocks"));

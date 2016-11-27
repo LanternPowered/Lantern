@@ -125,12 +125,14 @@ public final class ParticleTypeRegistryModule extends PluginCatalogRegistryModul
         registerParticle(32, "snow_shovel", true);
         registerParticle(13, "spell", true, ImmutableMap.of(
                 ParticleOptions.SLOW_HORIZONTAL_VELOCITY, false));
+        registerParticle(48, "spit", true);
         registerEffect("splash_potion", ImmutableMap.of(
                 ParticleOptions.POTION_EFFECT_TYPE, PotionEffectTypes.NIGHT_VISION));
         registerParticle(7, "suspended", false);
         registerParticle(8, "suspended_depth", false);
         registerParticle(45, "sweep_attack", false, ImmutableMap.of(
                 ParticleOptions.SCALE, 1.0));
+        registerParticle(47, "totem", true);
         registerParticle(22, "town_aura", true);
         registerParticle(4, "water_bubble", true);
         registerParticle(39, "water_drop", false);
@@ -143,7 +145,7 @@ public final class ParticleTypeRegistryModule extends PluginCatalogRegistryModul
     }
 
     private void registerParticle(int internalType, String id, boolean velocity) {
-        this.registerParticle(internalType, id, velocity, Collections.emptyMap());
+        registerParticle(internalType, id, velocity, Collections.emptyMap());
     }
 
     private void registerParticle(int internalType, String id, boolean velocity,

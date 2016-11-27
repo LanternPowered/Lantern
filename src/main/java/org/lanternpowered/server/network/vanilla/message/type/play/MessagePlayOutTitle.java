@@ -56,6 +56,19 @@ public abstract class MessagePlayOutTitle implements Message {
         }
     }
 
+    public static final class SetActionbarTitle extends MessagePlayOutTitle {
+
+        private final LocalizedText title;
+
+        public SetActionbarTitle(LocalizedText title) {
+            this.title = title;
+        }
+
+        public LocalizedText getTitle() {
+            return this.title;
+        }
+    }
+
     public static final class SetTimes extends MessagePlayOutTitle {
 
         private final int fadeIn;

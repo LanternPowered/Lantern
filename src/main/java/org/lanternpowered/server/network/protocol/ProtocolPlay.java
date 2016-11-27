@@ -478,6 +478,7 @@ final class ProtocolPlay extends ProtocolBase {
         codecPlayOutTitle.bind(MessagePlayOutTitle.Clear.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.Reset.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetSubtitle.class);
+        codecPlayOutTitle.bind(MessagePlayOutTitle.SetActionbarTitle.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetTimes.class);
         codecPlayOutTitle.bind(MessagePlayOutTitle.SetTitle.class);
         outbound.bind(0x46, CodecPlayOutSoundEffect.class, MessagePlayOutSoundEffect.class);

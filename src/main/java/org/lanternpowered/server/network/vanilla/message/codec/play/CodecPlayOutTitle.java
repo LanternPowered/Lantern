@@ -36,6 +36,7 @@ public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
 
     private static final int SET_TITLE = 0;
     private static final int SET_SUBTITLE = 1;
+    private static final int SET_ACTIONBAR_TITLE = 1;
     private static final int SET_TIMES = 3;
     private static final int CLEAR = 4;
     private static final int RESET = 5;
@@ -53,6 +54,9 @@ public final class CodecPlayOutTitle implements Codec<MessagePlayOutTitle> {
         } else if (message instanceof MessagePlayOutTitle.SetSubtitle) {
             buf.writeVarInt(SET_SUBTITLE);
             buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetSubtitle) message).getTitle());
+        } else if (message instanceof MessagePlayOutTitle.SetActionbarTitle) {
+            buf.writeVarInt(SET_ACTIONBAR_TITLE);
+            buf.write(Types.LOCALIZED_TEXT, ((MessagePlayOutTitle.SetActionbarTitle) message).getTitle());
         } else {
             final MessagePlayOutTitle.SetTimes message0 = (MessagePlayOutTitle.SetTimes) message;
             buf.writeVarInt(SET_TIMES);

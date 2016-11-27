@@ -114,6 +114,7 @@ import org.lanternpowered.server.game.registry.type.data.HorseColorRegistryModul
 import org.lanternpowered.server.game.registry.type.data.HorseStyleRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.InstrumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
+import org.lanternpowered.server.game.registry.type.data.LlamaVariantRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.NotePitchRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.OcelotTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.data.PickupRuleRegistryModule;
@@ -248,6 +249,7 @@ import org.spongepowered.api.data.type.Hinges;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseStyle;
 import org.spongepowered.api.data.type.InstrumentType;
+import org.spongepowered.api.data.type.LlamaVariant;
 import org.spongepowered.api.data.type.LogAxes;
 import org.spongepowered.api.data.type.LogAxis;
 import org.spongepowered.api.data.type.NotePitch;
@@ -499,6 +501,7 @@ public class LanternGameRegistry implements GameRegistry {
                         new EnumValueRegistryModule<LogAxis>(LanternLogAxis.class, LogAxes.class) {})
                 .registerModule(NotePitch.class, new NotePitchRegistryModule())
                 .registerModule(OcelotType.class, new OcelotTypeRegistryModule())
+                .registerModule(LlamaVariant.class, new LlamaVariantRegistryModule())
                 .registerModule(Profession.class, new ProfessionRegistryModule())
                 .registerModule(RabbitType.class, new RabbitTypeRegistryModule())
                 .registerModule(ToolType.class, new ToolTypeRegistryModule())

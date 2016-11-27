@@ -46,13 +46,13 @@ public final class RuleTypes {
     public static final RuleType<Boolean> DO_TILE_DROPS =
             RuleType.create(DefaultGameRules.DO_TILE_DROPS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> DO_WEATHER_CYCLE =
-            RuleType.create("doWeatherCycle", RuleDataTypes.BOOLEAN, true);
+            RuleType.create(DefaultGameRules.DO_WEATHER_CYCLE, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> KEEP_INVENTORY =
             RuleType.create(DefaultGameRules.KEEP_INVENTORY, RuleDataTypes.BOOLEAN, false);
     public static final RuleType<Boolean> LOG_ADMIN_COMMANDS =
             RuleType.create(DefaultGameRules.LOG_ADMIN_COMMANDS, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Integer> MAX_ENTITY_CRAMMING =
-            RuleType.create("maxEntityCramming", RuleDataTypes.INTEGER, 24);
+            RuleType.create(DefaultGameRules.MAX_ENTITY_CRAMMING, RuleDataTypes.INTEGER, 24);
     public static final RuleType<Boolean> MOB_GRIEFING =
             RuleType.create(DefaultGameRules.MOB_GRIEFING, RuleDataTypes.BOOLEAN, true);
     public static final RuleType<Boolean> NATURAL_REGENERATION =

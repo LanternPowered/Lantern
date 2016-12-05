@@ -42,6 +42,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabComplete> {
@@ -85,8 +86,8 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
         } else {
             // Vanilla mc will complete user names if
             // no command is being completed
-            int index = text.lastIndexOf(' ');
-            String part;
+            final int index = text.lastIndexOf(' ');
+            final String part;
             if (index == -1) {
                 part = text;
             } else {
@@ -96,12 +97,13 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                 return;
             }
             final String part1 = part.toLowerCase();
-            List<String> suggestions = Sponge.getServer().getOnlinePlayers().stream()
+            final List<String> suggestions = Sponge.getServer().getOnlinePlayers().stream()
                     .map(CommandSource::getName)
                     .filter(n -> n.toLowerCase().startsWith(part1))
                     .collect(Collectors.toList());
-            TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(Cause.source(context.getSession().getPlayer()).build(),
-                    ImmutableList.copyOf(suggestions), suggestions, text);
+            final TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(
+                    Cause.source(context.getSession().getPlayer()).build(),
+                    ImmutableList.copyOf(suggestions), suggestions, text, Optional.empty(), false);
             if (!Sponge.getEventManager().post(event)) {
                 context.getSession().send(new MessagePlayOutTabComplete(suggestions));
             }

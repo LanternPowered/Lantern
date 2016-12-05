@@ -324,7 +324,8 @@ public class LanternCommandManager implements CommandManager {
             }
             final List<String> rawSuggestions = new ArrayList<>(suggestions);
             final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.source(source).build(),
-                    ImmutableList.copyOf(suggestions), rawSuggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0], arguments);
+                    ImmutableList.copyOf(suggestions), rawSuggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0],
+                    arguments, Optional.ofNullable(targetPosition), false);
             Sponge.getGame().getEventManager().post(event);
             if (event.isCancelled()) {
                 return ImmutableList.of();

@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.vanilla.message.handler.play;
 
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
+import org.lanternpowered.server.command.LanternCommandManager;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
@@ -54,7 +55,11 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
         // from the ends and there are never two spaces directly after eachother
         final String textNormalized = StringUtils.normalizeSpace(text);
 
-        boolean hasPrefix = textNormalized.startsWith("/");
+        final Player player = context.getSession().getPlayer();
+        final Location<World> targetBlock = message.getBlockPosition()
+                .map(pos -> new Location<>(player.getWorld(), pos)).orElse(null);
+
+        final boolean hasPrefix = textNormalized.startsWith("/");
         if (hasPrefix || message.getAssumeCommand()) {
             String command = textNormalized;
 
@@ -68,12 +73,9 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                 command = command + " ";
             }
 
-            final Player player = context.getSession().getPlayer();
-            final Location<World> targetBlock = message.getBlockPosition()
-                    .map(pos -> new Location<>(player.getWorld(), pos)).orElse(null);
-
             // Get the suggestions
-            List<String> suggestions = Sponge.getCommandManager().getSuggestions(player, command, targetBlock);
+            List<String> suggestions = ((LanternCommandManager) Sponge.getCommandManager())
+                    .getSuggestions(player, command, targetBlock, message.getAssumeCommand());
 
             // If the suggestions are for the command and there was a prefix, then append the prefix
             if (hasPrefix && command.split(" ").length == 1 && !command.endsWith(" ")) {
@@ -103,7 +105,7 @@ public final class HandlerPlayInTabComplete implements Handler<MessagePlayInTabC
                     .collect(Collectors.toList());
             final TabCompleteEvent.Chat event = SpongeEventFactory.createTabCompleteEventChat(
                     Cause.source(context.getSession().getPlayer()).build(),
-                    ImmutableList.copyOf(suggestions), suggestions, text, Optional.empty(), false);
+                    ImmutableList.copyOf(suggestions), suggestions, text, Optional.ofNullable(targetBlock), false);
             if (!Sponge.getEventManager().post(event)) {
                 context.getSession().send(new MessagePlayOutTabComplete(suggestions));
             }

@@ -307,6 +307,10 @@ public class LanternCommandManager implements CommandManager {
 
     @Override
     public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition) {
+        return getSuggestions(source, arguments, targetPosition, false);
+    }
+
+    public List<String> getSuggestions(CommandSource source, String arguments, @Nullable Location<World> targetPosition, boolean usingBlock) {
         try {
             final List<String> suggestions;
             final String[] argSplit = arguments.split(" ", 2);
@@ -325,7 +329,7 @@ public class LanternCommandManager implements CommandManager {
             final List<String> rawSuggestions = new ArrayList<>(suggestions);
             final TabCompleteEvent.Command event = SpongeEventFactory.createTabCompleteEventCommand(Cause.source(source).build(),
                     ImmutableList.copyOf(suggestions), rawSuggestions, argSplit.length > 1 ? argSplit[1] : "", argSplit[0],
-                    arguments, Optional.ofNullable(targetPosition), false);
+                    arguments, Optional.ofNullable(targetPosition), usingBlock);
             Sponge.getGame().getEventManager().post(event);
             if (event.isCancelled()) {
                 return ImmutableList.of();

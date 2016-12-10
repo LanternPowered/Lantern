@@ -37,6 +37,14 @@ public class LanternRepresentedItemData extends AbstractData<RepresentedItemData
         super(RepresentedItemData.class, ImmutableRepresentedItemData.class);
     }
 
+    public LanternRepresentedItemData(ImmutableRepresentedItemData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternRepresentedItemData(RepresentedItemData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.REPRESENTED_ITEM, ItemStackSnapshot.NONE).notRemovable();

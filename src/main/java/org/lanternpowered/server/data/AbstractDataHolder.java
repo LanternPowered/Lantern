@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data;
 
+import com.google.common.collect.ImmutableList;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
 import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
@@ -201,9 +202,33 @@ public interface AbstractDataHolder extends AbstractCompositeValueStore<DataHold
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     default Collection<DataManipulator<?, ?>> getContainers() {
-        return null;
+        final ImmutableList.Builder<DataManipulator<?, ?>> builder = ImmutableList.builder();
+        for (DataManipulatorRegistration registration : DataManipulatorRegistry.get().getAll()) {
+            DataManipulator manipulator = (DataManipulator<?, ?>) registration.getImmutableManipulatorSupplier().get();
+            for (Key key : (Set<Key>) registration.getRequiredKeys()) {
+                final Optional value = getValue(key);
+                if (value.isPresent()) {
+                    manipulator.set(key, value.get());
+                } else if (!supports(key)) {
+                    manipulator = null;
+                    break;
+                }
+            }
+            if (manipulator != null) {
+                builder.add(manipulator);
+            }
+        }
+
+        // Try the additional manipulators if they are supported
+        final Map<Class<?>, DataManipulator<?, ?>> manipulators = getRawAdditionalContainers();
+        if (manipulators != null) {
+            manipulators.values().forEach(manipulator -> builder.add(manipulator.copy()));
+        }
+
+        return builder.build();
     }
 
     @Override

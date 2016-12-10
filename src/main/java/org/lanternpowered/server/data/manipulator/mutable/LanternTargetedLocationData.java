@@ -37,6 +37,14 @@ public class LanternTargetedLocationData extends AbstractData<TargetedLocationDa
         super(TargetedLocationData.class, ImmutableTargetedLocationData.class);
     }
 
+    public LanternTargetedLocationData(ImmutableTargetedLocationData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternTargetedLocationData(TargetedLocationData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.TARGETED_LOCATION, Vector3d.ZERO).notRemovable();

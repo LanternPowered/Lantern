@@ -37,4 +37,12 @@ public class LanternPotionEffectData extends AbstractListData<PotionEffect, Poti
     public LanternPotionEffectData() {
         super(PotionEffectData.class, ImmutablePotionEffectData.class, Keys.POTION_EFFECTS, new ArrayList<>());
     }
+
+    public LanternPotionEffectData(ImmutablePotionEffectData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternPotionEffectData(PotionEffectData manipulator) {
+        super(manipulator);
+    }
 }

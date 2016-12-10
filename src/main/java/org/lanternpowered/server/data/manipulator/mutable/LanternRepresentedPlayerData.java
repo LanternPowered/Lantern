@@ -39,6 +39,14 @@ public class LanternRepresentedPlayerData extends AbstractData<RepresentedPlayer
         super(RepresentedPlayerData.class, ImmutableRepresentedPlayerData.class);
     }
 
+    public LanternRepresentedPlayerData(ImmutableRepresentedPlayerData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternRepresentedPlayerData(RepresentedPlayerData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.REPRESENTED_PLAYER, LanternGameProfile.UNKNOWN).notRemovable();

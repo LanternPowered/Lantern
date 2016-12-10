@@ -36,6 +36,14 @@ public class LanternWetData extends AbstractData<WetData, ImmutableWetData> impl
         super(WetData.class, ImmutableWetData.class);
     }
 
+    public LanternWetData(ImmutableWetData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternWetData(WetData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.IS_WET, false).notRemovable();

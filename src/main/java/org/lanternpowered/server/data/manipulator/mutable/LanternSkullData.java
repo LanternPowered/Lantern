@@ -36,4 +36,12 @@ public class LanternSkullData extends AbstractVariantData<SkullType, SkullData, 
     public LanternSkullData() {
         super(SkullData.class, ImmutableSkullData.class, Keys.SKULL_TYPE, SkullTypes.SKELETON);
     }
+
+    public LanternSkullData(ImmutableSkullData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternSkullData(SkullData manipulator) {
+        super(manipulator);
+    }
 }

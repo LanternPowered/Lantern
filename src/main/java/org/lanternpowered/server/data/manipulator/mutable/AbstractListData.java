@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.data.manipulator.mutable;
 
+import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
+import org.lanternpowered.server.data.manipulator.immutable.IImmutableListData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
@@ -41,6 +43,27 @@ public abstract class AbstractListData<E, M extends ListData<E, M, I>, I extends
         super(manipulatorType, immutableManipulatorType);
         registerKey(listKey, defaultList).notRemovable();
         this.listKey = listKey;
+    }
+
+    public AbstractListData(I manipulator) {
+        //noinspection unchecked
+        this((IDataManipulatorBase<M, I>) manipulator);
+    }
+
+    public AbstractListData(M manipulator) {
+        //noinspection unchecked
+        this((IDataManipulatorBase<M, I>) manipulator);
+    }
+
+    protected AbstractListData(IDataManipulatorBase<M, I> manipulator) {
+        super(manipulator);
+        if (manipulator instanceof IListData) {
+            //noinspection unchecked
+            this.listKey = ((IListData) manipulator).getListKey();
+        } else {
+            //noinspection unchecked
+            this.listKey = ((IImmutableListData) manipulator).getListKey();
+        }
     }
 
     @Override

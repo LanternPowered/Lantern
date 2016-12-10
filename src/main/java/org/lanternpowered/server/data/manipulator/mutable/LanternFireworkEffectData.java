@@ -38,4 +38,12 @@ public class LanternFireworkEffectData extends AbstractListData<FireworkEffect, 
     public LanternFireworkEffectData() {
         super(FireworkEffectData.class, ImmutableFireworkEffectData.class, Keys.FIREWORK_EFFECTS, new ArrayList<>());
     }
+
+    public LanternFireworkEffectData(ImmutableFireworkEffectData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternFireworkEffectData(FireworkEffectData manipulator) {
+        super(manipulator);
+    }
 }

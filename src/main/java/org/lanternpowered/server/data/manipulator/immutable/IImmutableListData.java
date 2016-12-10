@@ -23,14 +23,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.manipulator.mutable;
+package org.lanternpowered.server.data.manipulator.immutable;
 
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableListData;
 import org.spongepowered.api.data.manipulator.mutable.ListData;
 import org.spongepowered.api.data.value.mutable.ListValue;
 
-public interface IListData<E, M extends ListData<E, M, I>, I extends ImmutableListData<E, I, M>> extends ListData<E, M, I> {
+public interface IImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>> extends ImmutableListData<E, I, M> {
 
     Key<? extends ListValue<E>> getListKey();
 }

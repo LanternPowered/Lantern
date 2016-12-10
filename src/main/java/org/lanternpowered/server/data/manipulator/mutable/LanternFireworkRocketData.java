@@ -36,6 +36,14 @@ public class LanternFireworkRocketData extends AbstractData<FireworkRocketData, 
         super(FireworkRocketData.class, ImmutableFireworkRocketData.class);
     }
 
+    public LanternFireworkRocketData(ImmutableFireworkRocketData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternFireworkRocketData(FireworkRocketData manipulator) {
+        super(manipulator);
+    }
+
     @Override
     public void registerKeys() {
         registerKey(Keys.FIREWORK_FLIGHT_MODIFIER, 0).notRemovable();

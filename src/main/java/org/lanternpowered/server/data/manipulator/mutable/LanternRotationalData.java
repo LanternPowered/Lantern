@@ -36,4 +36,12 @@ public class LanternRotationalData extends AbstractVariantData<Rotation, Rotatio
     public LanternRotationalData() {
         super(RotationalData.class, ImmutableRotationalData.class, Keys.ROTATION, Rotations.LEFT);
     }
+
+    public LanternRotationalData(ImmutableRotationalData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternRotationalData(RotationalData manipulator) {
+        super(manipulator);
+    }
 }

@@ -35,7 +35,7 @@ import org.spongepowered.api.data.value.mutable.ListValue;
 import java.util.List;
 
 public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>>
-        extends AbstractImmutableData<I, M> implements ImmutableListData<E, I, M> {
+        extends AbstractImmutableData<I, M> implements IImmutableListData<E, I, M> {
 
     private final Key<? extends ListValue<E>> listKey;
 
@@ -59,5 +59,10 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
     @Override
     public List<E> asList() {
         return get(this.listKey).get();
+    }
+
+    @Override
+    public Key<? extends ListValue<E>> getListKey() {
+        return this.listKey;
     }
 }

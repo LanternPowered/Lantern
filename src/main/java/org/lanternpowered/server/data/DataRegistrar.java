@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.data;
 
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
 import org.lanternpowered.server.data.persistence.DataTranslators;
 import org.lanternpowered.server.data.persistence.DataTypeSerializers;
 import org.lanternpowered.server.data.property.LanternPropertyRegistry;
@@ -63,6 +64,8 @@ public class DataRegistrar {
         dataManager.registerBuilder(PotionEffect.class, new LanternPotionEffectBuilder());
         dataManager.registerBuilder(RespawnLocation.class, new RespawnLocation.Builder());
         dataManager.registerBuilder(ItemEnchantment.class, new ItemEnchantmentDataBuilder());
+
+        DataManipulatorRegistry.get();
     }
 
     public static void finalizeRegistrations(Game game) {

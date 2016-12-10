@@ -87,6 +87,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardDisplayObjective;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardObjective;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardScore;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetCamera;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetCooldown;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutSetDifficulty;
@@ -218,6 +219,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPainting;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnParticle;
@@ -435,7 +437,8 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x2e, CodecPlayOutPlayerPositionAndLook.class, MessagePlayOutPlayerPositionAndLook.class);
         // ...
         outbound.bind(0x30, CodecPlayOutDestroyEntities.class, MessagePlayOutDestroyEntities.class);
-        // ...
+        // 0x31
+        outbound.bind(0x32, CodecPlayOutSendResourcePack.class, MessagePlayOutSendResourcePack.class);
         outbound.bind(0x33, CodecPlayOutPlayerRespawn.class, MessagePlayOutPlayerRespawn.class);
         outbound.bind(0x34, CodecPlayOutEntityHeadLook.class, MessagePlayOutEntityHeadLook.class);
         final CodecRegistration<MessagePlayOutWorldBorder, CodecPlayOutWorldBorder> codecPlayOutWorldBorder =

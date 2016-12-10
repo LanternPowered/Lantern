@@ -537,6 +537,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         if (achievementsMessage != null) {
             this.session.send(achievementsMessage);
         }
+
+        this.resourcePackSendQueue.pulse();
     }
 
     /**

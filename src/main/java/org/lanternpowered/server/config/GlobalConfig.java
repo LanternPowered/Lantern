@@ -178,6 +178,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         @Setting(value = "proxy")
         private Proxy proxy = new Proxy();
 
+        @Setting(value = "default-resource-pack", comment = "The default resource pack.\nLeave this empty to disable the default resource pack.")
+        private String defaultResourcePack = "";
+
     }
 
     @ConfigSerializable
@@ -332,5 +335,9 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
     public boolean useQueryEpollWhenAvailable() {
         return this.query.useEpollWhenAvailable;
+    }
+
+    public String getDefaultResourcePack() {
+        return this.server.defaultResourcePack;
     }
 }

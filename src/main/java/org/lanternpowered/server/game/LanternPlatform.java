@@ -83,16 +83,6 @@ public class LanternPlatform implements Platform {
     }
 
     @Override
-    public PluginContainer getApi() {
-        return this.apiContainer;
-    }
-
-    @Override
-    public PluginContainer getImplementation() {
-        return this.implContainer;
-    }
-
-    @Override
     public LanternMinecraftVersion getMinecraftVersion() {
         return LanternMinecraftVersion.CURRENT;
     }
@@ -109,7 +99,15 @@ public class LanternPlatform implements Platform {
 
     @Override
     public PluginContainer getContainer(Component component) {
-        return this.minecraftContainer;
+        switch (component) {
+            case GAME:
+                return this.minecraftContainer;
+            case API:
+                return this.apiContainer;
+            case IMPLEMENTATION:
+                return this.implContainer;
+        }
+        throw new IllegalArgumentException("Unknown Component: " + component);
     }
 
     @Override

@@ -63,6 +63,7 @@ import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
+import org.spongepowered.api.resourcepack.ResourcePacks;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.sql.SqlService;
 import org.spongepowered.api.text.Text;
@@ -76,9 +77,11 @@ import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.Closeable;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -225,7 +228,8 @@ public class LanternServer implements Server {
     // All the players by their uniqueId
     private final Map<UUID, LanternPlayer> playersByUUID = Maps.newConcurrentMap();
 
-    private Favicon favicon;
+    @Nullable private ResourcePack resourcePack;
+    @Nullable private Favicon favicon;
     private boolean onlineMode;
     private boolean whitelist;
 
@@ -321,6 +325,15 @@ public class LanternServer implements Server {
                 this.favicon = LanternFavicon.load(faviconPath);
             } catch (IOException e) {
                 Lantern.getLogger().error("Failed to load the favicon", e);
+            }
+        }
+
+        final String resourcePackPath = config.getDefaultResourcePack();
+        if (!resourcePackPath.isEmpty()) {
+            try {
+                this.resourcePack = ResourcePacks.fromUri(URI.create(resourcePackPath));
+            } catch (FileNotFoundException e) {
+                Lantern.getLogger().warn("Couldn't find a valid resource pack at the location: {}", resourcePackPath, e);
             }
         }
 
@@ -654,8 +667,7 @@ public class LanternServer implements Server {
 
     @Override
     public Optional<ResourcePack> getDefaultResourcePack() {
-        // TODO Auto-generated method stub
-        return Optional.empty();
+        return Optional.ofNullable(this.resourcePack);
     }
 
     @Override

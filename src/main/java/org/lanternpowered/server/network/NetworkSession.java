@@ -928,6 +928,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
             joinEvent.getChannel().ifPresent(channel -> channel.send(this.player, joinEvent.getMessage()));
         }
 
+        this.server.getDefaultResourcePack().ifPresent(this.player::sendResourcePack);
         this.player.resetIdleTimeoutCounter();
     }
 

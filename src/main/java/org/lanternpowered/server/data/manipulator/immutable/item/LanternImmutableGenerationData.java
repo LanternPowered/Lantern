@@ -44,7 +44,7 @@ public class LanternImmutableGenerationData extends AbstractImmutableData<Immuta
 
     @Override
     public void registerKeys() {
-        registerKey(Keys.GENERATION, 0, 0, Integer.MAX_VALUE).notRemovable();
+        registerKey(Keys.GENERATION, 0, 0, Integer.MAX_VALUE);
     }
 
     @Override

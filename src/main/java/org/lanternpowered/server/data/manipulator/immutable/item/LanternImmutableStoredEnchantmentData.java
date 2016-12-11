@@ -23,18 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.immutable;
+package org.lanternpowered.server.data.manipulator.immutable.item;
 
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
+import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableListData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableStoredEnchantmentData;
+import org.spongepowered.api.data.manipulator.mutable.item.StoredEnchantmentData;
+import org.spongepowered.api.data.meta.ItemEnchantment;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
-        ImmutableValueStore<S, H> {
+public class LanternImmutableStoredEnchantmentData extends AbstractImmutableListData<ItemEnchantment, ImmutableStoredEnchantmentData, StoredEnchantmentData>
+        implements ImmutableStoredEnchantmentData {
 
-    @SuppressWarnings("unchecked")
-    @Override
-    default S copy() {
-        return (S) this;
+    public LanternImmutableStoredEnchantmentData() {
+        super(ImmutableStoredEnchantmentData.class, StoredEnchantmentData.class, Keys.STORED_ENCHANTMENTS);
+    }
+
+    public LanternImmutableStoredEnchantmentData(StoredEnchantmentData manipulator) {
+        super(manipulator);
     }
 }

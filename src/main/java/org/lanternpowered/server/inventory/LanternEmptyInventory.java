@@ -50,7 +50,7 @@ import javax.annotation.Nullable;
 /**
  * Bottom type / empty results set for inventory queries.
  */
-final class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
+class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
 
     @Nullable private final AbstractInventory parent;
 

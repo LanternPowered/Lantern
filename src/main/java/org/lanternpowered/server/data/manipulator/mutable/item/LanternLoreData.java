@@ -23,18 +23,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.immutable;
+package org.lanternpowered.server.data.manipulator.mutable.item;
 
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
+import org.lanternpowered.server.data.manipulator.mutable.AbstractListData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableLoreData;
+import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
+import org.spongepowered.api.text.Text;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
-        ImmutableValueStore<S, H> {
+import java.util.ArrayList;
 
-    @SuppressWarnings("unchecked")
-    @Override
-    default S copy() {
-        return (S) this;
+public class LanternLoreData extends AbstractListData<Text, LoreData, ImmutableLoreData> implements LoreData {
+
+    public LanternLoreData() {
+        super(LoreData.class, ImmutableLoreData.class, Keys.ITEM_LORE, new ArrayList<>());
+    }
+
+    public LanternLoreData(ImmutableLoreData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternLoreData(LoreData manipulator) {
+        super(manipulator);
     }
 }

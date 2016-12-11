@@ -23,18 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.immutable;
+package org.lanternpowered.server.data.manipulator.mutable.item;
 
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
+import org.lanternpowered.server.data.manipulator.mutable.AbstractVariantData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableSpawnableData;
+import org.spongepowered.api.data.manipulator.mutable.item.SpawnableData;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
-        ImmutableValueStore<S, H> {
+public class LanternSpawnableData extends AbstractVariantData<EntityType, SpawnableData, ImmutableSpawnableData> implements SpawnableData {
 
-    @SuppressWarnings("unchecked")
-    @Override
-    default S copy() {
-        return (S) this;
+    public LanternSpawnableData() {
+        super(SpawnableData.class, ImmutableSpawnableData.class, Keys.SPAWNABLE_ENTITY_TYPE, EntityTypes.CHICKEN);
+    }
+
+    public LanternSpawnableData(ImmutableSpawnableData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternSpawnableData(SpawnableData manipulator) {
+        super(manipulator);
     }
 }

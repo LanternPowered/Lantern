@@ -50,6 +50,16 @@ import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutabl
 import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableDurabilityData;
 import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableEnchantmentData;
 import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableFishData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableGenerationData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableGoldenAppleData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableHideData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableInventoryItemData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableLoreData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableMapItemData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutablePagedData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutablePlaceableData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableSpawnableData;
+import org.lanternpowered.server.data.manipulator.immutable.item.LanternImmutableStoredEnchantmentData;
 import org.lanternpowered.server.data.manipulator.mutable.IDataManipulator;
 import org.lanternpowered.server.data.manipulator.mutable.LanternColoredData;
 import org.lanternpowered.server.data.manipulator.mutable.LanternCommandData;
@@ -72,6 +82,16 @@ import org.lanternpowered.server.data.manipulator.mutable.item.LanternCookedFish
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternDurabilityData;
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternEnchantmentData;
 import org.lanternpowered.server.data.manipulator.mutable.item.LanternFishData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternGenerationData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternGoldenAppleData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternHideData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternInventoryItemData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternLoreData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternMapItemData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternPagedData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternPlaceableData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternSpawnableData;
+import org.lanternpowered.server.data.manipulator.mutable.item.LanternStoredEnchantmentData;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -96,6 +116,16 @@ import org.spongepowered.api.data.manipulator.immutable.item.ImmutableCookedFish
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableDurabilityData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableEnchantmentData;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableFishData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableGenerationData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableGoldenAppleData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableHideData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableInventoryItemData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableLoreData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableMapItemData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutablePagedData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutablePlaceableData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableSpawnableData;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableStoredEnchantmentData;
 import org.spongepowered.api.data.manipulator.mutable.ColoredData;
 import org.spongepowered.api.data.manipulator.mutable.CommandData;
 import org.spongepowered.api.data.manipulator.mutable.DisplayNameData;
@@ -117,6 +147,16 @@ import org.spongepowered.api.data.manipulator.mutable.item.CookedFishData;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
 import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
 import org.spongepowered.api.data.manipulator.mutable.item.FishData;
+import org.spongepowered.api.data.manipulator.mutable.item.GenerationData;
+import org.spongepowered.api.data.manipulator.mutable.item.GoldenAppleData;
+import org.spongepowered.api.data.manipulator.mutable.item.HideData;
+import org.spongepowered.api.data.manipulator.mutable.item.InventoryItemData;
+import org.spongepowered.api.data.manipulator.mutable.item.LoreData;
+import org.spongepowered.api.data.manipulator.mutable.item.MapItemData;
+import org.spongepowered.api.data.manipulator.mutable.item.PagedData;
+import org.spongepowered.api.data.manipulator.mutable.item.PlaceableData;
+import org.spongepowered.api.data.manipulator.mutable.item.SpawnableData;
+import org.spongepowered.api.data.manipulator.mutable.item.StoredEnchantmentData;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -183,6 +223,26 @@ public class DataManipulatorRegistry {
                 ImmutableEnchantmentData.class, LanternImmutableEnchantmentData::new, LanternImmutableEnchantmentData::new);
         register(FishData.class, LanternFishData::new, LanternFishData::new, LanternFishData::new,
                 ImmutableFishData.class, LanternImmutableFishData::new, LanternImmutableFishData::new);
+        register(GenerationData.class, LanternGenerationData::new, LanternGenerationData::new, LanternGenerationData::new,
+                ImmutableGenerationData.class, LanternImmutableGenerationData::new, LanternImmutableGenerationData::new);
+        register(GoldenAppleData.class, LanternGoldenAppleData::new, LanternGoldenAppleData::new, LanternGoldenAppleData::new,
+                ImmutableGoldenAppleData.class, LanternImmutableGoldenAppleData::new, LanternImmutableGoldenAppleData::new);
+        register(HideData.class, LanternHideData::new, LanternHideData::new, LanternHideData::new,
+                ImmutableHideData.class, LanternImmutableHideData::new, LanternImmutableHideData::new);
+        register(InventoryItemData.class, LanternInventoryItemData::new, LanternInventoryItemData::new, LanternInventoryItemData::new,
+                ImmutableInventoryItemData.class, LanternImmutableInventoryItemData::new, LanternImmutableInventoryItemData::new);
+        register(LoreData.class, LanternLoreData::new, LanternLoreData::new, LanternLoreData::new,
+                ImmutableLoreData.class, LanternImmutableLoreData::new, LanternImmutableLoreData::new);
+        register(MapItemData.class, LanternMapItemData::new, LanternMapItemData::new, LanternMapItemData::new,
+                ImmutableMapItemData.class, LanternImmutableMapItemData::new, LanternImmutableMapItemData::new);
+        register(PagedData.class, LanternPagedData::new, LanternPagedData::new, LanternPagedData::new,
+                ImmutablePagedData.class, LanternImmutablePagedData::new, LanternImmutablePagedData::new);
+        register(PlaceableData.class, LanternPlaceableData::new, LanternPlaceableData::new, LanternPlaceableData::new,
+                ImmutablePlaceableData.class, LanternImmutablePlaceableData::new, LanternImmutablePlaceableData::new);
+        register(SpawnableData.class, LanternSpawnableData::new, LanternSpawnableData::new, LanternSpawnableData::new,
+                ImmutableSpawnableData.class, LanternImmutableSpawnableData::new, LanternImmutableSpawnableData::new);
+        register(StoredEnchantmentData.class, LanternStoredEnchantmentData::new, LanternStoredEnchantmentData::new, LanternStoredEnchantmentData::new,
+                ImmutableStoredEnchantmentData.class, LanternImmutableStoredEnchantmentData::new, LanternImmutableStoredEnchantmentData::new);
     }
 
     public <M extends DataManipulator<M, I>, I extends ImmutableDataManipulator<I, M>> DataManipulatorRegistration<M, I> register(

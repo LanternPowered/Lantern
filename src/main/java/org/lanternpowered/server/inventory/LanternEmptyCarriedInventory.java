@@ -23,18 +23,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.immutable;
+package org.lanternpowered.server.inventory;
 
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
+import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
-        ImmutableValueStore<S, H> {
+import java.lang.ref.WeakReference;
+import java.util.Optional;
 
-    @SuppressWarnings("unchecked")
+import javax.annotation.Nullable;
+
+public class LanternEmptyCarriedInventory<C extends Carrier> extends LanternEmptyInventory implements CarriedInventory<C> {
+
+    @Nullable private final WeakReference<C> carrier;
+
+    public LanternEmptyCarriedInventory(@Nullable Inventory parent, @Nullable C carrier) {
+        super(parent);
+        this.carrier = carrier == null ? null : new WeakReference<>(carrier);
+    }
+
     @Override
-    default S copy() {
-        return (S) this;
+    public Optional<C> getCarrier() {
+        return this.carrier == null ? Optional.empty() : Optional.ofNullable(this.carrier.get());
     }
 }

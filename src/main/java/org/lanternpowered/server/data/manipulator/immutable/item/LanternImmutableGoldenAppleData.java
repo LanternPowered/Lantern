@@ -23,18 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.immutable;
+package org.lanternpowered.server.data.manipulator.immutable.item;
 
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
+import org.lanternpowered.server.data.manipulator.immutable.AbstractImmutableVariantData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutableGoldenAppleData;
+import org.spongepowered.api.data.manipulator.mutable.item.GoldenAppleData;
+import org.spongepowered.api.data.type.GoldenApple;
+import org.spongepowered.api.data.type.GoldenApples;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
-        ImmutableValueStore<S, H> {
+public class LanternImmutableGoldenAppleData extends AbstractImmutableVariantData<GoldenApple, ImmutableGoldenAppleData, GoldenAppleData>
+        implements ImmutableGoldenAppleData {
 
-    @SuppressWarnings("unchecked")
-    @Override
-    default S copy() {
-        return (S) this;
+    public LanternImmutableGoldenAppleData() {
+        super(ImmutableGoldenAppleData.class, GoldenAppleData.class, Keys.GOLDEN_APPLE_TYPE, GoldenApples.GOLDEN_APPLE);
+    }
+
+    public LanternImmutableGoldenAppleData(GoldenAppleData manipulator) {
+        super(manipulator);
     }
 }

@@ -93,6 +93,7 @@ public abstract class AbstractImmutableData<I extends ImmutableDataManipulator<I
                 key1 -> (Optional) AbstractValueContainer.super.getValue((Key) key1));
     }
 
+    @Override
     public <E, R extends ImmutableValue<E>> Optional<R> getImmutableValue(Key<? extends BaseValue<E>> key) {
         //noinspection unchecked
         return this.cachedImmutableValues.computeIfAbsent(key, key1 -> {

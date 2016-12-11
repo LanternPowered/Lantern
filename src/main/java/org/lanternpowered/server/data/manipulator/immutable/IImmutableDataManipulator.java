@@ -26,10 +26,16 @@
 package org.lanternpowered.server.data.manipulator.immutable;
 
 import org.lanternpowered.server.data.manipulator.IDataManipulatorBase;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
+import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
+
+import java.util.Optional;
 
 public interface IImmutableDataManipulator<I extends ImmutableDataManipulator<I, M>, M extends DataManipulator<M, I>>
         extends ImmutableDataManipulator<I, M>, IDataManipulatorBase<M, I> {
 
+    <E, R extends ImmutableValue<E>> Optional<R> getImmutableValue(Key<? extends BaseValue<E>> key);
 }

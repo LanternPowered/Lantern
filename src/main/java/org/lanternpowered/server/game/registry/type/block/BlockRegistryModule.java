@@ -1426,7 +1426,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                 .defaultState(state -> state.withTrait(LanternEnumTraits.FACING, Direction.UP).get())
                 .itemType(builder -> builder
                         .keysProvider(valueContainer -> valueContainer
-                                .registerKey(LanternKeys.INVENTORY, InventorySnapshot.EMPTY)
+                                .registerKey(LanternKeys.INVENTORY_SNAPSHOT, InventorySnapshot.EMPTY)
                         )
                         .maxStackQuantity(1)
                 )

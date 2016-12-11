@@ -29,6 +29,7 @@ import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBo
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
+import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.type.LanternBedPart;
 import org.lanternpowered.server.data.type.LanternDoorHalf;
 import org.lanternpowered.server.effect.potion.PotionType;
@@ -39,6 +40,9 @@ import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 public final class LanternKeys {
 
@@ -74,8 +78,8 @@ public final class LanternKeys {
             makeValueKey(LanternBedPart.class, DataQuery.of("BedPart"), "lantern:bed_part");
     public static final Key<Value<Boolean>> ENABLED =
             makeValueKey(Boolean.class, DataQuery.of("Enabled"), "lantern:enabled");
-    public static final Key<Value<InventorySnapshot>> INVENTORY =
-            makeValueKey(InventorySnapshot.class, DataQuery.of("Inventory"), "lantern:inventory");
+    public static final Key<Value<InventorySnapshot>> INVENTORY_SNAPSHOT =
+            makeValueKey(InventorySnapshot.class, DataQuery.of("InventorySnapshot"), "lantern:inventory_snapshot");
     public static final Key<Value<Boolean>> TRIGGERED =
             makeValueKey(Boolean.class, DataQuery.of("Triggered"), "lantern:triggered");
     public static final Key<Value<Boolean>> IS_ELYTRA_FLYING =
@@ -84,6 +88,8 @@ public final class LanternKeys {
             makeValueKey(PotionType.class, DataQuery.of("PotionType"), "lantern:potion_type");
     public static final Key<Value<Boolean>> EXPLODE =
             makeValueKey(Boolean.class, DataQuery.of("Explode"), "lantern:explode");
+    public static final Key<Value<CarriedInventory<? extends Carrier>>> ITEM_INVENTORY =
+            makeValueKey(new TypeToken<CarriedInventory<?>>() {}, DataQuery.of("ItemInventory"), "lantern:item_inventory");
 
     private LanternKeys() {
     }

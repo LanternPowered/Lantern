@@ -32,6 +32,7 @@ import org.spongepowered.api.data.manipulator.mutable.ListData;
 import org.spongepowered.api.data.value.immutable.ImmutableListValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E, I, M>, M extends ListData<E, M, I>>
@@ -41,7 +42,7 @@ public abstract class AbstractImmutableListData<E, I extends ImmutableListData<E
 
     public AbstractImmutableListData(Class<I> immutableManipulatorType, Class<M> manipulatorType, Key<ListValue<E>> listKey) {
         super(immutableManipulatorType, manipulatorType);
-        registerKey(listKey).notRemovable();
+        registerKey(listKey, new ArrayList<>()).notRemovable();
         this.listKey = listKey;
     }
 

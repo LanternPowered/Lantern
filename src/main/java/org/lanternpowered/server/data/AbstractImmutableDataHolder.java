@@ -25,11 +25,114 @@
  */
 package org.lanternpowered.server.data;
 
+import com.google.common.collect.ImmutableList;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistration;
+import org.lanternpowered.server.data.manipulator.DataManipulatorRegistry;
+import org.lanternpowered.server.data.manipulator.immutable.IImmutableDataManipulator;
 import org.lanternpowered.server.data.value.immutable.AbstractImmutableValueStore;
 import org.spongepowered.api.data.ImmutableDataHolder;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
+import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
-public interface AbstractImmutableDataHolder<T extends ImmutableDataHolder<T>> extends
-        AbstractImmutableValueStore<T, ImmutableDataManipulator<?, ?>>, ImmutableDataHolder<T> {
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
+public interface AbstractImmutableDataHolder<H extends ImmutableDataHolder<H>> extends
+        AbstractImmutableValueStore<H, ImmutableDataManipulator<?, ?>>, ImmutableDataHolder<H> {
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default <T extends ImmutableDataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
+        // Check default registrations
+        final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByMutable((Class) containerClass);
+        if (optRegistration.isPresent()) {
+            final DataManipulatorRegistration registration = optRegistration.get();
+            final DataManipulator manipulator = (DataManipulator) optRegistration.get().getManipulatorSupplier().get();
+            for (Key key : (Set<Key>) registration.getRequiredKeys()) {
+                final Optional value = getValue(key);
+                if (!value.isPresent()) {
+                    return Optional.empty();
+                }
+                manipulator.set(key, value.get());
+            }
+            return Optional.of((T) manipulator.asImmutable());
+        }
+
+        // Try the additional manipulators if they are supported
+        final Map<Class<?>, ImmutableDataManipulator<?, ?>> manipulators = getRawAdditionalContainers();
+        if (manipulators != null) {
+            for (ImmutableDataManipulator<?, ?> manipulator : manipulators.values()) {
+                if (containerClass.isInstance(manipulator)) {
+                    return Optional.of((T) manipulator.copy());
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    @Override
+    default <T extends ImmutableDataManipulator<?, ?>> Optional<T> getOrCreate(Class<T> containerClass) {
+        return get(containerClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default boolean supports(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
+        if (containerClass.isAssignableFrom(IImmutableDataManipulator.class)) {
+            // Offer all the default key values as long if they are supported
+            final Optional<DataManipulatorRegistration> optRegistration = DataManipulatorRegistry.get().getByMutable((Class) containerClass);
+            if (optRegistration.isPresent()) {
+                final DataManipulatorRegistration registration = optRegistration.get();
+                for (Key key : (Set<Key>) registration.getRequiredKeys()) {
+                    if (!supports(key)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+
+        // Support all the additional manipulators
+        return getRawAdditionalContainers() != null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    default List<ImmutableDataManipulator<?, ?>> getManipulators() {
+        final ImmutableList.Builder<ImmutableDataManipulator<?, ?>> builder = ImmutableList.builder();
+        for (DataManipulatorRegistration registration : DataManipulatorRegistry.get().getAll()) {
+            DataManipulator manipulator = (DataManipulator<?, ?>) registration.getImmutableManipulatorSupplier().get();
+            for (Key key : (Set<Key>) registration.getRequiredKeys()) {
+                final Optional value = getValue(key);
+                if (value.isPresent()) {
+                    manipulator.set(key, value.get());
+                } else if (!supports(key)) {
+                    manipulator = null;
+                    break;
+                }
+            }
+            if (manipulator != null) {
+                builder.add(manipulator.asImmutable());
+            }
+        }
+
+        // Try the additional manipulators if they are supported
+        final Map<Class<?>, ImmutableDataManipulator<?, ?>> manipulators = getRawAdditionalContainers();
+        if (manipulators != null) {
+            manipulators.values().forEach(manipulator -> builder.add(manipulator.copy()));
+        }
+
+        return builder.build();
+    }
+
+    @Override
+    default List<ImmutableDataManipulator<?, ?>> getContainers() {
+        return getManipulators();
+    }
 }

@@ -36,7 +36,6 @@ import org.lanternpowered.server.item.LanternItemType;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
@@ -51,6 +50,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+
+import javax.annotation.Nullable;
 
 public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmutableDataHolder<ItemStackSnapshot>, AbstractPropertyHolder {
 
@@ -71,6 +72,12 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
         this.rawValueMap = rawValueMap;
         this.itemType = itemType;
         this.quantity = quantity;
+    }
+
+    @Nullable
+    @Override
+    public Map<Class<?>, ImmutableDataManipulator<?,?>> getRawAdditionalContainers() {
+        return this.rawAdditionalManipulators;
     }
 
     @Override
@@ -96,11 +103,6 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
     }
 
     @Override
-    public List<ImmutableDataManipulator<?, ?>> getManipulators() {
-        return null;
-    }
-
-    @Override
     public int getContentVersion() {
         return 0;
     }
@@ -113,31 +115,6 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
     @Override
     public Map<Key<?>, KeyRegistration> getRawValueMap() {
         return this.rawValueMap;
-    }
-
-    @Override
-    public boolean supports(Key<?> key) {
-        return false;
-    }
-
-    @Override
-    public ItemStackSnapshot copy() {
-        return null;
-    }
-
-    @Override
-    public <T extends ImmutableDataManipulator<?, ?>> Optional<T> get(Class<T> containerClass) {
-        return null;
-    }
-
-    @Override
-    public <T extends ImmutableDataManipulator<?, ?>> Optional<T> getOrCreate(Class<T> containerClass) {
-        return null;
-    }
-
-    @Override
-    public boolean supports(Class<? extends ImmutableDataManipulator<?, ?>> containerClass) {
-        return false;
     }
 
     @Override
@@ -177,11 +154,6 @@ public class LanternItemStackSnapshot implements ItemStackSnapshot, AbstractImmu
 
     @Override
     public ItemStackSnapshot merge(ItemStackSnapshot that, MergeFunction function) {
-        return null;
-    }
-
-    @Override
-    public List<ImmutableDataManipulator<?, ?>> getContainers() {
         return null;
     }
 

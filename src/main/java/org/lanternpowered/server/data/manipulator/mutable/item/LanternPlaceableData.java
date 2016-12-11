@@ -23,18 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.data.value.immutable;
+package org.lanternpowered.server.data.manipulator.mutable.item;
 
-import org.lanternpowered.server.data.value.AbstractValueContainer;
-import org.spongepowered.api.data.value.ValueContainer;
-import org.spongepowered.api.data.value.immutable.ImmutableValueStore;
+import org.lanternpowered.server.data.manipulator.mutable.AbstractData;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.immutable.item.ImmutablePlaceableData;
+import org.spongepowered.api.data.manipulator.mutable.item.PlaceableData;
+import org.spongepowered.api.data.value.mutable.SetValue;
 
-public interface AbstractImmutableValueStore<S extends ImmutableValueStore<S, H>, H extends ValueContainer<?>> extends AbstractValueContainer<S, H>,
-        ImmutableValueStore<S, H> {
+import java.util.HashSet;
 
-    @SuppressWarnings("unchecked")
+public class LanternPlaceableData extends AbstractData<PlaceableData, ImmutablePlaceableData> implements PlaceableData {
+
+    public LanternPlaceableData() {
+        super(PlaceableData.class, ImmutablePlaceableData.class);
+    }
+
+    public LanternPlaceableData(ImmutablePlaceableData manipulator) {
+        super(manipulator);
+    }
+
+    public LanternPlaceableData(PlaceableData manipulator) {
+        super(manipulator);
+    }
+
     @Override
-    default S copy() {
-        return (S) this;
+    public void registerKeys() {
+        registerKey(Keys.PLACEABLE_BLOCKS, new HashSet<>()).notRemovable();
+    }
+
+    @Override
+    public SetValue<BlockType> placeable() {
+        return getValue(Keys.PLACEABLE_BLOCKS).get();
     }
 }

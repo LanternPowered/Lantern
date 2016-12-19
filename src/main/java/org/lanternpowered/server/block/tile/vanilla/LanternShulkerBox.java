@@ -27,12 +27,12 @@ package org.lanternpowered.server.block.tile.vanilla;
 
 import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.data.key.LanternKeys;
-import org.lanternpowered.server.effect.sound.LanternSoundTypes;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -64,19 +64,19 @@ public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory>
 
     @Override
     protected void playOpenSound(Location<World> location) {
-        location.getExtent().playSound(LanternSoundTypes.BLOCK_SHULKER_BOX_OPEN, SoundCategories.BLOCK,
+        location.getExtent().playSound(SoundTypes.BLOCK_SHULKER_BOX_OPEN, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
     }
 
     @Override
     protected void playCloseSound(Location<World> location) {
-        location.getExtent().playSound(LanternSoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
+        location.getExtent().playSound(SoundTypes.BLOCK_SHULKER_BOX_CLOSE, SoundCategories.BLOCK,
                 location.getPosition().add(0.5, 0.5, 0.5), 0.5, this.random.nextDouble() * 0.1 + 0.9);
     }
 
     @Override
     public BlockState getBlock() {
-        final BlockState block = this.getLocation().getBlock();
+        final BlockState block = getLocation().getBlock();
         // TODO: Check the colors??
         return block.getType().getId().contains("shulker_box") ? block : LanternBlockTypes.WHITE_SHULKER_BOX.getDefaultState();
     }

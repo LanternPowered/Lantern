@@ -55,14 +55,14 @@ public class ZombieVillagerEntityProtocol<E extends LanternEntity> extends Abstr
     @Override
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
-        parameterList.add(EntityParameters.ZombieVillager.PROFESSION, this.getProfessionId());
+        parameterList.add(EntityParameters.ZombieVillager.PROFESSION, getProfessionId());
         parameterList.add(EntityParameters.ZombieVillager.IS_CONVERTING, this.entity.get(LanternKeys.IS_CONVERTING).orElse(false));
     }
 
     @Override
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
-        final int profession = this.getProfessionId();
+        final int profession = getProfessionId();
         if (profession != this.lastProfession) {
             parameterList.add(EntityParameters.ZombieVillager.PROFESSION, profession);
             this.lastProfession = profession;

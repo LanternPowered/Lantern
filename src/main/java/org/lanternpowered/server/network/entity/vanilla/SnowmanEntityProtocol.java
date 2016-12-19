@@ -23,17 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.effect.sound;
+package org.lanternpowered.server.network.entity.vanilla;
 
-import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
 
-public final class LanternSoundTypes {
+public class SnowmanEntityProtocol<E extends LanternEntity> extends InsentientEntityProtocol<E> {
 
-    public static final SoundType BLOCK_SHULKER_BOX_CLOSE = DummyObjectProvider.createFor(SoundType.class, "BLOCK_SHULKER_BOX_CLOSE");
+    private boolean lastNoPumpkin;
 
-    public static final SoundType BLOCK_SHULKER_BOX_OPEN = DummyObjectProvider.createFor(SoundType.class, "BLOCK_SHULKER_BOX_OPEN");
+    public SnowmanEntityProtocol(E entity) {
+        super(entity);
+    }
 
-    private LanternSoundTypes() {
+    @Override
+    protected int getMobType() {
+        return 97;
+    }
+
+    @Override
+    protected void spawn(ParameterList parameterList) {
+        parameterList.add(EntityParameters.Snowman.FLAGS, (byte) (this.entity.get(LanternKeys.HAS_PUMPKIN_HEAD).orElse(false) ? 0 : 0x10));
+    }
+
+    @Override
+    protected void update(ParameterList parameterList) {
+        final boolean noPumpkin = !this.entity.get(LanternKeys.HAS_PUMPKIN_HEAD).orElse(false);
+        if (this.lastNoPumpkin != noPumpkin) {
+            parameterList.add(EntityParameters.Snowman.FLAGS, (byte) (noPumpkin ? 0x10 : 0));
+            this.lastNoPumpkin = noPumpkin;
+        }
     }
 }

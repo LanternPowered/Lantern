@@ -23,48 +23,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.entity.event;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
 
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
-import org.spongepowered.api.statistic.TeamStatistic;
-import org.spongepowered.api.text.format.TextColor;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 
-import javax.annotation.Nullable;
+public final class SwingHandEntityEvent implements EntityEvent {
 
-public class LanternTeamStatisticBuilder extends AbstractStatisticBuilder<TeamStatistic, TeamStatistic.Builder>
-        implements TeamStatistic.Builder {
+    public static SwingHandEntityEvent of(HandType handType) {
+        checkNotNull(handType, "handType");
+        return handType == HandTypes.MAIN_HAND ? Holder.MAIN_HAND :
+                handType == HandTypes.OFF_HAND ? Holder.OFF_HAND : new SwingHandEntityEvent(handType);
+    }
 
-    private TextColor teamColor;
+    private final HandType handType;
 
-    @Override
-    public TeamStatistic.Builder teamColor(TextColor color) {
-        this.teamColor = checkNotNull(color, "color");
-        return this;
+    private SwingHandEntityEvent(HandType handType) {
+        this.handType = handType;
+    }
+
+    public HandType getHandType() {
+        return this.handType;
     }
 
     @Override
-    public LanternTeamStatisticBuilder from(TeamStatistic value) {
-        super.from(value);
-        this.teamColor = value.getTeamColor();
-        return this;
+    public EntityEventType type() {
+        return EntityEventType.ALIVE;
     }
 
     @Override
-    public LanternTeamStatisticBuilder reset() {
-        super.reset();
-        this.teamColor = null;
-        return this;
+    public String toString() {
+        return toStringHelper(this).add("handType", this.handType.getId()).toString();
     }
 
-    @Override
-    TeamStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
-        checkState(this.teamColor != null, "The teamColor must be set");
-        return new LanternTeamStatistic(pluginId, id, name, translation, group, format, this.teamColor, internalId);
+    private static class Holder {
+        static final SwingHandEntityEvent MAIN_HAND = new SwingHandEntityEvent(HandTypes.MAIN_HAND);
+        static final SwingHandEntityEvent OFF_HAND = new SwingHandEntityEvent(HandTypes.OFF_HAND);
     }
 }

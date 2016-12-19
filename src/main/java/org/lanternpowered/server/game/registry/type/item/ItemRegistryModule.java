@@ -682,6 +682,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////
         register(344, builder()
                 .translation("item.egg.name")
+                .maxStackQuantity(16)
                 .build("minecraft", "egg"));
         ///////////////////
         ///   Compass   ///

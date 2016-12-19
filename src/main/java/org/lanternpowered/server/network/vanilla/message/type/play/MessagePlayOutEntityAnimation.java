@@ -23,33 +23,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.effect;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.SoundTypes;
+import org.lanternpowered.server.network.message.Message;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
+public final class MessagePlayOutEntityAnimation implements Message {
 
-public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
+    private final int entityId;
+    private final int animation;
 
-    public SoundTypeRegistryModule() {
-        super(SoundTypes.class);
+    public MessagePlayOutEntityAnimation(int entityId, int animation) {
+        this.entityId = entityId;
+        this.animation = animation;
     }
 
-    @Override
-    public void registerDefaults() {
-        final Gson gson = new Gson();
-        final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
-                .getResourceAsStream("/internal/sound-events.json"))), JsonArray.class);
-        for (int i = 0; i < array.size(); i++) {
-            final String name = array.get(i).getAsString();
-            final String id = name.replaceAll("\\.", "_");
-            register(new LanternSoundType("minecraft", id, name, i));
-        }
+    public int getEntityId() {
+        return this.entityId;
+    }
+
+    public int getAnimation() {
+        return this.animation;
     }
 }

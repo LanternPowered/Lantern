@@ -76,7 +76,7 @@ public interface AbstractEquipable extends Equipable {
         if (inventory instanceof EmptyInventory) {
             return false;
         }
-        InventoryTransactionResult result = inventory.<SimpleEquipmentInventory>first().set(type, equipment);
+        final InventoryTransactionResult result = inventory.<SimpleEquipmentInventory>first().set(type, equipment);
         return result.getType().equals(InventoryTransactionResult.Type.SUCCESS);
     }
 }

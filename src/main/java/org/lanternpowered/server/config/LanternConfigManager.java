@@ -48,22 +48,21 @@ public final class LanternConfigManager implements ConfigManager {
     @Override
     public ConfigRoot getSharedConfig(Object instance) {
         final PluginContainer pluginContainer = checkPlugin(instance, "instance");
-        return new LanternConfigRoot(this.getMapperFactory(pluginContainer), pluginContainer.getId().toLowerCase(),
-                this.configRoot);
+        final String name = pluginContainer.getId().toLowerCase();
+        return new LanternConfigRoot(getMapperFactory(pluginContainer), name, this.configRoot);
     }
 
     @Override
     public ConfigRoot getPluginConfig(Object instance) {
         final PluginContainer pluginContainer = checkPlugin(instance, "instance");
         final String name = pluginContainer.getId().toLowerCase();
-        return new LanternConfigRoot(this.getMapperFactory(pluginContainer), name, this.configRoot.resolve(name));
+        return new LanternConfigRoot(getMapperFactory(pluginContainer), name, this.configRoot.resolve(name));
     }
 
-    private ObjectMapperFactory getMapperFactory(PluginContainer container) {
+    private static ObjectMapperFactory getMapperFactory(PluginContainer container) {
         if (container instanceof LanternPluginContainer) {
             return ((LanternPluginContainer) container).getInjector().getInstance(GuiceObjectMapperFactory.class);
         }
         return DefaultObjectMapperFactory.getInstance();
     }
-
 }

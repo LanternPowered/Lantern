@@ -27,6 +27,7 @@ package org.lanternpowered.server.profile;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.JsonArray;
@@ -95,6 +96,16 @@ public final class LanternProfileProperty implements ProfileProperty {
         return Objects.hash(this.name, this.value, this.signature);
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("name", this.name)
+                .add("value", this.value)
+                .add("signature", this.signature)
+                .omitNullValues()
+                .toString();
+    }
+
     /**
      * Creates {@link LanternProfileProperty} from the specified {@link JsonObject}.
      *
@@ -102,9 +113,9 @@ public final class LanternProfileProperty implements ProfileProperty {
      * @return The profile property
      */
     public static LanternProfileProperty createFromJson(JsonObject jsonObject) {
-        String name = jsonObject.get("name").getAsString();
-        String value = jsonObject.get("value").getAsString();
-        String signature = jsonObject.has("signature") ? jsonObject.get("signature").getAsString() : null;
+        final String name = jsonObject.get("name").getAsString();
+        final String value = jsonObject.get("value").getAsString();
+        final String signature = jsonObject.has("signature") ? jsonObject.get("signature").getAsString() : null;
         return new LanternProfileProperty(name, value, signature);
     }
 
@@ -115,9 +126,9 @@ public final class LanternProfileProperty implements ProfileProperty {
      * @return The multimap
      */
     public static Multimap<String, ProfileProperty> createPropertiesMapFromJson(JsonArray jsonArray) {
-        Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
+        final Multimap<String, ProfileProperty> properties = LinkedHashMultimap.create();
         for (int i = 0; i < jsonArray.size(); i++) {
-            ProfileProperty profileProperty = createFromJson(jsonArray.get(i).getAsJsonObject());
+            final ProfileProperty profileProperty = createFromJson(jsonArray.get(i).getAsJsonObject());
             properties.put(profileProperty.getName(), profileProperty);
         }
         return properties;

@@ -138,7 +138,7 @@ public final class MessageCodecHandler extends MessageToMessageCodec<ByteBuf, Me
         }
         if (message instanceof BulkMessage) {
             ((BulkMessage) message).getMessages().forEach(message1 ->
-                    this.processMessage(message1, output, protocol, state, context));
+                    processMessage(message1, output, protocol, state, context));
             return;
         }
         final MessageRegistration messageRegistration = (MessageRegistration) protocol.inbound()

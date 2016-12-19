@@ -216,7 +216,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
                 this.playerInteractTimes.clear();
             }
         }
-        this.remove(context);
+        remove(context);
     }
 
     protected void remove(EntityProtocolInitContext context) {

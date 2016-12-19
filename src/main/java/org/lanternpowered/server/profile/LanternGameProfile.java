@@ -128,17 +128,17 @@ public final class LanternGameProfile implements GameProfile {
 
     @Override
     public DataContainer toContainer() {
-        DataContainer container = new MemoryDataContainer()
+        final DataContainer container = new MemoryDataContainer()
                 .set(UNIQUE_ID, this.uniqueId.toString());
         if (this.name != null) {
             container.set(NAME, this.name);
         }
         if (!this.properties.isEmpty()) {
-            DataContainer propertiesMap = new MemoryDataContainer();
+            final DataContainer propertiesMap = new MemoryDataContainer();
             for (String key : this.properties.keySet()) {
-                List<DataContainer> entries = Lists.newArrayList();
+                final List<DataContainer> entries = Lists.newArrayList();
                 for (ProfileProperty property : this.properties.get(key)) {
-                    DataContainer entry = new MemoryDataContainer()
+                    final DataContainer entry = new MemoryDataContainer()
                             .set(VALUE, property.getValue());
                     property.getSignature().ifPresent(signature -> entry.set(SIGNATURE, signature));
                     entries.add(entry);

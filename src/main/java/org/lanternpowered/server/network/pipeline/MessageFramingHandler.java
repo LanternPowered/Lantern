@@ -51,7 +51,6 @@ import static org.lanternpowered.server.network.buffer.LanternByteBuffer.readVar
 import static org.lanternpowered.server.network.buffer.LanternByteBuffer.writeVarInt;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageCodec;
 

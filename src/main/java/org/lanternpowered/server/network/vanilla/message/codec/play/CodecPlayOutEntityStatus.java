@@ -32,7 +32,7 @@ import org.lanternpowered.server.network.message.codec.Codec;
 import org.lanternpowered.server.network.message.codec.CodecContext;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetOpLevel;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetReducedDebug;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutEntityStatus;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 
 public final class CodecPlayOutEntityStatus implements Codec<Message> {
 
@@ -40,8 +40,8 @@ public final class CodecPlayOutEntityStatus implements Codec<Message> {
 
     @Override
     public ByteBuffer encode(CodecContext context, Message message) throws CodecException {
-        int entityId;
-        int action;
+        final int entityId;
+        final int action;
         if (message instanceof MessagePlayOutSetReducedDebug) {
             entityId = context.getChannel().attr(CodecPlayOutPlayerJoinGame.PLAYER_ENTITY_ID).get();
             action = ((MessagePlayOutSetReducedDebug) message).isReduced() ? 22 : 23;

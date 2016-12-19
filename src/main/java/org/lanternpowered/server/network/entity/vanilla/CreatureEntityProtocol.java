@@ -47,7 +47,7 @@ public abstract class CreatureEntityProtocol<E extends LanternEntity> extends Li
     protected abstract int getMobType();
 
     @Override
-    public void spawn(EntityProtocolUpdateContext context) {
+    protected void spawn(EntityProtocolUpdateContext context) {
         final Vector3d rot = this.entity.getRotation();
         final Vector3d headRot = this.entity instanceof LanternLiving ? ((LanternLiving) this.entity).getHeadRotation() : null;
         final Vector3d pos = this.entity.getPosition();

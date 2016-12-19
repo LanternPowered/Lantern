@@ -221,14 +221,14 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
      * @return The byte buffer
      */
     ParameterList fillParameters(boolean initial) {
-        return this.fillParameters(initial, new ByteBufParameterList(ByteBufferAllocator.unpooled()));
+        return fillParameters(initial, new ByteBufParameterList(ByteBufferAllocator.unpooled()));
     }
 
     private ParameterList fillParameters(boolean initial, ParameterList parameterList) {
         if (initial) {
-            this.spawn(parameterList);
+            spawn(parameterList);
         } else {
-            this.update(parameterList);
+            update(parameterList);
         }
         return parameterList;
     }
@@ -252,12 +252,12 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
      * @param parameterList The parameter list to fill
      */
     protected void spawn(ParameterList parameterList) {
-        parameterList.add(EntityParameters.Base.FLAGS, this.packFlags());
-        parameterList.add(EntityParameters.Base.AIR_LEVEL, this.getInitialAirLevel());
+        parameterList.add(EntityParameters.Base.FLAGS, packFlags());
+        parameterList.add(EntityParameters.Base.AIR_LEVEL, getInitialAirLevel());
         parameterList.add(EntityParameters.Base.CUSTOM_NAME, this.entity.get(Keys.DISPLAY_NAME).map(LanternTexts::toLegacy).orElse(""));
         parameterList.add(EntityParameters.Base.CUSTOM_NAME_VISIBLE, this.entity.get(Keys.CUSTOM_NAME_VISIBLE).orElse(true));
         parameterList.add(EntityParameters.Base.IS_SILENT, this.entity.get(Keys.IS_SILENT).orElse(false));
-        parameterList.add(EntityParameters.Base.NO_GRAVITY, this.hasNoGravity());
+        parameterList.add(EntityParameters.Base.NO_GRAVITY, hasNoGravity());
     }
 
     boolean hasNoGravity() {

@@ -45,6 +45,8 @@ public final class EntityProtocolTypes {
 
     public static final EntityProtocolType<LanternEntity> HUSK = dummy("HUSK");
 
+    public static final EntityProtocolType<LanternEntity> IRON_GOLEM = dummy("IRON_GOLEM");
+
     public static final EntityProtocolType<LanternEntity> ITEM = dummy("ITEM");
 
     public static final EntityProtocolType<LanternEntity> LIGHTNING = dummy("LIGHTNING");
@@ -60,6 +62,8 @@ public final class EntityProtocolTypes {
     public static final EntityProtocolType<LanternEntity> SILVERFISH = dummy("SILVERFISH");
 
     public static final EntityProtocolType<LanternEntity> SLIME = dummy("SLIME");
+
+    public static final EntityProtocolType<LanternEntity> SNOWMAN = dummy("SNOWMAN");
 
     public static final EntityProtocolType<LanternEntity> VILLAGER = dummy("VILLAGER");
 

@@ -46,9 +46,9 @@ public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends Entity
 
     private void spawn(EntityProtocolUpdateContext context, int quantity) {
         if (quantity == 0) {
-            context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.getRootEntityId()));
+            context.sendToAll(() -> new MessagePlayOutDestroyEntities(getRootEntityId()));
         } else {
-            context.sendToAll(() -> new MessagePlayOutSpawnExperienceOrb(this.getRootEntityId(), quantity, this.entity.getPosition()));
+            context.sendToAll(() -> new MessagePlayOutSpawnExperienceOrb(getRootEntityId(), quantity, this.entity.getPosition()));
         }
     }
 
@@ -56,11 +56,11 @@ public class ExperienceOrbEntityProtocol<E extends LanternEntity> extends Entity
     protected void update(EntityProtocolUpdateContext context) {
         final int quantity = this.entity.get(Keys.HELD_EXPERIENCE).orElse(1);
         if (this.lastQuantity != quantity) {
-            this.spawn(context, quantity);
-            this.update0(EntityProtocolUpdateContext.empty());
+            spawn(context, quantity);
+            update0(EntityProtocolUpdateContext.empty());
             this.lastQuantity = quantity;
         } else {
-            this.update0(context);
+            update0(context);
         }
     }
 

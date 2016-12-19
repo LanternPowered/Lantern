@@ -23,25 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play.internal;
+package org.lanternpowered.server.entity.event;
 
-import org.lanternpowered.server.network.message.Message;
+public final class DamageEntityEvent implements EntityEvent {
 
-public final class MessagePlayOutEntityStatus implements Message {
+    public static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
 
-    private final int entityId;
-    private final int status;
-
-    public MessagePlayOutEntityStatus(int entityId, int status) {
-        this.entityId = entityId;
-        this.status = status;
+    private DamageEntityEvent() {
     }
 
-    public int getEntityId() {
-        return this.entityId;
-    }
-
-    public int getStatus() {
-        return this.status;
+    @Override
+    public EntityEventType type() {
+        return EntityEventType.ALIVE;
     }
 }

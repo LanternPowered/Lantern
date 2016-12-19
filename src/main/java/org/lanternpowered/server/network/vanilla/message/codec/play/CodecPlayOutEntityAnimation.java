@@ -23,15 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.block.tile;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import org.spongepowered.api.block.tileentity.TileEntityType;
-import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
 
-public final class LanternTileEntityTypes {
+public class CodecPlayOutEntityAnimation implements Codec<MessagePlayOutEntityAnimation> {
 
-    public static final TileEntityType SHULKER_BOX = DummyObjectProvider.createFor(TileEntityType.class, "SHULKER_BOX");
-
-    private LanternTileEntityTypes() {
+    @Override
+    public ByteBuffer encode(CodecContext context, MessagePlayOutEntityAnimation message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
+        buf.writeByte((byte) message.getAnimation());
+        return buf;
     }
 }

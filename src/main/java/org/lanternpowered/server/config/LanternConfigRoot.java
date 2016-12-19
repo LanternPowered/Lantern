@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.config;
 
+import com.google.common.base.MoreObjects;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -37,16 +38,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-/**
- * Root for lantern configurations.
- */
-public final class LanternConfigRoot implements ConfigRoot {
+final class LanternConfigRoot implements ConfigRoot {
 
     private final ObjectMapperFactory mapperFactory;
     private final String pluginName;
     private final Path baseDir;
 
-    public LanternConfigRoot(ObjectMapperFactory mapperFactory, String pluginName, Path baseDir) {
+    LanternConfigRoot(ObjectMapperFactory mapperFactory, String pluginName, Path baseDir) {
         this.mapperFactory = mapperFactory;
         this.pluginName = pluginName;
         this.baseDir = baseDir;
@@ -68,7 +66,7 @@ public final class LanternConfigRoot implements ConfigRoot {
     @Override
     public ConfigurationLoader<CommentedConfigurationNode> getConfig() {
         return HoconConfigurationLoader.builder()
-                .setPath(this.getConfigPath())
+                .setPath(getConfigPath())
                 .setDefaultOptions(ConfigurationOptions.defaults().setObjectMapperFactory(this.mapperFactory))
                 .build();
     }
@@ -78,4 +76,12 @@ public final class LanternConfigRoot implements ConfigRoot {
         return this.baseDir;
     }
 
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("plugin", this.pluginName)
+                .add("directory", this.baseDir)
+                .add("configPath", this.baseDir.resolve(this.pluginName + ".conf"))
+                .toString();
+    }
 }

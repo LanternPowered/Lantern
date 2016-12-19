@@ -71,7 +71,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     private GameProfile getById(UUID uniqueId, boolean useCache, boolean signed) throws Exception {
         if (useCache) {
-            Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupById(uniqueId);
+            final Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupById(uniqueId);
             if (optProfile.isPresent()) {
                 return optProfile.get();
             }
@@ -91,7 +91,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
         return Lantern.getScheduler().submitAsyncTask(() -> {
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
             for (UUID uniqueId : uniqueIds) {
-                builder.add(this.getById(uniqueId, useCache, true));
+                builder.add(getById(uniqueId, useCache, true));
             }
             return builder.build();
         });
@@ -102,7 +102,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
         checkNotNull(name, "name");
         return Lantern.getScheduler().submitAsyncTask(() -> {
             if (useCache) {
-                Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupByName(name);
+                final Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupByName(name);
                 if (optProfile.isPresent()) {
                     return optProfile.get();
                 } else {
@@ -122,16 +122,16 @@ public final class LanternGameProfileManager implements GameProfileManager {
         checkNotNull(names, "names");
         return Lantern.getScheduler().submitAsyncTask(() -> {
             if (useCache) {
-                Map<String, Optional<GameProfile>> profiles = this.gameProfileCache.getOrLookupByNames(names);
+                final Map<String, Optional<GameProfile>> profiles = this.gameProfileCache.getOrLookupByNames(names);
                 return profiles.values().stream().filter(Optional::isPresent).map(Optional::get).collect(GuavaCollectors.toImmutableSet());
             }
             final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
-            Map<String, UUID> results = GameProfileQuery.queryUUIDByName(names);
+            final Map<String, UUID> results = GameProfileQuery.queryUUIDByName(names);
             for (String name : names) {
                 if (!results.containsKey(name)) {
                     throw new ProfileNotFoundException("Unable to find a profile with the name: " + name);
                 }
-                builder.add(this.getById(results.get(name), false, true));
+                builder.add(getById(results.get(name), false, true));
             }
             return builder.build();
         });
@@ -142,7 +142,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
         checkNotNull(profile, "profile");
         return Lantern.getScheduler().submitAsyncTask(() -> {
             if (useCache) {
-                Optional<GameProfile> optProfile = this.gameProfileCache.fillProfile(profile, signed);
+                final Optional<GameProfile> optProfile = this.gameProfileCache.fillProfile(profile, signed);
                 if (optProfile.isPresent()) {
                     return optProfile.get();
                 }

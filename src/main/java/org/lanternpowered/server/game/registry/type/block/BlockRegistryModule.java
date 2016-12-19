@@ -69,7 +69,6 @@ import org.lanternpowered.server.block.behavior.vanilla.RotationPlacementBehavio
 import org.lanternpowered.server.block.behavior.vanilla.TorchPlacementBehavior;
 import org.lanternpowered.server.block.extended.SnowyExtendedBlockStateProvider;
 import org.lanternpowered.server.block.state.LanternBlockState;
-import org.lanternpowered.server.block.tile.LanternTileEntityTypes;
 import org.lanternpowered.server.block.trait.LanternBooleanTraits;
 import org.lanternpowered.server.block.trait.LanternEnumTraits;
 import org.lanternpowered.server.block.trait.LanternIntegerTraits;
@@ -1430,7 +1429,7 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
                         )
                         .maxStackQuantity(1)
                 )
-                .tileEntityType(() -> LanternTileEntityTypes.SHULKER_BOX)
+                .tileEntityType(() -> TileEntityTypes.SHULKER_BOX)
                 .properties(builder -> builder
                         .add(hardness(2.0))
                         .add(blastResistance(10.0)))

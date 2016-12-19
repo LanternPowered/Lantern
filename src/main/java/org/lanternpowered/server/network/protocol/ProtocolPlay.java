@@ -56,6 +56,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInS
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInUseEntity;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutAddPotionEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutBlockChange;
@@ -66,6 +67,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayInOutConfirmWindowTransaction;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEffect;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityAnimation;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityCollectItem;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutEntityHeadLook;
@@ -84,6 +86,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerPositionAndLook;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerSpawnPosition;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardDisplayObjective;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardObjective;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutScoreboardScore;
@@ -197,6 +200,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayIn
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTabComplete;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInTeleportConfirm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInUseEntity;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAddPotionEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockAction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockChange;
@@ -206,6 +210,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutConfirmWindowTransaction;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEffect;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
@@ -219,6 +224,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPainting;
@@ -263,7 +269,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldSky;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutWorldTime;
 import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutChangeGameState;
-import org.lanternpowered.server.network.vanilla.message.type.play.internal.MessagePlayOutEntityStatus;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 
 final class ProtocolPlay extends ProtocolBase {
 
@@ -382,7 +388,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x03, CodecPlayOutSpawnMob.class, MessagePlayOutSpawnMob.class);
         outbound.bind(0x04, CodecPlayOutSpawnPainting.class, MessagePlayOutSpawnPainting.class);
         outbound.bind(0x05, CodecPlayOutSpawnPlayer.class, MessagePlayOutSpawnPlayer.class);
-        // 0x06
+        outbound.bind(0x06, CodecPlayOutEntityAnimation.class, MessagePlayOutEntityAnimation.class);
         outbound.bind(0x07, CodecPlayOutStatistics.class, MessagePlayOutStatistics.class);
         outbound.bind(0x08, CodecPlayOutBlockBreakAnimation.class, MessagePlayOutBlockBreakAnimation.class);
         outbound.bind(0x09, CodecPlayOutUpdateTileEntity.class, MessagePlayOutUpdateTileEntity.class);
@@ -437,7 +443,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x2e, CodecPlayOutPlayerPositionAndLook.class, MessagePlayOutPlayerPositionAndLook.class);
         // ...
         outbound.bind(0x30, CodecPlayOutDestroyEntities.class, MessagePlayOutDestroyEntities.class);
-        // 0x31
+        outbound.bind(0x31, CodecPlayOutRemovePotionEffect.class, MessagePlayOutRemovePotionEffect.class);
         outbound.bind(0x32, CodecPlayOutSendResourcePack.class, MessagePlayOutSendResourcePack.class);
         outbound.bind(0x33, CodecPlayOutPlayerRespawn.class, MessagePlayOutPlayerRespawn.class);
         outbound.bind(0x34, CodecPlayOutEntityHeadLook.class, MessagePlayOutEntityHeadLook.class);
@@ -488,6 +494,7 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x47, CodecPlayOutTabListHeaderAndFooter.class, MessagePlayOutTabListHeaderAndFooter.class);
         outbound.bind(0x48, CodecPlayOutEntityCollectItem.class, MessagePlayOutEntityCollectItem.class);
         outbound.bind(0x49, CodecPlayOutEntityTeleport.class, MessagePlayOutEntityTeleport.class);
-        // ...
+        // 0x4a
+        outbound.bind(0x4b, CodecPlayOutAddPotionEffect.class, MessagePlayOutAddPotionEffect.class);
     }
 }

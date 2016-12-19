@@ -90,6 +90,10 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("Explode"), "lantern:explode");
     public static final Key<Value<CarriedInventory<? extends Carrier>>> ITEM_INVENTORY =
             makeValueKey(new TypeToken<CarriedInventory<?>>() {}, DataQuery.of("ItemInventory"), "lantern:item_inventory");
+    public static final Key<Value<Boolean>> HOLDS_POPPY =
+            makeValueKey(Boolean.class, DataQuery.of("HoldsPoppy"), "lantern:holds_poppy");
+    public static final Key<Value<Boolean>> HAS_PUMPKIN_HEAD =
+            makeValueKey(Boolean.class, DataQuery.of("HasPumpkinHead"), "lantern:has_pumpkin_head");
 
     private LanternKeys() {
     }

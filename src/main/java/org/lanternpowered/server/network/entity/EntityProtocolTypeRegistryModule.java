@@ -34,6 +34,7 @@ import org.lanternpowered.server.network.entity.vanilla.ExperienceOrbEntityProto
 import org.lanternpowered.server.network.entity.vanilla.GiantEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.HumanEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.HuskEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.IronGolemEntityProcotol;
 import org.lanternpowered.server.network.entity.vanilla.ItemEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.LightningEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.MagmaCubeEntityProtocol;
@@ -42,6 +43,7 @@ import org.lanternpowered.server.network.entity.vanilla.PlayerEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.RabbitEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.SilverfishEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.SlimeEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.SnowmanEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.VillagerEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ZombieEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ZombieVillagerEntityProtocol;
@@ -73,6 +75,8 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
                 entity -> new HumanEntityProtocol(entity)));
         register(LanternEntityProtocolType.of("minecraft", "husk",
                 entity -> new HuskEntityProtocol<>(entity)));
+        register(LanternEntityProtocolType.of("minecraft", "iron_golem",
+                entity -> new IronGolemEntityProcotol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "item",
                 entity -> new ItemEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "lightning",
@@ -89,6 +93,8 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
                 entity -> new SilverfishEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "slime",
                 entity -> new SlimeEntityProtocol<>(entity)));
+        register(LanternEntityProtocolType.of("minecraft", "snowman",
+                entity -> new SnowmanEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "villager",
                 entity -> new VillagerEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "zombie",

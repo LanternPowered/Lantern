@@ -30,7 +30,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.ConfigBase;
@@ -54,25 +53,26 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-public class LanternGameProfileCache implements GameProfileCache {
+public final class LanternGameProfileCache implements GameProfileCache {
 
     // The duration before a profile expires
     private static final Duration EXPIRATION_DURATION = Duration.ofDays(30);
 
     // Lookup by name
-    private final Map<String, ProfileCacheEntry> byName = Maps.newConcurrentMap();
+    private final Map<String, ProfileCacheEntry> byName = new ConcurrentHashMap<>();
 
     // Lookup by unique id
-    private final Map<UUID, ProfileCacheEntry> byUUID = Maps.newConcurrentMap();
+    private final Map<UUID, ProfileCacheEntry> byUUID = new ConcurrentHashMap<>();
 
     // The cache file
     private final ProfileCacheFile cacheFile;
 
-    public LanternGameProfileCache(Path cacheFile) {
+    LanternGameProfileCache(Path cacheFile) {
         ProfileCacheFile cache = null;
         try {
             cache = new ProfileCacheFile(cacheFile);
@@ -92,7 +92,7 @@ public class LanternGameProfileCache implements GameProfileCache {
         @Setting(value = "entries")
         private List<ProfileCacheEntry> entries = new ArrayList<>();
 
-        public ProfileCacheFile(Path path) throws IOException {
+        ProfileCacheFile(Path path) throws IOException {
             super(path, false);
         }
 
@@ -163,17 +163,17 @@ public class LanternGameProfileCache implements GameProfileCache {
      */
     @Override
     public boolean add(GameProfile profile, boolean overwrite, @Nullable Date expiry) {
-        UUID uuid = checkNotNull(profile, "profile").getUniqueId();
+        final UUID uuid = checkNotNull(profile, "profile").getUniqueId();
         if (overwrite && this.byUUID.containsKey(uuid)) {
             return false;
         }
-        Instant expirationDate;
+        final Instant expirationDate;
         if (expiry != null) {
             expirationDate = expiry.toInstant();
         } else {
-            expirationDate = this.calculateDefaultExpirationDate();
+            expirationDate = calculateDefaultExpirationDate();
         }
-        ProfileCacheEntry entry = new ProfileCacheEntry(profile, expirationDate);
+        final ProfileCacheEntry entry = new ProfileCacheEntry(profile, expirationDate);
         this.byUUID.put(uuid, entry);
         profile.getName().ifPresent(name -> this.byName.put(name, entry));
         return true;
@@ -207,7 +207,7 @@ public class LanternGameProfileCache implements GameProfileCache {
 
     @Override
     public Optional<GameProfile> getById(UUID uniqueId) {
-        ProfileCacheEntry entry = this.byUUID.get(checkNotNull(uniqueId, "uniqueId"));
+        final ProfileCacheEntry entry = this.byUUID.get(checkNotNull(uniqueId, "uniqueId"));
         if (entry != null) {
             if (entry.isExpired()) {
                 this.byUUID.remove(uniqueId, entry);
@@ -227,16 +227,16 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Map<UUID, Optional<GameProfile>> getByIds(Iterable<UUID> uniqueIds) {
         checkNotNull(uniqueIds, "uniqueIds");
-        ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
-        uniqueIds.forEach(uniqueId -> builder.put(uniqueId, this.getById(uniqueId)));
+        final ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
+        uniqueIds.forEach(uniqueId -> builder.put(uniqueId, getById(uniqueId)));
         return builder.build();
     }
 
     @Override
     public Optional<GameProfile> lookupById(UUID uniqueId) {
         try {
-            GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(uniqueId, true);
-            this.add(gameProfile, true, null);
+            final GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(uniqueId, true);
+            add(gameProfile, true, null);
             this.byUUID.get(gameProfile.getUniqueId()).signed = true;
             return Optional.of(gameProfile);
         } catch (IOException e) {
@@ -249,14 +249,14 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Map<UUID, Optional<GameProfile>> lookupByIds(Iterable<UUID> uniqueIds) {
         checkNotNull(uniqueIds, "uniqueIds");
-        ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
+        final ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
         uniqueIds.forEach(uniqueId -> builder.put(uniqueId, this.lookupById(uniqueId)));
         return builder.build();
     }
 
     @Override
     public Optional<GameProfile> getOrLookupById(UUID uniqueId) {
-        Optional<GameProfile> gameProfile = this.getById(checkNotNull(uniqueId, "uniqueId"));
+        final Optional<GameProfile> gameProfile = this.getById(checkNotNull(uniqueId, "uniqueId"));
         if (!gameProfile.isPresent()) {
             return this.lookupById(uniqueId);
         }
@@ -266,18 +266,18 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Map<UUID, Optional<GameProfile>> getOrLookupByIds(Iterable<UUID> uniqueIds) {
         checkNotNull(uniqueIds, "uniqueIds");
-        ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
-        uniqueIds.forEach(uniqueId -> builder.put(uniqueId, this.getOrLookupById(uniqueId)));
+        final ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
+        uniqueIds.forEach(uniqueId -> builder.put(uniqueId, getOrLookupById(uniqueId)));
         return builder.build();
     }
 
     @Override
     public Optional<GameProfile> getByName(String name) {
-        ProfileCacheEntry entry = this.byName.get(checkNotNull(name, "name"));
+        final ProfileCacheEntry entry = this.byName.get(checkNotNull(name, "name"));
         if (entry != null) {
             if (entry.isExpired()) {
-                UUID uniqueId = entry.gameProfile.getUniqueId();
-                ProfileCacheEntry entry1 = this.byUUID.get(uniqueId);
+                final UUID uniqueId = entry.gameProfile.getUniqueId();
+                final ProfileCacheEntry entry1 = this.byUUID.get(uniqueId);
                 if (entry == entry1 || entry1.isExpired()) {
                     this.byUUID.remove(uniqueId, entry);
                 }
@@ -292,24 +292,24 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Map<String, Optional<GameProfile>> getByNames(Iterable<String> names) {
         checkNotNull(names, "names");
-        ImmutableMap.Builder<String, Optional<GameProfile>> builder = ImmutableMap.builder();
-        names.forEach(name -> builder.put(name, this.getByName(name)));
+        final ImmutableMap.Builder<String, Optional<GameProfile>> builder = ImmutableMap.builder();
+        names.forEach(name -> builder.put(name, getByName(name)));
         return builder.build();
     }
 
     @Override
     public Map<String, Optional<GameProfile>> lookupByNames(Iterable<String> names) {
         checkNotNull(names, "names");
-        ImmutableMap.Builder<String, Optional<GameProfile>> result = ImmutableMap.builder();
-        this.lookupByNamesInto(result, Lists.newArrayList(names));
+        final ImmutableMap.Builder<String, Optional<GameProfile>> result = ImmutableMap.builder();
+        lookupByNamesInto(result, Lists.newArrayList(names));
         return result.build();
     }
 
     @Override
     public Optional<GameProfile> getOrLookupByName(String name) {
-        Optional<GameProfile> gameProfile = this.getByName(checkNotNull(name, "name"));
+        final Optional<GameProfile> gameProfile = getByName(checkNotNull(name, "name"));
         if (!gameProfile.isPresent()) {
-            return this.lookupByName(name);
+            return lookupByName(name);
         }
         return gameProfile;
     }
@@ -317,13 +317,13 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Map<String, Optional<GameProfile>> getOrLookupByNames(Iterable<String> names) {
         checkNotNull(names, "names");
-        ImmutableMap.Builder<String, Optional<GameProfile>> result = ImmutableMap.builder();
+        final ImmutableMap.Builder<String, Optional<GameProfile>> result = ImmutableMap.builder();
 
-        List<String> names0 = Lists.newArrayList(names);
-        Iterator<String> it = names0.iterator();
+        final List<String> names0 = Lists.newArrayList(names);
+        final Iterator<String> it = names0.iterator();
         while (it.hasNext()) {
-            String name = it.next();
-            Optional<GameProfile> gameProfile = this.getByName(name);
+            final String name = it.next();
+            final Optional<GameProfile> gameProfile = getByName(name);
             if (gameProfile.isPresent()) {
                 result.put(name, gameProfile);
                 it.remove();
@@ -336,10 +336,10 @@ public class LanternGameProfileCache implements GameProfileCache {
 
     private void lookupByNamesInto(ImmutableMap.Builder<String, Optional<GameProfile>> builder, List<String> names) {
         try {
-            Map<String, UUID> namesResult = GameProfileQuery.queryUUIDByName(names);
+            final Map<String, UUID> namesResult = GameProfileQuery.queryUUIDByName(names);
             names.forEach(name -> {
                 if (namesResult.containsKey(name)) {
-                    builder.put(name, this.lookupById(namesResult.get(name)));
+                    builder.put(name, lookupById(namesResult.get(name)));
                 } else {
                     builder.put(name, Optional.empty());
                 }
@@ -352,11 +352,12 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Optional<GameProfile> lookupByName(String name) {
         try {
-            Map<String, UUID> result = GameProfileQuery.queryUUIDByName(Collections.singletonList(checkNotNull(name, "name")));
+            final Map<String, UUID> result = GameProfileQuery.queryUUIDByName(
+                    Collections.singletonList(checkNotNull(name, "name")));
             if (result.isEmpty()) {
                 return Optional.empty();
             }
-            return this.lookupById(result.get(name));
+            return lookupById(result.get(name));
         } catch (IOException e) {
             Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);
         }
@@ -366,11 +367,12 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Optional<GameProfile> fillProfile(GameProfile profile, boolean signed) {
         try {
-            GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(checkNotNull(profile, "profile").getUniqueId(), signed);
+            final GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(
+                    checkNotNull(profile, "profile").getUniqueId(), signed);
             profile.getPropertyMap().putAll(gameProfile.getPropertyMap());
-            ProfileCacheEntry entry = this.byUUID.get(profile.getUniqueId());
+            final ProfileCacheEntry entry = this.byUUID.get(profile.getUniqueId());
             if (entry == null || entry.isExpired() || (!entry.signed && signed)) {
-                this.add(gameProfile, true, null);
+                add(gameProfile, true, null);
                 this.byUUID.get(gameProfile.getUniqueId()).signed = true;
             }
             return Optional.of(gameProfile);
@@ -383,10 +385,10 @@ public class LanternGameProfileCache implements GameProfileCache {
 
     @Override
     public Collection<GameProfile> getProfiles() {
-        ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
-        Iterator<Map.Entry<UUID, ProfileCacheEntry>> it = this.byUUID.entrySet().iterator();
+        final ImmutableList.Builder<GameProfile> builder = ImmutableList.builder();
+        final Iterator<Map.Entry<UUID, ProfileCacheEntry>> it = this.byUUID.entrySet().iterator();
         while (it.hasNext()) {
-            ProfileCacheEntry entry = it.next().getValue();
+            final ProfileCacheEntry entry = it.next().getValue();
             if (entry.isExpired()) {
                 entry.gameProfile.getName().ifPresent(this.byName::remove);
                 it.remove();
@@ -400,8 +402,9 @@ public class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Collection<GameProfile> match(String name) {
         final String search = checkNotNull(name, "name").toLowerCase(Locale.ROOT);
-        return this.getProfiles().stream().filter(profile -> profile.getName().isPresent())
-                .filter(profile -> profile.getName().get().toLowerCase(Locale.ROOT).startsWith(search))
+        return getProfiles().stream()
+                .filter(profile -> profile.getName().isPresent() &&
+                        profile.getName().get().toLowerCase(Locale.ROOT).startsWith(search))
                 .collect(GuavaCollectors.toImmutableSet());
     }
 }

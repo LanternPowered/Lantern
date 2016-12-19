@@ -44,7 +44,7 @@ public class HumanEntityProtocol extends HumanoidEntityProtocol<LanternEntity> {
 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        this.spawn(context, this.entity.getTranslation().get());
+        spawn(context, this.entity.getTranslation().get());
     }
 
     private void spawn(EntityProtocolUpdateContext context, String name) {
@@ -61,11 +61,11 @@ public class HumanEntityProtocol extends HumanoidEntityProtocol<LanternEntity> {
     protected void update(EntityProtocolUpdateContext context) {
         final String name = this.entity.getTranslation().get();
         if (!Objects.equals(this.lastName, name)) {
-            this.spawn(context, name);
-            this.update0(EntityProtocolUpdateContext.empty());
+            spawn(context, name);
+            update0(EntityProtocolUpdateContext.empty());
             this.lastName = name;
         } else {
-            this.update0(context);
+            update0(context);
         }
     }
 

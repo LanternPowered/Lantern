@@ -35,7 +35,7 @@ public final class CodecPlayOutEntityTeleport implements Codec<MessagePlayOutEnt
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityTeleport message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
         buf.writeDouble(message.getX());
         buf.writeDouble(message.getY());

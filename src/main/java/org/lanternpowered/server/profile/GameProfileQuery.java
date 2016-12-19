@@ -49,7 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-public class GameProfileQuery {
+final class GameProfileQuery {
 
     private final static Gson GSON = new Gson();
 
@@ -59,8 +59,8 @@ public class GameProfileQuery {
 
         int attempts = 0;
         while (true) {
-            URLConnection uc = url.openConnection();
-            InputStream is = uc.getInputStream();
+            final URLConnection uc = url.openConnection();
+            final InputStream is = uc.getInputStream();
 
             // Can be empty if the unique id invalid is
             if (is.available() == 0) {
@@ -72,7 +72,7 @@ public class GameProfileQuery {
                 throw new IOException("Failed to retrieve the profile after 6 attempts: " + uniqueId);
             }
 
-            JsonObject json = GSON.fromJson(new InputStreamReader(is), JsonObject.class);
+            final JsonObject json = GSON.fromJson(new InputStreamReader(is), JsonObject.class);
             if (json.has("error")) {
                 // Too many requests, lets wait for 10 seconds
                 try {
@@ -83,8 +83,8 @@ public class GameProfileQuery {
                 continue;
             }
 
-            String name = json.get("name").getAsString();
-            Multimap<String, ProfileProperty> properties;
+            final String name = json.get("name").getAsString();
+            final Multimap<String, ProfileProperty> properties;
 
             if (json.has("properties")) {
                 properties = LanternProfileProperty.createPropertiesMapFromJson(json.get("properties").getAsJsonArray());
@@ -97,12 +97,12 @@ public class GameProfileQuery {
     }
 
     static Map<String, UUID> queryUUIDByName(Iterable<String> names) throws IOException {
-        Map<String, UUID> results = Maps.newHashMap();
+        final Map<String, UUID> results = Maps.newHashMap();
         if (!names.iterator().hasNext()) {
             return results;
         }
-        List<String> namesList = Lists.newArrayList(names);
-        int size = namesList.size();
+        final List<String> namesList = Lists.newArrayList(names);
+        final int size = namesList.size();
         int count = 0;
         do {
             int index = count;
@@ -116,25 +116,28 @@ public class GameProfileQuery {
     }
 
     private static void postNameToUUIDPart(Map<String, UUID> results, List<String> names) throws IOException {
-        String body = GSON.toJson(names);
-        URL url = new URL("https://api.mojang.com/profiles/minecraft");
+        final String body = GSON.toJson(names);
+        final URL url = new URL("https://api.mojang.com/profiles/minecraft");
 
-        HttpURLConnection uc = (HttpURLConnection) url.openConnection();
+        final HttpURLConnection uc = (HttpURLConnection) url.openConnection();
         uc.setRequestMethod("POST");
         uc.setRequestProperty("Content-Type", "application/json");
         uc.setUseCaches(false);
         uc.setDoInput(true);
         uc.setDoOutput(true);
 
-        DataOutputStream os = new DataOutputStream(uc.getOutputStream());
+        final DataOutputStream os = new DataOutputStream(uc.getOutputStream());
         os.write(body.getBytes());
         os.flush();
         os.close();
 
-        JsonArray json = GSON.fromJson(new InputStreamReader(uc.getInputStream()), JsonArray.class);
+        final JsonArray json = GSON.fromJson(new InputStreamReader(uc.getInputStream()), JsonArray.class);
         for (JsonElement element : json) {
-            JsonObject obj = element.getAsJsonObject();
+            final JsonObject obj = element.getAsJsonObject();
             results.put(obj.get("name").getAsString(), UUIDHelper.fromFlatString(obj.get("id").getAsString()));
         }
+    }
+
+    private GameProfileQuery() {
     }
 }

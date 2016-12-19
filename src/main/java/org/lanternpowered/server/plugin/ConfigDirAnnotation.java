@@ -57,8 +57,8 @@ public class ConfigDirAnnotation implements ConfigDir {
         if (!(o instanceof ConfigDir)) {
             return false;
         }
-        ConfigDir that = (ConfigDir) o;
-        return this.sharedRoot() == that.sharedRoot();
+        final ConfigDir that = (ConfigDir) o;
+        return sharedRoot() == that.sharedRoot();
     }
 
     @Override

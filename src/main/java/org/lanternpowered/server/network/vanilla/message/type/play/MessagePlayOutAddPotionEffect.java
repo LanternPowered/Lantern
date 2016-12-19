@@ -23,54 +23,52 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.plugin;
+package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.config.DefaultConfig;
+import org.lanternpowered.server.network.message.Message;
+import org.spongepowered.api.effect.potion.PotionEffectType;
 
-import java.lang.annotation.Annotation;
+public final class MessagePlayOutAddPotionEffect implements Message {
 
-@SuppressWarnings("all")
-public class ConfigFileAnnotation implements DefaultConfig {
+    private final int entityId;
 
-    private final boolean shared;
+    private final PotionEffectType potionEffectType;
+    private final int duration;
+    private final int amplifier;
+    private final boolean ambient;
+    private final boolean showParticles;
 
-    public ConfigFileAnnotation(boolean shared) {
-        this.shared = shared;
+    public MessagePlayOutAddPotionEffect(int entityId, PotionEffectType potionEffectType, int duration, int amplifier,
+            boolean ambient, boolean showParticles) {
+        this.potionEffectType = potionEffectType;
+        this.entityId = entityId;
+        this.duration = duration;
+        this.amplifier = amplifier;
+        this.ambient = ambient;
+        this.showParticles = showParticles;
     }
 
-    @Override
-    public boolean sharedRoot() {
-        return this.shared;
+    public PotionEffectType getType() {
+        return this.potionEffectType;
     }
 
-    @Override
-    public Class<? extends Annotation> annotationType() {
-        return DefaultConfig.class;
+    public int getEntityId() {
+        return this.entityId;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof DefaultConfig)) {
-            return false;
-        }
-        final DefaultConfig that = (DefaultConfig) o;
-        return sharedRoot() == that.sharedRoot();
+    public int getDuration() {
+        return this.duration;
     }
 
-    @Override
-    public int hashCode() {
-        return (127 * "sharedRoot".hashCode()) ^ Boolean.valueOf(sharedRoot()).hashCode();
+    public int getAmplifier() {
+        return this.amplifier;
     }
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper('@' + getClass().getName())
-                .add("shared", this.shared)
-                .toString();
+    public boolean isAmbient() {
+        return this.ambient;
     }
 
+    public boolean getShowParticles() {
+        return this.showParticles;
+    }
 }

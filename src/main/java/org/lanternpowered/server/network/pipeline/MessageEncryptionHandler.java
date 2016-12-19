@@ -97,8 +97,8 @@ public final class MessageEncryptionHandler extends MessageToMessageCodec<ByteBu
             this.cipher.init(mode, sharedSecret, new IvParameterSpec(sharedSecret.getEncoded()));
         }
 
-        public void crypt(ByteBuf msg, List<Object> out) {
-            ByteBuffer outBuffer = ByteBuffer.allocate(msg.readableBytes());
+        void crypt(ByteBuf msg, List<Object> out) {
+            final ByteBuffer outBuffer = ByteBuffer.allocate(msg.readableBytes());
 
             try {
                 this.cipher.update(msg.nioBuffer(), outBuffer);

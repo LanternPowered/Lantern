@@ -23,33 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.game.registry.type.effect;
+package org.lanternpowered.server.network.vanilla.message.codec.play;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import org.lanternpowered.server.effect.sound.LanternSoundType;
-import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.spongepowered.api.effect.sound.SoundType;
-import org.spongepowered.api.effect.sound.SoundTypes;
+import io.netty.handler.codec.CodecException;
+import org.lanternpowered.server.effect.potion.LanternPotionEffectType;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.message.codec.Codec;
+import org.lanternpowered.server.network.message.codec.CodecContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
-public final class SoundTypeRegistryModule extends AdditionalPluginCatalogRegistryModule<SoundType> {
-
-    public SoundTypeRegistryModule() {
-        super(SoundTypes.class);
-    }
+public final class CodecPlayOutRemovePotionEffect implements Codec<MessagePlayOutRemovePotionEffect> {
 
     @Override
-    public void registerDefaults() {
-        final Gson gson = new Gson();
-        final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(SoundTypeRegistryModule.class
-                .getResourceAsStream("/internal/sound-events.json"))), JsonArray.class);
-        for (int i = 0; i < array.size(); i++) {
-            final String name = array.get(i).getAsString();
-            final String id = name.replaceAll("\\.", "_");
-            register(new LanternSoundType("minecraft", id, name, i));
-        }
+    public ByteBuffer encode(CodecContext context, MessagePlayOutRemovePotionEffect message) throws CodecException {
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        buf.writeVarInt(message.getEntityId());
+        buf.writeByte((byte) ((LanternPotionEffectType) message.getType()).getInternalId());
+        return buf;
     }
 }

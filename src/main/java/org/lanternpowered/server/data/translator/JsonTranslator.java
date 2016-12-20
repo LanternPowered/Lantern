@@ -73,12 +73,12 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
 
     @Override
     public JsonObject translate(DataView view) throws InvalidDataException {
-        return this.toJson(view.getValues(false)).getAsJsonObject();
+        return toJson(view.getValues(false)).getAsJsonObject();
     }
 
     @Override
     public DataContainer translate(JsonObject obj) throws InvalidDataException {
-        return (DataContainer) this.fromJson(null, obj);
+        return (DataContainer) fromJson(null, obj);
     }
 
     private Object fromJson(@Nullable DataView container, JsonElement json) {
@@ -87,22 +87,22 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
                 container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
             }
             for (Entry<String, JsonElement> en : json.getAsJsonObject().entrySet()) {
-                String key = en.getKey();
-                JsonElement element = en.getValue();
+                final String key = en.getKey();
+                final JsonElement element = en.getValue();
                 if (element.isJsonObject()) {
-                    this.fromJson(container.createView(DataQuery.of(key)), element);
+                    fromJson(container.createView(DataQuery.of(key)), element);
                 } else {
-                    container.set(DataQuery.of(key), this.fromJson(null, json));
+                    container.set(DataQuery.of(key), fromJson(null, json));
                 }
             }
             return container;
         } else if (json.isJsonArray()) {
-            JsonArray array = json.getAsJsonArray();
-            List<Object> objects = Lists.newArrayListWithCapacity(array.size());
+            final JsonArray array = json.getAsJsonArray();
+            final List<Object> objects = Lists.newArrayListWithCapacity(array.size());
             int ints = 0;
             int bytes = 0;
             for (int i = 0; i < array.size(); i++) {
-                Object object = this.fromJson(null, array.get(i));
+                final Object object = fromJson(null, array.get(i));
                 objects.add(object);
                 if (object instanceof Integer) {
                     ints++;
@@ -112,13 +112,13 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
                 }
             }
             if (bytes == objects.size()) {
-                Byte[] array0 = new Byte[bytes];
+                final Byte[] array0 = new Byte[bytes];
                 for (int i = 0; i < bytes; i++) {
                     array0[i] = (Byte) objects.get(i);
                 }
                 return array0;
             } else if (ints == objects.size()) {
-                Integer[] array0 = new Integer[ints];
+                final Integer[] array0 = new Integer[ints];
                 for (int i = 0; i < bytes; i++) {
                     array0[i] = (Integer) objects.get(i);
                 }
@@ -127,7 +127,7 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
                 return objects;
             }
         } else if (json.isJsonPrimitive()) {
-            String value = json.getAsString();
+            final String value = json.getAsString();
             if (DOUBLE.matcher(value).matches()) {
                 return Double.parseDouble(value.substring(0, value.length() - 1));
             } else if (FLOAT.matcher(value).matches()) {
@@ -157,7 +157,7 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
     @SuppressWarnings("unchecked")
     private JsonElement toJson(Object object) {
         if (object instanceof DataView || object instanceof DataSerializable || object instanceof Map<?,?>) {
-            Map<DataQuery, Object> map;
+            final Map<DataQuery, Object> map;
             if (object instanceof DataView) {
                 map = ((DataView) object).getValues(false);
             } else if (object instanceof DataSerializable) {
@@ -165,12 +165,12 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
             } else {
                 map = (Map<DataQuery, Object>) object;
             }
-            return this.toJson(new JsonObject(), map);
+            return toJson(new JsonObject(), map);
         } else if (object instanceof List<?>) {
-            JsonArray array = new JsonArray();
-            List<?> object0 = (List<?>) object;
+            final JsonArray array = new JsonArray();
+            final List<?> object0 = (List<?>) object;
             for (Object anObject0 : object0) {
-                array.add(this.toJson(anObject0));
+                array.add(toJson(anObject0));
             }
             return array;
         } else if (object instanceof Byte) {
@@ -186,15 +186,15 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
         } else if (object instanceof Float) {
             return new JsonPrimitive(object.toString() + "f");
         } else if (object instanceof Integer[]) {
-            Integer[] object0 = (Integer[]) object;
-            JsonArray array = new JsonArray();
+            final Integer[] object0 = (Integer[]) object;
+            final JsonArray array = new JsonArray();
             for (Integer anObject0 : object0) {
                 array.add(new JsonPrimitive(anObject0.toString()));
             }
             return array;
         } else if (object instanceof Byte[]) {
-            Byte[] object0 = (Byte[]) object;
-            JsonArray array = new JsonArray();
+            final Byte[] object0 = (Byte[]) object;
+            final JsonArray array = new JsonArray();
             for (Byte anObject0 : object0) {
                 array.add(new JsonPrimitive(anObject0.toString() + "b"));
             }
@@ -206,7 +206,7 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
 
     private JsonObject toJson(JsonObject json, Map<DataQuery, Object> map) {
         for (Entry<DataQuery, Object> en : map.entrySet()) {
-            json.add(en.getKey().asString('.'), this.toJson(en.getValue()));
+            json.add(en.getKey().asString('.'), toJson(en.getValue()));
         }
         return json;
     }

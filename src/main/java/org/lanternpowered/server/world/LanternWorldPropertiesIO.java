@@ -55,6 +55,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehaviors;
@@ -422,6 +423,7 @@ final class LanternWorldPropertiesIO {
 
                 worldConfig.getGeneration().setGeneratorType(generatorType);
                 worldConfig.getGeneration().setGeneratorSettings(generatorSettings);
+                worldConfig.setLowHorizon(generatorType == GeneratorTypes.FLAT);
             }
 
             if (spongeDataView != null) {

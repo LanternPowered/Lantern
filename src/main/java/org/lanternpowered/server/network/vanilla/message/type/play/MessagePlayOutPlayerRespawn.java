@@ -37,12 +37,14 @@ public final class MessagePlayOutPlayerRespawn implements Message {
     private final LanternGameMode gameMode;
     private final LanternDifficulty difficulty;
     private final LanternDimensionType dimensionType;
+    private final boolean lowHorizon;
 
     public MessagePlayOutPlayerRespawn(LanternGameMode gameMode, LanternDimensionType dimensionType,
-            LanternDifficulty difficulty) {
+            LanternDifficulty difficulty, boolean lowHorizon) {
         this.dimensionType = checkNotNull(dimensionType, "dimensionType");
         this.difficulty = checkNotNull(difficulty, "difficulty");
         this.gameMode = checkNotNull(gameMode, "gameMode");
+        this.lowHorizon = lowHorizon;
     }
 
     /**
@@ -70,5 +72,9 @@ public final class MessagePlayOutPlayerRespawn implements Message {
      */
     public LanternDifficulty getDifficulty() {
         return this.difficulty;
+    }
+
+    public boolean isLowHorizon() {
+        return this.lowHorizon;
     }
 }

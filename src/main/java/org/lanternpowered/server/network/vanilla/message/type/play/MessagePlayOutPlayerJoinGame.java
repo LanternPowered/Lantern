@@ -49,9 +49,11 @@ public final class MessagePlayOutPlayerJoinGame implements Message {
     // This will change the appearance of the hearts.
     private final boolean hardcore;
 
+    private final boolean lowHorizon;
+
     public MessagePlayOutPlayerJoinGame(LanternGameMode gameMode, LanternDimensionType dimensionType,
             LanternDifficulty difficulty, int entityId, int playerListSize,
-            boolean reducedDebug, boolean hardcore) {
+            boolean reducedDebug, boolean hardcore, boolean lowHorizon) {
         this.dimensionType = checkNotNull(dimensionType, "dimensionType");
         this.difficulty = checkNotNull(difficulty, "difficulty");
         this.gameMode = checkNotNull(gameMode, "gameMode");
@@ -59,6 +61,7 @@ public final class MessagePlayOutPlayerJoinGame implements Message {
         this.reducedDebug = reducedDebug;
         this.hardcore = hardcore;
         this.entityId = entityId;
+        this.lowHorizon = lowHorizon;
     }
 
     /**
@@ -125,4 +128,7 @@ public final class MessagePlayOutPlayerJoinGame implements Message {
         return this.reducedDebug;
     }
 
+    public boolean isLowHorizon() {
+        return this.lowHorizon;
+    }
 }

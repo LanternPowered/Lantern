@@ -23,35 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
-
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
-
-public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAbilities> {
-
-    @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerAbilities message) throws CodecException {
-        byte bits = 0;
-        if (message.isInvulnerable()) {
-            bits |= 0x1;
-        }
-        if (message.isFlying()) {
-            bits |= 0x2;
-        }
-        if (message.canFly()) {
-            bits |= 0x4;
-        }
-        if (message.isCreative()) {
-            bits |= 0x8;
-        }
-        final ByteBuffer buf = context.byteBufAlloc().buffer(9);
-        buf.writeByte(bits);
-        buf.writeFloat(message.getFlySpeed());
-        buf.writeFloat(message.getFieldOfView());
-        return buf;
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.data.meta;

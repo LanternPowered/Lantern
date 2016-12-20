@@ -27,6 +27,7 @@ package org.lanternpowered.server.network.entity;
 
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.registry.PluginCatalogRegistryModule;
+import org.lanternpowered.server.network.entity.vanilla.BatEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.ChickenEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.EnderDragonEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.EndermiteEntityProtocol;
@@ -41,6 +42,7 @@ import org.lanternpowered.server.network.entity.vanilla.MagmaCubeEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.PaintingEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.PlayerEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.RabbitEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.SheepEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.SilverfishEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.SlimeEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.SnowmanEntityProtocol;
@@ -61,6 +63,8 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
         // well it's not working, at least not outside the development environment, java is throwing
         // "no such constructor" exceptions...
         // Tested with: oracle jre1.8.0_101
+        register(LanternEntityProtocolType.of("minecraft", "bat",
+                entity -> new BatEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "chicken",
                 entity -> new ChickenEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "ender_dragon",
@@ -89,6 +93,8 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
                 entity -> new PlayerEntityProtocol(entity)));
         register(LanternEntityProtocolType.of("minecraft", "rabbit",
                 entity -> new RabbitEntityProtocol<>(entity)));
+        register(LanternEntityProtocolType.of("minecraft", "sheep",
+                entity -> new SheepEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "silverfish",
                 entity -> new SilverfishEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "slime",

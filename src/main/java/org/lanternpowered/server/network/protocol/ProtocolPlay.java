@@ -81,6 +81,7 @@ import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOut
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutMultiBlockChange;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutOpenSign;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerHealthUpdate;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerJoinGame;
 import org.lanternpowered.server.network.vanilla.message.codec.play.CodecPlayOutPlayerPositionAndLook;
@@ -224,6 +225,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutNamedSoundEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenBook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutOpenWindow;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSendResourcePack;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetEntityPassengers;
@@ -438,7 +440,8 @@ final class ProtocolPlay extends ProtocolBase {
         outbound.bind(0x27, CodecPlayOutEntityLook.class, MessagePlayOutEntityLook.class);
         // ...
         outbound.bind(0x2a, CodecPlayOutOpenSign.class, MessagePlayOutOpenSign.class);
-        // ...
+        outbound.bind(0x2b, CodecPlayOutPlayerAbilities.class, MessagePlayOutPlayerAbilities.class);
+        // 0x2c
         outbound.bind(0x2d, CodecPlayOutTabListEntries.class, MessagePlayOutTabListEntries.class);
         outbound.bind(0x2e, CodecPlayOutPlayerPositionAndLook.class, MessagePlayOutPlayerPositionAndLook.class);
         // ...

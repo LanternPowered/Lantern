@@ -23,35 +23,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.codec.play;
+package org.lanternpowered.server.network.entity.vanilla;
 
-import io.netty.handler.codec.CodecException;
-import org.lanternpowered.server.network.buffer.ByteBuffer;
-import org.lanternpowered.server.network.message.codec.Codec;
-import org.lanternpowered.server.network.message.codec.CodecContext;
-import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
 
-public class CodecPlayOutPlayerAbilities implements Codec<MessagePlayOutPlayerAbilities> {
+public class BatEntityProtocol<E extends LanternEntity> extends InsentientEntityProtocol<E> {
+
+    private boolean lastHanging;
+
+    public BatEntityProtocol(E entity) {
+        super(entity);
+    }
 
     @Override
-    public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerAbilities message) throws CodecException {
-        byte bits = 0;
-        if (message.isInvulnerable()) {
-            bits |= 0x1;
+    protected int getMobType() {
+        return 65;
+    }
+
+    @Override
+    protected void spawn(ParameterList parameterList) {
+        parameterList.add(EntityParameters.Bat.FLAGS, (byte) (this.entity.get(LanternKeys.IS_HANGING).orElse(false) ? 0x1 : 0));
+    }
+
+    @Override
+    protected void update(ParameterList parameterList) {
+        final boolean hanging = this.entity.get(LanternKeys.IS_HANGING).orElse(false);
+        if (this.lastHanging != hanging) {
+            parameterList.add(EntityParameters.Bat.FLAGS, (byte) (hanging ? 0x1 : 0));
+            this.lastHanging = hanging;
         }
-        if (message.isFlying()) {
-            bits |= 0x2;
-        }
-        if (message.canFly()) {
-            bits |= 0x4;
-        }
-        if (message.isCreative()) {
-            bits |= 0x8;
-        }
-        final ByteBuffer buf = context.byteBufAlloc().buffer(9);
-        buf.writeByte(bits);
-        buf.writeFloat(message.getFlySpeed());
-        buf.writeFloat(message.getFieldOfView());
-        return buf;
     }
 }

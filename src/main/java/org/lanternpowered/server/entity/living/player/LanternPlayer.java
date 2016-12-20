@@ -346,16 +346,17 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             oldWorld.removePlayer(this);
         }
         if (world != null) {
-            final LanternGameMode gameMode = (LanternGameMode) this.get(Keys.GAME_MODE).get();
+            final LanternGameMode gameMode = (LanternGameMode) get(Keys.GAME_MODE).get();
             final LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
             final LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
             final boolean reducedDebug = world.getOrCreateRule(RuleTypes.REDUCED_DEBUG_INFO).getValue();
+            final boolean lowHorizon = world.getProperties().getConfig().isLowHorizon();
             // The player has joined the server
             //noinspection ConstantConditions
             if (oldWorld == null) {
                 this.session.getServer().addPlayer(this);
                 this.session.send(new MessagePlayOutPlayerJoinGame(gameMode, dimensionType, difficulty, this.networkEntityId,
-                        this.session.getServer().getMaxPlayers(), reducedDebug, false));
+                        this.session.getServer().getMaxPlayers(), reducedDebug, false, lowHorizon));
                 // Send the server brand
                 this.session.send(new MessagePlayInOutBrand(LanternGame.IMPL_NAME));
                 // Send the player list
@@ -381,11 +382,11 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                     if (oldDimensionType == dimensionType) {
                         oldDimensionType = (LanternDimensionType) (dimensionType == DimensionTypes.OVERWORLD ? DimensionTypes.NETHER :
                                 DimensionTypes.OVERWORLD);
-                        this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, difficulty));
+                        this.session.send(new MessagePlayOutPlayerRespawn(gameMode, oldDimensionType, difficulty, lowHorizon));
                     }
                 }
                 // Send a respawn message
-                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty));
+                this.session.send(new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
                 this.session.send(new MessagePlayOutSetReducedDebug(reducedDebug));
             }
             // Send the first chunks

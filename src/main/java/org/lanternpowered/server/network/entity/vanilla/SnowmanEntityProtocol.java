@@ -44,12 +44,12 @@ public class SnowmanEntityProtocol<E extends LanternEntity> extends InsentientEn
 
     @Override
     protected void spawn(ParameterList parameterList) {
-        parameterList.add(EntityParameters.Snowman.FLAGS, (byte) (this.entity.get(LanternKeys.HAS_PUMPKIN_HEAD).orElse(false) ? 0 : 0x10));
+        parameterList.add(EntityParameters.Snowman.FLAGS, (byte) (this.entity.get(LanternKeys.HAS_PUMPKIN_HEAD).orElse(true) ? 0 : 0x10));
     }
 
     @Override
     protected void update(ParameterList parameterList) {
-        final boolean noPumpkin = !this.entity.get(LanternKeys.HAS_PUMPKIN_HEAD).orElse(false);
+        final boolean noPumpkin = !this.entity.get(LanternKeys.HAS_PUMPKIN_HEAD).orElse(true);
         if (this.lastNoPumpkin != noPumpkin) {
             parameterList.add(EntityParameters.Snowman.FLAGS, (byte) (noPumpkin ? 0x10 : 0));
             this.lastNoPumpkin = noPumpkin;

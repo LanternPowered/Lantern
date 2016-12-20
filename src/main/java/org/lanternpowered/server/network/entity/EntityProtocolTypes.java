@@ -31,6 +31,8 @@ import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
 public final class EntityProtocolTypes {
 
+    public static final EntityProtocolType<LanternEntity> BAT = dummy("BAT");
+
     public static final EntityProtocolType<LanternEntity> CHICKEN = dummy("CHICKEN");
 
     public static final EntityProtocolType<LanternEntity> ENDER_DRAGON = dummy("ENDER_DRAGON");
@@ -58,6 +60,8 @@ public final class EntityProtocolTypes {
     public static final EntityProtocolType<LanternPlayer> PLAYER = dummy("PLAYER");
 
     public static final EntityProtocolType<LanternEntity> RABBIT = dummy("RABBIT");
+
+    public static final EntityProtocolType<LanternEntity> SHEEP = dummy("SHEEP");
 
     public static final EntityProtocolType<LanternEntity> SILVERFISH = dummy("SILVERFISH");
 

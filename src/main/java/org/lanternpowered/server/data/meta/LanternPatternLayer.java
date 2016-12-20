@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.data.meta;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -35,11 +37,9 @@ import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
 import org.spongepowered.api.data.type.BannerPatternShape;
 import org.spongepowered.api.data.type.DyeColor;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.util.Optional;
 
-@NonnullByDefault
 public final class LanternPatternLayer implements PatternLayer {
 
     private static final DataQuery BANNER_SHAPE = DataQuery.of("BannerShapeId");
@@ -65,12 +65,20 @@ public final class LanternPatternLayer implements PatternLayer {
 
     @Override
     public int getContentVersion() {
-        return 0;
+        return 1;
     }
 
     @Override
     public DataContainer toContainer() {
-        return new MemoryDataContainer().set(BANNER_SHAPE, this.shape.getId()).set(DYE_COLOR, this.color.getName());
+        return new MemoryDataContainer().set(BANNER_SHAPE, this.shape.getId()).set(DYE_COLOR, this.color.getId());
+    }
+
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("shape", this.shape.getId())
+                .add("dyeColor", this.color.getId())
+                .toString();
     }
 
     public static class Builder implements DataBuilder<PatternLayer> {

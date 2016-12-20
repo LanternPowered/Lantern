@@ -25,42 +25,58 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
-import org.lanternpowered.server.data.type.LanternRabbitType;
+import org.lanternpowered.server.data.type.LanternDyeColor;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.RabbitTypes;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.DyeColors;
 
-public class RabbitEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
+public class SheepEntityProtocol<E extends LanternEntity> extends InsentientEntityProtocol<E> {
 
-    private int lastType;
+    private DyeColor lastColor;
+    private boolean lastSheared;
 
-    public RabbitEntityProtocol(E entity) {
+    public SheepEntityProtocol(E entity) {
         super(entity);
-    }
-
-    private int getTypeId() {
-        return ((LanternRabbitType) this.entity.get(Keys.RABBIT_TYPE).orElse(RabbitTypes.WHITE)).getInternalId();
     }
 
     @Override
     protected int getMobType() {
-        return 101;
+        return 91;
     }
 
     @Override
     protected void spawn(ParameterList parameterList) {
-        super.spawn(parameterList);
-        parameterList.add(EntityParameters.Rabbit.VARIANT, getTypeId());
+        byte flags = (byte) ((LanternDyeColor) this.entity.get(Keys.DYE_COLOR).orElse(DyeColors.WHITE)).getInternalId();
+        if (this.entity.get(Keys.IS_SHEARED).orElse(false)) {
+            flags |= 0x10;
+        }
+        parameterList.add(EntityParameters.Sheep.FLAGS, flags);
     }
 
     @Override
     protected void update(ParameterList parameterList) {
-        super.update(parameterList);
-        final int type = this.getTypeId();
-        if (type != this.lastType) {
-            parameterList.add(EntityParameters.Rabbit.VARIANT, type);
-            this.lastType = type;
+        final DyeColor color = this.entity.get(Keys.DYE_COLOR).orElse(DyeColors.WHITE);
+        int flags = -1;
+        if (this.lastColor != color) {
+            flags = 15 - ((LanternDyeColor) color).getInternalId();
+            this.lastColor = color;
+        }
+        final boolean sheared = this.entity.get(Keys.IS_SHEARED).orElse(false);
+        if (this.lastSheared != sheared) {
+            if (flags == -1) {
+                flags = 15 - ((LanternDyeColor) color).getInternalId();
+            }
+            if (sheared) {
+                flags |= 0x10;
+            }
+            this.lastSheared = sheared;
+        } else if (flags != -1 && sheared) {
+            flags |= 0x10;
+        }
+        if (flags != -1) {
+            parameterList.add(EntityParameters.Sheep.FLAGS, (byte) flags);
         }
     }
 }

@@ -57,16 +57,10 @@ public class ConfigurateTranslator extends AbstractDataTranslator<ConfigurationN
         super("sponge", "configuration_node", TypeToken.of(ConfigurationNode.class));
     }
 
-    public void populateNode(ConfigurationNode node, DataView container) {
-        checkNotNull(node, "node");
-        checkNotNull(container, "container");
-        node.setValue(container.getMap(DataQuery.of()).get());
-    }
-
     @Override
     public ConfigurationNode translate(DataView view) throws InvalidDataException {
         final ConfigurationNode node = SimpleConfigurationNode.root();
-        this.populateNode(node, view);
+        node.setValue(view.getMap(DataQuery.of()).get());
         return node;
     }
 

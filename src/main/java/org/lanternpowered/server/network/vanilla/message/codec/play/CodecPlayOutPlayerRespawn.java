@@ -35,11 +35,11 @@ public final class CodecPlayOutPlayerRespawn implements Codec<MessagePlayOutPlay
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutPlayerRespawn message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeInteger(message.getDimensionType().getInternalId());
         buf.writeByte((byte) message.getDifficulty().getInternalId());
         buf.writeByte((byte) message.getGameMode().getInternalId());
-        buf.writeString("default"); // Not used
+        buf.writeString(message.isLowHorizon() ? "flat" : "default");
         return buf;
     }
 }

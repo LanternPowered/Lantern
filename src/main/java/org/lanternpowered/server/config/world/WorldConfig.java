@@ -84,6 +84,9 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
     @Setting(value = "max-build-height", comment = "The maximum build height of this world.")
     private int maxBuildHeight = 255;
 
+    @Setting(value = "low-horizon", comment = "Lower the horizon of a world from y = 63 to y = 0")
+    private boolean lowHorizon = false;
+
     @Setting(value = "difficulty", comment = "The difficulty of this world.")
     private Difficulty difficulty = Difficulties.NORMAL;
 
@@ -214,4 +217,11 @@ public class WorldConfig extends ConfigBase implements ChunkLoadingConfig {
         this.hardcore = hardcore;
     }
 
+    public boolean isLowHorizon() {
+        return this.lowHorizon;
+    }
+
+    public void setLowHorizon(boolean lowHorizon) {
+        this.lowHorizon = lowHorizon;
+    }
 }

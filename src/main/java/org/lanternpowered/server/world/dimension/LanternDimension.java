@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.world.dimension;
 
+import static com.google.common.base.MoreObjects.toStringHelper;
+
 import org.lanternpowered.server.world.LanternWorld;
 import org.lanternpowered.server.world.gen.LanternGeneratorType;
 import org.spongepowered.api.service.context.Context;
@@ -36,7 +38,7 @@ public abstract class LanternDimension implements Dimension {
     private final LanternDimensionType<?> dimensionType;
     private final LanternWorld world;
 
-    public LanternDimension(LanternWorld world, LanternDimensionType<?> dimensionType) {
+    protected LanternDimension(LanternWorld world, LanternDimensionType<?> dimensionType) {
         this.dimensionType = dimensionType;
         this.world = world;
     }
@@ -53,7 +55,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public int getMinimumSpawnHeight() {
-        return this.getGeneratorType().getMinimalSpawnHeight();
+        return getGeneratorType().getMinimalSpawnHeight();
     }
 
     @Override
@@ -73,7 +75,7 @@ public abstract class LanternDimension implements Dimension {
 
     @Override
     public int getHeight() {
-        return this.getGeneratorType().getGeneratorHeight();
+        return getGeneratorType().getGeneratorHeight();
     }
 
     @Override
@@ -86,4 +88,12 @@ public abstract class LanternDimension implements Dimension {
         return this.world.getProperties().getGeneratorType();
     }
 
+    @Override
+    public String toString() {
+        return toStringHelper(this)
+                .add("worldUUID", this.world.getUniqueId().toString())
+                .add("worldName", this.world.getName())
+                .add("dimensionType", this.dimensionType.getId())
+                .toString();
+    }
 }

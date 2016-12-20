@@ -94,6 +94,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("HoldsPoppy"), "lantern:holds_poppy");
     public static final Key<Value<Boolean>> HAS_PUMPKIN_HEAD =
             makeValueKey(Boolean.class, DataQuery.of("HasPumpkinHead"), "lantern:has_pumpkin_head");
+    public static final Key<Value<Boolean>> IS_HANGING =
+            makeValueKey(Boolean.class, DataQuery.of("IsHanging"), "lantern:is_hanging");
 
     private LanternKeys() {
     }

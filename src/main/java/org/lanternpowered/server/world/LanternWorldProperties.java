@@ -32,9 +32,6 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
-import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetDifficulty;
@@ -60,6 +57,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.DimensionTypes;
 import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.GeneratorTypes;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.api.world.PortalAgentTypes;
 import org.spongepowered.api.world.SerializationBehavior;
@@ -167,7 +165,7 @@ public final class LanternWorldProperties implements WorldProperties {
 
     public void loadConfig() throws IOException {
         this.worldConfig.load();
-        this.updateWorldGenModifiers(this.worldConfig.getGeneration().getGenerationModifiers());
+        updateWorldGenModifiers(this.worldConfig.getGeneration().getGenerationModifiers());
     }
 
     public void update(LanternWorldArchetype worldArchetype) throws IOException {
@@ -189,6 +187,7 @@ public final class LanternWorldProperties implements WorldProperties {
         this.worldConfig.setPVPEnabled(worldArchetype.isPVPEnabled());
         this.setBuildHeight(worldArchetype.getBuildHeight());
         this.worldConfig.setHardcore(worldArchetype.isHardcore());
+        this.worldConfig.setLowHorizon(worldArchetype.getGeneratorType() == GeneratorTypes.FLAT);
         this.worldConfig.save();
     }
 

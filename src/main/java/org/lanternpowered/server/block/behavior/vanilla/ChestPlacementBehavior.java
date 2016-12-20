@@ -42,7 +42,7 @@ import org.spongepowered.api.world.World;
 
 public class ChestPlacementBehavior implements PlaceBlockBehavior {
 
-    private static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
+    private static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[] { Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST };
 
     @Override
     public BehaviorResult tryPlace(BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
@@ -50,7 +50,17 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
                 .orElseThrow(() -> new IllegalStateException("The BlockSnapshotProviderPlaceBehavior's BlockSnapshot isn't present."));
         final Location<World> location = context.tryGet(Parameters.BLOCK_LOCATION);
 
-        Location<World> otherChestLoc = null;
+        final LanternPlayer player = (LanternPlayer) context.get(Parameters.PLAYER).orElse(null);
+
+        // Get the direction the chest should face
+        Direction facing;
+        if (player != null) {
+            facing = player.getHorizontalDirection(Direction.Division.CARDINAL).getOpposite();
+        } else {
+            facing = Direction.NORTH;
+        }
+
+        Location<World> otherChestLoc;
         // Check whether the chest already a double chest is,
         // and fail if this is the case
         for (Direction directionToCheck : HORIZONTAL_DIRECTIONS) {
@@ -60,36 +70,29 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
                 // Check if it isn't already double
                 for (Direction directionToCheck1 : HORIZONTAL_DIRECTIONS) {
                     final Location<World> loc1 = otherChestLoc.getRelative(directionToCheck1);
-                    if (loc1.getBlock().getType() == this) {
+                    if (loc1.getBlock().getType() == snapshot.getState().getType()) {
                         return BehaviorResult.FAIL;
                     }
                 }
-            } else {
-                otherChestLoc = null;
+                final Direction otherFacing = otherChestLoc.get(Keys.DIRECTION).get();
+                // The chests don't have the same facing direction, we need to fix it
+                boolean flag = directionToCheck != facing && directionToCheck.getOpposite() != facing;
+                if (!(facing == otherFacing && flag)) {
+                    // The rotation of the chests is completely wrong, fix it
+                    if (!flag) {
+                        facing = directionToCheck == Direction.EAST || directionToCheck == Direction.WEST ? Direction.SOUTH : Direction.EAST;
+                    }
+                    context.addBlockChange(BlockSnapshot.builder()
+                            .from(otherChestLoc.createSnapshot())
+                            .add(Keys.DIRECTION, facing)
+                            .build());
+                }
+                break;
             }
-        }
-
-        final LanternPlayer player = (LanternPlayer) context.get(Parameters.PLAYER).orElse(null);
-
-        // Get the direction the chest should face
-        final Direction facing;
-        if (player != null) {
-            facing = player.getHorizontalDirection(Direction.Division.CARDINAL).getOpposite();
-        } else {
-            facing = Direction.NORTH;
         }
 
         context.addBlockChange(BlockSnapshotBuilder.create().from(snapshot)
                 .location(location).add(Keys.DIRECTION, facing).build());
-
-        // Rotate the other chest in the same one as we placed
-        if (otherChestLoc != null) {
-            context.addBlockChange(BlockSnapshot.builder()
-                    .from(otherChestLoc.createSnapshot())
-                    .add(Keys.DIRECTION, facing)
-                    .build());
-        }
-
         return BehaviorResult.SUCCESS;
     }
 }

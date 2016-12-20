@@ -39,8 +39,8 @@ public class TileDoubleChestInventory extends LanternOrderedInventory implements
     public TileDoubleChestInventory(@Nullable Inventory parent, @Nullable Translation name,
             IChestInventory upperInventory, IChestInventory lowerInventory) {
         super(parent, name == null ? tr("container.chestDouble") : name);
-        this.registerChild(upperInventory);
-        this.registerChild(lowerInventory);
-        this.finalizeContent();
+        registerChild(upperInventory);
+        registerChild(lowerInventory);
+        finalizeContent();
     }
 }

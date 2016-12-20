@@ -34,7 +34,7 @@ public abstract class LanternContainer<I extends TileEntityInventory<TileEntityC
     protected final I inventory;
 
     protected LanternContainer() {
-        this.inventory = this.createInventory();
+        this.inventory = createInventory();
         ((AbstractInventory) this.inventory).add(this);
     }
 

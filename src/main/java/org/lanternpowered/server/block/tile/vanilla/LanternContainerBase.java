@@ -46,11 +46,11 @@ public abstract class LanternContainerBase extends LanternTileEntity implements 
     @Override
     public Result onViewerAdded(Viewer viewer, org.lanternpowered.server.inventory.LanternContainer container) {
         if (this.playersCount++ == 0) {
-            this.soundDelay = this.getOpenSoundDelay();
+            this.soundDelay = getOpenSoundDelay();
 
-            final Location<World> location = this.getLocation();
+            final Location<World> location = getLocation();
             final LanternWorld world = (LanternWorld) location.getExtent();
-            world.addBlockAction(location.getBlockPosition(), this.getBlock().getType(), ContainerAnimationAction.OPEN);
+            world.addBlockAction(location.getBlockPosition(), getBlock().getType(), ContainerAnimationAction.OPEN);
         }
         return Result.IGNORE;
     }
@@ -60,9 +60,9 @@ public abstract class LanternContainerBase extends LanternTileEntity implements 
         if (--this.playersCount == 0) {
             this.soundDelay = this.getCloseSoundDelay();
 
-            final Location<World> location = this.getLocation();
+            final Location<World> location = getLocation();
             final LanternWorld world = (LanternWorld) location.getExtent();
-            world.addBlockAction(location.getBlockPosition(), this.getBlock().getType(), ContainerAnimationAction.CLOSE);
+            world.addBlockAction(location.getBlockPosition(), getBlock().getType(), ContainerAnimationAction.CLOSE);
         }
         return Result.IGNORE;
     }
@@ -106,11 +106,11 @@ public abstract class LanternContainerBase extends LanternTileEntity implements 
         super.pulse();
 
         if (this.soundDelay > 0 && --this.soundDelay == 0) {
-            final Location<World> location = this.getLocation();
+            final Location<World> location = getLocation();
             if (this.playersCount > 0) {
-                this.playOpenSound(location);
+                playOpenSound(location);
             } else {
-                this.playCloseSound(location);
+                playCloseSound(location);
             }
         }
     }

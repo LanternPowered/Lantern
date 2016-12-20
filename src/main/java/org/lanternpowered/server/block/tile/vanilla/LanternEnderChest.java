@@ -43,7 +43,7 @@ public class LanternEnderChest extends LanternContainerBase implements EnderChes
 
     @Override
     public BlockState getBlock() {
-        final BlockState block = this.getLocation().getBlock();
+        final BlockState block = getLocation().getBlock();
         return block.getType() == BlockTypes.ENDER_CHEST ? block : BlockTypes.ENDER_CHEST.getDefaultState();
     }
 

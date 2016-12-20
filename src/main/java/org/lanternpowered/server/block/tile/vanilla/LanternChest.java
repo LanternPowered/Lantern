@@ -42,12 +42,14 @@ import java.util.Random;
 
 public class LanternChest extends LanternContainer<TileChestInventory> implements Chest {
 
+    private static final Direction[] HORIZONTAL_DIRECTIONS = { Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST };
+
     private final Random random = new Random();
 
     @Override
     public void registerKeys() {
         super.registerKeys();
-        this.registerKey(Keys.DISPLAY_NAME, null);
+        registerKey(Keys.DISPLAY_NAME, null);
     }
 
     @Override
@@ -57,12 +59,11 @@ public class LanternChest extends LanternContainer<TileChestInventory> implement
 
     @Override
     public Optional<Inventory> getDoubleChestInventory() {
-        if (!this.isValid()) {
+        if (!isValid()) {
             return Optional.empty();
         }
-        final Location<World> location = this.getLocation();
-        /*
-        for (Direction directionToCheck : BlockChest.HORIZONTAL_DIRECTIONS) {
+        final Location<World> location = getLocation();
+        for (Direction directionToCheck : HORIZONTAL_DIRECTIONS) {
             final Location<World> loc = location.getRelative(directionToCheck);
             if (loc.getBlock().getType() != this.getBlock().getType()) {
                 continue;
@@ -77,7 +78,7 @@ public class LanternChest extends LanternContainer<TileChestInventory> implement
                             ((LanternChest) optTileEntity.get()).inventory, this.inventory));
                 }
             }
-        }*/
+        }
         return Optional.empty();
     }
 
@@ -95,7 +96,7 @@ public class LanternChest extends LanternContainer<TileChestInventory> implement
 
     @Override
     public BlockState getBlock() {
-        final BlockState block = this.getLocation().getBlock();
+        final BlockState block = getLocation().getBlock();
         return block.getType() == BlockTypes.CHEST || block.getType() == BlockTypes.TRAPPED_CHEST ? block : BlockTypes.CHEST.getDefaultState();
     }
 }

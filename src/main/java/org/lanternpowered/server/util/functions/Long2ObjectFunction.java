@@ -23,21 +23,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.event;
+package org.lanternpowered.server.util.functions;
 
-public final class DamageEntityEvent implements EntityEvent {
+@FunctionalInterface
+public interface Long2ObjectFunction<O> {
 
-    public static DamageEntityEvent of() {
-        return INSTANCE;
-    }
-
-    private static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
-
-    private DamageEntityEvent() {
-    }
-
-    @Override
-    public EntityEventType type() {
-        return EntityEventType.ALIVE;
-    }
+    O apply(long value);
 }

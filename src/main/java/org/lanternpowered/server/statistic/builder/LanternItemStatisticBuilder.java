@@ -23,48 +23,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.statistic.builder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.statistic.BlockStatistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
+import org.lanternpowered.server.statistic.LanternItemStatistic;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.statistic.ItemStatistic;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.translation.Translation;
+
+import java.text.NumberFormat;
 
 import javax.annotation.Nullable;
 
-public class LanternBlockStatisticBuilder extends AbstractStatisticBuilder<BlockStatistic, BlockStatistic.Builder> implements BlockStatistic.Builder {
+final class LanternItemStatisticBuilder extends AbstractStatisticBuilder<ItemStatistic, ItemStatisticBuilder>
+        implements ItemStatisticBuilder {
 
-    private BlockType blockType;
+    private ItemType itemType;
 
     @Override
-    public LanternBlockStatisticBuilder block(BlockType block) {
-        this.blockType = checkNotNull(block, "block");
+    public LanternItemStatisticBuilder item(ItemType item) {
+        this.itemType = checkNotNull(item, "item");
         return this;
     }
 
     @Override
-    public LanternBlockStatisticBuilder from(BlockStatistic value) {
+    public LanternItemStatisticBuilder from(ItemStatistic value) {
         super.from(value);
-        this.blockType = value.getBlockType();
+        this.itemType = value.getItemType();
         return this;
     }
 
     @Override
-    public LanternBlockStatisticBuilder reset() {
+    public LanternItemStatisticBuilder reset() {
         super.reset();
-        this.blockType = null;
+        this.itemType = null;
         return this;
     }
 
-
     @Override
-    BlockStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
-        checkState(this.blockType != null, "The blockType must be set");
-        return new LanternBlockStatistic(pluginId, id, name, translation, group, format, this.blockType, internalId);
+    protected ItemStatistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
+            String internalId, @Nullable Criterion criterion) {
+        checkState(this.itemType != null, "The itemType must be set");
+        return new LanternItemStatistic(pluginId, id, name, translation, internalId, format, criterion, type, this.itemType);
     }
 }

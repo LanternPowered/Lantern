@@ -40,6 +40,7 @@ import org.lanternpowered.server.network.entity.vanilla.ItemEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.LightningEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.MagmaCubeEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.PaintingEntityProtocol;
+import org.lanternpowered.server.network.entity.vanilla.PigEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.PlayerEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.RabbitEntityProtocol;
 import org.lanternpowered.server.network.entity.vanilla.SheepEntityProtocol;
@@ -89,6 +90,8 @@ public class EntityProtocolTypeRegistryModule extends PluginCatalogRegistryModul
                 entity -> new MagmaCubeEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "painting",
                 entity -> new PaintingEntityProtocol<>(entity)));
+        register(LanternEntityProtocolType.of("minecraft", "pig",
+                entity -> new PigEntityProtocol<>(entity)));
         register(LanternEntityProtocolType.of("minecraft", "player", LanternPlayer.class,
                 entity -> new PlayerEntityProtocol(entity)));
         register(LanternEntityProtocolType.of("minecraft", "rabbit",

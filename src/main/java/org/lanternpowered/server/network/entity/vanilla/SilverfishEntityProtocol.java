@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.entity.LanternEntity;
 
-public class SilverfishEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
+public class SilverfishEntityProtocol<E extends LanternEntity> extends InsentientEntityProtocol<E> {
 
     public SilverfishEntityProtocol(E entity) {
         super(entity);

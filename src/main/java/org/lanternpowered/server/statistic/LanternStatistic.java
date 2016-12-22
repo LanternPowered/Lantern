@@ -27,64 +27,56 @@ package org.lanternpowered.server.statistic;
 
 import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.lanternpowered.server.statistic.achievement.LanternAchievement;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.text.NumberFormat;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.annotation.Nullable;
 
 public class LanternStatistic extends PluginCatalogType.Base.Translatable implements Statistic {
 
-    private final StatisticGroup group;
-    @Nullable private final StatisticFormat format;
+    @Nullable private final Criterion criterion;
+    private final StatisticType type;
+    private final NumberFormat format;
     private final String internalId;
 
-    /**
-     * All the achievements that depend on this statistic, and the
-     * achievements should be added when this statistic is reached.
-     */
-    private Set<LanternAchievement> updateAchievements = new HashSet<>();
-
-    LanternStatistic(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format, String internalId) {
+    public LanternStatistic(String pluginId, String id, String name, Translation translation,
+            String internalId, NumberFormat format, @Nullable Criterion criterion, StatisticType type) {
         super(pluginId, id, name, translation);
         this.internalId = internalId;
-        this.group = group;
+        this.criterion = criterion;
         this.format = format;
-    }
-
-    void addUpdateAchievement(LanternAchievement achievement) {
-        this.updateAchievements.add(achievement);
-    }
-
-    @Override
-    public Optional<StatisticFormat> getStatisticFormat() {
-        return Optional.ofNullable(this.format);
-    }
-
-    @Override
-    public StatisticGroup getGroup() {
-        return this.group;
+        this.type = type;
     }
 
     @Override
     protected MoreObjects.ToStringHelper toStringHelper() {
         return super.toStringHelper()
-                .add("group", this.group.getId());
-    }
-
-    public Set<LanternAchievement> getUpdateAchievements() {
-        return Collections.unmodifiableSet(this.updateAchievements);
+                .add("type", this.type.getId())
+                .add("criterion", this.criterion == null ? null : this.criterion.getId())
+                .omitNullValues();
     }
 
     public String getInternalId() {
         return this.internalId;
+    }
+
+    @Override
+    public Optional<Criterion> getCriterion() {
+        return Optional.ofNullable(this.criterion);
+    }
+
+    @Override
+    public NumberFormat getFormat() {
+        return this.format;
+    }
+
+    @Override
+    public StatisticType getType() {
+        return this.type;
     }
 }

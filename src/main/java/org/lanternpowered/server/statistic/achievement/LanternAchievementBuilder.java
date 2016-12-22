@@ -27,61 +27,43 @@ package org.lanternpowered.server.statistic.achievement;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
-import org.spongepowered.api.statistic.Statistic;
+import org.lanternpowered.server.statistic.builder.AbstractStatisticBuilder;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.translation.Translation;
 
-import java.util.Locale;
+import java.text.NumberFormat;
 
 import javax.annotation.Nullable;
 
-public class LanternAchievementBuilder implements Achievement.Builder {
+public final class LanternAchievementBuilder extends AbstractStatisticBuilder<IAchievement, AchievementBuilder> implements AchievementBuilder {
 
-    private String name;
-    private Translation translation;
     private Translation description;
     @Nullable private Achievement parent;
-    @Nullable private Statistic sourceStatistic;
     private long targetValue;
-    @Nullable private String internalId;
-
-    public LanternAchievementBuilder() {
-        reset();
-    }
 
     @Override
-    public LanternAchievementBuilder from(Achievement value) {
-        this.name = value.getName();
-        this.translation = value.getTranslation();
+    public LanternAchievementBuilder from(IAchievement value) {
+        super.from(value);
         this.description = value.getDescription();
         this.parent = value.getParent().orElse(null);
-        this.sourceStatistic = value.getSourceStatistic().orElse(null);
-        this.targetValue = value.getStatisticTargetValue().orElse(1L);
+        this.targetValue = value.getStatisticTargetValue();
         return this;
     }
 
     @Override
     public LanternAchievementBuilder reset() {
-        this.name = null;
-        this.translation = null;
+        super.reset();
         this.description = null;
         this.parent = null;
-        this.sourceStatistic = null;
         this.targetValue = 1;
         return this;
     }
 
     @Override
-    public LanternAchievementBuilder name(String name) {
-        this.name = checkNotNull(name, "name");
-        return this;
-    }
-
-    @Override
-    public LanternAchievementBuilder translation(Translation translation) {
-        this.translation = checkNotNull(translation, "translation");
+    public LanternAchievementBuilder targetValue(long value) {
+        this.targetValue = value;
         return this;
     }
 
@@ -98,45 +80,10 @@ public class LanternAchievementBuilder implements Achievement.Builder {
     }
 
     @Override
-    public LanternAchievementBuilder sourceStatistic(@Nullable Statistic stat) {
-        this.sourceStatistic = stat;
-        return this;
-    }
-
-    @Override
-    public LanternAchievementBuilder targetValue(long value) {
-        this.targetValue = value;
-        return this;
-    }
-
-    public LanternAchievementBuilder internalId(String internalId) {
-        this.internalId = checkNotNull(internalId, "internalId");
-        return this;
-    }
-
-    public LanternAchievement build() throws IllegalStateException {
-        checkNotNull(this.name, "name");
-        checkNotNull(this.translation, "translation");
+    protected IAchievement build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
+            String internalId, @Nullable Criterion criterion) {
         checkNotNull(this.description, "description");
-        final int index = this.name.indexOf(':');
-        final String pluginId;
-        final String name;
-        if (index == -1) {
-            pluginId = LanternGame.SPONGE_PLATFORM_ID;
-            name = this.name;
-        } else {
-            pluginId = this.name.substring(0, index).toLowerCase();
-            name = this.name.substring(index + 1);
-        }
-        final String internalId = this.internalId == null ? pluginId + ':' + name.toLowerCase(Locale.ENGLISH) : this.internalId;
-        return new LanternAchievement(pluginId, name.toLowerCase(Locale.ENGLISH), name,
-                this.translation, internalId, this.parent, this.description, this.sourceStatistic, this.targetValue);
-    }
-
-    @Override
-    public Achievement buildAndRegister() throws IllegalStateException {
-        final LanternAchievement achievement = build();
-        Lantern.getRegistry().register(Achievement.class, achievement);
-        return achievement;
+        return new LanternAchievement(pluginId, id, name, translation, internalId, format, criterion,
+                type, this.targetValue, this.parent, this.description);
     }
 }

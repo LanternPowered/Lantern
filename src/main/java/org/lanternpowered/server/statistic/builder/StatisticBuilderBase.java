@@ -23,43 +23,62 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.statistic.builder;
 
-import com.google.common.base.MoreObjects;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
-import org.spongepowered.api.statistic.BlockStatistic;
+import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.translation.Translation;
-
-import java.text.NumberFormat;
+import org.spongepowered.api.util.ResettableBuilder;
 
 import javax.annotation.Nullable;
 
-public class LanternBlockStatistic extends LanternStatistic implements BlockStatistic {
+public interface StatisticBuilderBase<T extends Statistic, B extends StatisticBuilderBase<T, B>>
+        extends ResettableBuilder<T, B> {
 
-    private final BlockType blockType;
+    /**
+     * Sets the internal name for the {@link Statistic}.
+     *
+     * @param name The name of this achievement
+     * @return This builder, for chaining
+     */
+    B name(String name);
 
-    public LanternBlockStatistic(String pluginId, String id, String name, Translation translation, String internalId,
-            NumberFormat format, @Nullable Criterion criterion, StatisticType type, BlockType blockType) {
-        super(pluginId, id, name, translation, internalId, format, criterion, type);
-        this.blockType = blockType;
-    }
+    /**
+     * Sets the translation for the {@link Statistic}.
+     *
+     * @param translation The translation for the statistic
+     * @return This builder, for chaining
+     */
+    B translation(Translation translation);
+
+    /**
+     * Sets the criterion of the {@link Statistic}.
+     *
+     * @param criterion The criterion
+     * @return This builder, for chaining
+     */
+    B criterion(@Nullable Criterion criterion);
+
+    /**
+     * Sets the {@link StatisticType} of the {@link Statistic}.
+     *
+     * @param type The statistic type
+     * @return This builder, for chaining
+     */
+    B type(StatisticType type);
+
+    /**
+     * Builds an instance of a {@link Statistic}.
+     *
+     * @return A new instance of a statistic
+     * @throws IllegalStateException If the statistic is not completed
+     */
+    T build(String pluginId, String id) throws IllegalStateException;
 
     @Override
-    public BlockType getBlockType() {
-        return this.blockType;
-    }
+    B from(T value);
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper()
-                .add("entityType", this.blockType.getId());
-    }
-
-    @Override
-    public ItemType getItemType() {
-        return this.blockType.getItem().get();
-    }
+    B reset();
 }

@@ -23,21 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.event;
+package org.lanternpowered.server.network.entity.vanilla;
 
-public final class DamageEntityEvent implements EntityEvent {
+import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.entity.event.EntityEvent;
+import org.lanternpowered.server.entity.event.LoveModeEntityEvent;
+import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityStatus;
 
-    public static DamageEntityEvent of() {
-        return INSTANCE;
-    }
+public abstract class AnimalEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
 
-    private static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
-
-    private DamageEntityEvent() {
+    public AnimalEntityProtocol(E entity) {
+        super(entity);
     }
 
     @Override
-    public EntityEventType type() {
-        return EntityEventType.ALIVE;
+    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
+        if (event instanceof LoveModeEntityEvent) {
+            context.sendToAll(() -> new MessagePlayOutEntityStatus(getRootEntityId(), 18));
+        } else {
+            super.handleEvent(context, event);
+        }
     }
 }

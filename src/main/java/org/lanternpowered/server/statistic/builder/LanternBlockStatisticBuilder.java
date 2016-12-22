@@ -23,48 +23,50 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.statistic.builder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
-import org.spongepowered.api.statistic.TeamStatistic;
-import org.spongepowered.api.text.format.TextColor;
+import org.lanternpowered.server.statistic.LanternBlockStatistic;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.statistic.BlockStatistic;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.translation.Translation;
+
+import java.text.NumberFormat;
 
 import javax.annotation.Nullable;
 
-public class LanternTeamStatisticBuilder extends AbstractStatisticBuilder<TeamStatistic, TeamStatistic.Builder>
-        implements TeamStatistic.Builder {
+final class LanternBlockStatisticBuilder extends AbstractStatisticBuilder<BlockStatistic, BlockStatisticBuilder> implements BlockStatisticBuilder {
 
-    private TextColor teamColor;
+    private BlockType blockType;
 
     @Override
-    public TeamStatistic.Builder teamColor(TextColor color) {
-        this.teamColor = checkNotNull(color, "color");
+    public LanternBlockStatisticBuilder block(BlockType block) {
+        this.blockType = checkNotNull(block, "block");
         return this;
     }
 
     @Override
-    public LanternTeamStatisticBuilder from(TeamStatistic value) {
+    public LanternBlockStatisticBuilder from(BlockStatistic value) {
         super.from(value);
-        this.teamColor = value.getTeamColor();
+        this.blockType = value.getBlockType();
         return this;
     }
 
     @Override
-    public LanternTeamStatisticBuilder reset() {
+    public LanternBlockStatisticBuilder reset() {
         super.reset();
-        this.teamColor = null;
+        this.blockType = null;
         return this;
     }
 
     @Override
-    TeamStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
-        checkState(this.teamColor != null, "The teamColor must be set");
-        return new LanternTeamStatistic(pluginId, id, name, translation, group, format, this.teamColor, internalId);
+    protected BlockStatistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
+            String internalId, @Nullable Criterion criterion) {
+        checkState(this.blockType != null, "The blockType must be set");
+        return new LanternBlockStatistic(pluginId, id, name, translation, internalId, format, criterion, type, this.blockType);
     }
 }

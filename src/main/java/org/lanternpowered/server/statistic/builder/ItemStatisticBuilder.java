@@ -23,49 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-import static com.google.common.base.Preconditions.checkState;
+package org.lanternpowered.server.statistic.builder;
 
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.statistic.ItemStatistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
-import org.spongepowered.api.text.translation.Translation;
 
-import javax.annotation.Nullable;
+public interface ItemStatisticBuilder extends StatisticBuilderBase<ItemStatistic, ItemStatisticBuilder> {
 
-public class LanternItemStatisticBuilder extends AbstractStatisticBuilder<ItemStatistic, ItemStatistic.Builder>
-        implements ItemStatistic.Builder {
-
-    private ItemType itemType;
-
-    @Override
-    public ItemStatistic.Builder item(ItemType item) {
-        this.itemType = checkNotNull(item, "item");
-        return this;
+    static ItemStatisticBuilder create() {
+        return new LanternItemStatisticBuilder();
     }
 
-    @Override
-    public LanternItemStatisticBuilder from(ItemStatistic value) {
-        super.from(value);
-        this.itemType = value.getItemType();
-        return this;
-    }
+    /**
+     * Sets the {@link ItemType} of the {@link ItemStatistic}.
+     *
+     * @param item The item
+     * @return This builder, for chaining
+     */
+    ItemStatisticBuilder item(ItemType item);
 
-    @Override
-    public LanternItemStatisticBuilder reset() {
-        super.reset();
-        this.itemType = null;
-        return this;
-    }
-
-
-    @Override
-    ItemStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
-        checkState(this.itemType != null, "The itemType must be set");
-        return new LanternItemStatistic(pluginId, id, name, translation, group, format, this.itemType, internalId);
-    }
 }

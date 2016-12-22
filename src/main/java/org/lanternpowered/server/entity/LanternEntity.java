@@ -188,6 +188,12 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
         return Direction.getClosest(direction, division);
     }
 
+    public Vector3d getHorizontalDirectionVector() {
+        final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
+        // Invert the x direction because west and east are swapped
+        return Quaternions.fromAxesAnglesDeg(rotation.mul(0, 1, 0)).getDirection().mul(-1, 1, 1);
+    }
+
     /**
      * Gets the {@link Direction} that the entity is looking in the horizontal plane.
      *
@@ -195,10 +201,7 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
      * @return The direction
      */
     public Direction getHorizontalDirection(Direction.Division division) {
-        final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
-        // Invert the x direction because west and east are swapped
-        final Vector3d direction = Quaternions.fromAxesAnglesDeg(rotation.mul(0, 1, 0)).getDirection().mul(-1, 1, 1);
-        return Direction.getClosest(direction, division);
+        return Direction.getClosest(getHorizontalDirectionVector(), division);
     }
 
     @Nullable

@@ -32,7 +32,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 
-public class SheepEntityProtocol<E extends LanternEntity> extends InsentientEntityProtocol<E> {
+public class SheepEntityProtocol<E extends LanternEntity> extends AnimalEntityProtocol<E> {
 
     private DyeColor lastColor;
     private boolean lastSheared;
@@ -48,6 +48,7 @@ public class SheepEntityProtocol<E extends LanternEntity> extends InsentientEnti
 
     @Override
     protected void spawn(ParameterList parameterList) {
+        super.spawn(parameterList);
         byte flags = (byte) ((LanternDyeColor) this.entity.get(Keys.DYE_COLOR).orElse(DyeColors.WHITE)).getInternalId();
         if (this.entity.get(Keys.IS_SHEARED).orElse(false)) {
             flags |= 0x10;
@@ -57,6 +58,7 @@ public class SheepEntityProtocol<E extends LanternEntity> extends InsentientEnti
 
     @Override
     protected void update(ParameterList parameterList) {
+        super.update(parameterList);
         final DyeColor color = this.entity.get(Keys.DYE_COLOR).orElse(DyeColors.WHITE);
         int flags = -1;
         if (this.lastColor != color) {

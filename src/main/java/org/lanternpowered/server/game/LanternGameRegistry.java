@@ -153,8 +153,7 @@ import org.lanternpowered.server.game.registry.type.scoreboard.DisplaySlotRegist
 import org.lanternpowered.server.game.registry.type.scoreboard.ObjectiveDisplayModeRegistryModule;
 import org.lanternpowered.server.game.registry.type.scoreboard.VisibilityRegistryModule;
 import org.lanternpowered.server.game.registry.type.statistic.AchievementRegistryModule;
-import org.lanternpowered.server.game.registry.type.statistic.StatisticFormatRegistryModule;
-import org.lanternpowered.server.game.registry.type.statistic.StatisticGroupRegistryModule;
+import org.lanternpowered.server.game.registry.type.statistic.StatisticTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ArgumentTypeRegistryModule;
 import org.lanternpowered.server.game.registry.type.text.ChatTypeRegistryModule;
@@ -195,12 +194,12 @@ import org.lanternpowered.server.script.function.condition.ConditionTypeRegistry
 import org.lanternpowered.server.script.function.value.DoubleValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.FloatValueProviderTypeRegistryModule;
 import org.lanternpowered.server.script.function.value.IntValueProviderTypeRegistryModule;
-import org.lanternpowered.server.statistic.LanternBlockStatisticBuilder;
-import org.lanternpowered.server.statistic.LanternEntityStatisticBuilder;
-import org.lanternpowered.server.statistic.LanternItemStatisticBuilder;
-import org.lanternpowered.server.statistic.LanternStatisticBuilder;
-import org.lanternpowered.server.statistic.LanternTeamStatisticBuilder;
-import org.lanternpowered.server.statistic.achievement.LanternAchievementBuilder;
+import org.lanternpowered.server.statistic.achievement.AchievementBuilder;
+import org.lanternpowered.server.statistic.achievement.IAchievement;
+import org.lanternpowered.server.statistic.builder.BlockStatisticBuilder;
+import org.lanternpowered.server.statistic.builder.EntityStatisticBuilder;
+import org.lanternpowered.server.statistic.builder.ItemStatisticBuilder;
+import org.lanternpowered.server.statistic.builder.StatisticBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorBuilder;
 import org.lanternpowered.server.text.selector.LanternSelectorFactory;
 import org.lanternpowered.server.text.translation.TranslationManager;
@@ -344,9 +343,7 @@ import org.spongepowered.api.statistic.BlockStatistic;
 import org.spongepowered.api.statistic.EntityStatistic;
 import org.spongepowered.api.statistic.ItemStatistic;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
-import org.spongepowered.api.statistic.TeamStatistic;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.api.text.chat.ChatVisibility;
@@ -452,12 +449,11 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerBuilderSupplier(InventoryArchetype.Builder.class, LanternInventoryArchetypeBuilder::new)
                 .registerBuilderSupplier(BiomeGenerationSettings.Builder.class, LanternBiomeGenerationSettingsBuilder::new)
                 .registerBuilderSupplier(VirtualBiomeType.Builder.class, LanternVirtualBiomeTypeBuilder::new)
-                .registerBuilderSupplier(Achievement.Builder.class, LanternAchievementBuilder::new)
-                .registerBuilderSupplier(BlockStatistic.Builder.class, LanternBlockStatisticBuilder::new)
-                .registerBuilderSupplier(EntityStatistic.Builder.class, LanternEntityStatisticBuilder::new)
-                .registerBuilderSupplier(ItemStatistic.Builder.class, LanternItemStatisticBuilder::new)
-                .registerBuilderSupplier(Statistic.Builder.class, LanternStatisticBuilder::new)
-                .registerBuilderSupplier(TeamStatistic.Builder.class, LanternTeamStatisticBuilder::new)
+                .registerBuilderSupplier(AchievementBuilder.class, IAchievement::builder)
+                .registerBuilderSupplier(BlockStatisticBuilder.class, BlockStatisticBuilder::create)
+                .registerBuilderSupplier(EntityStatisticBuilder.class, EntityStatisticBuilder::create)
+                .registerBuilderSupplier(ItemStatisticBuilder.class, ItemStatisticBuilder::create)
+                .registerBuilderSupplier(StatisticBuilder.class, StatisticBuilder::create)
         ;
         // All enum value enumerations must extend registry class, because very strange things
         // are happening. Without this, all the dummy fields are never updated???
@@ -574,8 +570,7 @@ public class LanternGameRegistry implements GameRegistry {
                 .registerModule(PotionType.class, PotionTypeRegistryModule.get())
                 .registerModule(RailDirection.class, RailDirectionRegistryModule.get())
                 .registerModule(Achievement.class, AchievementRegistryModule.get())
-                .registerModule(StatisticFormat.class, StatisticFormatRegistryModule.get())
-                .registerModule(StatisticGroup.class, StatisticGroupRegistryModule.get())
+                .registerModule(StatisticType.class, StatisticTypeRegistryModule.get())
                 .registerModule(Statistic.class, StatisticRegistryModule.get())
                 // Script registry modules
                 .registerModule(Parameter.class, new ContextParameterRegistryModule())
@@ -959,38 +954,23 @@ public class LanternGameRegistry implements GameRegistry {
     }
 
     @Override
-    public Optional<EntityStatistic> getEntityStatistic(StatisticGroup statisticGroup, EntityType entityType) {
-        // TODO Auto-generated method stub
+    public Optional<EntityStatistic> getEntityStatistic(StatisticType statType, EntityType entityType) {
         return null;
     }
 
     @Override
-    public Optional<ItemStatistic> getItemStatistic(StatisticGroup statisticGroup, ItemType itemType) {
-        // TODO Auto-generated method stub
+    public Optional<ItemStatistic> getItemStatistic(StatisticType statType, ItemType itemType) {
         return null;
     }
 
     @Override
-    public Optional<BlockStatistic> getBlockStatistic(StatisticGroup statisticGroup, BlockType blockType) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Optional<TeamStatistic> getTeamStatistic(StatisticGroup statisticGroup, TextColor teamColor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Collection<Statistic> getStatistics(StatisticGroup statisticGroup) {
-        // TODO Auto-generated method stub
+    public Optional<BlockStatistic> getBlockStatistic(StatisticType statType, BlockType blockType) {
         return null;
     }
 
     @Override
     public Optional<Rotation> getRotationFromDegree(int degrees) {
-        return this.getRegistryModule(RotationRegistryModule.class).get().getRotationFromDegree(degrees);
+        return getRegistryModule(RotationRegistryModule.class).get().getRotationFromDegree(degrees);
     }
 
     @Override

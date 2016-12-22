@@ -23,21 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.event;
+package org.lanternpowered.server.statistic.builder;
 
-public final class DamageEntityEvent implements EntityEvent {
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.statistic.BlockStatistic;
 
-    public static DamageEntityEvent of() {
-        return INSTANCE;
+public interface BlockStatisticBuilder extends StatisticBuilderBase<BlockStatistic, BlockStatisticBuilder> {
+
+    static BlockStatisticBuilder create() {
+        return new LanternBlockStatisticBuilder();
     }
 
-    private static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
+    /**
+     * Sets the {@link BlockType} of the {@link BlockStatistic}.
+     *
+     * @param block The block
+     * @return This builder, for chaining
+     */
+    BlockStatisticBuilder block(BlockType block);
 
-    private DamageEntityEvent() {
-    }
-
-    @Override
-    public EntityEventType type() {
-        return EntityEventType.ALIVE;
-    }
 }

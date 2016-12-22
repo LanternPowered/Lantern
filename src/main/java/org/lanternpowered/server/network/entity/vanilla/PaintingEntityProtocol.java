@@ -67,34 +67,34 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        this.spawn(context, this.getArt(), this.getDirection(), this.entity.getPosition().toInt());
+        spawn(context, getArt(), getDirection(), this.entity.getPosition().toInt());
     }
 
     private void spawn(EntityProtocolUpdateContext context, Art art, Direction direction, Vector3i position) {
-        context.sendToAll(() -> new MessagePlayOutSpawnPainting(this.getRootEntityId(),
+        context.sendToAll(() -> new MessagePlayOutSpawnPainting(getRootEntityId(),
                 this.entity.getUniqueId(), art, position.getX(), position.getY(), position.getZ(), direction));
     }
 
     @Override
     public void update(EntityProtocolUpdateContext context) {
-        final Art art = this.getArt();
-        final Direction direction = this.getDirection();
+        final Art art = getArt();
+        final Direction direction = getDirection();
         final Vector3i position = this.entity.getPosition().toInt();
         final int x = position.getX();
         final int y = position.getY();
         final int z = position.getZ();
 
         if (art != this.lastArt || direction != this.lastDirection) {
-            this.spawn(context, art, direction, position);
-            this.update0(EntityProtocolUpdateContext.empty());
+            spawn(context, art, direction, position);
+            update0(EntityProtocolUpdateContext.empty());
             this.lastDirection = direction;
             this.lastArt = art;
             this.lastX = x;
             this.lastY = y;
             this.lastZ = z;
         } else if (x != this.lastX || y != this.lastY || z != this.lastZ) {
-            this.update0(context);
-            context.sendToAll(() -> new MessagePlayOutEntityTeleport(this.getRootEntityId(), x, y, z, 0, 0, true));
+            update0(context);
+            context.sendToAll(() -> new MessagePlayOutEntityTeleport(getRootEntityId(), x, y, z, 0, 0, true));
             this.lastX = x;
             this.lastY = y;
             this.lastZ = z;

@@ -23,21 +23,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.event;
+package org.lanternpowered.server.network.entity.vanilla;
 
-public final class DamageEntityEvent implements EntityEvent {
+import org.lanternpowered.server.entity.LanternEntity;
+import org.lanternpowered.server.network.entity.parameter.ParameterList;
+import org.spongepowered.api.data.key.Keys;
 
-    public static DamageEntityEvent of() {
-        return INSTANCE;
-    }
+public class PigEntityProtocol<E extends LanternEntity> extends AnimalEntityProtocol<E> {
 
-    private static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
+    private boolean lastSaddled;
 
-    private DamageEntityEvent() {
+    public PigEntityProtocol(E entity) {
+        super(entity);
     }
 
     @Override
-    public EntityEventType type() {
-        return EntityEventType.ALIVE;
+    protected int getMobType() {
+        return 90;
+    }
+
+    @Override
+    protected void spawn(ParameterList parameterList) {
+        super.spawn(parameterList);
+        parameterList.add(EntityParameters.Pig.HAS_SADDLE, this.entity.get(Keys.PIG_SADDLE).orElse(false));
+    }
+
+    @Override
+    protected void update(ParameterList parameterList) {
+        super.update(parameterList);
+        final boolean saddled = this.entity.get(Keys.PIG_SADDLE).orElse(false);
+        if (this.lastSaddled != saddled) {
+            parameterList.add(EntityParameters.Pig.HAS_SADDLE, saddled);
+            this.lastSaddled = saddled;
+        }
     }
 }

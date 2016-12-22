@@ -23,30 +23,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.statistic.builder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.util.Conditions.checkNotNullOrEmpty;
 
-import org.lanternpowered.server.game.Lantern;
-import org.lanternpowered.server.game.LanternGame;
+import org.lanternpowered.server.statistic.StatisticNumberFormats;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
+import org.spongepowered.api.statistic.StatisticType;
+import org.spongepowered.api.statistic.StatisticTypes;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.text.NumberFormat;
 import java.util.Locale;
 
 import javax.annotation.Nullable;
 
 @SuppressWarnings("unchecked")
-public abstract class AbstractStatisticBuilder<T extends Statistic, B extends Statistic.StatisticBuilder<T, B>> implements Statistic.StatisticBuilder<T, B> {
+public abstract class AbstractStatisticBuilder<T extends Statistic, B extends StatisticBuilderBase<T, B>> implements StatisticBuilderBase<T, B> {
 
-    private String name;
+    @Nullable private String name;
     private Translation translation;
-    private StatisticGroup group;
-    @Nullable private StatisticFormat format;
+    private StatisticType type;
+    private NumberFormat format;
     @Nullable private String internalId;
+    @Nullable private Criterion criterion;
 
     public AbstractStatisticBuilder() {
         reset();
@@ -63,9 +66,10 @@ public abstract class AbstractStatisticBuilder<T extends Statistic, B extends St
     public B reset() {
         this.name = null;
         this.translation = null;
-        this.group = null;
-        this.format = null;
+        this.type = StatisticTypes.BASIC;
+        this.format = StatisticNumberFormats.COUNT;
         this.internalId = null;
+        this.criterion = null;
         return (B) this;
     }
 
@@ -82,15 +86,25 @@ public abstract class AbstractStatisticBuilder<T extends Statistic, B extends St
     }
 
     @Override
-    public B format(@Nullable StatisticFormat format) {
-        this.format = format;
+    public B criterion(@Nullable Criterion criterion) {
+        this.criterion = criterion;
         return (B) this;
     }
 
     @Override
-    public B group(StatisticGroup group) {
-        this.group = checkNotNull(group, "group");
+    public B type(StatisticType type) {
+        this.type = checkNotNull(type, "type");
         return (B) this;
+    }
+
+    @Override
+    public T build(String pluginId, String id) throws IllegalStateException {
+        checkNotNullOrEmpty(pluginId, "pluginId");
+        checkNotNullOrEmpty(id, "id");
+        checkState(this.translation != null, "The translation must be set");
+        final String name = this.name == null ? id : this.name;
+        final String internalId = this.internalId == null ? pluginId + ':' + name.toLowerCase(Locale.ENGLISH) : this.internalId;
+        return build(pluginId, id, name, this.translation, this.type, this.format, internalId, this.criterion);
     }
 
     public B internalId(String internalId) {
@@ -98,32 +112,6 @@ public abstract class AbstractStatisticBuilder<T extends Statistic, B extends St
         return (B) this;
     }
 
-    public T build() throws IllegalStateException {
-        checkState(this.name != null, "The name must be set");
-        checkState(this.translation != null, "The translation must be set");
-        checkState(this.group != null, "The group must be set");
-        final int index = this.name.indexOf(':');
-        final String pluginId;
-        final String name;
-        if (index == -1) {
-            pluginId = LanternGame.SPONGE_PLATFORM_ID;
-            name = this.name;
-        } else {
-            pluginId = this.name.substring(0, index).toLowerCase();
-            name = this.name.substring(index + 1);
-        }
-        final String internalId = this.internalId == null ? pluginId + ':' + name.toLowerCase(Locale.ENGLISH) : this.internalId;
-        final StatisticFormat format = this.format == null ? this.group.getDefaultStatisticFormat() : this.format;
-        return build(pluginId, name.toLowerCase(Locale.ENGLISH), name, this.translation, this.group, format, internalId);
-    }
-
-    abstract T build(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format, String internalId);
-
-    @Override
-    public T buildAndRegister() throws IllegalStateException {
-        final T statistic = build();
-        Lantern.getRegistry().register(Statistic.class, statistic);
-        return statistic;
-    }
+    protected abstract T build(String pluginId, String id, String name, Translation translation,
+            StatisticType type, NumberFormat format, String internalId, @Nullable Criterion criterion);
 }

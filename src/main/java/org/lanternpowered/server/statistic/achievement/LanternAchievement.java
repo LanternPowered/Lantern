@@ -25,13 +25,15 @@
  */
 package org.lanternpowered.server.statistic.achievement;
 
-import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableSet;
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.statistic.Statistic;
+import org.lanternpowered.server.statistic.LanternStatistic;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Optional;
@@ -39,25 +41,21 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-public class LanternAchievement extends PluginCatalogType.Base.Translatable implements Achievement {
+public final class LanternAchievement extends LanternStatistic implements IAchievement {
 
     private final Set<Achievement> children = new HashSet<>();
     @Nullable private volatile Set<Achievement> immutableChildren;
+    private final long statisticTargetValue;
 
     @Nullable private final Achievement parent;
     private final Translation description;
-    @Nullable private final Statistic sourceStatistic;
-    private final long statisticTargetValue;
-    private final String internalId;
 
-    LanternAchievement(String pluginId, String id, String name, Translation translation, String internalId,
-            @Nullable Achievement parent, Translation description, @Nullable Statistic sourceStatistic, long statisticTargetValue) {
-        super(pluginId, id, name, translation);
-        this.sourceStatistic = sourceStatistic;
+    LanternAchievement(String pluginId, String id, String name, Translation translation, String internalId, NumberFormat format,
+            @Nullable Criterion criterion, StatisticType type, long statisticTargetValue, @Nullable Achievement parent, Translation description) {
+        super(pluginId, id, name, translation, internalId, format, criterion, type);
         this.statisticTargetValue = statisticTargetValue;
-        this.description = description;
-        this.internalId = internalId;
         this.parent = parent;
+        this.description = description;
     }
 
     void addChild(LanternAchievement achievement) {
@@ -85,24 +83,17 @@ public class LanternAchievement extends PluginCatalogType.Base.Translatable impl
     }
 
     @Override
-    public Optional<Statistic> getSourceStatistic() {
-        return Optional.ofNullable(this.sourceStatistic);
+    public Optional<ItemStackSnapshot> getItemStackSnapshot() {
+        return Optional.empty();
     }
 
     @Override
-    public Optional<Long> getStatisticTargetValue() {
-        return this.sourceStatistic == null ? Optional.empty() : Optional.of(this.statisticTargetValue);
+    public boolean isSpecial() {
+        return false;
     }
 
     @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper()
-                .omitNullValues()
-                .add("sourceStatistic", getSourceStatistic().orElse(null))
-                .add("statisticTargetValue", getStatisticTargetValue().orElse(null));
-    }
-
-    public String getInternalId() {
-        return this.internalId;
+    public long getStatisticTargetValue() {
+        return this.statisticTargetValue;
     }
 }

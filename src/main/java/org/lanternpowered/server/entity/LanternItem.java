@@ -193,9 +193,9 @@ public class LanternItem extends LanternEntity implements Item {
                     } else if (itemType == ItemTypes.LEATHER) {
                         player.triggerAchievement(Achievements.KILL_COW);
                     } else if (itemType == ItemTypes.DIAMOND) {
-                        player.triggerAchievement(Achievements.GET_DIAMONDS);
+                        player.triggerAchievement(Achievements.DIAMONDS);
                     } else if (itemType == ItemTypes.BLAZE_ROD) {
-                        player.triggerAchievement(Achievements.GET_BLAZE_ROD);
+                        player.triggerAchievement(Achievements.BLAZE_ROD);
                     }
                 }
 

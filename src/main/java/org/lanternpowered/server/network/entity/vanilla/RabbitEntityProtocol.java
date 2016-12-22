@@ -31,7 +31,7 @@ import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.RabbitTypes;
 
-public class RabbitEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
+public class RabbitEntityProtocol<E extends LanternEntity> extends AnimalEntityProtocol<E> {
 
     private int lastType;
 

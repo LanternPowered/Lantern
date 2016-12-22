@@ -57,6 +57,8 @@ public final class EntityProtocolTypes {
 
     public static final EntityProtocolType<LanternEntity> PAINTING = dummy("PAINTING");
 
+    public static final EntityProtocolType<LanternEntity> PIG = dummy("PIG");
+
     public static final EntityProtocolType<LanternPlayer> PLAYER = dummy("PLAYER");
 
     public static final EntityProtocolType<LanternEntity> RABBIT = dummy("RABBIT");

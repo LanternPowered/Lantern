@@ -23,29 +23,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.entity.event;
 
-import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.statistic.StatisticFormat;
+/**
+ * Plays the love mode animation of the entity. Spawns
+ * hearts above the entity.
+ */
+public final class LoveModeEntityEvent implements EntityEvent {
 
-import java.util.function.LongFunction;
-
-public class LanternStatisticFormat extends PluginCatalogType.Base implements StatisticFormat {
-
-    private final LongFunction<String> formatter;
-
-    public LanternStatisticFormat(String pluginId, String name, LongFunction<String> formatter) {
-        super(pluginId, name);
-        this.formatter = formatter;
+    public static LoveModeEntityEvent of() {
+        return INSTANCE;
     }
 
-    public LanternStatisticFormat(String pluginId, String id, String name, LongFunction<String> formatter) {
-        super(pluginId, id, name);
-        this.formatter = formatter;
-    }
+    private static final LoveModeEntityEvent INSTANCE = new LoveModeEntityEvent();
 
     @Override
-    public String format(long value) {
-        return this.formatter.apply(value);
+    public EntityEventType type() {
+        return EntityEventType.ALIVE;
     }
 }

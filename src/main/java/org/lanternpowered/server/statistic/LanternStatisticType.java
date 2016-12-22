@@ -25,44 +25,25 @@
  */
 package org.lanternpowered.server.statistic;
 
-import com.google.common.base.MoreObjects;
 import org.lanternpowered.server.catalog.PluginCatalogType;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.translation.Translation;
 
-public class LanternStatisticGroup extends PluginCatalogType.Base.Translatable implements StatisticGroup {
+public class LanternStatisticType extends PluginCatalogType.Base.Translatable implements StatisticType {
 
-    private final StatisticFormat defaultStatisticFormat;
-
-    public LanternStatisticGroup(String pluginId, String name, String translation, StatisticFormat defaultStatisticFormat) {
+    public LanternStatisticType(String pluginId, String name, String translation) {
         super(pluginId, name, translation);
-        this.defaultStatisticFormat = defaultStatisticFormat;
     }
 
-    public LanternStatisticGroup(String pluginId, String name, Translation translation, StatisticFormat defaultStatisticFormat) {
+    public LanternStatisticType(String pluginId, String name, Translation translation) {
         super(pluginId, name, translation);
-        this.defaultStatisticFormat = defaultStatisticFormat;
     }
 
-    public LanternStatisticGroup(String pluginId, String id, String name, String translation, StatisticFormat defaultStatisticFormat) {
+    public LanternStatisticType(String pluginId, String id, String name, String translation) {
         super(pluginId, id, name, translation);
-        this.defaultStatisticFormat = defaultStatisticFormat;
     }
 
-    public LanternStatisticGroup(String pluginId, String id, String name, Translation translation, StatisticFormat defaultStatisticFormat) {
+    public LanternStatisticType(String pluginId, String id, String name, Translation translation) {
         super(pluginId, id, name, translation);
-        this.defaultStatisticFormat = defaultStatisticFormat;
-    }
-
-    @Override
-    public StatisticFormat getDefaultStatisticFormat() {
-        return this.defaultStatisticFormat;
-    }
-
-    @Override
-    protected MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper()
-                .add("defaultStatisticFormat", this.defaultStatisticFormat.getId());
     }
 }

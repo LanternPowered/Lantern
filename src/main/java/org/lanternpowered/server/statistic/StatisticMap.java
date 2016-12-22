@@ -30,9 +30,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.game.registry.type.statistic.StatisticRegistryModule;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutStatistics;
-import org.lanternpowered.server.statistic.achievement.LanternAchievement;
+import org.lanternpowered.server.statistic.achievement.IAchievement;
 import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticGroups;
+import org.spongepowered.api.statistic.achievement.Achievement;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -92,21 +92,16 @@ public final class StatisticMap {
         Set<MessagePlayOutStatistics.Entry> entries = initial ? new HashSet<>() : null;
         for (Map.Entry<String, StatisticEntry> entry : this.statisticEntries.entrySet()) {
             final LanternStatistic statistic = entry.getValue().getStatistic();
-            if (statistic == null || (!entry.getValue().isDirty(statistic.getGroup() == StatisticGroups.HIDDEN) && !initial)) {
+            if (!(statistic instanceof Achievement) || !entry.getValue().isDirty(true)) {
                 continue;
             }
-            final Set<LanternAchievement> achievements = statistic.getUpdateAchievements();
-            if (achievements.isEmpty()) {
-                continue;
-            }
+            final IAchievement achievement = (IAchievement) statistic;
             final long value = entry.getValue().get();
-            for (LanternAchievement achievement : achievements) {
-                if (value >= achievement.getStatisticTargetValue().orElse(1L)) {
-                    if (entries == null) {
-                        entries = new HashSet<>();
-                    }
-                    entries.add(new MessagePlayOutStatistics.Entry(achievement.getInternalId(), (int) value));
+            if (value >= achievement.getStatisticTargetValue()) {
+                if (entries == null) {
+                    entries = new HashSet<>();
                 }
+                entries.add(new MessagePlayOutStatistics.Entry(((LanternStatistic) achievement).getInternalId(), (int) value));
             }
         }
         return entries == null ? null : new MessagePlayOutStatistics(entries);
@@ -114,11 +109,7 @@ public final class StatisticMap {
 
     public MessagePlayOutStatistics createStatisticsMessage() {
         return new MessagePlayOutStatistics(this.statisticEntries.entrySet().stream()
-                .filter(entry -> {
-                    final LanternStatistic statistic = entry.getValue().getStatistic();
-                    // Don't send hidden statistics, hidden statistics can trigger achievements though
-                    return (statistic == null || statistic.getGroup() != StatisticGroups.HIDDEN) && entry.getValue().isDirty(true);
-                })
+                .filter(entry -> entry.getValue().getStatistic() instanceof Achievement && entry.getValue().isDirty(true))
                 .map(entry -> new MessagePlayOutStatistics.Entry(entry.getKey(), (int) entry.getValue().get()))
                 .collect(Collectors.toSet()));
     }

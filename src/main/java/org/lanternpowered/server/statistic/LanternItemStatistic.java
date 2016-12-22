@@ -25,11 +25,14 @@
  */
 package org.lanternpowered.server.statistic;
 
+import com.google.common.base.MoreObjects;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.statistic.ItemStatistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.translation.Translation;
+
+import java.text.NumberFormat;
 
 import javax.annotation.Nullable;
 
@@ -37,14 +40,20 @@ public class LanternItemStatistic extends LanternStatistic implements ItemStatis
 
     private final ItemType itemType;
 
-    LanternItemStatistic(String pluginId, String id, String name, Translation translation,
-            StatisticGroup group, @Nullable StatisticFormat format, ItemType itemType, String internalId) {
-        super(pluginId, id, name, translation, group, format, internalId);
+    public LanternItemStatistic(String pluginId, String id, String name, Translation translation, String internalId, NumberFormat format,
+            @Nullable Criterion criterion, StatisticType type, ItemType itemType) {
+        super(pluginId, id, name, translation, internalId, format, criterion, type);
         this.itemType = itemType;
     }
 
     @Override
     public ItemType getItemType() {
         return this.itemType;
+    }
+
+    @Override
+    protected MoreObjects.ToStringHelper toStringHelper() {
+        return super.toStringHelper()
+                .add("itemType", this.itemType.getId());
     }
 }

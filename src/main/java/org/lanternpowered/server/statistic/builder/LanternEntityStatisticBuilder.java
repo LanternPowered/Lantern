@@ -23,21 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
+package org.lanternpowered.server.statistic.builder;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.server.statistic.LanternEntityStatistic;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
 import org.spongepowered.api.statistic.EntityStatistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
+import org.spongepowered.api.statistic.StatisticType;
 import org.spongepowered.api.text.translation.Translation;
+
+import java.text.NumberFormat;
 
 import javax.annotation.Nullable;
 
-public class LanternEntityStatisticBuilder extends AbstractStatisticBuilder<EntityStatistic, EntityStatistic.Builder>
-        implements EntityStatistic.Builder {
+final class LanternEntityStatisticBuilder extends AbstractStatisticBuilder<EntityStatistic, EntityStatisticBuilder>
+        implements EntityStatisticBuilder {
 
     private EntityType entityType;
 
@@ -61,11 +64,10 @@ public class LanternEntityStatisticBuilder extends AbstractStatisticBuilder<Enti
         return this;
     }
 
-
     @Override
-    EntityStatistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
+    protected EntityStatistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
+            String internalId, @Nullable Criterion criterion) {
         checkState(this.entityType != null, "The entityType must be set");
-        return new LanternEntityStatistic(pluginId, id, name, translation, group, format, this.entityType, internalId);
+        return new LanternEntityStatistic(pluginId, id, name, translation, internalId, format, criterion, type, this.entityType);
     }
 }

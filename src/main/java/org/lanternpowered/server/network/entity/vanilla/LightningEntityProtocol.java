@@ -34,12 +34,12 @@ public class LightningEntityProtocol<E extends LanternEntity> extends EntityProt
 
     public LightningEntityProtocol(E entity) {
         super(entity);
-        this.setTrackingRange(512);
+        setTrackingRange(512);
     }
 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        context.sendToAllExceptSelf(new MessagePlayOutSpawnThunderbolt(this.getRootEntityId(), this.entity.getPosition()));
+        context.sendToAllExceptSelf(new MessagePlayOutSpawnThunderbolt(getRootEntityId(), this.entity.getPosition()));
     }
 
     @Override

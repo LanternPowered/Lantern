@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.block.behavior.vanilla;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.behavior.Behavior;
 import org.lanternpowered.server.behavior.BehaviorContext;
 import org.lanternpowered.server.behavior.BehaviorResult;
@@ -80,7 +81,16 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
                 if (!(facing == otherFacing && flag)) {
                     // The rotation of the chests is completely wrong, fix it
                     if (!flag) {
-                        facing = directionToCheck == Direction.EAST || directionToCheck == Direction.WEST ? Direction.SOUTH : Direction.EAST;
+                        if (player != null) {
+                            final Vector3d dir = player.getHorizontalDirectionVector();
+                            if (directionToCheck == Direction.EAST || directionToCheck == Direction.WEST) {
+                                facing = dir.getZ() >= 0 ? Direction.SOUTH : Direction.NORTH;
+                            } else {
+                                facing = dir.getX() >= 0 ? Direction.WEST : Direction.EAST;
+                            }
+                        } else {
+                            facing = directionToCheck == Direction.EAST || directionToCheck == Direction.WEST ? Direction.SOUTH : Direction.EAST;
+                        }
                     }
                     context.addBlockChange(BlockSnapshot.builder()
                             .from(otherChestLoc.createSnapshot())

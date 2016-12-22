@@ -73,6 +73,7 @@ import org.lanternpowered.server.permission.AbstractSubject;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.scoreboard.LanternScoreboard;
 import org.lanternpowered.server.statistic.StatisticMap;
+import org.lanternpowered.server.statistic.achievement.IAchievement;
 import org.lanternpowered.server.text.chat.LanternChatType;
 import org.lanternpowered.server.text.title.LanternTitles;
 import org.lanternpowered.server.world.LanternWeatherUniverse;
@@ -111,7 +112,6 @@ import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.api.statistic.achievement.Achievement;
 import org.spongepowered.api.text.BookView;
 import org.spongepowered.api.text.Text;
@@ -966,16 +966,10 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     }
 
     public void triggerAchievement(Achievement achievement) {
-        // TODO: You can currently only trigger achievements with a source statistic (vanilla achievements)
-        achievement.getSourceStatistic().ifPresent(statistic -> {
-            final Optional<Achievement> parent = achievement.getParent();
-            if (parent.isPresent()) {
-                final Optional<Statistic> statistic1 = parent.get().getSourceStatistic();
-                if (statistic1.isPresent() && this.statisticMap.get(statistic1.get()).get() < parent.get().getStatisticTargetValue().get()) {
-                    return;
-                }
-            }
-            this.statisticMap.get(statistic).set(achievement.getStatisticTargetValue().get());
-        });
+        final Optional<Achievement> parent = achievement.getParent();
+        if (parent.isPresent() && this.statisticMap.get(parent.get()).get() < ((IAchievement) parent.get()).getStatisticTargetValue()) {
+            return;
+        }
+        this.statisticMap.get(achievement).set(((IAchievement) achievement).getStatisticTargetValue());
     }
 }

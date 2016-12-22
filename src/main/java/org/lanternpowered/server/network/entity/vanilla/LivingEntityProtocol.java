@@ -73,7 +73,7 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
 
     @Override
     protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
-        if (event == DamageEntityEvent.INSTANCE) {
+        if (event instanceof DamageEntityEvent) {
             context.sendToAll(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 1));
         } else if (event instanceof SwingHandEntityEvent) {
             final HandType handType = ((SwingHandEntityEvent) event).getHandType();

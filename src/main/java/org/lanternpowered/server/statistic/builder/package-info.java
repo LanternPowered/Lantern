@@ -23,20 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.statistic;
-
-import org.spongepowered.api.statistic.Statistic;
-import org.spongepowered.api.statistic.StatisticFormat;
-import org.spongepowered.api.statistic.StatisticGroup;
-import org.spongepowered.api.text.translation.Translation;
-
-import javax.annotation.Nullable;
-
-public class LanternStatisticBuilder extends AbstractStatisticBuilder<Statistic, Statistic.Builder> implements Statistic.Builder {
-
-    @Override
-    Statistic build(String pluginId, String id, String name, Translation translation, StatisticGroup group,
-            @Nullable StatisticFormat format, String internalId) {
-        return new LanternStatistic(pluginId, id, name, translation, group, format, internalId);
-    }
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.statistic.builder;

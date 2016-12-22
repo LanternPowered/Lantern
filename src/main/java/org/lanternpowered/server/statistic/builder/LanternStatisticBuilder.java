@@ -23,21 +23,23 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity.event;
+package org.lanternpowered.server.statistic.builder;
 
-public final class DamageEntityEvent implements EntityEvent {
+import org.lanternpowered.server.statistic.LanternStatistic;
+import org.spongepowered.api.scoreboard.critieria.Criterion;
+import org.spongepowered.api.statistic.Statistic;
+import org.spongepowered.api.statistic.StatisticType;
+import org.spongepowered.api.text.translation.Translation;
 
-    public static DamageEntityEvent of() {
-        return INSTANCE;
-    }
+import java.text.NumberFormat;
 
-    private static final DamageEntityEvent INSTANCE = new DamageEntityEvent();
+import javax.annotation.Nullable;
 
-    private DamageEntityEvent() {
-    }
+final class LanternStatisticBuilder extends AbstractStatisticBuilder<Statistic, StatisticBuilder> implements StatisticBuilder {
 
     @Override
-    public EntityEventType type() {
-        return EntityEventType.ALIVE;
+    protected Statistic build(String pluginId, String id, String name, Translation translation, StatisticType type, NumberFormat format,
+            String internalId, @Nullable Criterion criterion) {
+        return new LanternStatistic(pluginId, id, name, translation, internalId, format, criterion, type);
     }
 }

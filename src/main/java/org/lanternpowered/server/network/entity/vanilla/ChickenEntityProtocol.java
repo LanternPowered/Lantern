@@ -27,7 +27,7 @@ package org.lanternpowered.server.network.entity.vanilla;
 
 import org.lanternpowered.server.entity.LanternEntity;
 
-public class ChickenEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
+public class ChickenEntityProtocol<E extends LanternEntity> extends AnimalEntityProtocol<E> {
 
     public ChickenEntityProtocol(E entity) {
         super(entity);

@@ -31,7 +31,6 @@ import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.inventory.LanternInventoryRow;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInOutHeldItemChange;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.text.translation.Translation;
@@ -69,7 +68,7 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
                 index, this.slots.size() - 1);
         Inventory inventory = this;
         while (!(inventory instanceof LanternPlayerInventory)) {
-            Inventory inventory1 = inventory.parent();
+            final Inventory inventory1 = inventory.parent();
             if (inventory == inventory1) {
                 inventory = null;
                 break;
@@ -80,6 +79,6 @@ public class LanternHotbar extends LanternInventoryRow implements Hotbar {
             ((LanternPlayerInventory) inventory).getCarrier().ifPresent(
                     player -> ((LanternPlayer) player).getConnection().send(new MessagePlayInOutHeldItemChange(index)));
         }
-        this.setRawSelectedSlotIndex(index);
+        setRawSelectedSlotIndex(index);
     }
 }

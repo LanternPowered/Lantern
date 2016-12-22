@@ -44,8 +44,8 @@ public final class HandlerPlayInResourcePackStatus implements Handler<MessagePla
         final Optional<ResourcePack> resourcePack = context.getSession().getPlayer().getResourcePackSendQueue().poll(message.getStatus());
         final LanternPlayer player = context.getSession().getPlayer();
         if (!resourcePack.isPresent()) {
-            Lantern.getLogger().warn("{} received a unexpected resource pack status message, no resource pack was pending",
-                    player.getName());
+            Lantern.getLogger().warn("{} received a unexpected resource pack status message ({}), no resource pack was pending",
+                    player.getName(), message.getStatus());
             return;
         }
         Sponge.getEventManager().post(SpongeEventFactory.createResourcePackStatusEvent(

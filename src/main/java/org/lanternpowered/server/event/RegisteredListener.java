@@ -31,10 +31,8 @@ import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.EventListener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
-@NonnullByDefault
-public class RegisteredListener<T extends Event> implements LanternEventListener<T>, Comparable<RegisteredListener<?>> {
+final class RegisteredListener<T extends Event> implements LanternEventListener<T>, Comparable<RegisteredListener<?>> {
 
     private final PluginContainer plugin;
     private final EventListener<? super T> handler;

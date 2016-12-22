@@ -98,6 +98,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("IsHanging"), "lantern:is_hanging");
     public static final Key<Value<Boolean>> ELYTRA_SPEED_BOOST =
             makeValueKey(Boolean.class, DataQuery.of("ElytraSpeedBoost"), "lantern:elytra_speed_boost");
+    public static final Key<Value<Boolean>> SUPER_STEVE =
+            makeValueKey(Boolean.class, DataQuery.of("SuperSteve"), "lantern:super_steve");
 
     private LanternKeys() {
     }

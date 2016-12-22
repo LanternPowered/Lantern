@@ -66,7 +66,7 @@ import org.spongepowered.api.util.generator.event.factory.ClassGenerator;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public final class ClassEventListenerFactory implements AnnotatedEventListener.Factory {
+final class ClassEventListenerFactory implements AnnotatedEventListener.Factory {
 
     private final AtomicInteger id = new AtomicInteger();
     private final DefineableClassLoader classLoader;
@@ -76,7 +76,7 @@ public final class ClassEventListenerFactory implements AnnotatedEventListener.F
 
     private final String targetPackage;
 
-    public ClassEventListenerFactory(String targetPackage, FilterFactory factory, DefineableClassLoader classLoader) {
+    ClassEventListenerFactory(String targetPackage, FilterFactory factory, DefineableClassLoader classLoader) {
         checkNotNull(targetPackage, "targetPackage");
         checkArgument(!targetPackage.isEmpty(), "targetPackage cannot be empty");
         this.targetPackage = targetPackage + '.';

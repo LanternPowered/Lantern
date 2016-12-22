@@ -25,15 +25,30 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.play;
 
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerAbilities;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.spongepowered.api.data.key.Keys;
 
 public class HandlerPlayInPlayerAbilities implements Handler<MessagePlayInPlayerAbilities> {
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerAbilities message) {
-        context.getSession().getPlayer().offer(Keys.IS_FLYING, message.isFlying());
+        final boolean flying = message.isFlying();
+        final LanternPlayer player = context.getSession().getPlayer();
+        if (!flying || player.get(Keys.CAN_FLY).orElse(false)) {
+            player.offer(Keys.IS_FLYING, flying);
+        } else {
+            if (player.get(LanternKeys.SUPER_STEVE).orElse(false)) {
+                // TODO: Just set velocity once it's implemented
+                context.getSession().send(new MessagePlayOutEntityVelocity(player.getNetworkId(), 0, 1.0, 0));
+                player.offer(LanternKeys.IS_ELYTRA_FLYING, true);
+            }
+            player.triggerEvent(RefreshAbilitiesPlayerEvent.of());
+        }
     }
 }

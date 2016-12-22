@@ -286,6 +286,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).notRemovable();
         registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
         registerKey(LanternKeys.ELYTRA_SPEED_BOOST, false).notRemovable();
+        registerKey(LanternKeys.SUPER_STEVE, false).notRemovable();
         registerKey(LanternKeys.SCORE, 0).notRemovable();
         registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
@@ -294,7 +295,6 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 })
                 .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
                 .failAlwaysRemoveHandler());
-        offer(LanternKeys.ELYTRA_SPEED_BOOST, true);
     }
 
     @Nullable
@@ -545,7 +545,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         this.resourcePackSendQueue.pulse();
 
         if (get(LanternKeys.IS_ELYTRA_FLYING).get()) {
-            offer(LanternKeys.ELYTRA_SPEED_BOOST, get(Keys.IS_SNEAKING).get());
+            offer(LanternKeys.ELYTRA_SPEED_BOOST, get(Keys.IS_SPRINTING).get());
         }
     }
 

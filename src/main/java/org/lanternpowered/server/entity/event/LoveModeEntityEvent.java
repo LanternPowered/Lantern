@@ -37,6 +37,9 @@ public final class LoveModeEntityEvent implements EntityEvent {
 
     private static final LoveModeEntityEvent INSTANCE = new LoveModeEntityEvent();
 
+    private LoveModeEntityEvent() {
+    }
+
     @Override
     public EntityEventType type() {
         return EntityEventType.ALIVE;

@@ -23,30 +23,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.event;
+package org.lanternpowered.server.entity.event;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+public final class RefreshAbilitiesPlayerEvent implements EntityEvent {
 
-import org.spongepowered.api.event.Event;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
+    public static RefreshAbilitiesPlayerEvent of() {
+        return INSTANCE;
+    }
 
-import java.lang.reflect.Method;
+    private static final RefreshAbilitiesPlayerEvent INSTANCE = new RefreshAbilitiesPlayerEvent();
 
-public abstract class AnnotatedEventListener implements LanternEventListener<Event> {
-
-    protected final Object handle;
-
-    protected AnnotatedEventListener(Object handle) {
-        this.handle = checkNotNull(handle, "handle");
+    private RefreshAbilitiesPlayerEvent() {
     }
 
     @Override
-    public Object getHandle() {
-        return this.handle;
-    }
-
-    interface Factory {
-
-        AnnotatedEventListener create(Object handle, Method method) throws Exception;
+    public EntityEventType type() {
+        return EntityEventType.DEATH_OR_ALIVE;
     }
 }

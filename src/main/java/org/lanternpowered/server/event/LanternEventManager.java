@@ -45,7 +45,6 @@ import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.annotation.NonnullByDefault;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -57,10 +56,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import javax.inject.Singleton;
-
-@Singleton
-@NonnullByDefault
 public class LanternEventManager implements EventManager {
 
     private final Object lock = new Object();
@@ -166,7 +161,7 @@ public class LanternEventManager implements EventManager {
 
     @Override
     public void registerListeners(Object plugin, Object listener) {
-        this.register(checkPlugin(plugin, "plugin"), checkNotNull(listener, "listener"));
+        register(checkPlugin(plugin, "plugin"), checkNotNull(listener, "listener"));
     }
 
     @Override

@@ -33,7 +33,7 @@ import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOu
 
 public abstract class AnimalEntityProtocol<E extends LanternEntity> extends AgeableEntityProtocol<E> {
 
-    public AnimalEntityProtocol(E entity) {
+    protected AnimalEntityProtocol(E entity) {
         super(entity);
     }
 

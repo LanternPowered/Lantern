@@ -29,6 +29,8 @@ import static org.lanternpowered.server.network.entity.EntityProtocolManager.INV
 
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.entity.event.EntityEvent;
+import org.lanternpowered.server.entity.event.RefreshAbilitiesPlayerEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.inventory.LanternItemStack;
@@ -40,6 +42,7 @@ import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 import org.spongepowered.api.data.key.Keys;
@@ -57,6 +60,9 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     private int elytraRocketId = INVALID_ENTITY_ID;
     private boolean lastElytraFlying;
     private boolean lastElytraSpeedBoost;
+
+    private boolean lastCanFly;
+    private float lastFlySpeed;
 
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
@@ -80,15 +86,30 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     protected void spawn(EntityProtocolUpdateContext context) {
         super.spawn(context);
         context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillParameters(true)));
-        context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) getEntity().get(Keys.GAME_MODE).get()));
+        final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
+        context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+        context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
+                this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE,
+                this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue(), 0.01f));
     }
 
     @Override
     protected void update(EntityProtocolUpdateContext context) {
-        final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
+        final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
+        final boolean canFly = canFly();
+        final float flySpeed = this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue();
         if (gameMode != this.lastGameMode) {
             context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
+                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, 0.01f));
             this.lastGameMode = gameMode;
+            this.lastCanFly = canFly;
+            this.lastFlySpeed = flySpeed;
+        } else if (canFly != this.lastCanFly || flySpeed != this.lastFlySpeed) {
+            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
+                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly, false, gameMode == GameModes.CREATIVE, flySpeed, 0.01f));
+            this.lastCanFly = canFly;
+            this.lastFlySpeed = flySpeed;
         }
         super.update(context);
         // Some 1.11.2 magic, ultra secret stuff...
@@ -115,6 +136,24 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             this.lastElytraSpeedBoost = elytraSpeedBoost;
             this.lastElytraFlying = elytraFlying;
         }
+    }
+
+    @Override
+    protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
+        if (event instanceof RefreshAbilitiesPlayerEvent) {
+            final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
+            final float flySpeed = this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue();
+            context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
+                    this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, flySpeed, 0.01f));
+        } else {
+            super.handleEvent(context, event);
+        }
+    }
+
+    private boolean canFly() {
+        // TODO: Double jump?
+        return this.entity.get(Keys.CAN_FLY).orElse(false) ||
+                this.entity.get(LanternKeys.SUPER_STEVE).orElse(false);
     }
 
     @Override

@@ -84,7 +84,7 @@ public class ChestPlacementBehavior implements PlaceBlockBehavior {
                         if (player != null) {
                             final Vector3d dir = player.getHorizontalDirectionVector();
                             if (directionToCheck == Direction.EAST || directionToCheck == Direction.WEST) {
-                                facing = dir.getZ() >= 0 ? Direction.SOUTH : Direction.NORTH;
+                                facing = dir.getZ() >= 0 ? Direction.NORTH : Direction.SOUTH;
                             } else {
                                 facing = dir.getX() >= 0 ? Direction.WEST : Direction.EAST;
                             }

@@ -69,11 +69,11 @@ public final class StatisticNumberFormats {
                 object = StringUtils.normalizeSpace(object);
                 final int index = object.lastIndexOf(' ');
                 final String type = object.substring(index + 1).toLowerCase(Locale.ENGLISH);
-                final long value = DECIMAL_FORMAT.parse(object.substring(0, index)).longValue();
+                final Number value = DECIMAL_FORMAT.parse(object.substring(0, index));
                 switch (type) {
-                    case "cm": return value;
-                    case "km": return value * 100000;
-                    case "m" : return value * 100;
+                    case "cm": return value.longValue();
+                    case "km": return (long) (value.doubleValue() * 100000.0);
+                    case "m" : return (long) (value.doubleValue() * 100.0);
                     default:
                         throw new IllegalArgumentException("Invalid distance formatted string: " + object);
                 }
@@ -114,13 +114,13 @@ public final class StatisticNumberFormats {
                 object = StringUtils.normalizeSpace(object);
                 final int index = object.lastIndexOf(' ');
                 final String type = object.substring(index + 1).toLowerCase(Locale.ENGLISH);
-                final long value = DECIMAL_FORMAT.parse(object.substring(0, index)).longValue();
+                final double value = DECIMAL_FORMAT.parse(object.substring(0, index)).doubleValue();
                 switch (type) {
-                    case "s": return value * 20;
-                    case "m": return value * 1200;
-                    case "h": return value * 72000;
-                    case "d": return value * 1728000;
-                    case "y": return value * 630720000;
+                    case "s": return (long) (value * 20.0);
+                    case "m": return (long) (value * 1200.0);
+                    case "h": return (long) (value * 72000.0);
+                    case "d": return (long) (value * 1728000.0);
+                    case "y": return (long) (value * 630720000.0);
                     default:
                         throw new IllegalArgumentException("Invalid distance formatted string: " + object);
                 }

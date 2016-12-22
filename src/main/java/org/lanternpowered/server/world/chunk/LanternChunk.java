@@ -1289,7 +1289,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
     }
 
     public static int fixEntityYSection(int section) {
-        return section < 0 ? 0 : section > CHUNK_SECTIONS ? CHUNK_SECTIONS - 1 : section;
+        return section < 0 ? 0 : section >= CHUNK_SECTIONS ? CHUNK_SECTIONS - 1 : section;
     }
 
     public void addIntersectingEntities(ImmutableSet.Builder<Entity> builder, int maxYSection, int minYSection, AABB box, Predicate<Entity> filter) {

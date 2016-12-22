@@ -38,7 +38,6 @@ import static org.lanternpowered.server.block.PropertyProviders.replaceable;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
-import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectMap;
 import it.unimi.dsi.fastutil.bytes.Byte2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ShortMap;
@@ -48,7 +47,6 @@ import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
 import org.lanternpowered.server.block.BlockTypeBuilder;
 import org.lanternpowered.server.block.BlockTypeBuilderImpl;
 import org.lanternpowered.server.block.LanternBlockType;
-import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.block.PropertyProviderCollections;
 import org.lanternpowered.server.block.TranslationProvider;
 import org.lanternpowered.server.block.aabb.BoundingBoxes;
@@ -90,7 +88,6 @@ import org.lanternpowered.server.data.type.LanternStoneType;
 import org.lanternpowered.server.data.type.LanternTreeType;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.AdditionalPluginCatalogRegistryModule;
-import org.lanternpowered.server.game.registry.CatalogMappingData;
 import org.lanternpowered.server.game.registry.type.data.KeyRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.ItemRegistryModule;
 import org.lanternpowered.server.game.registry.type.item.inventory.equipment.EquipmentTypeRegistryModule;
@@ -108,7 +105,6 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.util.Direction;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
@@ -1492,13 +1488,5 @@ public final class BlockRegistryModule extends AdditionalPluginCatalogRegistryMo
     private byte doubleStoneSlabData(BlockState blockState, int type) {
         final byte seamless = (byte) (blockState.getTraitValue(LanternBooleanTraits.SEAMLESS).get() ? 1 : 0);
         return (byte) (seamless << 3 | type);
-    }
-
-    @Override
-    public List<CatalogMappingData> getCatalogMappings() {
-        return ImmutableList.<CatalogMappingData>builder()
-                .addAll(super.getCatalogMappings())
-                .add(new CatalogMappingData(LanternBlockTypes.class, provideCatalogMap()))
-                .build();
     }
 }

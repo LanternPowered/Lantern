@@ -25,10 +25,10 @@
  */
 package org.lanternpowered.server.block.tile.vanilla;
 
-import org.lanternpowered.server.block.LanternBlockTypes;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.inventory.InventorySnapshot;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundCategories;
@@ -78,6 +78,6 @@ public class LanternShulkerBox extends LanternContainer<TileShulkerBoxInventory>
     public BlockState getBlock() {
         final BlockState block = getLocation().getBlock();
         // TODO: Check the colors??
-        return block.getType().getId().contains("shulker_box") ? block : LanternBlockTypes.WHITE_SHULKER_BOX.getDefaultState();
+        return block.getType().getId().contains("shulker_box") ? block : BlockTypes.WHITE_SHULKER_BOX.getDefaultState();
     }
 }

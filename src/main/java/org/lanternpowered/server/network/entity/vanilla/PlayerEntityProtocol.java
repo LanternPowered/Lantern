@@ -153,7 +153,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     private boolean canFly() {
         // TODO: Double jump?
         return this.entity.get(Keys.CAN_FLY).orElse(false) ||
-                this.entity.get(LanternKeys.SUPER_STEVE).orElse(false);
+                (this.entity.get(LanternKeys.SUPER_STEVE).orElse(false) && !this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false));
     }
 
     @Override

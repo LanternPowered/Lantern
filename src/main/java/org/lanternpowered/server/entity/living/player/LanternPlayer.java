@@ -90,6 +90,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
@@ -284,6 +285,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.GAME_MODE, GameModes.NOT_SET).notRemovable();
         registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).notRemovable();
         registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
+        registerKey(LanternKeys.ELYTRA_SPEED_BOOST, false).notRemovable();
         registerKey(LanternKeys.SCORE, 0).notRemovable();
         registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
@@ -292,6 +294,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
                 })
                 .retrieveHandler((key, valueContainer) -> Optional.of(this.statisticMap.getStatisticValues()))
                 .failAlwaysRemoveHandler());
+        offer(LanternKeys.ELYTRA_SPEED_BOOST, true);
     }
 
     @Nullable
@@ -540,6 +543,10 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         }
 
         this.resourcePackSendQueue.pulse();
+
+        if (get(LanternKeys.IS_ELYTRA_FLYING).get()) {
+            offer(LanternKeys.ELYTRA_SPEED_BOOST, get(Keys.IS_SNEAKING).get());
+        }
     }
 
     /**

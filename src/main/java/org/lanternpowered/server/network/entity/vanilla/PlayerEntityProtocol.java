@@ -25,25 +25,55 @@
  */
 package org.lanternpowered.server.network.entity.vanilla;
 
+import static org.lanternpowered.server.network.entity.EntityProtocolManager.INVALID_ENTITY_ID;
+
+import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.network.buffer.ByteBuffer;
+import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
+import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
+import org.lanternpowered.server.network.entity.parameter.ByteBufParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.item.ItemTypes;
+
+import java.util.UUID;
 
 public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> {
 
     private boolean lastHasNoGravity;
     private GameMode lastGameMode = GameModes.NOT_SET;
 
+    private int elytraRocketId = INVALID_ENTITY_ID;
+    private boolean lastElytraFlying;
+    private boolean lastElytraSpeedBoost;
+
     public PlayerEntityProtocol(LanternPlayer entity) {
         super(entity);
         setTickRate(1);
+    }
+
+    @Override
+    protected void init(EntityProtocolInitContext context) {
+        super.init(context);
+        this.elytraRocketId = context.acquire();
+    }
+
+    @Override
+    protected void remove(EntityProtocolInitContext context) {
+        super.remove(context);
+        context.release(this.elytraRocketId);
+        this.elytraRocketId = INVALID_ENTITY_ID;
     }
 
     @Override
@@ -61,6 +91,30 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             this.lastGameMode = gameMode;
         }
         super.update(context);
+        // Some 1.11.2 magic, ultra secret stuff...
+        final boolean elytraFlying = this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false);
+        final boolean elytraSpeedBoost = this.entity.get(LanternKeys.ELYTRA_SPEED_BOOST).orElse(false);
+        if (this.lastElytraFlying != elytraFlying || this.lastElytraSpeedBoost != elytraSpeedBoost) {
+            if (this.lastElytraFlying && this.lastElytraSpeedBoost) {
+                context.sendToAll(() -> new MessagePlayOutDestroyEntities(this.elytraRocketId));
+            } else if (elytraFlying && elytraSpeedBoost) {
+                // Create the fireworks data item
+                final LanternItemStack itemStack = new LanternItemStack(ItemTypes.FIREWORKS);
+
+                // Write the item to a parameter list
+                final ByteBufParameterList parameterList = new ByteBufParameterList(ByteBufferAllocator.unpooled());
+                parameterList.add(EntityParameters.Fireworks.ITEM, itemStack);
+                parameterList.add(EntityParameters.Fireworks.ELYTRA_BOOST_PLAYER, getRootEntityId());
+
+                parameterList.getByteBuffer().ifPresent(ByteBuffer::retain);
+
+                context.sendToAll(() -> new MessagePlayOutSpawnObject(this.elytraRocketId, UUID.randomUUID(), 76, 0,
+                        this.entity.getPosition(), 0, 0, Vector3d.ZERO));
+                context.sendToAll(() -> new MessagePlayOutEntityMetadata(this.elytraRocketId, parameterList));
+            }
+            this.lastElytraSpeedBoost = elytraSpeedBoost;
+            this.lastElytraFlying = elytraFlying;
+        }
     }
 
     @Override

@@ -204,6 +204,8 @@ public class ItemStackStore extends DataHolderStore<LanternItemStack> implements
         // Fix a identifier type in the mc server
         if (identifier.equals("minecraft:cooked_fished")) {
             identifier = "minecraft:cooked_fish";
+        } else if (identifier.equals("minecraft:totem")) {
+            identifier = "minecraft:totem_of_undying";
         }
         final String identifier1 = identifier;
         final ItemType itemType = ItemRegistryModule.get().getById(identifier).orElseThrow(

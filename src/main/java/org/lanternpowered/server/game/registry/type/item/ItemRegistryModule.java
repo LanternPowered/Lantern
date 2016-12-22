@@ -1359,13 +1359,19 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         register(449, builder()
                 .translation("item.totem.name")
                 .maxStackQuantity(1)
-                .build("minecraft", "totem"));
+                .build("minecraft", "totem_of_undying"));
         /////////////////////////
         ///   Shulker Shell   ///
         /////////////////////////
         register(450, builder()
                 .translation("item.shulkerShell.name")
                 .build("minecraft", "shulker_shell"));
+        ///////////////////////
+        ///   Iron Nugget   ///
+        ///////////////////////
+        register(452, builder()
+                .translation("item.ironNugget.name")
+                .build("minecraft", "iron_nugget"));
         /////////////////////
         ///   Record 13   ///
         /////////////////////

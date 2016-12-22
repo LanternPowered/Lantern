@@ -60,6 +60,7 @@ public class EnchantmentRegistryModule extends InternalPluginCatalogRegistryModu
         register(new LanternEnchantment("minecraft", "knockback", "enchantment.knockback", 19));
         register(new LanternEnchantment("minecraft", "fire_aspect", "enchantment.fire", 20));
         register(new LanternEnchantment("minecraft", "looting", "enchantment.lootBonus", 21));
+        register(new LanternEnchantment("minecraft", "sweeping", "enchantment.sweeping", 22));
         register(new LanternEnchantment("minecraft", "efficiency", "enchantment.digging", 32));
         register(new LanternEnchantment("minecraft", "silk_touch", "enchantment.untouching", 33));
         register(new LanternEnchantment("minecraft", "unbreaking", "enchantment.durability", 34));

@@ -553,6 +553,8 @@ public final class EntityParameters {
 
         public static final ParameterType<ItemStack> ITEM = PARAMETERS.newParameterType(ParameterValueTypes.ITEM_STACK);
 
+        public static final ParameterType<Integer> ELYTRA_BOOST_PLAYER = PARAMETERS.newParameterType(ParameterValueTypes.INTEGER);
+
         private Fireworks() {
         }
     }

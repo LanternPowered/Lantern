@@ -89,7 +89,7 @@ import java.util.zip.InflaterInputStream;
 
 import javax.annotation.Nullable;
 
-public class RegionFile {
+public final class RegionFile {
 
     private static final Marker REGION_FILE_MARKER = MarkerFactory.getMarker("REGION_FILE");
 
@@ -102,11 +102,13 @@ public class RegionFile {
     private static final int CHUNK_HEADER_SIZE = 5;
     private static final byte[] EMPTY_SECTOR = new byte[SECTOR_BYTES];
 
-    private RandomAccessFile file;
+    private final RandomAccessFile file;
     private final int[] offsets;
-    private final BitSet freeSectors;
+    private final BitSet usedSectors;
     private final int regionX;
     private final int regionZ;
+
+    private int sectorCount;
 
     RegionFile(Path path, int regionX, int regionZ) throws IOException {
         this.regionX = regionX;
@@ -119,38 +121,48 @@ public class RegionFile {
         }
 
         this.file = new RandomAccessFile(path.toFile(), "rw");
+
+        long length = this.file.length();
         // seek to the end to prepare size checking
-        this.file.seek(this.file.length());
+        this.file.seek(length);
 
         // if the file size is under 8KB, grow it (4K chunk offset table, 4K timestamp table)
-        if (this.file.length() < 2 * SECTOR_BYTES) {
+        if (length < 2 * SECTOR_BYTES) {
             if (lastModified != 0) {
                 // Only give a warning if the region file existed beforehand
                 Lantern.getLogger().warn(REGION_FILE_MARKER, "Region \"{}\" under 8K: {} increasing by {}",
-                        path, this.file.length(), 2 * SECTOR_BYTES - this.file.length());
+                        path, length, 2 * SECTOR_BYTES - length);
             }
 
-            for (long i = this.file.length(); i < 2 * SECTOR_BYTES; ++i) {
-                this.file.write(0);
+            if (length == 0) {
+                this.file.write(EMPTY_SECTOR);
+                this.file.write(EMPTY_SECTOR);
+            } else {
+                for (; length < 2 * SECTOR_BYTES; length++) {
+                    this.file.write(0);
+                }
             }
         }
 
+        length = this.file.length();
         // if the file size is not a multiple of 4KB, grow it
-        if ((this.file.length() & 0xfff) != 0) {
+        if ((length & 0xfff) != 0) {
             Lantern.getLogger().warn(REGION_FILE_MARKER, "Region \"{}\" not aligned: {} increasing by {}",
-                    path, this.file.length(), SECTOR_BYTES - (this.file.length() & 0xfff));
+                    path, length, SECTOR_BYTES - (length & 0xfff));
 
-            for (long i = this.file.length() & 0xfff; i < SECTOR_BYTES; ++i) {
+            length = length & 0xfff;
+            for (; length < SECTOR_BYTES; length++) {
                 this.file.write(0);
             }
         }
 
         // set up the available sector map
         final int nSectors = (int) (this.file.length() / SECTOR_BYTES);
-        this.freeSectors = new BitSet(nSectors);
-        this.freeSectors.set(2, nSectors);
+        this.sectorCount = nSectors;
+        this.usedSectors = new BitSet(nSectors);
+        this.usedSectors.set(0, 2);
 
-        // don't set the following sectors
+        // set the following sectors
         // 0 - chunk offset table
         // 1 - for the last modified
 
@@ -164,9 +176,7 @@ public class RegionFile {
             final int numSectors = (offset & 0xff);
 
             if (offset != 0 && startSector >= 0 && startSector + numSectors <= nSectors) {
-                for (int sectorNum = 0; sectorNum < numSectors; ++sectorNum) {
-                    this.freeSectors.set(startSector + sectorNum, false);
-                }
+                this.usedSectors.set(startSector, startSector + numSectors);
             } else if (offset != 0) {
                 Lantern.getLogger().warn(REGION_FILE_MARKER, "Region \"{}\": offsets[{}] = {} -> {},{} does not fit",
                         path, i, offset, startSector, numSectors);
@@ -198,7 +208,7 @@ public class RegionFile {
 
             final int sectorNumber = offset >> 8;
             final int numSectors = offset & 0xff;
-            if (sectorNumber + numSectors > this.freeSectors.size()) {
+            if (sectorNumber + numSectors > this.sectorCount) {
                 logWarning();
                 return false;
             }
@@ -238,7 +248,7 @@ public class RegionFile {
 
             final int sectorNumber = offset >> 8;
             final int numSectors = offset & 0xff;
-            if (sectorNumber + numSectors > this.freeSectors.size()) {
+            if (sectorNumber + numSectors > this.sectorCount) {
                 logWarning();
                 return null;
             }
@@ -324,22 +334,20 @@ public class RegionFile {
             // we need to allocate new sectors
 
             // mark the sectors previously used for this chunk as free
-            for (int i = 0; i < sectorsAllocated; ++i) {
-                this.freeSectors.set(sectorNumber + i, true);
-            }
+            this.usedSectors.clear(sectorNumber, sectorNumber + sectorsAllocated);
 
             // scan for a free space large enough to store this chunk
-            int runStart = this.freeSectors.nextSetBit(0);
+            int runStart = this.usedSectors.nextClearBit(2);
             int runLength = 0;
-            if (runStart != -1) {
-                for (int i = runStart; i < this.freeSectors.size(); ++i) {
+            if (runStart != -1 && runStart < this.sectorCount) {
+                for (int i = runStart; i < this.sectorCount; ++i) {
                     if (runLength != 0) {
-                        if (this.freeSectors.get(i)) {
+                        if (!this.usedSectors.get(i)) {
                             runLength++;
                         } else {
                             runLength = 0;
                         }
-                    } else if (this.freeSectors.get(i)) {
+                    } else if (!this.usedSectors.get(i)) {
                         runStart = i;
                         runLength = 1;
                     }
@@ -347,29 +355,26 @@ public class RegionFile {
                         break;
                     }
                 }
-            }
-
-            if (runLength >= sectorsNeeded) {
-                // we found a free space large enough
-                sectorNumber = runStart;
-                setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
-                for (int i = 0; i < sectorsNeeded; ++i) {
-                    this.freeSectors.set(sectorNumber + i, false);
-                }
-                write(sectorNumber, data, length);
             } else {
-                // no free space large enough found -- we need to grow the file
-                this.file.seek(this.file.length());
-                sectorNumber = this.freeSectors.size();
-                int size = this.freeSectors.size();
-                for (int i = 0; i < sectorsNeeded; ++i) {
-                    this.file.write(EMPTY_SECTOR);
-                    this.freeSectors.set(size++, false);
-                }
-
-                write(sectorNumber, data, length);
-                setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
+                runStart = this.sectorCount;
             }
+
+            sectorNumber = runStart;
+            if (runLength < sectorsNeeded) {
+                final int added = sectorsNeeded - runLength;
+                this.sectorCount += added;
+                this.file.seek(this.file.length());
+                for (int i = 0; i < added; i++) {
+                    this.file.write(EMPTY_SECTOR);
+                }
+            }
+
+            // Clear the sectors to set them in use
+            this.usedSectors.set(sectorNumber, sectorNumber + sectorsNeeded);
+
+            // Write chunk data and offset
+            write(sectorNumber, data, length);
+            setOffset(x, z, (sectorNumber << 8) | sectorsNeeded);
         }
         setTimestamp(x, z, (int) (System.currentTimeMillis() / 1000L));
     }

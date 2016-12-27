@@ -1442,6 +1442,11 @@ public final class LanternChunkManager {
         this.loadedChunks.clear();
         this.reusableChunks.clear();
         this.chunkTaskExecutor.shutdown();
+        try {
+            this.chunkIOService.unload();
+        } catch (IOException e) {
+            this.game.getLogger().warn("An error occurred while unloading the chunk io service", e);
+        }
     }
 
     /**

@@ -132,6 +132,16 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
     }
 
     @Override
+    public Optional<ItemType> getById(String id) {
+        if ("minecraft:cooked_fished".equals(id)) {
+            id = "minecraft:cooked_fish";
+        } else if ("minecraft:totem".equals(id)) {
+            id = "minecraft:totem_of_undying";
+        }
+        return super.getById(id);
+    }
+
+    @Override
     public void registerDefaults() {
         final LanternItemType none = builder().build("minecraft", "none");
         register(0, none);

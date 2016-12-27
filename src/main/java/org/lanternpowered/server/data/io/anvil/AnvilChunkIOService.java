@@ -425,6 +425,7 @@ public class AnvilChunkIOService implements ChunkIOService {
 
         try (NbtDataContainerOutputStream nbt = new NbtDataContainerOutputStream(region.getChunkDataOutputStream(regionX, regionZ))) {
             nbt.write(rootView);
+            nbt.flush();
         }
     }
 

@@ -105,7 +105,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
 
     @Override
     public void write(DataView dataView) throws IOException {
-        this.writeEntry("", checkNotNull(dataView, "dataView"));
+        writeEntry("", checkNotNull(dataView, "dataView"));
     }
 
     @SuppressWarnings("unchecked")
@@ -138,7 +138,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
                 object = ((DataSerializable) object).toContainer().getValues(false);
             }
             for (Entry<DataQuery, Object> entry : ((Map<DataQuery, Object>) object).entrySet()) {
-                this.writeEntry(entry.getKey().asString('.'), entry.getValue());
+                writeEntry(entry.getKey().asString('.'), entry.getValue());
             }
             this.dos.writeByte(END);
         } else if (type == DOUBLE) {
@@ -165,7 +165,7 @@ public class NbtDataContainerOutputStream implements Closeable, Flushable, DataC
             List<Object> list = (List<Object>) object;
             byte type0 = END;
             if (!list.isEmpty()) {
-                type0 = this.typeFor(list.get(0));
+                type0 = typeFor(list.get(0));
             }
             this.dos.writeByte(type0);
             this.dos.writeInt(list.size());

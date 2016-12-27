@@ -38,6 +38,7 @@ import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -133,5 +134,10 @@ public abstract class LanternTileEntity extends BaseComponentHolder implements T
      */
     public void setLocation(Location<World> location) {
         this.location = location;
+    }
+
+    @Override
+    public LocatableBlock getLocatableBlock() {
+        return null;
     }
 }

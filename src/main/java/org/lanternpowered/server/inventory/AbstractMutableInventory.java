@@ -32,6 +32,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.spongepowered.api.effect.Viewer;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -39,6 +40,7 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
@@ -367,7 +369,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
         checkNotNull(args, "args");
         // This madness, trying to
         // cover all the cases
-        return this.query(inventory -> {
+        return query(inventory -> {
             for (Object arg : args) {
                 if (arg instanceof Inventory) {
                     if (inventory.equals(arg)) {
@@ -387,6 +389,13 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
                     }
                 } else if (arg instanceof ItemType) {
                     if (inventory.contains((ItemType) arg)) {
+                        return true;
+                    }
+                } else if (arg instanceof EquipmentSlotType) {
+                    final Optional<EquipmentSlotType> optProperty = inventory.getProperty(EquipmentSlotType.class, "");
+                    //noinspection ConstantConditions
+                    if (optProperty.isPresent() &&
+                            ((LanternEquipmentType) ((EquipmentSlotType) arg).getValue()).isChild(optProperty.get().getValue())) {
                         return true;
                     }
                 } else if (arg instanceof InventoryProperty<?,?>) {

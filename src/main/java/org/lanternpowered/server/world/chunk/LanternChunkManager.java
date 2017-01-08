@@ -963,14 +963,12 @@ public final class LanternChunkManager {
             // Stop here if we can't generate
             if (!generate) {
                 chunk.initializeEmpty();
-                System.out.println("initializeEmpty");
                 return success = false;
             }
             Cause cause0 = cause.get();
             // Generate chunk
             try {
                 generate(chunk, cause0);
-                System.out.println("generate");
             } catch (Throwable e) {
                 this.game.getLogger().error("Error while generating chunk ({};{})", chunk.getX(), chunk.getZ(), e);
                 return success = false;

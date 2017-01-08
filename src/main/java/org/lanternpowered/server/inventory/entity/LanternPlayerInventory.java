@@ -84,7 +84,7 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 finalizeContent();
             }
         });
-        this.equipmentInventory = this.registerChild(new LanternEquipmentInventory(this, player) {
+        this.equipmentInventory = registerChild(new LanternEquipmentInventory(this, player) {
             {
                 registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.HEADWEAR));
                 registerSlot(new LanternEquipmentSlot(this, EquipmentTypes.CHESTPLATE));
@@ -94,39 +94,38 @@ public class LanternPlayerInventory extends LanternOrderedInventory implements P
                 finalizeContent();
             }
         });
-        this.mainInventory = this.registerChild(new HumanMainInventory(this, null) {
+        this.mainInventory = registerChild(new HumanMainInventory(this, null) {
             {
                 for (int y = 0; y < 3; y++) {
                     for (int x = 0; x < 9; x++) {
-                        this.registerSlotAt(x, y);
+                        registerSlotAt(x, y);
                     }
                 }
-                hotbar = this.registerRow(3, new LanternHotbar(this) {
+                hotbar = registerRow(3, new LanternHotbar(this) {
                     {
                         for (int x = 0; x < 9; x++) {
-                            this.registerSlotAt(x);
+                            registerSlotAt(x);
                         }
-                        this.finalizeContent();
+                        finalizeContent();
                     }
                 });
                 finalizeContent();
                 prioritizeChild(hotbar);
             }
         });
-        this.offHandSlot = this.registerChild(new OffHandSlot(this, null));
+        this.offHandSlot = registerChild(new OffHandSlot(this, null));
 
         // Generate inventory views
         this.inventoryViews.put(HumanInventoryView.MAIN,
-                this.generateMainView(this, this.mainInventory));
+                generateMainView(this, this.mainInventory));
         this.inventoryViews.put(HumanInventoryView.REVERSE_MAIN_AND_HOTBAR,
-                this.generateReverseMainAndHotbarView(this, this.mainInventory));
-        final AbstractMutableInventory priorityMainAndHotbarView = this.generatePriorityMainAndHotbarView(this, this.mainInventory);
+                generateReverseMainAndHotbarView(this, this.mainInventory));
         this.inventoryViews.put(HumanInventoryView.PRIORITY_MAIN_AND_HOTBAR,
-                priorityMainAndHotbarView);
+                generatePriorityMainAndHotbarView(this, this.mainInventory));
         this.inventoryViews.put(HumanInventoryView.ALL_PRIORITY_MAIN,
-                this.generateAllPriorityMainView(this.mainInventory));
+                generateAllPriorityMainView(this.mainInventory));
         this.inventoryViews.put(HumanInventoryView.RAW_INVENTORY,
-                this.generateRawInventoryView(this.mainInventory, this.equipmentInventory, this.offHandSlot));
+                generateRawInventoryView(this.mainInventory, this.equipmentInventory, this.offHandSlot));
 
         // This is the default views/inventories
         this.inventoryViews.put(HumanInventoryView.MAIN_AND_PRIORITY_HOTBAR, this.mainInventory);

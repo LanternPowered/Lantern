@@ -23,30 +23,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.inventory.entity;
+package org.lanternpowered.server.inventory.equipment;
 
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
-import org.spongepowered.api.text.translation.Translation;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.util.generator.dummy.DummyObjectProvider;
 
-import javax.annotation.Nullable;
+public final class LanternEquipmentTypes {
 
-public class OffHandSlot extends LanternSlot {
+    public static final EquipmentType MAIN_HAND = DummyObjectProvider.createFor(EquipmentType.class, "MAIN_HAND");
 
-    public OffHandSlot(@Nullable Inventory parent, @Nullable Translation name) {
-        super(parent, name);
-        registerProperty(new EquipmentSlotType(LanternEquipmentTypes.OFF_HAND));
-    }
+    public static final EquipmentType OFF_HAND = DummyObjectProvider.createFor(EquipmentType.class, "OFF_HAND");
 
-    @Override
-    public boolean isReverseShiftClickOfferOrder() {
-        return false;
-    }
-
-    @Override
-    public boolean doesAllowShiftClickOffer() {
-        return false;
+    private LanternEquipmentTypes() {
     }
 }

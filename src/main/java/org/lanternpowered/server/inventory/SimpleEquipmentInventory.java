@@ -58,11 +58,11 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#poll()
      * @param equipmentType Type of equipment slot to query for
-     * @return removed ItemStack, per the semantics of {@link Inventory#poll()}
+     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
      */
     public Optional<ItemStack> poll(EquipmentSlotType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.poll(stack -> {
+        return poll(stack -> {
             final EquipmentType equipmentType1 = equipmentType.getValue();
             if (equipmentType1 == null) {
                 return false;
@@ -82,12 +82,12 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#poll()
      * @param equipmentType Type of equipment slot to query for
-     * @param limit item limit
-     * @return removed ItemStack, per the semantics of {@link Inventory#poll()}
+     * @param limit The item limit
+     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
      */
     public Optional<ItemStack> poll(EquipmentSlotType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.poll(limit, stack -> {
+        return poll(limit, stack -> {
             final EquipmentType equipmentType1 = equipmentType.getValue();
             if (equipmentType1 == null) {
                 return false;
@@ -107,11 +107,11 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#poll()
      * @param equipmentType Type of equipment slot to query for
-     * @return removed ItemStack, per the semantics of {@link Inventory#poll()}
+     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
      */
     public Optional<ItemStack> poll(EquipmentType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.poll(stack -> {
+        return poll(stack -> {
             final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
             return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
         });
@@ -123,12 +123,12 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#poll()
      * @param equipmentType Type of equipment slot to query for
-     * @param limit item limit
-     * @return removed ItemStack, per the semantics of {@link Inventory#poll()}
+     * @param limit The item limit
+     * @return The removed ItemStack, per the semantics of {@link Inventory#poll()}
      */
     public Optional<ItemStack> poll(EquipmentType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.poll(limit, stack -> {
+        return poll(limit, stack -> {
             final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
             return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
         });
@@ -140,11 +140,11 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#peek()
      * @param equipmentType Type of equipment slot to query for
-     * @return removed ItemStack, per the semantics of {@link Inventory#peek()}
+     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
      */
     public Optional<ItemStack> peek(EquipmentSlotType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.peek(stack -> {
+        return peek(stack -> {
             final EquipmentType equipmentType1 = equipmentType.getValue();
             if (equipmentType1 == null) {
                 return false;
@@ -164,12 +164,12 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#peek()
      * @param equipmentType Type of equipment slot to query for
-     * @param limit item limit
-     * @return removed ItemStack, per the semantics of {@link Inventory#peek()}
+     * @param limit The item limit
+     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
      */
     public Optional<ItemStack> peek(EquipmentSlotType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.peek(limit, stack -> {
+        return peek(limit, stack -> {
             final EquipmentType equipmentType1 = equipmentType.getValue();
             if (equipmentType1 == null) {
                 return false;
@@ -189,11 +189,11 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#peek()
      * @param equipmentType Type of equipment slot to query for
-     * @return removed ItemStack, per the semantics of {@link Inventory#peek()}
+     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
      */
     public Optional<ItemStack> peek(EquipmentType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.peek(stack -> {
+        return peek(stack -> {
             final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
             return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
         });
@@ -205,12 +205,12 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#peek()
      * @param equipmentType Type of equipment slot to query for
-     * @param limit item limit
-     * @return removed ItemStack, per the semantics of {@link Inventory#peek()}
+     * @param limit The item limit
+     * @return The removed ItemStack, per the semantics of {@link Inventory#peek()}
      */
     public Optional<ItemStack> peek(EquipmentType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return this.peek(limit, stack -> {
+        return peek(limit, stack -> {
             final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
             return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
         });
@@ -221,8 +221,8 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#set(ItemStack)
      * @param equipmentType Type of equipment slot to set
-     * @param stack stack to insert
-     * @return operation result, for details see {@link Inventory#set}
+     * @param stack The stack to insert
+     * @return The operation result, for details see {@link Inventory#set}
      */
     public InventoryTransactionResult set(EquipmentSlotType equipmentType, @Nullable ItemStack stack) {
         checkNotNull(equipmentType, "equipmentType");
@@ -240,8 +240,8 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      *
      * @see Inventory#set(ItemStack)
      * @param equipmentType Type of equipment slot to set
-     * @param stack stack to insert
-     * @return operation result, for details see {@link Inventory#set}
+     * @param stack The stack to insert
+     * @return The operation result, for details see {@link Inventory#set}
      */
     public InventoryTransactionResult set(EquipmentType equipmentType, @Nullable ItemStack stack) {
         checkNotNull(equipmentType, "equipmentType");
@@ -255,7 +255,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      * Get the {@link Slot} for the specified equipment type.
      *
      * @param equipmentType Type of equipment slot to set
-     * @return matching slot or {@link Optional#empty()} if no matching slot
+     * @return The matching slot or {@link Optional#empty()} if no matching slot
      */
     @SuppressWarnings("unchecked")
     public Optional<Slot> getSlot(EquipmentSlotType equipmentType) {
@@ -271,7 +271,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      * Get the {@link Slot} for the specified equipment type.
      *
      * @param equipmentType Type of equipment slot to set
-     * @return matching slot or {@link Optional#empty()} if no matching slot
+     * @return The matching slot or {@link Optional#empty()} if no matching slot
      */
     @SuppressWarnings("unchecked")
     public Optional<Slot> getSlot(EquipmentType equipmentType) {

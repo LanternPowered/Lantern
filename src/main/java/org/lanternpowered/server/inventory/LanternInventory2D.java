@@ -94,6 +94,7 @@ public class LanternInventory2D extends LanternOrderedInventory implements Inven
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (property == SlotPos.class && child instanceof Slot) {
+            //noinspection SuspiciousMethodCalls
             final Vector2i pos = this.slotsByPos.inverse().get(child);
             return pos == null ? Optional.empty() : Optional.of(property.cast(SlotPos.of(pos)));
         }
@@ -104,6 +105,7 @@ public class LanternInventory2D extends LanternOrderedInventory implements Inven
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
         final List<T> properties = super.tryGetProperties(child, property);
         if (property == SlotPos.class && child instanceof Slot) {
+            //noinspection SuspiciousMethodCalls
             final Vector2i pos = this.slotsByPos.inverse().get(child);
             if (pos != null) {
                 properties.add(property.cast(SlotPos.of(pos)));

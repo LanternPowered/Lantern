@@ -101,7 +101,7 @@ public abstract class AbstractInventory implements IInventory {
         if (parent == this) {
             return (T) empty();
         }
-        int index = parent.getChildIndex(this);
+        final int index = parent.getChildIndex(this);
         checkState(index != -1);
         return (T) parent.getChild(index + 1);
     }

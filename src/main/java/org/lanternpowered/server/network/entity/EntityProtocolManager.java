@@ -78,8 +78,6 @@ public final class EntityProtocolManager {
     private static int allocatorIdCounter = 0;
 
     private final static IntSet allocatorReusableIds = new IntOpenHashSet();
-    private final static IntIterator allocatorReusableIdsIterator = allocatorReusableIds.iterator();
-
     private final static StampedLock allocatorLock = new StampedLock();
 
     /**
@@ -137,14 +135,14 @@ public final class EntityProtocolManager {
             checkNotNull(array, "array");
             final long stamp = allocatorLock.writeLock();
             try {
-                final IntIterator iterator = allocatorReusableIds.iterator();
+                IntIterator it = allocatorReusableIds.iterator();
                 boolean fail = false;
                 for (int i = 0; i < array.length; i++) {
-                    if (!iterator.hasNext()) {
+                    if (!it.hasNext()) {
                         fail = true;
                         break;
                     }
-                    array[i] = iterator.next();
+                    array[i] = it.nextInt();
                     if (i != 0 && array[i - 1] != array[i] - 1) {
                         fail = true;
                         break;
@@ -158,9 +156,10 @@ public final class EntityProtocolManager {
                         }
                     }
                 } else {
+                    it = allocatorReusableIds.iterator();
                     for (int id : array) {
-                        allocatorReusableIdsIterator.nextInt();
-                        allocatorReusableIdsIterator.remove();
+                        it.nextInt();
+                        it.remove();
                         if (this.entityProtocol != null) {
                             this.entityProtocol.entityProtocolManager.idToEntityProtocolMap.put(id, this.entityProtocol);
                         }
@@ -174,11 +173,12 @@ public final class EntityProtocolManager {
 
         private int acquire0() {
             final int id;
-            if (allocatorReusableIdsIterator.hasNext()) {
+            final IntIterator it = allocatorReusableIds.iterator();
+            if (it.hasNext()) {
                 try {
-                    id = allocatorReusableIdsIterator.nextInt();
+                    id = it.nextInt();
                 } finally {
-                    allocatorReusableIdsIterator.remove();
+                    it.remove();
                 }
             } else {
                 id = allocatorIdCounter++;

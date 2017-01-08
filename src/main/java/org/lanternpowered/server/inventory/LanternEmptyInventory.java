@@ -50,6 +50,7 @@ import javax.annotation.Nullable;
 /**
  * Bottom type / empty results set for inventory queries.
  */
+@SuppressWarnings("unchecked")
 class LanternEmptyInventory extends AbstractInventory implements EmptyInventory {
 
     @Nullable private final AbstractInventory parent;
@@ -73,7 +74,6 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
         return Collections.emptyList();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T first() {
         return (T) this;
@@ -115,7 +115,6 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
                 .type(InventoryTransactionResult.Type.FAILURE).reject(stack).build());
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
         return (T) this;
@@ -170,6 +169,11 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     }
 
     @Override
+    public boolean containsAny(ItemStack stack) {
+        return false;
+    }
+
+    @Override
     public boolean contains(ItemType type) {
         return false;
     }
@@ -183,43 +187,41 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
     public void setMaxStackSize(int size) {
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(Class<?>... types) {
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(ItemType... types) {
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(ItemStack... types) {
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
+    public <T extends Inventory> T queryAny(ItemStack... types) {
+        return (T) this;
+    }
+
     @Override
     public <T extends Inventory> T query(InventoryProperty<?, ?>... props) {
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(Translation... names) {
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(String... names) {
         return (T) this;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T query(Object... args) {
         return (T) this;
@@ -240,7 +242,6 @@ class LanternEmptyInventory extends AbstractInventory implements EmptyInventory 
         return EmptyIterator.get();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> T next() {
         return (T) this;

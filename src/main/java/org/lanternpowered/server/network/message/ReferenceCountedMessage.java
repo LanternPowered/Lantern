@@ -36,13 +36,13 @@ public abstract class ReferenceCountedMessage implements Message, ReferenceCount
 
     @Override
     public int refCnt() {
-        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        final ReferenceCounted referenceCounted = getReferenceCounted();
         return referenceCounted == null ? 1 : referenceCounted.refCnt();
     }
 
     @Override
     public ReferenceCounted retain() {
-        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        final ReferenceCounted referenceCounted = getReferenceCounted();
         if (referenceCounted != null) {
             referenceCounted.retain();
         }
@@ -51,7 +51,7 @@ public abstract class ReferenceCountedMessage implements Message, ReferenceCount
 
     @Override
     public ReferenceCounted retain(int increment) {
-        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        final ReferenceCounted referenceCounted = getReferenceCounted();
         if (referenceCounted != null) {
             referenceCounted.retain(increment);
         }
@@ -60,7 +60,7 @@ public abstract class ReferenceCountedMessage implements Message, ReferenceCount
 
     @Override
     public ReferenceCounted touch() {
-        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        final ReferenceCounted referenceCounted = getReferenceCounted();
         if (referenceCounted != null) {
             referenceCounted.touch();
         }
@@ -69,7 +69,7 @@ public abstract class ReferenceCountedMessage implements Message, ReferenceCount
 
     @Override
     public ReferenceCounted touch(Object hint) {
-        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        final ReferenceCounted referenceCounted = getReferenceCounted();
         if (referenceCounted != null) {
             referenceCounted.touch(hint);
         }
@@ -78,13 +78,13 @@ public abstract class ReferenceCountedMessage implements Message, ReferenceCount
 
     @Override
     public boolean release() {
-        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        final ReferenceCounted referenceCounted = getReferenceCounted();
         return referenceCounted == null || referenceCounted.release();
     }
 
     @Override
     public boolean release(int decrement) {
-        final ReferenceCounted referenceCounted = this.getReferenceCounted();
+        final ReferenceCounted referenceCounted = getReferenceCounted();
         return referenceCounted == null || referenceCounted.release(decrement);
     }
 

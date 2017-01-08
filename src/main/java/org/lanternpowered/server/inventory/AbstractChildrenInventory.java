@@ -332,6 +332,18 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     }
 
     @Override
+    public boolean containsAny(ItemStack stack) {
+        checkNotNull(stack, "stack");
+        // Loop through the inventories
+        for (AbstractInventory inventory : this.children) {
+            if (inventory.containsAny(stack)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
     public boolean contains(ItemType type) {
         checkNotNull(type, "type");
         // Loop through the inventories

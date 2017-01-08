@@ -80,7 +80,7 @@ public class FastSoftThreadLocal<T> {
         if (ref != null) {
             T value = ref.get();
             if (value == null) {
-                this.set(value = this.initialValue());
+                set(value = initialValue());
             }
             return value;
         }

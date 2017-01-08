@@ -59,7 +59,7 @@ public final class ConcurrentObjectArray<O> {
      */
     public void set(int index, O object) {
         final StampedLock lock = this.locks[index];
-        long stamp = lock.writeLock();
+        final long stamp = lock.writeLock();
         try {
             this.objects[index] = object;
         } finally {
@@ -68,7 +68,7 @@ public final class ConcurrentObjectArray<O> {
     }
 
     public void work(int index, Consumer<O> consumer, boolean write) {
-        this.work(index, consumer, write, false);
+        work(index, consumer, write, false);
     }
 
     /**
@@ -84,7 +84,7 @@ public final class ConcurrentObjectArray<O> {
     public void work(int index, Consumer<O> consumer, boolean write, boolean forceReadLock) {
         final StampedLock lock = this.locks[index];
         if (write) {
-            long stamp = lock.writeLock();
+            final long stamp = lock.writeLock();
             try {
                 consumer.accept(this.objects[index]);
             } finally {
@@ -94,7 +94,9 @@ public final class ConcurrentObjectArray<O> {
             long stamp;
             if (!forceReadLock) {
                 stamp = lock.tryOptimisticRead();
-                consumer.accept(this.objects[index]);
+                if (stamp != 0L) {
+                    consumer.accept(this.objects[index]);
+                }
                 if (lock.validate(stamp)) {
                     return;
                 }
@@ -109,13 +111,13 @@ public final class ConcurrentObjectArray<O> {
     }
 
     public <T> T work(int index, Function<O, T> function, boolean write) {
-        return this.work(index, function, write, false);
+        return work(index, function, write, false);
     }
 
     public <T> T work(int index, Function<O, T> function, boolean write, boolean forceReadLock) {
         final StampedLock lock = this.locks[index];
         if (write) {
-            long stamp = lock.writeLock();
+            final long stamp = lock.writeLock();
             try {
                 return function.apply(this.objects[index]);
             } finally {
@@ -125,8 +127,9 @@ public final class ConcurrentObjectArray<O> {
             long stamp;
             if (!forceReadLock) {
                 stamp = lock.tryOptimisticRead();
-                T result = function.apply(this.objects[index]);
+                final T result = stamp == 0L ? null : function.apply(this.objects[index]);
                 if (lock.validate(stamp)) {
+                    //noinspection ConstantConditions
                     return result;
                 }
             }
@@ -149,7 +152,7 @@ public final class ConcurrentObjectArray<O> {
      */
     public void work(int index, Function<O, O> function) {
         final StampedLock lock = this.locks[index];
-        long stamp = lock.writeLock();
+        final long stamp = lock.writeLock();
         try {
             this.objects[index] = function.apply(this.objects[index]);
         } finally {

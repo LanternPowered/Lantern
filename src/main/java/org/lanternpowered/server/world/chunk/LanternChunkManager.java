@@ -280,14 +280,14 @@ public final class LanternChunkManager {
     }
 
     private void doChunkLoad(Vector2i coords) {
-        final Set<ChunkLoadingTicket> tickets = ticketsByPos.get(coords);
+        final Set<ChunkLoadingTicket> tickets = this.ticketsByPos.get(coords);
         if (tickets == null) {
             return;
         }
         // Chunk may be null if's already being loaded by a different thread.
         getOrCreateChunk(coords, () -> {
             // Build the cause only if the chunk isn't already loaded
-            return Cause.source(world).named("tickets", tickets.toArray(new Object[tickets.size()])).build();
+            return Cause.source(this.world).named("tickets", tickets.toArray(new Object[tickets.size()])).build();
         }, true, false);
     }
 
@@ -868,8 +868,8 @@ public final class LanternChunkManager {
 
         final EventManager eventManager = Sponge.getEventManager();
 
-        Vector3i min = new Vector3i(chunkX + 8, 0, chunkZ + 8);
-        Extent volume = new SoftBufferExtentViewDownsize(chunk.getWorld(), min, min.add(15, 0, 15), min.sub(8, 0, 8), min.add(23, 0, 23));
+        final Vector3i min = new Vector3i(chunkX + 8, 0, chunkZ + 8);
+        final Extent volume = new SoftBufferExtentViewDownsize(chunk.getWorld(), min, min.add(15, 0, 15), min.sub(8, 0, 8), min.add(23, 0, 23));
 
         // Call the pre populate event, this allows
         // modifications to the populators list
@@ -894,7 +894,7 @@ public final class LanternChunkManager {
 
     @Nullable
     private LanternChunk isChunkLoaded(Vector2i pos) {
-        final LanternChunk chunk = this.getChunk(pos, false);
+        final LanternChunk chunk = getChunk(pos, false);
         return chunk != null && chunk.loaded ? chunk : null;
     }
 
@@ -908,7 +908,7 @@ public final class LanternChunkManager {
      * @return true if it was successful
      */
     public boolean load(LanternChunk chunk, Supplier<Cause> cause, boolean generate) {
-        return this.load0(chunk, cause, generate, true);
+        return load0(chunk, cause, generate, true);
     }
 
     private boolean load0(LanternChunk chunk, Supplier<Cause> cause, boolean generate, boolean wait) {
@@ -950,6 +950,7 @@ public final class LanternChunkManager {
                 // Try to load the chunk
                 if (this.chunkIOService.read(chunk)) {
                     this.game.getEventManager().post(SpongeEventFactory.createLoadChunkEvent(cause.get(), chunk));
+                    this.world.getEventListener().onLoadChunk(chunk);
                     return true;
                 }
             } catch (Exception e) {
@@ -962,12 +963,14 @@ public final class LanternChunkManager {
             // Stop here if we can't generate
             if (!generate) {
                 chunk.initializeEmpty();
+                System.out.println("initializeEmpty");
                 return success = false;
             }
             Cause cause0 = cause.get();
             // Generate chunk
             try {
-                this.generate(chunk, cause0);
+                generate(chunk, cause0);
+                System.out.println("generate");
             } catch (Throwable e) {
                 this.game.getLogger().error("Error while generating chunk ({};{})", chunk.getX(), chunk.getZ(), e);
                 return success = false;
@@ -989,7 +992,8 @@ public final class LanternChunkManager {
     /**
      * Attempts to generate the chunk.
      * 
-     * @param chunk the chunk
+     * @param chunk The chunk
+     * @param cause The cause
      */
     private void generate(LanternChunk chunk, Cause cause) {
         final EventManager eventManager = Sponge.getEventManager();
@@ -1217,7 +1221,7 @@ public final class LanternChunkManager {
 
     private boolean unload0(Vector2i coords, Supplier<Cause> cause, boolean wait) {
         checkNotNull(cause, "cause");
-        final LanternChunk chunk = this.getChunk(checkNotNull(coords, "coords"));
+        final LanternChunk chunk = getChunk(checkNotNull(coords, "coords"));
         if (chunk != null) {
             return unload0(chunk, cause, wait);
         }
@@ -1324,7 +1328,7 @@ public final class LanternChunkManager {
      * @param coords the coordinates
      */
     void force(LanternLoadingTicket ticket, Vector2i coords) {
-        this.force(ticket, coords, true);
+        force(ticket, coords, true);
     }
 
     /**
@@ -1335,7 +1339,7 @@ public final class LanternChunkManager {
      * @param callEvents whether the force chunk events should be called
      */
     void force(LanternLoadingTicket ticket, Vector2i coords, boolean callEvents) {
-        final LanternChunk chunk = this.getChunk(coords, false);
+        final LanternChunk chunk = getChunk(coords, false);
         // The chunk at this coords is already loaded,
         // wa can call the event directly
         lockInternally(coords, ticket);

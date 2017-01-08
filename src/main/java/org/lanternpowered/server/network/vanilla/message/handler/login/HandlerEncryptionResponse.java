@@ -157,10 +157,7 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
             return;
         }
 
-        Lantern.getScheduler().submitAsyncTask(() -> {
-            performAuth(session, authData.getUsername(), hash);
-            return null;
-        });
+        Lantern.getScheduler().submitAsyncTask(() -> performAuth(session, authData.getUsername(), hash));
     }
 
     private void performAuth(NetworkSession session, String username, String hash) {

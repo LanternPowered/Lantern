@@ -69,7 +69,7 @@ public class LanternScheduler implements Scheduler {
     @Override
     public Set<Task> getTasksByName(String pattern) {
         final Pattern searchPattern = Pattern.compile(checkNotNull(pattern, "pattern"));
-        return this.getScheduledTasks().stream()
+        return getScheduledTasks().stream()
                 .filter(task -> searchPattern.matcher(task.getName()).matches())
                 .collect(GuavaCollectors.toImmutableSet());
     }
@@ -94,7 +94,7 @@ public class LanternScheduler implements Scheduler {
     @Override
     public Set<Task> getScheduledTasks(Object plugin) {
         final PluginContainer pluginContainer = checkPlugin(plugin, "plugin");
-        return this.getScheduledTasks().stream()
+        return getScheduledTasks().stream()
                 .filter(task -> task.getOwner().equals(pluginContainer))
                 .collect(GuavaCollectors.toImmutableSet());
     }
@@ -112,7 +112,7 @@ public class LanternScheduler implements Scheduler {
      */
     public <V> Future<V> callSync(Callable<V> callable) {
         final ListenableFutureTask<V> future = ListenableFutureTask.create(callable);
-        this.createTaskBuilder().execute(future).submit(Lantern.getMinecraftPlugin());
+        createTaskBuilder().execute(future).submit(Lantern.getMinecraftPlugin());
         return future;
     }
 
@@ -133,11 +133,11 @@ public class LanternScheduler implements Scheduler {
     }
 
     String getNameFor(PluginContainer plugin, ScheduledTask.TaskSynchronicity syncType) {
-        return this.getDelegate(syncType).nextName(plugin);
+        return getDelegate(syncType).nextName(plugin);
     }
 
     void submit(ScheduledTask task) {
-        this.getDelegate(task).addTask(task);
+        getDelegate(task).addTask(task);
     }
 
     /**
@@ -158,10 +158,17 @@ public class LanternScheduler implements Scheduler {
 
     @Override
     public SpongeExecutorService createAsyncExecutor(Object plugin) {
-        return new TaskExecutorService(() -> this.createTaskBuilder().async(), this.asyncScheduler, checkPlugin(plugin, "plugin"));
+        return new TaskExecutorService(() -> createTaskBuilder().async(), this.asyncScheduler, checkPlugin(plugin, "plugin"));
     }
 
     public <T> CompletableFuture<T> submitAsyncTask(Callable<T> callable) {
         return Functional.asyncFailableFuture(callable, this.asyncScheduler.getExecutor());
+    }
+
+    public CompletableFuture<Void> submitAsyncTask(Runnable callable) {
+        return Functional.asyncFailableFuture(() -> {
+            callable.run();
+            return null;
+        }, this.asyncScheduler.getExecutor());
     }
 }

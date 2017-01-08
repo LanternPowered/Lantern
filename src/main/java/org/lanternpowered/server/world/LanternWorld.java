@@ -143,6 +143,7 @@ import org.spongepowered.api.world.weather.Weathers;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -264,9 +265,9 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         } else {
             this.weatherUniverse = null;
         }
-        this.timeUniverse = this.addComponent(TimeUniverse.class);
+        this.timeUniverse = addComponent(TimeUniverse.class);
         // Create the world border
-        this.worldBorder = this.addComponent(LanternWorldBorder.class);
+        this.worldBorder = addComponent(LanternWorldBorder.class);
         // Create the dimension
         this.dimension = dimensionType.newDimension(this);
         // Create the portal agent
@@ -344,8 +345,8 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
             for (int x = chunkX - SPAWN_SIZE; x < chunkX + SPAWN_SIZE; x++) {
                 for (int z = chunkZ - SPAWN_SIZE; z < chunkZ + SPAWN_SIZE; z++) {
-                    this.chunkManager.getOrCreateChunk(x, z, () -> Cause.source(this.game.getMinecraftPlugin())
-                            .owner(this).build(), true);
+                    this.chunkManager.getOrCreateChunk(x, z,
+                            () -> Cause.source(this.game.getMinecraftPlugin()).owner(this).build(), true);
                     this.spawnLoadingTicket.forceChunk(new Vector2i(x, z));
                 }
             }
@@ -1004,7 +1005,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
         if (!players.hasNext()) {
             return;
         }
-        MessagePlayOutParticleEffect message = new MessagePlayOutParticleEffect(position, particleEffect);
+        final MessagePlayOutParticleEffect message = new MessagePlayOutParticleEffect(position, particleEffect);
         while (players.hasNext()) {
             players.next().getConnection().send(message);
         }
@@ -1012,7 +1013,7 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     @Override
     public void sendMessage(Text message) {
-        this.sendMessage(ChatTypes.CHAT, message);
+        sendMessage(ChatTypes.CHAT, message);
     }
 
     @Override
@@ -1171,19 +1172,17 @@ public class LanternWorld extends BaseComponentHolder implements AbstractExtent,
 
     private void pulseEntities() {
         // Pulse the entities
-        final Iterator<LanternEntity> iterator = this.entitiesByUniqueId.values().iterator();
-        while (iterator.hasNext()) {
-            final LanternEntity entity = iterator.next();
+        for (LanternEntity entity : new ArrayList<>(this.entitiesByUniqueId.values())) {
             if (entity.isRemoved()) {
                 final Vector3i lastChunk = entity.getLastChunkSectionCoords();
                 if (lastChunk != null && entity.getRemoveState() == LanternEntity.RemoveState.DESTROYED) {
                     final LanternChunk chunk = this.chunkManager.getChunkIfLoaded(lastChunk.getX(), lastChunk.getZ());
                     if (chunk != null) {
-                        chunk.removeEntity(entity, lastChunk.getY() >> 4);
+                        chunk.removeEntity(entity, lastChunk.getY());
                     }
                 }
                 this.entityProtocolManager.remove(entity);
-                iterator.remove();
+                this.entitiesByUniqueId.remove(entity.getUniqueId());
             } else {
                 final Vector3i lastChunkSection = entity.getLastChunkSectionCoords();
                 entity.pulse();

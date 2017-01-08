@@ -41,7 +41,7 @@ public interface EquipmentItemFilter extends ItemFilter {
         final Optional<EquipmentProperty> optProp = type.getDefaultProperty(EquipmentProperty.class);
         if (optProp.isPresent()) {
             final EquipmentType equipmentType = optProp.get().getValue();
-            return equipmentType != null && this.isValidItem(equipmentType);
+            return equipmentType != null && isValidItem(equipmentType);
         }
         return false;
     }
@@ -51,7 +51,7 @@ public interface EquipmentItemFilter extends ItemFilter {
         final Optional<EquipmentProperty> optProp = stack.getProperty(EquipmentProperty.class);
         if (optProp.isPresent()) {
             final EquipmentType equipmentType = optProp.get().getValue();
-            return equipmentType != null && this.isValidItem(equipmentType);
+            return equipmentType != null && isValidItem(equipmentType);
         }
         return false;
     }

@@ -129,7 +129,8 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
             if (this.released) {
                 return ImmutableSet.of();
             }
-            return this.queue.stream().map(v -> new Vector3i(v.getX(), 0, v.getY()))
+            return this.queue.stream()
+                    .map(v -> new Vector3i(v.getX(), 0, v.getY()))
                     .collect(GuavaCollectors.toImmutableSet());
         }
     }
@@ -219,7 +220,7 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
     @Override
     public void release() {
         synchronized (this.queue) {
-            this.unforceChunks();
+            unforceChunks();
             this.chunkManager.release(this);
             this.released = true;
         }
@@ -238,6 +239,6 @@ class LanternLoadingTicket implements ChunkLoadingTicket {
 
     @Override
     public String toString() {
-        return this.toStringHelper().toString();
+        return toStringHelper().toString();
     }
 }

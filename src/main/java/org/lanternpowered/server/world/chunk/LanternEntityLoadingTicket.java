@@ -114,6 +114,6 @@ class LanternEntityLoadingTicket extends LanternLoadingTicket implements EntityC
 
     @Override
     MoreObjects.ToStringHelper toStringHelper() {
-        return super.toStringHelper().omitNullValues().add("entity", this.getEntityUniqueId());
+        return super.toStringHelper().omitNullValues().add("entity", getEntityUniqueId());
     }
 }

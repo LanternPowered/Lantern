@@ -91,7 +91,7 @@ public abstract class ServerBase {
             }
             epollAvailabilityLogged = true;
         }
-        final ChannelFuture future = this.init0(address, epoll);
+        final ChannelFuture future = init0(address, epoll);
         this.initialized = true;
         return future;
     }
@@ -100,7 +100,7 @@ public abstract class ServerBase {
 
     public final void shutdown() {
         if (this.initialized) {
-            this.shutdown0();
+            shutdown0();
             this.initialized = false;
         }
     }

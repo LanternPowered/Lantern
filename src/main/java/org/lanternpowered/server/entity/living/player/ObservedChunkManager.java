@@ -31,7 +31,6 @@ import static org.lanternpowered.server.world.chunk.LanternChunk.CHUNK_SECTION_V
 
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectMap;
 import it.unimi.dsi.fastutil.shorts.Short2ObjectOpenHashMap;
@@ -79,7 +78,7 @@ public final class ObservedChunkManager implements WorldEventListener {
     /**
      * All the chunks that are being observed.
      */
-    private final Map<Long, ObservedChunk> observedChunks = Maps.newConcurrentMap();
+    private final Map<Long, ObservedChunk> observedChunks = new ConcurrentHashMap<>();
 
     public ObservedChunkManager(LanternWorld world) {
         this.world = world;
@@ -93,7 +92,7 @@ public final class ObservedChunkManager implements WorldEventListener {
     public void onLoadChunk(LanternChunk chunk) {
         final ObservedChunk observedChunk = this.observedChunks.get(chunk.getKey());
         if (observedChunk != null) {
-            observedChunk.streamChunk(chunk);
+            observedChunk.streamChunkLoad(chunk);
         }
     }
 
@@ -101,7 +100,7 @@ public final class ObservedChunkManager implements WorldEventListener {
     public void onUnloadChunk(LanternChunk chunk) {
         final ObservedChunk observedChunk = this.observedChunks.get(chunk.getKey());
         if (observedChunk != null) {
-            observedChunk.streamChunk(chunk);
+            observedChunk.streamChunkUnload(chunk);
         }
     }
 
@@ -115,7 +114,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
     @Override
     public void onBlockChange(int x, int y, int z, BlockState oldBlockState, BlockState newBlockState) {
-        final long key = LanternChunk.key(x >> 4,  z >> 4);
+        final long key = LanternChunk.key(x >> 4, z >> 4);
         final ObservedChunk observedChunk = this.observedChunks.get(key);
         if (observedChunk != null) {
             observedChunk.addBlockChange(() -> new Vector3i(x, y, z));
@@ -127,7 +126,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
     @Override
     public void onBlockAction(int x, int y, int z, BlockType blockType, BlockAction blockAction) {
-        final long key = LanternChunk.key(x >> 4,  z >> 4);
+        final long key = LanternChunk.key(x >> 4, z >> 4);
         final ObservedChunk observedChunk = this.observedChunks.get(key);
         if (observedChunk != null) {
             observedChunk.addBlockAction(new Vector3i(x, y, z), blockType, blockAction);
@@ -312,7 +311,7 @@ public final class ObservedChunkManager implements WorldEventListener {
 
         private List<Message> createChunkLoadMessages(LanternChunk chunk) {
             final List<Message> messages = new ArrayList<>();
-            messages.add(this.createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true));
+            messages.add(createLoadChunkMessage(chunk, ALL_SECTIONS_BIT_MASK, true));
             if (!this.activeBlockActions.isEmpty()) {
                 this.activeBlockActions.values().forEach(queuedBlockAction -> messages.add(queuedBlockAction.blockActionData));
             }
@@ -325,17 +324,29 @@ public final class ObservedChunkManager implements WorldEventListener {
          *
          * @param chunk The chunk
          */
-        void streamChunk(LanternChunk chunk) {
+        void streamChunkLoad(LanternChunk chunk) {
             List<Message> messages = null;
             for (LanternPlayer observer : this.observers) {
                 if (this.clientObservers.add(observer)) {
                     if (messages == null) {
-                        messages = this.createChunkLoadMessages(chunk);
+                        messages = createChunkLoadMessages(chunk);
                     }
                     observer.getConnection().send(messages);
                 }
             }
             // TODO: Also send tile entities
+        }
+
+        void streamChunkUnload(LanternChunk chunk) {
+            Message message = null;
+            for (LanternPlayer observer : this.observers) {
+                if (this.clientObservers.remove(observer)) {
+                    if (message == null) {
+                        message = new MessagePlayOutUnloadChunk(this.coords.getX(), this.coords.getY());
+                    }
+                    observer.getConnection().send(message);
+                }
+            }
         }
 
         private MessagePlayOutChunkData createLoadChunkMessage(LanternChunk chunk, int sectionsBitMask, boolean biomes) {
@@ -461,7 +472,7 @@ public final class ObservedChunkManager implements WorldEventListener {
                 // to the player
                 if (chunk != null) {
                     this.clientObservers.add(observer);
-                    observer.getConnection().send(this.createChunkLoadMessages(chunk));
+                    observer.getConnection().send(createChunkLoadMessages(chunk));
                 }
                 // Otherwise we will wait for the LoadChunkEvent to be called and
                 // send the messages at that point

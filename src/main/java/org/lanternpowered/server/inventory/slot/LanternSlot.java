@@ -492,6 +492,13 @@ public class LanternSlot extends AbstractMutableInventory implements Slot {
     @Override
     public boolean contains(ItemStack stack) {
         checkNotNull(stack, "stack");
+        //noinspection ConstantConditions
+        return containsAny(stack) && this.itemStack.getQuantity() >= stack.getQuantity();
+    }
+
+    @Override
+    public boolean containsAny(ItemStack stack) {
+        checkNotNull(stack, "stack");
         return this.itemStack != null && ((LanternItemStack) this.itemStack).isSimilar(stack);
     }
 

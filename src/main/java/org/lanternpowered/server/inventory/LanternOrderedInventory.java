@@ -49,6 +49,8 @@ import javax.annotation.Nullable;
 
 public class LanternOrderedInventory extends AbstractChildrenInventory implements OrderedInventory {
 
+    private static final int INVALID_INDEX = -1;
+
     /**
      * All the leaf {@link Slot}s of this inventory.
      */
@@ -59,6 +61,10 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
      */
     protected final List<LanternSlot> slots = new ArrayList<>();
     final Object2IntMap<LanternSlot> indexBySlot = new Object2IntOpenHashMap<>();
+
+    {
+        this.indexBySlot.defaultReturnValue(INVALID_INDEX);
+    }
 
     public LanternOrderedInventory(@Nullable Inventory parent, @Nullable Translation name) {
         super(parent, name);
@@ -81,23 +87,23 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
      * @return The slot for chaining
      */
     protected <T extends Slot> T registerSlot(T slot) {
-        return this.registerSlot(slot, true);
+        return registerSlot(slot, true);
     }
 
     <T extends Slot> T registerSlot(T slot, boolean leaf) {
-        this.registerSlot(this.nextFreeSlotIndex(), slot, leaf);
+        registerSlot(nextFreeSlotIndex(), slot, leaf);
         return slot;
     }
 
     @Override
     protected <T extends Inventory> T registerChild(T childInventory) {
         if (childInventory instanceof Slot) {
-            this.registerSlot((Slot) childInventory, true);
+            registerSlot((Slot) childInventory, true);
             return childInventory;
         }
         super.registerChild(childInventory);
         if (childInventory instanceof OrderedInventory) {
-            ((LanternOrderedInventory) childInventory).slots.forEach(slot -> this.registerSlot(slot, false));
+            ((LanternOrderedInventory) childInventory).slots.forEach(slot -> registerSlot(slot, false));
         }
         return childInventory;
     }
@@ -135,8 +141,9 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
     @Override
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Inventory child, Class<T> property, @Nullable Object key) {
         if (property == SlotIndex.class && child instanceof Slot) {
-            final Integer index = this.indexBySlot.get(child);
-            return index == null ? Optional.empty() : Optional.of(property.cast(SlotIndex.of(index)));
+            //noinspection SuspiciousMethodCalls
+            final int index = this.indexBySlot.getInt(child);
+            return index == INVALID_INDEX ? Optional.empty() : Optional.of(property.cast(SlotIndex.of(index)));
         }
         return super.tryGetProperty(child, property, key);
     }
@@ -145,8 +152,9 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
     protected <T extends InventoryProperty<?, ?>> List<T> tryGetProperties(Inventory child, Class<T> property) {
         final List<T> properties = super.tryGetProperties(child, property);
         if (property == SlotIndex.class && child instanceof Slot) {
-            final Integer index = this.indexBySlot.get(child);
-            if (index != null) {
+            //noinspection SuspiciousMethodCalls
+            final int index = this.indexBySlot.getInt(child);
+            if (index != INVALID_INDEX) {
                 properties.add(property.cast(SlotIndex.of(index)));
             }
         }
@@ -211,9 +219,6 @@ public class LanternOrderedInventory extends AbstractChildrenInventory implement
      * @return The slot index
      */
     public int getSlotIndex(Slot slot) {
-        if (!this.indexBySlot.containsKey(slot)) {
-            return -1;
-        }
-        return this.indexBySlot.get(slot);
+        return this.indexBySlot.getInt(slot);
     }
 }

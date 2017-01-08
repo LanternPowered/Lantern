@@ -236,6 +236,11 @@ public class AltParentProxyInventory extends AbstractInventory {
     }
 
     @Override
+    public boolean containsAny(ItemStack stack) {
+        return this.delegate.containsAny(stack);
+    }
+
+    @Override
     public boolean contains(ItemType type) {
         return this.delegate.contains(type);
     }
@@ -266,6 +271,12 @@ public class AltParentProxyInventory extends AbstractInventory {
     public <T extends Inventory> T query(ItemStack... types) {
         //noinspection unchecked
         return (T) AltParentProxyInventories.get(this, this.delegate.query(types));
+    }
+
+    @Override
+    public <T extends Inventory> T queryAny(ItemStack... types) {
+        //noinspection unchecked
+        return (T) AltParentProxyInventories.get(this, this.delegate.queryAny(types));
     }
 
     @Override

@@ -241,7 +241,7 @@ public class LanternChunk implements AbstractExtent, Chunk {
             this.types = types;
 
             // Count the non air blocks.
-            this.recountTypes();
+            recountTypes();
         }
 
         /**
@@ -751,8 +751,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
      */
     public short[] getBiomes() {
         long stamp = this.biomesLock.tryOptimisticRead();
-        short[] biomes = this.biomes.clone();
-        if (!this.biomesLock.validate(stamp)) {
+        short[] biomes = stamp == 0L ? null : this.biomes.clone();
+        if (biomes == null || !this.biomesLock.validate(stamp)) {
             stamp = this.biomesLock.readLock();
             try {
                 biomes = this.biomes.clone();
@@ -818,8 +818,8 @@ public class LanternChunk implements AbstractExtent, Chunk {
         if (!this.loaded) {
             return;
         }
-        int index = (z & 0xf) << 4 | x & 0xf;
-        long stamp = this.biomesLock.writeLock();
+        final int index = (z & 0xf) << 4 | x & 0xf;
+        final long stamp = this.biomesLock.writeLock();
         try {
             this.biomes[index] = biome;
         } finally {

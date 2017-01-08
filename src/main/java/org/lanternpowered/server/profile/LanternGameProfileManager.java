@@ -82,7 +82,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
     @Override
     public CompletableFuture<GameProfile> get(UUID uniqueId, boolean useCache) {
         checkNotNull(uniqueId, "uniqueId");
-        return Lantern.getScheduler().submitAsyncTask(() -> this.getById(uniqueId, useCache, true));
+        return Lantern.getScheduler().submitAsyncTask(() -> getById(uniqueId, useCache, true));
     }
 
     @Override

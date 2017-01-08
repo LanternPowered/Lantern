@@ -287,7 +287,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Override
     public <T extends Inventory> T query(ItemStack... types) {
         checkNotNull(types, "types");
-        return this.query(inventory -> {
+        return query(inventory -> {
             // Slots are leaf nodes so only check if they contain
             // the item
             if (inventory instanceof Slot) {
@@ -303,9 +303,27 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
 
     @SuppressWarnings("unchecked")
     @Override
+    public <T extends Inventory> T queryAny(ItemStack... types) {
+        checkNotNull(types, "types");
+        return query(inventory -> {
+            // Slots are leaf nodes so only check if they contain
+            // the item
+            if (inventory instanceof Slot) {
+                for (ItemStack type : types) {
+                    if (inventory.containsAny(type)) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }, true);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public <T extends Inventory> T query(InventoryProperty<?, ?>... props) {
         checkNotNull(props, "props");
-        return this.query(inventory -> {
+        return query(inventory -> {
             for (InventoryProperty<?,?> prop : props) {
                 if (((AbstractInventory) inventory).hasProperty(prop)) {
                     return true;
@@ -319,7 +337,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Override
     public <T extends Inventory> T query(Translation... names) {
         checkNotNull(names, "names");
-        return this.query(inventory -> {
+        return query(inventory -> {
             for (Translation name : names) {
                 if (inventory.getName().equals(name)) {
                     return true;
@@ -332,7 +350,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Override
     public <T extends Inventory> T query(String... names) {
         checkNotNull(names, "names");
-        return this.query(inventory -> {
+        return query(inventory -> {
             String plainName = inventory.getName().get();
             for (String name : names) {
                 if (plainName.equals(name)) {

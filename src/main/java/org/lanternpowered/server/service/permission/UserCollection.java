@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.service.permission;
 
+import com.google.common.base.Throwables;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.service.permission.base.LanternSubject;
 import org.lanternpowered.server.service.permission.base.LanternSubjectCollection;
@@ -34,6 +35,7 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 
@@ -60,12 +62,16 @@ public class UserCollection extends LanternSubjectCollection {
     }
 
     private GameProfile uuidToGameProfile(UUID uuid) {
-        return (GameProfile) Lantern.getGame().getGameProfileManager().get(uuid, true);
+        try {
+            return Lantern.getGame().getGameProfileManager().get(uuid, true).get();
+        } catch (InterruptedException | ExecutionException e) {
+            throw Throwables.propagate(e);
+        }
     }
 
     @Override
     public boolean hasRegistered(String identifier) {
-        UUID uuid = identifierToUUID(identifier);
+        final UUID uuid = identifierToUUID(identifier);
         return uuid != null && Lantern.getGame().getOpsConfig().getEntryByUUID(uuid).isPresent();
     }
 

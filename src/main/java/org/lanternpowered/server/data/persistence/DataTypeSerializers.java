@@ -38,6 +38,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.util.Coerce;
 
 import java.lang.reflect.TypeVariable;
 import java.math.BigDecimal;
@@ -306,6 +307,25 @@ public final class DataTypeSerializers {
                 }
                 throw new InvalidDataException("Unsupported number format: " + view);
             } else if (data instanceof Number) {
+                final Class<?> raw = type.getRawType();
+                final Number number = (Number) data;
+                if (double.class.equals(raw) || Double.class.equals(raw)) {
+                    return number.doubleValue();
+                } else if (short.class.equals(raw) || Short.class.equals(raw)) {
+                    return number.shortValue();
+                } else if (long.class.equals(raw) || Long.class.equals(raw)) {
+                    return number.longValue();
+                } else if (int.class.equals(raw) || Integer.class.equals(raw)) {
+                    return number.intValue();
+                } else if (byte.class.equals(raw) || Byte.class.equals(raw)) {
+                    return number.byteValue();
+                } else if (float.class.equals(raw) || Float.class.equals(raw)) {
+                    return number.floatValue();
+                } else if (BigInteger.class.equals(raw)) {
+                    return BigInteger.valueOf(number.longValue());
+                } else if (BigDecimal.class.equals(raw)) {
+                    return BigDecimal.valueOf(number.doubleValue());
+                }
                 return (Number) data;
             }
             throw new InvalidDataException("Unsupported data type: " + data.getClass().getName());
@@ -322,28 +342,28 @@ public final class DataTypeSerializers {
         }
     }
 
-    private static class BooleanSerializer implements DataTypeSerializer<Boolean, Boolean> {
+    private static class BooleanSerializer implements DataTypeSerializer<Boolean, Object> {
 
         @Override
-        public Boolean deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Boolean data) throws InvalidDataException {
-            return data;
+        public Boolean deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Object data) throws InvalidDataException {
+            return Coerce.asBoolean(data).orElseThrow(() -> new InvalidDataException("Invalid boolean data format: " + data));
         }
 
         @Override
-        public Boolean serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Boolean obj) throws InvalidDataException {
+        public Object serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Boolean obj) throws InvalidDataException {
             return obj;
         }
     }
 
-    private static class StringSerializer implements DataTypeSerializer<String, String> {
+    private static class StringSerializer implements DataTypeSerializer<String, Object> {
 
         @Override
-        public String deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, String data) throws InvalidDataException {
-            return data;
+        public String deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Object data) throws InvalidDataException {
+            return data.toString();
         }
 
         @Override
-        public String serialize(TypeToken<?> type, DataTypeSerializerContext ctx, String obj) throws InvalidDataException {
+        public Object serialize(TypeToken<?> type, DataTypeSerializerContext ctx, String obj) throws InvalidDataException {
             return obj;
         }
     }

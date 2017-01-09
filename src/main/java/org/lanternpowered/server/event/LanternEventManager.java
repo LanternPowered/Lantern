@@ -146,7 +146,7 @@ public class LanternEventManager implements EventManager {
             }
         }
 
-        this.register(handlers);
+        register(handlers);
     }
 
     private static <T extends Event> RegisteredListener<T> createRegistration(PluginContainer plugin, Class<T> eventClass,
@@ -168,12 +168,12 @@ public class LanternEventManager implements EventManager {
     public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, Order order, boolean beforeModifications,
             EventListener<? super T> listener) {
         // Ignore the "beforeModifications" property, this is only used in combination with mods
-        this.registerListener(plugin, eventClass, order, listener);
+        registerListener(plugin, eventClass, order, listener);
     }
 
     @Override
     public <T extends Event> void registerListener(Object plugin, Class<T> eventClass, EventListener<? super T> listener) {
-        this.registerListener(plugin, eventClass, Order.DEFAULT, listener);
+        registerListener(plugin, eventClass, Order.DEFAULT, listener);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class LanternEventManager implements EventManager {
         checkNotNull(eventClass, "eventClass");
         checkNotNull(order, "order");
         checkNotNull(listener, "listener");
-        this.register(createRegistration(container, eventClass, order, listener));
+        register(createRegistration(container, eventClass, order, listener));
     }
 
     private void unregister(Predicate<RegisteredListener<?>> unregister) {
@@ -207,13 +207,13 @@ public class LanternEventManager implements EventManager {
     @Override
     public void unregisterListeners(final Object listener) {
         checkNotNull(listener, "listener");
-        this.unregister(handler -> listener.equals(handler.getHandle()));
+        unregister(handler -> listener.equals(handler.getHandle()));
     }
 
     @Override
     public void unregisterPluginListeners(Object pluginObj) {
         final PluginContainer plugin = checkPlugin(pluginObj, "plugin");
-        this.unregister(handler -> plugin.equals(handler.getPlugin()));
+        unregister(handler -> plugin.equals(handler.getPlugin()));
     }
 
     @Override

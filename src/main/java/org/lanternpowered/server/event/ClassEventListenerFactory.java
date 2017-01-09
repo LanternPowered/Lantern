@@ -92,11 +92,11 @@ final class ClassEventListenerFactory implements AnnotatedEventListener.Factory 
     }
 
     private Class<? extends AnnotatedEventListener> createClass(Method method) throws Exception {
-        Class<?> handle = method.getDeclaringClass();
-        Class<?> eventClass = method.getParameterTypes()[0];
-        String name = this.targetPackage + eventClass.getSimpleName() + "Listener_" + handle.getSimpleName() + '_' + method.getName()
-                + this.id.incrementAndGet();
-        Class<? extends EventFilter> filter = this.filterFactory.createFilter(method);
+        final Class<?> handle = method.getDeclaringClass();
+        final Class<?> eventClass = method.getParameterTypes()[0];
+        final String name = this.targetPackage + eventClass.getSimpleName() + "Listener_" + handle.getSimpleName() + '_'
+                + method.getName() + this.id.incrementAndGet();
+        final Class<? extends EventFilter> filter = this.filterFactory.createFilter(method);
 
         if (filter == null && method.getParameterCount() != 1) {
             // basic sanity check

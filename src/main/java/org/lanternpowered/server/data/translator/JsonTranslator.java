@@ -78,10 +78,14 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
 
     @Override
     public DataContainer translate(JsonObject obj) throws InvalidDataException {
-        return (DataContainer) fromJson(null, obj);
+        return (DataContainer) fromJson(obj);
     }
 
-    private Object fromJson(@Nullable DataView container, JsonElement json) {
+    public static Object fromJson(JsonElement json) {
+        return fromJson(null, json);
+    }
+
+    private static Object fromJson(@Nullable DataView container, JsonElement json) {
         if (json.isJsonObject()) {
             if (container == null) {
                 container = new MemoryDataContainer(DataView.SafetyMode.NO_DATA_CLONED);
@@ -92,7 +96,7 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
                 if (element.isJsonObject()) {
                     fromJson(container.createView(DataQuery.of(key)), element);
                 } else {
-                    container.set(DataQuery.of(key), fromJson(null, json));
+                    container.set(DataQuery.of(key), fromJson(json));
                 }
             }
             return container;
@@ -102,7 +106,7 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
             int ints = 0;
             int bytes = 0;
             for (int i = 0; i < array.size(); i++) {
-                final Object object = fromJson(null, array.get(i));
+                final Object object = fromJson(array.get(i));
                 objects.add(object);
                 if (object instanceof Integer) {
                     ints++;

@@ -57,6 +57,7 @@ import org.lanternpowered.server.command.CommandPlaySound;
 import org.lanternpowered.server.command.CommandProvider;
 import org.lanternpowered.server.command.CommandSay;
 import org.lanternpowered.server.command.CommandScoreboard;
+import org.lanternpowered.server.command.CommandSetData;
 import org.lanternpowered.server.command.CommandSetIdleTimeout;
 import org.lanternpowered.server.command.CommandSetSpawn;
 import org.lanternpowered.server.command.CommandStop;
@@ -87,6 +88,7 @@ import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.lanternpowered.server.game.version.MinecraftVersionCache;
 import org.lanternpowered.server.network.channel.LanternChannelRegistrar;
 import org.lanternpowered.server.network.protocol.Protocol;
+import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.plugin.LanternPluginManager;
 import org.lanternpowered.server.plugin.SimplePluginContainer;
 import org.lanternpowered.server.profile.LanternGameProfileManager;
@@ -346,7 +348,7 @@ public class LanternGame implements Game {
         this.pluginsFolder = Paths.get(PLUGINS_FOLDER);
 
         // Load the asset repository
-        this.loadAssetRepository();
+        loadAssetRepository();
 
         // Create the minecraft plugin container
         this.minecraft = new SimplePluginContainer(MINECRAFT_ID, MINECRAFT_NAME, MINECRAFT_VERSION, () -> this.server);
@@ -438,13 +440,13 @@ public class LanternGame implements Game {
         // Register the game profile resolver
         this.gameProfileManager = new LanternGameProfileManager(this.configFolder.resolve(PROFILE_CACHE_FILE));
 
-        this.registerService(WhitelistService.class, this.whitelistConfig);
-        this.registerService(BanService.class, this.banConfig);
-        this.registerService(RconService.class, rconService);
+        registerService(WhitelistService.class, this.whitelistConfig);
+        registerService(BanService.class, this.banConfig);
+        registerService(RconService.class, rconService);
 
-        this.registerService(UserStorageService.class, new LanternUserStorageService());
+        registerService(UserStorageService.class, new LanternUserStorageService());
         // Register the pagination service
-        this.registerService(PaginationService.class, new LanternPaginationService());
+        registerService(PaginationService.class, new LanternPaginationService());
 
         // Register the command service
         this.commandManager = new LanternCommandManager(this.getLogger(), new LanternCommandDisambiguator(this));
@@ -470,6 +472,7 @@ public class LanternGame implements Game {
         commandProviders.put(this.minecraft, new CommandPlaySound());
         commandProviders.put(this.minecraft, new CommandSay());
         commandProviders.put(this.minecraft, new CommandScoreboard());
+        commandProviders.put(this.implContainer, new CommandSetData());
         commandProviders.put(this.minecraft, new CommandSetIdleTimeout());
         commandProviders.put(this.minecraft, new CommandSetSpawn());
         commandProviders.put(this.minecraft, new CommandStop());
@@ -496,7 +499,7 @@ public class LanternGame implements Game {
         this.teleportHelper = new LanternTeleportHelper();
 
         // Call the construction events
-        this.postGameStateChange(GameState.CONSTRUCTION, GameConstructionEvent.class);
+        postGameStateChange(GameState.CONSTRUCTION, GameConstructionEvent.class);
 
         // Load the plugin instances
         try {
@@ -515,10 +518,10 @@ public class LanternGame implements Game {
                 });
 
         // Pre-init phase
-        this.postGameStateChange(GameState.PRE_INITIALIZATION, GamePreInitializationEvent.class);
+        postGameStateChange(GameState.PRE_INITIALIZATION, GamePreInitializationEvent.class);
 
         // Create the default sql service
-        this.registerService(SqlService.class, new LanternSqlService());
+        registerService(SqlService.class, new LanternSqlService());
 
         // Call init phase for registry
         this.gameRegistry.init();
@@ -533,12 +536,14 @@ public class LanternGame implements Game {
                 entry.getValue().getOpPermissionLevel().ifPresent(level -> service.getGroupForOpLevel(level).getSubjectData()
                         .setPermission(SubjectData.GLOBAL_CONTEXT, entry.getValue().getPermissionFor(entry.getKey()), Tristate.TRUE));
             }
-            // Group level 1 permissions
-            SubjectData subjectData = service.getGroupForOpLevel(1).getSubjectData();
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, "minecraft.selector", Tristate.TRUE);
-            // Group level 2 permissions
-            subjectData = service.getGroupForOpLevel(2).getSubjectData();
-            subjectData.setPermission(SubjectData.GLOBAL_CONTEXT, "minecraft.commandblock", Tristate.TRUE);
+            service.getGroupForOpLevel(Permissions.SELECTOR_LEVEL).getSubjectData()
+                    .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.SELECTOR_PERMISSION, Tristate.TRUE);
+            service.getGroupForOpLevel(Permissions.COMMAND_BLOCK_LEVEL).getSubjectData()
+                    .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.COMMAND_BLOCK_PERMISSION, Tristate.TRUE);
+            service.getGroupForOpLevel(Permissions.Login.BYPASS_PLAYER_LIMIT_LEVEL).getSubjectData()
+                    .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION, Tristate.TRUE);
+            service.getGroupForOpLevel(Permissions.Login.BYPASS_WHITELIST_LEVEL).getSubjectData()
+                    .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Login.BYPASS_WHITELIST_PERMISSION, Tristate.TRUE);
 
             this.serviceManager.setProvider(this.minecraft, PermissionService.class, service);
         } else {
@@ -553,16 +558,16 @@ public class LanternGame implements Game {
         }
 
         // Init phase
-        this.postGameStateChange(GameState.INITIALIZATION, GameInitializationEvent.class);
+        postGameStateChange(GameState.INITIALIZATION, GameInitializationEvent.class);
 
         // Call post init phase for registry
         this.gameRegistry.postInit();
 
         // Post-init phase
-        this.postGameStateChange(GameState.POST_INITIALIZATION, GamePostInitializationEvent.class);
+        postGameStateChange(GameState.POST_INITIALIZATION, GamePostInitializationEvent.class);
 
         // Load-complete phase
-        this.postGameStateChange(GameState.LOAD_COMPLETE, GameLoadCompleteEvent.class);
+        postGameStateChange(GameState.LOAD_COMPLETE, GameLoadCompleteEvent.class);
     }
 
     public <T extends GameStateEvent> void postGameStateChange(GameState gameState, Class<T> eventClass) {

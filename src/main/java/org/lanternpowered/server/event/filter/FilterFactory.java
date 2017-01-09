@@ -59,11 +59,11 @@ public class FilterFactory {
     }
 
     private Class<? extends EventFilter> createClass(Method method) {
-        Class<?> handle = method.getDeclaringClass();
-        Class<?> eventClass = method.getParameterTypes()[0];
-        String name = this.targetPackage + eventClass.getSimpleName() + "Filter_" + handle.getSimpleName() + '_'
+        final Class<?> handle = method.getDeclaringClass();
+        final Class<?> eventClass = method.getParameterTypes()[0];
+        final String name = this.targetPackage + eventClass.getSimpleName() + "Filter_" + handle.getSimpleName() + '_'
                 + method.getName() + this.id.incrementAndGet();
-        byte[] cls = FilterGenerator.getInstance().generateClass(name, method);
+        final byte[] cls = FilterGenerator.getInstance().generateClass(name, method);
         return this.classLoader.defineClass(name, cls);
     }
 }

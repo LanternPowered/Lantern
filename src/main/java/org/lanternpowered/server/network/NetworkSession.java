@@ -66,6 +66,7 @@ import org.lanternpowered.server.network.protocol.Protocol;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageInOutKeepAlive;
 import org.lanternpowered.server.network.vanilla.message.type.connection.MessageOutDisconnect;
+import org.lanternpowered.server.permission.Permissions;
 import org.lanternpowered.server.profile.LanternGameProfile;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.world.LanternWorld;
@@ -80,6 +81,8 @@ import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.ban.Ban;
@@ -838,7 +841,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         final BanConfig banConfig = Lantern.getGame().getBanConfig();
         // Check whether the player is banned and kick if necessary
-        Optional<BanEntry> optBanEntry = banConfig.getEntryByProfile(gameProfile);
+        Optional<BanEntry> optBanEntry = banConfig.getEntryByProfile(this.gameProfile);
         if (!optBanEntry.isPresent()) {
             final SocketAddress address = getChannel().remoteAddress();
             if (address instanceof InetSocketAddress) {
@@ -865,12 +868,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
             kickReason = builder.build();
             // Check for white-list
-        } else if (Lantern.getGame().getGlobalConfig().isWhitelistEnabled() &&
-                !Lantern.getGame().getWhitelistConfig().isWhitelisted(this.gameProfile) &&
-                !Lantern.getGame().getOpsConfig().getEntryByProfile(this.gameProfile).isPresent()) {
+        } else if (!isWhitelisted(this.gameProfile)) {
             kickReason = Text.of("You are not white-listed on this server!");
             // Check whether the server is full
-        } else if (Lantern.getServer().getOnlinePlayers().size() >= Lantern.getServer().getMaxPlayers()) {
+        } else if (Lantern.getServer().getOnlinePlayers().size() >= Lantern.getServer().getMaxPlayers()
+                && !canBypassPlayerLimit(this.gameProfile)) {
             kickReason = Text.of("The server is full!");
         }
 
@@ -930,6 +932,27 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
         this.server.getDefaultResourcePack().ifPresent(this.player::sendResourcePack);
         this.player.resetIdleTimeoutCounter();
+    }
+
+    private static boolean canBypassPlayerLimit(GameProfile gameProfile) {
+        final PermissionService permissionService = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
+        return permissionService.getUserSubjects()
+                .get(gameProfile.getUniqueId().toString())
+                .hasPermission(Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION);
+    }
+
+    private static boolean isWhitelisted(GameProfile gameProfile) {
+        if (!Lantern.getGame().getGlobalConfig().isWhitelistEnabled()) {
+            return true;
+        }
+        final WhitelistService whitelistService = Sponge.getServiceManager().provideUnchecked(WhitelistService.class);
+        if (whitelistService.isWhitelisted(gameProfile)) {
+            return true;
+        }
+        final PermissionService permissionService = Sponge.getServiceManager().provideUnchecked(PermissionService.class);
+        return permissionService.getUserSubjects()
+                .get(gameProfile.getUniqueId().toString())
+                .hasPermission(Permissions.Login.BYPASS_WHITELIST_PERMISSION);
     }
 
     @Override

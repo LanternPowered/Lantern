@@ -545,7 +545,12 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         this.resourcePackSendQueue.pulse();
 
         if (get(LanternKeys.IS_ELYTRA_FLYING).get()) {
-            offer(LanternKeys.ELYTRA_SPEED_BOOST, get(Keys.IS_SPRINTING).get());
+            if (get(Keys.IS_SNEAKING).get()) {
+                offer(LanternKeys.IS_ELYTRA_FLYING, false);
+                offer(LanternKeys.ELYTRA_SPEED_BOOST, false);
+            } else {
+                offer(LanternKeys.ELYTRA_SPEED_BOOST, get(Keys.IS_SPRINTING).get());
+            }
         }
     }
 

@@ -75,7 +75,10 @@ public final class EntityProtocolManager {
 
     private final Int2ObjectMap<AbstractEntityProtocol<?>> idToEntityProtocolMap = new Int2ObjectOpenHashMap<>();
 
-    private static int allocatorIdCounter = 0;
+    // Start at 1, using 0 may cause some issues
+    // on the client regarding elytra flying boost,
+    // and maybe other related bugs.
+    private static int allocatorIdCounter = 1;
 
     private final static IntSet allocatorReusableIds = new IntOpenHashSet();
     private final static StampedLock allocatorLock = new StampedLock();

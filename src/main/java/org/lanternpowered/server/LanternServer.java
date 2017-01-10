@@ -635,9 +635,10 @@ public class LanternServer implements Server {
 
         // Close all the services if possible
         serviceRegistrations.forEach(provider -> {
-            if (provider instanceof CloseableService) {
+            final Object service = provider.getProvider();
+            if (service instanceof CloseableService) {
                 try {
-                    ((CloseableService) provider).close();
+                    ((CloseableService) service).close();
                 } catch (Exception e) {
                     Lantern.getLogger().error("A error occurred while closing the {}.", provider.getService().getName(), e);
                 }

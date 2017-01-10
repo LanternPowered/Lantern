@@ -26,6 +26,7 @@
 package org.lanternpowered.server;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -46,6 +47,7 @@ import org.lanternpowered.server.network.query.QueryServer;
 import org.lanternpowered.server.network.rcon.EmptyRconService;
 import org.lanternpowered.server.network.rcon.RconServer;
 import org.lanternpowered.server.network.status.LanternFavicon;
+import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.text.LanternTexts;
 import org.lanternpowered.server.util.SecurityHelper;
 import org.lanternpowered.server.util.ShutdownMonitorThread;
@@ -61,11 +63,14 @@ import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppedServerEvent;
 import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
+import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.resourcepack.ResourcePacks;
 import org.spongepowered.api.scoreboard.Scoreboard;
-import org.spongepowered.api.service.sql.SqlService;
+import org.spongepowered.api.service.ProviderRegistration;
+import org.spongepowered.api.service.ServiceManager;
+import org.spongepowered.api.service.SimpleServiceManager;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -75,10 +80,10 @@ import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.storage.ChunkLayout;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -591,7 +596,7 @@ public class LanternServer implements Server {
         this.consoleManager.shutdown();
 
         // Kick all the online players
-        this.getOnlinePlayers().forEach(player -> ((LanternPlayer) player).getConnection().disconnect(kickMessage));
+        getOnlinePlayers().forEach(player -> ((LanternPlayer) player).getConnection().disconnect(kickMessage));
 
         // Stop the network servers - starts the shutdown process
         // It may take a second or two for Netty to totally clean up
@@ -613,34 +618,47 @@ public class LanternServer implements Server {
         // Stop the async scheduler
         this.game.getScheduler().shutdownAsyncScheduler();
 
-        // Close the sql service if possible
-        this.game.getServiceManager().provide(SqlService.class).ifPresent(service -> {
-            if (service instanceof Closeable) {
+        final Collection<ProviderRegistration<?>> serviceRegistrations;
+        try {
+            final Field field = SimpleServiceManager.class.getDeclaredField("providers");
+            field.setAccessible(true);
+
+            final ServiceManager serviceManager = this.game.getServiceManager();
+            checkState(serviceManager instanceof SimpleServiceManager);
+
+            //noinspection unchecked
+            final Map<Class<?>, ProviderRegistration<?>> map = (Map<Class<?>, ProviderRegistration<?>>) field.get(serviceManager);
+            serviceRegistrations = map.values();
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new IllegalStateException(e);
+        }
+
+        // Close all the services if possible
+        serviceRegistrations.forEach(provider -> {
+            if (provider instanceof CloseableService) {
                 try {
-                    ((Closeable) service).close();
-                } catch (IOException e) {
-                    Lantern.getLogger().error("A error occurred while closing the sql service.", e);
+                    ((CloseableService) provider).close();
+                } catch (Exception e) {
+                    Lantern.getLogger().error("A error occurred while closing the {}.", provider.getService().getName(), e);
                 }
             }
         });
 
         // Shutdown the game profile manager
         this.game.getGameProfileManager().getDefaultCache().save();
+        final GameProfileCache cache = this.game.getGameProfileManager().getCache();
+        if (cache instanceof CloseableService) {
+            try {
+                ((CloseableService) cache).close();
+            } catch (Exception e) {
+                Lantern.getLogger().error("A error occurred while closing the GameProfileCache.", e);
+            }
+        }
 
         try {
             this.game.getOpsConfig().save();
         } catch (IOException e) {
             Lantern.getLogger().error("A error occurred while saving the ops config.", e);
-        }
-        try {
-            this.game.getWhitelistConfig().save();
-        } catch (IOException e) {
-            Lantern.getLogger().error("A error occurred while saving the white-list config.", e);
-        }
-        try {
-            this.game.getBanConfig().save();
-        } catch (IOException e) {
-            Lantern.getLogger().error("A error occurred while saving the bans config.", e);
         }
 
         this.game.postGameStateChange(GameState.SERVER_STOPPED, GameStoppedServerEvent.class);

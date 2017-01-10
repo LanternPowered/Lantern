@@ -37,6 +37,7 @@ import ninja.leaping.configurate.objectmapping.serialize.TypeSerializerCollectio
 import org.lanternpowered.server.config.ConfigBase;
 import org.lanternpowered.server.config.user.UserStorage;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.service.CloseableService;
 import org.lanternpowered.server.util.collect.Lists2;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -61,9 +62,9 @@ import java.util.UUID;
 import java.util.function.Supplier;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService {
+public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>, BanService, CloseableService {
 
-    public static final ConfigurationOptions OPTIONS;
+    private static final ConfigurationOptions OPTIONS;
 
     static {
         final TypeSerializerCollection typeSerializers = DEFAULT_OPTIONS.getSerializers();
@@ -190,17 +191,14 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
 
     @Override
     public boolean pardon(GameProfile profile) {
-        final Optional<Ban.Profile> ban = this.getBanFor(checkNotNull(profile, "profile"));
-        if (ban.isPresent()) {
-            return this.removeBan(ban.get());
-        }
-        return false;
+        final Optional<Ban.Profile> ban = getBanFor(checkNotNull(profile, "profile"));
+        return ban.isPresent() && removeBan(ban.get());
     }
 
     @Override
     public boolean pardon(InetAddress address) {
-        Optional<Ban.Ip> ban = this.getBanFor(checkNotNull(address, "address"));
-        return ban.isPresent() && this.removeBan(ban.get());
+        final Optional<Ban.Ip> ban = getBanFor(checkNotNull(address, "address"));
+        return ban.isPresent() && removeBan(ban.get());
     }
 
     /**
@@ -214,16 +212,17 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     public boolean removeBan(Ban ban, Supplier<Cause> causeSupplier) {
         checkNotNull(ban, "ban");
         checkNotNull(causeSupplier, "causeSupplier");
+        //noinspection SuspiciousMethodCalls
         if (this.entries0.remove(ban)) {
             // Post the pardon events
-            Event event;
+            final Event event;
             if (ban instanceof Ban.Ip) {
                 event = SpongeEventFactory.createPardonIpEvent(causeSupplier.get(), (Ban.Ip) ban);
             } else {
-                Ban.Profile profileBan = (Ban.Profile) ban;
-                Cause cause = causeSupplier.get();
+                final Ban.Profile profileBan = (Ban.Profile) ban;
+                final Cause cause = causeSupplier.get();
                 // Check if the pardoned player is online (not yet been kicked)
-                Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
+                final Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
                 if (optTarget.isPresent()) {
                     event = SpongeEventFactory.createPardonUserEventTargetPlayer(cause, profileBan, optTarget.get(), optTarget.get());
                 } else {
@@ -253,7 +252,7 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     @Override
     public boolean removeBan(Ban ban) {
         checkNotNull(ban, "ban");
-        return this.removeBan(ban, getCauseSupplierFor(ban));
+        return removeBan(ban, getCauseSupplierFor(ban));
     }
 
     /**
@@ -267,24 +266,24 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     public Optional<? extends Ban> addBan(Ban ban, Supplier<Cause> causeSupplier) {
         checkNotNull(ban, "ban");
         checkNotNull(causeSupplier, "causeSupplier");
-        Optional<Ban> oldBan;
+        final Optional<Ban> oldBan;
         if (ban instanceof Ban.Ip) {
-            oldBan = (Optional) this.getBanFor(((Ban.Ip) ban).getAddress());
+            oldBan = (Optional) getBanFor(((Ban.Ip) ban).getAddress());
         } else {
-            oldBan = (Optional) this.getBanFor(((Ban.Profile) ban).getProfile());
+            oldBan = (Optional) getBanFor(((Ban.Profile) ban).getProfile());
         }
         oldBan.ifPresent(this.entries0::remove);
         this.entries0.add((BanEntry) ban);
         if (!oldBan.isPresent() || !oldBan.get().equals(ban)) {
             // Post the ban events
-            Event event;
+            final Event event;
             if (ban instanceof Ban.Ip) {
                 event = SpongeEventFactory.createBanIpEvent(causeSupplier.get(), (Ban.Ip) ban);
             } else {
-                Ban.Profile profileBan = (Ban.Profile) ban;
-                Cause cause = causeSupplier.get();
+                final Ban.Profile profileBan = (Ban.Profile) ban;
+                final Cause cause = causeSupplier.get();
                 // Check if the pardoned player is online (not yet been kicked)
-                Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
+                final Optional<Player> optTarget = Sponge.getServer().getPlayer(profileBan.getProfile().getUniqueId());
                 if (optTarget.isPresent()) {
                     event = SpongeEventFactory.createBanUserEventTargetPlayer(cause, profileBan, optTarget.get(), optTarget.get());
                 } else {
@@ -303,11 +302,12 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
     @Override
     public Optional<? extends Ban> addBan(Ban ban) {
         checkNotNull(ban, "ban");
-        return this.addBan(ban, getCauseSupplierFor(ban));
+        return addBan(ban, getCauseSupplierFor(ban));
     }
 
     @Override
     public boolean hasBan(Ban ban) {
+        //noinspection SuspiciousMethodCalls
         return this.entries0.contains(checkNotNull(ban, "ban"));
     }
 
@@ -316,4 +316,12 @@ public final class BanConfig extends ConfigBase implements UserStorage<BanEntry>
         return ImmutableList.copyOf(this.entries0);
     }
 
+    @Override
+    public void close() {
+        try {
+            save();
+        } catch (IOException e) {
+            Lantern.getLogger().error("A error occurred while saving the bans config.", e);
+        }
+    }
 }

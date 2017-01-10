@@ -28,21 +28,19 @@ package org.lanternpowered.server.command;
 import static org.lanternpowered.server.text.translation.TranslationHelper.t;
 
 import com.google.common.base.Joiner;
-import org.lanternpowered.server.config.user.UserEntry;
-import org.lanternpowered.server.config.user.WhitelistConfig;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.lanternpowered.server.util.Reloadable;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
 
-import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class CommandWhitelist extends CommandProvider {
@@ -58,13 +56,13 @@ public final class CommandWhitelist extends CommandProvider {
                         .arguments(GenericArguments.string(Text.of("player")))
                         .executor((src, args) -> {
                             final String playerName = args.<String>getOne("player").get();
-                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
+                            final WhitelistService service = Sponge.getServiceManager().provideUnchecked(WhitelistService.class);
                             Lantern.getGame().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
-                                if (error != null) {
+                                if (error != null || service.isWhitelisted(profile = ((LanternGameProfile) profile).withoutProperties())) {
                                     src.sendMessage(t("commands.whitelist.add.failed", playerName));
                                 } else {
                                     src.sendMessage(t("commands.whitelist.add.success", playerName));
-                                    config.addProfile(((LanternGameProfile) profile).withoutProperties());
+                                    service.addProfile(profile);
                                 }
                             });
                             return CommandResult.success();
@@ -74,21 +72,22 @@ public final class CommandWhitelist extends CommandProvider {
                         .arguments(GenericArguments.string(Text.of("player")))
                         .executor((src, args) -> {
                             final String playerName = args.<String>getOne("player").get();
-                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
-                            final Optional<UserEntry> entry = config.getEntryByName(playerName);
-                            if (entry.isPresent()) {
-                                config.removeProfile(entry.get().getProfile());
-                                src.sendMessage(t("commands.whitelist.remove.success", playerName));
-                            } else {
-                                src.sendMessage(t("commands.whitelist.remove.failed", playerName));
-                            }
+                            final WhitelistService service = Sponge.getServiceManager().provideUnchecked(WhitelistService.class);
+                            Lantern.getGame().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
+                                if (error != null) {
+                                    src.sendMessage(t("commands.whitelist.remove.failed", playerName));
+                                } else {
+                                    src.sendMessage(t("commands.whitelist.remove.success", playerName));
+                                    service.removeProfile(((LanternGameProfile) profile).withoutProperties());
+                                }
+                            });
                             return CommandResult.success();
                         })
                         .build(), "remove")
                 .child(CommandSpec.builder()
                         .executor((src, args) -> {
-                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
-                            final List<String> whitelisted = config.getWhitelistedProfiles().stream()
+                            final WhitelistService service = Sponge.getServiceManager().provideUnchecked(WhitelistService.class);
+                            final List<String> whitelisted = service.getWhitelistedProfiles().stream()
                                     .map(p -> p.getName().get()).collect(Collectors.toList());
 
                             src.sendMessage(t("commands.whitelist.list", whitelisted.size(), Sponge.getServer().getOnlinePlayers().size()));
@@ -112,11 +111,16 @@ public final class CommandWhitelist extends CommandProvider {
                         .build(), "off")
                 .child(CommandSpec.builder()
                         .executor((src, args) -> {
-                            final WhitelistConfig config = Lantern.getGame().getWhitelistConfig();
-                            try {
-                                config.load();
-                            } catch (IOException e) {
-                                throw new CommandException(Text.of("Unable to reload the whitelist config."), e);
+                            final WhitelistService service = Sponge.getServiceManager().provideUnchecked(WhitelistService.class);
+                            if (service instanceof Reloadable) {
+                                try {
+                                    ((Reloadable) service).reload();
+                                } catch (Exception e) {
+                                    throw new CommandException(t("commands.whitelist.reload.failed", e.getMessage()), e);
+                                }
+                            } else {
+                                src.sendMessage(t("commands.whitelist.reload.notSupported"));
+                                return CommandResult.empty();
                             }
                             return CommandResult.success();
                         })

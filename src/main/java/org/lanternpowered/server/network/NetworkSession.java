@@ -45,8 +45,6 @@ import io.netty.handler.timeout.TimeoutException;
 import io.netty.util.AttributeKey;
 import io.netty.util.ReferenceCountUtil;
 import org.lanternpowered.server.LanternServer;
-import org.lanternpowered.server.config.user.ban.BanConfig;
-import org.lanternpowered.server.config.user.ban.BanEntry;
 import org.lanternpowered.server.config.world.WorldConfig;
 import org.lanternpowered.server.data.io.PlayerIO;
 import org.lanternpowered.server.entity.LanternEntity;
@@ -81,6 +79,7 @@ import org.spongepowered.api.event.message.MessageEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.network.PlayerConnection;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
@@ -839,23 +838,22 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         // The kick reason
         Text kickReason = null;
 
-        final BanConfig banConfig = Lantern.getGame().getBanConfig();
+        final BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
         // Check whether the player is banned and kick if necessary
-        Optional<BanEntry> optBanEntry = banConfig.getEntryByProfile(this.gameProfile);
-        if (!optBanEntry.isPresent()) {
+        Ban ban = banService.getBanFor(this.gameProfile).orElse(null);
+        if (ban == null) {
             final SocketAddress address = getChannel().remoteAddress();
             if (address instanceof InetSocketAddress) {
-                optBanEntry = banConfig.getEntryByIp(((InetSocketAddress) address).getAddress());
+                ban = banService.getBanFor(((InetSocketAddress) address).getAddress()).orElse(null);
             }
         }
-        if (optBanEntry.isPresent()) {
-            final BanEntry banEntry = optBanEntry.get();
-            final Optional<Instant> optExpirationDate = banEntry.getExpirationDate();
-            final Optional<Text> optReason = banEntry.getReason();
+        if (ban != null) {
+            final Optional<Instant> optExpirationDate = ban.getExpirationDate();
+            final Optional<Text> optReason = ban.getReason();
 
             // Generate the kick message
             Text.Builder builder = Text.builder();
-            if (banEntry instanceof Ban.Profile) {
+            if (ban instanceof Ban.Profile) {
                 builder.append(Text.of("You are banned from this server!"));
             } else {
                 builder.append(Text.of("Your IP address is banned from this server!"));

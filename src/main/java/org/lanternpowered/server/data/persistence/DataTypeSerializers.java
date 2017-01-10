@@ -74,7 +74,7 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public DataSerializable deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, DataView data) throws InvalidDataException {
-            DataBuilder<DataSerializable> dataBuilder = (DataBuilder<DataSerializable>) LanternDataManager.get()
+            final DataBuilder<DataSerializable> dataBuilder = (DataBuilder<DataSerializable>) LanternDataManager.get()
                     .getBuilder((Class<? extends DataSerializable>) type.getRawType())
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a DataBuilder for the DataSerializable: " + type));
             return dataBuilder.build(data).orElseThrow(() -> new InvalidDataException("Unable to deserializer the " + type));
@@ -116,27 +116,27 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public Multimap<?, ?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<DataView> entries) throws InvalidDataException {
-            TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
-            TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
-            DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
+            final TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
+            final TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
+            final DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + keyType.toString()));
-            DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
+            final DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + valueType.toString()));
-            Multimap map = HashMultimap.create();
+            final Multimap map = HashMultimap.create();
             for (DataView entry : entries) {
-                Object key = keySerial.deserialize(type, ctx, entry.get(KEY)
+                final Object key = keySerial.deserialize(type, ctx, entry.get(KEY)
                         .orElseThrow(() -> new InvalidDataException("Entry is missing a key.")));
                 if (!entry.contains(VALUE) && entry.contains(ENTRIES)) {
                     throw new InvalidDataException("Entry is missing values.");
                 }
-                List<?> dataViews = entry.getList(ENTRIES).orElse(null);
+                final List<?> dataViews = entry.getList(ENTRIES).orElse(null);
                 if (dataViews != null) {
                     dataViews.forEach(o -> {
                         Object value = valueSerial.deserialize(type, ctx, o);
                         map.put(key, value);
                     });
                 } else {
-                    Object value = valueSerial.deserialize(type, ctx, entry.get(VALUE).get());
+                    final Object value = valueSerial.deserialize(type, ctx, entry.get(VALUE).get());
                     map.put(key, value);
                 }
             }
@@ -146,17 +146,17 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public List<DataView> serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Multimap<?, ?> obj) throws InvalidDataException {
-            TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
-            TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
-            DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
+            final TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
+            final TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
+            final DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + keyType.toString()));
-            DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
+            final DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + valueType.toString()));
-            List<DataView> dataViews = new ArrayList<>();
+            final List<DataView> dataViews = new ArrayList<>();
             for (Object key : obj.keySet()) {
-                DataContainer dataContainer = new MemoryDataContainer();
+                final DataContainer dataContainer = new MemoryDataContainer();
                 dataContainer.set(KEY, keySerial.serialize(keyType, ctx, key));
-                Collection<Object> values = ((Multimap) obj).get(key);
+                final Collection<Object> values = ((Multimap) obj).get(key);
                 if (values.size() == 1) {
                     dataContainer.set(VALUE, valueSerial.serialize(valueType, ctx, values.iterator().next()));
                 } else {
@@ -179,17 +179,17 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public Map<?, ?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<DataView> entries) throws InvalidDataException {
-            TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
-            TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
-            DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
+            final TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
+            final TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
+            final DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + keyType.toString()));
-            DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
+            final DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + valueType.toString()));
-            Map map = new HashMap<>();
+            final Map map = new HashMap<>();
             for (DataView entry : entries) {
-                Object key = keySerial.deserialize(type, ctx, entry.get(KEY)
+                final Object key = keySerial.deserialize(type, ctx, entry.get(KEY)
                         .orElseThrow(() -> new InvalidDataException("Entry is missing a key.")));
-                Object value = valueSerial.deserialize(type, ctx, entry.get(VALUE)
+                final Object value = valueSerial.deserialize(type, ctx, entry.get(VALUE)
                         .orElseThrow(() -> new InvalidDataException("Entry is missing a value.")));
                 map.put(key, value);
             }
@@ -199,11 +199,11 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public List<DataView> serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Map<?, ?> obj) throws InvalidDataException {
-            TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
-            TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
-            DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
+            final TypeToken<?> keyType = type.resolveType(this.keyTypeVariable);
+            final TypeToken<?> valueType = type.resolveType(this.valueTypeVariable);
+            final DataTypeSerializer keySerial = ctx.getSerializers().getTypeSerializer(keyType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + keyType.toString()));
-            DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
+            final DataTypeSerializer valueSerial = ctx.getSerializers().getTypeSerializer(valueType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + valueType.toString()));
             return obj.entrySet().stream().map(entry -> new MemoryDataContainer()
                     .set(KEY, keySerial.serialize(keyType, ctx, entry.getKey()))
@@ -218,8 +218,8 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public List<?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<Object> data) throws InvalidDataException {
-            TypeToken<?> elementType = type.resolveType(this.typeVariable);
-            DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
+            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
+            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
             return (List) data.stream()
                     .map(object -> elementSerial.deserialize(elementType, ctx, object))
@@ -229,8 +229,8 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public List<Object> serialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<?> obj) throws InvalidDataException {
-            TypeToken<?> elementType = type.resolveType(this.typeVariable);
-            DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
+            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
+            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
             return obj.stream().map(object -> elementSerial.serialize(elementType, ctx, object)).collect(Collectors.toList());
         }
@@ -243,8 +243,8 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public Set<?> deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, List<Object> data) throws InvalidDataException {
-            TypeToken<?> elementType = type.resolveType(this.typeVariable);
-            DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
+            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
+            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
             return (Set) data.stream()
                     .map(object -> elementSerial.deserialize(elementType, ctx, object))
@@ -254,8 +254,8 @@ public final class DataTypeSerializers {
         @SuppressWarnings("unchecked")
         @Override
         public List<Object> serialize(TypeToken<?> type, DataTypeSerializerContext ctx, Set<?> obj) throws InvalidDataException {
-            TypeToken<?> elementType = type.resolveType(this.typeVariable);
-            DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
+            final TypeToken<?> elementType = type.resolveType(this.typeVariable);
+            final DataTypeSerializer elementSerial = ctx.getSerializers().getTypeSerializer(elementType)
                     .orElseThrow(() -> new IllegalStateException("Wasn't able to find a type serializer for: " + elementType.toString()));
             return obj.stream().map(object -> elementSerial.serialize(elementType, ctx, object)).collect(Collectors.toList());
         }
@@ -269,7 +269,7 @@ public final class DataTypeSerializers {
             // Enum values should be uppercase
             data = data.toUpperCase();
 
-            Enum ret;
+            final Enum ret;
             try {
                 ret = Enum.valueOf(((TypeToken) type).getRawType().asSubclass(Enum.class), data);
             } catch (IllegalArgumentException e) {
@@ -295,8 +295,8 @@ public final class DataTypeSerializers {
             if (data instanceof DataView) {
                 final DataView view = (DataView) data;
                 if (view.contains(TYPE) && view.contains(VALUE)) {
-                    String numberType = view.getString(TYPE).get();
-                    String value = view.getString(VALUE).get();
+                    final String numberType = view.getString(TYPE).get();
+                    final String value = view.getString(VALUE).get();
                     if (numberType.equals(BigDecimal.class.getSimpleName())) {
                         return new BigDecimal(value);
                     } else if (numberType.equals(BigInteger.class.getSimpleName())) {
@@ -326,7 +326,7 @@ public final class DataTypeSerializers {
                 } else if (BigDecimal.class.equals(raw)) {
                     return BigDecimal.valueOf(number.doubleValue());
                 }
-                return (Number) data;
+                throw new InvalidDataException("Unsupported number type: " + type.getRawType().getName());
             }
             throw new InvalidDataException("Unsupported data type: " + data.getClass().getName());
         }

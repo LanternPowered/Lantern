@@ -541,7 +541,7 @@ public class LanternGame implements Game {
             service.getGroupForOpLevel(Permissions.COMMAND_BLOCK_LEVEL).getSubjectData()
                     .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.COMMAND_BLOCK_PERMISSION, Tristate.TRUE);
             service.getGroupForOpLevel(Permissions.Login.BYPASS_PLAYER_LIMIT_LEVEL).getSubjectData()
-                    .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION, Tristate.TRUE);
+                    .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Login.BYPASS_PLAYER_LIMIT_PERMISSION, Tristate.FALSE);
             service.getGroupForOpLevel(Permissions.Login.BYPASS_WHITELIST_LEVEL).getSubjectData()
                     .setPermission(SubjectData.GLOBAL_CONTEXT, Permissions.Login.BYPASS_WHITELIST_PERMISSION, Tristate.TRUE);
 

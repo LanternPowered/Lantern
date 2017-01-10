@@ -104,7 +104,7 @@ public final class CommandSetData extends CommandProvider {
                                 } catch (JsonParseException e) {
                                     throw args.createError(t("Invalid json data: %s\nError: %s", content, e.getMessage()));
                                 }
-                                final Object data = JsonTranslator.fromJson(element);
+                                final Object data = element == null ? null : JsonTranslator.fromJson(element);
                                 final Key key = currentKey.get();
                                 final TypeToken<?> typeToken = key.getElementToken();
 

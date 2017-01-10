@@ -28,18 +28,16 @@ package org.lanternpowered.server.service.sql;
 import com.github.benmanes.caffeine.cache.CacheLoader;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import com.github.benmanes.caffeine.cache.RemovalCause;
 import com.github.benmanes.caffeine.cache.RemovalListener;
 import com.google.common.collect.ImmutableMap;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.service.CloseableService;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.sql.SqlService;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.DriverManager;
@@ -48,7 +46,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
-import java.util.concurrent.ExecutionException;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -69,7 +66,7 @@ import javax.sql.DataSource;
  *     -- if some plugin makes database connections to a ton of different databases
  *     we may want to implement this, but it is kinda unimportant.
  */
-public class LanternSqlService implements SqlService, Closeable {
+public class LanternSqlService implements SqlService, CloseableService {
 
     private static final Map<String, Properties> PROTOCOL_SPECIFIC_PROPS;
     private static final Map<String, BiFunction<PluginContainer, String, String>> PATH_CANONICALIZERS;
@@ -146,7 +143,7 @@ public class LanternSqlService implements SqlService, Closeable {
     }
 
     @Override
-    public void close() throws IOException {
+    public void close() {
         this.connectionCache.invalidateAll();
     }
 
@@ -226,7 +223,7 @@ public class LanternSqlService implements SqlService, Closeable {
          * @return A constructed ConnectionInfo object using the info from the provided URL
          * @throws SQLException If the driver for the given URL is not present
          */
-        public static ConnectionInfo fromUrl(@Nullable PluginContainer container, String fullUrl) throws SQLException {
+        static ConnectionInfo fromUrl(@Nullable PluginContainer container, String fullUrl) throws SQLException {
             Matcher match = URL_REGEX.matcher(fullUrl);
             if (!match.matches()) {
                 throw new IllegalArgumentException("URL " + fullUrl + " is not a valid JDBC URL");
@@ -237,7 +234,7 @@ public class LanternSqlService implements SqlService, Closeable {
             final String user = match.group(3);
             final String pass = match.group(4);
             String serverDatabaseSpecifier = match.group(5);
-            BiFunction<PluginContainer, String, String> derelativizer = PATH_CANONICALIZERS.get(protocol);
+            final BiFunction<PluginContainer, String, String> derelativizer = PATH_CANONICALIZERS.get(protocol);
             if (container != null && derelativizer != null) {
                 serverDatabaseSpecifier = derelativizer.apply(container, serverDatabaseSpecifier);
             }

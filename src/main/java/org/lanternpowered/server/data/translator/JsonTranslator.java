@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.lanternpowered.server.data.persistence.AbstractDataTranslator;
@@ -78,13 +79,16 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
 
     @Override
     public DataContainer translate(JsonObject obj) throws InvalidDataException {
+        //noinspection ConstantConditions
         return (DataContainer) fromJson(obj);
     }
 
+    @Nullable
     public static Object fromJson(JsonElement json) {
         return fromJson(null, json);
     }
 
+    @Nullable
     private static Object fromJson(@Nullable DataView container, JsonElement json) {
         if (json.isJsonObject()) {
             if (container == null) {
@@ -96,7 +100,8 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
                 if (element.isJsonObject()) {
                     fromJson(container.createView(DataQuery.of(key)), element);
                 } else {
-                    container.set(DataQuery.of(key), fromJson(json));
+                    //noinspection ConstantConditions
+                    container.set(DataQuery.of(key), fromJson(element));
                 }
             }
             return container;
@@ -154,13 +159,17 @@ public class JsonTranslator extends AbstractDataTranslator<JsonObject> {
                 }
                 return value;
             }
+        } else if (json.isJsonNull()) {
+            return null;
         }
-        return json;
+        throw new IllegalArgumentException();
     }
 
     @SuppressWarnings("unchecked")
-    private JsonElement toJson(Object object) {
-        if (object instanceof DataView || object instanceof DataSerializable || object instanceof Map<?,?>) {
+    private JsonElement toJson(@Nullable Object object) {
+        if (object == null) {
+            return JsonNull.INSTANCE;
+        } else if (object instanceof DataView || object instanceof DataSerializable || object instanceof Map<?,?>) {
             final Map<DataQuery, Object> map;
             if (object instanceof DataView) {
                 map = ((DataView) object).getValues(false);

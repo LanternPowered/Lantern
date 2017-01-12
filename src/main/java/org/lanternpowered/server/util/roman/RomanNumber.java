@@ -37,6 +37,26 @@ import java.util.Locale;
 public final class RomanNumber extends Number {
 
     /**
+     * Converts the integer value into a {@link RomanNumber}.
+     *
+     * @param value The integer value
+     * @return The roman number
+     * @throws IllegalRomanNumberException If the specified is negative, zero or greater then 3999
+     */
+    public static String toString(int value) throws IllegalRomanNumberException {
+        checkIllegalNumber(value);
+        final StringBuilder builder = new StringBuilder();
+        for (Int2ObjectMap.Entry<String> entry : VALUES_TO_STRING.int2ObjectEntrySet()) {
+            final long count = value / entry.getIntKey();
+            for (long i = 0; i < count; i++) {
+                builder.append(entry.getValue());
+            }
+            value = value % entry.getIntKey();
+        }
+        return builder.toString();
+    }
+
+    /**
      * Parses the string argument as an {@link RomanNumber}.
      *
      * @param s The string to parse
@@ -69,16 +89,7 @@ public final class RomanNumber extends Number {
      * @throws IllegalRomanNumberException If the specified is negative, zero or greater then 3999
      */
     public static RomanNumber valueOf(int value) throws IllegalRomanNumberException {
-        checkIllegalNumber(value);
-        final StringBuilder builder = new StringBuilder();
-        for (Int2ObjectMap.Entry<String> entry : VALUES_TO_STRING.int2ObjectEntrySet()) {
-            final long count = value / entry.getIntKey();
-            for (long i = 0; i < count; i++) {
-                builder.append(entry.getValue());
-            }
-            value = value % entry.getIntKey();
-        }
-        return new RomanNumber(builder.toString(), value);
+        return new RomanNumber(toString(value), value);
     }
 
     private static void checkIllegalNumber(int value) throws IllegalRomanNumberException {

@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.network.vanilla.message.handler.status;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -42,6 +44,7 @@ import org.lanternpowered.server.network.status.LanternStatusHelper;
 import org.lanternpowered.server.network.status.LanternStatusResponse;
 import org.lanternpowered.server.text.gson.LanternJsonTextSerializer;
 import org.spongepowered.api.MinecraftVersion;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
@@ -61,7 +64,6 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         final LanternServer server = session.getServer();
         final Gson gson = new Gson();
 
-        final LanternMinecraftVersion serverVersion = Lantern.getGame().getPlatform().getMinecraftVersion();
         final Text description = server.getMotd();
 
         final InetSocketAddress address = session.getAddress();
@@ -75,9 +77,11 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
 
         final LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress);
         final ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
-        final LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
+        final LanternStatusResponse response = new LanternStatusResponse(Lantern.getGame().getPlatform().getMinecraftVersion(),
+                server.getFavicon(), description, players);
 
         final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
+        Sponge.getEventManager().post(event);
 
         // Cancelled, we are done here
         if (event.isCancelled()) {
@@ -88,7 +92,9 @@ public final class HandlerStatusRequest implements Handler<MessageStatusInReques
         final JsonObject rootObject = new JsonObject();
         final JsonObject versionObject = new JsonObject();
 
-        versionObject.addProperty("name", Lantern.getGame().getPlatform().getMinecraftVersion().getName());
+        checkState(response.getVersion() instanceof LanternMinecraftVersion);
+        final LanternMinecraftVersion serverVersion = (LanternMinecraftVersion) response.getVersion();
+        versionObject.addProperty("name", serverVersion.getName());
         versionObject.addProperty("protocol", serverVersion.getProtocol());
 
         if (response.getPlayers().isPresent()) {

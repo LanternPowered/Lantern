@@ -28,6 +28,7 @@ package org.lanternpowered.server.network.status;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
+import org.lanternpowered.server.game.version.LanternMinecraftVersion;
 import org.spongepowered.api.MinecraftVersion;
 import org.spongepowered.api.event.server.ClientPingServerEvent;
 import org.spongepowered.api.network.status.Favicon;
@@ -39,8 +40,7 @@ import javax.annotation.Nullable;
 
 public class LanternStatusResponse implements ClientPingServerEvent.Response {
 
-    private final MinecraftVersion version;
-
+    private MinecraftVersion version;
     private Optional<Favicon> favicon;
     private Text description;
     private Players players;
@@ -52,6 +52,32 @@ public class LanternStatusResponse implements ClientPingServerEvent.Response {
         this.favicon = checkNotNull(favicon, "favicon");
         this.version = checkNotNull(version, "version");
         this.players = checkNotNull(players, "players");
+    }
+
+    /**
+     * Sets the {@link MinecraftVersion} of the status response.
+     *
+     * <p>The name of this version will be displayed on the client when the
+     * server or the client is outdated.</p>
+     *
+     * @param version The version
+     */
+    public void setVersion(MinecraftVersion version) {
+        this.version = checkNotNull(version, "version");
+    }
+
+    /**
+     * Sets the {@link MinecraftVersion} of the status response.
+     *
+     * <p>The name of this version will be displayed on the client when the
+     * server or the client is outdated.</p>
+     *
+     * @param name The name
+     * @param protocol The protocol version
+     * @param legacy Whether the version is legacy
+     */
+    public void setVersion(String name, int protocol, boolean legacy) {
+        setVersion(new LanternMinecraftVersion(name, protocol, legacy));
     }
 
     @Override

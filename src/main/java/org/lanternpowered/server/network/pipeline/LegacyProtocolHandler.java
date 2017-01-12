@@ -73,7 +73,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
         boolean legacy = false;
 
         try {
-            int messageId = buf.readUnsignedByte();
+            final int messageId = buf.readUnsignedByte();
             // Old client's are not so smart, make sure that
             // they don't attempt to login
             if (messageId == 0x02) {
@@ -173,15 +173,15 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
             // The message was successfully decoded as a legacy one
             legacy = true;
 
-            MinecraftVersion serverVersion = Lantern.getGame().getPlatform().getMinecraftVersion();
+            final MinecraftVersion serverVersion = Lantern.getGame().getPlatform().getMinecraftVersion();
             Text description = server.getMotd();
 
-            InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
-            LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress);
-            ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
-            LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
+            final InetSocketAddress address = (InetSocketAddress) ctx.channel().remoteAddress();
+            final LanternStatusClient client = new LanternStatusClient(address, clientVersion, virtualAddress);
+            final ClientPingServerEvent.Response.Players players = LanternStatusHelper.createPlayers(server);
+            final LanternStatusResponse response = new LanternStatusResponse(serverVersion, server.getFavicon(), description, players);
 
-            ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
+            final ClientPingServerEvent event = SpongeEventFactory.createClientPingServerEvent(Cause.source(client).build(), client, response);
             Sponge.getEventManager().post(event);
 
             // Cancelled, we are done here
@@ -192,7 +192,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
 
             description = response.getDescription();
             int online = players.getOnline();
-            int max = players.getMax();
+            final int max = players.getMax();
 
             // The players should be hidden, this will replace the player count
             // with ???
@@ -200,39 +200,29 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                 online = -1;
             }
 
-            StringBuilder dataBuilder = new StringBuilder();
+            final String data;
 
             if (full) {
-                String description0 = getFirstLine(TextSerializers.LEGACY_FORMATTING_CODE.serialize(description));
-                dataBuilder
-                        .append('\u00A7')
-                        // This value is always 1.
-                        .append(1)
-                        .append('\u0000')
-                        // The protocol version, just use a value out of range
-                        // of the available ones.
-                        .append(127)
-                        .append('\u0000')
-                        // The version/name string of the server.
-                        .append(Lantern.getGame().getPlatform().getMinecraftVersion().getName())
-                        .append('\u0000')
-                        // The motd of the server. In legacy format.
-                        .append(description0)
-                        .append('\u0000')
-                        .append(online)
-                        .append('\u0000')
-                        .append(max);
+                final String description0 = getFirstLine(TextSerializers.LEGACY_FORMATTING_CODE.serialize(description));
+                // 1. This value is always 1.
+                // 2. The protocol version, just use a value out of range
+                //    of the available ones.
+                // 3. The version/name string of the server.
+                // 4. The motd of the server. In legacy format.
+                // 5. The online players
+                // 6. The maximum amount of players
+                data = String.format("\u00A7%s\u0000%s\u0000%s\u0000%s\u0000%s\u0000%s",
+                        1, 127, response.getVersion().getName(), description0, online, max);
             } else {
-                String description0 = getFirstLine(TextSerializers.PLAIN.serialize(description));
-                dataBuilder
-                        .append(description0)
-                        .append('\u00A7')
-                        .append(online)
-                        .append('\u00A7')
-                        .append(max);
+                final String description0 = getFirstLine(TextSerializers.PLAIN.serialize(description));
+                // 1. The motd of the server. In legacy format.
+                // 2. The online players
+                // 3. The maximum amount of players
+                data = String.format("%s\u00A7%s\u00A7%s",
+                        description0, online, max);
             }
 
-            sendDisconnectMessage(ctx, dataBuilder.toString());
+            sendDisconnectMessage(ctx, data);
         } catch (Exception ignore) {
         } finally {
             if (legacy) {
@@ -252,9 +242,9 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
      * @param message The message
      */
     private static void sendDisconnectMessage(ChannelHandlerContext ctx, String message) {
-        byte[] data = message.getBytes(StandardCharsets.UTF_16BE);
+        final byte[] data = message.getBytes(StandardCharsets.UTF_16BE);
 
-        ByteBuf output = ctx.alloc().buffer();
+        final ByteBuf output = ctx.alloc().buffer();
         output.writeByte(0xff);
         output.writeShort(data.length >> 1);
         output.writeBytes(data);
@@ -263,7 +253,7 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
     }
 
     private static String getFirstLine(String value) {
-        int i = value.indexOf('\n');
+        final int i = value.indexOf('\n');
         return i == -1 ? value : value.substring(0, i);
     }
 

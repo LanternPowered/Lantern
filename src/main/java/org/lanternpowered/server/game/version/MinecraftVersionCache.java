@@ -42,11 +42,11 @@ public class MinecraftVersionCache {
     private final Int2ObjectMap<LanternMinecraftVersion> legacyVersionsByProtocol = new Int2ObjectOpenHashMap<>();
 
     public void load() {
-        this.load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-versions.json"), false);
-        this.load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-legacy-versions.json"), true);
+        load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-versions.json"), false);
+        load(MinecraftVersionCache.class.getResourceAsStream("/internal/mc-legacy-versions.json"), true);
     }
 
-    public void load(InputStream inputStream, boolean legacy) {
+    private void load(InputStream inputStream, boolean legacy) {
         final Gson gson = new Gson();
         final JsonArray array = gson.fromJson(new BufferedReader(new InputStreamReader(inputStream)), JsonArray.class);
 
@@ -66,7 +66,7 @@ public class MinecraftVersionCache {
     }
 
     public LanternMinecraftVersion getVersionOrUnknown(int protocol, boolean legacy) {
-        return this.getVersion(protocol, legacy).orElseGet(
+        return getVersion(protocol, legacy).orElseGet(
                 () -> legacy ? LanternMinecraftVersion.UNKNOWN_LEGACY : LanternMinecraftVersion.UNKNOWN);
     }
 }

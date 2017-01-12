@@ -27,8 +27,6 @@ package org.lanternpowered.server.config;
 
 import static org.lanternpowered.server.config.ConfigConstants.ENABLED;
 
-import com.google.common.base.Predicate;
-import com.google.common.base.Predicates;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import ninja.leaping.configurate.objectmapping.Setting;
@@ -39,6 +37,7 @@ import org.lanternpowered.server.config.world.chunk.ChunkLoadingTickets;
 import org.lanternpowered.server.config.world.chunk.GlobalChunkLoading;
 import org.lanternpowered.server.network.ProxyType;
 import org.lanternpowered.server.util.IpSet;
+import org.lanternpowered.server.util.functions.Predicates;
 import org.spongepowered.api.text.Text;
 
 import java.io.IOException;
@@ -47,6 +46,7 @@ import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -166,7 +166,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
         // https://github.com/SpongePowered/SpongeCommon/commit/71220742baf4b0317ddefe625b12cc64a7ec9084
         // TODO: Move this?
         @Setting(value = "ip-sets")
-        private Map<String, List<IpSet>> ipSets = Maps.newHashMap();
+        private Map<String, List<IpSet>> ipSets = new HashMap<>();
 
         // TODO: Move this?
         @Setting(value = "op-permission-level", comment = "The default op level of all the operators.")

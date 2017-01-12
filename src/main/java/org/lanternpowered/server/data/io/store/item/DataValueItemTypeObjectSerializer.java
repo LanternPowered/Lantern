@@ -29,7 +29,7 @@ import org.lanternpowered.server.catalog.InternalCatalogType;
 import org.lanternpowered.server.data.io.store.SimpleValueContainer;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.game.registry.InternalCatalogRegistryModule;
-import org.lanternpowered.server.util.IntToIntFunction;
+import org.lanternpowered.server.util.functions.Int2IntFunction;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
@@ -45,11 +45,11 @@ public class DataValueItemTypeObjectSerializer<T extends CatalogType> extends It
     private final Key<? extends BaseValue<T>> key;
     private final InternalCatalogRegistryModule<T> registryModule;
 
-    @Nullable private final IntToIntFunction dataValueToInternalId;
-    @Nullable private final IntToIntFunction internalIdToDataValue;
+    @Nullable private final Int2IntFunction dataValueToInternalId;
+    @Nullable private final Int2IntFunction internalIdToDataValue;
 
     public DataValueItemTypeObjectSerializer(Key<? extends BaseValue<T>> key, InternalCatalogRegistryModule<T> registryModule,
-            IntToIntFunction dataValueToInternalId, IntToIntFunction internalIdToDataValue) {
+            Int2IntFunction dataValueToInternalId, Int2IntFunction internalIdToDataValue) {
         this(dataValueToInternalId, internalIdToDataValue, key, registryModule);
     }
 
@@ -57,7 +57,7 @@ public class DataValueItemTypeObjectSerializer<T extends CatalogType> extends It
         this(null, null, key, registryModule);
     }
 
-    private DataValueItemTypeObjectSerializer(@Nullable IntToIntFunction dataValueToInternalId, @Nullable IntToIntFunction internalIdToDataValue,
+    private DataValueItemTypeObjectSerializer(@Nullable Int2IntFunction dataValueToInternalId, @Nullable Int2IntFunction internalIdToDataValue,
             Key<? extends BaseValue<T>> key, InternalCatalogRegistryModule<T> registryModule) {
         this.key = key;
         this.registryModule = registryModule;

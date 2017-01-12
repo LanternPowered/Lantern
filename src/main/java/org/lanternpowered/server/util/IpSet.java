@@ -27,7 +27,6 @@ package org.lanternpowered.server.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import com.google.common.base.Predicate;
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -37,6 +36,7 @@ import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.function.Predicate;
 
 import javax.annotation.Nullable;
 
@@ -51,7 +51,7 @@ public class IpSet implements Predicate<InetAddress> {
     }
 
     @Override
-    public boolean apply(@Nullable InetAddress input) {
+    public boolean test(@Nullable InetAddress input) {
         if (input == null) {
             return false;
         }

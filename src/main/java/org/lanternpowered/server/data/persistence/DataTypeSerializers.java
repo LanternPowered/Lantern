@@ -29,6 +29,8 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.LanternDataManager;
+import org.lanternpowered.server.util.roman.IllegalRomanNumberException;
+import org.lanternpowered.server.util.roman.RomanNumber;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
@@ -292,7 +294,39 @@ public final class DataTypeSerializers {
 
         @Override
         public Number deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Object data) throws InvalidDataException {
-            if (data instanceof DataView) {
+            final Class<?> raw = type.getRawType();
+            if (data instanceof String) {
+                if (double.class.equals(raw) || Double.class.equals(raw)) {
+                    return Coerce.asDouble(data).orElseThrow(() -> new InvalidDataException("Invalid double format: " + data));
+                } else if (short.class.equals(raw) || Short.class.equals(raw)) {
+                    return Coerce.asShort(data).orElseThrow(() -> new InvalidDataException("Invalid short format: " + data));
+                } else if (long.class.equals(raw) || Long.class.equals(raw)) {
+                    return Coerce.asLong(data).orElseThrow(() -> new InvalidDataException("Invalid long format: " + data));
+                } else if (int.class.equals(raw) || Integer.class.equals(raw)) {
+                    return Coerce.asInteger(data).orElseThrow(() -> new InvalidDataException("Invalid int format: " + data));
+                } else if (byte.class.equals(raw) || Byte.class.equals(raw)) {
+                    return Coerce.asByte(data).orElseThrow(() -> new InvalidDataException("Invalid byte format: " + data));
+                } else if (float.class.equals(raw) || Float.class.equals(raw)) {
+                    return Coerce.asFloat(data).orElseThrow(() -> new InvalidDataException("Invalid float format: " + data));
+                } else if (BigInteger.class.equals(raw)) {
+                    return BigInteger.valueOf(Coerce.asLong(data)
+                            .orElseThrow(() -> new InvalidDataException("Invalid big integer format: " + data)));
+                } else if (BigDecimal.class.equals(raw)) {
+                    return BigDecimal.valueOf(Coerce.asDouble(data)
+                            .orElseThrow(() -> new InvalidDataException("Invalid big decimal format: " + data)));
+                } else if (RomanNumber.class.equals(raw)) {
+                    try {
+                        try {
+                            return RomanNumber.parse((String) data);
+                        } catch (NumberFormatException e) {
+                            return RomanNumber.valueOf(Coerce.asInteger(data)
+                                    .orElseThrow(() -> new InvalidDataException("Invalid int format: " + data)));
+                        }
+                    } catch (IllegalRomanNumberException e) {
+                        throw new InvalidDataException(e);
+                    }
+                }
+            } else if (data instanceof DataView) {
                 final DataView view = (DataView) data;
                 if (view.contains(TYPE) && view.contains(VALUE)) {
                     final String numberType = view.getString(TYPE).get();
@@ -307,7 +341,6 @@ public final class DataTypeSerializers {
                 }
                 throw new InvalidDataException("Unsupported number format: " + view);
             } else if (data instanceof Number) {
-                final Class<?> raw = type.getRawType();
                 final Number number = (Number) data;
                 if (double.class.equals(raw) || Double.class.equals(raw)) {
                     return number.doubleValue();
@@ -325,6 +358,8 @@ public final class DataTypeSerializers {
                     return BigInteger.valueOf(number.longValue());
                 } else if (BigDecimal.class.equals(raw)) {
                     return BigDecimal.valueOf(number.doubleValue());
+                } else if (RomanNumber.class.equals(raw)) {
+                    return RomanNumber.valueOf(number.intValue());
                 }
                 throw new InvalidDataException("Unsupported number type: " + type.getRawType().getName());
             }

@@ -65,8 +65,7 @@ public class LanternContextCalculator implements ContextCalculator<Subject> {
                 final InetAddress addr = checkNotNull(function.apply(key), "addr");
                 builder.add(new Context(contextKey, addr.getHostAddress()));
                 //noinspection Guava,ConstantConditions
-                for (String set : Maps.filterValues(Lantern.getGame().getGlobalConfig().getIpSets(),
-                        input -> input.apply(addr)).keySet()) {
+                for (String set : Maps.filterValues(Lantern.getGame().getGlobalConfig().getIpSets(), input -> input.test(addr)).keySet()) {
                     builder.add(new Context(contextKey, set));
                 }
                 return builder.build();

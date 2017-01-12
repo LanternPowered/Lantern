@@ -74,7 +74,7 @@ public final class CommandWhitelist extends CommandProvider {
                             final String playerName = args.<String>getOne("player").get();
                             final WhitelistService service = Sponge.getServiceManager().provideUnchecked(WhitelistService.class);
                             Lantern.getGame().getGameProfileManager().get(playerName).whenComplete((profile, error) -> {
-                                if (error != null || service.isWhitelisted(profile = ((LanternGameProfile) profile).withoutProperties())) {
+                                if (error != null || !service.isWhitelisted(profile = ((LanternGameProfile) profile).withoutProperties())) {
                                     src.sendMessage(t("commands.whitelist.remove.failed", playerName));
                                 } else {
                                     src.sendMessage(t("commands.whitelist.remove.success", playerName));

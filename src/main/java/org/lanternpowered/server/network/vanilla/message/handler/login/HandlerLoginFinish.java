@@ -27,15 +27,16 @@ package org.lanternpowered.server.network.vanilla.message.handler.login;
 
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.forge.message.type.handshake.MessageForgeHandshakeInStart;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.pipeline.MessageCompressionHandler;
-import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.protocol.ProtocolState;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginInFinish;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSetCompression;
 import org.lanternpowered.server.network.vanilla.message.type.login.MessageLoginOutSuccess;
 import org.lanternpowered.server.profile.LanternGameProfile;
+import org.spongepowered.api.profile.GameProfileCache;
 
 public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
 
@@ -52,7 +53,12 @@ public final class HandlerLoginFinish implements Handler<MessageLoginInFinish> {
             // Remove the compression handler placeholder
             context.getChannel().pipeline().remove(NetworkSession.COMPRESSION);
         }
-        Lantern.getGame().getGameProfileManager().getCache().add(gameProfile, true, null);
+        final GameProfileCache gameProfileCache = Lantern.getGame().getGameProfileManager().getCache();
+        // Store the old profile temporarily
+        gameProfileCache.getById(gameProfile.getUniqueId()).ifPresent(
+                profile -> context.getChannel().attr(NetworkSession.PREVIOUS_GAME_PROFILE).set(profile));
+        // Cache the new profile
+        gameProfileCache.add(gameProfile, true, null);
         session.sendWithFuture(new MessageLoginOutSuccess(gameProfile.getUniqueId(), gameProfile.getName().get()))
                 .addListener(future -> {
                     session.setGameProfile(gameProfile);

@@ -120,6 +120,11 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     public static final String HANDLER = "handler";
 
     /**
+     * The game profile of the player the last time he joined.
+     */
+    public static final AttributeKey<GameProfile> PREVIOUS_GAME_PROFILE = AttributeKey.valueOf("previous-game-profile");
+
+    /**
      * The attribute key for the FML (Forge Mod Loader) marker.
      */
     public static final AttributeKey<Boolean> FML_MARKER = AttributeKey.valueOf("fml-marker");
@@ -918,7 +923,15 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         this.player.setTransform(toTransform);
 
         final MessageChannel messageChannel = this.player.getMessageChannel();
-        final Text joinMessage = t("multiplayer.player.joined", this.player.getName());
+        final Text joinMessage;
+
+        final GameProfile previousProfile = this.channel.attr(PREVIOUS_GAME_PROFILE).getAndRemove();
+        if (previousProfile != null && previousProfile.getName().isPresent() &&
+                !previousProfile.getName().get().equals(this.gameProfile.getName().get())) {
+            joinMessage = t("multiplayer.player.joined.renamed", this.player.getName(), previousProfile.getName().get());
+        } else {
+            joinMessage = t("multiplayer.player.joined", this.player.getName());
+        }
 
         final ClientConnectionEvent.Join joinEvent = SpongeEventFactory.createClientConnectionEventJoin(cause, messageChannel,
                 Optional.of(messageChannel), new MessageEvent.MessageFormatter(joinMessage), this.player, false);

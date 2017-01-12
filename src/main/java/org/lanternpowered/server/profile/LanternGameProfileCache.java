@@ -37,6 +37,7 @@ import org.lanternpowered.server.game.Lantern;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.profile.GameProfileCache;
 import org.spongepowered.api.profile.ProfileNotFoundException;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.util.GuavaCollectors;
 
 import java.io.IOException;
@@ -120,25 +121,25 @@ public final class LanternGameProfileCache implements GameProfileCache {
         }
     }
 
+    @SuppressWarnings("NullableProblems")
     @ConfigSerializable
     private static class ProfileCacheEntry {
 
         @Setting(value = "profile")
         private LanternGameProfile gameProfile;
+
         @Setting(value = "expiration-date")
         private Instant expirationDate;
-        @Setting(value = "signed")
-        private boolean signed;
 
         private ProfileCacheEntry() {
         }
 
-        public ProfileCacheEntry(GameProfile profile, Instant expirationDate) {
+        ProfileCacheEntry(GameProfile profile, Instant expirationDate) {
             this.gameProfile = (LanternGameProfile) profile;
             this.expirationDate = expirationDate;
         }
 
-        public boolean isExpired() {
+        boolean isExpired() {
             return Instant.now().compareTo(this.expirationDate) > 0;
         }
     }
@@ -164,7 +165,7 @@ public final class LanternGameProfileCache implements GameProfileCache {
     @Override
     public boolean add(GameProfile profile, boolean overwrite, @Nullable Date expiry) {
         final UUID uuid = checkNotNull(profile, "profile").getUniqueId();
-        if (overwrite && this.byUUID.containsKey(uuid)) {
+        if (!overwrite && this.byUUID.containsKey(uuid)) {
             return false;
         }
         final Instant expirationDate;
@@ -212,7 +213,7 @@ public final class LanternGameProfileCache implements GameProfileCache {
             if (entry.isExpired()) {
                 this.byUUID.remove(uniqueId, entry);
                 entry.gameProfile.getName().ifPresent(name -> {
-                    ProfileCacheEntry entry1 = this.byName.get(name);
+                    final ProfileCacheEntry entry1 = this.byName.get(name);
                     if (entry == entry1) {
                         this.byName.remove(name, entry);
                     }
@@ -237,7 +238,6 @@ public final class LanternGameProfileCache implements GameProfileCache {
         try {
             final GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(uniqueId, true);
             add(gameProfile, true, null);
-            this.byUUID.get(gameProfile.getUniqueId()).signed = true;
             return Optional.of(gameProfile);
         } catch (IOException e) {
             Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);
@@ -250,15 +250,15 @@ public final class LanternGameProfileCache implements GameProfileCache {
     public Map<UUID, Optional<GameProfile>> lookupByIds(Iterable<UUID> uniqueIds) {
         checkNotNull(uniqueIds, "uniqueIds");
         final ImmutableMap.Builder<UUID, Optional<GameProfile>> builder = ImmutableMap.builder();
-        uniqueIds.forEach(uniqueId -> builder.put(uniqueId, this.lookupById(uniqueId)));
+        uniqueIds.forEach(uniqueId -> builder.put(uniqueId, lookupById(uniqueId)));
         return builder.build();
     }
 
     @Override
     public Optional<GameProfile> getOrLookupById(UUID uniqueId) {
-        final Optional<GameProfile> gameProfile = this.getById(checkNotNull(uniqueId, "uniqueId"));
+        final Optional<GameProfile> gameProfile = getById(checkNotNull(uniqueId, "uniqueId"));
         if (!gameProfile.isPresent()) {
-            return this.lookupById(uniqueId);
+            return lookupById(uniqueId);
         }
         return gameProfile;
     }
@@ -367,14 +367,11 @@ public final class LanternGameProfileCache implements GameProfileCache {
     @Override
     public Optional<GameProfile> fillProfile(GameProfile profile, boolean signed) {
         try {
+            // Always query signed data, so it can be reused easily
             final GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(
-                    checkNotNull(profile, "profile").getUniqueId(), signed);
+                    checkNotNull(profile, "profile").getUniqueId(), true);
             profile.getPropertyMap().putAll(gameProfile.getPropertyMap());
-            final ProfileCacheEntry entry = this.byUUID.get(profile.getUniqueId());
-            if (entry == null || entry.isExpired() || (!entry.signed && signed)) {
-                add(gameProfile, true, null);
-                this.byUUID.get(gameProfile.getUniqueId()).signed = true;
-            }
+            add(gameProfile, true, null);
             return Optional.of(gameProfile);
         } catch (IOException e) {
             Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);

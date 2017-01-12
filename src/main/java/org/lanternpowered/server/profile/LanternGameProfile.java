@@ -28,6 +28,7 @@ package org.lanternpowered.server.profile;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
@@ -44,6 +45,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -194,6 +196,8 @@ public final class LanternGameProfile implements GameProfile {
                 .omitNullValues()
                 .add("uniqueId", this.uniqueId)
                 .add("name", this.name)
+                .add("properties", this.properties.isEmpty() ? null : Joiner.on(", ").join(this.properties.values().stream()
+                        .map(LanternProfileProperty::toString).collect(Collectors.toList())))
                 .toString();
     }
 

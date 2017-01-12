@@ -105,7 +105,7 @@ public final class HandlerLoginStart implements Handler<MessageLoginInStart> {
                     throw new RuntimeException(e);
                 } catch (ExecutionException e) {
                     // Generate a offline id
-                    UUID uniqueId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
+                    final UUID uniqueId = UUID.nameUUIDFromBytes(("OfflinePlayer:" + username).getBytes(StandardCharsets.UTF_8));
                     profile = new LanternGameProfile(uniqueId, username);
                 }
             }

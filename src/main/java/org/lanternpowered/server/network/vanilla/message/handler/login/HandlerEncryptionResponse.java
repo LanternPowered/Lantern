@@ -181,11 +181,11 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 }
             }
 
-            String name = json.get("name").getAsString();
-            String id = json.get("id").getAsString();
+            final String name = json.get("name").getAsString();
+            final String id = json.get("id").getAsString();
 
             // Parse UUID
-            UUID uuid;
+            final UUID uuid;
 
             try {
                 uuid = UUIDHelper.fromFlatString(id);
@@ -195,13 +195,14 @@ public final class HandlerEncryptionResponse implements Handler<MessageLoginInEn
                 return;
             }
 
-            Multimap<String, ProfileProperty> properties = LanternProfileProperty.createPropertiesMapFromJson(json.getAsJsonArray("properties"));
-            LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
+            final Multimap<String, ProfileProperty> properties = LanternProfileProperty
+                    .createPropertiesMapFromJson(json.getAsJsonArray("properties"));
+            final LanternGameProfile gameProfile = new LanternGameProfile(uuid, name, properties);
 
             Lantern.getLogger().info("Finished authenticating.");
 
-            ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(Cause.source(gameProfile).build(), session,
-                    new MessageEvent.MessageFormatter(t("disconnect.notAllowedToJoin")), gameProfile, false);
+            final ClientConnectionEvent.Auth event = SpongeEventFactory.createClientConnectionEventAuth(Cause.source(gameProfile).build(),
+                    session, new MessageEvent.MessageFormatter(t("disconnect.notAllowedToJoin")), gameProfile, false);
 
             Sponge.getEventManager().post(event);
             if (event.isCancelled()) {

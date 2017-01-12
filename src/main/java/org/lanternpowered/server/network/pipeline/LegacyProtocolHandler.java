@@ -153,8 +153,8 @@ public final class LegacyProtocolHandler extends ChannelInboundHandlerAdapter {
                     bytes = new byte[buf.readShort() << 1];
                     buf.readBytes(bytes);
 
-                    String host = new String(bytes, StandardCharsets.UTF_16BE);
-                    int port = buf.readInt();
+                    final String host = new String(bytes, StandardCharsets.UTF_16BE);
+                    final int port = buf.readInt();
 
                     virtualAddress = InetSocketAddress.createUnresolved(host, port);
                 }

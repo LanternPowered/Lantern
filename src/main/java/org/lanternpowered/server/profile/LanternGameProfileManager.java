@@ -76,7 +76,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
                 return optProfile.get();
             }
         }
-        return GameProfileQuery.queryProfileByUUID(uniqueId, signed);
+        return GameProfileQuery.queryProfileByUUID(uniqueId, true);
     }
 
     @Override
@@ -147,7 +147,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
                     return optProfile.get();
                 }
             }
-            final GameProfile gameProfile = this.getById(profile.getUniqueId(), useCache, signed);
+            final GameProfile gameProfile = getById(profile.getUniqueId(), useCache, signed);
             ((LanternGameProfile) profile).setName(gameProfile.getName().get());
             profile.getPropertyMap().putAll(gameProfile.getPropertyMap());
             return profile;

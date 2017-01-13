@@ -40,7 +40,7 @@ public final class MessagePlayInChatMessage implements Message {
     /**
      * Gets the message received from the client.
      * 
-     * @return the message
+     * @return The message
      */
     public String getMessage() {
         return this.message;

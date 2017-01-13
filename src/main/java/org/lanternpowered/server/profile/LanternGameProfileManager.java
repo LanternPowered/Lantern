@@ -76,7 +76,7 @@ public final class LanternGameProfileManager implements GameProfileManager {
                 return optProfile.get();
             }
         }
-        return GameProfileQuery.queryProfileByUUID(uniqueId, true);
+        return GameProfileQuery.queryProfileByUUID(uniqueId, signed);
     }
 
     @Override
@@ -105,9 +105,8 @@ public final class LanternGameProfileManager implements GameProfileManager {
                 final Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupByName(name);
                 if (optProfile.isPresent()) {
                     return optProfile.get();
-                } else {
-                    throw new ProfileNotFoundException("Unable to find a profile for the name: " + name);
                 }
+                throw new ProfileNotFoundException("Unable to find a profile for the name: " + name);
             }
             final Map<String, UUID> result = GameProfileQuery.queryUUIDByName(Collections.singletonList(name));
             if (!result.containsKey(name)) {
@@ -142,12 +141,15 @@ public final class LanternGameProfileManager implements GameProfileManager {
         checkNotNull(profile, "profile");
         return Lantern.getScheduler().submitAsyncTask(() -> {
             if (useCache) {
+                // Load the profile into the cache
+                this.gameProfileCache.getOrLookupById(profile.getUniqueId());
                 final Optional<GameProfile> optProfile = this.gameProfileCache.fillProfile(profile, signed);
                 if (optProfile.isPresent()) {
                     return optProfile.get();
                 }
+                throw new ProfileNotFoundException("Failed to find a profile with the uuid: " + profile.getUniqueId());
             }
-            final GameProfile gameProfile = getById(profile.getUniqueId(), useCache, signed);
+            final GameProfile gameProfile = getById(profile.getUniqueId(), false, signed);
             ((LanternGameProfile) profile).setName(gameProfile.getName().get());
             profile.getPropertyMap().putAll(gameProfile.getPropertyMap());
             return profile;

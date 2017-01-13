@@ -37,8 +37,8 @@ public final class MessageLoginInEncryptionResponse implements Message {
     /**
      * Creates a new encryption response message.
      * 
-     * @param sharedSecret the shared secret
-     * @param verifyToken the verify token
+     * @param sharedSecret The shared secret
+     * @param verifyToken The verify token
      */
     public MessageLoginInEncryptionResponse(byte[] sharedSecret, byte[] verifyToken) {
         this.sharedSecret = checkNotNull(sharedSecret, "sharedSecret");
@@ -48,7 +48,7 @@ public final class MessageLoginInEncryptionResponse implements Message {
     /**
      * Gets the shared secret of the encryption response.
      * 
-     * @return the shared secret
+     * @return The shared secret
      */
     public byte[] getSharedSecret() {
         return this.sharedSecret;
@@ -57,7 +57,7 @@ public final class MessageLoginInEncryptionResponse implements Message {
     /**
      * Gets the verify token of the encryption response.
      * 
-     * @return the verify token
+     * @return The verify token
      */
     public byte[] getVerifyToken() {
         return this.verifyToken;

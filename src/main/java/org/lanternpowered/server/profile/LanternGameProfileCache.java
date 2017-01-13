@@ -30,6 +30,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multiset;
 import ninja.leaping.configurate.objectmapping.Setting;
 import ninja.leaping.configurate.objectmapping.serialize.ConfigSerializable;
 import org.lanternpowered.server.config.ConfigBase;
@@ -330,7 +331,7 @@ public final class LanternGameProfileCache implements GameProfileCache {
             }
         }
 
-        this.lookupByNamesInto(result, names0);
+        lookupByNamesInto(result, names0);
         return result.build();
     }
 
@@ -366,16 +367,19 @@ public final class LanternGameProfileCache implements GameProfileCache {
 
     @Override
     public Optional<GameProfile> fillProfile(GameProfile profile, boolean signed) {
-        try {
-            // Always query signed data, so it can be reused easily
-            final GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(
-                    checkNotNull(profile, "profile").getUniqueId(), true);
-            profile.getPropertyMap().putAll(gameProfile.getPropertyMap());
-            add(gameProfile, true, null);
-            return Optional.of(gameProfile);
-        } catch (IOException e) {
-            Lantern.getLogger().warn("An error occurred while retrieving game profile data.", e);
-        } catch (ProfileNotFoundException ignored) {
+        checkNotNull(profile, "profile");
+        final Optional<GameProfile> cachedProfile = getById(profile.getUniqueId());
+        if (!cachedProfile.isPresent()) {
+            return Optional.empty();
+        }
+        cachedProfile.get().getName().ifPresent(((LanternGameProfile) profile)::setName);
+        if (signed) {
+            profile.getPropertyMap().putAll(cachedProfile.get().getPropertyMap());
+        } else {
+            // Add all the properties without the signature when not signed is requested
+            for (Map.Entry<String, ProfileProperty> entry : cachedProfile.get().getPropertyMap().entries()) {
+                profile.getPropertyMap().put(entry.getKey(), ((LanternProfileProperty) entry.getValue()).withoutSignature());
+            }
         }
         return Optional.empty();
     }

@@ -78,6 +78,10 @@ public final class LanternProfileProperty implements ProfileProperty {
         return Optional.ofNullable(this.signature);
     }
 
+    public LanternProfileProperty withoutSignature() {
+        return this.signature == null ? this : new LanternProfileProperty(this.name, this.value, null);
+    }
+
     @Override
     public boolean equals(@Nullable Object other) {
         if (this == other) {

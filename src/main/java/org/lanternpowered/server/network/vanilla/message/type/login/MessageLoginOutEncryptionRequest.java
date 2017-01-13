@@ -38,8 +38,8 @@ public final class MessageLoginOutEncryptionRequest implements Message {
     /**
      * Creates a new encryption request message.
      * 
-     * @param publicKey the public key
-     * @param verifyToken the verify token
+     * @param publicKey The public key
+     * @param verifyToken The verify token
      */
     public MessageLoginOutEncryptionRequest(String sessionId, byte[] publicKey, byte[] verifyToken) {
         this.verifyToken = checkNotNull(verifyToken, "verifyToken");
@@ -50,7 +50,7 @@ public final class MessageLoginOutEncryptionRequest implements Message {
     /**
      * Gets the public key of the encryption request.
      * 
-     * @return the public key
+     * @return The public key
      */
     public byte[] getPublicKey() {
         return this.publicKey;
@@ -59,7 +59,7 @@ public final class MessageLoginOutEncryptionRequest implements Message {
     /**
      * Gets the verify token of the encryption request.
      * 
-     * @return the verify token
+     * @return The verify token
      */
     public byte[] getVerifyToken() {
         return this.verifyToken;
@@ -69,7 +69,7 @@ public final class MessageLoginOutEncryptionRequest implements Message {
      * Gets the session id (hash) that should be
      * used for authenticating.
      *
-     * @return the session id
+     * @return The session id
      */
     public String getSessionId() {
         return this.sessionId;

@@ -256,7 +256,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message message) throws Exception {
-        this.messageReceived(message);
+        messageReceived(message);
     }
 
     /**
@@ -898,7 +898,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
         }
 
         Lantern.getLogger().debug("The player {} successfully to joined from {}.",
-                this.gameProfile.getName().orElse("Unknown"), this.channel.remoteAddress());
+                this.gameProfile.getName().get(), this.channel.remoteAddress());
 
         // Update the first join and last played data
         final Instant lastJoined = Instant.now();
@@ -970,7 +970,7 @@ public final class NetworkSession extends SimpleChannelInboundHandler<Message> i
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .omitNullValues()
-                .add("address", this.getAddress())
+                .add("address", getAddress())
                 .add("virtualHost", this.virtualHostAddress)
                 .add("profile", this.gameProfile)
                 .add("protocolVersion", this.protocolVersion)

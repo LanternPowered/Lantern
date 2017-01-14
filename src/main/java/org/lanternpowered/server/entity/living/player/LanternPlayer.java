@@ -282,7 +282,8 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.FLYING_SPEED, 0.1).notRemovable();
         registerKey(Keys.CAN_FLY, false).notRemovable();
         registerKey(Keys.RESPAWN_LOCATIONS, new HashMap<>()).notRemovable();
-        registerKey(Keys.GAME_MODE, GameModes.NOT_SET).notRemovable();
+        registerKey(Keys.GAME_MODE, GameModes.NOT_SET).notRemovable().addListener(
+                (oldElement, newElement) -> ((LanternGameMode) newElement).getAbilityApplier().accept(this));
         registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).notRemovable();
         registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
         registerKey(LanternKeys.ELYTRA_SPEED_BOOST, false).notRemovable();

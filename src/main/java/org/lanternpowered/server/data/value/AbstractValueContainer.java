@@ -40,9 +40,11 @@ import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -63,7 +65,8 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
      */
     class ElementHolderKeyRegistrationImpl<V extends BaseValue<E>, E> extends SimpleKeyRegistration.SingleProcessor<V, E> implements ElementHolderKeyRegistration<V, E> {
 
-        private @Nullable E value;
+        @Nullable private List<Listener<E>> listeners;
+        @Nullable private E value;
 
         ElementHolderKeyRegistrationImpl(Key<? extends V> key) {
             super(key);
@@ -72,8 +75,14 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
         @Nullable
         @Override
         public synchronized E set(@Nullable E value) {
-            final E oldValue = this.value;
-            this.value = value;
+            final E oldValue;
+            synchronized (this) {
+                oldValue = this.value;
+                this.value = value;
+            }
+            if (this.listeners != null && !Objects.equals(oldValue, value)) {
+                this.listeners.forEach(listener -> listener.accept(oldValue, value));
+            }
             return oldValue;
         }
 
@@ -81,6 +90,14 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
         @Override
         public synchronized E get() {
             return this.value;
+        }
+
+        @Override
+        public void addListener(Listener<E> listener) {
+            if (this.listeners == null) {
+                this.listeners = new ArrayList<>(1);
+            }
+            this.listeners.add(listener);
         }
 
         @Override

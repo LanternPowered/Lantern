@@ -26,20 +26,37 @@
 package org.lanternpowered.server.entity.living.player.gamemode;
 
 import org.lanternpowered.server.catalog.PluginCatalogType;
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.translation.Translation;
 
+import java.util.function.Consumer;
+
 public class LanternGameMode extends PluginCatalogType.Base.Translatable.Internal implements GameMode {
 
-    public LanternGameMode(String pluginId, String name, Translation translation, int internalId) {
+    private final Consumer<LanternPlayer> abilityApplier;
+
+    public LanternGameMode(String pluginId, String name, String translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
         super(pluginId, name, translation, internalId);
+        this.abilityApplier = abilityApplier;
     }
 
-    public LanternGameMode(String pluginId, String id, String name, int internalId) {
-        super(pluginId, id, name, "gameMode." + name, internalId);
+    public LanternGameMode(String pluginId, String name, Translation translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
+        super(pluginId, name, translation, internalId);
+        this.abilityApplier = abilityApplier;
     }
 
-    public LanternGameMode(String pluginId, String name, int internalId) {
-        super(pluginId, name, "gameMode." + name, internalId);
+    public LanternGameMode(String pluginId, String id, String name, String translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
+        super(pluginId, id, name, translation, internalId);
+        this.abilityApplier = abilityApplier;
+    }
+
+    public LanternGameMode(String pluginId, String id, String name, Translation translation, int internalId, Consumer<LanternPlayer> abilityApplier) {
+        super(pluginId, id, name, translation, internalId);
+        this.abilityApplier = abilityApplier;
+    }
+
+    public Consumer<LanternPlayer> getAbilityApplier() {
+        return this.abilityApplier;
     }
 }

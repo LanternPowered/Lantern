@@ -25,8 +25,10 @@
  */
 package org.lanternpowered.server.game.registry.type.entity.player;
 
+import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.game.registry.AdditionalInternalPluginCatalogRegistryModule;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 
@@ -44,10 +46,28 @@ public final class GameModeRegistryModule extends AdditionalInternalPluginCatalo
 
     @Override
     public void registerDefaults() {
-        register(new LanternGameMode("minecraft", "not_set", -1));
-        register(new LanternGameMode("minecraft", "survival", 0));
-        register(new LanternGameMode("minecraft", "creative", 1));
-        register(new LanternGameMode("minecraft", "adventure", 2));
-        register(new LanternGameMode("minecraft", "spectator", 3));
+        register(new LanternGameMode("minecraft", "not_set", "gameMode.notSet", -1,
+                player -> {}));
+        register(new LanternGameMode("minecraft", "survival", "gameMode.survival", 0,
+                player -> {
+                    player.offer(Keys.CAN_FLY, false);
+                    player.offer(Keys.IS_FLYING, false);
+                    player.offer(LanternKeys.INVULNERABLE, false);
+                }));
+        register(new LanternGameMode("minecraft", "creative", "gameMode.creative", 1,
+                player -> {
+                    player.offer(Keys.CAN_FLY, true);
+                    player.offer(LanternKeys.INVULNERABLE, true);
+                }));
+        register(new LanternGameMode("minecraft", "adventure", "gameMode.adventure", 2,
+                player -> {
+                    player.offer(Keys.CAN_FLY, false);
+                    player.offer(Keys.IS_FLYING, false);
+                    player.offer(LanternKeys.INVULNERABLE, false);
+                }));
+        register(new LanternGameMode("minecraft", "spectator", "gameMode.spectator", 3,
+                player -> {
+                    player.offer(LanternKeys.INVULNERABLE, true);
+                }));
     }
 }

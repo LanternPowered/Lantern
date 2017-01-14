@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.data.value;
 
+import java.util.function.BiConsumer;
+
 import javax.annotation.Nullable;
 
 public interface ElementHolder<E> {
@@ -43,4 +45,18 @@ public interface ElementHolder<E> {
      * @return The current element if present, otherwise {@code null}
      */
     @Nullable E get();
+
+    /**
+     * Adds a listener that tracks the changes of the internal value.
+     *
+     * @param listener The listener
+     */
+    void addListener(Listener<E> listener);
+
+    @FunctionalInterface
+    interface Listener<E> extends BiConsumer<E, E> {
+
+        @Override
+        void accept(E oldElement, E newElement);
+    }
 }

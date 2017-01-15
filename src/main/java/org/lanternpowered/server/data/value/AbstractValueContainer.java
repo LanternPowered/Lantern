@@ -74,7 +74,7 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
 
         @Nullable
         @Override
-        public synchronized E set(@Nullable E value) {
+        public E set(@Nullable E value) {
             final E oldValue;
             synchronized (this) {
                 oldValue = this.value;
@@ -88,8 +88,10 @@ public interface AbstractValueContainer<C extends ValueContainer<C>, H extends V
 
         @Nullable
         @Override
-        public synchronized E get() {
-            return this.value;
+        public E get() {
+            synchronized (this) {
+                return this.value;
+            }
         }
 
         @Override

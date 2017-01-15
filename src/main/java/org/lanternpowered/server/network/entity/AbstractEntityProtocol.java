@@ -93,6 +93,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
     private final class SimpleEntityProtocolContext implements EntityProtocolUpdateContext {
 
+        @Nullable private E entity;
+
         @SuppressWarnings("NullableProblems")
         private Set<LanternPlayer> trackers;
 
@@ -110,14 +112,14 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
 
         @Override
         public void sendToSelf(Message message) {
-            if (entity instanceof Player) {
+            if (this.entity instanceof Player) {
                 ((LanternPlayer) entity).getConnection().send(message);
             }
         }
 
         @Override
         public void sendToSelf(Supplier<Message> messageSupplier) {
-            if (entity instanceof Player) {
+            if (this.entity instanceof Player) {
                 sendToSelf(messageSupplier.get());
             }
         }
@@ -324,6 +326,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         final TempEvents events = processEvents(contextData.removed != null, true);
         if (contextData.removed != null) {
             ctx.trackers = contextData.removed;
+            //noinspection SuspiciousMethodCalls
+            ctx.entity = contextData.removed.contains(this.entity) ? this.entity : null;
             if (events != null && events.deathOrAlive != null) {
                 events.deathOrAlive.forEach(event -> handleEvent(ctx, event));
             }
@@ -335,6 +339,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         Set<LanternPlayer> trackers = null;
         if (contextData.update != null) {
             ctx.trackers = contextData.update;
+            //noinspection SuspiciousMethodCalls
+            ctx.entity = contextData.update.contains(this.entity) ? this.entity : null;
             update(ctx);
             if (events != null) {
                 trackers = contextData.added == null ? contextData.update : new HashSet<>(contextData.update);
@@ -342,6 +348,8 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         }
         if (contextData.added != null) {
             ctx.trackers = contextData.added;
+            //noinspection SuspiciousMethodCalls
+            ctx.entity = contextData.added.contains(this.entity) ? this.entity : null;
             spawn(ctx);
             if (events != null) {
                 if (trackers == null) {
@@ -353,6 +361,7 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         }
         if (trackers != null) {
             ctx.trackers = trackers;
+            ctx.entity = this.entity;
             events.alive.forEach(event -> handleEvent(ctx, event));
         }
     }

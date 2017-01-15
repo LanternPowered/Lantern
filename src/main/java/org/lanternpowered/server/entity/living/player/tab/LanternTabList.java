@@ -63,23 +63,25 @@ public class LanternTabList implements TabList {
      * Initializes the {@link TabList} for the player and sends
      * the initial entries as a bulk.
      *
-     * @param entries the entries
+     * @param entries The entries
      */
     public void init(List<LanternTabListEntry> entries) {
         if (entries.isEmpty()) {
             return;
         }
-        List<MessagePlayOutTabListEntries.Entry> messageEntries = new ArrayList<>();
+        final List<MessagePlayOutTabListEntries.Entry> messageEntries = new ArrayList<>();
         entries.forEach(e -> {
             checkArgument(e.getList() == this, "Tab list entry targets the wrong tab list!");
             this.tabListEntries.put(e.getProfile().getUniqueId(), e);
             e.getGlobalEntry().addEntry(e);
-            messageEntries.add(new MessagePlayOutTabListEntries.Entry.Add(e.getProfile(), e.getGameMode(),
+            messageEntries.add(new MessagePlayOutTabListEntries.Entry.Add(
+                    e.getFixedUUID(), e.getProfile().getName().orElse("unknown"),
+                    e.getProfile().getPropertyMap().values(), e.getGameMode(),
                     e.getDisplayName().orElse(null), e.getLatency()));
         });
         this.player.getConnection().send(new MessagePlayOutTabListEntries(messageEntries));
         if (this.footer.isPresent() || this.header.isPresent()) {
-            this.sendHeaderAndFooterUpdate();
+            sendHeaderAndFooterUpdate();
         }
     }
 
@@ -141,15 +143,16 @@ public class LanternTabList implements TabList {
     @Override
     public TabList addEntry(TabListEntry entry) throws IllegalArgumentException {
         checkNotNull(entry, "entry");
-        UUID uniqueId = entry.getProfile().getUniqueId();
+        final UUID uniqueId = entry.getProfile().getUniqueId();
         checkArgument(entry.getList() == this,
                 "The tab list entries #getList() list does not match to this list.");
         checkArgument(!this.tabListEntries.containsKey(uniqueId),
                 "There is already a tab list entry assigned with the unique id: " + uniqueId.toString());
         this.tabListEntries.put(uniqueId, (LanternTabListEntry) entry);
         this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(new MessagePlayOutTabListEntries.Entry.Add(
-                entry.getProfile(), entry.getGameMode(), entry.getDisplayName().orElse(null), entry.getLatency()))));
-        LanternTabListEntry entry0 = (LanternTabListEntry) entry;
+                ((LanternTabListEntry) entry).getFixedUUID(), entry.getProfile().getName().orElse("unknown"),
+                entry.getProfile().getPropertyMap().values(), entry.getGameMode(), entry.getDisplayName().orElse(null), entry.getLatency()))));
+        final LanternTabListEntry entry0 = (LanternTabListEntry) entry;
         entry0.attached = true;
         entry0.getGlobalEntry().addEntry(entry0);
         return this;
@@ -166,10 +169,10 @@ public class LanternTabList implements TabList {
 
     @Override
     public Optional<TabListEntry> removeEntry(UUID uniqueId) {
-        final Optional<TabListEntry> entry = this.removeRawEntry(uniqueId);
+        final Optional<TabListEntry> entry = removeRawEntry(uniqueId);
         entry.ifPresent(entry0 -> {
             this.player.getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.Remove(entry0.getProfile()))));
+                    new MessagePlayOutTabListEntries.Entry.Remove(((LanternTabListEntry) entry0).getFixedUUID()))));
             ((LanternTabListEntry) entry0).getGlobalEntry().removeEntry((LanternTabListEntry) entry0);
         });
         return entry;

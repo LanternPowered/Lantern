@@ -26,10 +26,14 @@
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Multimap;
 import org.lanternpowered.server.network.message.Message;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.text.Text;
+
+import java.util.Collection;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -47,20 +51,25 @@ public final class MessagePlayOutTabListEntries implements Message {
 
     public static class Entry {
 
-        private final GameProfile gameProfile;
+        private final UUID uniqueId;
+        @Nullable private final String name;
+        @Nullable private final Collection<ProfileProperty> properties;
         @Nullable private final GameMode gameMode;
         @Nullable private final Text displayName;
         @Nullable private final Integer ping;
 
-        Entry(GameProfile gameProfile, @Nullable GameMode gameMode, @Nullable Text displayName, @Nullable Integer ping) {
+        Entry(UUID uniqueId, @Nullable String name, @Nullable Collection<ProfileProperty> properties,
+                @Nullable GameMode gameMode, @Nullable Text displayName, @Nullable Integer ping) {
             this.displayName = displayName;
-            this.gameProfile = gameProfile;
+            this.properties = properties;
+            this.uniqueId = uniqueId;
             this.gameMode = gameMode;
+            this.name = name;
             this.ping = ping;
         }
 
-        public GameProfile getGameProfile() {
-            return this.gameProfile;
+        public UUID getUniqueId() {
+            return this.uniqueId;
         }
 
         @Nullable
@@ -78,38 +87,49 @@ public final class MessagePlayOutTabListEntries implements Message {
             return this.ping;
         }
 
+        @Nullable
+        public Collection<ProfileProperty> getProperties() {
+            return this.properties;
+        }
+
+        @Nullable
+        public String getName() {
+            return this.name;
+        }
+
         public static final class Add extends Entry {
 
-            public Add(GameProfile gameProfile, GameMode gameMode, @Nullable Text displayName, int ping) {
-                super(gameProfile, gameMode, displayName, ping);
+            public Add(UUID uniqueId, String name, Collection<ProfileProperty> properties,
+                    GameMode gameMode, @Nullable Text displayName, int ping) {
+                super(uniqueId, name, properties, gameMode, displayName, ping);
             }
         }
 
         public static final class UpdateGameMode extends Entry {
 
-            public UpdateGameMode(GameProfile gameProfile, GameMode gameMode) {
-                super(gameProfile, gameMode, null, null);
+            public UpdateGameMode(UUID uniqueId, GameMode gameMode) {
+                super(uniqueId, null, null, gameMode, null, null);
             }
         }
 
         public static final class UpdateLatency extends Entry {
 
-            public UpdateLatency(GameProfile gameProfile, int ping) {
-                super(gameProfile, null, null, ping);
+            public UpdateLatency(UUID uniqueId, int ping) {
+                super(uniqueId, null, null, null, null, ping);
             }
         }
 
         public static final class UpdateDisplayName extends Entry {
 
-            public UpdateDisplayName(GameProfile gameProfile, @Nullable Text displayName) {
-                super(gameProfile, null, displayName, null);
+            public UpdateDisplayName(UUID uniqueId, @Nullable Text displayName) {
+                super(uniqueId, null, null, null, displayName, null);
             }
         }
 
         public static final class Remove extends Entry {
 
-            public Remove(GameProfile gameProfile) {
-                super(gameProfile, null, null, null);
+            public Remove(UUID uniqueId) {
+                super(uniqueId, null, null, null, null, null);
             }
         }
     }

@@ -247,6 +247,16 @@ public final class LanternGameProfileCache implements GameProfileCache {
         return Optional.empty();
     }
 
+    GameProfile getOrLookupByIdFailable(UUID uniqueId) throws Exception {
+        final Optional<GameProfile> optGameProfile = getById(checkNotNull(uniqueId, "uniqueId"));
+        if (optGameProfile.isPresent()) {
+            return optGameProfile.get();
+        }
+        final GameProfile gameProfile = GameProfileQuery.queryProfileByUUID(uniqueId, true);
+        add(gameProfile, true, null);
+        return gameProfile;
+    }
+
     @Override
     public Map<UUID, Optional<GameProfile>> lookupByIds(Iterable<UUID> uniqueIds) {
         checkNotNull(uniqueIds, "uniqueIds");

@@ -72,7 +72,6 @@ public final class LanternGameProfile implements GameProfile {
     private String name;
 
     protected LanternGameProfile() {
-        this.properties = LinkedHashMultimap.create();
     }
 
     public LanternGameProfile(UUID uniqueId, @Nullable String name) {

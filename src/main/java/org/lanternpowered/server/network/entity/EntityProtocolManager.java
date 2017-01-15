@@ -37,6 +37,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,6 +73,11 @@ public final class EntityProtocolManager {
      * All the {@link AbstractEntityProtocol}s that will be destroyed.
      */
     private final Queue<AbstractEntityProtocol<?>> queuedForRemoval = new ConcurrentLinkedDeque<>();
+
+    /**
+     * All the {@link LanternPlayer}s that will refreshed.
+     */
+    private final Queue<LanternPlayer> queuedForRefresh = new ConcurrentLinkedDeque<>();
 
     private final Int2ObjectMap<AbstractEntityProtocol<?>> idToEntityProtocolMap = new Int2ObjectOpenHashMap<>();
 
@@ -313,11 +319,34 @@ public final class EntityProtocolManager {
             removed.destroy(new EntityProtocolInitContextImpl(removed));
         }
 
+        final Set<LanternPlayer> refreshedPlayers = new HashSet<>(this.queuedForRefresh.size());
+        LanternPlayer player;
+        while ((player = this.queuedForRefresh.poll()) != null) {
+            refreshedPlayers.add(player);
+        }
+
         final List<AbstractEntityProtocol.TrackerUpdateContextData> updateContextDataList = new ArrayList<>();
 
         final Set<AbstractEntityProtocol<?>> protocols = new HashSet<>(this.entityProtocols.values());
         for (AbstractEntityProtocol<?> protocol : protocols) {
-            final AbstractEntityProtocol.TrackerUpdateContextData contextData = protocol.buildUpdateContextData(players);
+            AbstractEntityProtocol.TrackerUpdateContextData contextData = protocol.buildUpdateContextData(players);
+            if (!refreshedPlayers.isEmpty()) {
+                if (contextData == null) {
+                    contextData = protocol.createTrackerUpdateContextData();
+                }
+                if (contextData.removed == null) {
+                    contextData.removed = refreshedPlayers;
+                } else {
+                    //noinspection unchecked
+                    contextData.removed.addAll(refreshedPlayers);
+                }
+                if (contextData.added == null) {
+                    contextData.added = refreshedPlayers;
+                } else {
+                    //noinspection unchecked
+                    contextData.added.addAll(refreshedPlayers);
+                }
+            }
             if (contextData != null) {
                 //noinspection unchecked
                 protocol.updateTrackers(contextData);

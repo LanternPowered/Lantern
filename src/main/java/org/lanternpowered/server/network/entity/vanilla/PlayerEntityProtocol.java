@@ -43,13 +43,19 @@ import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityMetadata;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerAbilities;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerPositionAndLook;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutPlayerRespawn;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetGameMode;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnObject;
+import org.lanternpowered.server.world.LanternWorld;
+import org.lanternpowered.server.world.difficulty.LanternDifficulty;
+import org.lanternpowered.server.world.dimension.LanternDimensionType;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.item.ItemTypes;
 
+import java.util.Collections;
 import java.util.UUID;
 
 public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> {
@@ -83,18 +89,36 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     }
 
     @Override
-    protected void spawn(EntityProtocolUpdateContext context) {
-        super.spawn(context);
-        context.sendToSelf(() -> new MessagePlayOutEntityMetadata(getRootEntityId(), fillParameters(true)));
-        final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
-        context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
+    protected void spawn0(EntityProtocolUpdateContext context) {
+        final LanternGameMode gameMode = (LanternGameMode) getEntity().get(Keys.GAME_MODE).get();
+        // Only send the respawn message if the player isn't dead,
+        // we don't want to remove the dead screen
+        // TODO: Trigger this as a event in the player?
+        if (this.entity.get(Keys.HEALTH).orElse(0.0) > 0) {
+            final LanternWorld world = this.entity.getWorld();
+
+            final LanternDimensionType dimensionType = (LanternDimensionType) world.getDimension().getType();
+            final LanternDifficulty difficulty = (LanternDifficulty) world.getDifficulty();
+            final boolean lowHorizon = world.getProperties().getConfig().isLowHorizon();
+
+            context.sendToSelf(() -> new MessagePlayOutPlayerRespawn(gameMode, dimensionType, difficulty, lowHorizon));
+            context.sendToSelf(() -> {
+                final Vector3d pos = this.entity.getPosition();
+                final Vector3d rot = this.entity.getRotation();
+                return new MessagePlayOutPlayerPositionAndLook(pos.getX(), pos.getY(), pos.getZ(),
+                        (float) rot.getX(), (float) rot.getY(), Collections.emptySet(), 0);
+            });
+            this.entity.getInventoryContainer().openInventoryForAndInitialize(this.entity);
+        } else {
+            context.sendToSelf(() -> new MessagePlayOutSetGameMode(gameMode));
+        }
         context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
                 this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE,
                 this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue(), 0.01f));
     }
 
     @Override
-    protected void update(EntityProtocolUpdateContext context) {
+    protected void update0(EntityProtocolUpdateContext context) {
         final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
         final boolean canFly = canFly();
         final float flySpeed = this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue();
@@ -111,7 +135,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
             this.lastCanFly = canFly;
             this.lastFlySpeed = flySpeed;
         }
-        super.update(context);
+        super.update0(context);
         // Some 1.11.2 magic, ultra secret stuff...
         final boolean elytraFlying = this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false);
         final boolean elytraSpeedBoost = this.entity.get(LanternKeys.ELYTRA_SPEED_BOOST).orElse(false);

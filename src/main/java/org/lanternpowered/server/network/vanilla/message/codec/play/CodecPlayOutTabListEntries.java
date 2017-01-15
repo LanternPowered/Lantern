@@ -54,34 +54,38 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
     private final Object2IntMap<Class<?>> typeLookup;
 
     {
-        Object2IntMap<Class<?>> typeLookup = new Object2IntOpenHashMap<>();
+        final Object2IntMap<Class<?>> typeLookup = new Object2IntOpenHashMap<>();
         typeLookup.put(Entry.Add.class, ADD);
         typeLookup.put(Entry.UpdateGameMode.class, UPDATE_GAME_MODE);
         typeLookup.put(Entry.UpdateLatency.class, UPDATE_LATENCY);
         typeLookup.put(Entry.UpdateDisplayName.class, UPDATE_DISPLAY_NAME);
         typeLookup.put(Entry.Remove.class, REMOVE);
+        typeLookup.defaultReturnValue(-1);
         this.typeLookup = Object2IntMaps.unmodifiable(typeLookup);
     }
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutTabListEntries message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
-        List<Entry> entries = message.getEntries();
-        int type = this.typeLookup.get(entries.get(0).getClass());
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
+        final List<Entry> entries = message.getEntries();
+        final int type = this.typeLookup.getInt(entries.get(0).getClass());
+        if (type == -1) {
+            throw new CodecException("Illegal entry type: " + entries.get(0).getClass().getName());
+        }
         buf.writeVarInt(type);
         buf.writeVarInt(entries.size());
         for (Entry entry : entries) {
-            buf.writeUniqueId(entry.getGameProfile().getUniqueId());
+            buf.writeUniqueId(entry.getUniqueId());
             switch (type) {
                 case ADD:
-                    buf.writeString(entry.getGameProfile().getName().orElse("unknown"));
-                    Collection<ProfileProperty> properties = entry.getGameProfile().getPropertyMap().values();
+                    buf.writeString(entry.getName());
+                    final Collection<ProfileProperty> properties = entry.getProperties();
                     buf.writeVarInt(properties.size());
                     for (ProfileProperty property : properties) {
                         buf.writeString(property.getName());
                         buf.writeString(property.getValue());
-                        Optional<String> signature = property.getSignature();
-                        boolean flag = signature.isPresent();
+                        final Optional<String> signature = property.getSignature();
+                        final boolean flag = signature.isPresent();
                         buf.writeBoolean(flag);
                         if (flag) {
                             buf.writeString(signature.get());
@@ -89,8 +93,8 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
                     }
                     buf.writeVarInt(((LanternGameMode) entry.getGameMode()).getInternalId());
                     buf.writeVarInt(entry.getPing());
-                    Text displayName = entry.getDisplayName();
-                    boolean flag = displayName != null;
+                    final Text displayName = entry.getDisplayName();
+                    final boolean flag = displayName != null;
                     buf.writeBoolean(flag);
                     if (flag) {
                         buf.write(Types.TEXT, displayName);
@@ -103,8 +107,8 @@ public final class CodecPlayOutTabListEntries implements Codec<MessagePlayOutTab
                     buf.writeVarInt(entry.getPing());
                     break;
                 case UPDATE_DISPLAY_NAME:
-                    Text displayName0 = entry.getDisplayName();
-                    boolean flag0 = displayName0 != null;
+                    final Text displayName0 = entry.getDisplayName();
+                    final boolean flag0 = displayName0 != null;
                     buf.writeBoolean(flag0);
                     if (flag0) {
                         buf.write(Types.TEXT, displayName0);

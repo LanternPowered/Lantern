@@ -36,10 +36,10 @@ public final class UUIDHelper {
     }
 
     /**
-     * Parses the uuid instance from a flat string (without dashes).
+     * Parses the {@link UUID} instance from a flat string (without dashes).
      * 
-     * @param string the flat string
-     * @return the uuid
+     * @param string The flat string
+     * @return The unique id
      */
     public static UUID fromFlatString(String string) {
         checkNotNull(string, "string");
@@ -49,13 +49,21 @@ public final class UUIDHelper {
     }
 
     /**
-     * Converts the uuid to a flat string (without dashes).
+     * Converts the {@link UUID} to a flat string (without dashes).
      * 
-     * @param uuid the uuid
-     * @return the flat string
+     * @param uniqueId The unique id
+     * @return The flat string
      */
-    public static String toFlatString(UUID uuid) {
-        return checkNotNull(uuid, "uuid").toString().replace("-", "");
+    public static String toFlatString(UUID uniqueId) {
+        return checkNotNull(uniqueId, "uniqueId").toString().replace("-", "");
     }
 
+    public static UUID modifyVersion(UUID uniqueId, int version) {
+        checkNotNull(uniqueId, "uniqueId");
+        checkArgument(version >= 0 && version <= 15, "Invalid version number");
+        long most = uniqueId.getMostSignificantBits();
+        most &= 0xFFFFFFFFFFFF0FFFL; // Clear the version
+        most |= version << 12; // Set the version
+        return new UUID(most, uniqueId.getLeastSignificantBits());
+    }
 }

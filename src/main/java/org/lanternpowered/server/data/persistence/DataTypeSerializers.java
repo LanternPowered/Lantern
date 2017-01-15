@@ -29,6 +29,7 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.reflect.TypeToken;
 import org.lanternpowered.server.data.LanternDataManager;
+import org.lanternpowered.server.entity.DefaultHumanSkins;
 import org.lanternpowered.server.util.roman.IllegalRomanNumberException;
 import org.lanternpowered.server.util.roman.RomanNumber;
 import org.spongepowered.api.CatalogType;
@@ -40,6 +41,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.persistence.DataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.util.Coerce;
 
 import java.lang.reflect.TypeVariable;
@@ -49,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -69,6 +72,7 @@ public final class DataTypeSerializers {
         dataManager.registerTypeSerializer(TypeToken.of(String.class), new StringSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(Boolean.class), new BooleanSerializer());
         dataManager.registerTypeSerializer(TypeToken.of(DataSerializable.class), new DataSerializableSerializer());
+        dataManager.registerTypeSerializer(TypeToken.of(ProfileProperty.class), new ProfilePropertySerializer());
     }
 
     private static class DataSerializableSerializer implements DataViewTypeSerializer<DataSerializable> {
@@ -400,6 +404,26 @@ public final class DataTypeSerializers {
         @Override
         public Object serialize(TypeToken<?> type, DataTypeSerializerContext ctx, String obj) throws InvalidDataException {
             return obj;
+        }
+    }
+
+
+    private static class ProfilePropertySerializer implements DataTypeSerializer<ProfileProperty, Object> {
+
+        @Override
+        public ProfileProperty deserialize(TypeToken<?> type, DataTypeSerializerContext ctx, Object data) throws InvalidDataException {
+            final String string = data.toString().toLowerCase(Locale.ENGLISH);
+            if (string.equals("steve")) {
+                return DefaultHumanSkins.STEVE;
+            } else if (string.equals("alex")) {
+                return DefaultHumanSkins.ALEX;
+            }
+            throw new InvalidDataException("TODO");
+        }
+
+        @Override
+        public Object serialize(TypeToken<?> type, DataTypeSerializerContext ctx, ProfileProperty obj) throws InvalidDataException {
+            throw new InvalidDataException("TODO");
         }
     }
 }

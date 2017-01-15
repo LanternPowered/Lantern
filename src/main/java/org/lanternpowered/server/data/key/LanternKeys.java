@@ -26,6 +26,7 @@
 package org.lanternpowered.server.data.key;
 
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeMutableBoundedValueKey;
+import static org.lanternpowered.server.data.key.LanternKeyFactory.makeOptionalKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeSetKey;
 import static org.lanternpowered.server.data.key.LanternKeyFactory.makeValueKey;
 
@@ -38,11 +39,13 @@ import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.type.SkinPart;
 import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
+import org.spongepowered.api.data.value.mutable.OptionalValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.profile.property.ProfileProperty;
 
 public final class LanternKeys {
 
@@ -100,6 +103,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("ElytraSpeedBoost"), "lantern:elytra_speed_boost");
     public static final Key<Value<Boolean>> SUPER_STEVE =
             makeValueKey(Boolean.class, DataQuery.of("SuperSteve"), "lantern:super_steve");
+    public static final Key<Value<ProfileProperty>> HUMAN_SKIN =
+            makeValueKey(ProfileProperty.class, DataQuery.of("HumanSkin"), "lantern:human_skin");
 
     private LanternKeys() {
     }

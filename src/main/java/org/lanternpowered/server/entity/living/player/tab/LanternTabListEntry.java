@@ -26,6 +26,7 @@
 package org.lanternpowered.server.entity.living.player.tab;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static org.lanternpowered.server.util.UUIDHelper.modifyVersion;
 
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -35,10 +36,24 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
 public final class LanternTabListEntry implements TabListEntry {
+
+    /**
+     * Modifies a {@link UUID} to replace the first 5 versions.
+     * This is to avoid possible collision with human {@link UUID}s
+     * on the client. These versions should be unused.
+     *
+     * @param uniqueId The uniqueId
+     * @return The modified uniqueId
+     */
+    static UUID modifyUUID(UUID uniqueId) {
+        final int version = uniqueId.version();
+        return modifyVersion(uniqueId, version + 8);
+    }
 
     private final GlobalTabListEntry globalEntry;
     private final LanternTabList tabList;
@@ -96,7 +111,7 @@ public final class LanternTabListEntry implements TabListEntry {
         this.setRawDisplayName(displayName);
         if (this.attached) {
             this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(this.getProfile(), displayName))));
+                    new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(getProfile().getUniqueId(), displayName))));
         }
         return this;
     }
@@ -115,12 +130,16 @@ public final class LanternTabListEntry implements TabListEntry {
         this.latency = latency;
     }
 
+    UUID getFixedUUID() {
+        return modifyUUID(getProfile().getUniqueId());
+    }
+
     @Override
     public LanternTabListEntry setLatency(int latency) {
         this.setRawLatency(latency);
         if (this.attached) {
             this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.UpdateLatency(this.getProfile(), latency))));
+                    new MessagePlayOutTabListEntries.Entry.UpdateLatency(getFixedUUID(), latency))));
         }
         return this;
     }
@@ -144,7 +163,7 @@ public final class LanternTabListEntry implements TabListEntry {
         this.setRawGameMode(gameMode);
         if (this.attached) {
             this.tabList.getPlayer().getConnection().send(new MessagePlayOutTabListEntries(Collections.singletonList(
-                    new MessagePlayOutTabListEntries.Entry.UpdateGameMode(this.getProfile(), gameMode))));
+                    new MessagePlayOutTabListEntries.Entry.UpdateGameMode(getFixedUUID(), gameMode))));
         }
         return this;
     }

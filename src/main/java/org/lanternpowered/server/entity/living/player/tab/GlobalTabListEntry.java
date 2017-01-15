@@ -25,6 +25,8 @@
  */
 package org.lanternpowered.server.entity.living.player.tab;
 
+import static org.lanternpowered.server.entity.living.player.tab.LanternTabListEntry.modifyUUID;
+
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.profile.GameProfile;
@@ -33,6 +35,7 @@ import org.spongepowered.api.text.Text;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -57,7 +60,7 @@ public class GlobalTabListEntry {
      * @param tabListEntry The tab list entry
      */
     void addEntry(LanternTabListEntry tabListEntry) {
-        boolean empty = this.tabListEntries.isEmpty();
+        final boolean empty = this.tabListEntries.isEmpty();
         this.tabListEntries.add(tabListEntry);
         if (empty) {
             this.tabList.addEntry(this);
@@ -76,6 +79,10 @@ public class GlobalTabListEntry {
         }
     }
 
+    UUID getFixedUUID() {
+        return modifyUUID(this.gameProfile.getUniqueId());
+    }
+
     /**
      * Removes this entry from all the {@link LanternTabList}s.
      */
@@ -83,8 +90,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.Remove(this.gameProfile)));
+        final MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
+                new MessagePlayOutTabListEntries.Entry.Remove(getFixedUUID())));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.getList().removeRawEntry(this.gameProfile.getUniqueId());
             tabListEntry.getList().getPlayer().getConnection().send(message);
@@ -97,8 +104,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(this.gameProfile, displayName)));
+        final MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
+                new MessagePlayOutTabListEntries.Entry.UpdateDisplayName(getFixedUUID(), displayName)));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.setRawDisplayName(displayName);
             tabListEntry.getList().getPlayer().getConnection().send(message);
@@ -109,8 +116,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.UpdateLatency(this.gameProfile, latency)));
+        final MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
+                new MessagePlayOutTabListEntries.Entry.UpdateLatency(getFixedUUID(), latency)));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.setRawLatency(latency);
             tabListEntry.getList().getPlayer().getConnection().send(message);
@@ -121,8 +128,8 @@ public class GlobalTabListEntry {
         if (this.tabListEntries.isEmpty()) {
             return;
         }
-        MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
-                new MessagePlayOutTabListEntries.Entry.UpdateGameMode(this.gameProfile, gameMode)));
+        final MessagePlayOutTabListEntries message = new MessagePlayOutTabListEntries(Collections.singletonList(
+                new MessagePlayOutTabListEntries.Entry.UpdateGameMode(getFixedUUID(), gameMode)));
         this.tabListEntries.forEach(tabListEntry -> {
             tabListEntry.setRawGameMode(gameMode);
             tabListEntry.getList().getPlayer().getConnection().send(message);

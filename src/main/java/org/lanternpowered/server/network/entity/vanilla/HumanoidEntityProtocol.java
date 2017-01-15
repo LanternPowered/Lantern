@@ -30,6 +30,7 @@ import static org.lanternpowered.server.network.vanilla.message.codec.play.Codec
 import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.data.type.LanternSkinPart;
+import org.lanternpowered.server.entity.DefaultHumanSkins;
 import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
@@ -37,11 +38,15 @@ import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityVelocity;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSpawnPlayer;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutTabListEntries;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.SkinPart;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.profile.property.ProfileProperty;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
@@ -52,13 +57,28 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
     private HandPreference lastDominantHand = HandPreferences.RIGHT;
     @Nullable private Set<SkinPart> lastSkinParts;
 
+    private String lastName;
+    private ProfileProperty lastSkin;
+
     public HumanoidEntityProtocol(E entity) {
         super(entity);
     }
 
+    private ProfileProperty getSkin() {
+        return this.entity.get(LanternKeys.HUMAN_SKIN).orElseGet(
+                () -> (this.entity.getUniqueId().hashCode() & 0x1) == 1 ? DefaultHumanSkins.ALEX : DefaultHumanSkins.STEVE);
+    }
+
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        final int entityId = this.getRootEntityId();
+        spawn(context, this.entity.getTranslation().get(), getSkin());
+    }
+
+    protected void spawn(EntityProtocolUpdateContext context, String name, ProfileProperty skin) {
+        context.sendToAll(() -> new MessagePlayOutTabListEntries(Collections.singleton(new MessagePlayOutTabListEntries.Entry.Add(
+                this.entity.getUniqueId(), name, Collections.singleton(skin), GameModes.SURVIVAL, null, 0))));
+
+        final int entityId = getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
         final Vector3d headRot = this.entity instanceof LanternLiving ? ((LanternLiving) this.entity).getHeadRotation() : null;
@@ -69,13 +89,38 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final double pitch = headRot != null ? headRot.getX() : rot.getX();
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnPlayer(entityId, this.entity.getUniqueId(),
-                pos, wrapAngle(yaw), wrapAngle(pitch), this.fillParameters(true)));
+                pos, wrapAngle(yaw), wrapAngle(pitch), fillParameters(true)));
         if (headRot != null) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));
         }
         if (!vel.equals(Vector3d.ZERO)) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityVelocity(entityId, vel.getX(), vel.getY(), vel.getZ()));
         }
+
+        spawn0(context);
+
+        context.sendToAll(() -> new MessagePlayOutTabListEntries(
+                Collections.singleton(new MessagePlayOutTabListEntries.Entry.Remove(this.entity.getUniqueId()))));
+    }
+
+    protected void spawn0(EntityProtocolUpdateContext context) {}
+
+    @Override
+    protected void update(EntityProtocolUpdateContext context) {
+        final String name = this.entity.getTranslation().get();
+        final ProfileProperty skin = this.entity.get(LanternKeys.HUMAN_SKIN).orElse(DefaultHumanSkins.STEVE);
+        if (!Objects.equals(this.lastName, name) || !Objects.equals(this.lastSkin, skin)) {
+            spawn(context, name, skin);
+            update0(EntityProtocolUpdateContext.empty());
+            this.lastName = name;
+            this.lastSkin = skin;
+        } else {
+            update0(context);
+        }
+    }
+
+    protected void update0(EntityProtocolUpdateContext context) {
+        super.update(context);
     }
 
     @Override

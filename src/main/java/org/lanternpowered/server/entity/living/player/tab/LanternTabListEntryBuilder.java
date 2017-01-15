@@ -28,6 +28,7 @@ package org.lanternpowered.server.entity.living.player.tab;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
+import org.lanternpowered.server.profile.LanternGameProfile;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.tab.TabList;
 import org.spongepowered.api.entity.living.player.tab.TabListEntry;
@@ -52,7 +53,7 @@ public final class LanternTabListEntryBuilder implements TabListEntry.Builder {
 
     @Override
     public LanternTabListEntryBuilder profile(GameProfile profile) {
-        this.profile = checkNotNull(profile, "profile");
+        this.profile = ((LanternGameProfile) checkNotNull(profile, "profile")).copy();
         return this;
     }
 

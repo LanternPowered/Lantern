@@ -137,10 +137,15 @@ public class CompositeValueContainerStore<T extends S, S extends CompositeValueS
                     final TypeToken<?> typeToken = entry.getKey().getElementToken();
                     final DataTypeSerializer dataTypeSerializer = Lantern.getGame().getDataManager().getTypeSerializer(typeToken).orElse(null);
                     if (dataTypeSerializer == null) {
-                        Lantern.getLogger().warn("Unable to serialize the data key value: " + entry.getKey());
+                        Lantern.getLogger().warn("Unable to serialize the data key value: {}", entry.getKey());
                     } else {
-                        valuesView.set(DataQuery.of(entry.getKey().getId()),
-                                dataTypeSerializer.serialize(typeToken, context, entry.getValue()));
+                        try {
+                            valuesView.set(DataQuery.of(entry.getKey().getId()),
+                                    dataTypeSerializer.serialize(typeToken, context, entry.getValue()));
+                        } catch (Exception e) {
+                            Lantern.getLogger().warn("Failed to serialize a value of type {} for {}",
+                                    entry.getValue().getClass().getName(), typeToken.getRawType().getName(), e);
+                        }
                     }
                 }
                 if (valuesView.isEmpty()) {

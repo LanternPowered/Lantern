@@ -71,9 +71,14 @@ public final class LanternGameProfileManager implements GameProfileManager {
 
     private GameProfile getById(UUID uniqueId, boolean useCache, boolean signed) throws Exception {
         if (useCache) {
-            final Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupById(uniqueId);
-            if (optProfile.isPresent()) {
-                return optProfile.get();
+            if (this.gameProfileCache instanceof LanternGameProfileCache) {
+                return ((LanternGameProfileCache) this.gameProfileCache).getOrLookupByIdFailable(uniqueId);
+            } else {
+                final Optional<GameProfile> optProfile = this.gameProfileCache.getOrLookupById(uniqueId);
+                if (optProfile.isPresent()) {
+                    return optProfile.get();
+                }
+                throw new IllegalArgumentException("Unable to retrieve the game profile for: " + uniqueId);
             }
         }
         return GameProfileQuery.queryProfileByUUID(uniqueId, signed);

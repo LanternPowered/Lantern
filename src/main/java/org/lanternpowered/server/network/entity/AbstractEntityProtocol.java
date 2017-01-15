@@ -253,6 +253,10 @@ public abstract class AbstractEntityProtocol<E extends LanternEntity> {
         this.entityId = rootEntityId;
     }
 
+    TrackerUpdateContextData createTrackerUpdateContextData() {
+        return new TrackerUpdateContextData(this);
+    }
+
     final class TrackerUpdateContextData {
 
         final AbstractEntityProtocol<?> entityProtocol;

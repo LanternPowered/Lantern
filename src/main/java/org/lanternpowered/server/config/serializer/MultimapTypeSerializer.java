@@ -38,26 +38,26 @@ import java.util.Map;
 
 public final class MultimapTypeSerializer implements TypeSerializer<Multimap> {
 
+    @SuppressWarnings("unchecked")
     @Override
     public Multimap deserialize(TypeToken<?> type, ConfigurationNode node) throws ObjectMappingException {
         final Multimap<Object, Object> multimap = LinkedHashMultimap.create();
         if (node.hasMapChildren()) {
-            TypeToken<?> key = type.resolveType(Multimap.class.getTypeParameters()[0]);
-            TypeToken<?> value = type.resolveType(Multimap.class.getTypeParameters()[1]);
-            TypeSerializer keySerial = node.getOptions().getSerializers().get(key);
-            TypeSerializer valueSerial = node.getOptions().getSerializers().get(value);
+            final TypeToken<?> key = type.resolveType(Multimap.class.getTypeParameters()[0]);
+            final TypeToken<?> value = type.resolveType(Multimap.class.getTypeParameters()[1]);
+            final TypeSerializer keySerial = node.getOptions().getSerializers().get(key);
+            final TypeSerializer valueSerial = node.getOptions().getSerializers().get(value);
 
             if (keySerial == null) {
                 throw new ObjectMappingException("No type serializer available for type " + key);
             }
-
             if (valueSerial == null) {
                 throw new ObjectMappingException("No type serializer available for type " + value);
             }
 
             for (Map.Entry<Object, ? extends ConfigurationNode> ent : node.getChildrenMap().entrySet()) {
-                Object keyValue = keySerial.deserialize(key, SimpleConfigurationNode.root().setValue(ent.getKey()));
-                Object valueValue = valueSerial.deserialize(value, ent.getValue());
+                final Object keyValue = keySerial.deserialize(key, SimpleConfigurationNode.root().setValue(ent.getKey()));
+                final Object valueValue = valueSerial.deserialize(value, ent.getValue());
                 if (keyValue == null || valueValue == null) {
                     continue;
                 }
@@ -65,15 +65,16 @@ public final class MultimapTypeSerializer implements TypeSerializer<Multimap> {
                 multimap.put(keyValue, valueValue);
             }
         }
-        return null;
+        return multimap;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void serialize(TypeToken<?> type, Multimap obj, ConfigurationNode node) throws ObjectMappingException {
-        TypeToken<?> key = type.resolveType(Multimap.class.getTypeParameters()[0]);
-        TypeToken<?> value = type.resolveType(Multimap.class.getTypeParameters()[1]);
-        TypeSerializer keySerial = node.getOptions().getSerializers().get(key);
-        TypeSerializer valueSerial = node.getOptions().getSerializers().get(value);
+        final TypeToken<?> key = type.resolveType(Multimap.class.getTypeParameters()[0]);
+        final TypeToken<?> value = type.resolveType(Multimap.class.getTypeParameters()[1]);
+        final TypeSerializer keySerial = node.getOptions().getSerializers().get(key);
+        final TypeSerializer valueSerial = node.getOptions().getSerializers().get(value);
 
         if (keySerial == null) {
             throw new ObjectMappingException("No type serializer available for type " + key);
@@ -86,7 +87,7 @@ public final class MultimapTypeSerializer implements TypeSerializer<Multimap> {
         node.setValue(ImmutableMap.of());
         for (Object k : obj.keySet()) {
             for (Object v : obj.get(k)) {
-                SimpleConfigurationNode keyNode = SimpleConfigurationNode.root();
+                final SimpleConfigurationNode keyNode = SimpleConfigurationNode.root();
                 keySerial.serialize(key, k, keyNode);
                 valueSerial.serialize(value, v, node.getNode(keyNode.getValue()));
             }

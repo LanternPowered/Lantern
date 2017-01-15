@@ -38,6 +38,7 @@ import org.lanternpowered.server.data.io.store.item.WrittenBookItemTypeObjectSer
 import org.lanternpowered.server.data.key.LanternKeys;
 import org.lanternpowered.server.effect.AbstractViewer;
 import org.lanternpowered.server.effect.sound.LanternSoundType;
+import org.lanternpowered.server.entity.DefaultHumanSkins;
 import org.lanternpowered.server.entity.LanternHumanoid;
 import org.lanternpowered.server.entity.living.player.gamemode.LanternGameMode;
 import org.lanternpowered.server.entity.living.player.tab.GlobalTabList;
@@ -90,7 +91,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
@@ -109,6 +109,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.property.ProfileProperty;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.Scoreboard;
 import org.spongepowered.api.service.permission.Subject;
@@ -135,10 +136,12 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.Nullable;
 
@@ -244,6 +247,14 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         this.user.setPlayer(this);
         resetIdleTimeoutCounter();
         setBoundingBoxBase(BOUNDING_BOX_BASE);
+        final Iterator<ProfileProperty> it = gameProfile.getPropertyMap().get("textures").iterator();
+        if (it.hasNext()) {
+            // The player has a skin
+            offer(LanternKeys.HUMAN_SKIN, it.next());
+        } else {
+            // Use the default skins
+            offer(LanternKeys.HUMAN_SKIN, (gameProfile.getUniqueId().hashCode() & 0x1) == 1 ? DefaultHumanSkins.ALEX : DefaultHumanSkins.STEVE);
+        }
     }
 
     public Set<LanternBossBar> getBossBars() {
@@ -285,6 +296,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(Keys.GAME_MODE, GameModes.NOT_SET).notRemovable().addListener(
                 (oldElement, newElement) -> ((LanternGameMode) newElement).getAbilityApplier().accept(this));
         registerKey(Keys.DOMINANT_HAND, HandPreferences.RIGHT).notRemovable();
+        registerKey(LanternKeys.HUMAN_SKIN, null);
         registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
         registerKey(LanternKeys.ELYTRA_SPEED_BOOST, false).notRemovable();
         registerKey(LanternKeys.SUPER_STEVE, false).notRemovable();
@@ -398,9 +410,9 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             this.session.send(world.getProperties().createWorldBorderMessage());
             world.getWeatherUniverse().ifPresent(u -> this.session.send(((LanternWeatherUniverse) u).createSkyUpdateMessage()));
             this.session.send(world.getComponent(TimeUniverse.class).get().createUpdateTimeMessage());
-            this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
+            // this.session.send(new MessagePlayInOutHeldItemChange(this.inventory.getHotbar().getSelectedSlotIndex()));
             setScoreboard(world.getScoreboard());
-            this.inventoryContainer.openInventoryForAndInitialize(this);
+            // this.inventoryContainer.openInventoryForAndInitialize(this);
             this.bossBars.forEach(bossBar -> bossBar.resendBossBar(this));
             // Add the player to the world
             world.addPlayer(this);
@@ -428,7 +440,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
 
     @Override
     public boolean setPositionAndWorld(World world, Vector3d position) {
-        final LanternWorld oldWorld = this.getWorld();
+        final LanternWorld oldWorld = getWorld();
         final boolean success = super.setPositionAndWorld(world, position);
         if (success && world == oldWorld) {
             this.session.send(new MessagePlayOutPlayerPositionAndLook(position.getX(), position.getY(), position.getZ(), 0, 0, RELATIVE_ROTATION, 0));

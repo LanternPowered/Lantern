@@ -149,7 +149,7 @@ public abstract class LanternContainer extends LanternOrderedInventory implement
     protected abstract void openInventoryFor(LanternPlayer viewer);
 
     public void openInventoryForAndInitialize(Player viewer) {
-        this.openInventoryFor((LanternPlayer) viewer);
+        openInventoryFor((LanternPlayer) viewer);
 
         final List<ItemStack> items = this.slots.stream()
                 .map(slot -> slot.peek().orElse(null)).collect(Collectors.toList());

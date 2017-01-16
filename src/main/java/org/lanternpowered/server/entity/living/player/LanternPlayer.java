@@ -90,7 +90,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.data.type.HandTypes;
@@ -288,6 +287,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(LanternKeys.IS_ELYTRA_FLYING, false).notRemovable();
         registerKey(LanternKeys.ELYTRA_SPEED_BOOST, false).notRemovable();
         registerKey(LanternKeys.SUPER_STEVE, false).notRemovable();
+        registerKey(LanternKeys.CAN_WALL_JUMP, false).notRemovable();
         registerKey(LanternKeys.SCORE, 0).notRemovable();
         registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {

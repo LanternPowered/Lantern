@@ -44,7 +44,11 @@ public class RotationPlacementBehavior implements PlaceBlockBehavior {
         // Get the direction the chest should face
         final Direction facing;
         if (player != null) {
-            facing = player.getDirection(Direction.Division.CARDINAL).getOpposite();
+            if (player.getPosition().getY() - context.tryGet(Parameters.BLOCK_LOCATION).getBlockPosition().getY() >= 0.5) {
+                facing = player.getDirection(Direction.Division.CARDINAL).getOpposite();
+            } else {
+                facing = player.getHorizontalDirection(Direction.Division.CARDINAL).getOpposite();
+            }
         } else {
             facing = Direction.NORTH;
         }

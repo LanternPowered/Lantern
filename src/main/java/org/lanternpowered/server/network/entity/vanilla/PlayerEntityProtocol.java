@@ -89,15 +89,14 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         final GameMode gameMode = getEntity().get(Keys.GAME_MODE).get();
         context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
         context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
-                this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE,
-                this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue(), 0.01f));
+                this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, getFlySpeed(), 0.01f));
     }
 
     @Override
     protected void update(EntityProtocolUpdateContext context) {
         final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
         final boolean canFly = canFly();
-        final float flySpeed = this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue();
+        final float flySpeed = getFlySpeed();
         if (gameMode != this.lastGameMode) {
             context.sendToSelf(() -> new MessagePlayOutSetGameMode((LanternGameMode) gameMode));
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
@@ -142,7 +141,7 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     protected void handleEvent(EntityProtocolUpdateContext context, EntityEvent event) {
         if (event instanceof RefreshAbilitiesPlayerEvent) {
             final GameMode gameMode = this.entity.get(Keys.GAME_MODE).get();
-            final float flySpeed = this.entity.get(Keys.FLYING_SPEED).orElse(0.0).floatValue();
+            final float flySpeed = getFlySpeed();
             context.sendToSelf(() -> new MessagePlayOutPlayerAbilities(
                     this.entity.get(Keys.IS_FLYING).orElse(false), canFly(), false, gameMode == GameModes.CREATIVE, flySpeed, 0.01f));
         } else {
@@ -150,9 +149,13 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
         }
     }
 
+    private float getFlySpeed() {
+        return this.entity.get(Keys.CAN_FLY).orElse(false) ? this.entity.get(Keys.FLYING_SPEED).orElse(0.1).floatValue() : 0f;
+    }
+
     private boolean canFly() {
         // TODO: Double jump?
-        return this.entity.get(Keys.CAN_FLY).orElse(false) ||
+        return this.entity.get(Keys.CAN_FLY).orElse(false) || this.entity.get(LanternKeys.CAN_WALL_JUMP).orElse(false) ||
                 (this.entity.get(LanternKeys.SUPER_STEVE).orElse(false) && !this.entity.get(LanternKeys.IS_ELYTRA_FLYING).orElse(false));
     }
 

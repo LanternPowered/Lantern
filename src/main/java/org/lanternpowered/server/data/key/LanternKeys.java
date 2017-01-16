@@ -41,7 +41,6 @@ import org.spongepowered.api.data.value.mutable.MutableBoundedValue;
 import org.spongepowered.api.data.value.mutable.SetValue;
 import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 
 public final class LanternKeys {
@@ -100,6 +99,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("ElytraSpeedBoost"), "lantern:elytra_speed_boost");
     public static final Key<Value<Boolean>> SUPER_STEVE =
             makeValueKey(Boolean.class, DataQuery.of("SuperSteve"), "lantern:super_steve");
+    public static final Key<Value<Boolean>> CAN_WALL_JUMP =
+            makeValueKey(Boolean.class, DataQuery.of("CanWallJump"), "lantern:can_wall_jump");
 
     private LanternKeys() {
     }

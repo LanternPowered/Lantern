@@ -182,10 +182,13 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
      * @return The direction
      */
     public Direction getDirection(Direction.Division division) {
-        Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
+        return Direction.getClosest(getDirectionVector(), division);
+    }
+
+    public Vector3d getDirectionVector() {
+        final Vector3d rotation = this instanceof Living ? ((Living) this).getHeadRotation() : this.rotation;
         // Invert the x direction because west and east are swapped
-        final Vector3d direction = Quaternions.fromAxesAnglesDeg(rotation.mul(1, -1, 1)).getDirection();
-        return Direction.getClosest(direction, division);
+        return Quaternions.fromAxesAnglesDeg(rotation.mul(1, -1, 1)).getDirection();
     }
 
     public Vector3d getHorizontalDirectionVector() {

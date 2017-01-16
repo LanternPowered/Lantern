@@ -103,6 +103,8 @@ public final class LanternKeys {
             makeValueKey(Boolean.class, DataQuery.of("SuperSteve"), "lantern:super_steve");
     public static final Key<Value<Boolean>> CAN_WALL_JUMP =
             makeValueKey(Boolean.class, DataQuery.of("CanWallJump"), "lantern:can_wall_jump");
+    public static final Key<Value<Boolean>> CAN_DUAL_WIELD =
+            makeValueKey(Boolean.class, DataQuery.of("CanDualWield"), "lantern:can_dual_wield");
 
     private LanternKeys() {
     }

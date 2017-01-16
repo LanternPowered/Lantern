@@ -28,6 +28,7 @@ package org.lanternpowered.server.game.registry.type.item;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.lanternpowered.server.item.PropertyProviders.armorType;
+import static org.lanternpowered.server.item.PropertyProviders.dualWield;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
@@ -218,78 +219,91 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///  Iron Sword ///
         ///////////////////
         register(267, toolBuilder(ToolTypes.IRON)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordIron.name")
                 .build("minecraft", "iron_sword"));
         ////////////////////
         /// Wooden Sword ///
         ////////////////////
         register(268, toolBuilder(ToolTypes.WOOD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordWood.name")
                 .build("minecraft", "wooden_sword"));
         /////////////////////
         /// Wooden Shovel ///
         /////////////////////
         register(269, toolBuilder(ToolTypes.WOOD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelWood.name")
                 .build("minecraft", "wooden_shovel"));
         //////////////////////
         /// Wooden Pickaxe ///
         //////////////////////
         register(270, toolBuilder(ToolTypes.WOOD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeWood.name")
                 .build("minecraft", "wooden_pickaxe"));
         //////////////////////
         ///   Wooden Axe   ///
         //////////////////////
         register(271, toolBuilder(ToolTypes.WOOD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetWood.name")
                 .build("minecraft", "wooden_axe"));
         ////////////////////
         ///  Stone Sword ///
         ////////////////////
         register(272, toolBuilder(ToolTypes.STONE)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordStone.name")
                 .build("minecraft", "stone_sword"));
         /////////////////////
         ///  Stone Shovel ///
         /////////////////////
         register(273, toolBuilder(ToolTypes.STONE)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelStone.name")
                 .build("minecraft", "stone_shovel"));
         //////////////////////
         ///  Stone Pickaxe ///
         //////////////////////
         register(274, toolBuilder(ToolTypes.STONE)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeStone.name")
                 .build("minecraft", "stone_pickaxe"));
         //////////////////////
         ///    Stone Axe   ///
         //////////////////////
         register(275, toolBuilder(ToolTypes.STONE)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetStone.name")
                 .build("minecraft", "stone_axe"));
         /////////////////////
         /// Diamond Sword ///
         /////////////////////
         register(276, toolBuilder(ToolTypes.DIAMOND)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordDiamond.name")
                 .build("minecraft", "diamond_sword"));
         //////////////////////
         /// Diamond Shovel ///
         //////////////////////
         register(277, toolBuilder(ToolTypes.DIAMOND)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelDiamond.name")
                 .build("minecraft", "diamond_shovel"));
         ///////////////////////
         /// Diamond Pickaxe ///
         ///////////////////////
         register(278, toolBuilder(ToolTypes.DIAMOND)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeDiamond.name")
                 .build("minecraft", "diamond_pickaxe"));
         ///////////////////////
         ///   Diamond Axe   ///
         ///////////////////////
         register(279, toolBuilder(ToolTypes.DIAMOND)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetDiamond.name")
                 .build("minecraft", "diamond_axe"));
         ///////////////////////
@@ -314,24 +328,28 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///  Golden Sword ///
         /////////////////////
         register(283, toolBuilder(ToolTypes.GOLD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordGold.name")
                 .build("minecraft", "golden_sword"));
         //////////////////////
         ///  Golden Shovel ///
         //////////////////////
         register(284, toolBuilder(ToolTypes.GOLD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelGold.name")
                 .build("minecraft", "golden_shovel"));
         ///////////////////////
         ///  Golden Pickaxe ///
         ///////////////////////
         register(285, toolBuilder(ToolTypes.GOLD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeGold.name")
                 .build("minecraft", "golden_pickaxe"));
         ///////////////////////
         ///    Golden Axe   ///
         ///////////////////////
         register(286, toolBuilder(ToolTypes.GOLD)
+                .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetGold.name")
                 .build("minecraft", "golden_axe"));
         ///////////////////////

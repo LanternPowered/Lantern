@@ -23,27 +23,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior;
+package org.lanternpowered.server.entity.living.player;
 
-public enum BehaviorResult {
-    /**
-     * The block interaction was a success and the result
-     * should be returned directly.
-     */
-    SUCCESS,
-    /**
-     * Continue to the next {@link Behavior} in the context and
-     * keep all the stored changes.
-     */
-    CONTINUE,
-    /**
-     * The current {@link Behavior} failed failed. The pipeline
-     * handling will be interrupted.
-     */
-    FAIL,
-    /**
-     * The current {@link Behavior} failed and silently
-     * move to the next behavior, discarding all the current changes.
-     */
-    PASS,
+import org.lanternpowered.server.item.CooldownTracker;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutSetCooldown;
+
+public class PlayerCooldownTracker extends CooldownTracker {
+
+    private final LanternPlayer player;
+
+    public PlayerCooldownTracker(LanternPlayer player) {
+        this.player = player;
+    }
+
+    @Override
+    public void set0(int internalId, int cooldown) {
+        this.player.getConnection().send(new MessagePlayOutSetCooldown(internalId, cooldown));
+    }
+
+    @Override
+    protected void remove0(int internalId) {
+        this.player.getConnection().send(new MessagePlayOutSetCooldown(internalId, 0));
+    }
 }

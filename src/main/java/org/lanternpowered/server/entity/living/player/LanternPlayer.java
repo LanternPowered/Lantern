@@ -55,6 +55,7 @@ import org.lanternpowered.server.inventory.block.EnderChestInventory;
 import org.lanternpowered.server.inventory.block.IChestInventory;
 import org.lanternpowered.server.inventory.container.ChestInventoryContainer;
 import org.lanternpowered.server.inventory.entity.LanternPlayerInventory;
+import org.lanternpowered.server.item.CooldownTracker;
 import org.lanternpowered.server.network.NetworkSession;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.objects.RawItemStack;
@@ -217,6 +218,11 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
     private final Set<LanternBossBar> bossBars = new HashSet<>();
 
     /**
+     * The item cooldown tracker of this {@link Player}.
+     */
+    private final CooldownTracker cooldownTracker = new PlayerCooldownTracker(this);
+
+    /**
      * The last time that the player was active.
      */
     private long lastActiveTime;
@@ -289,6 +295,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         registerKey(LanternKeys.ELYTRA_SPEED_BOOST, false).notRemovable();
         registerKey(LanternKeys.SUPER_STEVE, false).notRemovable();
         registerKey(LanternKeys.CAN_WALL_JUMP, false).notRemovable();
+        registerKey(LanternKeys.CAN_DUAL_WIELD, false).notRemovable();
         registerKey(LanternKeys.SCORE, 0).notRemovable();
         registerProcessorKey(Keys.STATISTICS).applyValueProcessor(builder -> builder
                 .offerHandler((key, valueContainer, map) -> {
@@ -985,5 +992,9 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
             return;
         }
         this.statisticMap.get(achievement).set(((IAchievement) achievement).getStatisticTargetValue());
+    }
+
+    public CooldownTracker getCooldownTracker() {
+        return this.cooldownTracker;
     }
 }

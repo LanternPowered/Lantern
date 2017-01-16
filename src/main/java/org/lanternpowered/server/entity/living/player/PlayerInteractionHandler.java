@@ -32,15 +32,20 @@ import org.lanternpowered.server.behavior.Parameters;
 import org.lanternpowered.server.block.LanternBlockType;
 import org.lanternpowered.server.block.behavior.types.BreakBlockBehavior;
 import org.lanternpowered.server.block.behavior.types.InteractWithBlockBehavior;
+import org.lanternpowered.server.data.key.LanternKeys;
+import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
 import org.lanternpowered.server.game.Lantern;
 import org.lanternpowered.server.inventory.entity.OffHandSlot;
 import org.lanternpowered.server.inventory.slot.LanternSlot;
+import org.lanternpowered.server.item.DualWieldProperty;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.behavior.types.InteractWithItemBehavior;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerBlockPlacement;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerDigging;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutBlockBreakAnimation;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
 import org.lanternpowered.server.world.LanternWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -96,7 +101,7 @@ public final class PlayerInteractionHandler {
      * player gets teleported to a different world or is removed.
      */
     void reset() {
-        this.sendBreakUpdate(-1);
+        sendBreakUpdate(-1);
     }
 
     /**
@@ -104,16 +109,13 @@ public final class PlayerInteractionHandler {
      */
     void pulse() {
         if (this.diggingBlock != null) {
-            int breakState = (int) Math.round(((double) Math.max(0, this.diggingEndTime - System.nanoTime()) / (double) this.diggingDuration) * 10.0);
+            final int breakState = (int) Math.round(((double) Math.max(0, this.diggingEndTime - System.nanoTime())
+                    / (double) this.diggingDuration) * 10.0);
             if (this.lastBreakState != breakState) {
-                this.sendBreakUpdate(breakState);
+                sendBreakUpdate(breakState);
                 this.lastBreakState = breakState;
             }
         }
-    }
-
-    public void handleUseItem(MessagePlayInPlayerUseItem message) {
-
     }
 
     /**
@@ -121,13 +123,15 @@ public final class PlayerInteractionHandler {
      * custom break times? Only allowed by faster breaking.
      */
     private void sendBreakUpdate(int breakState) {
-        LanternWorld world = this.player.getWorld();
+        final LanternWorld world = this.player.getWorld();
+        //noinspection ConstantConditions
         if (world == null) {
             return;
         }
         final Set<LanternPlayer> players = this.player.getWorld().getRawPlayers();
         // Update for all the players except the breaker
         if (players.size() - 1 <= 0) {
+            //noinspection ConstantConditions
             final MessagePlayOutBlockBreakAnimation message = new MessagePlayOutBlockBreakAnimation(
                     this.diggingBlock, this.player.getNetworkId(), breakState);
             players.forEach(player -> {
@@ -156,7 +160,7 @@ public final class PlayerInteractionHandler {
                 Lantern.getLogger().warn("{} started breaking a block without finishing the last one.", this.player.getName());
             }
 
-            BlockType blockType = this.player.getWorld().getBlockType(blockPos);
+            final BlockType blockType = this.player.getWorld().getBlockType(blockPos);
             if (blockType == BlockTypes.AIR) {
                 return;
             }
@@ -185,19 +189,19 @@ public final class PlayerInteractionHandler {
             if (this.diggingBlock == null) {
                 return;
             }
-            BlockType blockType = this.player.getWorld().getBlockType(blockPos);
+            final BlockType blockType = this.player.getWorld().getBlockType(blockPos);
             if (blockType != this.diggingBlockType) {
                 return;
             }
             if (this.diggingEndTime == -1) {
                 Lantern.getLogger().warn("{} attempted to break a unbreakable block.", this.player.getName());
             } else {
-                long deltaTime = System.nanoTime() - this.diggingEndTime;
+                final long deltaTime = System.nanoTime() - this.diggingEndTime;
                 if (deltaTime < 0) {
                     Lantern.getLogger().warn("{} finished breaking a block too early, {}ms too fast.",
                             this.player.getName(), -(deltaTime / 1000));
                 }
-                this.handleBrokenBlock();
+                handleBrokenBlock();
             }
         }
     }
@@ -319,6 +323,13 @@ public final class PlayerInteractionHandler {
         handleItemInteraction(context, snapshot);
     }
 
+    public void handleSwingArm(MessagePlayInPlayerSwingArm message) {
+        if (message.getHandType() == HandTypes.OFF_HAND) {
+            return;
+        }
+        this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.MAIN_HAND));
+    }
+
     public void handleItemInteraction(MessagePlayInPlayerUseItem message) {
         final long time = System.currentTimeMillis();
         if (this.lastInteractionTime != -1 && (time - this.lastInteractionTime) < 40) {
@@ -330,10 +341,42 @@ public final class PlayerInteractionHandler {
         context.set(Parameters.PLAYER, this.player);
 
         final BehaviorContextImpl.Snapshot snapshot = context.createSnapshot();
-        handleItemInteraction(context, snapshot);
+        if (!handleItemInteraction(context, snapshot)) {
+            if (!this.player.get(LanternKeys.CAN_DUAL_WIELD).orElse(false)) {
+                return;
+            }
+            final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
+            final Optional<ItemStack> handItem = offHandSlot.peek();
+
+            if (handItem.isPresent()) {
+                final DualWieldProperty property = handItem.get().getProperty(DualWieldProperty.class).orElse(null);
+                //noinspection ConstantConditions
+                if (property != null && property.getValue()) {
+                    /*
+                    final Vector3d position = this.player.getPosition().add(0, this.player.get(Keys.IS_SNEAKING).get() ? 1.54 : 1.62, 0);
+                    final Optional<BlockRayHit<LanternWorld>> hit = BlockRay.from(this.player.getWorld(), position)
+                            .direction(this.player.getDirectionVector())
+                            .distanceLimit(5)
+                            // Is this supposed to be inverted?
+                            .skipFilter(Predicates.not(BlockRay.onlyAirFilter()))
+                            .build()
+                            .end();
+                    if (hit.isPresent() && hit.get().getLocation().getBlock().getType() != BlockTypes.AIR) {
+                        return;
+                    }
+                    */
+                    this.player.getConnection().send(new MessagePlayOutEntityAnimation(this.player.getNetworkId(), 3));
+                    this.player.triggerEvent(SwingHandEntityEvent.of(HandTypes.OFF_HAND));
+                    /*
+                    final CooldownTracker cooldownTracker = this.player.getCooldownTracker();
+                    cooldownTracker.set(handItem.get().getItem(), 15);
+                    */
+                }
+            }
+        }
     }
 
-    private void handleItemInteraction(BehaviorContextImpl context, BehaviorContextImpl.Snapshot snapshot) {
+    private boolean handleItemInteraction(BehaviorContextImpl context, BehaviorContextImpl.Snapshot snapshot) {
         // Try the action of the hotbar item first
         final LanternSlot hotbarSlot = this.player.getInventory().getHotbar().getSelectedSlot();
         final OffHandSlot offHandSlot = this.player.getInventory().getOffhand();
@@ -349,7 +392,7 @@ public final class PlayerInteractionHandler {
             if (context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
                     (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx))) {
                 context.accept();
-                return;
+                return true;
             }
 
             context.restoreSnapshot(snapshot);
@@ -366,7 +409,10 @@ public final class PlayerInteractionHandler {
             if (context.process(itemType.getPipeline().pipeline(InteractWithItemBehavior.class),
                     (ctx, behavior) -> behavior.tryInteract(itemType.getPipeline(), ctx))) {
                 context.accept();
+                return true;
             }
         }
+
+        return false;
     }
 }

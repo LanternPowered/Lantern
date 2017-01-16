@@ -128,6 +128,7 @@ import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPla
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerOnGroundState;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSneak;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSprint;
+import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerSwingArm;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInPlayerUseItem;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInRequestStatistics;
 import org.lanternpowered.server.network.vanilla.message.handler.play.HandlerPlayInSignBook;
@@ -326,7 +327,8 @@ final class ProtocolPlay extends ProtocolBase {
                 .bindHandler(new HandlerPlayInCreativeWindowAction());
         inbound.bind(0x19, CodecPlayInChangeSign.class, MessagePlayInChangeSign.class)
                 .bindHandler(new HandlerPlayInChangeSign());
-        inbound.bind(0x1a, CodecPlayInPlayerSwingArm.class, MessagePlayInPlayerSwingArm.class); // TODO: Handler
+        inbound.bind(0x1a, CodecPlayInPlayerSwingArm.class, MessagePlayInPlayerSwingArm.class)
+                .bindHandler(new HandlerPlayInPlayerSwingArm());
         inbound.bind(0x1b, CodecPlayInSpectate.class, MessagePlayInSpectate.class); // TODO: Handler
         inbound.bind(0x1c, CodecPlayInPlayerBlockPlacement.class, MessagePlayInPlayerBlockPlacement.class)
                 .bindHandler(new HandlerPlayInPlayerBlockPlacement());

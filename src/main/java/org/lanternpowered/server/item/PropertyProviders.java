@@ -34,6 +34,37 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 
 public final class PropertyProviders {
 
+    private static final DualWieldProperty DUAL_WIELD_PROPERTY_TRUE = new DualWieldProperty(true);
+    private static final DualWieldProperty DUAL_WIELD_PROPERTY_FALSE = new DualWieldProperty(false);
+
+    public static PropertyProviderCollection cooldown(int cooldown) {
+        final CooldownProperty property = new CooldownProperty(cooldown);
+        return PropertyProviderCollection.builder()
+                .add(CooldownProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection cooldown(ObjectProvider<Integer> cooldown) {
+        return PropertyProviderCollection.builder()
+                .add(CooldownProperty.class, (itemType, itemStack) ->
+                        new CooldownProperty(cooldown.get(itemType, itemStack)))
+                .build();
+    }
+
+    public static PropertyProviderCollection dualWield(boolean dualWield) {
+        final DualWieldProperty property = dualWield ? DUAL_WIELD_PROPERTY_TRUE : DUAL_WIELD_PROPERTY_FALSE;
+        return PropertyProviderCollection.builder()
+                .add(DualWieldProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection dualWield(ObjectProvider<Boolean> dualWield) {
+        return PropertyProviderCollection.builder()
+                .add(DualWieldProperty.class, (itemType, itemStack) ->
+                        dualWield.get(itemType, itemStack) ? DUAL_WIELD_PROPERTY_TRUE : DUAL_WIELD_PROPERTY_FALSE)
+                .build();
+    }
+
     public static PropertyProviderCollection toolType(ToolType toolType) {
         final ToolTypeProperty property = new ToolTypeProperty(toolType);
         return PropertyProviderCollection.builder()

@@ -23,27 +23,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.behavior;
+package org.lanternpowered.server.network.vanilla.message.handler.play;
 
-public enum BehaviorResult {
-    /**
-     * The block interaction was a success and the result
-     * should be returned directly.
-     */
-    SUCCESS,
-    /**
-     * Continue to the next {@link Behavior} in the context and
-     * keep all the stored changes.
-     */
-    CONTINUE,
-    /**
-     * The current {@link Behavior} failed failed. The pipeline
-     * handling will be interrupted.
-     */
-    FAIL,
-    /**
-     * The current {@link Behavior} failed and silently
-     * move to the next behavior, discarding all the current changes.
-     */
-    PASS,
+import org.lanternpowered.server.entity.living.player.LanternPlayer;
+import org.lanternpowered.server.network.NetworkContext;
+import org.lanternpowered.server.network.message.handler.Handler;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayInPlayerSwingArm;
+
+public class HandlerPlayInPlayerSwingArm implements Handler<MessagePlayInPlayerSwingArm> {
+
+    @Override
+    public void handle(NetworkContext context, MessagePlayInPlayerSwingArm message) {
+        final LanternPlayer player = context.getSession().getPlayer();
+        player.resetIdleTimeoutCounter();
+        player.getInteractionHandler().handleSwingArm(message);
+    }
 }

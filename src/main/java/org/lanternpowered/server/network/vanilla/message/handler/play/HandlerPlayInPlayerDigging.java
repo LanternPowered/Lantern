@@ -34,7 +34,7 @@ public final class HandlerPlayInPlayerDigging implements Handler<MessagePlayInPl
 
     @Override
     public void handle(NetworkContext context, MessagePlayInPlayerDigging message) {
-        LanternPlayer player = context.getSession().getPlayer();
+        final LanternPlayer player = context.getSession().getPlayer();
         player.resetIdleTimeoutCounter();
         player.getInteractionHandler().handleDigging(message);
     }

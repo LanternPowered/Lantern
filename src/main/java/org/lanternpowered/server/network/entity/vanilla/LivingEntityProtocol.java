@@ -78,9 +78,9 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
         } else if (event instanceof SwingHandEntityEvent) {
             final HandType handType = ((SwingHandEntityEvent) event).getHandType();
             if (handType == HandTypes.MAIN_HAND) {
-                context.sendToAll(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 0));
+                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 0));
             } else if (handType == HandTypes.OFF_HAND) {
-                context.sendToAll(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 3));
+                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityAnimation(getRootEntityId(), 3));
             } else {
                 super.handleEvent(context, event);
             }

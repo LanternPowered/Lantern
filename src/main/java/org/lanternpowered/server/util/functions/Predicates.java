@@ -63,6 +63,12 @@ public final class Predicates {
         return predicate;
     }
 
+    @SuppressWarnings("unchecked")
+    public static <T> Predicate<T> not(Predicate<T> predicate) {
+        checkNotNull(predicate, "predicate");
+        return o -> !predicate.test(o);
+    }
+
     private Predicates() {
     }
 }

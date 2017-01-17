@@ -40,6 +40,7 @@ import org.spongepowered.api.item.inventory.InventoryArchetype;
 import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 import org.spongepowered.api.item.inventory.property.InventoryCapacity;
 import org.spongepowered.api.item.inventory.property.InventoryTitle;
@@ -226,10 +227,10 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
         if (property == InventoryTitle.class) {
             //noinspection unchecked
-            return Optional.of((T) new InventoryTitle(Text.of(this.getName())));
+            return Optional.of((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
             //noinspection unchecked
-            return Optional.of((T) new InventoryCapacity(this.capacity()));
+            return Optional.of((T) new InventoryCapacity(capacity()));
         }
         return Optional.empty();
     }
@@ -238,10 +239,10 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
         final List<T> properties = new ArrayList<>();
         if (property == InventoryTitle.class) {
             //noinspection unchecked
-            properties.add((T) new InventoryTitle(Text.of(this.getName())));
+            properties.add((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
             //noinspection unchecked
-            properties.add((T) new InventoryCapacity(this.capacity()));
+            properties.add((T) new InventoryCapacity(capacity()));
         }
         return properties;
     }
@@ -258,7 +259,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Override
     public <T extends Inventory> T query(ItemType... types) {
         checkNotNull(types, "types");
-        return this.query(inventory -> {
+        return query(inventory -> {
             // Slots are leaf nodes so only check if they contain
             // the item
             if (inventory instanceof Slot) {
@@ -275,7 +276,7 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
     @Override
     public <T extends Inventory> T query(Class<?>... types) {
         checkNotNull(types, "types");
-        return this.query(inventory -> {
+        return query(inventory -> {
             for (Class<?> type : types) {
                 if (type.isInstance(inventory)) {
                     return true;
@@ -391,12 +392,19 @@ public abstract class AbstractMutableInventory extends AbstractInventory {
                     if (inventory.contains((ItemType) arg)) {
                         return true;
                     }
+                } else if (arg instanceof EquipmentType) {
+                    for (EquipmentSlotType property : inventory.getProperties(EquipmentSlotType.class)) {
+                        //noinspection ConstantConditions
+                        if (((LanternEquipmentType) arg).isChild(property.getValue())) {
+                            return true;
+                        }
+                    }
                 } else if (arg instanceof EquipmentSlotType) {
-                    final Optional<EquipmentSlotType> optProperty = inventory.getProperty(EquipmentSlotType.class, "");
-                    //noinspection ConstantConditions
-                    if (optProperty.isPresent() &&
-                            ((LanternEquipmentType) ((EquipmentSlotType) arg).getValue()).isChild(optProperty.get().getValue())) {
-                        return true;
+                    for (EquipmentSlotType property : inventory.getProperties(EquipmentSlotType.class)) {
+                        //noinspection ConstantConditions
+                        if (((LanternEquipmentType) ((EquipmentSlotType) arg).getValue()).isChild(property.getValue())) {
+                            return true;
+                        }
                     }
                 } else if (arg instanceof InventoryProperty<?,?>) {
                     if (((AbstractInventory) inventory).hasProperty((InventoryProperty<?, ?>) arg)) {

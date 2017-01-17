@@ -28,6 +28,8 @@ package org.lanternpowered.server.network.entity.vanilla;
 import static org.lanternpowered.server.network.vanilla.message.codec.play.CodecUtils.wrapAngle;
 
 import com.flowpowered.math.vector.Vector3d;
+import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import it.unimi.dsi.fastutil.ints.IntList;
 import org.lanternpowered.server.data.key.LanternKeys;
@@ -35,6 +37,9 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
+import org.lanternpowered.server.inventory.LanternItemStack;
+import org.lanternpowered.server.inventory.SimpleEquipmentInventory;
+import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
 import org.lanternpowered.server.network.entity.AbstractEntityProtocol;
@@ -44,6 +49,7 @@ import org.lanternpowered.server.network.entity.parameter.EmptyParameterList;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutDestroyEntities;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityCollectItem;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityEquipment;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityHeadLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLook;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityLookAndRelativeMove;
@@ -56,11 +62,32 @@ import org.lanternpowered.server.text.LanternTexts;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.EmptyInventory;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.InventoryProperty;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
+import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
 import java.util.Collections;
 import java.util.List;
 
 public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEntityProtocol<E> {
+
+    private static class Holder {
+
+        private final static EquipmentType[] EQUIPMENT_TYPES =
+                {
+                        LanternEquipmentTypes.MAIN_HAND,
+                        LanternEquipmentTypes.OFF_HAND,
+                        EquipmentTypes.BOOTS,
+                        EquipmentTypes.LEGGINGS,
+                        EquipmentTypes.CHESTPLATE,
+                        EquipmentTypes.HEADWEAR
+                };
+    }
 
     private double lastX;
     private double lastY;
@@ -79,6 +106,8 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
     private List<Entity> lastPassengers = Collections.emptyList();
 
+    private final Int2ObjectMap<ItemStack> lastEquipment = new Int2ObjectOpenHashMap<>();
+
     public EntityProtocol(E entity) {
         super(entity);
     }
@@ -86,6 +115,18 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     @Override
     protected void destroy(EntityProtocolUpdateContext context) {
         context.sendToAllExceptSelf(new MessagePlayOutDestroyEntities(getRootEntityId()));
+    }
+
+    protected void spawnWithEquipment(EntityProtocolUpdateContext context) {
+        if (hasEquipment() && this.entity instanceof Carrier) {
+            final Inventory inventory = ((Carrier) this.entity).getInventory();
+            for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
+                final EquipmentType equipmentType = Holder.EQUIPMENT_TYPES[i];
+                final ItemStack itemStack = inventory.query(equipmentType).first().peek().orElse(null);
+                final int slotIndex = i;
+                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
+            }
+        }
     }
 
     @Override
@@ -108,7 +149,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
         // TODO: On ground state
 
-        final int entityId = this.getRootEntityId();
+        final int entityId = getRootEntityId();
 
         if (dirtyRot) {
             this.lastYaw = yaw;
@@ -174,7 +215,30 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         if (!parameterList.isEmpty()) {
             context.sendToAll(() -> new MessagePlayOutEntityMetadata(entityId, parameterList));
         }
+        if (hasEquipment() && this.entity instanceof Carrier) {
+            final Inventory inventory = ((Carrier) this.entity).getInventory();
+            for (int i = 0; i < Holder.EQUIPMENT_TYPES.length; i++) {
+                final EquipmentType equipmentType = Holder.EQUIPMENT_TYPES[i];
+                final ItemStack itemStack = inventory.query(equipmentType).first().peek().orElse(null);
+                final ItemStack oldItemStack = this.lastEquipment.get(i);
+                if (!LanternItemStack.isSimilar(itemStack, oldItemStack)) {
+                    this.lastEquipment.put(i, itemStack);
+                    final int slotIndex = i;
+                    context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
+                }
+            }
+        }
         // TODO: Update attributes
+    }
+
+    /**
+     * Gets whether the entity can hold equipment
+     * on the client side.
+     *
+     * @return Has equipment
+     */
+    protected boolean hasEquipment() {
+        return false;
     }
 
     @Override

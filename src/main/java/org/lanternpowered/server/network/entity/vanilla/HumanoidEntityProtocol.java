@@ -58,7 +58,7 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
 
     @Override
     protected void spawn(EntityProtocolUpdateContext context) {
-        final int entityId = this.getRootEntityId();
+        final int entityId = getRootEntityId();
 
         final Vector3d rot = this.entity.getRotation();
         final Vector3d headRot = this.entity instanceof LanternLiving ? ((LanternLiving) this.entity).getHeadRotation() : null;
@@ -69,13 +69,14 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
         final double pitch = headRot != null ? headRot.getX() : rot.getX();
 
         context.sendToAllExceptSelf(() -> new MessagePlayOutSpawnPlayer(entityId, this.entity.getUniqueId(),
-                pos, wrapAngle(yaw), wrapAngle(pitch), this.fillParameters(true)));
+                pos, wrapAngle(yaw), wrapAngle(pitch), fillParameters(true)));
         if (headRot != null) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headRot.getY())));
         }
         if (!vel.equals(Vector3d.ZERO)) {
             context.sendToAllExceptSelf(() -> new MessagePlayOutEntityVelocity(entityId, vel.getX(), vel.getY(), vel.getZ()));
         }
+        spawnWithEquipment(context);
     }
 
     @Override
@@ -113,5 +114,10 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
     @Override
     protected boolean isSprinting() {
         return this.entity.get(Keys.IS_SPRINTING).orElse(false);
+    }
+
+    @Override
+    protected boolean hasEquipment() {
+        return true;
     }
 }

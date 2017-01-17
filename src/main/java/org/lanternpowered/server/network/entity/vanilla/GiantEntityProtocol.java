@@ -37,4 +37,9 @@ public class GiantEntityProtocol<E extends LanternEntity> extends InsentientEnti
     protected int getMobType() {
         return 53;
     }
+
+    @Override
+    protected boolean hasEquipment() {
+        return true;
+    }
 }

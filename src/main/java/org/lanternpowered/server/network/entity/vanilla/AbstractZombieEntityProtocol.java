@@ -45,7 +45,7 @@ public abstract class AbstractZombieEntityProtocol<E extends LanternEntity> exte
     protected void spawn(ParameterList parameterList) {
         super.spawn(parameterList);
         parameterList.add(EntityParameters.AbstractZombie.UNUSED, 0);
-        parameterList.add(EntityParameters.AbstractZombie.HANDS_UP, this.areHandsUp());
+        parameterList.add(EntityParameters.AbstractZombie.HANDS_UP, areHandsUp());
     }
 
     @Override
@@ -56,5 +56,10 @@ public abstract class AbstractZombieEntityProtocol<E extends LanternEntity> exte
             parameterList.add(EntityParameters.AbstractZombie.HANDS_UP, handsUp);
             this.lastAreHandsUp = handsUp;
         }
+    }
+
+    @Override
+    protected boolean hasEquipment() {
+        return true;
     }
 }

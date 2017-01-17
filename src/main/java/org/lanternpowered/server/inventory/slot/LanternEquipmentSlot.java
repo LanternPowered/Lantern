@@ -28,6 +28,7 @@ package org.lanternpowered.server.inventory.slot;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
+import org.lanternpowered.server.data.property.PropertyKeySetter;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
@@ -83,20 +84,13 @@ public class LanternEquipmentSlot extends LanternFilteringSlot implements Equipm
         if (this.itemFilter instanceof SimpleEquipmentItemFilter) {
             for (EquipmentType equipmentType : ((SimpleEquipmentItemFilter) this.itemFilter).equipmentTypes) {
                 if (equipmentType instanceof EquipmentTypeWorn) {
-                    this.registerProperty(new ArmorSlotType((EquipmentTypeWorn) equipmentType) {
-                        @Override
-                        protected String getDefaultKey(@Nullable EquipmentType value) {
-                            return value == null ? super.getDefaultKey(null) : value.getId();
-                        }
-                    });
-                } else {
-                    this.registerProperty(new EquipmentSlotType(equipmentType) {
-                        @Override
-                        protected String getDefaultKey(@Nullable EquipmentType value) {
-                            return value == null ? super.getDefaultKey(null) : value.getId();
-                        }
-                    });
+                    final ArmorSlotType slotType = new ArmorSlotType((EquipmentTypeWorn) equipmentType);
+                    PropertyKeySetter.setKey(slotType, equipmentType.getId());
+                    registerProperty(slotType);
                 }
+                final EquipmentSlotType slotType = new EquipmentSlotType(equipmentType);
+                PropertyKeySetter.setKey(slotType, equipmentType.getId());
+                registerProperty(slotType);
             }
         }
     }

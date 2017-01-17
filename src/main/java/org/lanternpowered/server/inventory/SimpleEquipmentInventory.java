@@ -27,8 +27,6 @@ package org.lanternpowered.server.inventory;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import org.lanternpowered.server.inventory.equipment.LanternEquipmentType;
-import org.lanternpowered.server.inventory.slot.LanternSlot;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
@@ -62,18 +60,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> poll(EquipmentSlotType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return poll(stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
+        return getSlot(equipmentType).map(Inventory::poll).orElseGet(Optional::empty);
     }
 
     /**
@@ -87,18 +74,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> poll(EquipmentSlotType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return poll(limit, stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
+        return getSlot(equipmentType).map(slot -> slot.poll(limit)).orElseGet(Optional::empty);
     }
 
     /**
@@ -111,10 +87,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> poll(EquipmentType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return poll(stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
+        return getSlot(equipmentType).map(Inventory::poll).orElseGet(Optional::empty);
     }
 
     /**
@@ -128,10 +101,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> poll(EquipmentType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return poll(limit, stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
+        return getSlot(equipmentType).map(slot -> slot.poll(limit)).orElseGet(Optional::empty);
     }
 
     /**
@@ -144,18 +114,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> peek(EquipmentSlotType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return peek(stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
+        return getSlot(equipmentType).map(Inventory::peek).orElseGet(Optional::empty);
     }
 
     /**
@@ -169,18 +128,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> peek(EquipmentSlotType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return peek(limit, stack -> {
-            final EquipmentType equipmentType1 = equipmentType.getValue();
-            if (equipmentType1 == null) {
-                return false;
-            }
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            if (equipmentSlotType.isPresent()) {
-                final EquipmentType equipmentType2 = equipmentSlotType.get().getValue();
-                return equipmentType2 != null && ((LanternEquipmentType) equipmentType1).isChild(equipmentType2);
-            }
-            return false;
-        });
+        return getSlot(equipmentType).map(slot -> slot.peek(limit)).orElseGet(Optional::empty);
     }
 
     /**
@@ -193,10 +141,7 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> peek(EquipmentType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return peek(stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
+        return getSlot(equipmentType).map(Inventory::peek).orElseGet(Optional::empty);
     }
 
     /**
@@ -210,10 +155,8 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public Optional<ItemStack> peek(EquipmentType equipmentType, int limit) {
         checkNotNull(equipmentType, "equipmentType");
-        return peek(limit, stack -> {
-            final Optional<EquipmentSlotType> equipmentSlotType = stack.getProperty(EquipmentSlotType.class);
-            return equipmentSlotType.isPresent() && ((LanternEquipmentType) equipmentType).isChild(equipmentSlotType.get().getValue());
-        });
+        //noinspection ConstantConditions
+        return getSlot(equipmentType).map(slot -> slot.peek(limit)).orElseGet(Optional::empty);
     }
 
     /**
@@ -226,13 +169,12 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public InventoryTransactionResult set(EquipmentSlotType equipmentType, @Nullable ItemStack stack) {
         checkNotNull(equipmentType, "equipmentType");
-        LanternSlot slot = null;
-        if (equipmentType.getValue() != null) {
-            slot = this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
-                    ((EquipmentSlot) s).isValidItem(equipmentType.getValue())).findFirst().orElse(null);
-        }
-        return slot == null ? InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE)
-                .reject(stack).build() : slot.set(stack);
+        //noinspection ConstantConditions
+        return getSlot(equipmentType).map(slot -> slot.set(stack)).orElseGet(
+                () -> InventoryTransactionResult.builder()
+                        .type(InventoryTransactionResult.Type.FAILURE)
+                        .reject(LanternItemStack.toSnapshot(stack).createStack())
+                        .build());
     }
 
     /**
@@ -245,10 +187,12 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
      */
     public InventoryTransactionResult set(EquipmentType equipmentType, @Nullable ItemStack stack) {
         checkNotNull(equipmentType, "equipmentType");
-        LanternSlot slot = this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
-                    ((EquipmentSlot) s).isValidItem(equipmentType)).findFirst().orElse(null);
-        return slot == null ? InventoryTransactionResult.builder().type(InventoryTransactionResult.Type.FAILURE)
-                .reject(stack).build() : slot.set(stack);
+        //noinspection ConstantConditions
+        return getSlot(equipmentType).map(slot -> slot.set(stack)).orElseGet(
+                () -> InventoryTransactionResult.builder()
+                        .type(InventoryTransactionResult.Type.FAILURE)
+                        .reject(LanternItemStack.toSnapshot(stack).createStack())
+                        .build());
     }
 
     /**
@@ -260,11 +204,10 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
     @SuppressWarnings("unchecked")
     public Optional<Slot> getSlot(EquipmentSlotType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        if (equipmentType.getValue() != null) {
-            return (Optional) this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
-                    ((EquipmentSlot) s).isValidItem(equipmentType.getValue())).findFirst();
-        }
-        return Optional.empty();
+        //noinspection ConstantConditions
+        return equipmentType.getValue() == null ? Optional.empty() :
+                (Optional) (this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
+                        ((EquipmentSlot) s).isValidItem(equipmentType.getValue())).findFirst());
     }
 
     /**
@@ -276,7 +219,8 @@ public class SimpleEquipmentInventory extends LanternOrderedInventory {
     @SuppressWarnings("unchecked")
     public Optional<Slot> getSlot(EquipmentType equipmentType) {
         checkNotNull(equipmentType, "equipmentType");
-        return (Optional) this.slots.stream().filter(s -> s instanceof EquipmentSlot
-                && ((EquipmentSlot) s).isValidItem(equipmentType)).findFirst();
+        //noinspection ConstantConditions
+        return (Optional) (this.slots.stream().filter(s -> s instanceof EquipmentSlot &&
+                        ((EquipmentSlot) s).isValidItem(equipmentType)).findFirst());
     }
 }

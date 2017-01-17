@@ -193,6 +193,12 @@ public class LanternItemStack implements ItemStack, AbstractPropertyHolder, Abst
         return this.itemType == that.getItem() && compareRawDataMaps(this, (AbstractValueContainer) that);
     }
 
+    public static boolean isSimilar(@Nullable ItemStack itemStackA, @Nullable ItemStack itemStackB) {
+        //noinspection SimplifiableConditionalExpression
+        return itemStackA == itemStackB ? true : itemStackA == null || itemStackB == null ? false :
+                ((LanternItemStack) itemStackA).isSimilar(itemStackB);
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)

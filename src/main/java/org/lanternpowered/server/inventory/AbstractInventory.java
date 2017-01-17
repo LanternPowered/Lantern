@@ -194,7 +194,6 @@ public abstract class AbstractInventory implements IInventory {
     @Override
     public boolean hasProperty(Inventory child, InventoryProperty<?,?> property) {
         checkNotNull(property, "property");
-
         //noinspection unchecked
         Optional<InventoryProperty<?, ?>> optProperty = tryGetProperty(
                 child, (Class) property.getClass(), property.getKey());
@@ -265,10 +264,10 @@ public abstract class AbstractInventory implements IInventory {
     protected <T extends InventoryProperty<?, ?>> Optional<T> tryGetProperty(Class<T> property, @Nullable Object key) {
         if (property == InventoryTitle.class) {
             //noinspection unchecked
-            return Optional.of((T) new InventoryTitle(Text.of(this.getName())));
+            return Optional.of((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
             //noinspection unchecked
-            return Optional.of((T) new InventoryCapacity(this.capacity()));
+            return Optional.of((T) new InventoryCapacity(capacity()));
         }
         return Optional.empty();
     }
@@ -277,10 +276,10 @@ public abstract class AbstractInventory implements IInventory {
         final List<T> properties = new ArrayList<>();
         if (property == InventoryTitle.class) {
             //noinspection unchecked
-            properties.add((T) new InventoryTitle(Text.of(this.getName())));
+            properties.add((T) new InventoryTitle(Text.of(getName())));
         } else if (property == InventoryCapacity.class) {
             //noinspection unchecked
-            properties.add((T) new InventoryCapacity(this.capacity()));
+            properties.add((T) new InventoryCapacity(capacity()));
         }
         return properties;
     }

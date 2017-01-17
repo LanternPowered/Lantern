@@ -229,7 +229,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
                 matches.add(inventory);
             }
             if (nested) {
-                Inventory inventory1 = ((AbstractInventory) inventory).query(matcher, true);
+                final Inventory inventory1 = ((AbstractInventory) inventory).query(matcher, true);
                 if (!(inventory1 instanceof EmptyInventory)) {
                     matches.add(inventory1);
                 }
@@ -248,17 +248,20 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     @Override
     public <T extends Inventory> T query(Predicate<Inventory> matcher, boolean nested) {
         checkNotNull(matcher, "matcher");
+        if (!nested && matcher.test(this)) {
+            return (T) new AbstractChildrenInventory(null, null, Collections.singletonList(this)) {{ finalizeContent(); }};
+        }
         final List<Inventory> matches = queryInventories(matcher, nested);
         if (matches.isEmpty()) {
             return (T) empty();
         }
-        return (T) new AbstractChildrenInventory(null, null, Collections.unmodifiableList((List) matches));
+        return (T) new AbstractChildrenInventory(null, null, Collections.unmodifiableList((List) matches)) {{ finalizeContent(); }};
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public <T extends Inventory> Iterable<T> slots() {
-        return (Iterable) Iterables.unmodifiableIterable(this.getSlotInventories());
+        return (Iterable) Iterables.unmodifiableIterable(getSlotInventories());
     }
 
     @Override
@@ -269,7 +272,7 @@ public class AbstractChildrenInventory extends AbstractMutableInventory {
     @Override
     public void clear() {
         // Clear all the sub inventories
-        this.iterator().forEachRemaining(Inventory::clear);
+        iterator().forEachRemaining(Inventory::clear);
     }
 
     @Override

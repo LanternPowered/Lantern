@@ -30,9 +30,9 @@ import org.lanternpowered.server.network.message.Message;
 public final class MessagePlayOutEntityHeadLook implements Message {
 
     private final int entityId;
-    private final float yaw;
+    private final byte yaw;
 
-    public MessagePlayOutEntityHeadLook(int entityId, float yaw) {
+    public MessagePlayOutEntityHeadLook(int entityId, byte yaw) {
         this.entityId = entityId;
         this.yaw = yaw;
     }
@@ -41,7 +41,7 @@ public final class MessagePlayOutEntityHeadLook implements Message {
         return this.entityId;
     }
 
-    public float getYaw() {
+    public byte getYaw() {
         return this.yaw;
     }
 

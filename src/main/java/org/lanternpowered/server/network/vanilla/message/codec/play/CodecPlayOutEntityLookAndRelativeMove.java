@@ -40,8 +40,8 @@ public final class CodecPlayOutEntityLookAndRelativeMove implements Codec<Messag
         buf.writeShort((short) message.getDeltaX());
         buf.writeShort((short) message.getDeltaY());
         buf.writeShort((short) message.getDeltaZ());
-        buf.writeByte((byte) message.getYaw());
-        buf.writeByte((byte) message.getPitch());
+        buf.writeByte(message.getYaw());
+        buf.writeByte(message.getPitch());
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

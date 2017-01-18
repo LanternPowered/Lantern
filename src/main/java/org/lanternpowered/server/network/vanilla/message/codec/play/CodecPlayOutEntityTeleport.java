@@ -40,8 +40,8 @@ public final class CodecPlayOutEntityTeleport implements Codec<MessagePlayOutEnt
         buf.writeDouble(message.getX());
         buf.writeDouble(message.getY());
         buf.writeDouble(message.getZ());
-        buf.writeByte((byte) message.getYaw());
-        buf.writeByte((byte) message.getPitch());
+        buf.writeByte(message.getYaw());
+        buf.writeByte(message.getPitch());
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

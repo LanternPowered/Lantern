@@ -32,10 +32,10 @@ public final class MessagePlayOutEntityLook implements Message {
     private final int entityId;
     private final boolean onGround;
 
-    private final int yaw;
-    private final int pitch;
+    private final byte yaw;
+    private final byte pitch;
 
-    public MessagePlayOutEntityLook(int entityId, int yaw, int pitch, boolean onGround) {
+    public MessagePlayOutEntityLook(int entityId, byte yaw, byte pitch, boolean onGround) {
         this.onGround = onGround;
         this.entityId = entityId;
         this.pitch = pitch;
@@ -46,11 +46,11 @@ public final class MessagePlayOutEntityLook implements Message {
         return this.entityId;
     }
 
-    public int getYaw() {
+    public byte getYaw() {
         return this.yaw;
     }
 
-    public int getPitch() {
+    public byte getPitch() {
         return this.pitch;
     }
 

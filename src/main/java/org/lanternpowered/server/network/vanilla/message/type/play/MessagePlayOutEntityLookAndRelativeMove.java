@@ -32,16 +32,15 @@ public final class MessagePlayOutEntityLookAndRelativeMove implements Message {
     private final int entityId;
     private final boolean onGround;
 
-    private final int yaw;
-    private final int pitch;
+    private final byte yaw;
+    private final byte pitch;
 
     private final int deltaX;
     private final int deltaY;
     private final int deltaZ;
 
     public MessagePlayOutEntityLookAndRelativeMove(int entityId, int deltaX, int deltaY, int deltaZ,
-            int yaw, int pitch, boolean onGround) {
-
+            byte yaw, byte pitch, boolean onGround) {
         this.onGround = onGround;
         this.entityId = entityId;
         this.deltaX = deltaX;
@@ -55,11 +54,11 @@ public final class MessagePlayOutEntityLookAndRelativeMove implements Message {
         return this.entityId;
     }
 
-    public int getYaw() {
+    public byte getYaw() {
         return this.yaw;
     }
 
-    public int getPitch() {
+    public byte getPitch() {
         return this.pitch;
     }
 

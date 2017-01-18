@@ -38,7 +38,6 @@ import org.lanternpowered.server.entity.LanternLiving;
 import org.lanternpowered.server.entity.event.CollectEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.inventory.LanternItemStack;
-import org.lanternpowered.server.inventory.SimpleEquipmentInventory;
 import org.lanternpowered.server.inventory.equipment.LanternEquipmentTypes;
 import org.lanternpowered.server.network.buffer.ByteBuffer;
 import org.lanternpowered.server.network.buffer.ByteBufferAllocator;
@@ -63,13 +62,10 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.EmptyInventory;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.InventoryProperty;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.EquipmentSlotType;
 
 import java.util.Collections;
 import java.util.List;
@@ -93,10 +89,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private double lastY;
     private double lastZ;
 
-    private double lastYaw;
-    private double lastPitch;
+    private byte lastYaw;
+    private byte lastPitch;
 
-    private double lastHeadYaw;
+    private byte lastHeadYaw;
 
     private double lastVelX;
     private double lastVelY;
@@ -139,10 +135,10 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
         final double y = pos.getY();
         final double z = pos.getZ();
 
-        final double yaw = rot.getY();
+        final byte yaw = wrapAngle(rot.getY());
         // All living entities have a head rotation and changing the pitch
         // would only affect the head pitch.
-        final double pitch = (headRot != null ? headRot : rot).getX();
+        final byte pitch = wrapAngle((headRot != null ? headRot : rot).getX());
 
         boolean dirtyPos = x != this.lastX || y != this.lastY || z != this.lastZ;
         boolean dirtyRot = yaw != this.lastYaw || z != this.lastPitch;
@@ -174,7 +170,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
 
                     if (dirtyRot) {
                         context.sendToAllExceptSelf(new MessagePlayOutEntityLookAndRelativeMove(entityId,
-                                dxu, dyu, dzu, wrapAngle(yaw), wrapAngle(pitch), false));
+                                dxu, dyu, dzu, yaw, pitch, false));
                         // The rotation is already send
                         dirtyRot = false;
                     } else {
@@ -183,21 +179,21 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                     }
                 } else {
                     context.sendToAllExceptSelf(new MessagePlayOutEntityTeleport(entityId,
-                            x, y, z, wrapAngle(yaw), wrapAngle(pitch), false));
+                            x, y, z, yaw, pitch, false));
                     // The rotation is already send
                     dirtyRot = false;
                 }
             }
         }
         if (dirtyRot) {
-            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, wrapAngle(yaw), wrapAngle(pitch), false));
+            context.sendToAllExceptSelf(() -> new MessagePlayOutEntityLook(entityId, yaw, pitch, false));
         }
         if (headRot != null) {
-            double headYaw = headRot.getY();
+            final byte headYaw = wrapAngle(headRot.getY());
             if (headYaw != this.lastHeadYaw) {
-                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, wrapAngle(headYaw)));
+                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityHeadLook(entityId, headYaw));
             }
-            this.lastHeadYaw = yaw;
+            this.lastHeadYaw = headYaw;
         }
         final Vector3d velocity = this.entity.getVelocity();
         final double vx = velocity.getX();

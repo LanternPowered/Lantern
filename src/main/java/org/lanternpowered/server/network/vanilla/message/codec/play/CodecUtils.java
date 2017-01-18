@@ -25,6 +25,7 @@
  */
 package org.lanternpowered.server.network.vanilla.message.codec.play;
 
+import com.flowpowered.math.GenericMath;
 import org.spongepowered.api.util.Direction;
 
 public final class CodecUtils {
@@ -43,29 +44,29 @@ public final class CodecUtils {
     }
 
     /**
-     * Wraps the float angle into a byte.
+     * Wraps the double angle into a byte.
      * 
-     * @param angle the angle
-     * @return the byte
+     * @param angle The angle
+     * @return The byte value
      */
     public static byte wrapAngle(double angle) {
-        while (angle >= 360d) {
-            angle -= 360d;
+        while (angle >= 360.0) {
+            angle -= 360.0;
         }
-        while (angle < 0) {
-            angle += 360d;
+        while (angle < 0.0) {
+            angle += 360.0;
         }
-        return (byte) ((angle / 360d) * 256d);
+        return (byte) GenericMath.floor((angle / 360.0) * 256.0);
     }
 
     /**
-     * Unwraps the byte angle into a float.
+     * Unwraps the byte angle into a double.
      * 
-     * @param angle the angle
-     * @return the float
+     * @param angle The byte value
+     * @return The angle
      */
-    public static float unwrapAngle(byte angle) {
-        return ((float) angle / 256f) * 360f;
+    public static double unwrapAngle(byte angle) {
+        return ((double) (angle & 0xff) / 256.0) * 360.0;
     }
 
     private CodecUtils() {

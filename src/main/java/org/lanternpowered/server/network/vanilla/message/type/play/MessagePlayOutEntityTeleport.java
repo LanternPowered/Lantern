@@ -25,9 +25,6 @@
  */
 package org.lanternpowered.server.network.vanilla.message.type.play;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.flowpowered.math.vector.Vector3d;
 import org.lanternpowered.server.network.message.Message;
 
 public final class MessagePlayOutEntityTeleport implements Message {
@@ -35,14 +32,14 @@ public final class MessagePlayOutEntityTeleport implements Message {
     private final int entityId;
     private final boolean onGround;
 
-    private final int yaw;
-    private final int pitch;
+    private final byte yaw;
+    private final byte pitch;
 
     private final double x;
     private final double y;
     private final double z;
 
-    public MessagePlayOutEntityTeleport(int entityId, double x, double y, double z, int yaw, int pitch, boolean onGround) {
+    public MessagePlayOutEntityTeleport(int entityId, double x, double y, double z, byte yaw, byte pitch, boolean onGround) {
         this.onGround = onGround;
         this.entityId = entityId;
         this.pitch = pitch;
@@ -56,11 +53,11 @@ public final class MessagePlayOutEntityTeleport implements Message {
         return this.entityId;
     }
 
-    public int getYaw() {
+    public byte getYaw() {
         return this.yaw;
     }
 
-    public int getPitch() {
+    public byte getPitch() {
         return this.pitch;
     }
 

@@ -94,7 +94,7 @@ public class PaintingEntityProtocol<E extends LanternEntity> extends EntityProto
             this.lastZ = z;
         } else if (x != this.lastX || y != this.lastY || z != this.lastZ) {
             update0(context);
-            context.sendToAll(() -> new MessagePlayOutEntityTeleport(getRootEntityId(), x, y, z, 0, 0, true));
+            context.sendToAll(() -> new MessagePlayOutEntityTeleport(getRootEntityId(), x, y, z, (byte) 0, (byte) 0, true));
             this.lastX = x;
             this.lastY = y;
             this.lastZ = z;

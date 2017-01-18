@@ -35,10 +35,10 @@ public final class CodecPlayOutEntityLook implements Codec<MessagePlayOutEntityL
 
     @Override
     public ByteBuffer encode(CodecContext context, MessagePlayOutEntityLook message) throws CodecException {
-        ByteBuffer buf = context.byteBufAlloc().buffer();
+        final ByteBuffer buf = context.byteBufAlloc().buffer();
         buf.writeVarInt(message.getEntityId());
-        buf.writeByte((byte) message.getYaw());
-        buf.writeByte((byte) message.getPitch());
+        buf.writeByte(message.getYaw());
+        buf.writeByte(message.getPitch());
         buf.writeBoolean(message.isOnGround());
         return buf;
     }

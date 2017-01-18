@@ -153,19 +153,20 @@ public class LanternEntity extends BaseComponentHolder implements Entity, Abstra
 
     public LanternEntity(UUID uniqueId) {
         this.uniqueId = uniqueId;
-        registerKeys();
         if (!bypassEntityTypeLookup) {
-            this.entityType = (LanternEntityType) EntityTypeRegistryModule.get().getByClass(this.getClass()).orElseThrow(
+            this.entityType = (LanternEntityType) EntityTypeRegistryModule.get().getByClass(getClass()).orElseThrow(
                     () -> new IllegalStateException("Every entity class should be registered as a EntityType."));
         } else {
             //noinspection ConstantConditions
             this.entityType = null;
         }
+        registerKeys();
     }
 
     @Override
     public void registerKeys() {
-        registerKey(Keys.DISPLAY_NAME, null);
+        //noinspection ConstantConditions
+        registerKey(Keys.DISPLAY_NAME, Text.EMPTY);
         registerKey(Keys.CUSTOM_NAME_VISIBLE, true);
         registerKey(Keys.VELOCITY, Vector3d.ZERO).notRemovable();
         registerKey(Keys.FIRE_TICKS, 0).notRemovable();

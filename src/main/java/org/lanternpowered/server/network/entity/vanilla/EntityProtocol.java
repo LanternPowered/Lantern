@@ -120,7 +120,9 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
                 final EquipmentType equipmentType = Holder.EQUIPMENT_TYPES[i];
                 final ItemStack itemStack = inventory.query(equipmentType).first().peek().orElse(null);
                 final int slotIndex = i;
-                context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
+                if (itemStack != null) {
+                    context.sendToAllExceptSelf(() -> new MessagePlayOutEntityEquipment(getRootEntityId(), slotIndex, itemStack));
+                }
             }
         }
     }

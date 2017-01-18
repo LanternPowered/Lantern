@@ -60,7 +60,6 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-@NonnullByDefault
 public class LanternUser extends AbstractSubjectBase implements AbstractPropertyHolder, AbstractArmorEquipable, User {
 
     private final LanternGameProfile gameProfile;

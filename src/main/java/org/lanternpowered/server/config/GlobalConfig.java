@@ -156,7 +156,7 @@ public class GlobalConfig extends ConfigBase implements ChunkLoadingConfig {
 
         @Setting(value = "chat-spam-threshold", comment =
                 "The minimum time between messages (in milliseconds) when they will be considered spam.")
-        private int chatSpamThreshold = 900;
+        private int chatSpamThreshold = 200;
 
         @Setting(value = "player-idle-timeout", comment =
                 "The player idle timeout in minutes, a value smaller or equal to 0 disables the check.")

@@ -249,6 +249,7 @@ public class LanternPlayer extends LanternHumanoid implements AbstractSubject, P
         this.user.setPlayer(this);
         resetIdleTimeoutCounter();
         setBoundingBoxBase(BOUNDING_BOX_BASE);
+        offer(Keys.DISPLAY_NAME, Text.of(gameProfile.getName().get()));
     }
 
     public Set<LanternBossBar> getBossBars() {

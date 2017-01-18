@@ -27,6 +27,7 @@ package org.lanternpowered.server.game;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.gson.Gson;
@@ -99,6 +100,7 @@ import org.lanternpowered.server.service.permission.LanternContextCalculator;
 import org.lanternpowered.server.service.permission.LanternPermissionService;
 import org.lanternpowered.server.service.sql.LanternSqlService;
 import org.lanternpowered.server.service.user.LanternUserStorageService;
+import org.lanternpowered.server.util.ClassLoaderUtil;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.lanternpowered.server.world.LanternTeleportHelper;
 import org.lanternpowered.server.world.chunk.LanternChunkTicketManager;
@@ -142,6 +144,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URLClassLoader;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -181,8 +185,11 @@ public class LanternGame implements Game {
     // The name of the ban config file
     public static final String BANS_CONFIG = "bans.json";
 
-    // The name of the config folder
+    // The name of the plugins folder
     public static final String PLUGINS_FOLDER = "plugins";
+
+    // The name of the libraries folder
+    public static final String LIBRARIES_FOLDER = "libraries";
 
     // The name of the profile cache file
     public static final String PROFILE_CACHE_FILE = "profile-cache.json";
@@ -500,6 +507,23 @@ public class LanternGame implements Game {
 
         // Call the construction events
         postGameStateChange(GameState.CONSTRUCTION, GameConstructionEvent.class);
+
+        // Load libraries
+        final Path librariesFolder = Paths.get(LIBRARIES_FOLDER);
+        if (!Files.exists(librariesFolder)) {
+            try {
+                Files.createDirectories(librariesFolder);
+            } catch (IOException e) {
+                throw Throwables.propagate(e);
+            }
+        }
+        try (DirectoryStream<Path> dir = Files.newDirectoryStream(librariesFolder, path -> path.toString().endsWith(".jar"))) {
+            for (Path path : dir) {
+                ClassLoaderUtil.addURL((URLClassLoader) getClass().getClassLoader(), path.toUri().toURL());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load the libraries: {}", e);
+        }
 
         // Load the plugin instances
         try {

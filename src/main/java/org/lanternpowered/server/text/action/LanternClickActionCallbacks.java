@@ -57,7 +57,7 @@ public final class LanternClickActionCallbacks {
 
     private static final LanternClickActionCallbacks INSTANCE = new LanternClickActionCallbacks();
 
-    public static LanternClickActionCallbacks getInstance() {
+    public static LanternClickActionCallbacks get() {
         return INSTANCE;
     }
 

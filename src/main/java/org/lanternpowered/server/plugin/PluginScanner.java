@@ -117,9 +117,9 @@ final class PluginScanner {
                 final Path path = Paths.get(source);
                 if (Files.exists(path)) {
                     if (Files.isDirectory(path)) {
-                        this.scanClasspathDirectory(path);
+                        scanClasspathDirectory(path);
                     } else if (JAR_FILE.matches(path)) {
-                        this.scanJar(path, true);
+                        scanJar(path, true);
                     }
                 }
             }
@@ -143,7 +143,7 @@ final class PluginScanner {
     private void visitClasspathFile(Path path) {
         if (CLASS_FILE.matches(path)) {
             try (InputStream in = Files.newInputStream(path)) {
-                PluginCandidate candidate = scanClassFile(in, null);
+                final PluginCandidate candidate = scanClassFile(in, null);
                 if (candidate != null) {
                     addCandidate(candidate);
                 }
@@ -256,8 +256,8 @@ final class PluginScanner {
                         + "Please see https://docs.spongepowered.org/master/en/plugin/plugin-meta.html for details.", path, METADATA_FILE);
             }
         } else if (!classpath) {
-            logger.error("No valid plugins found in {}. Is the file actually a plugin JAR? Please keep in mind Forge mods can be only loaded on "
-                    + "SpongeForge servers, SpongeVanilla supports only Sponge plugins.", path);
+            logger.error("No valid plugins found in {}. Is the file actually a plugin JAR? Please keep in"
+                    + "mind that Lantern can only load Sponge plugins.", path);
         }
     }
 

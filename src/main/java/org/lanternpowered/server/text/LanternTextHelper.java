@@ -28,7 +28,6 @@ package org.lanternpowered.server.text;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.lanternpowered.server.data.translator.JsonTranslator;
-import org.lanternpowered.server.entity.LanternEntityType;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -86,10 +85,10 @@ public final class LanternTextHelper {
                 break;
             case "run_command":
                 // Check for a valid click action callback
-                Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(value.trim().toLowerCase());
+                final Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(value.trim().toLowerCase());
                 if (matcher.matches()) {
-                    UUID uniqueId = UUID.fromString(matcher.group(1));
-                    Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.getInstance().getCallbackForUUID(uniqueId);
+                    final UUID uniqueId = UUID.fromString(matcher.group(1));
+                    final Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.get().getCallbackForUUID(uniqueId);
                     if (callback.isPresent()) {
                         return TextActions.executeCallback(callback.get());
                     }
@@ -139,16 +138,16 @@ public final class LanternTextHelper {
         if (clickAction instanceof ClickAction.ChangePage) {
             return new RawAction("change_page", ((ClickAction.ChangePage) clickAction).getResult().toString());
         } else if (clickAction instanceof ClickAction.OpenUrl) {
-            URL url = ((ClickAction.OpenUrl) clickAction).getResult();
-            String scheme = url.getProtocol();
-            String host = url.getProtocol();
+            final URL url = ((ClickAction.OpenUrl) clickAction).getResult();
+            final String scheme = url.getProtocol();
+            final String host = url.getProtocol();
             if ("file".equalsIgnoreCase(scheme) && (host == null || host.equals(""))) {
                 return new RawAction("open_file", url.getFile());
             } else {
                 return new RawAction("open_url", url.toExternalForm());
             }
         } else if (clickAction instanceof ClickAction.ExecuteCallback) {
-            final UUID uniqueId = LanternClickActionCallbacks.getInstance().getOrCreateIdForCallback(
+            final UUID uniqueId = LanternClickActionCallbacks.get().getOrCreateIdForCallback(
                     ((ClickAction.ExecuteCallback) clickAction).getResult());
             return new RawAction("run_command", LanternClickActionCallbacks.COMMAND_BASE + uniqueId.toString());
         } else if (clickAction instanceof ClickAction.RunCommand) {

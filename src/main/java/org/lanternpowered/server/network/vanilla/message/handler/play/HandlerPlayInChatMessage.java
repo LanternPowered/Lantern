@@ -33,6 +33,7 @@ import io.netty.util.AttributeKey;
 import org.apache.commons.lang3.StringUtils;
 import org.lanternpowered.server.entity.living.player.LanternPlayer;
 import org.lanternpowered.server.game.Lantern;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.NetworkContext;
 import org.lanternpowered.server.network.message.handler.Handler;
 import org.lanternpowered.server.network.NetworkSession;
@@ -41,6 +42,7 @@ import org.lanternpowered.server.text.TextConstants;
 import org.lanternpowered.server.text.action.LanternClickActionCallbacks;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.event.SpongeEventFactory;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -65,7 +67,13 @@ import java.util.regex.Pattern;
 
 public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChatMessage> {
 
-    private final static AttributeKey<Long> LAST_CHAT_TIME = AttributeKey.valueOf("last-chat-time");
+    private final static AttributeKey<ChatData> CHAT_DATA = AttributeKey.valueOf("chat-data");
+
+    private static class ChatData {
+
+        private int chatThrottle;
+        private long lastChatTime = -1L;
+    }
 
     @Override
     public void handle(NetworkContext context, MessagePlayInChatMessage message) {
@@ -75,10 +83,10 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         final String message0 = message.getMessage();
 
         // Check for a valid click action callback
-        Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(message0);
+        final Matcher matcher = LanternClickActionCallbacks.COMMAND_PATTERN.matcher(message0);
         if (matcher.matches()) {
-            UUID uniqueId = UUID.fromString(matcher.group(1));
-            Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.getInstance().getCallbackForUUID(uniqueId);
+            final UUID uniqueId = UUID.fromString(matcher.group(1));
+            final Optional<Consumer<CommandSource>> callback = LanternClickActionCallbacks.get().getCallbackForUUID(uniqueId);
             if (callback.isPresent()) {
                 callback.get().accept(player);
             } else {
@@ -96,21 +104,35 @@ public final class HandlerPlayInChatMessage implements Handler<MessagePlayInChat
         if (message1.startsWith("/")) {
             Lantern.getSyncExecutorService().submit(() -> Sponge.getCommandManager().process(player, message1.substring(1)));
         } else {
-            Text nameText = Text.of(player.getName()); // TODO: player.getDisplayNameData().displayName().get();
-            Text rawMessageText = Text.of(message0);
-            Text messageText = newTextWithLinks(message0, true);
-            MessageChannel channel = player.getMessageChannel();
-            MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(Cause.of(NamedCause.source(player)),
+            final Text nameText = player.get(Keys.DISPLAY_NAME).get();
+            final Text rawMessageText = Text.of(message0);
+            final Text messageText = newTextWithLinks(message0, true);
+            final MessageChannel channel = player.getMessageChannel();
+            final MessageChannelEvent.Chat event = SpongeEventFactory.createMessageChannelEventChat(Cause.of(NamedCause.source(player)),
                     channel, Optional.of(channel), new MessageEvent.MessageFormatter(nameText, messageText), rawMessageText, false);
             if (!Sponge.getEventManager().post(event) && !event.isMessageCancelled()) {
                 event.getChannel().ifPresent(c -> c.send(player, event.getMessage(), ChatTypes.CHAT));
             }
         }
-        Attribute<Long> attr = context.getChannel().attr(LAST_CHAT_TIME);
-        long currentTime = System.currentTimeMillis();
-        Long lastTime = attr.getAndSet(currentTime);
-        if (lastTime != null && currentTime - lastTime < Lantern.getGame().getGlobalConfig().getChatSpamThreshold()) {
-            session.disconnect(t("disconnect.spam"));
+        final Attribute<ChatData> attr = context.getChannel().attr(CHAT_DATA);
+        ChatData chatData = attr.get();
+        if (chatData == null) {
+            chatData = new ChatData();
+            final ChatData chatData1 = attr.setIfAbsent(chatData);
+            if (chatData1 != null) {
+                chatData = chatData1;
+            }
+        }
+        //noinspection SynchronizationOnLocalVariableOrMethodParameter
+        synchronized (chatData) {
+            final long currentTime = LanternGame.currentTimeTicks();
+            if (chatData.lastChatTime != -1L) {
+                chatData.chatThrottle = (int) Math.max(0, chatData.chatThrottle - (currentTime - chatData.lastChatTime));
+            }
+            chatData.chatThrottle += 20;
+            if (chatData.chatThrottle > Lantern.getGame().getGlobalConfig().getChatSpamThreshold()) {
+                session.disconnect(t("disconnect.spam"));
+            }
         }
     }
 

@@ -42,6 +42,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.ReplaceableProperty;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -142,7 +143,11 @@ public class SlabItemInteractionBehavior<E extends Enum<E>> implements InteractW
                     itemStack -> itemStack.getValues().forEach(value -> snapshotBuilder1.add((Key) value.getKey(), value.get())));
             context.addBlockChange(snapshotBuilder1.build());
 
-            context.get(Parameters.USED_SLOT).ifPresent(slot -> slot.poll(1));
+            context.get(Parameters.PLAYER).ifPresent(player -> {
+                if (!player.get(Keys.GAME_MODE).orElse(GameModes.NOT_SET).equals(GameModes.CREATIVE)) {
+                    context.tryGet(Parameters.USED_SLOT).poll(1);
+                }
+            });
             return BehaviorResult.SUCCESS;
         }
 

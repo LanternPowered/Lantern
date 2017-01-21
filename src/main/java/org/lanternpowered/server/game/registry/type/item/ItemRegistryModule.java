@@ -27,12 +27,16 @@ package org.lanternpowered.server.game.registry.type.item;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
+import static org.lanternpowered.server.item.PropertyProviders.applicableEffects;
 import static org.lanternpowered.server.item.PropertyProviders.armorType;
 import static org.lanternpowered.server.item.PropertyProviders.dualWield;
 import static org.lanternpowered.server.item.PropertyProviders.equipmentType;
+import static org.lanternpowered.server.item.PropertyProviders.foodRestoration;
 import static org.lanternpowered.server.item.PropertyProviders.maximumUseDuration;
+import static org.lanternpowered.server.item.PropertyProviders.saturation;
 import static org.lanternpowered.server.item.PropertyProviders.toolType;
 import static org.lanternpowered.server.item.PropertyProviders.useDuration;
+import static org.lanternpowered.server.item.PropertyProviders.useLimit;
 import static org.lanternpowered.server.text.translation.TranslationHelper.tr;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -57,10 +61,12 @@ import org.lanternpowered.server.item.ItemTypeBuilderImpl;
 import org.lanternpowered.server.item.LanternItemType;
 import org.lanternpowered.server.item.TranslationProvider;
 import org.lanternpowered.server.item.behavior.vanilla.ArmorQuickEquipInteractionBehavior;
-import org.lanternpowered.server.item.behavior.vanilla.EatingInteractionBehavior;
+import org.lanternpowered.server.item.behavior.vanilla.ConsumableInteractionBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.OpenHeldBookBehavior;
 import org.lanternpowered.server.item.behavior.vanilla.ShieldInteractionBehavior;
-import org.lanternpowered.server.item.behavior.vanilla.food.GoldenAppleConsumer;
+import org.lanternpowered.server.item.behavior.vanilla.consumable.GoldenAppleEffectsProvider;
+import org.lanternpowered.server.item.behavior.vanilla.consumable.MilkConsumer;
+import org.lanternpowered.server.item.behavior.vanilla.consumable.PotionEffectsProvider;
 import org.lanternpowered.server.util.ReflectionHelper;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.ArmorType;
@@ -158,25 +164,25 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////
         /// Iron Shovel ///
         ///////////////////
-        register(256, toolBuilder(ToolTypes.IRON)
+        register(256, toolBuilder(251, ToolTypes.IRON)
                 .translation("item.shovelIron.name")
                 .build("minecraft", "iron_shovel"));
         ////////////////////
         /// Iron Pickaxe ///
         ////////////////////
-        register(257, toolBuilder(ToolTypes.IRON)
+        register(257, toolBuilder(251, ToolTypes.IRON)
                 .translation("item.pickaxeIron.name")
                 .build("minecraft", "iron_pickaxe"));
         ////////////////////
         ///   Iron Axe   ///
         ////////////////////
-        register(258, toolBuilder(ToolTypes.IRON)
+        register(258, toolBuilder(251, ToolTypes.IRON)
                 .translation("item.hatchetIron.name")
                 .build("minecraft", "iron_axe"));
         ///////////////////////
         /// Flint and Steel ///
         ///////////////////////
-        register(259, durableBuilder()
+        register(259, durableBuilder(65)
                 .translation("item.flintAndSteel.name")
                 .build("minecraft", "flint_and_steel"));
         ///////////////////
@@ -184,14 +190,17 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////
         register(260, builder()
                 .translation("item.apple.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(3))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "apple"));
         ///////////////////
         ///     Bow     ///
         ///////////////////
-        register(261, durableBuilder()
+        register(261, durableBuilder(385)
                 .translation("item.bow.name")
                 .properties(builder -> builder.add(maximumUseDuration(72000)))
                 .build("minecraft", "bow"));
@@ -231,91 +240,91 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////
         ///  Iron Sword ///
         ///////////////////
-        register(267, toolBuilder(ToolTypes.IRON)
+        register(267, toolBuilder(251, ToolTypes.IRON)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordIron.name")
                 .build("minecraft", "iron_sword"));
         ////////////////////
         /// Wooden Sword ///
         ////////////////////
-        register(268, toolBuilder(ToolTypes.WOOD)
+        register(268, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordWood.name")
                 .build("minecraft", "wooden_sword"));
         /////////////////////
         /// Wooden Shovel ///
         /////////////////////
-        register(269, toolBuilder(ToolTypes.WOOD)
+        register(269, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelWood.name")
                 .build("minecraft", "wooden_shovel"));
         //////////////////////
         /// Wooden Pickaxe ///
         //////////////////////
-        register(270, toolBuilder(ToolTypes.WOOD)
+        register(270, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeWood.name")
                 .build("minecraft", "wooden_pickaxe"));
         //////////////////////
         ///   Wooden Axe   ///
         //////////////////////
-        register(271, toolBuilder(ToolTypes.WOOD)
+        register(271, toolBuilder(60, ToolTypes.WOOD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetWood.name")
                 .build("minecraft", "wooden_axe"));
         ////////////////////
         ///  Stone Sword ///
         ////////////////////
-        register(272, toolBuilder(ToolTypes.STONE)
+        register(272, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordStone.name")
                 .build("minecraft", "stone_sword"));
         /////////////////////
         ///  Stone Shovel ///
         /////////////////////
-        register(273, toolBuilder(ToolTypes.STONE)
+        register(273, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelStone.name")
                 .build("minecraft", "stone_shovel"));
         //////////////////////
         ///  Stone Pickaxe ///
         //////////////////////
-        register(274, toolBuilder(ToolTypes.STONE)
+        register(274, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeStone.name")
                 .build("minecraft", "stone_pickaxe"));
         //////////////////////
         ///    Stone Axe   ///
         //////////////////////
-        register(275, toolBuilder(ToolTypes.STONE)
+        register(275, toolBuilder(132, ToolTypes.STONE)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetStone.name")
                 .build("minecraft", "stone_axe"));
         /////////////////////
         /// Diamond Sword ///
         /////////////////////
-        register(276, toolBuilder(ToolTypes.DIAMOND)
+        register(276, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordDiamond.name")
                 .build("minecraft", "diamond_sword"));
         //////////////////////
         /// Diamond Shovel ///
         //////////////////////
-        register(277, toolBuilder(ToolTypes.DIAMOND)
+        register(277, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelDiamond.name")
                 .build("minecraft", "diamond_shovel"));
         ///////////////////////
         /// Diamond Pickaxe ///
         ///////////////////////
-        register(278, toolBuilder(ToolTypes.DIAMOND)
+        register(278, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeDiamond.name")
                 .build("minecraft", "diamond_pickaxe"));
         ///////////////////////
         ///   Diamond Axe   ///
         ///////////////////////
-        register(279, toolBuilder(ToolTypes.DIAMOND)
+        register(279, toolBuilder(1562, ToolTypes.DIAMOND)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetDiamond.name")
                 .build("minecraft", "diamond_axe"));
@@ -336,36 +345,38 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////
         register(282, builder()
                 .translation("item.mushroomStew.name")
-                .properties(builder -> builder.add(useDuration(32)))
-                .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(6).saturation(0.6)
-                                .restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(6))
+                        .add(saturation(0.6)))
+                .behaviors(pipeline -> pipeline.add(
+                        new ConsumableInteractionBehavior().restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
                 .build("minecraft", "mushroom_stew"));
         /////////////////////
         ///  Golden Sword ///
         /////////////////////
-        register(283, toolBuilder(ToolTypes.GOLD)
+        register(283, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.swordGold.name")
                 .build("minecraft", "golden_sword"));
         //////////////////////
         ///  Golden Shovel ///
         //////////////////////
-        register(284, toolBuilder(ToolTypes.GOLD)
+        register(284, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.shovelGold.name")
                 .build("minecraft", "golden_shovel"));
         ///////////////////////
         ///  Golden Pickaxe ///
         ///////////////////////
-        register(285, toolBuilder(ToolTypes.GOLD)
+        register(285, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.pickaxeGold.name")
                 .build("minecraft", "golden_pickaxe"));
         ///////////////////////
         ///    Golden Axe   ///
         ///////////////////////
-        register(286, toolBuilder(ToolTypes.GOLD)
+        register(286, toolBuilder(33, ToolTypes.GOLD)
                 .properties(builder -> builder.add(dualWield(true)))
                 .translation("item.hatchetGold.name")
                 .build("minecraft", "golden_axe"));
@@ -390,31 +401,31 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         ///    Wooden Hoe   ///
         ///////////////////////
-        register(290, toolBuilder(ToolTypes.WOOD)
+        register(290, toolBuilder(60, ToolTypes.WOOD)
                 .translation("item.hoeWood.name")
                 .build("minecraft", "wooden_hoe"));
         ///////////////////////
         ///     Stone Hoe   ///
         ///////////////////////
-        register(291, toolBuilder(ToolTypes.STONE)
+        register(291, toolBuilder(132, ToolTypes.STONE)
                 .translation("item.hoeStone.name")
                 .build("minecraft", "stone_hoe"));
         ///////////////////////
         ///     Iron Hoe    ///
         ///////////////////////
-        register(292, toolBuilder(ToolTypes.IRON)
+        register(292, toolBuilder(251, ToolTypes.IRON)
                 .translation("item.hoeIron.name")
                 .build("minecraft", "iron_hoe"));
         ///////////////////////
         ///   Diamond Hoe   ///
         ///////////////////////
-        register(293, toolBuilder(ToolTypes.DIAMOND)
+        register(293, toolBuilder(1562, ToolTypes.DIAMOND)
                 .translation("item.hoeDiamond.name")
                 .build("minecraft", "diamond_hoe"));
         ///////////////////////
         ///    Golden Hoe   ///
         ///////////////////////
-        register(294, toolBuilder(ToolTypes.GOLD)
+        register(294, toolBuilder(33, ToolTypes.GOLD)
                 .translation("item.hoeGold.name")
                 .build("minecraft", "golden_hoe"));
         ///////////////////////
@@ -434,128 +445,131 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(297, builder()
                 .translation("item.bread.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(5))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(5).saturation(0.6)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "bread"));
         //////////////////////////
         ///   Leather Helmet   ///
         //////////////////////////
-        register(298, leatherArmorBuilder(EquipmentTypes.HEADWEAR)
+        register(298, leatherArmorBuilder(56, EquipmentTypes.HEADWEAR)
                 .translation("item.helmetCloth.name")
                 .build("minecraft", "leather_helmet"));
         //////////////////////////
         /// Leather Chestplate ///
         //////////////////////////
-        register(299, leatherArmorBuilder(EquipmentTypes.CHESTPLATE)
+        register(299, leatherArmorBuilder(81, EquipmentTypes.CHESTPLATE)
                 .translation("item.chestplateCloth.name")
                 .build("minecraft", "leather_chestplate"));
         //////////////////////////
         ///  Leather Leggings  ///
         //////////////////////////
-        register(300, leatherArmorBuilder(EquipmentTypes.LEGGINGS)
+        register(300, leatherArmorBuilder(76, EquipmentTypes.LEGGINGS)
                 .translation("item.leggingsCloth.name")
                 .build("minecraft", "leather_leggings"));
         //////////////////////////
         ///    Leather Boots   ///
         //////////////////////////
-        register(301, leatherArmorBuilder(EquipmentTypes.BOOTS)
+        register(301, leatherArmorBuilder(66, EquipmentTypes.BOOTS)
                 .translation("item.bootsCloth.name")
                 .build("minecraft", "leather_boots"));
         ////////////////////////////
         ///   Chainmail Helmet   ///
         ////////////////////////////
-        register(302, armorBuilder(ArmorTypes.CHAIN, EquipmentTypes.HEADWEAR)
+        register(302, armorBuilder(166, ArmorTypes.CHAIN, EquipmentTypes.HEADWEAR)
                 .translation("item.helmetChain.name")
                 .build("minecraft", "chainmail_helmet"));
         ////////////////////////////
         /// Chainmail Chestplate ///
         ////////////////////////////
-        register(303, armorBuilder(ArmorTypes.CHAIN, EquipmentTypes.CHESTPLATE)
+        register(303, armorBuilder(241, ArmorTypes.CHAIN, EquipmentTypes.CHESTPLATE)
                 .translation("item.chestplateChain.name")
                 .build("minecraft", "chainmail_chestplate"));
         ////////////////////////////
         ///  Chainmail Leggings  ///
         ////////////////////////////
-        register(304, armorBuilder(ArmorTypes.CHAIN, EquipmentTypes.LEGGINGS)
+        register(304, armorBuilder(226, ArmorTypes.CHAIN, EquipmentTypes.LEGGINGS)
                 .translation("item.leggingsChain.name")
                 .build("minecraft", "chainmail_leggings"));
         ////////////////////////////
         ///    Chainmail Boots   ///
         ////////////////////////////
-        register(305, armorBuilder(ArmorTypes.CHAIN, EquipmentTypes.BOOTS)
+        register(305, armorBuilder(196, ArmorTypes.CHAIN, EquipmentTypes.BOOTS)
                 .translation("item.bootsChain.name")
                 .build("minecraft", "chainmail_boots"));
         ///////////////////////
         ///   Iron Helmet   ///
         ///////////////////////
-        register(306, armorBuilder(ArmorTypes.IRON, EquipmentTypes.HEADWEAR)
+        register(306, armorBuilder(166, ArmorTypes.IRON, EquipmentTypes.HEADWEAR)
                 .translation("item.helmetIron.name")
                 .build("minecraft", "iron_helmet"));
         ///////////////////////
         /// Iron Chestplate ///
         ///////////////////////
-        register(307, armorBuilder(ArmorTypes.IRON, EquipmentTypes.CHESTPLATE)
+        register(307, armorBuilder(241, ArmorTypes.IRON, EquipmentTypes.CHESTPLATE)
                 .translation("item.chestplateIron.name")
                 .build("minecraft", "iron_chestplate"));
         ///////////////////////
         ///  Iron Leggings  ///
         ///////////////////////
-        register(308, armorBuilder(ArmorTypes.IRON, EquipmentTypes.LEGGINGS)
+        register(308, armorBuilder(226, ArmorTypes.IRON, EquipmentTypes.LEGGINGS)
                 .translation("item.leggingsIron.name")
                 .build("minecraft", "iron_leggings"));
         ///////////////////////
         ///    Iron Boots   ///
         ///////////////////////
-        register(309, armorBuilder(ArmorTypes.IRON, EquipmentTypes.BOOTS)
+        register(309, armorBuilder(196, ArmorTypes.IRON, EquipmentTypes.BOOTS)
                 .translation("item.bootsIron.name")
                 .build("minecraft", "iron_boots"));
         //////////////////////////
         ///   Diamond Helmet   ///
         //////////////////////////
-        register(310, armorBuilder(ArmorTypes.DIAMOND, EquipmentTypes.HEADWEAR)
+        register(310, armorBuilder(364, ArmorTypes.DIAMOND, EquipmentTypes.HEADWEAR)
                 .translation("item.helmetDiamond.name")
                 .build("minecraft", "diamond_helmet"));
         //////////////////////////
         /// Diamond Chestplate ///
         //////////////////////////
-        register(311, armorBuilder(ArmorTypes.DIAMOND, EquipmentTypes.CHESTPLATE)
+        register(311, armorBuilder(529, ArmorTypes.DIAMOND, EquipmentTypes.CHESTPLATE)
                 .translation("item.chestplateDiamond.name")
                 .build("minecraft", "diamond_chestplate"));
         //////////////////////////
         ///  Diamond Leggings  ///
         //////////////////////////
-        register(312, armorBuilder(ArmorTypes.DIAMOND, EquipmentTypes.LEGGINGS)
+        register(312, armorBuilder(496, ArmorTypes.DIAMOND, EquipmentTypes.LEGGINGS)
                 .translation("item.leggingsDiamond.name")
                 .build("minecraft", "diamond_leggings"));
         //////////////////////////
         ///    Diamond Boots   ///
         //////////////////////////
-        register(313, armorBuilder(ArmorTypes.DIAMOND, EquipmentTypes.BOOTS)
+        register(313, armorBuilder(430, ArmorTypes.DIAMOND, EquipmentTypes.BOOTS)
                 .translation("item.bootsDiamond.name")
                 .build("minecraft", "diamond_boots"));
         /////////////////////////
         ///   Golden Helmet   ///
         /////////////////////////
-        register(314, armorBuilder(ArmorTypes.GOLD, EquipmentTypes.HEADWEAR)
+        register(314, armorBuilder(78, ArmorTypes.GOLD, EquipmentTypes.HEADWEAR)
                 .translation("item.helmetGold.name")
                 .build("minecraft", "golden_helmet"));
         /////////////////////////
         /// Golden Chestplate ///
         /////////////////////////
-        register(315, armorBuilder(ArmorTypes.GOLD, EquipmentTypes.CHESTPLATE)
+        register(315, armorBuilder(113, ArmorTypes.GOLD, EquipmentTypes.CHESTPLATE)
                 .translation("item.chestplateGold.name")
                 .build("minecraft", "golden_chestplate"));
         /////////////////////////
         ///  Golden Leggings  ///
         /////////////////////////
-        register(316, armorBuilder(ArmorTypes.GOLD, EquipmentTypes.LEGGINGS)
+        register(316, armorBuilder(76, ArmorTypes.GOLD, EquipmentTypes.LEGGINGS)
                 .translation("item.leggingsGold.name")
                 .build("minecraft", "golden_leggings"));
         /////////////////////////
         ///    Golden Boots   ///
         /////////////////////////
-        register(317, armorBuilder(ArmorTypes.GOLD, EquipmentTypes.BOOTS)
+        register(317, armorBuilder(66, ArmorTypes.GOLD, EquipmentTypes.BOOTS)
                 .translation("item.bootsGold.name")
                 .build("minecraft", "golden_boots"));
         ///////////////////////
@@ -569,18 +583,24 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(319, builder()
                 .translation("item.porkchopRaw.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(3))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "porkchop"));
         /////////////////////////
         ///  Cooked Porkchop  ///
         /////////////////////////
         register(320, builder()
                 .translation("item.porkchopCooked.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(8))
+                        .add(saturation(0.8)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(8).saturation(0.8)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "cooked_porkchop"));
         /////////////////////////
         ///      Painting     ///
@@ -596,10 +616,13 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.GOLDEN_APPLE_TYPE, GoldenApples.GOLDEN_APPLE)
                 )
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(4))
+                        .add(saturation(1.2))
+                        .add(applicableEffects(new GoldenAppleEffectsProvider())))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(4).saturation(1.2)
-                                .consumer(new GoldenAppleConsumer()).alwaysConsumable(true)))
+                        .add(new ConsumableInteractionBehavior().ignoreFoodLevel(true)))
                 .build("minecraft", "golden_apple"));
         /////////////////////
         ///      Sign     ///
@@ -683,6 +706,11 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(335, builder()
                 .translation("item.milk.name")
+                .properties(builder -> builder
+                        .add(useDuration(32)))
+                .behaviors(pipeline -> pipeline
+                        .add(new ConsumableInteractionBehavior().consumer(new MilkConsumer())
+                                .restItem(() -> new LanternItemStack(ItemTypes.BUCKET))))
                 .maxStackQuantity(1)
                 .build("minecraft", "milk_bucket"));
         /////////////////
@@ -834,9 +862,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(357, builder()
                 .translation("item.cookie.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(2))
+                        .add(saturation(0.1)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(2).saturation(0.1)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "cookie"));
         //////////////////////
         ///   Filled Map   ///
@@ -857,9 +888,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////
         register(360, builder()
                 .translation("item.melon.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(2))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "melon"));
         /////////////////////////
         ///   Pumpkin Seeds   ///
@@ -878,47 +912,62 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////
         register(363, builder()
                 .translation("item.beefRaw.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(3))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "beef"));
         ///////////////////////
         ///   Cooked Beef   ///
         ///////////////////////
         register(364, builder()
                 .translation("item.beefCooked.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(8))
+                        .add(saturation(0.8)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(8).saturation(0.8)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "cooked_beef"));
         ///////////////////
         ///   Chicken   ///
         ///////////////////
         register(365, builder()
                 .translation("item.chickenRaw.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(2))
+                        .add(saturation(0.3))
+                        .add(applicableEffects(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)
-                                .potionEffect(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "chicken"));
         //////////////////////////
         ///   Cooked Chicken   ///
         //////////////////////////
         register(366, builder()
                 .translation("item.chickenCooked.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(6))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(6).saturation(0.6)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "cooked_chicken"));
         ////////////////////////
         ///   Rotten Flesh   ///
         ////////////////////////
         register(367, builder()
                 .translation("item.rottenFlesh.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(4))
+                        .add(saturation(0.1))
+                        .add(applicableEffects(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(4).saturation(0.1)
-                                .potionEffect(PotionEffect.of(PotionEffectTypes.HUNGER, 0, 600))))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "rotten_flesh"));
         ///////////////////////
         ///   Ender Pearl   ///
@@ -955,6 +1004,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///   Potion   ///
         //////////////////
         register(373, potionEffectsBuilder(PotionType::getTranslation)
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(applicableEffects(new PotionEffectsProvider())))
+                .behaviors(pipeline -> pipeline
+                        .add(new ConsumableInteractionBehavior()
+                                .restItem(() -> new LanternItemStack(ItemTypes.GLASS_BOTTLE))))
                 .maxStackQuantity(1)
                 .build("minecraft", "potion"));
         ////////////////////////
@@ -968,10 +1023,13 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////////
         register(375, builder()
                 .translation("item.spiderEye.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(2))
+                        .add(saturation(0.8))
+                        .add(applicableEffects(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(2).saturation(0.8)
-                                .potionEffect(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "spider_eye"));
         ////////////////////////////////
         ///   Fermented Spider Eye   ///
@@ -1079,37 +1137,49 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(391, builder()
                 .translation("item.carrots.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(3))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(3).saturation(0.6)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "carrot"));
         //////////////////
         ///   Potato   ///
         //////////////////
         register(392, builder()
                 .translation("item.potato.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(1))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(1).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "potato"));
         ////////////////////////
         ///   Baked Potato   ///
         ////////////////////////
         register(393, builder()
                 .translation("item.potatoBaked.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(5))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(5).saturation(0.6)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "baked_potato"));
         ////////////////////////////
         ///   Poisonous Potato   ///
         ////////////////////////////
         register(394, builder()
                 .translation("item.potatoPoisonous.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(2))
+                        .add(saturation(0.3))
+                        .add(applicableEffects(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)
-                                .potionEffect(PotionEffect.of(PotionEffectTypes.POISON, 0, 100))))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "poisonous_potato"));
         ///////////////
         ///   Map   ///
@@ -1122,9 +1192,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         register(396, builder()
                 .translation("item.carrotGolden.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(6))
+                        .add(saturation(1.2)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(6).saturation(1.2)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "golden_carrot"));
         /////////////////
         ///   Skull   ///
@@ -1154,9 +1227,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ///////////////////////
         register(400, builder()
                 .translation("item.pumpkinPie.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(8))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(8).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "pumpkin_pie"));
         ////////////////////
         ///  Fireworks   ///
@@ -1236,27 +1312,36 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(411, builder()
                 .translation("item.rabbitRaw.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(3))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(3).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "rabbit"));
         /////////////////////////
         ///   Cooked Rabbit   ///
         /////////////////////////
         register(412, builder()
                 .translation("item.rabbitCooked.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(5))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(5).saturation(0.6)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "cooked_rabbit"));
         ///////////////////////
         ///   Rabbit Stew   ///
         ///////////////////////
         register(413, builder()
                 .translation("item.rabbitStew.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(10))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(10).saturation(0.6)
+                        .add(new ConsumableInteractionBehavior()
                                 .restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
                 .maxStackQuantity(1)
                 .build("minecraft", "rabbit_stew"));
@@ -1323,20 +1408,24 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         register(423, builder()
                 .translation("item.muttonRaw.name")
-                .properties(builder ->
-                        builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(2))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(2).saturation(0.3)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "mutton"));
         /////////////////////////
         ///   Cooked Mutton   ///
         /////////////////////////
         register(424, builder()
                 .translation("item.muttonCooked.name")
-                .properties(builder ->
-                        builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(6))
+                        .add(saturation(0.8)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(6).saturation(0.8)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "cooked_mutton"));
         //////////////////
         ///   Banner   ///
@@ -1386,10 +1475,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////////
         register(432, builder()
                 .translation("item.chorusFruit.name")
-                .properties(builder ->
-                        builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(4))
+                        .add(saturation(0.3)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(4).saturation(0.3).alwaysConsumable(true)))
+                        .add(new ConsumableInteractionBehavior().ignoreFoodLevel(true)))
                 // TODO: Add random teleport consumer behavior
                 .build("minecraft", "chorus_fruit"));
         ///////////////////////////////
@@ -1403,10 +1494,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         ////////////////////
         register(434, builder()
                 .translation("item.beetroot.name")
-                .properties(builder ->
-                        builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(1))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(1).saturation(0.6)))
+                        .add(new ConsumableInteractionBehavior()))
                 .build("minecraft", "beetroot"));
         //////////////////////////
         ///   Beetroot Seeds   ///
@@ -1419,9 +1512,12 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         /////////////////////////
         register(436, builder()
                 .translation("item.beetroot_soup.name")
-                .properties(builder -> builder.add(useDuration(32)))
+                .properties(builder -> builder
+                        .add(useDuration(32))
+                        .add(foodRestoration(6))
+                        .add(saturation(0.6)))
                 .behaviors(pipeline -> pipeline
-                        .add(new EatingInteractionBehavior().food(6).saturation(0.6)
+                        .add(new ConsumableInteractionBehavior()
                                 .restItem(() -> new LanternItemStack(ItemTypes.BOWL))))
                 .maxStackQuantity(1)
                 .build("minecraft", "beetroot_soup"));
@@ -1460,7 +1556,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         ///   Shield   ///
         //////////////////
-        register(442, durableBuilder()
+        register(442, durableBuilder(336)
                 .translation("item.shield.name")
                 .behaviors(pipeline -> pipeline
                         .add(new ShieldInteractionBehavior()))
@@ -1468,7 +1564,7 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
         //////////////////
         ///   Elytra   ///
         //////////////////
-        register(443, durableBuilder()
+        register(443, durableBuilder(432)
                 .translation("item.elytra.name")
                 .properties(builder -> builder
                         .add(equipmentType(EquipmentTypes.CHESTPLATE)))
@@ -1626,29 +1722,30 @@ public final class ItemRegistryModule extends AdditionalPluginCatalogRegistryMod
                 ((LanternDyeColor) (itemStack == null ? defaultColor : itemStack.get(Keys.DYE_COLOR).get())).getTranslationPart()));
     }
 
-    private ItemTypeBuilder durableBuilder() {
+    private ItemTypeBuilder durableBuilder(int useLimit) {
         return builder()
                 .maxStackQuantity(1)
+                .properties(builder -> useLimit(useLimit))
                 .keysProvider(valueContainer -> {
                     valueContainer.registerKey(Keys.ITEM_DURABILITY, 0);
                     valueContainer.registerKey(Keys.UNBREAKABLE, true); // True until durability is implemented
                 });
     }
 
-    private ItemTypeBuilder toolBuilder(ToolType toolType) {
-        return durableBuilder()
+    private ItemTypeBuilder toolBuilder(int useLimit, ToolType toolType) {
+        return durableBuilder(useLimit)
                 .properties(builder -> builder
                         .add(toolType(toolType)));
     }
 
-    private ItemTypeBuilder leatherArmorBuilder(EquipmentType equipmentType) {
-        return armorBuilder(ArmorTypes.LEATHER, equipmentType)
+    private ItemTypeBuilder leatherArmorBuilder(int useLimit, EquipmentType equipmentType) {
+        return armorBuilder(useLimit, ArmorTypes.LEATHER, equipmentType)
                 .keysProvider(valueContainer -> valueContainer
                         .registerKey(Keys.COLOR, null));
     }
 
-    private ItemTypeBuilder armorBuilder(ArmorType armorType, EquipmentType equipmentType) {
-        return durableBuilder()
+    private ItemTypeBuilder armorBuilder(int useLimit, ArmorType armorType, EquipmentType equipmentType) {
+        return durableBuilder(useLimit)
                 .properties(builder -> builder
                         .add(armorType(armorType))
                         .add(equipmentType(equipmentType)))

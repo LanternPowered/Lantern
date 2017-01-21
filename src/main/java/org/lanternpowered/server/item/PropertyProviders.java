@@ -25,21 +25,111 @@
  */
 package org.lanternpowered.server.item;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
+import com.google.common.collect.ImmutableSet;
 import org.lanternpowered.server.item.property.CooldownProperty;
 import org.lanternpowered.server.item.property.DualWieldProperty;
+import org.lanternpowered.server.item.property.HealthRestorationProperty;
 import org.lanternpowered.server.item.property.MaximumUseDurationProperty;
 import org.lanternpowered.server.item.property.MinimumUseDurationProperty;
+import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.property.item.EquipmentProperty;
+import org.spongepowered.api.data.property.item.FoodRestorationProperty;
+import org.spongepowered.api.data.property.item.SaturationProperty;
 import org.spongepowered.api.data.property.item.ToolTypeProperty;
+import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.type.ArmorType;
 import org.spongepowered.api.data.type.ToolType;
+import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+
+import java.util.Collection;
 
 public final class PropertyProviders {
 
     private static final DualWieldProperty DUAL_WIELD_PROPERTY_TRUE = new DualWieldProperty(true);
     private static final DualWieldProperty DUAL_WIELD_PROPERTY_FALSE = new DualWieldProperty(false);
+
+    public static PropertyProviderCollection applicableEffects(PotionEffect... potionEffects) {
+        checkNotNull(potionEffects, "potionEffects");
+        final ApplicableEffectProperty property = new ApplicableEffectProperty(ImmutableSet.copyOf(potionEffects));
+        return PropertyProviderCollection.builder()
+                .add(ApplicableEffectProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection applicableEffects(Collection<PotionEffect> potionEffects) {
+        checkNotNull(potionEffects, "potionEffects");
+        final ApplicableEffectProperty property = new ApplicableEffectProperty(ImmutableSet.copyOf(potionEffects));
+        return PropertyProviderCollection.builder()
+                .add(ApplicableEffectProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection applicableEffects(ObjectProvider<Collection<PotionEffect>> potionEffects) {
+        return PropertyProviderCollection.builder()
+                .add(ApplicableEffectProperty.class, (itemType, itemStack) ->
+                        new ApplicableEffectProperty(ImmutableSet.copyOf(potionEffects.get(itemType, itemStack))))
+                .build();
+    }
+
+    public static PropertyProviderCollection foodRestoration(int food) {
+        final FoodRestorationProperty property = new FoodRestorationProperty(food);
+        return PropertyProviderCollection.builder()
+                .add(FoodRestorationProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection foodRestoration(ObjectProvider<Integer> food) {
+        return PropertyProviderCollection.builder()
+                .add(FoodRestorationProperty.class, (itemType, itemStack) ->
+                        new FoodRestorationProperty(food.get(itemType, itemStack)))
+                .build();
+    }
+
+    public static PropertyProviderCollection saturation(double saturation) {
+        final SaturationProperty property = new SaturationProperty(saturation);
+        return PropertyProviderCollection.builder()
+                .add(SaturationProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection saturation(ObjectProvider<Double> saturation) {
+        return PropertyProviderCollection.builder()
+                .add(SaturationProperty.class, (itemType, itemStack) ->
+                        new SaturationProperty(saturation.get(itemType, itemStack)))
+                .build();
+    }
+
+    public static PropertyProviderCollection healthRestoration(double health) {
+        final HealthRestorationProperty property = new HealthRestorationProperty(health);
+        return PropertyProviderCollection.builder()
+                .add(HealthRestorationProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection healthRestoration(ObjectProvider<Double> health) {
+        return PropertyProviderCollection.builder()
+                .add(HealthRestorationProperty.class, (itemType, itemStack) ->
+                        new HealthRestorationProperty(health.get(itemType, itemStack)))
+                .build();
+    }
+
+    public static PropertyProviderCollection useLimit(int limit) {
+        final UseLimitProperty property = new UseLimitProperty(limit);
+        return PropertyProviderCollection.builder()
+                .add(UseLimitProperty.class, (itemType, itemStack) -> property)
+                .build();
+    }
+
+    public static PropertyProviderCollection useLimit(ObjectProvider<Integer> limit) {
+        return PropertyProviderCollection.builder()
+                .add(UseLimitProperty.class, (itemType, itemStack) ->
+                        new UseLimitProperty(limit.get(itemType, itemStack)))
+                .build();
+    }
 
     public static PropertyProviderCollection useDuration(int duration) {
         return useDuration(duration, duration);

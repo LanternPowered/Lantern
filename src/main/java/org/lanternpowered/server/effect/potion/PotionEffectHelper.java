@@ -29,13 +29,14 @@ import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public final class PotionEffectHelper {
 
-    public static List<PotionEffect> merge(List<PotionEffect> effectsA, List<PotionEffect> effectsB) {
+    public static List<PotionEffect> merge(Collection<PotionEffect> effectsA, Collection<PotionEffect> effectsB) {
         final Map<PotionEffectType, PotionEffect> effectsByType = new HashMap<>();
         for (PotionEffect effect : effectsA) {
             effectsByType.put(effect.getType(), effect);

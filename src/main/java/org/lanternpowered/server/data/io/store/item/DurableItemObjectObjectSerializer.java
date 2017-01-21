@@ -23,52 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.entity;
+package org.lanternpowered.server.data.io.store.item;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
-import com.flowpowered.math.vector.Vector3d;
+import org.lanternpowered.server.data.io.store.SimpleValueContainer;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.UUID;
+public class DurableItemObjectObjectSerializer extends ItemTypeObjectSerializer {
 
-public class LanternLiving extends LanternEntity implements Living {
-
-    private Vector3d headRotation = Vector3d.ZERO;
-
-    public LanternLiving(UUID uniqueId) {
-        super(uniqueId);
+    @Override
+    public void serializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.serializeValues(itemStack, valueContainer, dataView);
+        valueContainer.remove(Keys.ITEM_DURABILITY).ifPresent(durability -> dataView.set(DATA_VALUE, durability));
     }
 
     @Override
-    public void registerKeys() {
-        super.registerKeys();
-        registerKey(Keys.MAX_AIR, 300, 0, Integer.MAX_VALUE);
-        registerKey(Keys.REMAINING_AIR, 300, 0, Keys.MAX_AIR);
-        registerKey(Keys.MAX_HEALTH, 20.0, 0.0, 1024.0);
-        registerKey(Keys.HEALTH, 20.0, 0.0, Keys.MAX_HEALTH);
-        registerKey(Keys.POTION_EFFECTS, new ArrayList<>());
-    }
-
-    protected void setRawHeadRotation(Vector3d rotation) {
-        this.headRotation = checkNotNull(rotation, "rotation");
-    }
-
-    @Override
-    public Vector3d getHeadRotation() {
-        return this.headRotation;
-    }
-
-    @Override
-    public void setHeadRotation(Vector3d rotation) {
-        setRawHeadRotation(rotation);
-    }
-
-    @Override
-    public Text getTeamRepresentation() {
-        return Text.of(getUniqueId().toString());
+    public void deserializeValues(ItemStack itemStack, SimpleValueContainer valueContainer, DataView dataView) {
+        super.deserializeValues(itemStack, valueContainer, dataView);
+        dataView.getInt(DATA_VALUE).ifPresent(durability -> valueContainer.set(Keys.ITEM_DURABILITY, durability));
     }
 }

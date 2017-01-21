@@ -23,16 +23,5 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.network.vanilla.message.type.play;
-
-import org.lanternpowered.server.network.message.Message;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.inventory.ItemStack;
-
-/**
- * When a {@link Player} stops using a {@link ItemStack}, this will only be send
- * for items that have a action that takes some time, like drawing a bow, eating consumable.
- */
-public final class MessagePlayInOutFinishUsingItem implements Message {
-
-}
+@org.spongepowered.api.util.annotation.NonnullByDefault
+package org.lanternpowered.server.item.behavior.vanilla.consumable;

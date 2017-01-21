@@ -23,26 +23,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.lanternpowered.server.item.behavior.vanilla.food;
+package org.lanternpowered.server.item.behavior.vanilla.consumable;
 
 import com.google.common.collect.ImmutableList;
-import org.lanternpowered.server.behavior.Behavior;
-import org.lanternpowered.server.behavior.BehaviorContext;
-import org.lanternpowered.server.behavior.Parameters;
-import org.lanternpowered.server.behavior.pipeline.BehaviorPipeline;
-import org.lanternpowered.server.effect.potion.PotionEffectHelper;
-import org.lanternpowered.server.item.behavior.vanilla.EatingInteractionBehavior;
+import org.lanternpowered.server.item.ObjectProvider;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.GoldenApple;
 import org.spongepowered.api.data.type.GoldenApples;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.Collections;
+import java.util.Collection;
 import java.util.List;
 
-public class GoldenAppleConsumer implements EatingInteractionBehavior.Consumer {
+import javax.annotation.Nullable;
+
+public class GoldenAppleEffectsProvider implements ObjectProvider<Collection<PotionEffect>> {
 
     private final List<PotionEffect> enchanted = ImmutableList.<PotionEffect>builder()
             .add(PotionEffect.of(PotionEffectTypes.REGENERATION, 1, 400))
@@ -57,11 +55,9 @@ public class GoldenAppleConsumer implements EatingInteractionBehavior.Consumer {
             .build();
 
     @Override
-    public void apply(Player player, BehaviorPipeline<Behavior> pipeline, BehaviorContext context) {
-        final GoldenApple goldenApple = context.get(Parameters.USED_ITEM_STACK)
-                .flatMap(stack -> stack.get(Keys.GOLDEN_APPLE_TYPE)).orElse(GoldenApples.GOLDEN_APPLE);
-        final List<PotionEffect> potionEffects = player.get(Keys.POTION_EFFECTS).orElse(Collections.emptyList());
-        player.offer(Keys.POTION_EFFECTS, PotionEffectHelper.merge(potionEffects,
-                goldenApple == GoldenApples.ENCHANTED_GOLDEN_APPLE ? this.enchanted : this.normal));
+    public Collection<PotionEffect> get(ItemType itemType, @Nullable ItemStack itemStack) {
+        final GoldenApple goldenApple = itemStack == null ? GoldenApples.GOLDEN_APPLE :
+                itemStack.get(Keys.GOLDEN_APPLE_TYPE).orElse(GoldenApples.GOLDEN_APPLE);
+        return goldenApple == GoldenApples.ENCHANTED_GOLDEN_APPLE ? this.enchanted : this.normal;
     }
 }

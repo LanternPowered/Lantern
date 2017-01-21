@@ -120,4 +120,18 @@ public abstract class HumanoidEntityProtocol<E extends LanternEntity> extends Li
     protected boolean hasEquipment() {
         return true;
     }
+
+    @Override
+    boolean isCustomNameVisible() {
+        // The display doesn't have to be updated through
+        // the parameters for humanoids
+        return false;
+    }
+
+    @Override
+    String getCustomName() {
+        // The display doesn't have to be updated through
+        // the parameters for humanoids
+        return "";
+    }
 }

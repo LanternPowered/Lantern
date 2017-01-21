@@ -31,6 +31,7 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.network.entity.EntityProtocolInitContext;
 import org.lanternpowered.server.network.entity.NetworkIdHolder;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
+import org.spongepowered.api.data.key.Keys;
 
 public class EnderDragonEntityProtocol<E extends LanternEntity> extends CreatureEntityProtocol<E> {
 
@@ -80,5 +81,13 @@ public class EnderDragonEntityProtocol<E extends LanternEntity> extends Creature
     protected void update(ParameterList parameterList) {
         super.update(parameterList);
         // TODO: Update phase
+    }
+
+    @Override
+    boolean isSilent() {
+        // Override the silent method, due the complexity of this
+        // entity, it would be hard to play the sounds ourselves
+        // The sounds have to be synced to the wing animations, etc.
+        return this.entity.get(Keys.IS_SILENT).orElse(false);
     }
 }

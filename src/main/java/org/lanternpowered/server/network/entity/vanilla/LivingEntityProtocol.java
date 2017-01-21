@@ -30,20 +30,33 @@ import org.lanternpowered.server.entity.LanternEntity;
 import org.lanternpowered.server.entity.event.DamageEntityEvent;
 import org.lanternpowered.server.entity.event.EntityEvent;
 import org.lanternpowered.server.entity.event.SwingHandEntityEvent;
+import org.lanternpowered.server.game.LanternGame;
 import org.lanternpowered.server.network.entity.EntityProtocolUpdateContext;
 import org.lanternpowered.server.network.entity.parameter.ParameterList;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutAddPotionEffect;
 import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutEntityAnimation;
+import org.lanternpowered.server.network.vanilla.message.type.play.MessagePlayOutRemovePotionEffect;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectType;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import javax.annotation.Nullable;
 
 public abstract class LivingEntityProtocol<E extends LanternEntity> extends EntityProtocol<E> {
 
     private float lastHealth;
     private int lastArrowsInEntity;
     private byte lastHandData;
+
+    @Nullable private Map<PotionEffectType, PotionEffect> lastPotionEffects;
+    private long lastPotionSendTime = -1L;
 
     protected LivingEntityProtocol(E entity) {
         super(entity);
@@ -91,6 +104,46 @@ public abstract class LivingEntityProtocol<E extends LanternEntity> extends Enti
             parameterList.add(EntityParameters.Living.HAND_DATA, handData);
             this.lastHandData = handData;
         }
+    }
+
+    @Override
+    protected void update(EntityProtocolUpdateContext context) {
+        super.update(context);
+        final List<PotionEffect> potionEffects = this.entity.get(Keys.POTION_EFFECTS).orElse(null);
+        final Map<PotionEffectType, PotionEffect> potionEffectMap = new HashMap<>();
+        for (PotionEffect potionEffect : potionEffects) {
+            if (potionEffect.getDuration() > 0) {
+                potionEffectMap.put(potionEffect.getType(), potionEffect);
+            }
+        }
+        final long time = LanternGame.currentTimeTicks();
+        if (this.lastPotionSendTime == -1L) {
+            potionEffects.forEach(potionEffect -> context.sendToAll(() -> createAddMessage(potionEffect)));
+        } else {
+            final int delay = (int) (time - this.lastPotionSendTime);
+            for (PotionEffect potionEffect : potionEffectMap.values()) {
+                //noinspection ConstantConditions
+                final PotionEffect oldEntry = this.lastPotionEffects.remove(potionEffect.getType());
+                if (oldEntry == null ||
+                        oldEntry.getDuration() - delay != potionEffect.getDuration() ||
+                        oldEntry.getAmplifier() != potionEffect.getAmplifier() ||
+                        oldEntry.isAmbient() != potionEffect.isAmbient() ||
+                        oldEntry.getShowParticles() != potionEffect.getShowParticles()) {
+                    context.sendToAll(() -> createAddMessage(potionEffect));
+                }
+            }
+            this.lastPotionEffects.values().stream()
+                    .filter(potionEffect -> potionEffect.getDuration() - delay > 0)
+                    .forEach(potionEffect -> context.sendToAll(
+                            () -> new MessagePlayOutRemovePotionEffect(getRootEntityId(), potionEffect.getType())));
+        }
+        this.lastPotionSendTime = time;
+        this.lastPotionEffects = potionEffectMap;
+    }
+
+    private MessagePlayOutAddPotionEffect createAddMessage(PotionEffect potionEffect) {
+        return new MessagePlayOutAddPotionEffect(getRootEntityId(), potionEffect.getType(), potionEffect.getDuration(),
+                potionEffect.getAmplifier(), potionEffect.isAmbient(), potionEffect.getShowParticles());
     }
 
     @Override

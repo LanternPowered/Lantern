@@ -70,6 +70,8 @@ import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
 public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEntityProtocol<E> {
 
     private static class Holder {
@@ -99,6 +101,11 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
     private double lastVelZ;
 
     private byte lastFlags;
+    private boolean lastSilent;
+    private short lastAirLevel;
+    private boolean lastCustomNameVisible;
+
+    @Nullable private String lastCustomName;
 
     private List<Entity> lastPassengers = Collections.emptyList();
 
@@ -315,11 +322,24 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
      */
     protected void spawn(ParameterList parameterList) {
         parameterList.add(EntityParameters.Base.FLAGS, packFlags());
-        parameterList.add(EntityParameters.Base.AIR_LEVEL, getInitialAirLevel());
-        parameterList.add(EntityParameters.Base.CUSTOM_NAME, this.entity.get(Keys.DISPLAY_NAME).map(LanternTexts::toLegacy).orElse(""));
-        parameterList.add(EntityParameters.Base.CUSTOM_NAME_VISIBLE, this.entity.get(Keys.CUSTOM_NAME_VISIBLE).orElse(true));
-        parameterList.add(EntityParameters.Base.IS_SILENT, this.entity.get(Keys.IS_SILENT).orElse(false));
+        parameterList.add(EntityParameters.Base.AIR_LEVEL, getAirLevel());
+        parameterList.add(EntityParameters.Base.CUSTOM_NAME, getCustomName());
+        parameterList.add(EntityParameters.Base.CUSTOM_NAME_VISIBLE, isCustomNameVisible());
+        parameterList.add(EntityParameters.Base.IS_SILENT, isSilent());
         parameterList.add(EntityParameters.Base.NO_GRAVITY, hasNoGravity());
+    }
+
+    boolean isCustomNameVisible() {
+        return this.entity.get(Keys.CUSTOM_NAME_VISIBLE).orElse(true);
+    }
+
+    String getCustomName() {
+        return this.entity.get(Keys.DISPLAY_NAME).map(LanternTexts::toLegacy).orElse("");
+    }
+
+    boolean isSilent() {
+        // Always silent for regular entities, we will handle our own sounds
+        return true;
     }
 
     boolean hasNoGravity() {
@@ -365,6 +385,26 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
             parameterList.add(EntityParameters.Base.FLAGS, flags);
             this.lastFlags = flags;
         }
+        final boolean silent = isSilent();
+        if (silent != this.lastSilent) {
+            parameterList.add(EntityParameters.Base.IS_SILENT, silent);
+            this.lastSilent = silent;
+        }
+        final boolean customNameVisible = isCustomNameVisible();
+        if (customNameVisible != this.lastCustomNameVisible) {
+            parameterList.add(EntityParameters.Base.CUSTOM_NAME_VISIBLE, customNameVisible);
+            this.lastCustomNameVisible = customNameVisible;
+        }
+        final String customName = getCustomName();
+        if (!customName.equals(this.lastCustomName)) {
+            parameterList.add(EntityParameters.Base.CUSTOM_NAME, customName);
+            this.lastCustomName = customName;
+        }
+        final short airLevel = getAirLevel();
+        if (airLevel != this.lastAirLevel) {
+            parameterList.add(EntityParameters.Base.AIR_LEVEL, airLevel);
+            this.lastAirLevel = airLevel;
+        }
     }
 
     /**
@@ -375,7 +415,7 @@ public abstract class EntityProtocol<E extends LanternEntity> extends AbstractEn
      *
      * @return The air level
      */
-    protected short getInitialAirLevel() {
+    protected short getAirLevel() {
         return 100;
     }
 }

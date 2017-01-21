@@ -182,4 +182,11 @@ public class PlayerEntityProtocol extends HumanoidEntityProtocol<LanternPlayer> 
     boolean hasNoGravity() {
         return !this.entity.get(Keys.HAS_GRAVITY).orElse(true);
     }
+
+    @Override
+    protected short getAirLevel() {
+        final double max = this.entity.get(Keys.MAX_AIR).orElse(100);
+        final double air = this.entity.get(Keys.REMAINING_AIR).orElse(100);
+        return (short) (Math.min(1.0, air / max) * 100);
+    }
 }
